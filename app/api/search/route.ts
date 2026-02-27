@@ -1,0 +1,38 @@
+import { type NextRequest, NextResponse } from "next/server";
+import { badRequest } from "@/lib/api/errors";
+import { searchMovies, searchMulti, searchTv } from "@/lib/tmdb/client";
+import type { TmdbSearchResponse } from "@/lib/tmdb/types";
+
+export async function GET(req: NextRequest) {
+  const query = req.nextUrl.searchParams.get("query");
+  const type = req.nextUrl.searchParams.get("type");
+
+  if (!query) return badRequest("query parameter is required");
+
+  let results: TmdbSearchResponse;
+  if (type === "movie") {
+    results = await searchMovies(query);
+  } else if (type === "tv") {
+    results = await searchTv(query);
+  } else {
+    results = await searchMulti(query);
+  }
+
+  // Filter out person results from multi search
+  const filtered = results.results.filter(
+    (r) => r.media_type !== "person" || type,
+  );
+
+  return NextResponse.json({
+    results: filtered.map((r) => ({
+      tmdbId: r.id,
+      type: r.media_type ?? type,
+      title: r.title ?? r.name,
+      overview: r.overview,
+      releaseDate: r.release_date ?? r.first_air_date,
+      posterPath: r.poster_path,
+      popularity: r.popularity,
+      voteAverage: r.vote_average,
+    })),
+  });
+}

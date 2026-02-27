@@ -1,0 +1,344 @@
+import { eq } from "drizzle-orm";
+import { db } from "@/lib/db/client";
+import {
+  episodes,
+  seasons,
+  titleRecommendations,
+  titles,
+} from "@/lib/db/schema";
+import {
+  getMovieDetails,
+  getRecommendations,
+  getSimilar,
+  getTvDetails,
+  getTvSeasonDetails,
+} from "@/lib/tmdb/client";
+import { refreshAvailability } from "./availability";
+
+export async function importTitle(tmdbId: number, type: "movie" | "tv") {
+  const existing = db
+    .select()
+    .from(titles)
+    .where(eq(titles.tmdbId, tmdbId))
+    .get();
+  if (existing) return existing;
+
+  const now = new Date();
+
+  if (type === "movie") {
+    const movie = await getMovieDetails(tmdbId);
+    const row = db
+      .insert(titles)
+      .values({
+        tmdbId: movie.id,
+        type: "movie",
+        title: movie.title,
+        originalTitle: movie.original_title,
+        overview: movie.overview,
+        releaseDate: movie.release_date || null,
+        posterPath: movie.poster_path,
+        backdropPath: movie.backdrop_path,
+        popularity: movie.popularity,
+        voteAverage: movie.vote_average,
+        voteCount: movie.vote_count,
+        status: movie.status,
+        lastFetchedAt: now,
+      })
+      .returning()
+      .get();
+    // Fire-and-forget: fetch availability & recommendations
+    refreshAvailability(row.id).catch(() => {});
+    refreshRecommendations(row.id).catch(() => {});
+    return row;
+  }
+
+  const show = await getTvDetails(tmdbId);
+  const row = db
+    .insert(titles)
+    .values({
+      tmdbId: show.id,
+      type: "tv",
+      title: show.name,
+      originalTitle: show.original_name,
+      overview: show.overview,
+      firstAirDate: show.first_air_date || null,
+      posterPath: show.poster_path,
+      backdropPath: show.backdrop_path,
+      popularity: show.popularity,
+      voteAverage: show.vote_average,
+      voteCount: show.vote_count,
+      status: show.status,
+      lastFetchedAt: now,
+    })
+    .returning()
+    .get();
+
+  await refreshTvChildren(row.id, tmdbId, show.number_of_seasons);
+  // Fire-and-forget: fetch availability & recommendations
+  refreshAvailability(row.id).catch(() => {});
+  refreshRecommendations(row.id).catch(() => {});
+  return row;
+}
+
+export async function refreshTitle(titleId: string) {
+  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+  if (!title) return null;
+
+  const now = new Date();
+
+  if (title.type === "movie") {
+    const movie = await getMovieDetails(title.tmdbId);
+    db.update(titles)
+      .set({
+        title: movie.title,
+        originalTitle: movie.original_title,
+        overview: movie.overview,
+        releaseDate: movie.release_date || null,
+        posterPath: movie.poster_path,
+        backdropPath: movie.backdrop_path,
+        popularity: movie.popularity,
+        voteAverage: movie.vote_average,
+        voteCount: movie.vote_count,
+        status: movie.status,
+        lastFetchedAt: now,
+      })
+      .where(eq(titles.id, titleId))
+      .run();
+  } else {
+    const show = await getTvDetails(title.tmdbId);
+    db.update(titles)
+      .set({
+        title: show.name,
+        originalTitle: show.original_name,
+        overview: show.overview,
+        firstAirDate: show.first_air_date || null,
+        posterPath: show.poster_path,
+        backdropPath: show.backdrop_path,
+        popularity: show.popularity,
+        voteAverage: show.vote_average,
+        voteCount: show.vote_count,
+        status: show.status,
+        lastFetchedAt: now,
+      })
+      .where(eq(titles.id, titleId))
+      .run();
+    await refreshTvChildren(titleId, title.tmdbId, show.number_of_seasons);
+  }
+
+  return db.select().from(titles).where(eq(titles.id, titleId)).get();
+}
+
+export async function refreshTvChildren(
+  titleId: string,
+  tmdbId: number,
+  numberOfSeasons: number,
+) {
+  const now = new Date();
+
+  for (let sn = 1; sn <= numberOfSeasons; sn++) {
+    // Rate-limit: 250ms between TMDB calls
+    if (sn > 1) await delay(250);
+
+    const seasonData = await getTvSeasonDetails(tmdbId, sn);
+
+    const seasonRow = db
+      .insert(seasons)
+      .values({
+        titleId,
+        seasonNumber: seasonData.season_number,
+        name: seasonData.name,
+        overview: seasonData.overview,
+        posterPath: seasonData.poster_path,
+        airDate: seasonData.air_date,
+        lastFetchedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: [seasons.titleId, seasons.seasonNumber],
+        set: {
+          name: seasonData.name,
+          overview: seasonData.overview,
+          posterPath: seasonData.poster_path,
+          airDate: seasonData.air_date,
+          lastFetchedAt: now,
+        },
+      })
+      .returning()
+      .get();
+
+    for (const ep of seasonData.episodes) {
+      db.insert(episodes)
+        .values({
+          seasonId: seasonRow.id,
+          episodeNumber: ep.episode_number,
+          name: ep.name,
+          overview: ep.overview,
+          stillPath: ep.still_path,
+          airDate: ep.air_date,
+          runtimeMinutes: ep.runtime,
+        })
+        .onConflictDoUpdate({
+          target: [episodes.seasonId, episodes.episodeNumber],
+          set: {
+            name: ep.name,
+            overview: ep.overview,
+            stillPath: ep.still_path,
+            airDate: ep.air_date,
+            runtimeMinutes: ep.runtime,
+          },
+        })
+        .run();
+    }
+  }
+}
+
+export async function refreshRecommendations(titleId: string) {
+  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+  if (!title) return;
+
+  const now = new Date();
+
+  // Fetch both recommendations and similar
+  const [recs, similar] = await Promise.all([
+    getRecommendations(title.tmdbId, title.type),
+    getSimilar(title.tmdbId, title.type),
+  ]);
+
+  // Process recommendations
+  for (let i = 0; i < recs.results.length && i < 20; i++) {
+    const r = recs.results[i];
+    const type = r.media_type ?? title.type;
+    if (type !== "movie" && type !== "tv") continue;
+
+    // Minimal upsert of the recommended title
+    const existing = db
+      .select()
+      .from(titles)
+      .where(eq(titles.tmdbId, r.id))
+      .get();
+    let recTitleId: string;
+    if (existing) {
+      recTitleId = existing.id;
+    } else {
+      const row = db
+        .insert(titles)
+        .values({
+          tmdbId: r.id,
+          type,
+          title: r.title ?? r.name ?? "Unknown",
+          originalTitle: r.original_title ?? r.original_name,
+          overview: r.overview,
+          releaseDate: r.release_date,
+          firstAirDate: r.first_air_date,
+          posterPath: r.poster_path,
+          backdropPath: r.backdrop_path,
+          popularity: r.popularity,
+          voteAverage: r.vote_average,
+          voteCount: r.vote_count,
+          lastFetchedAt: null,
+        })
+        .onConflictDoNothing()
+        .returning()
+        .get();
+      if (!row) {
+        const found = db
+          .select()
+          .from(titles)
+          .where(eq(titles.tmdbId, r.id))
+          .get();
+        if (!found) continue;
+        recTitleId = found.id;
+      } else {
+        recTitleId = row.id;
+      }
+    }
+
+    db.insert(titleRecommendations)
+      .values({
+        titleId,
+        recommendedTitleId: recTitleId,
+        source: "tmdb_recommendations",
+        rank: i + 1,
+        lastFetchedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: [
+          titleRecommendations.titleId,
+          titleRecommendations.recommendedTitleId,
+          titleRecommendations.source,
+        ],
+        set: { rank: i + 1, lastFetchedAt: now },
+      })
+      .run();
+  }
+
+  // Process similar
+  for (let i = 0; i < similar.results.length && i < 20; i++) {
+    const r = similar.results[i];
+    const type = r.media_type ?? title.type;
+    if (type !== "movie" && type !== "tv") continue;
+
+    const existing = db
+      .select()
+      .from(titles)
+      .where(eq(titles.tmdbId, r.id))
+      .get();
+    let recTitleId: string;
+    if (existing) {
+      recTitleId = existing.id;
+    } else {
+      const row = db
+        .insert(titles)
+        .values({
+          tmdbId: r.id,
+          type,
+          title: r.title ?? r.name ?? "Unknown",
+          originalTitle: r.original_title ?? r.original_name,
+          overview: r.overview,
+          releaseDate: r.release_date,
+          firstAirDate: r.first_air_date,
+          posterPath: r.poster_path,
+          backdropPath: r.backdrop_path,
+          popularity: r.popularity,
+          voteAverage: r.vote_average,
+          voteCount: r.vote_count,
+          lastFetchedAt: null,
+        })
+        .onConflictDoNothing()
+        .returning()
+        .get();
+      if (!row) {
+        const found = db
+          .select()
+          .from(titles)
+          .where(eq(titles.tmdbId, r.id))
+          .get();
+        if (!found) continue;
+        recTitleId = found.id;
+      } else {
+        recTitleId = row.id;
+      }
+    }
+
+    db.insert(titleRecommendations)
+      .values({
+        titleId,
+        recommendedTitleId: recTitleId,
+        source: "tmdb_similar",
+        rank: i + 1,
+        lastFetchedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: [
+          titleRecommendations.titleId,
+          titleRecommendations.recommendedTitleId,
+          titleRecommendations.source,
+        ],
+        set: { rank: i + 1, lastFetchedAt: now },
+      })
+      .run();
+  }
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
