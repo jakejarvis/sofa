@@ -46,13 +46,13 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   return (
     <div className="relative mx-auto w-full max-w-sm">
       {/* Subtle glow behind card */}
-      <div className="absolute -inset-4 rounded-2xl bg-amber/3 blur-2xl" />
+      <div className="absolute -inset-4 rounded-2xl bg-primary/3 blur-2xl" />
 
       <div className="relative space-y-8 rounded-xl border border-border/50 bg-card/80 p-8 backdrop-blur-sm">
         <div className="space-y-2 text-center">
           <Link
             href="/"
-            className="font-display text-2xl tracking-tight text-amber"
+            className="font-display text-2xl tracking-tight text-primary"
           >
             Couch Potato
           </Link>
@@ -79,7 +79,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-amber/40 focus:outline-none focus:ring-1 focus:ring-amber/20"
+                className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20"
                 placeholder="Your name"
               />
             </div>
@@ -98,7 +98,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-amber/40 focus:outline-none focus:ring-1 focus:ring-amber/20"
+              className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20"
               placeholder="you@example.com"
             />
           </div>
@@ -117,7 +117,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-amber/40 focus:outline-none focus:ring-1 focus:ring-amber/20"
+              className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20"
               placeholder="Min 8 characters"
             />
           </div>
@@ -131,7 +131,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-amber font-medium text-background transition-all hover:shadow-lg hover:shadow-amber/20 disabled:pointer-events-none disabled:opacity-50"
+            className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-primary font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/20 disabled:pointer-events-none disabled:opacity-50"
           >
             {loading ? "Loading..." : isRegister ? "Create account" : "Sign in"}
           </button>
@@ -143,7 +143,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="font-medium text-amber transition-colors hover:text-amber/80"
+                className="font-medium text-primary transition-colors hover:text-primary/80"
               >
                 Sign in
               </Link>
@@ -153,7 +153,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
               Don&apos;t have an account?{" "}
               <Link
                 href="/register"
-                className="font-medium text-amber transition-colors hover:text-amber/80"
+                className="font-medium text-primary transition-colors hover:text-primary/80"
               >
                 Register
               </Link>

@@ -44,8 +44,8 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
         onClick={() => setOpen(!open)}
         className={`inline-flex h-9 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all ${
           current
-            ? "border-amber/30 bg-amber/10 text-amber hover:bg-amber/15"
-            : "border-border/50 hover:border-amber/30 hover:bg-amber/5"
+            ? "border-primary/30 bg-primary/10 text-primary hover:bg-primary/15"
+            : "border-border/50 hover:border-primary/30 hover:bg-primary/5"
         }`}
       >
         <CurrentIcon size={15} />
@@ -65,7 +65,7 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
                   setOpen(false);
                 }}
                 className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent ${
-                  s.value === currentStatus ? "text-amber" : "text-foreground"
+                  s.value === currentStatus ? "text-primary" : "text-foreground"
                 }`}
               >
                 <Icon size={15} />

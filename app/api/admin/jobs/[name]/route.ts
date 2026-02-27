@@ -1,6 +1,5 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { badRequest } from "@/lib/api/errors";
 import { registerJobs } from "@/lib/jobs/registry";
 import { scheduler } from "@/lib/jobs/scheduler";
 
@@ -15,8 +14,9 @@ export async function POST(
   const jobNames = scheduler.getJobNames();
 
   if (!jobNames.includes(name)) {
-    return badRequest(
-      `Unknown job: ${name}. Available: ${jobNames.join(", ")}`,
+    return NextResponse.json(
+      { error: `Unknown job: ${name}. Available: ${jobNames.join(", ")}` },
+      { status: 400 },
     );
   }
 

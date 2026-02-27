@@ -55,7 +55,7 @@ export function NavBar() {
               </Link>
               <Link
                 href="/register"
-                className="inline-flex h-8 items-center rounded-md bg-amber px-4 text-sm font-medium text-background transition-all hover:shadow-md hover:shadow-amber/20"
+                className="inline-flex h-8 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:shadow-md hover:shadow-primary/20"
               >
                 Register
               </Link>
@@ -81,7 +81,7 @@ function NavLink({
       href={href}
       className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors ${
         active
-          ? "bg-amber/10 text-amber"
+          ? "bg-primary/10 text-primary"
           : "text-muted-foreground hover:bg-accent hover:text-foreground"
       }`}
     >

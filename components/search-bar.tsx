@@ -41,7 +41,7 @@ export function SearchBar({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="flex h-13 w-full rounded-xl border border-border/50 bg-card/50 pl-11 pr-4 text-base backdrop-blur-sm transition-all placeholder:text-muted-foreground/50 focus:border-amber/40 focus:outline-none focus:ring-1 focus:ring-amber/20"
+        className="flex h-13 w-full rounded-xl border border-border/50 bg-card/50 pl-11 pr-4 text-base backdrop-blur-sm transition-all placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20"
       />
     </div>
   );

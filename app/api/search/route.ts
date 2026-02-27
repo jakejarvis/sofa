@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { badRequest } from "@/lib/api/errors";
 import { searchMovies, searchMulti, searchTv } from "@/lib/tmdb/client";
 import type { TmdbSearchResponse } from "@/lib/tmdb/types";
 
@@ -7,7 +6,11 @@ export async function GET(req: NextRequest) {
   const query = req.nextUrl.searchParams.get("query");
   const type = req.nextUrl.searchParams.get("type");
 
-  if (!query) return badRequest("query parameter is required");
+  if (!query)
+    return NextResponse.json(
+      { error: "query parameter is required" },
+      { status: 400 },
+    );
 
   let results: TmdbSearchResponse;
   if (type === "movie") {

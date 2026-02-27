@@ -66,7 +66,7 @@ export default function SearchPage() {
 
       {loading && (
         <div className="flex items-center justify-center py-16">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-amber border-t-transparent" />
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         </div>
       )}
 
@@ -96,8 +96,8 @@ export default function SearchPage() {
               {importing === r.tmdbId && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-background/80 backdrop-blur-sm">
                   <div className="flex items-center gap-2">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-amber border-t-transparent" />
-                    <span className="text-sm font-medium text-amber">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                    <span className="text-sm font-medium text-primary">
                       Importing
                     </span>
                   </div>

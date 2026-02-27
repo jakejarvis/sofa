@@ -1,0 +1,88 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+```bash
+pnpm dev              # Start Next.js dev server
+pnpm build            # Production build
+pnpm lint             # Biome lint check
+pnpm format           # Biome format (auto-fix)
+pnpm db:push          # Push schema changes to SQLite database
+pnpm db:generate      # Generate Drizzle migration files
+pnpm db:migrate       # Run Drizzle migrations
+pnpm db:studio        # Open Drizzle Studio (visual DB browser)
+```
+
+## Architecture
+
+**Couch Potato** is a self-hosted movie & TV tracking app (like Trakt/TVTime) built as a single Next.js 16 application with SQLite.
+
+### Stack
+
+- **Framework**: Next.js 16 (App Router), React 19, TypeScript
+- **Database**: SQLite via better-sqlite3 + Drizzle ORM (WAL mode, singleton via `globalThis`)
+- **Auth**: Better Auth with Drizzle adapter, email/password
+- **Styling**: Tailwind CSS v4, shadcn components, dark cinema theme with warm primary accents
+- **Fonts**: DM Serif Display (display), DM Sans (body), Geist Mono (mono)
+- **Linting**: Biome (2-space indent, organized imports, React/Next.js recommended rules)
+- **External API**: TMDB (The Movie Database) with Bearer token auth
+
+### Path alias
+
+`@/*` maps to project root (`./`), e.g. `@/lib/db/client` → `./lib/db/client`.
+
+### Key directories
+
+- `lib/db/schema.ts` — Single file with all Drizzle table definitions (auth tables + app tables)
+- `lib/services/` — Business logic layer (metadata, tracking, discovery, availability)
+- `lib/tmdb/` — TMDB API client and TypeScript types
+- `lib/auth/` — Better Auth server config (`server.ts`) and client hooks (`client.ts`)
+- `lib/jobs/` — In-process background job scheduler (setInterval-based, `globalThis` singleton)
+- `app/api/` — Next.js route handlers
+- `app/(pages)/` — User-facing pages (dashboard, search, title detail, login, register)
+- `components/` — App components + `components/ui/` for shadcn primitives
+
+### Auth pattern
+
+Route handlers call Better Auth directly. Every authenticated route follows this pattern:
+
+```typescript
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth/server";
+const session = await auth.api.getSession({ headers: await headers() });
+if (!session)
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+// use session.user.id
+```
+
+### Database schema
+
+All app tables use UUID text primary keys generated via the `uuid` package. Better Auth tables use their own ID format. Key relationships:
+
+- `titles` → `seasons` → `episodes` (TV hierarchy)
+- `userTitleStatus` links users to titles with status (watchlist/in_progress/completed)
+- `userMovieWatches` / `userEpisodeWatches` track watch history
+- `userRatings` stores 1-5 star ratings
+- `availabilityOffers` caches streaming provider data per title
+- `titleRecommendations` stores TMDB recommendations and similar titles
+
+### Service layer
+
+- **metadata.ts**: `importTitle()` fetches from TMDB, inserts into DB, fire-and-forgets availability + recommendations refresh. `refreshTvChildren()` fetches all seasons/episodes with 250ms rate limiting.
+- **tracking.ts**: Auto-transitions — logging a movie watch sets status to `completed`; logging an episode watch sets `in_progress`; all episodes watched auto-completes the series.
+- **discovery.ts**: Feed generators — continue watching (next unwatched episode per in-progress show), library titles with availability, personalized recommendations from completed/highly-rated titles.
+- **availability.ts**: Caches US streaming providers from TMDB watch/providers endpoint.
+
+### TMDB images
+
+Only paths are stored in DB. Full URLs are constructed at render time: `https://image.tmdb.org/t/p/{size}{path}` (common sizes: w300, w500, w1280).
+
+### Background jobs
+
+Registered in `lib/jobs/registry.ts`, started via Next.js instrumentation hook (`instrumentation.ts`) in production. Jobs: nightly library refresh (24h), availability refresh (6h), recommendations refresh (12h), TV episodes refresh (12h). All batch jobs use 300ms delay between TMDB calls.
+
+### Environment variables
+
+See `.env.example`: `DATABASE_URL`, `TMDB_API_KEY`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`.

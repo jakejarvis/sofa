@@ -1,7 +1,7 @@
+import { headers } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { AuthError, requireAuth } from "@/lib/api/auth-guard";
-import { unauthorized } from "@/lib/api/errors";
+import { auth } from "@/lib/auth/server";
 import {
   getUserTitleInfo,
   removeTitleStatus,
@@ -12,15 +12,14 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  let userId: string;
-  try {
-    userId = await requireAuth();
-  } catch (e) {
-    if (e instanceof AuthError) return unauthorized();
-    throw e;
-  }
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   const { id } = await params;
-  const info = getUserTitleInfo(userId, id);
+  const info = getUserTitleInfo(session.user.id, id);
   return NextResponse.json(info);
 }
 
@@ -28,21 +27,20 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  let userId: string;
-  try {
-    userId = await requireAuth();
-  } catch (e) {
-    if (e instanceof AuthError) return unauthorized();
-    throw e;
-  }
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   const { id } = await params;
   const body = await req.json();
   const { status } = body;
 
   if (status === null || status === undefined) {
-    removeTitleStatus(userId, id);
+    removeTitleStatus(session.user.id, id);
   } else {
-    setTitleStatus(userId, id, status);
+    setTitleStatus(session.user.id, id, status);
   }
 
   return NextResponse.json({ ok: true });

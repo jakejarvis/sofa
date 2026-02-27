@@ -1,16 +1,15 @@
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { AuthError, requireAuth } from "@/lib/api/auth-guard";
-import { unauthorized } from "@/lib/api/errors";
+import { auth } from "@/lib/auth/server";
 import { getRecommendationsFeed } from "@/lib/services/discovery";
 
 export async function GET() {
-  let userId: string;
-  try {
-    userId = await requireAuth();
-  } catch (e) {
-    if (e instanceof AuthError) return unauthorized();
-    throw e;
-  }
-  const feed = getRecommendationsFeed(userId);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const feed = getRecommendationsFeed(session.user.id);
   return NextResponse.json(feed);
 }

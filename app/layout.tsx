@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, DM_Serif_Display, Geist_Mono } from "next/font/google";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -33,7 +35,7 @@ export default function RootLayout({
       <body
         className={`${dmSans.variable} ${dmSerif.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        {children}
+        <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>
   );

@@ -122,7 +122,7 @@ export default function TitleDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-amber border-t-transparent" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -237,12 +237,12 @@ export default function TitleDetailPage() {
               {title.title}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-              <span className="rounded bg-amber/10 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-amber">
+              <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-primary">
                 {title.type}
               </span>
               {year && <span>{year}</span>}
               {title.voteAverage != null && title.voteAverage > 0 && (
-                <span className="flex items-center gap-1 text-amber">
+                <span className="flex items-center gap-1 text-primary">
                   ★ {title.voteAverage.toFixed(1)}
                   {title.voteCount != null && (
                     <span className="text-muted-foreground">
@@ -275,7 +275,7 @@ export default function TitleDetailPage() {
               <button
                 type="button"
                 onClick={handleWatchMovie}
-                className="inline-flex h-9 items-center gap-2 rounded-lg bg-amber px-4 text-sm font-medium text-background transition-all hover:shadow-md hover:shadow-amber/20"
+                className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:shadow-md hover:shadow-primary/20"
               >
                 <IconPlayerPlay size={15} />
                 Mark Watched
@@ -348,7 +348,7 @@ export default function TitleDetailPage() {
                         {season.name ?? `Season ${season.seasonNumber}`}
                       </span>
                       {watchedCount > 0 && (
-                        <span className="text-xs text-amber">
+                        <span className="text-xs text-primary">
                           {watchedCount}/{totalCount}
                         </span>
                       )}
@@ -386,8 +386,8 @@ export default function TitleDetailPage() {
                               disabled={watchingEp === ep.id}
                               className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-all ${
                                 isWatched
-                                  ? "border-amber bg-amber text-background"
-                                  : "border-border/50 hover:border-amber/50 hover:bg-amber/5"
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
                               }`}
                             >
                               {isWatched && <IconCheck size={14} />}

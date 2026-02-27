@@ -1,7 +1,6 @@
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { notFound } from "@/lib/api/errors";
 import { db } from "@/lib/db/client";
 import { titleRecommendations, titles } from "@/lib/db/schema";
 
@@ -11,7 +10,8 @@ export async function GET(
 ) {
   const { id } = await params;
   const title = db.select().from(titles).where(eq(titles.id, id)).get();
-  if (!title) return notFound("Title not found");
+  if (!title)
+    return NextResponse.json({ error: "Title not found" }, { status: 404 });
 
   const recs = db
     .select({

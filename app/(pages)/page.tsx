@@ -77,7 +77,7 @@ export default function DashboardPage() {
   if (isPending || loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-amber border-t-transparent" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -100,8 +100,8 @@ export default function DashboardPage() {
 
       {isEmpty && (
         <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-border/50 py-16 text-center">
-          <div className="rounded-full bg-amber/10 p-4">
-            <IconDeviceTv size={32} className="text-amber" />
+          <div className="rounded-full bg-primary/10 p-4">
+            <IconDeviceTv size={32} className="text-primary" />
           </div>
           <div className="space-y-1">
             <p className="font-medium">Your library is empty</p>
@@ -111,7 +111,7 @@ export default function DashboardPage() {
           </div>
           <Link
             href="/search"
-            className="inline-flex h-9 items-center rounded-lg bg-amber px-4 text-sm font-medium text-background transition-all hover:shadow-md hover:shadow-amber/20"
+            className="inline-flex h-9 items-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:shadow-md hover:shadow-primary/20"
           >
             Start searching
           </Link>
@@ -122,7 +122,7 @@ export default function DashboardPage() {
       {continueWatching.length > 0 && (
         <FeedSection
           title="Continue Watching"
-          icon={<IconPlayerPlay size={20} className="text-amber" />}
+          icon={<IconPlayerPlay size={20} className="text-primary" />}
         >
           <div className="feed-scroll flex gap-4 overflow-x-auto pb-2">
             {continueWatching.map((item) => (
@@ -136,7 +136,7 @@ export default function DashboardPage() {
       {newAvailable.length > 0 && (
         <FeedSection
           title="In Your Library"
-          icon={<IconSparkles size={20} className="text-amber" />}
+          icon={<IconSparkles size={20} className="text-primary" />}
         >
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {newAvailable.slice(0, 10).map((t) => (
@@ -159,7 +159,7 @@ export default function DashboardPage() {
       {recommendations.length > 0 && (
         <FeedSection
           title="Recommended for You"
-          icon={<IconSparkles size={20} className="text-amber" />}
+          icon={<IconSparkles size={20} className="text-primary" />}
         >
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {recommendations.slice(0, 10).map((t) => (
@@ -209,7 +209,7 @@ function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
   return (
     <Link
       href={`/titles/${item.title.id}`}
-      className="group flex w-56 shrink-0 gap-3 rounded-lg border border-border/30 bg-card/50 p-3 transition-all hover:border-amber/20 hover:bg-card"
+      className="group flex w-56 shrink-0 gap-3 rounded-lg border border-border/30 bg-card/50 p-3 transition-all hover:border-primary/20 hover:bg-card"
     >
       <div className="h-20 w-14 shrink-0 overflow-hidden rounded-md bg-muted">
         {posterUrl ? (
@@ -235,7 +235,7 @@ function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
             S{item.nextEpisode.seasonNumber} E{item.nextEpisode.episodeNumber}
           </p>
         )}
-        <p className="text-[10px] font-medium uppercase tracking-wider text-amber">
+        <p className="text-[10px] font-medium uppercase tracking-wider text-primary">
           Up next
         </p>
       </div>

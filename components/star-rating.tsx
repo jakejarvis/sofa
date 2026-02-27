@@ -29,7 +29,7 @@ export function StarRating({ value, onChange }: StarRatingProps) {
             className="p-0.5 transition-transform hover:scale-110"
           >
             {filled ? (
-              <IconStarFilled size={18} className="text-amber" />
+              <IconStarFilled size={18} className="text-primary" />
             ) : (
               <IconStar size={18} className="text-muted-foreground/30" />
             )}

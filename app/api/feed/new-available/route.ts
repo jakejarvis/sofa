@@ -1,18 +1,17 @@
+import { headers } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { AuthError, requireAuth } from "@/lib/api/auth-guard";
-import { unauthorized } from "@/lib/api/errors";
+import { auth } from "@/lib/auth/server";
 import { getNewAvailableFeed } from "@/lib/services/discovery";
 
 export async function GET(req: NextRequest) {
-  let userId: string;
-  try {
-    userId = await requireAuth();
-  } catch (e) {
-    if (e instanceof AuthError) return unauthorized();
-    throw e;
-  }
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   const days = Number(req.nextUrl.searchParams.get("days") ?? 14);
-  const feed = getNewAvailableFeed(userId, days);
+  const feed = getNewAvailableFeed(session.user.id, days);
   return NextResponse.json(feed);
 }

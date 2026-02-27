@@ -50,12 +50,12 @@ export function TitleCard({
       <div className="mt-2 space-y-0.5">
         <p className="line-clamp-1 text-sm font-medium leading-snug">{title}</p>
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="rounded bg-amber/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber">
+          <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
             {type}
           </span>
           {year && <span>{year}</span>}
           {voteAverage != null && voteAverage > 0 && (
-            <span className="text-amber">★ {voteAverage.toFixed(1)}</span>
+            <span className="text-primary">★ {voteAverage.toFixed(1)}</span>
           )}
         </div>
       </div>
