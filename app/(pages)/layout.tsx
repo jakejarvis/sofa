@@ -1,4 +1,10 @@
+"use client";
+
+import { CommandPalette } from "@/components/command-palette";
+import { KeyboardHelpDialog } from "@/components/keyboard-help-dialog";
+import { KeyboardProvider } from "@/components/keyboard-provider";
 import { NavBar } from "@/components/nav-bar";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function PagesLayout({
   children,
@@ -6,9 +12,18 @@ export default function PagesLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen">
-      <NavBar />
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
-    </div>
+    <KeyboardProvider>
+      <div className="min-h-screen">
+        <NavBar />
+        {/* Ambient glow */}
+        <div className="pointer-events-none fixed left-1/2 top-1/4 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[800px] rounded-full bg-primary/3 blur-[200px]" />
+        <main className="relative mx-auto max-w-6xl px-4 py-6 sm:px-6">
+          {children}
+        </main>
+      </div>
+      <CommandPalette />
+      <KeyboardHelpDialog />
+      <Toaster position="bottom-right" />
+    </KeyboardProvider>
   );
 }

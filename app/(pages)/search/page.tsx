@@ -3,7 +3,8 @@
 import { IconDeviceTv, IconMovie } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
-import { SearchBar } from "@/components/search-bar";
+import { toast } from "sonner";
+import { SearchAutocomplete } from "@/components/search-autocomplete";
 import { TitleCard } from "@/components/title-card";
 
 interface SearchResult {
@@ -24,19 +25,21 @@ export default function SearchPage() {
   const [importing, setImporting] = useState<number | null>(null);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = useCallback(async (query: string) => {
-    setLoading(true);
-    setSearched(true);
-    try {
-      const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-      const data = await res.json();
-      setResults(data.results ?? []);
-    } finally {
-      setLoading(false);
-    }
+  const handleResults = useCallback((res: SearchResult[]) => {
+    setResults(res);
+    if (res.length > 0) setSearched(true);
   }, []);
 
-  async function handleImport(tmdbId: number, type: "movie" | "tv") {
+  const handleLoading = useCallback((l: boolean) => {
+    setLoading(l);
+    if (l) setSearched(true);
+  }, []);
+
+  async function handleImport(
+    tmdbId: number,
+    type: "movie" | "tv",
+    title: string,
+  ) {
     setImporting(tmdbId);
     try {
       const res = await fetch("/api/titles/import", {
@@ -44,10 +47,13 @@ export default function SearchPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tmdbId, type }),
       });
-      const title = await res.json();
-      if (title.id) {
-        router.push(`/titles/${title.id}`);
+      const data = await res.json();
+      if (data.id) {
+        toast.success(`Added "${title}" to library`);
+        router.push(`/titles/${data.id}`);
       }
+    } catch {
+      toast.error("Failed to import title");
     } finally {
       setImporting(null);
     }
@@ -62,13 +68,7 @@ export default function SearchPage() {
         </p>
       </div>
 
-      <SearchBar onSearch={handleSearch} />
-
-      {loading && (
-        <div className="flex items-center justify-center py-16">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-        </div>
-      )}
+      <SearchAutocomplete onResults={handleResults} onLoading={handleLoading} />
 
       {!loading && searched && results.length === 0 && (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
@@ -91,10 +91,10 @@ export default function SearchPage() {
                 posterPath={r.posterPath}
                 releaseDate={r.releaseDate}
                 voteAverage={r.voteAverage}
-                onImport={() => handleImport(r.tmdbId, r.type)}
+                onImport={() => handleImport(r.tmdbId, r.type, r.title)}
               />
               {importing === r.tmdbId && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-background/80 backdrop-blur-sm">
+                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/80 backdrop-blur-sm">
                   <div className="flex items-center gap-2">
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                     <span className="text-sm font-medium text-primary">

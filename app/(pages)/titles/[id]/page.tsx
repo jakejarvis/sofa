@@ -6,12 +6,26 @@ import {
   IconChevronUp,
   IconPlayerPlay,
 } from "@tabler/icons-react";
+import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { TitleDetailSkeleton } from "@/components/skeletons";
 import { StarRating } from "@/components/star-rating";
 import { StatusButton } from "@/components/status-button";
 import { TitleCard } from "@/components/title-card";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Progress } from "@/components/ui/progress";
+import { useRegisterShortcut } from "@/hooks/use-register-shortcut";
 
 interface Episode {
   id: string;
@@ -69,8 +83,24 @@ interface Title {
   episodeWatches?: string[];
 }
 
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } },
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 12, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 300, damping: 24 },
+  },
+};
+
 export default function TitleDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const [title, setTitle] = useState<Title | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendedTitle[]>(
     [],
@@ -119,12 +149,170 @@ export default function TitleDetailPage() {
     fetchRecommendations();
   }, [fetchTitle, fetchRecommendations]);
 
+  // Keyboard shortcuts
+  const statusCycle = useMemo(
+    () => ["watchlist", "in_progress", "completed"] as const,
+    [],
+  );
+
+  const handleStatusChange = useCallback(
+    async (status: string | null) => {
+      // Optimistic update
+      setTitle((t) => (t ? { ...t, userStatus: status } : t));
+      try {
+        const res = await fetch(`/api/titles/${id}/status`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        });
+        if (!res.ok) throw new Error();
+        const label =
+          status === "watchlist"
+            ? "Added to watchlist"
+            : status === "in_progress"
+              ? "Marked as watching"
+              : status === "completed"
+                ? "Marked as completed"
+                : "Removed from list";
+        toast.success(label);
+      } catch {
+        // Revert
+        setTitle((t) =>
+          t ? { ...t, userStatus: title?.userStatus ?? null } : t,
+        );
+        toast.error("Failed to update status");
+      }
+    },
+    [id, title?.userStatus],
+  );
+
+  const handleRating = useCallback(
+    async (ratingStars: number) => {
+      const prev = title?.userRating ?? 0;
+      // Optimistic update
+      setTitle((t) => (t ? { ...t, userRating: ratingStars } : t));
+      try {
+        const res = await fetch(`/api/titles/${id}/rating`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ratingStars }),
+        });
+        if (!res.ok) throw new Error();
+        toast.success(
+          ratingStars > 0
+            ? `Rated ${ratingStars} star${ratingStars > 1 ? "s" : ""}`
+            : "Rating removed",
+        );
+      } catch {
+        setTitle((t) => (t ? { ...t, userRating: prev } : t));
+        toast.error("Failed to update rating");
+      }
+    },
+    [id, title?.userRating],
+  );
+
+  const handleWatchMovie = useCallback(async () => {
+    setTitle((t) => (t ? { ...t, userStatus: "completed" } : t));
+    try {
+      const res = await fetch(`/api/movies/${id}/watch`, { method: "POST" });
+      if (!res.ok) throw new Error();
+      toast.success(`Marked "${title?.title}" as watched`);
+    } catch {
+      setTitle((t) =>
+        t ? { ...t, userStatus: title?.userStatus ?? null } : t,
+      );
+      toast.error("Failed to mark as watched");
+    }
+  }, [id, title?.title, title?.userStatus]);
+
+  const handleWatchEpisode = useCallback(
+    async (episodeId: string, seasonNum: number, epNum: number) => {
+      setWatchingEp(episodeId);
+      // Optimistic update
+      setTitle((t) => {
+        if (!t) return t;
+        const watches = [...(t.episodeWatches ?? [])];
+        if (!watches.includes(episodeId)) watches.push(episodeId);
+        return {
+          ...t,
+          episodeWatches: watches,
+          userStatus: t.userStatus ?? "in_progress",
+        };
+      });
+      try {
+        const res = await fetch(`/api/episodes/${episodeId}/watch`, {
+          method: "POST",
+        });
+        if (!res.ok) throw new Error();
+        toast.success(`Watched S${seasonNum} E${epNum}`);
+      } catch {
+        // Revert
+        setTitle((t) => {
+          if (!t) return t;
+          return {
+            ...t,
+            episodeWatches: (t.episodeWatches ?? []).filter(
+              (w) => w !== episodeId,
+            ),
+          };
+        });
+        toast.error("Failed to mark episode");
+      }
+      setWatchingEp(null);
+    },
+    [],
+  );
+
+  // Page keyboard shortcuts
+  useRegisterShortcut("title-cycle-status", {
+    keys: ["w"],
+    description: "Cycle status",
+    action: () => {
+      if (!title) return;
+      const currentIdx = statusCycle.indexOf(
+        title.userStatus as (typeof statusCycle)[number],
+      );
+      const nextStatus =
+        currentIdx === statusCycle.length - 1
+          ? null
+          : statusCycle[currentIdx + 1];
+      handleStatusChange(nextStatus);
+    },
+    scope: "Title",
+  });
+
+  useRegisterShortcut("title-mark-watched", {
+    keys: ["m"],
+    description: "Mark watched",
+    action: () => {
+      if (!title) return;
+      if (title.type === "movie") {
+        handleWatchMovie();
+      }
+    },
+    scope: "Title",
+  });
+
+  useRegisterShortcut("title-escape", {
+    keys: ["Escape"],
+    description: "Go back",
+    action: () => router.back(),
+    scope: "Title",
+  });
+
+  // Rating shortcuts 1-5
+  for (const n of [1, 2, 3, 4, 5]) {
+    // biome-ignore lint/correctness/useHookAtTopLevel: loop is stable
+    useRegisterShortcut(`title-rate-${n}`, {
+      keys: [String(n)],
+      description: `Rate ${n} star${n > 1 ? "s" : ""}`,
+      action: () => handleRating(n),
+      scope: "Title",
+    });
+  }
+
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-24">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
+    return <TitleDetailSkeleton />;
   }
   if (!title) {
     return (
@@ -141,43 +329,34 @@ export default function TitleDetailPage() {
   const dateStr = title.releaseDate ?? title.firstAirDate;
   const year = dateStr?.slice(0, 4);
 
-  async function handleStatusChange(status: string | null) {
-    await fetch(`/api/titles/${id}/status`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    setTitle((t) => (t ? { ...t, userStatus: status } : t));
-  }
+  async function handleMarkSeason(season: Season) {
+    const unwatched = season.episodes.filter(
+      (ep) => !title?.episodeWatches?.includes(ep.id),
+    );
+    if (unwatched.length === 0) return;
 
-  async function handleRating(ratingStars: number) {
-    await fetch(`/api/titles/${id}/rating`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ratingStars }),
-    });
-    setTitle((t) => (t ? { ...t, userRating: ratingStars } : t));
-  }
-
-  async function handleWatchMovie() {
-    await fetch(`/api/movies/${id}/watch`, { method: "POST" });
-    setTitle((t) => (t ? { ...t, userStatus: "completed" } : t));
-  }
-
-  async function handleWatchEpisode(episodeId: string) {
-    setWatchingEp(episodeId);
-    await fetch(`/api/episodes/${episodeId}/watch`, { method: "POST" });
+    // Optimistic update
     setTitle((t) => {
       if (!t) return t;
       const watches = [...(t.episodeWatches ?? [])];
-      if (!watches.includes(episodeId)) watches.push(episodeId);
-      return {
-        ...t,
-        episodeWatches: watches,
-        userStatus: t.userStatus ?? "in_progress",
-      };
+      for (const ep of unwatched) {
+        if (!watches.includes(ep.id)) watches.push(ep.id);
+      }
+      return { ...t, episodeWatches: watches };
     });
-    setWatchingEp(null);
+
+    try {
+      await Promise.all(
+        unwatched.map((ep) =>
+          fetch(`/api/episodes/${ep.id}/watch`, { method: "POST" }),
+        ),
+      );
+      toast.success(
+        `Watched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
+      );
+    } catch {
+      toast.error("Failed to mark some episodes");
+    }
   }
 
   // Group availability by offerType
@@ -197,9 +376,22 @@ export default function TitleDetailPage() {
 
   return (
     <div className="space-y-10">
+      {/* Breadcrumb */}
+      <Breadcrumb className="relative z-20">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink render={<Link href="/" />}>Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{title.title}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       {/* Backdrop hero */}
       {backdropUrl && (
-        <div className="relative -mx-4 -mt-6 h-72 overflow-hidden sm:h-96">
+        <div className="relative -mx-4 -mt-4 h-80 overflow-hidden sm:-mx-6 sm:h-[28rem]">
           <Image
             src={backdropUrl}
             alt=""
@@ -207,18 +399,30 @@ export default function TitleDetailPage() {
             className="object-cover"
             priority
           />
+          {/* Three-layer gradient */}
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/20" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-transparent" />
+          {/* Film grain overlay */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            }}
+          />
         </div>
       )}
 
       {/* Title header */}
-      <div
+      <motion.div
         className={`flex flex-col gap-8 sm:flex-row ${backdropUrl ? "-mt-32 relative z-10" : ""}`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring" as const, stiffness: 200, damping: 24 }}
       >
         {posterUrl && (
           <div className="shrink-0">
-            <div className="overflow-hidden rounded-xl shadow-2xl shadow-black/40">
+            <div className="overflow-hidden rounded-2xl ring-1 ring-foreground/5 shadow-2xl shadow-black/50">
               <Image
                 src={posterUrl}
                 alt={title.title}
@@ -275,7 +479,7 @@ export default function TitleDetailPage() {
               <button
                 type="button"
                 onClick={handleWatchMovie}
-                className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:shadow-md hover:shadow-primary/20"
+                className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all active:scale-[0.97] hover:shadow-md hover:shadow-primary/20"
               >
                 <IconPlayerPlay size={15} />
                 Mark Watched
@@ -317,7 +521,7 @@ export default function TitleDetailPage() {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Seasons & Episodes (TV) */}
       {title.type === "tv" && title.seasons.length > 0 && (
@@ -330,11 +534,13 @@ export default function TitleDetailPage() {
                 title.episodeWatches?.includes(ep.id),
               ).length;
               const totalCount = season.episodes.length;
+              const progressPercent =
+                totalCount > 0 ? (watchedCount / totalCount) * 100 : 0;
 
               return (
                 <div
                   key={season.id}
-                  className="overflow-hidden rounded-lg border border-border/50 bg-card/50"
+                  className="overflow-hidden rounded-xl border border-border/50 bg-card/50"
                 >
                   <button
                     type="button"
@@ -347,16 +553,28 @@ export default function TitleDetailPage() {
                       <span className="font-medium">
                         {season.name ?? `Season ${season.seasonNumber}`}
                       </span>
-                      {watchedCount > 0 && (
-                        <span className="text-xs text-primary">
-                          {watchedCount}/{totalCount}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">
-                        {totalCount} ep
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {watchedCount}/{totalCount}
                       </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {totalCount > 0 && (
+                        <div className="hidden w-24 sm:block">
+                          <Progress value={progressPercent} />
+                        </div>
+                      )}
+                      {watchedCount < totalCount && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMarkSeason(season);
+                          }}
+                          className="rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-primary transition-colors hover:bg-primary/10"
+                        >
+                          Mark all
+                        </button>
+                      )}
                       {isOpen ? (
                         <IconChevronUp
                           size={16}
@@ -371,50 +589,82 @@ export default function TitleDetailPage() {
                     </div>
                   </button>
 
-                  {isOpen && (
-                    <div className="border-t border-border/50">
-                      {season.episodes.map((ep) => {
-                        const isWatched = title.episodeWatches?.includes(ep.id);
-                        return (
-                          <div
-                            key={ep.id}
-                            className="flex items-center gap-3 border-b border-border/30 px-4 py-3 last:border-b-0"
-                          >
-                            <button
-                              type="button"
-                              onClick={() => handleWatchEpisode(ep.id)}
-                              disabled={watchingEp === ep.id}
-                              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-all ${
-                                isWatched
-                                  ? "border-primary bg-primary text-primary-foreground"
-                                  : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
-                              }`}
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{
+                          type: "spring" as const,
+                          stiffness: 300,
+                          damping: 30,
+                        }}
+                        className="overflow-hidden border-t border-border/50"
+                      >
+                        {season.episodes.map((ep) => {
+                          const isWatched = title.episodeWatches?.includes(
+                            ep.id,
+                          );
+                          return (
+                            <div
+                              key={ep.id}
+                              className="flex items-center gap-3 border-b border-border/30 px-4 py-3 last:border-b-0"
                             >
-                              {isWatched && <IconCheck size={14} />}
-                            </button>
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-sm">
-                                <span className="font-mono text-xs text-muted-foreground">
-                                  E{String(ep.episodeNumber).padStart(2, "0")}
-                                </span>{" "}
-                                <span className="font-medium">
-                                  {ep.name ?? "Untitled"}
-                                </span>
-                              </p>
-                              {ep.airDate && (
-                                <p className="text-xs text-muted-foreground">
-                                  {ep.airDate}
-                                  {ep.runtimeMinutes
-                                    ? ` · ${ep.runtimeMinutes}m`
-                                    : ""}
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleWatchEpisode(
+                                    ep.id,
+                                    season.seasonNumber,
+                                    ep.episodeNumber,
+                                  )
+                                }
+                                disabled={watchingEp === ep.id}
+                                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-all ${
+                                  isWatched
+                                    ? "border-primary bg-primary text-primary-foreground"
+                                    : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
+                                }`}
+                              >
+                                {isWatched && (
+                                  <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{
+                                      type: "spring" as const,
+                                      stiffness: 500,
+                                      damping: 15,
+                                    }}
+                                  >
+                                    <IconCheck size={14} />
+                                  </motion.div>
+                                )}
+                              </button>
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm">
+                                  <span className="font-mono text-xs text-muted-foreground">
+                                    E{String(ep.episodeNumber).padStart(2, "0")}
+                                  </span>{" "}
+                                  <span className="font-medium">
+                                    {ep.name ?? "Untitled"}
+                                  </span>
                                 </p>
-                              )}
+                                {ep.airDate && (
+                                  <p className="text-xs text-muted-foreground">
+                                    {ep.airDate}
+                                    {ep.runtimeMinutes
+                                      ? ` · ${ep.runtimeMinutes}m`
+                                      : ""}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                          );
+                        })}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
@@ -426,20 +676,26 @@ export default function TitleDetailPage() {
       {recommendations.length > 0 && (
         <div className="space-y-4">
           <h2 className="font-display text-2xl tracking-tight">Recommended</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+          <motion.div
+            className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
             {recommendations.slice(0, 12).map((rec) => (
-              <TitleCard
-                key={rec.id}
-                id={rec.id}
-                tmdbId={rec.tmdbId}
-                type={rec.type}
-                title={rec.title}
-                posterPath={rec.posterPath}
-                releaseDate={rec.releaseDate ?? rec.firstAirDate}
-                voteAverage={rec.voteAverage}
-              />
+              <motion.div key={rec.id} variants={staggerItem}>
+                <TitleCard
+                  id={rec.id}
+                  tmdbId={rec.tmdbId}
+                  type={rec.type}
+                  title={rec.title}
+                  posterPath={rec.posterPath}
+                  releaseDate={rec.releaseDate ?? rec.firstAirDate}
+                  voteAverage={rec.voteAverage}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       )}
     </div>

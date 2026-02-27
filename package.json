@@ -24,6 +24,7 @@
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.45.1",
     "embla-carousel-react": "^8.6.0",
+    "motion": "^12.34.3",
     "next": "16.1.6",
     "react": "19.2.4",
     "react-day-picker": "^9.14.0",

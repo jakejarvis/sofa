@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -29,22 +32,26 @@ export function TitleCard({
     : null;
 
   const content = (
-    <div className="group relative overflow-hidden rounded-lg transition-transform duration-200 hover:scale-[1.02]">
-      <div className="aspect-[2/3] overflow-hidden rounded-lg bg-card">
+    <motion.div
+      className="group relative overflow-hidden rounded-xl ring-1 ring-foreground/5 transition-shadow hover:ring-primary/20 hover:shadow-lg hover:shadow-black/25"
+      whileHover={{ scale: 1.02 }}
+      transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
+    >
+      <div className="aspect-[2/3] overflow-hidden rounded-xl bg-card">
         {posterUrl ? (
           <Image
             src={posterUrl}
             alt={title}
             width={300}
             height={450}
-            className="h-full w-full object-cover transition-all duration-300 group-hover:brightness-110"
+            className="h-full w-full object-cover"
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-card to-muted text-sm text-muted-foreground">
             No poster
           </div>
         )}
-        {/* Overlay gradient */}
+        {/* Hover gradient overlay with metadata */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
       </div>
       <div className="mt-2 space-y-0.5">
@@ -59,7 +66,7 @@ export function TitleCard({
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 
   if (href || id) {

@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "motion/react";
 import Link from "next/link";
 
 export default function Home() {
@@ -12,24 +15,71 @@ export default function Home() {
       />
 
       {/* Warm primary glow */}
-      <div className="pointer-events-none absolute left-1/2 top-1/3 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[120px]" />
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-1/3 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[120px]"
+        animate={{ opacity: [0.4, 0.7, 0.4] }}
+        transition={{
+          duration: 6,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "easeInOut",
+        }}
+      />
 
       <main className="relative z-10 flex flex-col items-center gap-10 px-6 text-center">
         <div className="space-y-4">
-          <p className="text-sm font-medium uppercase tracking-[0.3em] text-primary">
+          <motion.p
+            className="text-sm font-medium uppercase tracking-[0.3em] text-primary"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              type: "spring" as const,
+              stiffness: 200,
+              damping: 20,
+            }}
+          >
             Self-hosted movie & TV tracker
-          </p>
-          <h1 className="font-display text-6xl tracking-tight sm:text-7xl md:text-8xl">
+          </motion.p>
+          <motion.h1
+            className="font-display text-6xl tracking-tight sm:text-7xl md:text-8xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              type: "spring" as const,
+              stiffness: 200,
+              damping: 20,
+              delay: 0.1,
+            }}
+          >
             Couch Potato
-          </h1>
-          <p className="mx-auto max-w-md text-lg leading-relaxed text-muted-foreground">
+          </motion.h1>
+          <motion.p
+            className="mx-auto max-w-md text-lg leading-relaxed text-muted-foreground"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              type: "spring" as const,
+              stiffness: 200,
+              damping: 20,
+              delay: 0.2,
+            }}
+          >
             Track what you watch. Know what&apos;s next.
             <br />
             Your library, your data, your rules.
-          </p>
+          </motion.p>
         </div>
 
-        <div className="flex gap-4">
+        <motion.div
+          className="flex gap-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            type: "spring" as const,
+            stiffness: 200,
+            damping: 20,
+            delay: 0.35,
+          }}
+        >
           <Link
             href="/login"
             className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/20"
@@ -43,7 +93,7 @@ export default function Home() {
           >
             Register
           </Link>
-        </div>
+        </motion.div>
       </main>
 
       {/* Bottom fade */}

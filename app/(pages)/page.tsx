@@ -5,10 +5,13 @@ import {
   IconPlayerPlay,
   IconSparkles,
 } from "@tabler/icons-react";
+import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { DashboardSkeleton } from "@/components/skeletons";
+import { StatsSummary } from "@/components/stats-summary";
 import { TitleCard } from "@/components/title-card";
 import { useSession } from "@/lib/auth/client";
 
@@ -25,6 +28,8 @@ interface ContinueWatchingItem {
     episodeNumber: number;
     name: string | null;
   } | null;
+  totalEpisodes: number;
+  watchedEpisodes: number;
 }
 
 interface FeedTitle {
@@ -38,6 +43,30 @@ interface FeedTitle {
   firstAirDate?: string | null;
   voteAverage?: number | null;
 }
+
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } },
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 12, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 300, damping: 24 },
+  },
+};
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 200, damping: 24 },
+  },
+};
 
 export default function DashboardPage() {
   const { data: session, isPending } = useSession();
@@ -75,11 +104,7 @@ export default function DashboardPage() {
   }, [session, isPending, router, fetchFeeds]);
 
   if (isPending || loading) {
-    return (
-      <div className="flex items-center justify-center py-24">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   const isEmpty =
@@ -88,19 +113,34 @@ export default function DashboardPage() {
     recommendations.length === 0;
 
   return (
-    <div className="space-y-10">
-      <div>
+    <motion.div
+      className="space-y-10"
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: {},
+        visible: { transition: { staggerChildren: 0.15 } },
+      }}
+    >
+      <motion.div variants={sectionVariants}>
         <h1 className="font-display text-3xl tracking-tight">
           Welcome back{session?.user?.name ? `, ${session.user.name}` : ""}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Here&apos;s what&apos;s happening with your library
         </p>
-      </div>
+      </motion.div>
+
+      <motion.div variants={sectionVariants}>
+        <StatsSummary />
+      </motion.div>
 
       {isEmpty && (
-        <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-border/50 py-16 text-center">
-          <div className="rounded-full bg-primary/10 p-4">
+        <motion.div
+          variants={sectionVariants}
+          className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-border/50 py-16 text-center"
+        >
+          <div className="animate-gentle-float rounded-full bg-primary/10 p-4">
             <IconDeviceTv size={32} className="text-primary" />
           </div>
           <div className="space-y-1">
@@ -115,69 +155,94 @@ export default function DashboardPage() {
           >
             Start searching
           </Link>
-        </div>
+        </motion.div>
       )}
 
       {/* Continue Watching */}
       {continueWatching.length > 0 && (
-        <FeedSection
-          title="Continue Watching"
-          icon={<IconPlayerPlay size={20} className="text-primary" />}
-        >
-          <div className="feed-scroll flex gap-4 overflow-x-auto pb-2">
-            {continueWatching.map((item) => (
-              <ContinueWatchingCard key={item.title.id} item={item} />
-            ))}
-          </div>
-        </FeedSection>
+        <motion.div variants={sectionVariants}>
+          <FeedSection
+            title="Continue Watching"
+            icon={<IconPlayerPlay size={20} className="text-primary" />}
+          >
+            <motion.div
+              className="feed-scroll flex gap-4 overflow-x-auto pb-2"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              {continueWatching.map((item) => (
+                <motion.div key={item.title.id} variants={staggerItem}>
+                  <ContinueWatchingCard item={item} />
+                </motion.div>
+              ))}
+            </motion.div>
+          </FeedSection>
+        </motion.div>
       )}
 
-      {/* New on Streaming */}
+      {/* In Your Library */}
       {newAvailable.length > 0 && (
-        <FeedSection
-          title="In Your Library"
-          icon={<IconSparkles size={20} className="text-primary" />}
-        >
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {newAvailable.slice(0, 10).map((t) => (
-              <TitleCard
-                key={t.titleId ?? t.id}
-                id={t.titleId ?? t.id}
-                tmdbId={t.tmdbId ?? 0}
-                type={t.type}
-                title={t.title}
-                posterPath={t.posterPath}
-                releaseDate={t.releaseDate ?? t.firstAirDate}
-                voteAverage={t.voteAverage}
-              />
-            ))}
-          </div>
-        </FeedSection>
+        <motion.div variants={sectionVariants}>
+          <FeedSection
+            title="In Your Library"
+            icon={<IconSparkles size={20} className="text-primary" />}
+          >
+            <motion.div
+              className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              {newAvailable.slice(0, 10).map((t) => (
+                <motion.div key={t.titleId ?? t.id} variants={staggerItem}>
+                  <TitleCard
+                    id={t.titleId ?? t.id}
+                    tmdbId={t.tmdbId ?? 0}
+                    type={t.type}
+                    title={t.title}
+                    posterPath={t.posterPath}
+                    releaseDate={t.releaseDate ?? t.firstAirDate}
+                    voteAverage={t.voteAverage}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          </FeedSection>
+        </motion.div>
       )}
 
       {/* Recommendations */}
       {recommendations.length > 0 && (
-        <FeedSection
-          title="Recommended for You"
-          icon={<IconSparkles size={20} className="text-primary" />}
-        >
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {recommendations.slice(0, 10).map((t) => (
-              <TitleCard
-                key={t.id}
-                id={t.id}
-                tmdbId={t.tmdbId ?? 0}
-                type={t.type}
-                title={t.title}
-                posterPath={t.posterPath}
-                releaseDate={t.releaseDate ?? t.firstAirDate}
-                voteAverage={t.voteAverage}
-              />
-            ))}
-          </div>
-        </FeedSection>
+        <motion.div variants={sectionVariants}>
+          <FeedSection
+            title="Recommended for You"
+            icon={<IconSparkles size={20} className="text-primary" />}
+          >
+            <motion.div
+              className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              {recommendations.slice(0, 10).map((t) => (
+                <motion.div key={t.id} variants={staggerItem}>
+                  <TitleCard
+                    id={t.id}
+                    tmdbId={t.tmdbId ?? 0}
+                    type={t.type}
+                    title={t.title}
+                    posterPath={t.posterPath}
+                    releaseDate={t.releaseDate ?? t.firstAirDate}
+                    voteAverage={t.voteAverage}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          </FeedSection>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -205,13 +270,17 @@ function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
   const posterUrl = item.title.posterPath
     ? `https://image.tmdb.org/t/p/w300${item.title.posterPath}`
     : null;
+  const progress =
+    item.totalEpisodes > 0
+      ? (item.watchedEpisodes / item.totalEpisodes) * 100
+      : 0;
 
   return (
     <Link
       href={`/titles/${item.title.id}`}
-      className="group flex w-56 shrink-0 gap-3 rounded-lg border border-border/30 bg-card/50 p-3 transition-all hover:border-primary/20 hover:bg-card"
+      className="group flex w-56 shrink-0 gap-3 rounded-xl border border-border/30 bg-card/50 p-3 transition-all hover:border-primary/20 hover:bg-card"
     >
-      <div className="h-20 w-14 shrink-0 overflow-hidden rounded-md bg-muted">
+      <div className="relative h-20 w-14 shrink-0 overflow-hidden rounded-md bg-muted">
         {posterUrl ? (
           <Image
             src={posterUrl}
@@ -225,6 +294,15 @@ function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
             ?
           </div>
         )}
+        {/* Progress bar at bottom of poster */}
+        {progress > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted">
+            <div
+              className="h-full bg-primary transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
       </div>
       <div className="min-w-0 flex-1 space-y-1">
         <p className="line-clamp-2 text-sm font-medium leading-snug">
@@ -235,7 +313,8 @@ function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
             S{item.nextEpisode.seasonNumber} E{item.nextEpisode.episodeNumber}
           </p>
         )}
-        <p className="text-[10px] font-medium uppercase tracking-wider text-primary">
+        <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-primary">
+          <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
           Up next
         </p>
       </div>

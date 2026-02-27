@@ -1,6 +1,7 @@
 "use client";
 
 import { IconStar, IconStarFilled } from "@tabler/icons-react";
+import { motion } from "motion/react";
 import { useState } from "react";
 
 interface StarRatingProps {
@@ -21,19 +22,29 @@ export function StarRating({ value, onChange }: StarRatingProps) {
       {[1, 2, 3, 4, 5].map((star) => {
         const filled = star <= (hover || value);
         return (
-          <button
+          <motion.button
             key={star}
             type="button"
             onClick={() => onChange(star === value ? 0 : star)}
             onMouseEnter={() => setHover(star)}
-            className="p-0.5 transition-transform hover:scale-110"
+            className="p-0.5"
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
+            animate={
+              filled && star === value ? { scale: [1, 1.25, 1] } : { scale: 1 }
+            }
+            transition={{
+              type: "spring" as const,
+              stiffness: 400,
+              damping: 15,
+            }}
           >
             {filled ? (
               <IconStarFilled size={18} className="text-primary" />
             ) : (
               <IconStar size={18} className="text-muted-foreground/30" />
             )}
-          </button>
+          </motion.button>
         );
       })}
     </div>

@@ -25,6 +25,8 @@ export interface ContinueWatchingItem {
     name: string | null;
   } | null;
   lastWatchedAt: Date | null;
+  totalEpisodes: number;
+  watchedEpisodes: number;
 }
 
 export function getContinueWatchingFeed(
@@ -67,6 +69,8 @@ export function getContinueWatchingFeed(
     // Find first unwatched episode
     let nextEpisode: ContinueWatchingItem["nextEpisode"] = null;
     let lastWatchedAt: Date | null = null;
+    let totalEpisodes = 0;
+    let watchedEpisodes = 0;
 
     // Get most recent watch for this show
     for (const s of titleSeasons) {
@@ -76,6 +80,8 @@ export function getContinueWatchingFeed(
         .where(eq(episodes.seasonId, s.id))
         .orderBy(episodes.episodeNumber)
         .all();
+
+      totalEpisodes += eps.length;
 
       for (const ep of eps) {
         const watch = db
@@ -90,6 +96,7 @@ export function getContinueWatchingFeed(
           .get();
 
         if (watch) {
+          watchedEpisodes++;
           if (!lastWatchedAt || watch.watchedAt > lastWatchedAt) {
             lastWatchedAt = watch.watchedAt;
           }
@@ -116,6 +123,8 @@ export function getContinueWatchingFeed(
         },
         nextEpisode,
         lastWatchedAt,
+        totalEpisodes,
+        watchedEpisodes,
       });
     }
   }
