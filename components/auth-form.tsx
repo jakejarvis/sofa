@@ -69,7 +69,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             href="/"
             className="font-display text-2xl tracking-tight text-primary"
           >
-            Couch Potato
+            Sofa
           </Link>
           <h1 className="text-lg font-medium">
             {isRegister ? "Create your account" : "Welcome back"}

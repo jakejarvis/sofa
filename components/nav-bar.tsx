@@ -27,7 +27,7 @@ export function NavBar() {
             href="/dashboard"
             className="font-display text-xl tracking-tight"
           >
-            Couch Potato
+            Sofa
           </Link>
           {session?.user && (
             <div className="hidden items-center gap-1 sm:flex">

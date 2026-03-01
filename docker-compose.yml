@@ -1,13 +1,13 @@
 services:
-  couch-potato:
+  sofa:
     build: .
-    image: couch-potato
-    container_name: couch-potato
+    image: sofa
+    container_name: sofa
     restart: unless-stopped
     ports:
       - "3000:3000"
     volumes:
-      - couch-potato-data:/data
+      - sofa-data:/data
     environment:
       - DATABASE_URL=file:/data/sqlite.db
       - TMDB_API_KEY=${TMDB_API_KEY}
@@ -21,4 +21,4 @@ services:
       retries: 3
 
 volumes:
-  couch-potato-data:
+  sofa-data:

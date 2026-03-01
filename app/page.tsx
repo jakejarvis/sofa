@@ -136,7 +136,7 @@ export default function Home() {
               delay: 0.1,
             }}
           >
-            Couch Potato
+            Sofa
           </motion.h1>
           <motion.p
             className="mx-auto max-w-md text-lg leading-relaxed text-muted-foreground"

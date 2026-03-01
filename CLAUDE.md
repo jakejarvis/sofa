@@ -17,7 +17,7 @@ pnpm db:studio        # Open Drizzle Studio (visual DB browser)
 
 ## Architecture
 
-**Couch Potato** is a self-hosted movie & TV tracking app (like Trakt/TVTime) built as a single Next.js 16 application with SQLite.
+**Sofa** is a self-hosted movie & TV tracking app (like Trakt/TVTime) built as a single Next.js 16 application with SQLite.
 
 ### Stack
 

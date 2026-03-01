@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Couch Potato",
+  title: "Sofa",
   description: "Track your movies and TV shows",
 };
 
