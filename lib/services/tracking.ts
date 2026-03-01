@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   episodes,
@@ -180,6 +180,85 @@ function checkAllEpisodesWatched(userId: string, titleId: string) {
 
   if (totalEpisodes > 0 && watchedEpisodes >= totalEpisodes) {
     setTitleStatus(userId, titleId, "completed");
+  }
+}
+
+export function unwatchEpisode(userId: string, episodeId: string) {
+  db.delete(userEpisodeWatches)
+    .where(
+      and(
+        eq(userEpisodeWatches.userId, userId),
+        eq(userEpisodeWatches.episodeId, episodeId),
+      ),
+    )
+    .run();
+
+  // Find parent title and downgrade from completed to in_progress
+  const ep = db.select().from(episodes).where(eq(episodes.id, episodeId)).get();
+  if (!ep) return;
+  const season = db
+    .select()
+    .from(seasons)
+    .where(eq(seasons.id, ep.seasonId))
+    .get();
+  if (!season) return;
+
+  const existing = db
+    .select()
+    .from(userTitleStatus)
+    .where(
+      and(
+        eq(userTitleStatus.userId, userId),
+        eq(userTitleStatus.titleId, season.titleId),
+      ),
+    )
+    .get();
+
+  if (existing?.status === "completed") {
+    setTitleStatus(userId, season.titleId, "in_progress");
+  }
+}
+
+export function unwatchSeason(userId: string, seasonId: string) {
+  const seasonEps = db
+    .select()
+    .from(episodes)
+    .where(eq(episodes.seasonId, seasonId))
+    .all();
+
+  const epIds = seasonEps.map((ep) => ep.id);
+  if (epIds.length > 0) {
+    db.delete(userEpisodeWatches)
+      .where(
+        and(
+          eq(userEpisodeWatches.userId, userId),
+          inArray(userEpisodeWatches.episodeId, epIds),
+        ),
+      )
+      .run();
+  }
+
+  // Find parent title and downgrade from completed to in_progress
+  const season = db
+    .select()
+    .from(seasons)
+    .where(eq(seasons.id, seasonId))
+    .get();
+  if (!season) return;
+
+  const existing = db
+    .select()
+    .from(userTitleStatus)
+    .where(
+      and(
+        eq(userTitleStatus.userId, userId),
+        eq(userTitleStatus.titleId, season.titleId),
+      ),
+    )
+    .get();
+
+  if (existing?.status === "completed") {
+    setTitleStatus(userId, season.titleId, "in_progress");
   }
 }
 

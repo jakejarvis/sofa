@@ -226,27 +226,15 @@ export default function TitleDetailPage() {
   }, [id, title?.title, title?.userStatus]);
 
   const handleWatchEpisode = useCallback(
-    async (episodeId: string, seasonNum: number, epNum: number) => {
+    async (
+      episodeId: string,
+      seasonNum: number,
+      epNum: number,
+      isWatched: boolean,
+    ) => {
       setWatchingEp(episodeId);
-      // Optimistic update
-      setTitle((t) => {
-        if (!t) return t;
-        const watches = [...(t.episodeWatches ?? [])];
-        if (!watches.includes(episodeId)) watches.push(episodeId);
-        return {
-          ...t,
-          episodeWatches: watches,
-          userStatus: t.userStatus ?? "in_progress",
-        };
-      });
-      try {
-        const res = await fetch(`/api/episodes/${episodeId}/watch`, {
-          method: "POST",
-        });
-        if (!res.ok) throw new Error();
-        toast.success(`Watched S${seasonNum} E${epNum}`);
-      } catch {
-        // Revert
+      if (isWatched) {
+        // Optimistic unwatch
         setTitle((t) => {
           if (!t) return t;
           return {
@@ -254,9 +242,55 @@ export default function TitleDetailPage() {
             episodeWatches: (t.episodeWatches ?? []).filter(
               (w) => w !== episodeId,
             ),
+            userStatus:
+              t.userStatus === "completed" ? "in_progress" : t.userStatus,
           };
         });
-        toast.error("Failed to mark episode");
+        try {
+          const res = await fetch(`/api/episodes/${episodeId}/watch`, {
+            method: "DELETE",
+          });
+          if (!res.ok) throw new Error();
+          toast.success(`Unwatched S${seasonNum} E${epNum}`);
+        } catch {
+          setTitle((t) => {
+            if (!t) return t;
+            const watches = [...(t.episodeWatches ?? [])];
+            if (!watches.includes(episodeId)) watches.push(episodeId);
+            return { ...t, episodeWatches: watches };
+          });
+          toast.error("Failed to unmark episode");
+        }
+      } else {
+        // Optimistic watch
+        setTitle((t) => {
+          if (!t) return t;
+          const watches = [...(t.episodeWatches ?? [])];
+          if (!watches.includes(episodeId)) watches.push(episodeId);
+          return {
+            ...t,
+            episodeWatches: watches,
+            userStatus: t.userStatus ?? "in_progress",
+          };
+        });
+        try {
+          const res = await fetch(`/api/episodes/${episodeId}/watch`, {
+            method: "POST",
+          });
+          if (!res.ok) throw new Error();
+          toast.success(`Watched S${seasonNum} E${epNum}`);
+        } catch {
+          setTitle((t) => {
+            if (!t) return t;
+            return {
+              ...t,
+              episodeWatches: (t.episodeWatches ?? []).filter(
+                (w) => w !== episodeId,
+              ),
+            };
+          });
+          toast.error("Failed to mark episode");
+        }
       }
       setWatchingEp(null);
     },
@@ -346,16 +380,43 @@ export default function TitleDetailPage() {
     });
 
     try {
-      await Promise.all(
-        unwatched.map((ep) =>
-          fetch(`/api/episodes/${ep.id}/watch`, { method: "POST" }),
-        ),
-      );
+      const res = await fetch(`/api/seasons/${season.id}/watch`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error();
       toast.success(
         `Watched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
       );
     } catch {
       toast.error("Failed to mark some episodes");
+    }
+  }
+
+  async function handleUnmarkSeason(season: Season) {
+    const seasonEpIds = season.episodes.map((ep) => ep.id);
+
+    // Optimistic update
+    setTitle((t) => {
+      if (!t) return t;
+      return {
+        ...t,
+        episodeWatches: (t.episodeWatches ?? []).filter(
+          (w) => !seasonEpIds.includes(w),
+        ),
+        userStatus: t.userStatus === "completed" ? "in_progress" : t.userStatus,
+      };
+    });
+
+    try {
+      const res = await fetch(`/api/seasons/${season.id}/watch`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error();
+      toast.success(
+        `Unwatched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
+      );
+    } catch {
+      toast.error("Failed to unmark some episodes");
     }
   }
 
@@ -544,12 +605,20 @@ export default function TitleDetailPage() {
                   key={season.id}
                   className="overflow-hidden rounded-xl border border-border/50 bg-card/50"
                 >
-                  <button
-                    type="button"
+                  {/* biome-ignore lint/a11y/useSemanticElements: contains nested buttons */}
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() =>
                       setOpenSeason(isOpen ? null : season.seasonNumber)
                     }
-                    className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-accent/50"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setOpenSeason(isOpen ? null : season.seasonNumber);
+                      }
+                    }}
+                    className="flex w-full cursor-pointer items-center justify-between p-4 text-left transition-colors hover:bg-accent/50"
                   >
                     <div className="flex items-center gap-3">
                       <span className="font-medium">
@@ -565,7 +634,7 @@ export default function TitleDetailPage() {
                           <Progress value={progressPercent} />
                         </div>
                       )}
-                      {watchedCount < totalCount && (
+                      {totalCount > 0 && watchedCount < totalCount && (
                         <button
                           type="button"
                           onClick={(e) => {
@@ -575,6 +644,18 @@ export default function TitleDetailPage() {
                           className="rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-primary transition-colors hover:bg-primary/10"
                         >
                           Mark all
+                        </button>
+                      )}
+                      {totalCount > 0 && watchedCount === totalCount && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleUnmarkSeason(season);
+                          }}
+                          className="rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        >
+                          Unmark all
                         </button>
                       )}
                       {isOpen ? (
@@ -589,7 +670,7 @@ export default function TitleDetailPage() {
                         />
                       )}
                     </div>
-                  </button>
+                  </div>
 
                   <AnimatePresence>
                     {isOpen && (
@@ -620,13 +701,14 @@ export default function TitleDetailPage() {
                                     ep.id,
                                     season.seasonNumber,
                                     ep.episodeNumber,
+                                    !!isWatched,
                                   )
                                 }
                                 disabled={watchingEp === ep.id}
-                                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition-all ${
+                                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
                                   isWatched
                                     ? "border-primary bg-primary text-primary-foreground"
-                                    : "border-border/50 hover:border-primary/50 hover:bg-primary/5"
+                                    : "border-muted-foreground/40 bg-muted-foreground/5 hover:border-primary/70 hover:bg-primary/10"
                                 }`}
                               >
                                 {isWatched && (

@@ -1,8 +1,11 @@
+import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth/server";
-import { logEpisodeWatch, unwatchEpisode } from "@/lib/services/tracking";
+import { db } from "@/lib/db/client";
+import { episodes } from "@/lib/db/schema";
+import { logEpisodeWatch, unwatchSeason } from "@/lib/services/tracking";
 
 export async function POST(
   _req: NextRequest,
@@ -15,7 +18,16 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  logEpisodeWatch(session.user.id, id);
+  const seasonEps = db
+    .select()
+    .from(episodes)
+    .where(eq(episodes.seasonId, id))
+    .all();
+
+  for (const ep of seasonEps) {
+    logEpisodeWatch(session.user.id, ep.id);
+  }
+
   return NextResponse.json({ ok: true });
 }
 
@@ -30,6 +42,6 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  unwatchEpisode(session.user.id, id);
+  unwatchSeason(session.user.id, id);
   return NextResponse.json({ ok: true });
 }
