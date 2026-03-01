@@ -20,6 +20,7 @@ interface ContinueWatchingItem {
     id: string;
     title: string;
     posterPath: string | null;
+    backdropPath: string | null;
     type: string;
   };
   nextEpisode: {
@@ -27,6 +28,8 @@ interface ContinueWatchingItem {
     seasonNumber: number;
     episodeNumber: number;
     name: string | null;
+    stillPath: string | null;
+    overview: string | null;
   } | null;
   totalEpisodes: number;
   watchedEpisodes: number;
@@ -267,9 +270,11 @@ function FeedSection({
 }
 
 function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
-  const posterUrl = item.title.posterPath
-    ? `https://image.tmdb.org/t/p/w300${item.title.posterPath}`
-    : null;
+  const stillUrl = item.nextEpisode?.stillPath
+    ? `https://image.tmdb.org/t/p/w500${item.nextEpisode.stillPath}`
+    : item.title.backdropPath
+      ? `https://image.tmdb.org/t/p/w500${item.title.backdropPath}`
+      : null;
   const progress =
     item.totalEpisodes > 0
       ? (item.watchedEpisodes / item.totalEpisodes) * 100
@@ -278,46 +283,62 @@ function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
   return (
     <Link
       href={`/titles/${item.title.id}`}
-      className="group flex w-56 shrink-0 gap-3 rounded-xl border border-border/30 bg-card/50 p-3 transition-all hover:border-primary/20 hover:bg-card"
+      className="group relative w-72 shrink-0 overflow-hidden rounded-xl border border-border/30 bg-card/50 transition-all hover:border-primary/20 hover:shadow-lg hover:shadow-black/25"
     >
-      <div className="relative h-20 w-14 shrink-0 overflow-hidden rounded-md bg-muted">
-        {posterUrl ? (
+      {/* Episode still / backdrop image */}
+      <div className="relative aspect-video overflow-hidden bg-muted">
+        {stillUrl ? (
           <Image
-            src={posterUrl}
-            alt={item.title.title}
-            width={56}
-            height={80}
-            className="h-full w-full object-cover"
+            src={stillUrl}
+            alt={item.nextEpisode?.name ?? item.title.title}
+            width={500}
+            height={281}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-[8px] text-muted-foreground">
-            ?
+          <div className="flex h-full items-center justify-center bg-gradient-to-br from-card via-secondary to-muted">
+            <IconPlayerPlay size={32} className="text-muted-foreground/30" />
           </div>
         )}
-        {/* Progress bar at bottom of poster */}
-        {progress > 0 && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted">
-            <div
-              className="h-full bg-primary transition-all"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        )}
-      </div>
-      <div className="min-w-0 flex-1 space-y-1">
-        <p className="line-clamp-2 text-sm font-medium leading-snug">
-          {item.title.title}
-        </p>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        {/* Episode label overlay */}
         {item.nextEpisode && (
-          <p className="text-xs text-muted-foreground">
-            S{item.nextEpisode.seasonNumber} E{item.nextEpisode.episodeNumber}
-          </p>
+          <div className="absolute bottom-2.5 left-3 right-3">
+            <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-primary">
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+              Up next
+            </p>
+            <p className="mt-0.5 truncate text-sm font-medium text-white">
+              <span className="font-mono text-xs text-white/60">
+                S{item.nextEpisode.seasonNumber} E
+                {item.nextEpisode.episodeNumber}
+              </span>{" "}
+              {item.nextEpisode.name}
+            </p>
+          </div>
         )}
-        <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-primary">
-          <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-          Up next
-        </p>
       </div>
+      {/* Bottom bar with title + progress */}
+      <div className="flex items-center gap-3 p-3">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium">{item.title.title}</p>
+          <p className="text-xs text-muted-foreground">
+            {item.watchedEpisodes}/{item.totalEpisodes} episodes
+          </p>
+        </div>
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+          <IconPlayerPlay size={14} />
+        </div>
+      </div>
+      {/* Progress bar */}
+      {progress > 0 && (
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-muted">
+          <div
+            className="h-full bg-primary transition-all"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      )}
     </Link>
   );
 }

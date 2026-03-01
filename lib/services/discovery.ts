@@ -16,6 +16,7 @@ export interface ContinueWatchingItem {
     id: string;
     title: string;
     posterPath: string | null;
+    backdropPath: string | null;
     type: string;
   };
   nextEpisode: {
@@ -23,6 +24,8 @@ export interface ContinueWatchingItem {
     seasonNumber: number;
     episodeNumber: number;
     name: string | null;
+    stillPath: string | null;
+    overview: string | null;
   } | null;
   lastWatchedAt: Date | null;
   totalEpisodes: number;
@@ -108,6 +111,8 @@ export function getContinueWatchingFeed(
             seasonNumber: s.seasonNumber,
             episodeNumber: ep.episodeNumber,
             name: ep.name,
+            stillPath: ep.stillPath,
+            overview: ep.overview,
           };
         }
       }
@@ -119,6 +124,7 @@ export function getContinueWatchingFeed(
           id: title.id,
           title: title.title,
           posterPath: title.posterPath,
+          backdropPath: title.backdropPath,
           type: title.type,
         },
         nextEpisode,

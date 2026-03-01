@@ -21,21 +21,29 @@ const statDefs = [
     key: "moviesThisMonth" as const,
     label: "Movies This Month",
     icon: IconMovie,
+    color: "text-primary",
+    bgColor: "bg-primary/10",
   },
   {
     key: "episodesThisWeek" as const,
     label: "Episodes This Week",
     icon: IconPlayerPlay,
+    color: "text-status-watching",
+    bgColor: "bg-status-watching/10",
   },
   {
     key: "librarySize" as const,
     label: "In Library",
     icon: IconLibrary,
+    color: "text-status-watchlist",
+    bgColor: "bg-status-watchlist/10",
   },
   {
     key: "completed" as const,
     label: "Completed",
     icon: IconCheck,
+    color: "text-status-completed",
+    bgColor: "bg-status-completed/10",
   },
 ];
 
@@ -70,13 +78,17 @@ export function StatsSummary() {
             className="rounded-xl border border-border/30 bg-card/50 p-4"
           >
             <div className="flex items-center gap-2">
-              <Icon size={14} className="text-primary" />
+              <div
+                className={`flex h-6 w-6 items-center justify-center rounded-md ${def.bgColor}`}
+              >
+                <Icon size={13} className={def.color} />
+              </div>
               <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 {def.label}
               </span>
             </div>
             <motion.p
-              className="mt-2 font-display text-2xl tracking-tight"
+              className={`mt-2 font-display text-2xl tabular-nums tracking-tight ${def.color}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: i * 0.08 + 0.2 }}
