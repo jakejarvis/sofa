@@ -1,7 +1,6 @@
 services:
   sofa:
-    build: .
-    image: sofa
+    image: ghcr.io/jakejarvis/sofa:latest
     container_name: sofa
     restart: unless-stopped
     ports:
@@ -13,12 +12,6 @@ services:
       - TMDB_API_READ_ACCESS_TOKEN=${TMDB_API_READ_ACCESS_TOKEN}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
       - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
-    healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
-      interval: 30s
-      timeout: 10s
-      start_period: 30s
-      retries: 3
 
 volumes:
   sofa-data:

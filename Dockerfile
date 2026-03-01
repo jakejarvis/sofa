@@ -37,5 +37,8 @@ USER nextjs
 EXPOSE 3000
 VOLUME /data
 
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget -qO /dev/null http://localhost:3000/api/health
+
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["node", "server.js"]
