@@ -7,6 +7,18 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useSession } from "@/lib/auth/client";
 
+/** Check whether the server has TMDB configured. */
+async function fetchSetupStatus(): Promise<boolean> {
+  try {
+    const res = await fetch("/api/setup/status");
+    if (!res.ok) return true; // assume configured on error
+    const data = await res.json();
+    return !!data.tmdbConfigured;
+  } catch {
+    return true;
+  }
+}
+
 // Well-known TMDB poster paths for the background collage
 const posterPaths = [
   "/1E5baAaEse26fej7uHcjOgEERB2.jpg", // The Dark Knight
@@ -48,9 +60,15 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isPending && session?.user) {
+    if (isPending) return;
+    if (session?.user) {
       router.replace("/dashboard");
+      return;
     }
+    // If not logged in, check whether TMDB is configured
+    fetchSetupStatus().then((configured) => {
+      if (!configured) router.replace("/setup");
+    });
   }, [session, isPending, router]);
 
   if (isPending) return null;

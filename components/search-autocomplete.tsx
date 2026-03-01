@@ -52,6 +52,16 @@ export function SearchAutocomplete({
       .then((r) => r.json())
       .then((data) => {
         if (!cancelled) {
+          if (data.code === "TMDB_NOT_CONFIGURED") {
+            toast.error("TMDB API key not configured", {
+              description: "Visit /setup for instructions.",
+              action: {
+                label: "Setup",
+                onClick: () => (window.location.href = "/setup"),
+              },
+            });
+            return;
+          }
           const res = data.results ?? [];
           setResults(res);
           onResults?.(res);

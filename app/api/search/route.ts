@@ -1,8 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { isTmdbConfigured } from "@/lib/config";
 import { searchMovies, searchMulti, searchTv } from "@/lib/tmdb/client";
 import type { TmdbSearchResponse } from "@/lib/tmdb/types";
 
 export async function GET(req: NextRequest) {
+  if (!isTmdbConfigured()) {
+    return NextResponse.json(
+      {
+        error: "TMDB API key is not configured. Visit /setup for instructions.",
+        code: "TMDB_NOT_CONFIGURED",
+      },
+      { status: 503 },
+    );
+  }
+
   const query = req.nextUrl.searchParams.get("query");
   const type = req.nextUrl.searchParams.get("type");
 
