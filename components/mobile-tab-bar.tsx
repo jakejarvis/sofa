@@ -1,20 +1,20 @@
 "use client";
 
-import { IconHome, IconSearch, IconUser } from "@tabler/icons-react";
+import { IconHome, IconSearch, IconSettings } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { signOut, useSession } from "@/lib/auth/client";
+import { usePathname } from "next/navigation";
+import { useSession } from "@/lib/auth/client";
 
 const tabs = [
   { href: "/dashboard", label: "Home", icon: IconHome },
   { href: "/search", label: "Search", icon: IconSearch },
+  { href: "/settings", label: "Settings", icon: IconSettings },
 ] as const;
 
 export function MobileTabBar() {
   const { data: session } = useSession();
   const pathname = usePathname();
-  const router = useRouter();
 
   if (!session?.user) return null;
 
@@ -56,20 +56,6 @@ export function MobileTabBar() {
             </Link>
           );
         })}
-        <button
-          type="button"
-          onClick={async () => {
-            await signOut();
-            router.push("/");
-            router.refresh();
-          }}
-          className="flex flex-1 flex-col items-center justify-center gap-0.5"
-        >
-          <IconUser size={20} className="text-muted-foreground" />
-          <span className="text-[10px] font-medium text-muted-foreground">
-            {session.user.name?.split(" ")[0] ?? "Account"}
-          </span>
-        </button>
       </div>
       {/* Safe area for devices with home indicator */}
       <div className="h-[env(safe-area-inset-bottom)]" />

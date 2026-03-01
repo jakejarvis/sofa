@@ -24,6 +24,10 @@ export const user = sqliteTable("user", {
     .notNull()
     .default(false),
   image: text("image"),
+  role: text("role").default("user"),
+  banned: int("banned", { mode: "boolean" }).default(false),
+  banReason: text("banReason"),
+  banExpires: int("banExpires", { mode: "timestamp" }),
   createdAt: int("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: int("updatedAt", { mode: "timestamp" }).notNull(),
 });
@@ -37,6 +41,7 @@ export const session = sqliteTable("session", {
   expiresAt: int("expiresAt", { mode: "timestamp" }).notNull(),
   ipAddress: text("ipAddress"),
   userAgent: text("userAgent"),
+  impersonatedBy: text("impersonatedBy"),
   createdAt: int("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: int("updatedAt", { mode: "timestamp" }).notNull(),
 });
@@ -277,3 +282,10 @@ export const titleRecommendations = sqliteTable(
     ),
   ],
 );
+
+// ─── App Settings ───────────────────────────────────────────────────
+
+export const appSettings = sqliteTable("appSettings", {
+  key: text("key").primaryKey(),
+  value: text("value"),
+});

@@ -1,6 +1,6 @@
 "use client";
 
-import { IconLogout, IconSearch } from "@tabler/icons-react";
+import { IconLogout, IconSearch, IconSettings } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -78,6 +78,12 @@ export function NavBar() {
                 <span className="hidden text-sm text-muted-foreground sm:inline">
                   {session.user.name}
                 </span>
+                <Link
+                  href="/settings"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  <IconSettings size={14} />
+                </Link>
                 <button
                   type="button"
                   onClick={async () => {
