@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useDebounce } from "@/hooks/use-debounce";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 interface SearchResult {
   tmdbId: number;
@@ -165,7 +166,7 @@ export function SearchAutocomplete({
                   <div className="h-[60px] w-10 shrink-0 overflow-hidden rounded-md bg-muted">
                     {r.posterPath ? (
                       <Image
-                        src={`https://image.tmdb.org/t/p/w92${r.posterPath}`}
+                        src={tmdbImageUrl(r.posterPath, "w92")!}
                         alt={r.title}
                         width={40}
                         height={60}

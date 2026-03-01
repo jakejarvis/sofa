@@ -57,23 +57,23 @@ const steps = [
   {
     number: "3",
     title: "Add it to your environment",
-    description: "Set the TMDB_API_KEY environment variable and restart Sofa.",
+    description: "Set the TMDB_API_READ_ACCESS_TOKEN environment variable and restart Sofa.",
   },
 ];
 
 const envSnippets = [
   {
     label: ".env file",
-    code: "TMDB_API_KEY=your_api_read_access_token_here",
+    code: "TMDB_API_READ_ACCESS_TOKEN=your_api_read_access_token_here",
   },
   {
     label: "Docker Compose",
     code: `environment:
-  - TMDB_API_KEY=your_api_read_access_token_here`,
+  - TMDB_API_READ_ACCESS_TOKEN=your_api_read_access_token_here`,
   },
   {
     label: "Docker run",
-    code: "docker run -e TMDB_API_KEY=your_token ...",
+    code: "docker run -e TMDB_API_READ_ACCESS_TOKEN=your_token ...",
   },
 ];
 

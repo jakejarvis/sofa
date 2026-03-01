@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useSession } from "@/lib/auth/client";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 /** Check whether the server has TMDB configured. */
 async function fetchSetupStatus(): Promise<boolean> {
@@ -103,7 +104,7 @@ export default function Home() {
             >
               <div className="overflow-hidden rounded-xl shadow-lg">
                 <Image
-                  src={`https://image.tmdb.org/t/p/w300${path}`}
+                  src={tmdbImageUrl(path, "w300")!}
                   alt=""
                   width={300}
                   height={450}

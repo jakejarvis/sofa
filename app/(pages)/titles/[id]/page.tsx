@@ -13,6 +13,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { TitleDetailSkeleton } from "@/components/skeletons";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { StarRating } from "@/components/star-rating";
 import { StatusButton } from "@/components/status-button";
 import { TitleCard } from "@/components/title-card";
@@ -355,12 +356,8 @@ export default function TitleDetailPage() {
     );
   }
 
-  const posterUrl = title.posterPath
-    ? `https://image.tmdb.org/t/p/w500${title.posterPath}`
-    : null;
-  const backdropUrl = title.backdropPath
-    ? `https://image.tmdb.org/t/p/w1280${title.backdropPath}`
-    : null;
+  const posterUrl = tmdbImageUrl(title.posterPath, "w500");
+  const backdropUrl = tmdbImageUrl(title.backdropPath, "w1280");
   const dateStr = title.releaseDate ?? title.firstAirDate;
   const year = dateStr?.slice(0, 4);
 
@@ -696,9 +693,7 @@ export default function TitleDetailPage() {
                           const isWatched = title.episodeWatches?.includes(
                             ep.id,
                           );
-                          const stillUrl = ep.stillPath
-                            ? `https://image.tmdb.org/t/p/w300${ep.stillPath}`
-                            : null;
+                          const stillUrl = tmdbImageUrl(ep.stillPath, "w300");
                           return (
                             <div
                               key={ep.id}
@@ -818,7 +813,7 @@ function ProviderBadge({
   name: string;
   logoPath: string | null;
 }) {
-  const logoUrl = logoPath ? `https://image.tmdb.org/t/p/w92${logoPath}` : null;
+  const logoUrl = tmdbImageUrl(logoPath, "w92");
 
   return (
     <div className="group relative">

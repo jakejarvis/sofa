@@ -10,7 +10,7 @@ services:
       - sofa-data:/data
     environment:
       - DATABASE_URL=file:/data/sqlite.db
-      - TMDB_API_KEY=${TMDB_API_KEY}
+      - TMDB_API_READ_ACCESS_TOKEN=${TMDB_API_READ_ACCESS_TOKEN}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
       - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
     healthcheck:

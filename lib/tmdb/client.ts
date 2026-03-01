@@ -7,11 +7,11 @@ import type {
   TmdbWatchProviderResponse,
 } from "./types";
 
-const BASE_URL = "https://api.themoviedb.org/3";
-
+const BASE_URL =
+  process.env.TMDB_API_BASE_URL || "https://api.themoviedb.org/3";
 function getApiKey() {
-  const key = process.env.TMDB_API_KEY;
-  if (!key) throw new Error("TMDB_API_KEY is not set");
+  const key = process.env.TMDB_API_READ_ACCESS_TOKEN;
+  if (!key) throw new Error("TMDB_API_READ_ACCESS_TOKEN is not set");
   return key;
 }
 
@@ -90,7 +90,4 @@ export async function getSimilar(tmdbId: number, type: "movie" | "tv") {
   return tmdbFetch<TmdbRecommendationResponse>(`/${type}/${tmdbId}/similar`);
 }
 
-export function tmdbImageUrl(path: string | null, size = "w500") {
-  if (!path) return null;
-  return `https://image.tmdb.org/t/p/${size}${path}`;
-}
+export { tmdbImageUrl } from "./image";

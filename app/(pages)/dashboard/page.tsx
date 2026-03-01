@@ -13,6 +13,7 @@ import { useCallback, useEffect, useState } from "react";
 import { DashboardSkeleton } from "@/components/skeletons";
 import { StatsSummary } from "@/components/stats-summary";
 import { TitleCard } from "@/components/title-card";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { useSession } from "@/lib/auth/client";
 
 interface ContinueWatchingItem {
@@ -270,11 +271,9 @@ function FeedSection({
 }
 
 function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
-  const stillUrl = item.nextEpisode?.stillPath
-    ? `https://image.tmdb.org/t/p/w500${item.nextEpisode.stillPath}`
-    : item.title.backdropPath
-      ? `https://image.tmdb.org/t/p/w500${item.title.backdropPath}`
-      : null;
+  const stillUrl =
+    tmdbImageUrl(item.nextEpisode?.stillPath ?? null, "w500") ??
+    tmdbImageUrl(item.title.backdropPath ?? null, "w500");
   const progress =
     item.totalEpisodes > 0
       ? (item.watchedEpisodes / item.totalEpisodes) * 100

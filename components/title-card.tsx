@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 interface TitleCardProps {
   id?: string;
@@ -27,9 +28,7 @@ export function TitleCard({
   onImport,
 }: TitleCardProps) {
   const year = releaseDate?.slice(0, 4);
-  const posterUrl = posterPath
-    ? `https://image.tmdb.org/t/p/w300${posterPath}`
-    : null;
+  const posterUrl = tmdbImageUrl(posterPath, "w300");
 
   const content = (
     <motion.div

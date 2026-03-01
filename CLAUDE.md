@@ -77,7 +77,7 @@ All app tables use UUID text primary keys generated via the `uuid` package. Bett
 
 ### TMDB images
 
-Only paths are stored in DB. Full URLs are constructed at render time: `https://image.tmdb.org/t/p/{size}{path}` (common sizes: w300, w500, w1280).
+Only paths are stored in DB. Full URLs are constructed at render time via `tmdbImageUrl()` from `lib/tmdb/image.ts` using the `TMDB_IMAGE_BASE_URL` env var (defaults to `https://image.tmdb.org/t/p`). Common sizes: w300, w500, w1280.
 
 ### Background jobs
 
@@ -85,7 +85,7 @@ Registered in `lib/jobs/registry.ts`, started via Next.js instrumentation hook (
 
 ### Environment variables
 
-See `.env.example`: `DATABASE_URL`, `TMDB_API_KEY`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`.
+See `.env.example`: `DATABASE_URL`, `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`.
 
 ## Browser Automation
 

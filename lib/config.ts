@@ -4,5 +4,5 @@
  */
 
 export function isTmdbConfigured(): boolean {
-  return !!process.env.TMDB_API_KEY;
+  return !!process.env.TMDB_API_READ_ACCESS_TOKEN;
 }
