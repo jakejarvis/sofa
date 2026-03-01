@@ -50,9 +50,7 @@ const steps = [
         <span className="font-mono text-xs text-primary">
           API Read Access Token
         </span>{" "}
-        (the long one starting with{" "}
-        <span className="font-mono text-xs text-muted-foreground">eyJ...</span>
-        ).
+        (the long one).
       </>
     ),
   },
