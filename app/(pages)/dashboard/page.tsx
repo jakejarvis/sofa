@@ -169,7 +169,7 @@ export default function DashboardPage() {
             icon={<IconPlayerPlay size={20} className="text-primary" />}
           >
             <motion.div
-              className="feed-scroll flex gap-4 overflow-x-auto pb-2"
+              className="feed-scroll -mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:-mx-0 sm:px-0"
               variants={staggerContainer}
               initial="hidden"
               animate="visible"
@@ -283,7 +283,7 @@ function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
   return (
     <Link
       href={`/titles/${item.title.id}`}
-      className="group relative w-72 shrink-0 overflow-hidden rounded-xl border border-border/30 bg-card/50 transition-all hover:border-primary/20 hover:shadow-lg hover:shadow-black/25"
+      className="group relative w-[calc(100vw-3rem)] shrink-0 overflow-hidden rounded-xl border border-border/30 bg-card/50 transition-all hover:border-primary/20 hover:shadow-lg hover:shadow-black/25 sm:w-72"
     >
       {/* Episode still / backdrop image */}
       <div className="relative aspect-video overflow-hidden bg-muted">

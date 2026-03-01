@@ -75,7 +75,7 @@ export function NavBar() {
                 <Kbd className="ml-1">⌘K</Kbd>
               </button>
               <div className="flex items-center gap-2 rounded-lg border border-border/30 px-2.5 py-1">
-                <span className="text-sm text-muted-foreground">
+                <span className="hidden text-sm text-muted-foreground sm:inline">
                   {session.user.name}
                 </span>
                 <button

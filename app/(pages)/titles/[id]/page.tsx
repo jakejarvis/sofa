@@ -632,9 +632,14 @@ export default function TitleDetailPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       {totalCount > 0 && (
-                        <div className="hidden w-24 sm:block">
-                          <Progress value={progressPercent} />
-                        </div>
+                        <>
+                          <span className="text-xs tabular-nums text-muted-foreground sm:hidden">
+                            {Math.round(progressPercent)}%
+                          </span>
+                          <div className="hidden w-24 sm:block">
+                            <Progress value={progressPercent} />
+                          </div>
+                        </>
                       )}
                       {totalCount > 0 && watchedCount < totalCount && (
                         <button
