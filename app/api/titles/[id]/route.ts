@@ -2,15 +2,39 @@ import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { availabilityOffers, episodes, seasons, titles } from "@/lib/db/schema";
+import { refreshTvChildren } from "@/lib/services/metadata";
+import { getTvDetails } from "@/lib/tmdb/client";
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const title = db.select().from(titles).where(eq(titles.id, id)).get();
+  let title = db.select().from(titles).where(eq(titles.id, id)).get();
   if (!title)
     return NextResponse.json({ error: "Title not found" }, { status: 404 });
+
+  // If this is a shell TV title (created by recommendations with no episode data),
+  // fetch the full details and episodes now.
+  if (title.type === "tv" && !title.lastFetchedAt) {
+    try {
+      const show = await getTvDetails(title.tmdbId);
+      db.update(titles)
+        .set({
+          overview: show.overview,
+          posterPath: show.poster_path,
+          backdropPath: show.backdrop_path,
+          status: show.status,
+          lastFetchedAt: new Date(),
+        })
+        .where(eq(titles.id, id))
+        .run();
+      await refreshTvChildren(id, title.tmdbId, show.number_of_seasons);
+      title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
+    } catch {
+      // Continue with whatever data we have
+    }
+  }
 
   let titleSeasons: Array<{
     id: string;

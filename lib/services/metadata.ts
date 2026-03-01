@@ -21,7 +21,38 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
     .from(titles)
     .where(eq(titles.tmdbId, tmdbId))
     .get();
-  if (existing) return existing;
+  if (existing) {
+    // For TV shows, check if seasons/episodes were actually loaded.
+    // They may be missing if a prior fetch failed or the title was created
+    // as a shell by the recommendations system (lastFetchedAt: null).
+    if (existing.type === "tv") {
+      const seasonCount = db
+        .select()
+        .from(seasons)
+        .where(eq(seasons.titleId, existing.id))
+        .all().length;
+      if (seasonCount === 0) {
+        const show = await getTvDetails(tmdbId);
+        if (!existing.lastFetchedAt) {
+          db.update(titles)
+            .set({
+              overview: show.overview,
+              posterPath: show.poster_path,
+              backdropPath: show.backdrop_path,
+              status: show.status,
+              lastFetchedAt: new Date(),
+            })
+            .where(eq(titles.id, existing.id))
+            .run();
+        }
+        await refreshTvChildren(existing.id, tmdbId, show.number_of_seasons);
+        refreshAvailability(existing.id).catch(() => {});
+        refreshRecommendations(existing.id).catch(() => {});
+        return db.select().from(titles).where(eq(titles.id, existing.id)).get();
+      }
+    }
+    return existing;
+  }
 
   const now = new Date();
 
@@ -139,54 +170,60 @@ export async function refreshTvChildren(
     // Rate-limit: 250ms between TMDB calls
     if (sn > 1) await delay(250);
 
-    const seasonData = await getTvSeasonDetails(tmdbId, sn);
+    try {
+      const seasonData = await getTvSeasonDetails(tmdbId, sn);
 
-    const seasonRow = db
-      .insert(seasons)
-      .values({
-        titleId,
-        seasonNumber: seasonData.season_number,
-        name: seasonData.name,
-        overview: seasonData.overview,
-        posterPath: seasonData.poster_path,
-        airDate: seasonData.air_date,
-        lastFetchedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: [seasons.titleId, seasons.seasonNumber],
-        set: {
+      const seasonRow = db
+        .insert(seasons)
+        .values({
+          titleId,
+          seasonNumber: seasonData.season_number,
           name: seasonData.name,
           overview: seasonData.overview,
           posterPath: seasonData.poster_path,
           airDate: seasonData.air_date,
           lastFetchedAt: now,
-        },
-      })
-      .returning()
-      .get();
-
-    for (const ep of seasonData.episodes) {
-      db.insert(episodes)
-        .values({
-          seasonId: seasonRow.id,
-          episodeNumber: ep.episode_number,
-          name: ep.name,
-          overview: ep.overview,
-          stillPath: ep.still_path,
-          airDate: ep.air_date,
-          runtimeMinutes: ep.runtime,
         })
         .onConflictDoUpdate({
-          target: [episodes.seasonId, episodes.episodeNumber],
+          target: [seasons.titleId, seasons.seasonNumber],
           set: {
+            name: seasonData.name,
+            overview: seasonData.overview,
+            posterPath: seasonData.poster_path,
+            airDate: seasonData.air_date,
+            lastFetchedAt: now,
+          },
+        })
+        .returning()
+        .get();
+
+      for (const ep of seasonData.episodes) {
+        db.insert(episodes)
+          .values({
+            seasonId: seasonRow.id,
+            episodeNumber: ep.episode_number,
             name: ep.name,
             overview: ep.overview,
             stillPath: ep.still_path,
             airDate: ep.air_date,
             runtimeMinutes: ep.runtime,
-          },
-        })
-        .run();
+          })
+          .onConflictDoUpdate({
+            target: [episodes.seasonId, episodes.episodeNumber],
+            set: {
+              name: ep.name,
+              overview: ep.overview,
+              stillPath: ep.still_path,
+              airDate: ep.air_date,
+              runtimeMinutes: ep.runtime,
+            },
+          })
+          .run();
+      }
+    } catch {
+      // Skip this season and continue with the rest — partial data is
+      // better than aborting entirely. The next refresh cycle will retry.
+      console.error(`Failed to fetch season ${sn} for TMDB ${tmdbId}`);
     }
   }
 }
