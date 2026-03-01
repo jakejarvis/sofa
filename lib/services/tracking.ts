@@ -14,6 +14,7 @@ export async function setTitleStatus(
   userId: string,
   titleId: string,
   status: "watchlist" | "in_progress" | "completed",
+  source: "manual" | "import" | "plex" | "jellyfin" = "manual",
 ) {
   const now = new Date();
   await db
@@ -26,7 +27,7 @@ export async function setTitleStatus(
     .run();
 
   if (status === "completed") {
-    await markAllEpisodesWatched(userId, titleId);
+    await markAllEpisodesWatched(userId, titleId, source);
   }
 }
 
@@ -42,11 +43,15 @@ export async function removeTitleStatus(userId: string, titleId: string) {
     .run();
 }
 
-export async function logMovieWatch(userId: string, titleId: string) {
+export async function logMovieWatch(
+  userId: string,
+  titleId: string,
+  source: "manual" | "import" | "plex" | "jellyfin" = "manual",
+) {
   const now = new Date();
   await db
     .insert(userMovieWatches)
-    .values({ userId, titleId, watchedAt: now, source: "manual" })
+    .values({ userId, titleId, watchedAt: now, source })
     .run();
 
   // Auto-set status to completed
@@ -62,17 +67,21 @@ export async function logMovieWatch(userId: string, titleId: string) {
     .get();
 
   if (!existing) {
-    await setTitleStatus(userId, titleId, "completed");
+    await setTitleStatus(userId, titleId, "completed", source);
   } else if (existing.status !== "completed") {
-    await setTitleStatus(userId, titleId, "completed");
+    await setTitleStatus(userId, titleId, "completed", source);
   }
 }
 
-export async function logEpisodeWatch(userId: string, episodeId: string) {
+export async function logEpisodeWatch(
+  userId: string,
+  episodeId: string,
+  source: "manual" | "import" | "plex" | "jellyfin" = "manual",
+) {
   const now = new Date();
   await db
     .insert(userEpisodeWatches)
-    .values({ userId, episodeId, watchedAt: now, source: "manual" })
+    .values({ userId, episodeId, watchedAt: now, source })
     .run();
 
   // Find the title for this episode
@@ -103,14 +112,18 @@ export async function logEpisodeWatch(userId: string, episodeId: string) {
     .get();
 
   if (!existing) {
-    await setTitleStatus(userId, titleId, "in_progress");
+    await setTitleStatus(userId, titleId, "in_progress", source);
   }
 
   // Check if all episodes are watched -> auto-complete
   await checkAllEpisodesWatched(userId, titleId);
 }
 
-async function markAllEpisodesWatched(userId: string, titleId: string) {
+async function markAllEpisodesWatched(
+  userId: string,
+  titleId: string,
+  source: "manual" | "import" | "plex" | "jellyfin" = "manual",
+) {
   const title = await db
     .select()
     .from(titles)
@@ -150,7 +163,7 @@ async function markAllEpisodesWatched(userId: string, titleId: string) {
             userId,
             episodeId: ep.id,
             watchedAt: now,
-            source: "manual",
+            source,
           })
           .run();
       }

@@ -111,6 +111,18 @@ export interface TmdbRecommendationResponse {
   total_results: number;
 }
 
+export interface TmdbFindResult {
+  movie_results: TmdbSearchResult[];
+  tv_results: TmdbSearchResult[];
+  tv_episode_results: {
+    id: number;
+    episode_number: number;
+    name: string;
+    season_number: number;
+    show_id: number;
+  }[];
+}
+
 export interface TmdbGenre {
   id: number;
   name: string;

@@ -179,7 +179,9 @@ export const userMovieWatches = sqliteTable(
       .notNull()
       .references(() => titles.id, { onDelete: "cascade" }),
     watchedAt: int("watchedAt", { mode: "timestamp" }).notNull(),
-    source: text("source", { enum: ["manual", "import"] })
+    source: text("source", {
+      enum: ["manual", "import", "plex", "jellyfin"],
+    })
       .notNull()
       .default("manual"),
   },
@@ -203,7 +205,9 @@ export const userEpisodeWatches = sqliteTable(
       .notNull()
       .references(() => episodes.id, { onDelete: "cascade" }),
     watchedAt: int("watchedAt", { mode: "timestamp" }).notNull(),
-    source: text("source", { enum: ["manual", "import"] })
+    source: text("source", {
+      enum: ["manual", "import", "plex", "jellyfin"],
+    })
       .notNull()
       .default("manual"),
   },
@@ -279,6 +283,55 @@ export const titleRecommendations = sqliteTable(
       table.titleId,
       table.recommendedTitleId,
       table.source,
+    ),
+  ],
+);
+
+// ─── Webhook Connections ─────────────────────────────────────────────
+
+export const webhookConnections = sqliteTable(
+  "webhookConnections",
+  {
+    id: uuidPk(),
+    userId: text("userId")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    provider: text("provider", { enum: ["plex", "jellyfin"] }).notNull(),
+    token: text("token").notNull().unique(),
+    mediaServerUsername: text("mediaServerUsername").notNull(),
+    enabled: int("enabled", { mode: "boolean" }).notNull().default(true),
+    createdAt: int("createdAt", { mode: "timestamp" }).notNull(),
+    lastEventAt: int("lastEventAt", { mode: "timestamp" }),
+  },
+  (table) => [
+    uniqueIndex("webhookConnections_userId_provider").on(
+      table.userId,
+      table.provider,
+    ),
+    uniqueIndex("webhookConnections_token").on(table.token),
+  ],
+);
+
+export const webhookEventLog = sqliteTable(
+  "webhookEventLog",
+  {
+    id: uuidPk(),
+    connectionId: text("connectionId")
+      .notNull()
+      .references(() => webhookConnections.id, { onDelete: "cascade" }),
+    eventType: text("eventType"),
+    mediaType: text("mediaType"),
+    mediaTitle: text("mediaTitle"),
+    status: text("status", {
+      enum: ["success", "ignored", "error"],
+    }).notNull(),
+    errorMessage: text("errorMessage"),
+    receivedAt: int("receivedAt", { mode: "timestamp" }).notNull(),
+  },
+  (table) => [
+    index("webhookEventLog_connectionId_receivedAt").on(
+      table.connectionId,
+      table.receivedAt,
     ),
   ],
 );

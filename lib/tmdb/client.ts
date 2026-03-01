@@ -1,4 +1,5 @@
 import type {
+  TmdbFindResult,
   TmdbGenreListResponse,
   TmdbMovieDetails,
   TmdbRecommendationResponse,
@@ -129,6 +130,15 @@ export async function discover(
     { ...params, page: String(page) },
     { next: { revalidate: 3600 } },
   );
+}
+
+export async function findByExternalId(
+  externalId: string,
+  source: "imdb_id" | "tvdb_id",
+) {
+  return tmdbFetch<TmdbFindResult>(`/find/${externalId}`, {
+    external_source: source,
+  });
 }
 
 export { tmdbImageUrl } from "./image";
