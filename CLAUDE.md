@@ -86,3 +86,13 @@ Registered in `lib/jobs/registry.ts`, started via Next.js instrumentation hook (
 ### Environment variables
 
 See `.env.example`: `DATABASE_URL`, `TMDB_API_KEY`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`.
+
+## Browser Automation
+
+Use `agent-browser` for web automation. Run `agent-browser --help` for all commands.
+
+Core workflow:
+1. `agent-browser open <url>` - Navigate to page
+2. `agent-browser snapshot -i` - Get interactive elements with refs (@e1, @e2)
+3. `agent-browser click @e1` / `fill @e2 "text"` - Interact using refs
+4. Re-snapshot after page changes
