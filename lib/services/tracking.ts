@@ -3,6 +3,7 @@ import { db } from "@/lib/db/client";
 import {
   episodes,
   seasons,
+  titles,
   userEpisodeWatches,
   userMovieWatches,
   userRatings,
@@ -22,6 +23,10 @@ export function setTitleStatus(
       set: { status, updatedAt: now },
     })
     .run();
+
+  if (status === "completed") {
+    markAllEpisodesWatched(userId, titleId);
+  }
 }
 
 export function removeTitleStatus(userId: string, titleId: string) {
@@ -95,6 +100,49 @@ export function logEpisodeWatch(userId: string, episodeId: string) {
 
   // Check if all episodes are watched -> auto-complete
   checkAllEpisodesWatched(userId, titleId);
+}
+
+function markAllEpisodesWatched(userId: string, titleId: string) {
+  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+  if (!title || title.type !== "tv") return;
+
+  const now = new Date();
+  const allSeasons = db
+    .select()
+    .from(seasons)
+    .where(eq(seasons.titleId, titleId))
+    .all();
+
+  for (const s of allSeasons) {
+    const eps = db
+      .select()
+      .from(episodes)
+      .where(eq(episodes.seasonId, s.id))
+      .all();
+
+    for (const ep of eps) {
+      const existing = db
+        .select()
+        .from(userEpisodeWatches)
+        .where(
+          and(
+            eq(userEpisodeWatches.userId, userId),
+            eq(userEpisodeWatches.episodeId, ep.id),
+          ),
+        )
+        .get();
+      if (!existing) {
+        db.insert(userEpisodeWatches)
+          .values({
+            userId,
+            episodeId: ep.id,
+            watchedAt: now,
+            source: "manual",
+          })
+          .run();
+      }
+    }
+  }
 }
 
 function checkAllEpisodesWatched(userId: string, titleId: string) {

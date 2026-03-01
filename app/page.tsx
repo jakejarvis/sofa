@@ -2,8 +2,22 @@
 
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useSession } from "@/lib/auth/client";
 
 export default function Home() {
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isPending && session?.user) {
+      router.replace("/dashboard");
+    }
+  }, [session, isPending, router]);
+
+  if (isPending) return null;
+
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
       {/* Background grain texture */}

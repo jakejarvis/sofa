@@ -35,11 +35,7 @@ export default function SearchPage() {
     if (l) setSearched(true);
   }, []);
 
-  async function handleImport(
-    tmdbId: number,
-    type: "movie" | "tv",
-    title: string,
-  ) {
+  async function handleOpen(tmdbId: number, type: "movie" | "tv") {
     setImporting(tmdbId);
     try {
       const res = await fetch("/api/titles/import", {
@@ -49,11 +45,10 @@ export default function SearchPage() {
       });
       const data = await res.json();
       if (data.id) {
-        toast.success(`Added "${title}" to library`);
         router.push(`/titles/${data.id}`);
       }
     } catch {
-      toast.error("Failed to import title");
+      toast.error("Failed to load title");
     } finally {
       setImporting(null);
     }
@@ -64,7 +59,7 @@ export default function SearchPage() {
       <div className="space-y-2">
         <h1 className="font-display text-3xl tracking-tight">Search</h1>
         <p className="text-sm text-muted-foreground">
-          Find movies and TV shows to add to your library
+          Find movies and TV shows to track
         </p>
       </div>
 
@@ -91,14 +86,14 @@ export default function SearchPage() {
                 posterPath={r.posterPath}
                 releaseDate={r.releaseDate}
                 voteAverage={r.voteAverage}
-                onImport={() => handleImport(r.tmdbId, r.type, r.title)}
+                onImport={() => handleOpen(r.tmdbId, r.type)}
               />
               {importing === r.tmdbId && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/80 backdrop-blur-sm">
                   <div className="flex items-center gap-2">
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                     <span className="text-sm font-medium text-primary">
-                      Importing
+                      Loading
                     </span>
                   </div>
                 </div>

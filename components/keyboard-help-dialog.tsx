@@ -10,11 +10,11 @@ import {
 import { Kbd } from "@/components/ui/kbd";
 
 export function KeyboardHelpDialog() {
-  const { shortcuts, helpOpen, setHelpOpen } = useKeyboard();
+  const { shortcutsRef, helpOpen, setHelpOpen } = useKeyboard();
 
   // Group shortcuts by scope
   const grouped: Record<string, { description: string; keys: string[] }[]> = {};
-  for (const def of shortcuts.values()) {
+  for (const def of shortcutsRef.current.values()) {
     const scope = def.scope ?? "Global";
     if (!grouped[scope]) grouped[scope] = [];
     grouped[scope].push({ description: def.description, keys: def.keys });

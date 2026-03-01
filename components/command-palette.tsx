@@ -90,7 +90,7 @@ export function CommandPalette() {
     registerShortcut("nav-home", {
       keys: ["g", "h"],
       description: "Go to dashboard",
-      action: () => router.push("/"),
+      action: () => router.push("/dashboard"),
       scope: "Navigation",
     });
     registerShortcut("nav-search", {
@@ -268,7 +268,7 @@ export function CommandPalette() {
                   <CommandItem
                     onSelect={() => {
                       setCommandPaletteOpen(false);
-                      router.push("/");
+                      router.push("/dashboard");
                     }}
                   >
                     <IconHome size={14} />

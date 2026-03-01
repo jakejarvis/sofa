@@ -9,7 +9,7 @@ import { Kbd } from "@/components/ui/kbd";
 import { signOut, useSession } from "@/lib/auth/client";
 
 const navLinks = [
-  { href: "/", label: "Home" },
+  { href: "/dashboard", label: "Home" },
   { href: "/search", label: "Search" },
 ] as const;
 
@@ -23,15 +23,18 @@ export function NavBar() {
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-6">
-          <Link href="/" className="font-display text-xl tracking-tight">
+          <Link
+            href="/dashboard"
+            className="font-display text-xl tracking-tight"
+          >
             Couch Potato
           </Link>
           {session?.user && (
             <div className="hidden items-center gap-1 sm:flex">
               {navLinks.map((link) => {
                 const isActive =
-                  link.href === "/"
-                    ? pathname === "/"
+                  link.href === "/dashboard"
+                    ? pathname === "/dashboard"
                     : pathname.startsWith(link.href);
                 return (
                   <Link

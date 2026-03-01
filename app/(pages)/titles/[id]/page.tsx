@@ -380,7 +380,9 @@ export default function TitleDetailPage() {
       <Breadcrumb className="relative z-20">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink render={<Link href="/" />}>Home</BreadcrumbLink>
+            <BreadcrumbLink render={<Link href="/dashboard" />}>
+              Home
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

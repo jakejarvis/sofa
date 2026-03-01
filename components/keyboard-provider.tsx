@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export interface ShortcutDef {
   keys: string[];
@@ -17,7 +18,7 @@ export interface ShortcutDef {
 }
 
 interface KeyboardContextValue {
-  shortcuts: Map<string, ShortcutDef>;
+  shortcutsRef: React.RefObject<Map<string, ShortcutDef>>;
   registerShortcut: (id: string, def: ShortcutDef) => void;
   unregisterShortcut: (id: string) => void;
   commandPaletteOpen: boolean;
@@ -35,30 +36,30 @@ export function useKeyboard() {
 }
 
 export function KeyboardProvider({ children }: { children: React.ReactNode }) {
-  const [shortcuts, setShortcuts] = useState<Map<string, ShortcutDef>>(
-    () => new Map(),
-  );
+  const shortcutsRef = useRef<Map<string, ShortcutDef>>(new Map());
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const commandPaletteOpenRef = useRef(false);
+  commandPaletteOpenRef.current = commandPaletteOpen;
   const pendingKeyRef = useRef<string | null>(null);
   const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const registerShortcut = useCallback((id: string, def: ShortcutDef) => {
-    setShortcuts((prev) => {
-      const next = new Map(prev);
-      next.set(id, def);
-      return next;
-    });
+    shortcutsRef.current.set(id, def);
   }, []);
 
   const unregisterShortcut = useCallback((id: string) => {
-    setShortcuts((prev) => {
-      const next = new Map(prev);
-      next.delete(id);
-      return next;
-    });
+    shortcutsRef.current.delete(id);
   }, []);
 
+  // Cmd/Ctrl+K: toggle command palette (always works, even in inputs)
+  useHotkeys("mod+k", () => setCommandPaletteOpen((prev) => !prev), {
+    preventDefault: true,
+    enableOnFormTags: ["INPUT", "TEXTAREA"],
+    enableOnContentEditable: true,
+  });
+
+  // Registered shortcuts handler (single keys + key sequences)
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       const target = e.target as HTMLElement;
@@ -68,22 +69,13 @@ export function KeyboardProvider({ children }: { children: React.ReactNode }) {
         tagName === "textarea" ||
         target.isContentEditable;
 
-      // Cmd+K / Ctrl+K always works
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setCommandPaletteOpen((prev) => !prev);
-        return;
-      }
-
-      // Don't fire shortcuts when typing in inputs (except Escape)
       if (isInput && e.key !== "Escape") return;
+      if (commandPaletteOpenRef.current && e.key !== "Escape") return;
 
-      // Don't fire when command palette is open
-      if (commandPaletteOpen && e.key !== "Escape") return;
+      const shortcuts = shortcutsRef.current;
 
-      // Check for two-key combos
       if (pendingKeyRef.current) {
-        const comboKey = `${pendingKeyRef.current}+${e.key}`;
+        const firstKey = pendingKeyRef.current;
         pendingKeyRef.current = null;
         if (pendingTimerRef.current) {
           clearTimeout(pendingTimerRef.current);
@@ -92,25 +84,22 @@ export function KeyboardProvider({ children }: { children: React.ReactNode }) {
         for (const def of shortcuts.values()) {
           if (
             def.keys.length === 2 &&
-            def.keys[0] === comboKey.split("+")[0] &&
-            def.keys[1] === comboKey.split("+")[1]
+            def.keys[0] === firstKey &&
+            def.keys[1] === e.key
           ) {
             e.preventDefault();
             def.action();
             return;
           }
         }
-        // If no combo matched, fall through to single-key check
       }
 
-      // Check for single-key shortcuts
       for (const def of shortcuts.values()) {
         if (def.keys.length === 1 && def.keys[0] === e.key) {
           e.preventDefault();
           def.action();
           return;
         }
-        // Start combo sequence
         if (def.keys.length === 2 && def.keys[0] === e.key) {
           e.preventDefault();
           pendingKeyRef.current = e.key;
@@ -124,12 +113,12 @@ export function KeyboardProvider({ children }: { children: React.ReactNode }) {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [shortcuts, commandPaletteOpen]);
+  }, []);
 
   return (
     <KeyboardContext.Provider
       value={{
-        shortcuts,
+        shortcutsRef,
         registerShortcut,
         unregisterShortcut,
         commandPaletteOpen,

@@ -44,7 +44,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           return;
         }
       }
-      router.push("/");
+      router.push("/dashboard");
       router.refresh();
     } catch {
       setError("Something went wrong");
