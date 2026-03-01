@@ -19,7 +19,7 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const info = getUserTitleInfo(session.user.id, id);
+  const info = await getUserTitleInfo(session.user.id, id);
   return NextResponse.json(info);
 }
 
@@ -38,9 +38,9 @@ export async function POST(
   const { status } = body;
 
   if (status === null || status === undefined) {
-    removeTitleStatus(session.user.id, id);
+    await removeTitleStatus(session.user.id, id);
   } else {
-    setTitleStatus(session.user.id, id, status);
+    await setTitleStatus(session.user.id, id, status);
   }
 
   return NextResponse.json({ ok: true });

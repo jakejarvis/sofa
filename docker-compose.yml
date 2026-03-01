@@ -1,0 +1,24 @@
+services:
+  couch-potato:
+    build: .
+    image: couch-potato
+    container_name: couch-potato
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - couch-potato-data:/data
+    environment:
+      - DATABASE_URL=file:/data/sqlite.db
+      - TMDB_API_KEY=${TMDB_API_KEY}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+volumes:
+  couch-potato-data:

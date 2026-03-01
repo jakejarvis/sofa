@@ -10,7 +10,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  let title = db.select().from(titles).where(eq(titles.id, id)).get();
+  let title = await db.select().from(titles).where(eq(titles.id, id)).get();
   if (!title)
     return NextResponse.json({ error: "Title not found" }, { status: 404 });
 
@@ -19,7 +19,8 @@ export async function GET(
   if (title.type === "tv" && !title.lastFetchedAt) {
     try {
       const show = await getTvDetails(title.tmdbId);
-      db.update(titles)
+      await db
+        .update(titles)
         .set({
           overview: show.overview,
           posterPath: show.poster_path,
@@ -30,7 +31,9 @@ export async function GET(
         .where(eq(titles.id, id))
         .run();
       await refreshTvChildren(id, title.tmdbId, show.number_of_seasons);
-      title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
+      title =
+        (await db.select().from(titles).where(eq(titles.id, id)).get()) ??
+        title;
     } catch {
       // Continue with whatever data we have
     }
@@ -55,25 +58,27 @@ export async function GET(
   }> = [];
 
   if (title.type === "tv") {
-    const seasonRows = db
+    const seasonRows = await db
       .select()
       .from(seasons)
       .where(eq(seasons.titleId, title.id))
       .orderBy(seasons.seasonNumber)
       .all();
 
-    titleSeasons = seasonRows.map((s) => ({
-      ...s,
-      episodes: db
-        .select()
-        .from(episodes)
-        .where(eq(episodes.seasonId, s.id))
-        .orderBy(episodes.episodeNumber)
-        .all(),
-    }));
+    titleSeasons = await Promise.all(
+      seasonRows.map(async (s) => ({
+        ...s,
+        episodes: await db
+          .select()
+          .from(episodes)
+          .where(eq(episodes.seasonId, s.id))
+          .orderBy(episodes.episodeNumber)
+          .all(),
+      })),
+    );
   }
 
-  const availability = db
+  const availability = await db
     .select()
     .from(availabilityOffers)
     .where(eq(availabilityOffers.titleId, title.id))

@@ -10,6 +10,6 @@ export async function GET() {
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const feed = getRecommendationsFeed(session.user.id);
+  const feed = await getRecommendationsFeed(session.user.id);
   return NextResponse.json(feed);
 }

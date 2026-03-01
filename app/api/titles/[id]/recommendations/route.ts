@@ -9,11 +9,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const title = db.select().from(titles).where(eq(titles.id, id)).get();
+  const title = await db.select().from(titles).where(eq(titles.id, id)).get();
   if (!title)
     return NextResponse.json({ error: "Title not found" }, { status: 404 });
 
-  const recs = db
+  const recs = await db
     .select({
       recommendedTitleId: titleRecommendations.recommendedTitleId,
       source: titleRecommendations.source,
@@ -24,18 +24,20 @@ export async function GET(
     .orderBy(titleRecommendations.rank)
     .all();
 
-  const results = recs
-    .map((rec) => {
-      const recTitle = db
-        .select()
-        .from(titles)
-        .where(eq(titles.id, rec.recommendedTitleId))
-        .get();
-      return recTitle
-        ? { ...recTitle, source: rec.source, rank: rec.rank }
-        : null;
-    })
-    .filter(Boolean);
+  const results = (
+    await Promise.all(
+      recs.map(async (rec) => {
+        const recTitle = await db
+          .select()
+          .from(titles)
+          .where(eq(titles.id, rec.recommendedTitleId))
+          .get();
+        return recTitle
+          ? { ...recTitle, source: rec.source, rank: rec.rank }
+          : null;
+      }),
+    )
+  ).filter(Boolean);
 
   return NextResponse.json(results);
 }

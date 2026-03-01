@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+*.md
+*.db
+*.db-*
+.env
+.env.*
+!.env.example
+.DS_Store
+.vercel
+coverage
+.vscode
+.idea

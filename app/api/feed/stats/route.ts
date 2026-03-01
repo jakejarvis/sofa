@@ -27,7 +27,7 @@ export async function GET() {
   weekStart.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
   weekStart.setHours(0, 0, 0, 0);
 
-  const [moviesThisMonth] = db
+  const [moviesThisMonth] = await db
     .select({ count: sql<number>`count(*)` })
     .from(userMovieWatches)
     .where(
@@ -38,7 +38,7 @@ export async function GET() {
     )
     .all();
 
-  const [episodesThisWeek] = db
+  const [episodesThisWeek] = await db
     .select({ count: sql<number>`count(*)` })
     .from(userEpisodeWatches)
     .where(
@@ -49,13 +49,13 @@ export async function GET() {
     )
     .all();
 
-  const [librarySize] = db
+  const [librarySize] = await db
     .select({ count: sql<number>`count(*)` })
     .from(userTitleStatus)
     .where(eq(userTitleStatus.userId, userId))
     .all();
 
-  const [completedCount] = db
+  const [completedCount] = await db
     .select({ count: sql<number>`count(*)` })
     .from(userTitleStatus)
     .where(

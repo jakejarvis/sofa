@@ -4,7 +4,11 @@ import { availabilityOffers, titles } from "@/lib/db/schema";
 import { getWatchProviders } from "@/lib/tmdb/client";
 
 export async function refreshAvailability(titleId: string) {
-  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+  const title = await db
+    .select()
+    .from(titles)
+    .where(eq(titles.id, titleId))
+    .get();
   if (!title) return;
 
   const data = await getWatchProviders(title.tmdbId, title.type);
@@ -15,7 +19,8 @@ export async function refreshAvailability(titleId: string) {
   const offerTypes = ["flatrate", "rent", "buy", "free", "ads"] as const;
 
   // Delete existing offers for this title+region
-  db.delete(availabilityOffers)
+  await db
+    .delete(availabilityOffers)
     .where(
       and(
         eq(availabilityOffers.titleId, titleId),
@@ -29,7 +34,8 @@ export async function refreshAvailability(titleId: string) {
     if (!providers) continue;
 
     for (const p of providers) {
-      db.insert(availabilityOffers)
+      await db
+        .insert(availabilityOffers)
         .values({
           titleId,
           region: "US",
@@ -46,7 +52,7 @@ export async function refreshAvailability(titleId: string) {
   }
 }
 
-export function getAvailability(titleId: string) {
+export async function getAvailability(titleId: string) {
   return db
     .select()
     .from(availabilityOffers)

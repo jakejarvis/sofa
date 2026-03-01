@@ -22,7 +22,7 @@ pnpm db:studio        # Open Drizzle Studio (visual DB browser)
 ### Stack
 
 - **Framework**: Next.js 16 (App Router), React 19, TypeScript
-- **Database**: SQLite via better-sqlite3 + Drizzle ORM (WAL mode, singleton via `globalThis`)
+- **Database**: SQLite via @libsql/client + Drizzle ORM (WAL mode, singleton via `globalThis`, async queries)
 - **Auth**: Better Auth with Drizzle adapter, email/password
 - **Styling**: Tailwind CSS v4, shadcn components, dark cinema theme with warm primary accents
 - **Fonts**: DM Serif Display (display), DM Sans (body), Geist Mono (mono)

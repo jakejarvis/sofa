@@ -18,14 +18,14 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const seasonEps = db
+  const seasonEps = await db
     .select()
     .from(episodes)
     .where(eq(episodes.seasonId, id))
     .all();
 
   for (const ep of seasonEps) {
-    logEpisodeWatch(session.user.id, ep.id);
+    await logEpisodeWatch(session.user.id, ep.id);
   }
 
   return NextResponse.json({ ok: true });
@@ -42,6 +42,6 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  unwatchSeason(session.user.id, id);
+  await unwatchSeason(session.user.id, id);
   return NextResponse.json({ ok: true });
 }

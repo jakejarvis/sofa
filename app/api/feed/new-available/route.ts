@@ -12,6 +12,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const days = Number(req.nextUrl.searchParams.get("days") ?? 14);
-  const feed = getNewAvailableFeed(session.user.id, days);
+  const feed = await getNewAvailableFeed(session.user.id, days);
   return NextResponse.json(feed);
 }

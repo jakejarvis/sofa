@@ -3,11 +3,30 @@ export async function onRequestError() {
 }
 
 export async function register() {
-  if (
-    process.env.NEXT_RUNTIME === "nodejs" &&
-    process.env.NODE_ENV === "production"
-  ) {
-    const { initJobs } = await import("@/lib/jobs/init");
-    initJobs();
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    // Run database migrations on startup
+    if (process.env.NODE_ENV === "production") {
+      const { runMigrations } = await import("@/lib/db/migrate");
+      await runMigrations();
+
+      const { initJobs } = await import("@/lib/jobs/init");
+      initJobs();
+
+      // Graceful shutdown — stop jobs and close DB on container stop
+      const { scheduler } = await import("@/lib/jobs/scheduler");
+      const { client } = await import("@/lib/db/client");
+
+      const shutdown = () => {
+        console.log("[shutdown] Stopping scheduler...");
+        scheduler.stop();
+        console.log("[shutdown] Closing database...");
+        client.close();
+        console.log("[shutdown] Clean shutdown complete");
+        process.exit(0);
+      };
+
+      process.on("SIGTERM", shutdown);
+      process.on("SIGINT", shutdown);
+    }
   }
 }

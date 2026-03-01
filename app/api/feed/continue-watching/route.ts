@@ -10,6 +10,6 @@ export async function GET() {
   if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const feed = getContinueWatchingFeed(session.user.id);
+  const feed = await getContinueWatchingFeed(session.user.id);
   return NextResponse.json(feed);
 }

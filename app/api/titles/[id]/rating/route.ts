@@ -25,6 +25,6 @@ export async function POST(
     );
   }
 
-  rateTitleStars(session.user.id, id, ratingStars);
+  await rateTitleStars(session.user.id, id, ratingStars);
   return NextResponse.json({ ok: true });
 }

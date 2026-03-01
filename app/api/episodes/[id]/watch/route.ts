@@ -15,7 +15,7 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  logEpisodeWatch(session.user.id, id);
+  await logEpisodeWatch(session.user.id, id);
   return NextResponse.json({ ok: true });
 }
 
@@ -30,6 +30,6 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  unwatchEpisode(session.user.id, id);
+  await unwatchEpisode(session.user.id, id);
   return NextResponse.json({ ok: true });
 }

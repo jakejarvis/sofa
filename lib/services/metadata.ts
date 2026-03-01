@@ -16,7 +16,7 @@ import {
 import { refreshAvailability } from "./availability";
 
 export async function importTitle(tmdbId: number, type: "movie" | "tv") {
-  const existing = db
+  const existing = await db
     .select()
     .from(titles)
     .where(eq(titles.tmdbId, tmdbId))
@@ -26,15 +26,18 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
     // They may be missing if a prior fetch failed or the title was created
     // as a shell by the recommendations system (lastFetchedAt: null).
     if (existing.type === "tv") {
-      const seasonCount = db
-        .select()
-        .from(seasons)
-        .where(eq(seasons.titleId, existing.id))
-        .all().length;
+      const seasonCount = (
+        await db
+          .select()
+          .from(seasons)
+          .where(eq(seasons.titleId, existing.id))
+          .all()
+      ).length;
       if (seasonCount === 0) {
         const show = await getTvDetails(tmdbId);
         if (!existing.lastFetchedAt) {
-          db.update(titles)
+          await db
+            .update(titles)
             .set({
               overview: show.overview,
               posterPath: show.poster_path,
@@ -58,7 +61,7 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
 
   if (type === "movie") {
     const movie = await getMovieDetails(tmdbId);
-    const row = db
+    const row = await db
       .insert(titles)
       .values({
         tmdbId: movie.id,
@@ -84,7 +87,7 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
   }
 
   const show = await getTvDetails(tmdbId);
-  const row = db
+  const row = await db
     .insert(titles)
     .values({
       tmdbId: show.id,
@@ -112,14 +115,19 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
 }
 
 export async function refreshTitle(titleId: string) {
-  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+  const title = await db
+    .select()
+    .from(titles)
+    .where(eq(titles.id, titleId))
+    .get();
   if (!title) return null;
 
   const now = new Date();
 
   if (title.type === "movie") {
     const movie = await getMovieDetails(title.tmdbId);
-    db.update(titles)
+    await db
+      .update(titles)
       .set({
         title: movie.title,
         originalTitle: movie.original_title,
@@ -137,7 +145,8 @@ export async function refreshTitle(titleId: string) {
       .run();
   } else {
     const show = await getTvDetails(title.tmdbId);
-    db.update(titles)
+    await db
+      .update(titles)
       .set({
         title: show.name,
         originalTitle: show.original_name,
@@ -173,7 +182,7 @@ export async function refreshTvChildren(
     try {
       const seasonData = await getTvSeasonDetails(tmdbId, sn);
 
-      const seasonRow = db
+      const seasonRow = await db
         .insert(seasons)
         .values({
           titleId,
@@ -198,7 +207,8 @@ export async function refreshTvChildren(
         .get();
 
       for (const ep of seasonData.episodes) {
-        db.insert(episodes)
+        await db
+          .insert(episodes)
           .values({
             seasonId: seasonRow.id,
             episodeNumber: ep.episode_number,
@@ -229,7 +239,11 @@ export async function refreshTvChildren(
 }
 
 export async function refreshRecommendations(titleId: string) {
-  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+  const title = await db
+    .select()
+    .from(titles)
+    .where(eq(titles.id, titleId))
+    .get();
   if (!title) return;
 
   const now = new Date();
@@ -247,7 +261,7 @@ export async function refreshRecommendations(titleId: string) {
     if (type !== "movie" && type !== "tv") continue;
 
     // Minimal upsert of the recommended title
-    const existing = db
+    const existing = await db
       .select()
       .from(titles)
       .where(eq(titles.tmdbId, r.id))
@@ -256,7 +270,7 @@ export async function refreshRecommendations(titleId: string) {
     if (existing) {
       recTitleId = existing.id;
     } else {
-      const row = db
+      const row = await db
         .insert(titles)
         .values({
           tmdbId: r.id,
@@ -277,7 +291,7 @@ export async function refreshRecommendations(titleId: string) {
         .returning()
         .get();
       if (!row) {
-        const found = db
+        const found = await db
           .select()
           .from(titles)
           .where(eq(titles.tmdbId, r.id))
@@ -289,7 +303,8 @@ export async function refreshRecommendations(titleId: string) {
       }
     }
 
-    db.insert(titleRecommendations)
+    await db
+      .insert(titleRecommendations)
       .values({
         titleId,
         recommendedTitleId: recTitleId,
@@ -314,7 +329,7 @@ export async function refreshRecommendations(titleId: string) {
     const type = r.media_type ?? title.type;
     if (type !== "movie" && type !== "tv") continue;
 
-    const existing = db
+    const existing = await db
       .select()
       .from(titles)
       .where(eq(titles.tmdbId, r.id))
@@ -323,7 +338,7 @@ export async function refreshRecommendations(titleId: string) {
     if (existing) {
       recTitleId = existing.id;
     } else {
-      const row = db
+      const row = await db
         .insert(titles)
         .values({
           tmdbId: r.id,
@@ -344,7 +359,7 @@ export async function refreshRecommendations(titleId: string) {
         .returning()
         .get();
       if (!row) {
-        const found = db
+        const found = await db
           .select()
           .from(titles)
           .where(eq(titles.tmdbId, r.id))
@@ -356,7 +371,8 @@ export async function refreshRecommendations(titleId: string) {
       }
     }
 
-    db.insert(titleRecommendations)
+    await db
+      .insert(titleRecommendations)
       .values({
         titleId,
         recommendedTitleId: recTitleId,

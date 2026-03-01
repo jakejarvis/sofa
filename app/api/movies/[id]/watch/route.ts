@@ -15,6 +15,6 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  logMovieWatch(session.user.id, id);
+  await logMovieWatch(session.user.id, id);
   return NextResponse.json({ ok: true });
 }
