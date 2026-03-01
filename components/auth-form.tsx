@@ -123,7 +123,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20"
-              placeholder="you@example.com"
+              placeholder="wwhite@graymatter.biz"
             />
           </motion.div>
 
