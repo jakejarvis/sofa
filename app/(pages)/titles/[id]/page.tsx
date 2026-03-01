@@ -32,6 +32,7 @@ interface Episode {
   episodeNumber: number;
   name: string | null;
   overview: string | null;
+  stillPath: string | null;
   airDate: string | null;
   runtimeMinutes: number | null;
 }
@@ -462,10 +463,11 @@ export default function TitleDetailPage() {
             className="object-cover"
             priority
           />
-          {/* Three-layer gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/20" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-transparent" />
+          {/* Multi-layer gradient for text readability on any backdrop */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-background/15" />
           {/* Film grain overlay */}
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.03]"
@@ -689,10 +691,13 @@ export default function TitleDetailPage() {
                           const isWatched = title.episodeWatches?.includes(
                             ep.id,
                           );
+                          const stillUrl = ep.stillPath
+                            ? `https://image.tmdb.org/t/p/w300${ep.stillPath}`
+                            : null;
                           return (
                             <div
                               key={ep.id}
-                              className="flex items-center gap-3 border-b border-border/30 px-4 py-3 last:border-b-0"
+                              className={`flex gap-3 border-b border-border/30 px-4 py-3 last:border-b-0 transition-colors ${isWatched ? "opacity-60" : ""}`}
                             >
                               <button
                                 type="button"
@@ -705,7 +710,7 @@ export default function TitleDetailPage() {
                                   )
                                 }
                                 disabled={watchingEp === ep.id}
-                                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
+                                className={`mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
                                   isWatched
                                     ? "border-primary bg-primary text-primary-foreground"
                                     : "border-muted-foreground/40 bg-muted-foreground/5 hover:border-primary/70 hover:bg-primary/10"
@@ -725,8 +730,19 @@ export default function TitleDetailPage() {
                                   </motion.div>
                                 )}
                               </button>
+                              {stillUrl && (
+                                <div className="hidden h-14 w-24 shrink-0 overflow-hidden rounded-md bg-muted sm:block">
+                                  <Image
+                                    src={stillUrl}
+                                    alt={ep.name ?? ""}
+                                    width={300}
+                                    height={169}
+                                    className="h-full w-full object-cover"
+                                  />
+                                </div>
+                              )}
                               <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm">
+                                <p className="text-sm">
                                   <span className="font-mono text-xs text-muted-foreground">
                                     E{String(ep.episodeNumber).padStart(2, "0")}
                                   </span>{" "}
@@ -734,12 +750,16 @@ export default function TitleDetailPage() {
                                     {ep.name ?? "Untitled"}
                                   </span>
                                 </p>
-                                {ep.airDate && (
-                                  <p className="text-xs text-muted-foreground">
-                                    {ep.airDate}
-                                    {ep.runtimeMinutes
-                                      ? ` · ${ep.runtimeMinutes}m`
-                                      : ""}
+                                <p className="text-xs text-muted-foreground">
+                                  {ep.airDate ?? ""}
+                                  {ep.airDate && ep.runtimeMinutes ? " · " : ""}
+                                  {ep.runtimeMinutes
+                                    ? `${ep.runtimeMinutes}m`
+                                    : ""}
+                                </p>
+                                {ep.overview && (
+                                  <p className="mt-1 hidden line-clamp-2 text-xs leading-relaxed text-muted-foreground/70 sm:block">
+                                    {ep.overview}
                                   </p>
                                 )}
                               </div>
@@ -796,23 +816,25 @@ function ProviderBadge({
   const logoUrl = logoPath ? `https://image.tmdb.org/t/p/w92${logoPath}` : null;
 
   return (
-    <div
-      className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card transition-transform hover:scale-105"
-      title={name}
-    >
-      {logoUrl ? (
-        <Image
-          src={logoUrl}
-          alt={name}
-          width={40}
-          height={40}
-          className="h-full w-full object-cover"
-        />
-      ) : (
-        <span className="text-[8px] font-medium text-muted-foreground">
-          {name.slice(0, 2)}
-        </span>
-      )}
+    <div className="group relative">
+      <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card transition-transform hover:scale-105">
+        {logoUrl ? (
+          <Image
+            src={logoUrl}
+            alt={name}
+            width={40}
+            height={40}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <span className="text-[8px] font-medium text-muted-foreground">
+            {name.slice(0, 2)}
+          </span>
+        )}
+      </div>
+      <div className="pointer-events-none absolute -top-8 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-md bg-popover px-2 py-1 text-[10px] font-medium text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100">
+        {name}
+      </div>
     </div>
   );
 }
