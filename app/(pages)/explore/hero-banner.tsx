@@ -1,0 +1,126 @@
+"use client";
+
+import { IconLoader2, IconPlus, IconStar } from "@tabler/icons-react";
+import { motion } from "motion/react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
+
+interface HeroBannerProps {
+  tmdbId: number;
+  type: "movie" | "tv";
+  title: string;
+  overview: string;
+  backdropPath: string | null;
+  voteAverage: number;
+}
+
+export function HeroBanner({
+  tmdbId,
+  type,
+  title,
+  overview,
+  backdropPath,
+  voteAverage,
+}: HeroBannerProps) {
+  const router = useRouter();
+  const [importing, setImporting] = useState(false);
+  const backdropUrl = tmdbImageUrl(backdropPath, "w1280");
+
+  async function handleImport() {
+    setImporting(true);
+    try {
+      const res = await fetch("/api/titles/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tmdbId, type }),
+      });
+      const data = await res.json();
+      if (data.id) {
+        router.push(`/titles/${data.id}`);
+      }
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  return (
+    <motion.div
+      className="relative -mx-4 -mt-6 mb-4 overflow-hidden sm:-mx-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
+      <div className="relative aspect-[21/9] min-h-[280px] max-h-[420px]">
+        {backdropUrl ? (
+          <Image
+            src={backdropUrl}
+            alt={title}
+            fill
+            priority
+            className="object-cover"
+          />
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-card via-secondary to-muted" />
+        )}
+
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent" />
+
+        {/* Content */}
+        <div className="absolute inset-0 flex items-end">
+          <div className="w-full px-4 pb-8 sm:px-6">
+            <div className="mx-auto max-w-6xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 24,
+                  delay: 0.2,
+                }}
+              >
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="rounded bg-primary/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+                    {type}
+                  </span>
+                  {voteAverage > 0 && (
+                    <span className="flex items-center gap-1 text-sm text-primary">
+                      <IconStar size={14} className="fill-primary" />
+                      {voteAverage.toFixed(1)}
+                    </span>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    Trending today
+                  </span>
+                </div>
+                <h2 className="font-display text-3xl tracking-tight sm:text-4xl">
+                  {title}
+                </h2>
+                <p className="mt-2 line-clamp-2 max-w-2xl text-sm text-muted-foreground">
+                  {overview}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleImport}
+                  disabled={importing}
+                  className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:shadow-md hover:shadow-primary/20 disabled:opacity-50"
+                >
+                  {importing ? (
+                    <IconLoader2 size={16} className="animate-spin" />
+                  ) : (
+                    <IconPlus size={16} />
+                  )}
+                  Add to Library
+                </button>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}

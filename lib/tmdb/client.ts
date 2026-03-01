@@ -1,4 +1,5 @@
 import type {
+  TmdbGenreListResponse,
   TmdbMovieDetails,
   TmdbRecommendationResponse,
   TmdbSearchResponse,
@@ -18,6 +19,7 @@ function getApiKey() {
 async function tmdbFetch<T>(
   path: string,
   params?: Record<string, string>,
+  fetchOptions?: RequestInit,
 ): Promise<T> {
   const url = new URL(`${BASE_URL}${path}`);
   if (params) {
@@ -27,9 +29,11 @@ async function tmdbFetch<T>(
   }
 
   const res = await fetch(url.toString(), {
+    ...fetchOptions,
     headers: {
       Authorization: `Bearer ${getApiKey()}`,
       Accept: "application/json",
+      ...fetchOptions?.headers,
     },
   });
 
@@ -88,6 +92,43 @@ export async function getRecommendations(tmdbId: number, type: "movie" | "tv") {
 
 export async function getSimilar(tmdbId: number, type: "movie" | "tv") {
   return tmdbFetch<TmdbRecommendationResponse>(`/${type}/${tmdbId}/similar`);
+}
+
+export async function getTrending(
+  mediaType: "all" | "movie" | "tv",
+  timeWindow: "day" | "week" = "day",
+) {
+  return tmdbFetch<TmdbSearchResponse>(
+    `/trending/${mediaType}/${timeWindow}`,
+    undefined,
+    { next: { revalidate: 3600 } },
+  );
+}
+
+export async function getPopular(type: "movie" | "tv", page = 1) {
+  return tmdbFetch<TmdbSearchResponse>(
+    `/${type}/popular`,
+    { page: String(page) },
+    { next: { revalidate: 3600 } },
+  );
+}
+
+export async function getGenres(type: "movie" | "tv") {
+  return tmdbFetch<TmdbGenreListResponse>(`/genre/${type}/list`, undefined, {
+    next: { revalidate: 86400 },
+  });
+}
+
+export async function discover(
+  type: "movie" | "tv",
+  params: Record<string, string>,
+  page = 1,
+) {
+  return tmdbFetch<TmdbSearchResponse>(
+    `/discover/${type}`,
+    { ...params, page: String(page) },
+    { next: { revalidate: 3600 } },
+  );
 }
 
 export { tmdbImageUrl } from "./image";

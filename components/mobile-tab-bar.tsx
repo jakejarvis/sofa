@@ -1,6 +1,6 @@
 "use client";
 
-import { IconHome, IconSearch, IconSettings } from "@tabler/icons-react";
+import { IconCompass, IconHome, IconSettings } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -8,7 +8,7 @@ import { useSession } from "@/lib/auth/client";
 
 const tabs = [
   { href: "/dashboard", label: "Home", icon: IconHome },
-  { href: "/search", label: "Search", icon: IconSearch },
+  { href: "/explore", label: "Explore", icon: IconCompass },
   { href: "/settings", label: "Settings", icon: IconSettings },
 ] as const;
 

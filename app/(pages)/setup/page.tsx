@@ -57,7 +57,8 @@ const steps = [
   {
     number: "3",
     title: "Add it to your environment",
-    description: "Set the TMDB_API_READ_ACCESS_TOKEN environment variable and restart Sofa.",
+    description:
+      "Set the TMDB_API_READ_ACCESS_TOKEN environment variable and restart Sofa.",
   },
 ];
 

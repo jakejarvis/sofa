@@ -94,10 +94,10 @@ export function CommandPalette() {
       action: () => router.push("/dashboard"),
       scope: "Navigation",
     });
-    registerShortcut("nav-search", {
-      keys: ["g", "s"],
-      description: "Go to search",
-      action: () => router.push("/search"),
+    registerShortcut("nav-explore", {
+      keys: ["g", "e"],
+      description: "Go to explore",
+      action: () => router.push("/explore"),
       scope: "Navigation",
     });
   }, [registerShortcut, setCommandPaletteOpen, setHelpOpen, router]);
@@ -279,12 +279,12 @@ export function CommandPalette() {
                   <CommandItem
                     onSelect={() => {
                       setCommandPaletteOpen(false);
-                      router.push("/search");
+                      router.push("/explore");
                     }}
                   >
                     <IconSearch size={14} />
-                    Go to Search
-                    <CommandShortcut>G S</CommandShortcut>
+                    Go to Explore
+                    <CommandShortcut>G E</CommandShortcut>
                   </CommandItem>
                   <CommandItem
                     onSelect={() => {

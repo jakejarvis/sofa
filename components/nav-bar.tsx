@@ -10,7 +10,7 @@ import { signOut, useSession } from "@/lib/auth/client";
 
 const navLinks = [
   { href: "/dashboard", label: "Home" },
-  { href: "/search", label: "Search" },
+  { href: "/explore", label: "Explore" },
 ] as const;
 
 export function NavBar() {

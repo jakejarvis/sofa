@@ -110,3 +110,12 @@ export interface TmdbRecommendationResponse {
   total_pages: number;
   total_results: number;
 }
+
+export interface TmdbGenre {
+  id: number;
+  name: string;
+}
+
+export interface TmdbGenreListResponse {
+  genres: TmdbGenre[];
+}
