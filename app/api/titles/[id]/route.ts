@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { availabilityOffers, episodes, seasons, titles } from "@/lib/db/schema";
+import { extractAndStoreColors, parseColorPalette } from "@/lib/services/colors";
 import { refreshTvChildren } from "@/lib/services/metadata";
 import { getTvDetails } from "@/lib/tmdb/client";
 
@@ -84,8 +85,14 @@ export async function GET(
     .where(eq(availabilityOffers.titleId, title.id))
     .all();
 
+  // Lazy color extraction: if no palette yet, fire-and-forget for next load
+  if (!title.colorPalette && title.posterPath) {
+    extractAndStoreColors(title.id, title.posterPath).catch(() => {});
+  }
+
   return NextResponse.json({
     ...title,
+    colorPalette: parseColorPalette(title.colorPalette),
     seasons: titleSeasons,
     availability,
   });

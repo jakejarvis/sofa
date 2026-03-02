@@ -91,6 +91,7 @@ export const titles = sqliteTable(
     voteAverage: real("voteAverage"),
     voteCount: int("voteCount"),
     status: text("status"),
+    colorPalette: text("colorPalette"),
     lastFetchedAt: int("lastFetchedAt", { mode: "timestamp" }),
   },
   (table) => [

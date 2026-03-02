@@ -14,6 +14,7 @@ import {
   getTvSeasonDetails,
 } from "@/lib/tmdb/client";
 import { refreshAvailability } from "./availability";
+import { extractAndStoreColors } from "./colors";
 
 export async function importTitle(tmdbId: number, type: "movie" | "tv") {
   const existing = await db
@@ -80,9 +81,10 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
       })
       .returning()
       .get();
-    // Fire-and-forget: fetch availability & recommendations
+    // Fire-and-forget: fetch availability, recommendations & colors
     refreshAvailability(row.id).catch(() => {});
     refreshRecommendations(row.id).catch(() => {});
+    extractAndStoreColors(row.id, movie.poster_path).catch(() => {});
     return row;
   }
 
@@ -108,9 +110,10 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
     .get();
 
   await refreshTvChildren(row.id, tmdbId, show.number_of_seasons);
-  // Fire-and-forget: fetch availability & recommendations
+  // Fire-and-forget: fetch availability, recommendations & colors
   refreshAvailability(row.id).catch(() => {});
   refreshRecommendations(row.id).catch(() => {});
+  extractAndStoreColors(row.id, show.poster_path).catch(() => {});
   return row;
 }
 
@@ -165,7 +168,15 @@ export async function refreshTitle(titleId: string) {
     await refreshTvChildren(titleId, title.tmdbId, show.number_of_seasons);
   }
 
-  return db.select().from(titles).where(eq(titles.id, titleId)).get();
+  const updated = await db
+    .select()
+    .from(titles)
+    .where(eq(titles.id, titleId))
+    .get();
+  if (updated) {
+    extractAndStoreColors(updated.id, updated.posterPath).catch(() => {});
+  }
+  return updated;
 }
 
 export async function refreshTvChildren(

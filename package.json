@@ -27,6 +27,7 @@
     "embla-carousel-react": "^8.6.0",
     "motion": "^12.34.3",
     "next": "16.1.6",
+    "node-vibrant": "^4.0.4",
     "react": "19.2.4",
     "react-day-picker": "^9.14.0",
     "react-dom": "19.2.4",
