@@ -17,6 +17,11 @@ import { StatusButton } from "@/components/status-button";
 import { TitleCard } from "@/components/title-card";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { Progress } from "@/components/ui/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useRegisterShortcut } from "@/hooks/use-register-shortcut";
 
 interface Episode {
@@ -855,8 +860,8 @@ function ProviderBadge({
   logoPath: string | null;
 }) {
   return (
-    <div className="group relative">
-      <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card transition-transform hover:scale-105">
+    <Tooltip>
+      <TooltipTrigger className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card transition-transform hover:scale-105">
         {logoPath ? (
           <Image
             src={logoPath}
@@ -870,10 +875,10 @@ function ProviderBadge({
             {name.slice(0, 2)}
           </span>
         )}
-      </div>
-      <div className="pointer-events-none absolute -top-8 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-md bg-popover px-2 py-1 text-[10px] font-medium text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100">
+      </TooltipTrigger>
+      <TooltipContent className="bg-popover px-2 py-1 text-[10px] font-medium text-popover-foreground shadow-md [&>:last-child]:bg-popover [&>:last-child]:fill-popover">
         {name}
-      </div>
-    </div>
+      </TooltipContent>
+    </Tooltip>
   );
 }

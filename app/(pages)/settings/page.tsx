@@ -31,6 +31,11 @@ import {
 } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { signOut, useSession } from "@/lib/auth/client";
 
 const sectionVariants = {
@@ -206,18 +211,24 @@ function WebhookCard({
                     value={webhookUrl}
                     className="font-mono text-[10px] text-muted-foreground"
                   />
-                  <Button
-                    variant="outline"
-                    size="icon-lg"
-                    onClick={handleCopy}
-                    title="Copy URL"
-                  >
-                    {copied ? (
-                      <IconCheck size={14} className="text-green-400" />
-                    ) : (
-                      <IconCopy size={14} />
-                    )}
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <Button
+                          variant="outline"
+                          size="icon-lg"
+                          onClick={handleCopy}
+                        />
+                      }
+                    >
+                      {copied ? (
+                        <IconCheck size={14} className="text-green-400" />
+                      ) : (
+                        <IconCopy size={14} />
+                      )}
+                    </TooltipTrigger>
+                    <TooltipContent>Copy URL</TooltipContent>
+                  </Tooltip>
                 </div>
               </div>
 
