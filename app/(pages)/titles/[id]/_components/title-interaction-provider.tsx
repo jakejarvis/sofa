@@ -9,6 +9,15 @@ import {
 } from "react";
 import { toast } from "sonner";
 import type { Season } from "@/lib/types/title";
+import {
+  unwatchEpisodeAction,
+  unwatchSeasonAction,
+  updateTitleRating,
+  updateTitleStatus,
+  watchEpisode,
+  watchMovie,
+  watchSeason,
+} from "./actions";
 
 interface TitleInteractionState {
   titleId: string;
@@ -74,12 +83,7 @@ export function TitleInteractionProvider({
       const prev = userStatus;
       setUserStatus(status);
       try {
-        const res = await fetch(`/api/titles/${titleId}/status`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status }),
-        });
-        if (!res.ok) throw new Error();
+        await updateTitleStatus(titleId, status);
         const label =
           status === "watchlist"
             ? "Added to watchlist"
@@ -102,12 +106,7 @@ export function TitleInteractionProvider({
       const prev = userRating;
       setUserRating(ratingStars);
       try {
-        const res = await fetch(`/api/titles/${titleId}/rating`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ratingStars }),
-        });
-        if (!res.ok) throw new Error();
+        await updateTitleRating(titleId, ratingStars);
         toast.success(
           ratingStars > 0
             ? `Rated ${ratingStars} star${ratingStars > 1 ? "s" : ""}`
@@ -125,10 +124,7 @@ export function TitleInteractionProvider({
     const prev = userStatus;
     setUserStatus("completed");
     try {
-      const res = await fetch(`/api/movies/${titleId}/watch`, {
-        method: "POST",
-      });
-      if (!res.ok) throw new Error();
+      await watchMovie(titleId);
       toast.success(`Marked "${titleName}" as watched`);
     } catch {
       setUserStatus(prev);
@@ -148,10 +144,7 @@ export function TitleInteractionProvider({
         setEpisodeWatches((w) => w.filter((id) => id !== episodeId));
         setUserStatus((s) => (s === "completed" ? "in_progress" : s));
         try {
-          const res = await fetch(`/api/episodes/${episodeId}/watch`, {
-            method: "DELETE",
-          });
-          if (!res.ok) throw new Error();
+          await unwatchEpisodeAction(episodeId);
           toast.success(`Unwatched S${seasonNum} E${epNum}`);
         } catch {
           setEpisodeWatches((w) =>
@@ -165,10 +158,7 @@ export function TitleInteractionProvider({
         );
         setUserStatus((s) => s ?? "in_progress");
         try {
-          const res = await fetch(`/api/episodes/${episodeId}/watch`, {
-            method: "POST",
-          });
-          if (!res.ok) throw new Error();
+          await watchEpisode(episodeId);
           toast.success(`Watched S${seasonNum} E${epNum}`);
         } catch {
           setEpisodeWatches((w) => w.filter((id) => id !== episodeId));
@@ -194,10 +184,7 @@ export function TitleInteractionProvider({
       });
 
       try {
-        const res = await fetch(`/api/seasons/${season.id}/watch`, {
-          method: "POST",
-        });
-        if (!res.ok) throw new Error();
+        await watchSeason(season.id);
         toast.success(
           `Watched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
         );
@@ -215,10 +202,7 @@ export function TitleInteractionProvider({
     setUserStatus((s) => (s === "completed" ? "in_progress" : s));
 
     try {
-      const res = await fetch(`/api/seasons/${season.id}/watch`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error();
+      await unwatchSeasonAction(season.id);
       toast.success(
         `Unwatched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
       );
