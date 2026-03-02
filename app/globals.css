@@ -51,39 +51,39 @@
   --color-status-completed: var(--status-completed);
 }
 
-/* Dark cinema — always dark, warm indigo base */
+/* Dark cinema — warm charcoal base, amber accent light */
 :root {
-  --background: oklch(0.12 0.008 270);
-  --foreground: oklch(0.93 0.01 80);
-  --card: oklch(0.16 0.008 270);
-  --card-foreground: oklch(0.93 0.01 80);
-  --popover: oklch(0.18 0.008 270);
-  --popover-foreground: oklch(0.93 0.01 80);
+  --background: oklch(0.13 0.006 55);
+  --foreground: oklch(0.93 0.015 80);
+  --card: oklch(0.19 0.008 55);
+  --card-foreground: oklch(0.93 0.015 80);
+  --popover: oklch(0.21 0.008 55);
+  --popover-foreground: oklch(0.93 0.015 80);
   --primary: oklch(0.8 0.14 65);
-  --primary-foreground: oklch(0.12 0.008 270);
-  --secondary: oklch(0.2 0.008 270);
+  --primary-foreground: oklch(0.13 0.006 55);
+  --secondary: oklch(0.22 0.008 55);
   --secondary-foreground: oklch(0.85 0.02 80);
-  --muted: oklch(0.2 0.008 270);
-  --muted-foreground: oklch(0.6 0.02 80);
-  --accent: oklch(0.22 0.01 270);
-  --accent-foreground: oklch(0.93 0.01 80);
+  --muted: oklch(0.22 0.008 55);
+  --muted-foreground: oklch(0.63 0.02 80);
+  --accent: oklch(0.25 0.010 55);
+  --accent-foreground: oklch(0.93 0.015 80);
   --destructive: oklch(0.65 0.2 25);
-  --border: oklch(0.8 0.02 65 / 8%);
-  --input: oklch(1 0 0 / 10%);
+  --border: oklch(1 0.015 65 / 10%);
+  --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.8 0.14 65);
   --chart-1: oklch(0.8 0.14 65);
   --chart-2: oklch(0.65 0.15 30);
-  --chart-3: oklch(0.55 0.12 260);
+  --chart-3: oklch(0.58 0.12 260);
   --chart-4: oklch(0.72 0.1 160);
-  --chart-5: oklch(0.6 0.15 310);
+  --chart-5: oklch(0.63 0.15 310);
   --radius: 0.625rem;
-  --sidebar: oklch(0.14 0.008 270);
-  --sidebar-foreground: oklch(0.93 0.01 80);
+  --sidebar: oklch(0.11 0.006 55);
+  --sidebar-foreground: oklch(0.93 0.015 80);
   --sidebar-primary: oklch(0.8 0.14 65);
-  --sidebar-primary-foreground: oklch(0.12 0.008 270);
-  --sidebar-accent: oklch(0.2 0.008 270);
-  --sidebar-accent-foreground: oklch(0.93 0.01 80);
-  --sidebar-border: oklch(0.8 0.02 65 / 8%);
+  --sidebar-primary-foreground: oklch(0.13 0.006 55);
+  --sidebar-accent: oklch(0.22 0.008 55);
+  --sidebar-accent-foreground: oklch(0.93 0.015 80);
+  --sidebar-border: oklch(1 0.015 65 / 10%);
   --sidebar-ring: oklch(0.8 0.14 65);
   --status-watchlist: oklch(0.72 0.12 220);
   --status-watching: oklch(0.78 0.14 65);
@@ -175,7 +175,7 @@ body::before {
 
 [data-slot="skeleton"] {
   animation: warm-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  background: oklch(0.22 0.015 270);
+  background: oklch(0.25 0.010 55);
 }
 
 /* Scrollbar styling */
