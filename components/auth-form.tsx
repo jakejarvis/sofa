@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { SofaLogo } from "@/components/sofa-logo";
 import { signIn, signUp } from "@/lib/auth/client";
 
 const fieldVariants = {
@@ -65,11 +66,8 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         transition={{ type: "spring" as const, stiffness: 200, damping: 20 }}
       >
         <div className="space-y-2 text-center">
-          <Link
-            href="/"
-            className="font-display text-2xl tracking-tight text-primary"
-          >
-            Sofa
+          <Link href="/" className="inline-flex justify-center text-primary">
+            <SofaLogo size={36} />
           </Link>
           <h1 className="text-lg font-medium">
             {isRegister ? "Create your account" : "Welcome back"}

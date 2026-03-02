@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useKeyboard } from "@/components/keyboard-provider";
+import { SofaLogo } from "@/components/sofa-logo";
 import { Kbd } from "@/components/ui/kbd";
 import { signOut, useSession } from "@/lib/auth/client";
 
@@ -25,9 +26,9 @@ export function NavBar() {
         <div className="flex items-center gap-6">
           <Link
             href="/dashboard"
-            className="font-display text-xl tracking-tight"
+            className="text-foreground transition-colors hover:text-primary"
           >
-            Sofa
+            <SofaLogo size={28} />
           </Link>
           {session?.user && (
             <div className="hidden items-center gap-1 sm:flex">

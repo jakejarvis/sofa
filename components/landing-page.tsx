@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { SofaLogo } from "@/components/sofa-logo";
 import { useSession } from "@/lib/auth/client";
 
 /** Check whether the server has TMDB configured. */
@@ -127,8 +128,8 @@ export function LandingPage({ posterUrls }: { posterUrls: string[] }) {
           >
             Self-hosted movie & TV tracker
           </motion.p>
-          <motion.h1
-            className="font-display text-6xl tracking-tight sm:text-7xl md:text-8xl"
+          <motion.div
+            className="flex justify-center text-primary"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -138,8 +139,8 @@ export function LandingPage({ posterUrls }: { posterUrls: string[] }) {
               delay: 0.1,
             }}
           >
-            Sofa
-          </motion.h1>
+            <SofaLogo size={96} className="sm:h-28 sm:w-28 md:h-32 md:w-32" />
+          </motion.div>
           <motion.p
             className="mx-auto max-w-md text-lg leading-relaxed text-muted-foreground"
             initial={{ opacity: 0, y: 20 }}

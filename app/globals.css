@@ -97,6 +97,12 @@
   body {
     @apply bg-background text-foreground antialiased;
   }
+
+  /* https://ui.shadcn.com/docs/components/radix/button#cursor */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 /* Film grain texture overlay */
