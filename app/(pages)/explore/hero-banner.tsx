@@ -45,12 +45,12 @@ export function HeroBanner({
 
   return (
     <motion.div
-      className="relative -mx-4 -mt-6 mb-4 overflow-hidden sm:-mx-6"
+      className="relative -mt-6 mb-4 ml-[calc(-50vw+50%)] mr-[calc(-50vw+50%)] overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="relative aspect-[21/9] min-h-[280px] max-h-[420px]">
+      <div className="relative w-full min-h-[280px] max-h-[420px] aspect-[21/9]">
         {backdropPath ? (
           <Image
             src={backdropPath}
