@@ -4,6 +4,7 @@ import {
   IconCheck,
   IconChevronDown,
   IconCopy,
+  IconInfoCircle,
   IconLogout,
   IconRefresh,
   IconSettings,
@@ -96,6 +97,7 @@ function WebhookCard({
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
+  const [cardOpen, setCardOpen] = useState(false);
 
   const isPlex = provider === "plex";
   const label = isPlex ? "Plex" : "Jellyfin";
@@ -124,207 +126,235 @@ function WebhookCard({
 
   return (
     <Card>
-      <CardContent>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <Icon className="size-4 text-primary" />
-            </div>
-            <div>
-              <CardTitle>{label}</CardTitle>
-              <CardDescription>
-                {connection
-                  ? connection.lastEventAt
-                    ? `Last event ${timeAgo(connection.lastEventAt)}`
-                    : "Connected — no events yet"
-                  : "Not configured"}
-              </CardDescription>
-            </div>
-          </div>
-          {connection && (
-            <Switch
-              checked={connection.enabled}
-              onCheckedChange={(checked) => onToggle(provider, checked)}
-            />
-          )}
-        </div>
-      </CardContent>
-
-      <CardContent className="space-y-3 pt-0">
-        <div>
-          <label
-            htmlFor={`${provider}-username`}
-            className="mb-1 block text-xs text-muted-foreground"
-          >
-            {label} username
-          </label>
-          <div className="flex gap-2">
-            <Input
-              id={`${provider}-username`}
-              placeholder={`Your ${label} username`}
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSave()}
-            />
-            {!connection ? (
-              <Button
-                onClick={handleSave}
-                disabled={saving || !username.trim()}
-                size="lg"
-              >
-                {saving ? "Saving..." : "Connect"}
-              </Button>
-            ) : (
-              username.trim() !== connection.mediaServerUsername && (
-                <Button
-                  onClick={handleSave}
-                  disabled={saving || !username.trim()}
-                  variant="outline"
-                  size="lg"
-                >
-                  Update
-                </Button>
-              )
-            )}
-          </div>
-        </div>
-
-        <AnimatePresence>
-          {webhookUrl && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="space-y-3 overflow-hidden"
-            >
-              <div>
-                <label
-                  htmlFor={`${provider}-webhook-url`}
-                  className="mb-1 block text-xs text-muted-foreground"
-                >
-                  Webhook URL
-                </label>
-                <div className="flex gap-2">
-                  <Input
-                    id={`${provider}-webhook-url`}
-                    readOnly
-                    value={webhookUrl}
-                    className="font-mono text-[10px] text-muted-foreground"
-                  />
-                  <Tooltip>
-                    <TooltipTrigger
-                      render={
-                        <Button
-                          variant="outline"
-                          size="icon-lg"
-                          onClick={handleCopy}
-                        />
-                      }
-                    >
-                      {copied ? (
-                        <IconCheck size={14} className="text-green-400" />
-                      ) : (
-                        <IconCopy size={14} />
-                      )}
-                    </TooltipTrigger>
-                    <TooltipContent>Copy URL</TooltipContent>
-                  </Tooltip>
-                </div>
+      <Collapsible open={cardOpen} onOpenChange={setCardOpen}>
+        <CardContent>
+          <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                <Icon className="size-4 text-primary" />
               </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onRegenerateToken(provider)}
-                >
-                  <IconRefresh size={12} />
-                  Regenerate URL
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => onDelete(provider)}
-                >
-                  <IconTrash size={12} />
-                  Disconnect
-                </Button>
+              <div className="text-left">
+                <CardTitle>{label}</CardTitle>
+                <CardDescription>
+                  {connection
+                    ? connection.lastEventAt
+                      ? `Last event ${timeAgo(connection.lastEventAt)}`
+                      : "Connected — no events yet"
+                    : "Not configured"}
+                </CardDescription>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
-          <CollapsibleTrigger className="flex w-full items-center gap-1.5 rounded-md py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
+            </div>
             <IconChevronDown
-              size={12}
-              className={`transition-transform ${setupOpen ? "rotate-0" : "-rotate-90"}`}
+              size={16}
+              className={`text-muted-foreground transition-transform duration-200 ${cardOpen ? "rotate-180" : ""}`}
             />
-            Setup instructions
           </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className="mt-2 rounded-lg bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
-              {isPlex ? (
-                <ol className="list-inside list-decimal space-y-1.5">
-                  <li>
-                    Open Plex, go to{" "}
-                    <span className="font-medium text-foreground">
-                      Settings &gt; Webhooks
-                    </span>
-                  </li>
-                  <li>
-                    Click{" "}
-                    <span className="font-medium text-foreground">
-                      Add Webhook
-                    </span>{" "}
-                    and paste the URL above
-                  </li>
-                  <li>
-                    Sofa will automatically log movies and episodes when you
-                    finish watching them
-                  </li>
-                  <li>
-                    Make sure the username above matches your Plex account name
-                  </li>
-                </ol>
-              ) : (
-                <ol className="list-inside list-decimal space-y-1.5">
-                  <li>
-                    Install the{" "}
-                    <span className="font-medium text-foreground">
-                      Webhook plugin
-                    </span>{" "}
-                    from Jellyfin&apos;s plugin catalog
-                  </li>
-                  <li>
-                    Go to{" "}
-                    <span className="font-medium text-foreground">
-                      Dashboard &gt; Plugins &gt; Webhook
-                    </span>
-                  </li>
-                  <li>
-                    Add a{" "}
-                    <span className="font-medium text-foreground">
-                      Generic Destination
-                    </span>{" "}
-                    and paste the URL above
-                  </li>
-                  <li>
-                    Enable the{" "}
-                    <span className="font-medium text-foreground">
-                      Playback Stop
-                    </span>{" "}
-                    notification type
-                  </li>
-                  <li>
-                    Make sure the username above matches your Jellyfin username
-                  </li>
-                </ol>
-              )}
+        </CardContent>
+
+        <CollapsibleContent>
+          <CardContent className="space-y-3 pt-0">
+            {connection && (
+              <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
+                <span className="text-xs text-muted-foreground">
+                  Webhook {connection.enabled ? "enabled" : "disabled"}
+                </span>
+                <Switch
+                  checked={connection.enabled}
+                  onCheckedChange={(checked) => onToggle(provider, checked)}
+                />
+              </div>
+            )}
+
+            {isPlex && (
+              <div className="flex gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
+                <IconInfoCircle
+                  size={14}
+                  className="mt-0.5 shrink-0 text-primary"
+                />
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  Plex webhooks require an active{" "}
+                  <span className="font-medium text-foreground">Plex Pass</span>{" "}
+                  subscription.
+                </p>
+              </div>
+            )}
+
+            <div>
+              <label
+                htmlFor={`${provider}-username`}
+                className="mb-1 block text-xs text-muted-foreground"
+              >
+                {label} username
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  id={`${provider}-username`}
+                  placeholder={`Your ${label} username`}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSave()}
+                />
+                {!connection ? (
+                  <Button
+                    onClick={handleSave}
+                    disabled={saving || !username.trim()}
+                  >
+                    {saving ? "Saving..." : "Connect"}
+                  </Button>
+                ) : (
+                  username.trim() !== connection.mediaServerUsername && (
+                    <Button
+                      onClick={handleSave}
+                      disabled={saving || !username.trim()}
+                      variant="outline"
+                    >
+                      Update
+                    </Button>
+                  )
+                )}
+              </div>
             </div>
-          </CollapsibleContent>
-        </Collapsible>
-      </CardContent>
+
+            <AnimatePresence>
+              {webhookUrl && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-3 overflow-hidden"
+                >
+                  <div>
+                    <label
+                      htmlFor={`${provider}-webhook-url`}
+                      className="mb-1 block text-xs text-muted-foreground"
+                    >
+                      Webhook URL
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        id={`${provider}-webhook-url`}
+                        readOnly
+                        value={webhookUrl}
+                        className="font-mono text-[10px] text-muted-foreground"
+                      />
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={handleCopy}
+                            />
+                          }
+                        >
+                          {copied ? (
+                            <IconCheck size={14} className="text-green-400" />
+                          ) : (
+                            <IconCopy size={14} />
+                          )}
+                        </TooltipTrigger>
+                        <TooltipContent>Copy URL</TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onRegenerateToken(provider)}
+                    >
+                      <IconRefresh size={12} />
+                      Regenerate URL
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => onDelete(provider)}
+                    >
+                      <IconTrash size={12} />
+                      Disconnect
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
+              <CollapsibleTrigger className="flex w-full items-center gap-1.5 rounded-md py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
+                <IconChevronDown
+                  size={12}
+                  className={`transition-transform ${setupOpen ? "rotate-0" : "-rotate-90"}`}
+                />
+                Setup instructions
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="mt-2 rounded-lg bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
+                  {isPlex ? (
+                    <ol className="list-inside list-decimal space-y-1.5">
+                      <li>
+                        Open Plex, go to{" "}
+                        <span className="font-medium text-foreground">
+                          Settings &gt; Webhooks
+                        </span>
+                      </li>
+                      <li>
+                        Click{" "}
+                        <span className="font-medium text-foreground">
+                          Add Webhook
+                        </span>{" "}
+                        and paste the URL above
+                      </li>
+                      <li>
+                        Sofa will automatically log movies and episodes when you
+                        finish watching them
+                      </li>
+                      <li>
+                        Make sure the username above matches your Plex account
+                        name
+                      </li>
+                    </ol>
+                  ) : (
+                    <ol className="list-inside list-decimal space-y-1.5">
+                      <li>
+                        Install the{" "}
+                        <span className="font-medium text-foreground">
+                          Webhook plugin
+                        </span>{" "}
+                        from Jellyfin&apos;s plugin catalog
+                      </li>
+                      <li>
+                        Go to{" "}
+                        <span className="font-medium text-foreground">
+                          Dashboard &gt; Plugins &gt; Webhook
+                        </span>
+                      </li>
+                      <li>
+                        Add a{" "}
+                        <span className="font-medium text-foreground">
+                          Generic Destination
+                        </span>{" "}
+                        and paste the URL above
+                      </li>
+                      <li>
+                        Enable the{" "}
+                        <span className="font-medium text-foreground">
+                          Playback Stop
+                        </span>{" "}
+                        notification type
+                      </li>
+                      <li>
+                        Make sure the username above matches your Jellyfin
+                        username
+                      </li>
+                    </ol>
+                  )}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 }
