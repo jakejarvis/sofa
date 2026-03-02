@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { isTmdbConfigured } from "@/lib/config";
 import { discover } from "@/lib/tmdb/client";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 export async function GET(req: NextRequest) {
   if (!isTmdbConfigured()) {
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
       title: r.title ?? r.name,
       overview: r.overview,
       releaseDate: r.release_date ?? r.first_air_date,
-      posterPath: r.poster_path,
+      posterPath: tmdbImageUrl(r.poster_path, "w500"),
       popularity: r.popularity,
       voteAverage: r.vote_average,
     })),

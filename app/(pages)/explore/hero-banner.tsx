@@ -5,7 +5,6 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 interface HeroBannerProps {
   tmdbId: number;
@@ -26,7 +25,6 @@ export function HeroBanner({
 }: HeroBannerProps) {
   const router = useRouter();
   const [importing, setImporting] = useState(false);
-  const backdropUrl = tmdbImageUrl(backdropPath, "w1280");
 
   async function handleImport() {
     setImporting(true);
@@ -53,9 +51,9 @@ export function HeroBanner({
       transition={{ duration: 0.6 }}
     >
       <div className="relative aspect-[21/9] min-h-[280px] max-h-[420px]">
-        {backdropUrl ? (
+        {backdropPath ? (
           <Image
-            src={backdropUrl}
+            src={backdropPath}
             alt={title}
             fill
             priority

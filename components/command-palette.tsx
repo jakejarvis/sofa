@@ -8,7 +8,6 @@ import {
   IconSearch,
 } from "@tabler/icons-react";
 import Image from "next/image";
-import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useKeyboard } from "@/components/keyboard-provider";
@@ -212,7 +211,7 @@ export function CommandPalette() {
                     <div className="h-12 w-8 shrink-0 overflow-hidden rounded bg-muted">
                       {r.posterPath ? (
                         <Image
-                          src={tmdbImageUrl(r.posterPath, "w92")!}
+                          src={r.posterPath as string}
                           alt={r.title}
                           width={32}
                           height={48}

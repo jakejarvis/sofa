@@ -13,7 +13,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { TitleDetailSkeleton } from "@/components/skeletons";
-import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { StarRating } from "@/components/star-rating";
 import { StatusButton } from "@/components/status-button";
 import { TitleCard } from "@/components/title-card";
@@ -366,8 +365,6 @@ export default function TitleDetailPage() {
     );
   }
 
-  const posterUrl = tmdbImageUrl(title.posterPath, "w500");
-  const backdropUrl = tmdbImageUrl(title.backdropPath, "w1280");
   const dateStr = title.releaseDate ?? title.firstAirDate;
   const year = dateStr?.slice(0, 4);
   const palette = title.colorPalette;
@@ -462,10 +459,10 @@ export default function TitleDetailPage() {
       </Breadcrumb>
 
       {/* Backdrop hero */}
-      {backdropUrl && (
+      {title.backdropPath && (
         <div className="relative -mx-4 -mt-4 h-80 overflow-hidden sm:-mx-6 sm:h-[28rem]">
           <Image
-            src={backdropUrl}
+            src={title.backdropPath}
             alt=""
             fill
             className="object-cover"
@@ -529,12 +526,12 @@ export default function TitleDetailPage() {
 
       {/* Title header */}
       <motion.div
-        className={`flex flex-col gap-8 sm:flex-row ${backdropUrl ? "-mt-32 relative z-10" : ""}`}
+        className={`flex flex-col gap-8 sm:flex-row ${title.backdropPath ? "-mt-32 relative z-10" : ""}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring" as const, stiffness: 200, damping: 24 }}
       >
-        {posterUrl && (
+        {title.posterPath && (
           <div className="shrink-0">
             <div
               className="overflow-hidden rounded-2xl ring-1 ring-foreground/5 shadow-2xl transition-shadow duration-500"
@@ -545,7 +542,7 @@ export default function TitleDetailPage() {
               }}
             >
               <Image
-                src={posterUrl}
+                src={title.posterPath}
                 alt={title.title}
                 width={220}
                 height={330}
@@ -752,7 +749,7 @@ export default function TitleDetailPage() {
                           const isWatched = title.episodeWatches?.includes(
                             ep.id,
                           );
-                          const stillUrl = tmdbImageUrl(ep.stillPath, "w300");
+                          const { stillPath } = ep;
                           return (
                             <div
                               key={ep.id}
@@ -789,10 +786,10 @@ export default function TitleDetailPage() {
                                   </motion.div>
                                 )}
                               </button>
-                              {stillUrl && (
+                              {stillPath && (
                                 <div className="hidden h-14 w-24 shrink-0 overflow-hidden rounded-md bg-muted sm:block">
                                   <Image
-                                    src={stillUrl}
+                                    src={stillPath}
                                     alt={ep.name ?? ""}
                                     width={300}
                                     height={169}
@@ -872,14 +869,12 @@ function ProviderBadge({
   name: string;
   logoPath: string | null;
 }) {
-  const logoUrl = tmdbImageUrl(logoPath, "w92");
-
   return (
     <div className="group relative">
       <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card transition-transform hover:scale-105">
-        {logoUrl ? (
+        {logoPath ? (
           <Image
-            src={logoUrl}
+            src={logoPath}
             alt={name}
             width={40}
             height={40}

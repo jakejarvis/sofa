@@ -8,6 +8,12 @@ import {
 } from "@/lib/db/schema";
 import { refreshAvailability } from "@/lib/services/availability";
 import {
+  cacheEpisodeStills,
+  cacheImagesForTitle,
+  cacheProviderLogos,
+  imageCacheEnabled,
+} from "@/lib/services/image-cache";
+import {
   refreshRecommendations,
   refreshTitle,
   refreshTvChildren,
@@ -151,6 +157,24 @@ async function refreshTvChildrenJob() {
   }
 }
 
+// Cache images for all library titles (posters, backdrops, stills, logos)
+async function cacheImagesJob() {
+  if (!imageCacheEnabled()) return;
+
+  const libraryIds = await getLibraryTitleIds();
+
+  for (const titleId of libraryIds) {
+    try {
+      await cacheImagesForTitle(titleId);
+      await cacheEpisodeStills(titleId);
+      await cacheProviderLogos(titleId);
+    } catch {
+      // Continue with remaining titles
+    }
+    await delay(RATE_LIMIT_MS);
+  }
+}
+
 export function registerJobs() {
   scheduler.register("nightlyRefreshLibrary", nightlyRefreshLibrary, 24 * HOUR);
   scheduler.register("refreshAvailability", refreshAvailabilityJob, 6 * HOUR);
@@ -160,4 +184,5 @@ export function registerJobs() {
     12 * HOUR,
   );
   scheduler.register("refreshTvChildren", refreshTvChildrenJob, 12 * HOUR);
+  scheduler.register("cacheImages", cacheImagesJob, 12 * HOUR);
 }

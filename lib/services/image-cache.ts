@@ -1,0 +1,209 @@
+import { existsSync, mkdirSync } from "node:fs";
+import { readFile, rename, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { eq } from "drizzle-orm";
+import { db } from "@/lib/db/client";
+import { availabilityOffers, episodes, seasons, titles } from "@/lib/db/schema";
+
+export type ImageCategory = "posters" | "backdrops" | "stills" | "logos";
+
+const CATEGORY_SIZES: Record<ImageCategory, string> = {
+  posters: "w500",
+  backdrops: "w1280",
+  stills: "w1280",
+  logos: "w92",
+};
+
+const IMAGE_BASE_URL =
+  process.env.TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p";
+
+const CACHE_DIR = process.env.IMAGE_CACHE_DIR || "/data/images";
+
+export function imageCacheEnabled(): boolean {
+  return process.env.IMAGE_CACHE_ENABLED !== "false";
+}
+
+export function ensureImageDirs() {
+  for (const category of Object.keys(CATEGORY_SIZES)) {
+    const dir = path.join(CACHE_DIR, category);
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
+  }
+}
+
+export function isImageCached(
+  category: ImageCategory,
+  filename: string,
+): boolean {
+  return existsSync(getLocalImagePath(category, filename));
+}
+
+export function getLocalImagePath(
+  category: ImageCategory,
+  filename: string,
+): string {
+  return path.join(CACHE_DIR, category, path.basename(filename));
+}
+
+export async function readCachedImage(
+  category: ImageCategory,
+  filename: string,
+): Promise<Buffer | null> {
+  const filePath = getLocalImagePath(category, filename);
+  if (!existsSync(filePath)) return null;
+  return readFile(filePath);
+}
+
+export async function downloadAndCacheImage(
+  tmdbPath: string,
+  category: ImageCategory,
+): Promise<Buffer | null> {
+  const size = CATEGORY_SIZES[category];
+  const url = `${IMAGE_BASE_URL}/${size}${tmdbPath}`;
+
+  const res = await fetch(url);
+  if (!res.ok) return null;
+
+  const buffer = Buffer.from(await res.arrayBuffer());
+  const filename = path.basename(tmdbPath);
+  const finalPath = getLocalImagePath(category, filename);
+  const tmpPath = `${finalPath}.tmp.${Date.now()}`;
+
+  try {
+    await writeFile(tmpPath, buffer);
+    await rename(tmpPath, finalPath);
+  } catch {
+    // Best-effort cleanup
+  }
+
+  return buffer;
+}
+
+export async function fetchAndMaybeCache(
+  tmdbPath: string,
+  category: ImageCategory,
+): Promise<{ buffer: Buffer; contentType: string } | null> {
+  // Try local first
+  const filename = path.basename(tmdbPath);
+  const cached = await readCachedImage(category, filename);
+  if (cached) {
+    const ext = path.extname(filename).toLowerCase();
+    const contentType =
+      ext === ".png"
+        ? "image/png"
+        : ext === ".webp"
+          ? "image/webp"
+          : "image/jpeg";
+    return { buffer: cached, contentType };
+  }
+
+  // Fetch from TMDB
+  const size = CATEGORY_SIZES[category];
+  const url = `${IMAGE_BASE_URL}/${size}${tmdbPath}`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+
+  const buffer = Buffer.from(await res.arrayBuffer());
+  const contentType = res.headers.get("content-type") || "image/jpeg";
+
+  // Fire-and-forget save to disk
+  const finalPath = getLocalImagePath(category, filename);
+  const tmpPath = `${finalPath}.tmp.${Date.now()}`;
+  writeFile(tmpPath, buffer)
+    .then(() => rename(tmpPath, finalPath))
+    .catch(() => {});
+
+  return { buffer, contentType };
+}
+
+export async function cacheImagesForTitle(titleId: string) {
+  const title = await db
+    .select()
+    .from(titles)
+    .where(eq(titles.id, titleId))
+    .get();
+  if (!title) return;
+
+  const tasks: Promise<unknown>[] = [];
+
+  if (
+    title.posterPath &&
+    !isImageCached("posters", path.basename(title.posterPath))
+  ) {
+    tasks.push(downloadAndCacheImage(title.posterPath, "posters"));
+  }
+  if (
+    title.backdropPath &&
+    !isImageCached("backdrops", path.basename(title.backdropPath))
+  ) {
+    tasks.push(downloadAndCacheImage(title.backdropPath, "backdrops"));
+  }
+
+  // Season posters
+  if (title.type === "tv") {
+    const allSeasons = await db
+      .select()
+      .from(seasons)
+      .where(eq(seasons.titleId, titleId))
+      .all();
+    for (const s of allSeasons) {
+      if (
+        s.posterPath &&
+        !isImageCached("posters", path.basename(s.posterPath))
+      ) {
+        tasks.push(downloadAndCacheImage(s.posterPath, "posters"));
+      }
+    }
+  }
+
+  await Promise.allSettled(tasks);
+}
+
+export async function cacheEpisodeStills(titleId: string) {
+  const allSeasons = await db
+    .select()
+    .from(seasons)
+    .where(eq(seasons.titleId, titleId))
+    .all();
+
+  for (const s of allSeasons) {
+    const eps = await db
+      .select()
+      .from(episodes)
+      .where(eq(episodes.seasonId, s.id))
+      .all();
+
+    const tasks: Promise<unknown>[] = [];
+    for (const ep of eps) {
+      if (
+        ep.stillPath &&
+        !isImageCached("stills", path.basename(ep.stillPath))
+      ) {
+        tasks.push(downloadAndCacheImage(ep.stillPath, "stills"));
+      }
+    }
+    await Promise.allSettled(tasks);
+  }
+}
+
+export async function cacheProviderLogos(titleId: string) {
+  const offers = await db
+    .select()
+    .from(availabilityOffers)
+    .where(eq(availabilityOffers.titleId, titleId))
+    .all();
+
+  const tasks: Promise<unknown>[] = [];
+  const seen = new Set<string>();
+  for (const offer of offers) {
+    if (offer.logoPath) {
+      const basename = path.basename(offer.logoPath);
+      if (!seen.has(basename) && !isImageCached("logos", basename)) {
+        seen.add(basename);
+        tasks.push(downloadAndCacheImage(offer.logoPath, "logos"));
+      }
+    }
+  }
+  await Promise.allSettled(tasks);
+}

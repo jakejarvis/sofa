@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { titleRecommendations, titles } from "@/lib/db/schema";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 export async function GET(
   _req: NextRequest,
@@ -39,5 +40,13 @@ export async function GET(
     )
   ).filter(Boolean);
 
-  return NextResponse.json(results);
+  return NextResponse.json(
+    results
+      .filter((r) => !!r)
+      .map((r) => ({
+        ...r,
+        posterPath: tmdbImageUrl(r.posterPath, "w500"),
+        backdropPath: tmdbImageUrl(r.backdropPath, "w1280"),
+      })),
+  );
 }

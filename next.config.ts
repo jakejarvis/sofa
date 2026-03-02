@@ -8,9 +8,6 @@ const imageHost = imageBaseUrl
 const nextConfig: NextConfig = {
   output: "standalone",
   reactCompiler: true,
-  env: {
-    TMDB_IMAGE_BASE_URL: process.env.TMDB_IMAGE_BASE_URL || "",
-  },
   images: {
     remotePatterns: [
       {

@@ -3,7 +3,6 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 interface TitleCardProps {
   id?: string;
@@ -28,7 +27,6 @@ export function TitleCard({
   onImport,
 }: TitleCardProps) {
   const year = releaseDate?.slice(0, 4);
-  const posterUrl = tmdbImageUrl(posterPath, "w300");
 
   const content = (
     <motion.div
@@ -37,9 +35,9 @@ export function TitleCard({
       transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
     >
       <div className="aspect-[2/3] overflow-hidden rounded-xl bg-card">
-        {posterUrl ? (
+        {posterPath ? (
           <Image
-            src={posterUrl}
+            src={posterPath}
             alt={title}
             width={300}
             height={450}

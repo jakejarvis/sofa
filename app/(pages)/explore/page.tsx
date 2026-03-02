@@ -1,5 +1,6 @@
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react";
 import { getGenres, getPopular, getTrending } from "@/lib/tmdb/client";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { GenreBrowser } from "./genre-browser";
 import { HeroBanner } from "./hero-banner";
 import { TitleRow } from "./title-row";
@@ -25,7 +26,7 @@ function mapResults(
         ? r.media_type
         : fallbackType) as "movie" | "tv",
       title: r.title ?? r.name ?? "",
-      posterPath: r.poster_path,
+      posterPath: tmdbImageUrl(r.poster_path, "w500"),
       releaseDate: r.release_date ?? r.first_air_date ?? null,
       voteAverage: r.vote_average,
     }));
@@ -58,7 +59,7 @@ export default async function ExplorePage() {
           type={heroTitle.media_type as "movie" | "tv"}
           title={heroTitle.title ?? heroTitle.name ?? ""}
           overview={heroTitle.overview}
-          backdropPath={heroTitle.backdrop_path}
+          backdropPath={tmdbImageUrl(heroTitle.backdrop_path, "w1280")}
           voteAverage={heroTitle.vote_average}
         />
       )}

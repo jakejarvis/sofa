@@ -2,9 +2,13 @@ import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { availabilityOffers, episodes, seasons, titles } from "@/lib/db/schema";
-import { extractAndStoreColors, parseColorPalette } from "@/lib/services/colors";
+import {
+  extractAndStoreColors,
+  parseColorPalette,
+} from "@/lib/services/colors";
 import { refreshTvChildren } from "@/lib/services/metadata";
 import { getTvDetails } from "@/lib/tmdb/client";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 export async function GET(
   _req: NextRequest,
@@ -92,8 +96,20 @@ export async function GET(
 
   return NextResponse.json({
     ...title,
+    posterPath: tmdbImageUrl(title.posterPath, "w500"),
+    backdropPath: tmdbImageUrl(title.backdropPath, "w1280"),
     colorPalette: parseColorPalette(title.colorPalette),
-    seasons: titleSeasons,
-    availability,
+    seasons: titleSeasons.map((s) => ({
+      ...s,
+      posterPath: tmdbImageUrl(s.posterPath, "w500"),
+      episodes: s.episodes.map((ep) => ({
+        ...ep,
+        stillPath: tmdbImageUrl(ep.stillPath, "w1280", "stills"),
+      })),
+    })),
+    availability: availability.map((a) => ({
+      ...a,
+      logoPath: tmdbImageUrl(a.logoPath, "w92"),
+    })),
   });
 }

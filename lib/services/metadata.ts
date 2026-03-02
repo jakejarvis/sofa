@@ -15,6 +15,11 @@ import {
 } from "@/lib/tmdb/client";
 import { refreshAvailability } from "./availability";
 import { extractAndStoreColors } from "./colors";
+import {
+  cacheEpisodeStills,
+  cacheImagesForTitle,
+  imageCacheEnabled,
+} from "./image-cache";
 
 export async function importTitle(tmdbId: number, type: "movie" | "tv") {
   const existing = await db
@@ -52,6 +57,10 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
         await refreshTvChildren(existing.id, tmdbId, show.number_of_seasons);
         refreshAvailability(existing.id).catch(() => {});
         refreshRecommendations(existing.id).catch(() => {});
+        if (imageCacheEnabled()) {
+          cacheImagesForTitle(existing.id).catch(() => {});
+          cacheEpisodeStills(existing.id).catch(() => {});
+        }
         return db.select().from(titles).where(eq(titles.id, existing.id)).get();
       }
     }
@@ -81,10 +90,11 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
       })
       .returning()
       .get();
-    // Fire-and-forget: fetch availability, recommendations & colors
+    // Fire-and-forget: fetch availability, recommendations, colors & image cache
     refreshAvailability(row.id).catch(() => {});
     refreshRecommendations(row.id).catch(() => {});
     extractAndStoreColors(row.id, movie.poster_path).catch(() => {});
+    if (imageCacheEnabled()) cacheImagesForTitle(row.id).catch(() => {});
     return row;
   }
 
@@ -110,10 +120,14 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
     .get();
 
   await refreshTvChildren(row.id, tmdbId, show.number_of_seasons);
-  // Fire-and-forget: fetch availability, recommendations & colors
+  // Fire-and-forget: fetch availability, recommendations, colors & image cache
   refreshAvailability(row.id).catch(() => {});
   refreshRecommendations(row.id).catch(() => {});
   extractAndStoreColors(row.id, show.poster_path).catch(() => {});
+  if (imageCacheEnabled()) {
+    cacheImagesForTitle(row.id).catch(() => {});
+    cacheEpisodeStills(row.id).catch(() => {});
+  }
   return row;
 }
 
@@ -175,6 +189,10 @@ export async function refreshTitle(titleId: string) {
     .get();
   if (updated) {
     extractAndStoreColors(updated.id, updated.posterPath).catch(() => {});
+    if (imageCacheEnabled()) {
+      cacheImagesForTitle(updated.id).catch(() => {});
+      if (updated.type === "tv") cacheEpisodeStills(updated.id).catch(() => {});
+    }
   }
   return updated;
 }

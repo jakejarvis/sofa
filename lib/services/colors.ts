@@ -1,7 +1,13 @@
+import path from "node:path";
 import { eq } from "drizzle-orm";
 import { Vibrant } from "node-vibrant/node";
 import { db } from "@/lib/db/client";
 import { titles } from "@/lib/db/schema";
+import {
+  getLocalImagePath,
+  imageCacheEnabled,
+  isImageCached,
+} from "@/lib/services/image-cache";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 export interface ColorPalette {
@@ -17,11 +23,21 @@ export async function extractAndStoreColors(
   titleId: string,
   posterPath: string | null,
 ): Promise<ColorPalette | null> {
-  const url = tmdbImageUrl(posterPath, "w300");
-  if (!url) return null;
+  if (!posterPath) return null;
+
+  // Prefer local file when image cache is active
+  let source: string;
+  const filename = path.basename(posterPath);
+  if (imageCacheEnabled() && isImageCached("posters", filename)) {
+    source = getLocalImagePath("posters", filename);
+  } else {
+    const url = tmdbImageUrl(posterPath, "w300");
+    if (!url) return null;
+    source = url;
+  }
 
   try {
-    const palette = await Vibrant.from(url).getPalette();
+    const palette = await Vibrant.from(source).getPalette();
 
     const colors: ColorPalette = {
       vibrant: palette.Vibrant?.hex ?? null,

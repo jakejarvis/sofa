@@ -9,6 +9,14 @@ export async function register() {
       const { runMigrations } = await import("@/lib/db/migrate");
       await runMigrations();
 
+      // Ensure image cache directories exist
+      const { ensureImageDirs, imageCacheEnabled } = await import(
+        "@/lib/services/image-cache"
+      );
+      if (imageCacheEnabled()) {
+        ensureImageDirs();
+      }
+
       const { initJobs } = await import("@/lib/jobs/init");
       initJobs();
 

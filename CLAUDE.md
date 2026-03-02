@@ -70,18 +70,23 @@ All app tables use UUID text primary keys generated via the `uuid` package. Bett
 
 ### Service layer
 
-- **metadata.ts**: `importTitle()` fetches from TMDB, inserts into DB, fire-and-forgets availability + recommendations refresh. `refreshTvChildren()` fetches all seasons/episodes with 250ms rate limiting.
+- **metadata.ts**: `importTitle()` fetches from TMDB, inserts into DB, fire-and-forgets availability + recommendations + image caching. `refreshTvChildren()` fetches all seasons/episodes with 250ms rate limiting.
+- **image-cache.ts**: Downloads and caches TMDB images to local disk. `cacheImagesForTitle()` caches poster + backdrop, `cacheEpisodeStills()` caches episode stills, `cacheProviderLogos()` caches streaming provider logos.
 - **tracking.ts**: Auto-transitions — logging a movie watch sets status to `completed`; logging an episode watch sets `in_progress`; all episodes watched auto-completes the series.
 - **discovery.ts**: Feed generators — continue watching (next unwatched episode per in-progress show), library titles with availability, personalized recommendations from completed/highly-rated titles.
 - **availability.ts**: Caches US streaming providers from TMDB watch/providers endpoint.
 
 ### TMDB images
 
-Only paths are stored in DB. Full URLs are constructed at render time via `tmdbImageUrl()` from `lib/tmdb/image.ts` using the `TMDB_IMAGE_BASE_URL` env var (defaults to `https://image.tmdb.org/t/p`). Common sizes: w300, w500, w1280.
+Only paths are stored in DB. Image URLs are resolved **server-side only** — API routes and server components call `tmdbImageUrl()` from `lib/tmdb/image.ts` before sending data to clients. Client components never import `tmdbImageUrl`; they receive ready-to-use URLs.
+
+When `IMAGE_CACHE_ENABLED` is set (default), images are downloaded to local disk (`IMAGE_CACHE_DIR`, defaults to `/data/images`) and served via `app/api/images/[...path]/route.ts`. Categories: `posters` (w500), `backdrops` (w1280), `stills` (w1280), `logos` (w92). When disabled, `tmdbImageUrl()` returns direct TMDB CDN URLs using `TMDB_IMAGE_BASE_URL` (defaults to `https://image.tmdb.org/t/p`).
+
+Core files: `lib/services/image-cache.ts` (caching logic), `lib/tmdb/image.ts` (URL construction), `app/api/images/[...path]/route.ts` (proxy route).
 
 ### Background jobs
 
-Registered in `lib/jobs/registry.ts`, started via Next.js instrumentation hook (`instrumentation.ts`) in production. Jobs: nightly library refresh (24h), availability refresh (6h), recommendations refresh (12h), TV episodes refresh (12h). All batch jobs use 300ms delay between TMDB calls.
+Registered in `lib/jobs/registry.ts`, started via Next.js instrumentation hook (`instrumentation.ts`) in production. Jobs: nightly library refresh (24h), availability refresh (6h), recommendations refresh (12h), TV episodes refresh (12h), image caching (12h). All batch jobs use 300ms delay between TMDB calls.
 
 ### Environment variables
 
