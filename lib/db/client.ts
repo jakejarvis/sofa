@@ -9,7 +9,7 @@ const globalForDb = globalThis as unknown as {
 
 if (!globalForDb._client) {
   globalForDb._client = createClient({
-    url: process.env.DATABASE_URL ?? "file:sqlite.db",
+    url: process.env.DATABASE_URL ?? "file:./data/sqlite.db",
   });
   globalForDb._client.execute("PRAGMA journal_mode = WAL");
   globalForDb._client.execute("PRAGMA foreign_keys = ON");

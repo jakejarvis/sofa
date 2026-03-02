@@ -4,11 +4,11 @@ import { Vibrant } from "node-vibrant/node";
 import { db } from "@/lib/db/client";
 import { titles } from "@/lib/db/schema";
 import {
+  downloadAndCacheImage,
   getLocalImagePath,
   imageCacheEnabled,
   isImageCached,
 } from "@/lib/services/image-cache";
-import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 export interface ColorPalette {
   vibrant: string | null;
@@ -25,15 +25,18 @@ export async function extractAndStoreColors(
 ): Promise<ColorPalette | null> {
   if (!posterPath) return null;
 
-  // Prefer local file when image cache is active
+  // Use local cached image, downloading first if needed
   let source: string;
   const filename = path.basename(posterPath);
-  if (imageCacheEnabled() && isImageCached("posters", filename)) {
+  if (imageCacheEnabled()) {
+    if (!isImageCached("posters", filename)) {
+      await downloadAndCacheImage(posterPath, "posters");
+    }
     source = getLocalImagePath("posters", filename);
   } else {
-    const url = tmdbImageUrl(posterPath, "w300");
-    if (!url) return null;
-    source = url;
+    const baseUrl =
+      process.env.TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p";
+    source = `${baseUrl}/w300${posterPath}`;
   }
 
   try {

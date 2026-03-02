@@ -4,18 +4,18 @@ export async function onRequestError() {
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
+    // Ensure image cache directories exist (all environments)
+    const { ensureImageDirs, imageCacheEnabled } = await import(
+      "@/lib/services/image-cache"
+    );
+    if (imageCacheEnabled()) {
+      ensureImageDirs();
+    }
+
     // Run database migrations on startup
     if (process.env.NODE_ENV === "production") {
       const { runMigrations } = await import("@/lib/db/migrate");
       await runMigrations();
-
-      // Ensure image cache directories exist
-      const { ensureImageDirs, imageCacheEnabled } = await import(
-        "@/lib/services/image-cache"
-      );
-      if (imageCacheEnabled()) {
-        ensureImageDirs();
-      }
 
       const { initJobs } = await import("@/lib/jobs/init");
       initJobs();
