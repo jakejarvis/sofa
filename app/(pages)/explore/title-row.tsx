@@ -1,8 +1,6 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
-import { useCallback } from "react";
 import { TitleCard } from "@/components/title-card";
 
 interface TitleRowItem {
@@ -36,23 +34,6 @@ const staggerItem = {
 };
 
 export function TitleRow({ heading, icon, items }: TitleRowProps) {
-  const router = useRouter();
-
-  const handleImport = useCallback(
-    async (tmdbId: number, type: "movie" | "tv") => {
-      const res = await fetch("/api/titles/import", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tmdbId, type }),
-      });
-      const data = await res.json();
-      if (data.id) {
-        router.push(`/titles/${data.id}`);
-      }
-    },
-    [router],
-  );
-
   if (items.length === 0) return null;
 
   return (
@@ -80,7 +61,7 @@ export function TitleRow({ heading, icon, items }: TitleRowProps) {
               posterPath={item.posterPath}
               releaseDate={item.releaseDate}
               voteAverage={item.voteAverage}
-              onImport={() => handleImport(item.tmdbId, item.type)}
+              href={`/titles/tmdb-${item.tmdbId}-${item.type}`}
             />
           </motion.div>
         ))}

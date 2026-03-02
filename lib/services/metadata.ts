@@ -21,7 +21,12 @@ import {
   imageCacheEnabled,
 } from "./image-cache";
 
-export async function importTitle(tmdbId: number, type: "movie" | "tv") {
+export async function importTitle(
+  tmdbId: number,
+  type: "movie" | "tv",
+  options?: { awaitEnrichment?: boolean },
+) {
+  const awaitEnrichment = options?.awaitEnrichment ?? false;
   const existing = await db
     .select()
     .from(titles)
@@ -55,8 +60,17 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
             .run();
         }
         await refreshTvChildren(existing.id, tmdbId, show.number_of_seasons);
-        refreshAvailability(existing.id).catch(() => {});
+        if (awaitEnrichment) {
+          await refreshAvailability(existing.id).catch(() => {});
+        } else {
+          refreshAvailability(existing.id).catch(() => {});
+        }
         await refreshRecommendations(existing.id).catch(() => {});
+        if (awaitEnrichment) {
+          await extractAndStoreColors(existing.id, show.poster_path).catch(
+            () => {},
+          );
+        }
         if (imageCacheEnabled()) {
           cacheImagesForTitle(existing.id).catch(() => {});
           cacheEpisodeStills(existing.id).catch(() => {});
@@ -90,10 +104,15 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
       })
       .returning()
       .get();
-    // Fire-and-forget: fetch availability, recommendations, colors & image cache
-    refreshAvailability(row.id).catch(() => {});
-    await refreshRecommendations(row.id).catch(() => {});
-    extractAndStoreColors(row.id, movie.poster_path).catch(() => {});
+    if (awaitEnrichment) {
+      await refreshAvailability(row.id).catch(() => {});
+      await refreshRecommendations(row.id).catch(() => {});
+      await extractAndStoreColors(row.id, movie.poster_path).catch(() => {});
+    } else {
+      refreshAvailability(row.id).catch(() => {});
+      await refreshRecommendations(row.id).catch(() => {});
+      extractAndStoreColors(row.id, movie.poster_path).catch(() => {});
+    }
     if (imageCacheEnabled()) cacheImagesForTitle(row.id).catch(() => {});
     return row;
   }
@@ -120,10 +139,15 @@ export async function importTitle(tmdbId: number, type: "movie" | "tv") {
     .get();
 
   await refreshTvChildren(row.id, tmdbId, show.number_of_seasons);
-  // Fire-and-forget: fetch availability, recommendations, colors & image cache
-  refreshAvailability(row.id).catch(() => {});
-  await refreshRecommendations(row.id).catch(() => {});
-  extractAndStoreColors(row.id, show.poster_path).catch(() => {});
+  if (awaitEnrichment) {
+    await refreshAvailability(row.id).catch(() => {});
+    await refreshRecommendations(row.id).catch(() => {});
+    await extractAndStoreColors(row.id, show.poster_path).catch(() => {});
+  } else {
+    refreshAvailability(row.id).catch(() => {});
+    await refreshRecommendations(row.id).catch(() => {});
+    extractAndStoreColors(row.id, show.poster_path).catch(() => {});
+  }
   if (imageCacheEnabled()) {
     cacheImagesForTitle(row.id).catch(() => {});
     cacheEpisodeStills(row.id).catch(() => {});

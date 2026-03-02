@@ -106,6 +106,8 @@ const staggerItem = {
   },
 };
 
+const TMDB_ID_PATTERN = /^tmdb-(\d+)-(movie|tv)$/;
+
 export default function TitleDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -117,12 +119,56 @@ export default function TitleDetailPage() {
   const [openSeason, setOpenSeason] = useState<number | null>(null);
   const [watchingEp, setWatchingEp] = useState<string | null>(null);
 
+  // Parse TMDB ID format: tmdb-{id}-{type}
+  const tmdbMatch = TMDB_ID_PATTERN.exec(id);
+  const isTmdbFormat = !!tmdbMatch;
+
+  const [resolvedId, setResolvedId] = useState<string | null>(
+    isTmdbFormat ? null : id,
+  );
+  const [resolveError, setResolveError] = useState<string | null>(null);
+
+  // Resolve TMDB ID to internal UUID
+  useEffect(() => {
+    if (!isTmdbFormat) return;
+    const tmdbId = Number(tmdbMatch[1]);
+    const type = tmdbMatch[2] as "movie" | "tv";
+    let cancelled = false;
+
+    fetch("/api/titles/resolve", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tmdbId, type }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to resolve title");
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        if (data.id) {
+          setResolvedId(data.id);
+          router.replace(`/titles/${data.id}`, { scroll: false });
+        } else {
+          setResolveError("Title could not be imported");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setResolveError("Failed to load title");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isTmdbFormat, tmdbMatch, router]);
+
   const fetchTitle = useCallback(async () => {
+    if (!resolvedId) return;
     setLoading(true);
     try {
       const [titleRes, statusRes] = await Promise.all([
-        fetch(`/api/titles/${id}`),
-        fetch(`/api/titles/${id}/status`),
+        fetch(`/api/titles/${resolvedId}`),
+        fetch(`/api/titles/${resolvedId}/status`),
       ]);
       const titleData = await titleRes.json();
       let statusData = { status: null, rating: null, episodeWatches: [] };
@@ -138,11 +184,12 @@ export default function TitleDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [resolvedId]);
 
   const fetchRecommendations = useCallback(async () => {
+    if (!resolvedId) return;
     try {
-      const res = await fetch(`/api/titles/${id}/recommendations`);
+      const res = await fetch(`/api/titles/${resolvedId}/recommendations`);
       if (res.ok) {
         const data = await res.json();
         setRecommendations(data ?? []);
@@ -150,7 +197,7 @@ export default function TitleDetailPage() {
     } catch {
       // silent
     }
-  }, [id]);
+  }, [resolvedId]);
 
   useEffect(() => {
     fetchTitle();
@@ -168,7 +215,7 @@ export default function TitleDetailPage() {
       // Optimistic update
       setTitle((t) => (t ? { ...t, userStatus: status } : t));
       try {
-        const res = await fetch(`/api/titles/${id}/status`, {
+        const res = await fetch(`/api/titles/${resolvedId}/status`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status }),
@@ -191,7 +238,7 @@ export default function TitleDetailPage() {
         toast.error("Failed to update status");
       }
     },
-    [id, title?.userStatus],
+    [resolvedId, title?.userStatus],
   );
 
   const handleRating = useCallback(
@@ -200,7 +247,7 @@ export default function TitleDetailPage() {
       // Optimistic update
       setTitle((t) => (t ? { ...t, userRating: ratingStars } : t));
       try {
-        const res = await fetch(`/api/titles/${id}/rating`, {
+        const res = await fetch(`/api/titles/${resolvedId}/rating`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ratingStars }),
@@ -216,13 +263,15 @@ export default function TitleDetailPage() {
         toast.error("Failed to update rating");
       }
     },
-    [id, title?.userRating],
+    [resolvedId, title?.userRating],
   );
 
   const handleWatchMovie = useCallback(async () => {
     setTitle((t) => (t ? { ...t, userStatus: "completed" } : t));
     try {
-      const res = await fetch(`/api/movies/${id}/watch`, { method: "POST" });
+      const res = await fetch(`/api/movies/${resolvedId}/watch`, {
+        method: "POST",
+      });
       if (!res.ok) throw new Error();
       toast.success(`Marked "${title?.title}" as watched`);
     } catch {
@@ -231,7 +280,7 @@ export default function TitleDetailPage() {
       );
       toast.error("Failed to mark as watched");
     }
-  }, [id, title?.title, title?.userStatus]);
+  }, [resolvedId, title?.title, title?.userStatus]);
 
   const handleWatchEpisode = useCallback(
     async (
@@ -353,7 +402,12 @@ export default function TitleDetailPage() {
     });
   }
 
-  if (loading) {
+  if (resolveError) {
+    return (
+      <p className="py-24 text-center text-muted-foreground">{resolveError}</p>
+    );
+  }
+  if (!resolvedId || loading) {
     return <TitleDetailSkeleton />;
   }
   if (!title) {

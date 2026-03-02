@@ -34,7 +34,6 @@ export function SearchAutocomplete({
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<"all" | "movie" | "tv">("all");
-  const [importing, setImporting] = useState<number | null>(null);
   const debouncedQuery = useDebounce(query, 300);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -79,25 +78,9 @@ export function SearchAutocomplete({
     };
   }, [debouncedQuery, filter, onResults, onLoading]);
 
-  const handleImport = useCallback(
-    async (result: SearchResult) => {
-      setImporting(result.tmdbId);
-      try {
-        const res = await fetch("/api/titles/import", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tmdbId: result.tmdbId, type: result.type }),
-        });
-        const title = await res.json();
-        if (title.id) {
-          toast.success(`Added "${result.title}" to library`);
-          router.push(`/titles/${title.id}`);
-        }
-      } catch {
-        toast.error("Failed to import title");
-      } finally {
-        setImporting(null);
-      }
+  const handleSelect = useCallback(
+    (result: SearchResult) => {
+      router.push(`/titles/tmdb-${result.tmdbId}-${result.type}`);
     },
     [router],
   );
@@ -159,7 +142,7 @@ export function SearchAutocomplete({
                 <CommandPrimitive.Item
                   key={`${r.type}-${r.tmdbId}`}
                   value={`${r.type}-${r.tmdbId}`}
-                  onSelect={() => handleImport(r)}
+                  onSelect={() => handleSelect(r)}
                   className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm data-[selected=true]:bg-accent"
                 >
                   <div className="h-[60px] w-10 shrink-0 overflow-hidden rounded-md bg-muted">
@@ -200,9 +183,6 @@ export function SearchAutocomplete({
                       </p>
                     )}
                   </div>
-                  {importing === r.tmdbId && (
-                    <div className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                  )}
                 </CommandPrimitive.Item>
               ))}
             </CommandPrimitive.List>

@@ -1,10 +1,9 @@
 "use client";
 
-import { IconLoader2, IconPlus, IconStar } from "@tabler/icons-react";
+import { IconPlus, IconStar } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import Link from "next/link";
 
 interface HeroBannerProps {
   tmdbId: number;
@@ -23,25 +22,7 @@ export function HeroBanner({
   backdropPath,
   voteAverage,
 }: HeroBannerProps) {
-  const router = useRouter();
-  const [importing, setImporting] = useState(false);
-
-  async function handleImport() {
-    setImporting(true);
-    try {
-      const res = await fetch("/api/titles/import", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tmdbId, type }),
-      });
-      const data = await res.json();
-      if (data.id) {
-        router.push(`/titles/${data.id}`);
-      }
-    } finally {
-      setImporting(false);
-    }
-  }
+  const href = `/titles/tmdb-${tmdbId}-${type}`;
 
   return (
     <motion.div
@@ -101,19 +82,13 @@ export function HeroBanner({
                 <p className="mt-2 line-clamp-2 max-w-2xl text-sm text-muted-foreground">
                   {overview}
                 </p>
-                <button
-                  type="button"
-                  onClick={handleImport}
-                  disabled={importing}
-                  className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:shadow-md hover:shadow-primary/20 disabled:opacity-50"
+                <Link
+                  href={href}
+                  className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:shadow-md hover:shadow-primary/20"
                 >
-                  {importing ? (
-                    <IconLoader2 size={16} className="animate-spin" />
-                  ) : (
-                    <IconPlus size={16} />
-                  )}
+                  <IconPlus size={16} />
                   Add to Library
-                </button>
+                </Link>
               </motion.div>
             </div>
           </div>

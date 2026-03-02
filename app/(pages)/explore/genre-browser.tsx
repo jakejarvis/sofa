@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { TitleCardSkeleton } from "@/components/skeletons";
 import { TitleCard } from "@/components/title-card";
 
@@ -41,7 +40,6 @@ const staggerItem = {
 };
 
 export function GenreBrowser({ movieGenres, tvGenres }: GenreBrowserProps) {
-  const router = useRouter();
   const [mediaType, setMediaType] = useState<"movie" | "tv">("movie");
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
   const [results, setResults] = useState<DiscoverResult[]>([]);
@@ -81,21 +79,6 @@ export function GenreBrowser({ movieGenres, tvGenres }: GenreBrowserProps) {
       cancelled = true;
     };
   }, [selectedGenre, mediaType]);
-
-  const handleImport = useCallback(
-    async (tmdbId: number, type: "movie" | "tv") => {
-      const res = await fetch("/api/titles/import", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tmdbId, type }),
-      });
-      const data = await res.json();
-      if (data.id) {
-        router.push(`/titles/${data.id}`);
-      }
-    },
-    [router],
-  );
 
   return (
     <section className="space-y-5">
@@ -173,7 +156,7 @@ export function GenreBrowser({ movieGenres, tvGenres }: GenreBrowserProps) {
                 posterPath={r.posterPath}
                 releaseDate={r.releaseDate}
                 voteAverage={r.voteAverage}
-                onImport={() => handleImport(r.tmdbId, r.type)}
+                href={`/titles/tmdb-${r.tmdbId}-${r.type}`}
               />
             </motion.div>
           ))}

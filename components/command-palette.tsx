@@ -69,7 +69,6 @@ export function CommandPalette() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
-  const [importing, setImporting] = useState<number | null>(null);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const debouncedQuery = useDebounce(query, 300);
 
@@ -135,22 +134,9 @@ export function CommandPalette() {
   }, [debouncedQuery]);
 
   const handleSelect = useCallback(
-    async (result: SearchResult) => {
-      setImporting(result.tmdbId);
-      try {
-        const res = await fetch("/api/titles/import", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tmdbId: result.tmdbId, type: result.type }),
-        });
-        const title = await res.json();
-        if (title.id) {
-          setCommandPaletteOpen(false);
-          router.push(`/titles/${title.id}`);
-        }
-      } finally {
-        setImporting(null);
-      }
+    (result: SearchResult) => {
+      setCommandPaletteOpen(false);
+      router.push(`/titles/tmdb-${result.tmdbId}-${result.type}`);
     },
     [router, setCommandPaletteOpen],
   );
@@ -205,7 +191,6 @@ export function CommandPalette() {
                   <CommandItem
                     key={`${r.type}-${r.tmdbId}`}
                     onSelect={() => handleSelect(r)}
-                    disabled={importing === r.tmdbId}
                     className="flex items-center gap-3 py-2"
                   >
                     <div className="h-12 w-8 shrink-0 overflow-hidden rounded bg-muted">
@@ -237,9 +222,6 @@ export function CommandPalette() {
                         )}
                       </div>
                     </div>
-                    {importing === r.tmdbId && (
-                      <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                    )}
                   </CommandItem>
                 ))}
               </CommandGroup>

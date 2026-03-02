@@ -7,7 +7,7 @@ import {
   parseColorPalette,
 } from "@/lib/services/colors";
 import { refreshTvChildren } from "@/lib/services/metadata";
-import { getTvDetails } from "@/lib/tmdb/client";
+import { getMovieDetails, getTvDetails } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 export async function GET(
@@ -36,6 +36,36 @@ export async function GET(
         .where(eq(titles.id, id))
         .run();
       await refreshTvChildren(id, title.tmdbId, show.number_of_seasons);
+      title =
+        (await db.select().from(titles).where(eq(titles.id, id)).get()) ??
+        title;
+    } catch {
+      // Continue with whatever data we have
+    }
+  }
+
+  // If this is a shell movie title (created by recommendations with no full data),
+  // fetch the full details now.
+  if (title.type === "movie" && !title.lastFetchedAt) {
+    try {
+      const movie = await getMovieDetails(title.tmdbId);
+      await db
+        .update(titles)
+        .set({
+          title: movie.title,
+          originalTitle: movie.original_title,
+          overview: movie.overview,
+          releaseDate: movie.release_date || null,
+          posterPath: movie.poster_path,
+          backdropPath: movie.backdrop_path,
+          popularity: movie.popularity,
+          voteAverage: movie.vote_average,
+          voteCount: movie.vote_count,
+          status: movie.status,
+          lastFetchedAt: new Date(),
+        })
+        .where(eq(titles.id, id))
+        .run();
       title =
         (await db.select().from(titles).where(eq(titles.id, id)).get()) ??
         title;
