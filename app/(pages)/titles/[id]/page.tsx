@@ -15,6 +15,7 @@ import { TitleDetailSkeleton } from "@/components/skeletons";
 import { StarRating } from "@/components/star-rating";
 import { StatusButton } from "@/components/status-button";
 import { TitleCard } from "@/components/title-card";
+import { TmdbLogo } from "@/components/tmdb-logo";
 import { Progress } from "@/components/ui/progress";
 import { useRegisterShortcut } from "@/hooks/use-register-shortcut";
 
@@ -550,10 +551,18 @@ export default function TitleDetailPage() {
                 </span>
               )}
               {title.status && (
-                <span className="rounded border border-border/50 px-2 py-0.5 text-xs">
+                <span className="inline-flex h-5 items-center rounded border border-border/50 px-2 text-xs">
                   {title.status}
                 </span>
               )}
+              <a
+                href={`https://www.themoviedb.org/${title.type === "movie" ? "movie" : "tv"}/${title.tmdbId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-5 items-center rounded border border-border/50 px-2 text-xs text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+              >
+                <TmdbLogo className="h-2.5 w-auto" />
+              </a>
             </div>
           </div>
 
