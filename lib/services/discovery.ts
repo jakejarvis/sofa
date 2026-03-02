@@ -7,9 +7,73 @@ import {
   titleRecommendations,
   titles,
   userEpisodeWatches,
+  userMovieWatches,
   userRatings,
   userTitleStatus,
 } from "@/lib/db/schema";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
+
+export interface DashboardStats {
+  moviesThisMonth: number;
+  episodesThisWeek: number;
+  librarySize: number;
+  completed: number;
+}
+
+export async function getUserStats(userId: string): Promise<DashboardStats> {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const dayOfWeek = now.getDay();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  weekStart.setHours(0, 0, 0, 0);
+
+  const [moviesThisMonth] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(userMovieWatches)
+    .where(
+      and(
+        eq(userMovieWatches.userId, userId),
+        sql`${userMovieWatches.watchedAt} >= ${Math.floor(monthStart.getTime() / 1000)}`,
+      ),
+    )
+    .all();
+
+  const [episodesThisWeek] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(userEpisodeWatches)
+    .where(
+      and(
+        eq(userEpisodeWatches.userId, userId),
+        sql`${userEpisodeWatches.watchedAt} >= ${Math.floor(weekStart.getTime() / 1000)}`,
+      ),
+    )
+    .all();
+
+  const [librarySizeRow] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(userTitleStatus)
+    .where(eq(userTitleStatus.userId, userId))
+    .all();
+
+  const [completedCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(userTitleStatus)
+    .where(
+      and(
+        eq(userTitleStatus.userId, userId),
+        eq(userTitleStatus.status, "completed"),
+      ),
+    )
+    .all();
+
+  return {
+    moviesThisMonth: moviesThisMonth?.count ?? 0,
+    episodesThisWeek: episodesThisWeek?.count ?? 0,
+    librarySize: librarySizeRow?.count ?? 0,
+    completed: completedCount?.count ?? 0,
+  };
+}
 
 export interface ContinueWatchingItem {
   title: {
@@ -154,9 +218,11 @@ export async function getNewAvailableFeed(userId: string, days = 14) {
       titleId: titles.id,
       title: titles.title,
       type: titles.type,
+      tmdbId: titles.tmdbId,
       posterPath: titles.posterPath,
       releaseDate: titles.releaseDate,
       firstAirDate: titles.firstAirDate,
+      voteAverage: titles.voteAverage,
       popularity: titles.popularity,
     })
     .from(titles)
@@ -262,4 +328,50 @@ export async function getRecommendationsFeed(userId: string) {
       }),
     )
   ).filter(Boolean);
+}
+
+export async function getRecommendationsForTitle(titleId: string) {
+  const title = await db
+    .select()
+    .from(titles)
+    .where(eq(titles.id, titleId))
+    .get();
+  if (!title) return [];
+
+  const recs = await db
+    .select({
+      recommendedTitleId: titleRecommendations.recommendedTitleId,
+      source: titleRecommendations.source,
+      rank: titleRecommendations.rank,
+    })
+    .from(titleRecommendations)
+    .where(eq(titleRecommendations.titleId, titleId))
+    .orderBy(titleRecommendations.rank)
+    .all();
+
+  const results = (
+    await Promise.all(
+      recs.map(async (rec) => {
+        const recTitle = await db
+          .select()
+          .from(titles)
+          .where(eq(titles.id, rec.recommendedTitleId))
+          .get();
+        return recTitle
+          ? { ...recTitle, source: rec.source, rank: rec.rank }
+          : null;
+      }),
+    )
+  ).filter((r): r is NonNullable<typeof r> => r !== null);
+
+  return results.map((r) => ({
+    id: r.id,
+    tmdbId: r.tmdbId,
+    type: r.type as "movie" | "tv",
+    title: r.title,
+    posterPath: tmdbImageUrl(r.posterPath, "w500"),
+    releaseDate: r.releaseDate,
+    firstAirDate: r.firstAirDate,
+    voteAverage: r.voteAverage,
+  }));
 }

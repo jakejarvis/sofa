@@ -7,14 +7,7 @@ import {
   IconPlayerPlay,
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
-
-interface Stats {
-  moviesThisMonth: number;
-  episodesThisWeek: number;
-  librarySize: number;
-  completed: number;
-}
+import type { DashboardStats } from "@/lib/services/discovery";
 
 const statDefs = [
   {
@@ -47,18 +40,7 @@ const statDefs = [
   },
 ];
 
-export function StatsSummary() {
-  const [stats, setStats] = useState<Stats | null>(null);
-
-  useEffect(() => {
-    fetch("/api/feed/stats")
-      .then((r) => r.json())
-      .then((data) => setStats(data))
-      .catch(() => {});
-  }, []);
-
-  if (!stats) return null;
-
+export function StatsDisplay({ stats }: { stats: DashboardStats }) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       {statDefs.map((def, i) => {

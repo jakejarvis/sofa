@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
+  availabilityOffers,
   episodes,
   seasons,
   titleRecommendations,
@@ -13,8 +14,15 @@ import {
   getTvDetails,
   getTvSeasonDetails,
 } from "@/lib/tmdb/client";
+import { tmdbImageUrl } from "@/lib/tmdb/image";
+import type {
+  AvailabilityOffer,
+  Episode,
+  ResolvedTitle,
+  Season,
+} from "@/lib/types/title";
 import { refreshAvailability } from "./availability";
-import { extractAndStoreColors } from "./colors";
+import { extractAndStoreColors, parseColorPalette } from "./colors";
 import {
   cacheEpisodeStills,
   cacheImagesForTitle,
@@ -443,6 +451,145 @@ export async function refreshRecommendations(titleId: string) {
       })
       .run();
   }
+}
+
+export async function getTitleWithChildren(id: string): Promise<{
+  title: ResolvedTitle;
+  seasons: Season[];
+  availability: AvailabilityOffer[];
+} | null> {
+  let title = await db.select().from(titles).where(eq(titles.id, id)).get();
+  if (!title) return null;
+
+  // If this is a shell TV title, fetch full details now
+  if (title.type === "tv" && !title.lastFetchedAt) {
+    try {
+      const show = await getTvDetails(title.tmdbId);
+      await db
+        .update(titles)
+        .set({
+          overview: show.overview,
+          posterPath: show.poster_path,
+          backdropPath: show.backdrop_path,
+          status: show.status,
+          lastFetchedAt: new Date(),
+        })
+        .where(eq(titles.id, id))
+        .run();
+      await refreshTvChildren(id, title.tmdbId, show.number_of_seasons);
+      title =
+        (await db.select().from(titles).where(eq(titles.id, id)).get()) ??
+        title;
+    } catch {
+      // Continue with whatever data we have
+    }
+  }
+
+  // If this is a shell movie title, fetch full details now
+  if (title.type === "movie" && !title.lastFetchedAt) {
+    try {
+      const movie = await getMovieDetails(title.tmdbId);
+      await db
+        .update(titles)
+        .set({
+          title: movie.title,
+          originalTitle: movie.original_title,
+          overview: movie.overview,
+          releaseDate: movie.release_date || null,
+          posterPath: movie.poster_path,
+          backdropPath: movie.backdrop_path,
+          popularity: movie.popularity,
+          voteAverage: movie.vote_average,
+          voteCount: movie.vote_count,
+          status: movie.status,
+          lastFetchedAt: new Date(),
+        })
+        .where(eq(titles.id, id))
+        .run();
+      title =
+        (await db.select().from(titles).where(eq(titles.id, id)).get()) ??
+        title;
+    } catch {
+      // Continue with whatever data we have
+    }
+  }
+
+  let titleSeasons: Season[] = [];
+
+  if (title.type === "tv") {
+    const seasonRows = await db
+      .select()
+      .from(seasons)
+      .where(eq(seasons.titleId, title.id))
+      .orderBy(seasons.seasonNumber)
+      .all();
+
+    titleSeasons = await Promise.all(
+      seasonRows.map(async (s) => ({
+        id: s.id,
+        seasonNumber: s.seasonNumber,
+        name: s.name,
+        episodes: (
+          await db
+            .select()
+            .from(episodes)
+            .where(eq(episodes.seasonId, s.id))
+            .orderBy(episodes.episodeNumber)
+            .all()
+        ).map(
+          (ep): Episode => ({
+            id: ep.id,
+            episodeNumber: ep.episodeNumber,
+            name: ep.name,
+            overview: ep.overview,
+            stillPath: tmdbImageUrl(ep.stillPath, "w1280", "stills"),
+            airDate: ep.airDate,
+            runtimeMinutes: ep.runtimeMinutes,
+          }),
+        ),
+      })),
+    );
+  }
+
+  const availability = (
+    await db
+      .select()
+      .from(availabilityOffers)
+      .where(eq(availabilityOffers.titleId, title.id))
+      .all()
+  ).map(
+    (a): AvailabilityOffer => ({
+      providerId: a.providerId,
+      providerName: a.providerName,
+      logoPath: tmdbImageUrl(a.logoPath, "w92"),
+      offerType: a.offerType,
+    }),
+  );
+
+  // Lazy color extraction
+  if (!title.colorPalette && title.posterPath) {
+    extractAndStoreColors(title.id, title.posterPath).catch(() => {});
+  }
+
+  const resolvedTitle: ResolvedTitle = {
+    id: title.id,
+    tmdbId: title.tmdbId,
+    type: title.type as "movie" | "tv",
+    title: title.title,
+    originalTitle: title.originalTitle,
+    overview: title.overview,
+    releaseDate: title.releaseDate,
+    firstAirDate: title.firstAirDate,
+    posterPath: tmdbImageUrl(title.posterPath, "w500"),
+    backdropPath: tmdbImageUrl(title.backdropPath, "w1280"),
+    popularity: title.popularity,
+    voteAverage: title.voteAverage,
+    voteCount: title.voteCount,
+    status: title.status,
+    colorPalette: parseColorPalette(title.colorPalette),
+  };
+
+  return { title: resolvedTitle, seasons: titleSeasons, availability };
 }
 
 function delay(ms: number) {
