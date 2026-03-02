@@ -3,6 +3,7 @@ import { DM_Sans, DM_Serif_Display, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({
         className={`${dmSans.variable} ${dmSerif.variable} ${geistMono.variable} font-sans antialiased`}
       >
         <TooltipProvider>{children}</TooltipProvider>
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );

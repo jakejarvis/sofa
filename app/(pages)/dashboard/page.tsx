@@ -8,7 +8,6 @@ import {
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { DashboardSkeleton } from "@/components/skeletons";
 import { StatsSummary } from "@/components/stats-summary";
@@ -72,8 +71,7 @@ const sectionVariants = {
 };
 
 export default function DashboardPage() {
-  const { data: session, isPending } = useSession();
-  const router = useRouter();
+  const { data: session } = useSession();
   const [continueWatching, setContinueWatching] = useState<
     ContinueWatchingItem[]
   >([]);
@@ -98,15 +96,10 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    if (isPending) return;
-    if (!session?.user) {
-      router.replace("/login");
-      return;
-    }
     fetchFeeds();
-  }, [session, isPending, router, fetchFeeds]);
+  }, [fetchFeeds]);
 
-  if (isPending || loading) {
+  if (loading) {
     return <DashboardSkeleton />;
   }
 

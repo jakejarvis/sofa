@@ -354,17 +354,13 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (isPending) return;
-    if (!session?.user) {
-      router.replace("/login");
-      return;
-    }
     fetchWebhooks();
-    if (session.user.role === "admin") {
+    if (session?.user?.role === "admin") {
       fetchSettings();
     } else {
       setLoadingSettings(false);
     }
-  }, [session, isPending, router, fetchSettings, fetchWebhooks]);
+  }, [session, isPending, fetchSettings, fetchWebhooks]);
 
   async function handleToggleRegistration(checked: boolean) {
     setToggling(true);

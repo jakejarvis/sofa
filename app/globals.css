@@ -65,7 +65,7 @@
   --secondary-foreground: oklch(0.85 0.02 80);
   --muted: oklch(0.22 0.008 55);
   --muted-foreground: oklch(0.63 0.02 80);
-  --accent: oklch(0.25 0.010 55);
+  --accent: oklch(0.25 0.01 55);
   --accent-foreground: oklch(0.93 0.015 80);
   --destructive: oklch(0.65 0.2 25);
   --border: oklch(1 0.015 65 / 10%);
@@ -175,7 +175,7 @@ body::before {
 
 [data-slot="skeleton"] {
   animation: warm-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  background: oklch(0.25 0.010 55);
+  background: oklch(0.25 0.01 55);
 }
 
 /* Scrollbar styling */

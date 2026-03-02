@@ -1,17 +1,20 @@
-"use client";
-
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { CommandPalette } from "@/components/command-palette";
 import { KeyboardHelpDialog } from "@/components/keyboard-help-dialog";
 import { KeyboardProvider } from "@/components/keyboard-provider";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
 import { NavBar } from "@/components/nav-bar";
-import { Toaster } from "@/components/ui/sonner";
+import { auth } from "@/lib/auth/server";
 
-export default function PagesLayout({
+export default async function PagesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect("/login");
+
   return (
     <KeyboardProvider>
       <div className="min-h-screen overflow-x-hidden pb-14 sm:pb-0">
@@ -25,7 +28,6 @@ export default function PagesLayout({
       <MobileTabBar />
       <CommandPalette />
       <KeyboardHelpDialog />
-      <Toaster position="bottom-right" />
     </KeyboardProvider>
   );
 }
