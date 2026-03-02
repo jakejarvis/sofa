@@ -8,7 +8,6 @@ import {
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -16,14 +15,6 @@ import { TitleDetailSkeleton } from "@/components/skeletons";
 import { StarRating } from "@/components/star-rating";
 import { StatusButton } from "@/components/status-button";
 import { TitleCard } from "@/components/title-card";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Progress } from "@/components/ui/progress";
 import { useRegisterShortcut } from "@/hooks/use-register-shortcut";
 
@@ -443,24 +434,9 @@ export default function TitleDetailPage() {
 
   return (
     <div className="relative space-y-10">
-      {/* Breadcrumb */}
-      <Breadcrumb className="relative z-20">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink render={<Link href="/dashboard" />}>
-              Home
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{title.title}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
       {/* Backdrop hero */}
       {title.backdropPath && (
-        <div className="relative -mx-4 -mt-4 h-80 overflow-hidden sm:-mx-6 sm:h-[28rem]">
+        <div className="relative -mt-6 ml-[calc(-50vw+50%)] mr-[calc(-50vw+50%)] h-80 overflow-hidden sm:h-[28rem]">
           <Image
             src={title.backdropPath}
             alt=""
@@ -526,7 +502,7 @@ export default function TitleDetailPage() {
 
       {/* Title header */}
       <motion.div
-        className={`flex flex-col gap-8 sm:flex-row ${title.backdropPath ? "-mt-32 relative z-10" : ""}`}
+        className={`flex flex-row gap-4 sm:gap-8 ${title.backdropPath ? "-mt-32 relative z-10" : ""}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring" as const, stiffness: 200, damping: 24 }}
@@ -534,7 +510,7 @@ export default function TitleDetailPage() {
         {title.posterPath && (
           <div className="shrink-0">
             <div
-              className="overflow-hidden rounded-2xl ring-1 ring-foreground/5 shadow-2xl transition-shadow duration-500"
+              className="overflow-hidden rounded-xl sm:rounded-2xl ring-1 ring-foreground/5 shadow-2xl transition-shadow duration-500"
               style={{
                 boxShadow: palette?.darkVibrant
                   ? `0 25px 60px -12px ${palette.darkVibrant}50, 0 12px 28px -8px rgba(0,0,0,0.5)`
@@ -546,7 +522,7 @@ export default function TitleDetailPage() {
                 alt={title.title}
                 width={220}
                 height={330}
-                className="h-auto w-[180px] sm:w-[220px]"
+                className="h-auto w-[120px] sm:w-[220px]"
                 priority
               />
             </div>
@@ -555,7 +531,7 @@ export default function TitleDetailPage() {
 
         <div className="flex-1 space-y-5">
           <div>
-            <h1 className="font-display text-4xl tracking-tight sm:text-5xl">
+            <h1 className="font-display text-2xl tracking-tight sm:text-5xl">
               {title.title}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
