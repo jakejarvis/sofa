@@ -1,9 +1,25 @@
 "use client";
 
-import { IconCheck, IconChevronDown, IconChevronUp } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconChecks,
+  IconChevronDown,
+  IconChevronUp,
+} from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
 import { useTitleInteraction } from "./title-interaction-provider";
 
@@ -11,16 +27,58 @@ export function TitleSeasons() {
   const {
     seasons,
     episodeWatches,
+    userStatus,
     handleWatchEpisode,
     handleMarkSeason,
     handleUnmarkSeason,
+    handleMarkAllWatched,
     watchingEp,
   } = useTitleInteraction();
   const [openSeason, setOpenSeason] = useState<number | null>(null);
+  const [markAllOpen, setMarkAllOpen] = useState(false);
 
   return (
     <div className="space-y-3">
-      <h2 className="font-display text-2xl tracking-tight">Seasons</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-2xl tracking-tight">Seasons</h2>
+        {userStatus && userStatus !== "completed" && (
+          <AlertDialog open={markAllOpen} onOpenChange={setMarkAllOpen}>
+            <AlertDialogTrigger
+              render={
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  <IconChecks size={14} />
+                  Mark All Watched
+                </button>
+              }
+            />
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Mark all episodes as watched?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will mark every episode of this show as watched. You can
+                  undo this later by unmarking individual seasons.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    handleMarkAllWatched();
+                    setMarkAllOpen(false);
+                  }}
+                >
+                  Mark All Watched
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+      </div>
       <div className="space-y-2">
         {seasons.map((season) => {
           const isOpen = openSeason === season.seasonNumber;
