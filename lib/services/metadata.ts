@@ -566,9 +566,13 @@ export async function getTitleWithChildren(id: string): Promise<{
     }),
   );
 
-  // Lazy color extraction
-  if (!title.colorPalette && title.posterPath) {
-    extractAndStoreColors(title.id, title.posterPath).catch(() => {});
+  // Lazy color extraction — await so the palette is available for theming
+  let palette = parseColorPalette(title.colorPalette);
+  if (!palette && title.posterPath) {
+    palette =
+      (await extractAndStoreColors(title.id, title.posterPath).catch(
+        () => null,
+      )) ?? null;
   }
 
   const resolvedTitle: ResolvedTitle = {
@@ -586,7 +590,7 @@ export async function getTitleWithChildren(id: string): Promise<{
     voteAverage: title.voteAverage,
     voteCount: title.voteCount,
     status: title.status,
-    colorPalette: parseColorPalette(title.colorPalette),
+    colorPalette: palette,
   };
 
   return { title: resolvedTitle, seasons: titleSeasons, availability };

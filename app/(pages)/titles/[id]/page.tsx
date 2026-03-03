@@ -10,6 +10,7 @@ import { titles } from "@/lib/db/schema";
 import { getTitleWithChildren, importTitle } from "@/lib/services/metadata";
 import { getUserTitleInfo } from "@/lib/services/tracking";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
+import { getTitleThemeStyle } from "@/lib/utils/title-theme";
 import { TitleActions } from "./_components/title-actions";
 import { TitleAvailability } from "./_components/title-availability";
 import { TitleHero } from "./_components/title-hero";
@@ -72,8 +73,10 @@ export default async function TitleDetailPage({
 
   const { title, seasons, availability } = result;
 
+  const themeStyle = getTitleThemeStyle(title.colorPalette);
+
   return (
-    <div className="relative space-y-10">
+    <div className="relative space-y-10" style={themeStyle}>
       <TitleInteractionProvider
         titleId={title.id}
         titleType={title.type}
