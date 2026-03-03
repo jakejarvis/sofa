@@ -75,7 +75,7 @@ export default async function SettingsPage() {
               Sofa
             </a>{" "}
             v{APP_VERSION}
-            {GIT_COMMIT !== "unknown" && (
+            {GIT_COMMIT && (
               <>
                 {" "}
                 (

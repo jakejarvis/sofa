@@ -12,7 +12,9 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ARG GIT_COMMIT_SHA
 ENV NODE_ENV=production
+ENV GIT_COMMIT_SHA=${GIT_COMMIT_SHA}
 RUN pnpm build
 
 # --- Runner ---
