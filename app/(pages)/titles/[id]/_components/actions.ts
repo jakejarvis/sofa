@@ -24,7 +24,7 @@ async function getSessionUserId() {
 
 export async function updateTitleStatus(
   titleId: string,
-  status: "watchlist" | null,
+  status: "in_progress" | null,
 ) {
   const userId = await getSessionUserId();
   if (status === null) {

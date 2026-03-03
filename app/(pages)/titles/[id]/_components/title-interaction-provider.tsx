@@ -84,17 +84,10 @@ export function TitleInteractionProvider({
   const handleStatusChange = useCallback(
     async (status: string | null) => {
       const prev = userStatus;
-      setUserStatus(status);
+      setUserStatus(status === "watchlist" ? "in_progress" : status);
       try {
-        await updateTitleStatus(
-          titleId,
-          status === "watchlist" ? "watchlist" : null,
-        );
-        toast.success(
-          status === "watchlist"
-            ? "Added to watchlist"
-            : "Removed from library",
-        );
+        await updateTitleStatus(titleId, status ? "in_progress" : null);
+        toast.success(status ? "Added to watchlist" : "Removed from library");
       } catch {
         setUserStatus(prev);
         toast.error("Failed to update status");

@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  IconBookmarkFilled,
   IconCheck,
   IconPlayerPlayFilled,
   IconPlus,
@@ -9,21 +8,17 @@ import {
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 
+const watchingStyle = {
+  label: "Watching",
+  icon: IconPlayerPlayFilled,
+  class: "text-status-watching",
+  bgClass: "bg-status-watching/10 hover:bg-status-watching/15",
+  borderClass: "ring-status-watching/20",
+};
+
 const statusConfig = {
-  watchlist: {
-    label: "Watchlist",
-    icon: IconBookmarkFilled,
-    class: "text-status-watchlist",
-    bgClass: "bg-status-watchlist/10 hover:bg-status-watchlist/15",
-    borderClass: "ring-status-watchlist/20",
-  },
-  in_progress: {
-    label: "Watching",
-    icon: IconPlayerPlayFilled,
-    class: "text-status-watching",
-    bgClass: "bg-status-watching/10 hover:bg-status-watching/15",
-    borderClass: "ring-status-watching/20",
-  },
+  watchlist: watchingStyle,
+  in_progress: watchingStyle,
   completed: {
     label: "Completed",
     icon: IconCheck,
