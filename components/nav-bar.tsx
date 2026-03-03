@@ -23,11 +23,11 @@ export function NavBar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <div className="flex items-center gap-6">
+      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-5 px-4 sm:gap-0 sm:px-6">
+        <div className="flex items-center gap-3 sm:gap-6">
           <Link
             href="/dashboard"
-            className="text-foreground transition-colors hover:text-primary"
+            className="shrink-0 text-foreground transition-colors hover:text-primary"
           >
             <SofaLogo size={28} />
           </Link>
@@ -61,8 +61,17 @@ export function NavBar() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Search trigger pill */}
+        <div className="flex flex-1 items-center justify-end gap-3 sm:flex-none">
+          {/* Mobile search trigger */}
+          <button
+            type="button"
+            onClick={() => setCommandPaletteOpen(true)}
+            className="flex flex-1 items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:border-primary/20 hover:bg-card sm:hidden"
+          >
+            <IconSearch size={14} />
+            <span>Search...</span>
+          </button>
+          {/* Desktop search trigger pill */}
           <button
             type="button"
             onClick={() => setCommandPaletteOpen(true)}
@@ -72,8 +81,8 @@ export function NavBar() {
             <span>Search...</span>
             <Kbd className="ml-1">⌘K</Kbd>
           </button>
-          <div className="flex items-center gap-2 rounded-lg border border-border/30 px-2.5 py-1">
-            <span className="hidden text-sm text-muted-foreground sm:inline">
+          <div className="hidden items-center gap-2 rounded-lg border border-border/30 px-2.5 py-1 sm:flex">
+            <span className="text-sm text-muted-foreground">
               {session?.user?.name}
             </span>
             <Link

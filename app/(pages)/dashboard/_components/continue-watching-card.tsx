@@ -59,7 +59,7 @@ export function ContinueWatchingCard({
               Up next
             </p>
             <p className="mt-0.5 truncate text-sm font-medium text-white">
-              <span className="font-mono text-xs text-white/60">
+              <span className="font-mono text-xs text-white/60 [word-spacing:-0.25em] mr-0.5">
                 S{item.nextEpisode.seasonNumber} E
                 {item.nextEpisode.episodeNumber}
               </span>{" "}
