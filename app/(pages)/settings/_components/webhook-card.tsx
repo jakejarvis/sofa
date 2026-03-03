@@ -4,13 +4,13 @@ import {
   IconCheck,
   IconChevronDown,
   IconCopy,
+  IconExternalLink,
   IconInfoCircle,
   IconRefresh,
   IconTrash,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { JellyfinIcon, PlexIcon } from "@/components/icons/media-servers";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,6 +30,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { JellyfinIcon, PlexIcon } from "./icons";
 
 export interface WebhookConnection {
   id: string;
@@ -110,7 +111,7 @@ export function WebhookCard({
   return (
     <Card>
       <Collapsible open={cardOpen} onOpenChange={setCardOpen}>
-        <CardContent>
+        <CardContent className={cardOpen ? "pb-4" : ""}>
           <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
@@ -134,7 +135,7 @@ export function WebhookCard({
           </CollapsibleTrigger>
         </CardContent>
 
-        <CollapsibleContent>
+        <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
           <CardContent className="space-y-3 border-t border-border/30 pt-4">
             {connection && (
               <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
@@ -154,9 +155,17 @@ export function WebhookCard({
                   size={14}
                   className="mt-0.5 shrink-0 text-primary"
                 />
-                <p className="text-xs leading-relaxed text-muted-foreground">
+                <p className="text-xs leading-relaxed text-foreground/80">
                   Plex webhooks require an active{" "}
-                  <span className="font-medium text-foreground">Plex Pass</span>{" "}
+                  <a
+                    href="https://www.plex.tv/plex-pass/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-foreground inline-flex items-center gap-0.5 hover:underline underline-offset-2"
+                  >
+                    <span>Plex Pass</span>
+                    <IconExternalLink className="size-3 inline-block translate-y-[-1px]" />
+                  </a>{" "}
                   subscription.
                 </p>
               </div>
@@ -271,7 +280,7 @@ export function WebhookCard({
                 />
                 Setup instructions
               </CollapsibleTrigger>
-              <CollapsibleContent>
+              <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
                 <div className="mt-2 rounded-lg bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
                   {isPlex ? (
                     <ol className="list-inside list-decimal space-y-1.5">

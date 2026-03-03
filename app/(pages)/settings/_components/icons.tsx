@@ -6,14 +6,14 @@ export function PlexIcon(props: SVGProps<SVGSVGElement>) {
       xmlns="http://www.w3.org/2000/svg"
       width="1em"
       height="1em"
-      viewBox="0 0 24 24"
+      viewBox="0 0 32 32"
       aria-hidden="true"
       {...props}
     >
-      {/* Icon from Material Design Icons by Pictogrammers - https://github.com/Templarian/MaterialDesign/blob/master/LICENSE */}
+      {/* Icon from CoreUI Brands by creativeLabs Łukasz Holeczek - https://creativecommons.org/publicdomain/zero/1.0/ */}
       <path
         fill="currentColor"
-        d="M4 2c-1.11 0-2 .89-2 2v16c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V4c0-1.11-.89-2-2-2zm4.56 4h3.5l3.44 6l-3.44 6h-3.5L12 12z"
+        d="M15.527 0H6.24l10.239 16L6.24 32h9.287L25.76 16z"
       />
     </svg>
   );
