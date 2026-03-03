@@ -80,7 +80,7 @@ All app tables use UUID text primary keys generated via the `uuid` package. Bett
 
 Only paths are stored in DB. Image URLs are resolved **server-side only** — API routes and server components call `tmdbImageUrl()` from `lib/tmdb/image.ts` before sending data to clients. Client components never import `tmdbImageUrl`; they receive ready-to-use URLs.
 
-When `IMAGE_CACHE_ENABLED` is set (default), images are downloaded to local disk (`IMAGE_CACHE_DIR`, defaults to `/data/images`) and served via `app/api/images/[...path]/route.ts`. Categories: `posters` (w500), `backdrops` (w1280), `stills` (w1280), `logos` (w92). When disabled, `tmdbImageUrl()` returns direct TMDB CDN URLs using `TMDB_IMAGE_BASE_URL` (defaults to `https://image.tmdb.org/t/p`).
+When `IMAGE_CACHE_ENABLED` is set (default), images are downloaded to local disk (`CACHE_DIR`, derived from `DATA_DIR/images`) and served via `app/api/images/[...path]/route.ts`. Categories: `posters` (w500), `backdrops` (w1280), `stills` (w1280), `logos` (w92). When disabled, `tmdbImageUrl()` returns direct TMDB CDN URLs using `TMDB_IMAGE_BASE_URL` (defaults to `https://image.tmdb.org/t/p`).
 
 Core files: `lib/services/image-cache.ts` (caching logic), `lib/tmdb/image.ts` (URL construction), `app/api/images/[...path]/route.ts` (proxy route).
 
@@ -90,7 +90,7 @@ Registered in `lib/jobs/registry.ts`, started via Next.js instrumentation hook (
 
 ### Environment variables
 
-See `.env.example`: `DATABASE_URL`, `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`.
+See `.env.example`: `DATA_DIR` (root for DB + cache, default `./data`), `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`. `DATABASE_URL` and `CACHE_DIR` are derived from `DATA_DIR` but can be overridden individually.
 
 ## Browser Automation
 

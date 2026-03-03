@@ -17,7 +17,10 @@ const CATEGORY_SIZES: Record<ImageCategory, string> = {
 const IMAGE_BASE_URL =
   process.env.TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p";
 
-const CACHE_DIR = process.env.IMAGE_CACHE_DIR || "/data/images";
+const DATA_DIR = process.env.DATA_DIR || "./data";
+const CACHE_DIR = process.env.CACHE_DIR
+  ? path.join(process.env.CACHE_DIR, "images")
+  : path.join(DATA_DIR, "images");
 
 export function imageCacheEnabled(): boolean {
   return process.env.IMAGE_CACHE_ENABLED !== "false";

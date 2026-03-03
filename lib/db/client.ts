@@ -7,10 +7,13 @@ const globalForDb = globalThis as unknown as {
   _client: ReturnType<typeof createClient> | undefined;
 };
 
+const DATA_DIR = process.env.DATA_DIR || "./data";
+const DATABASE_URL = process.env.DATABASE_URL || `file:${DATA_DIR}/sqlite.db`;
+
 function getClient() {
   if (!globalForDb._client) {
     globalForDb._client = createClient({
-      url: process.env.DATABASE_URL ?? "file:./data/sqlite.db",
+      url: DATABASE_URL,
     });
     globalForDb._client.execute("PRAGMA journal_mode = WAL");
     globalForDb._client.execute("PRAGMA foreign_keys = ON");

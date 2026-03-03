@@ -1,5 +1,6 @@
+# syntax=docker/dockerfile:1
 FROM node:24-alpine AS base
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10 --activate
 
 # --- Dependencies ---
 FROM base AS deps
@@ -25,16 +26,17 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
+ENV DATA_DIR=/data
 
 RUN addgroup --system --gid 1001 nodejs \
     && adduser --system --uid 1001 nextjs \
-    && mkdir -p /data/images/posters /data/images/backdrops /data/images/stills /data/images/logos \
+    && mkdir -p /data \
     && chown -R nextjs:nodejs /data
 
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
+COPY --from=builder --link --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --link --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --link --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --link --chown=nextjs:nodejs /app/drizzle ./drizzle
 
 USER nextjs
 EXPOSE 3000
