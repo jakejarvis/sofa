@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${dmSans.variable} ${dmSerif.variable} ${geistMono.variable} font-sans antialiased`}
+        className={`${dmSans.variable} ${dmSerif.variable} ${geistMono.variable} overflow-x-hidden font-sans antialiased`}
       >
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster position="bottom-right" />
