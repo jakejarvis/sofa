@@ -1,3 +1,4 @@
+import { Cron } from "croner";
 import { and, eq, isNotNull, lt, or } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
@@ -19,11 +20,39 @@ import {
   refreshTvChildren,
 } from "@/lib/services/metadata";
 import { getTvDetails } from "@/lib/tmdb/client";
-import { scheduler } from "./scheduler";
 
-const HOUR = 60 * 60 * 1000;
-const DAY = 24 * HOUR;
+const DAY = 24 * 60 * 60 * 1000;
 const RATE_LIMIT_MS = 300;
+
+const globalForJobs = globalThis as unknown as {
+  _jobs: Map<string, Cron> | undefined;
+};
+
+if (!globalForJobs._jobs) {
+  globalForJobs._jobs = new Map<string, Cron>();
+}
+const jobs = globalForJobs._jobs;
+
+function schedule(name: string, cron: string, handler: () => Promise<void>) {
+  jobs.set(
+    name,
+    new Cron(
+      cron,
+      {
+        name,
+        protect: true,
+        catch: (err: unknown) => {
+          console.error(`[scheduler] Job ${name} failed:`, err);
+        },
+      },
+      async () => {
+        console.log(`[scheduler] Running job: ${name}`);
+        await handler();
+        console.log(`[scheduler] Completed job: ${name}`);
+      },
+    ),
+  );
+}
 
 function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -175,14 +204,20 @@ async function cacheImagesJob() {
   }
 }
 
-export function registerJobs() {
-  scheduler.register("nightlyRefreshLibrary", nightlyRefreshLibrary, 24 * HOUR);
-  scheduler.register("refreshAvailability", refreshAvailabilityJob, 6 * HOUR);
-  scheduler.register(
-    "refreshRecommendations",
-    refreshRecommendationsJob,
-    12 * HOUR,
-  );
-  scheduler.register("refreshTvChildren", refreshTvChildrenJob, 12 * HOUR);
-  scheduler.register("cacheImages", cacheImagesJob, 12 * HOUR);
+export function startJobs() {
+  if (jobs.size > 0) return;
+
+  schedule("nightlyRefreshLibrary", "0 3 * * *", nightlyRefreshLibrary);
+  schedule("refreshAvailability", "0 */6 * * *", refreshAvailabilityJob);
+  schedule("refreshRecommendations", "0 */12 * * *", refreshRecommendationsJob);
+  schedule("refreshTvChildren", "30 */12 * * *", refreshTvChildrenJob);
+  schedule("cacheImages", "0 1,13 * * *", cacheImagesJob);
+
+  console.log(`[scheduler] Started ${jobs.size} jobs`);
+}
+
+export function stopJobs() {
+  for (const job of jobs.values()) {
+    job.stop();
+  }
 }

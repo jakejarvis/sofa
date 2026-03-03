@@ -17,16 +17,15 @@ export async function register() {
     runMigrations();
 
     // Initialize job scheduler
-    const { initJobs } = await import("@/lib/jobs/init");
-    initJobs();
+    const { startJobs, stopJobs } = await import("@/lib/cron");
+    startJobs();
 
     // Graceful shutdown — stop jobs and close DB on container stop
-    const { scheduler } = await import("@/lib/jobs/scheduler");
     const { closeDatabase } = await import("@/lib/db/client");
 
     const shutdown = () => {
       console.log("[shutdown] Stopping scheduler...");
-      scheduler.stop();
+      stopJobs();
       console.log("[shutdown] Closing database...");
       closeDatabase();
       console.log("[shutdown] Clean shutdown complete");

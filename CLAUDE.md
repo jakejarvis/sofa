@@ -39,7 +39,7 @@ bun db:studio        # Open Drizzle Studio (visual DB browser)
 - `lib/services/` — Business logic layer (metadata, tracking, discovery, availability)
 - `lib/tmdb/` — TMDB API client and TypeScript types
 - `lib/auth/` — Better Auth server config (`server.ts`) and client hooks (`client.ts`)
-- `lib/jobs/` — In-process background job scheduler (setInterval-based, `globalThis` singleton)
+- `lib/cron.ts` — Background job scheduler (croner, `globalThis` singleton)
 - `app/api/` — Next.js route handlers
 - `app/(pages)/` — User-facing pages (dashboard, search, title detail, login, register)
 - `components/` — App components + `components/ui/` for shadcn primitives
@@ -86,7 +86,7 @@ Core files: `lib/services/image-cache.ts` (caching logic), `lib/tmdb/image.ts` (
 
 ### Background jobs
 
-Registered in `lib/jobs/registry.ts`, started via Next.js instrumentation hook (`instrumentation.ts`) in production. Jobs: nightly library refresh (24h), availability refresh (6h), recommendations refresh (12h), TV episodes refresh (12h), image caching (12h). All batch jobs use 300ms delay between TMDB calls.
+Defined in `lib/cron.ts` using croner cron expressions, started via Next.js instrumentation hook (`instrumentation.ts`) in production. Jobs: nightly library refresh (`0 3 * * *`), availability refresh (`0 */6 * * *`), recommendations refresh (`0 */12 * * *`), TV episodes refresh (`30 */12 * * *`), image caching (`0 1,13 * * *`). All jobs use `protect: true` to prevent overlapping runs. All batch jobs use 300ms delay between TMDB calls.
 
 ### Environment variables
 
