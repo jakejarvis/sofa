@@ -5,14 +5,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-pnpm dev              # Start Next.js dev server
-pnpm build            # Production build
-pnpm lint             # Biome lint check
-pnpm format           # Biome format (auto-fix)
-pnpm db:push          # Push schema changes to SQLite database
-pnpm db:generate      # Generate Drizzle migration files
-pnpm db:migrate       # Run Drizzle migrations
-pnpm db:studio        # Open Drizzle Studio (visual DB browser)
+bun dev              # Start Next.js dev server
+bun build            # Production build
+bun lint             # Biome lint check
+bun format           # Biome format (auto-fix)
+bun db:push          # Push schema changes to SQLite database
+bun db:generate      # Generate Drizzle migration files
+bun db:migrate       # Run Drizzle migrations
+bun db:studio        # Open Drizzle Studio (visual DB browser)
 ```
 
 ## Architecture
@@ -22,7 +22,7 @@ pnpm db:studio        # Open Drizzle Studio (visual DB browser)
 ### Stack
 
 - **Framework**: Next.js 16 (App Router), React 19, TypeScript
-- **Database**: SQLite via @libsql/client + Drizzle ORM (WAL mode, singleton via `globalThis`, async queries)
+- **Database**: SQLite via bun:sqlite + Drizzle ORM (WAL mode, singleton via `globalThis`, sync queries)
 - **Auth**: Better Auth with Drizzle adapter, email/password
 - **Styling**: Tailwind CSS v4, shadcn components, dark cinema theme with warm primary accents
 - **Fonts**: DM Serif Display (display), DM Sans (body), Geist Mono (mono)

@@ -1,8 +1,8 @@
-import { migrate } from "drizzle-orm/libsql/migrator";
+import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import { db } from "./client";
 
-export async function runMigrations() {
+export function runMigrations() {
   console.log("[migrate] Running database migrations...");
-  await migrate(db, { migrationsFolder: "./drizzle" });
+  migrate(db, { migrationsFolder: "./drizzle" });
   console.log("[migrate] Database migrations complete");
 }

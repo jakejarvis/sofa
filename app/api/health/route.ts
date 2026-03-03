@@ -1,9 +1,10 @@
+import { sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { client } from "@/lib/db/client";
+import { db } from "@/lib/db/client";
 
 export async function GET() {
   try {
-    await client.execute("SELECT 1");
+    db.run(sql`SELECT 1`);
 
     return NextResponse.json({ status: "healthy" }, { status: 200 });
   } catch {

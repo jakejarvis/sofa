@@ -1,49 +1,51 @@
 # syntax=docker/dockerfile:1
-FROM node:24-alpine AS base
-RUN corepack enable && corepack prepare pnpm@10 --activate
+FROM oven/bun:1-alpine AS base
 
 # --- Dependencies ---
 FROM base AS deps
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+
+COPY package.json bun.lock ./
+
+RUN bun install --frozen-lockfile
 
 # --- Builder ---
 FROM base AS builder
 WORKDIR /app
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
 ARG GIT_COMMIT_SHA
 ENV NODE_ENV=production
 ENV GIT_COMMIT_SHA=${GIT_COMMIT_SHA}
-RUN pnpm build
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN bun run build
 
 # --- Runner ---
-FROM node:24-alpine AS runner
-RUN apk add --no-cache tini
+FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
+ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATA_DIR=/data
 
-RUN addgroup --system --gid 1001 nodejs \
-    && adduser --system --uid 1001 nextjs \
-    && mkdir -p /data \
-    && chown -R nextjs:nodejs /data
+RUN mkdir -p /data \
+    && chown bun:bun /data
 
-COPY --from=builder --link --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --link --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --link --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --link --chown=nextjs:nodejs /app/drizzle ./drizzle
+COPY --from=builder --chown=bun:bun /app/public ./public
+COPY --from=builder --chown=bun:bun /app/package.json ./package.json
+COPY --from=builder --chown=bun:bun /app/.next/standalone ./
+COPY --from=builder --chown=bun:bun /app/.next/static ./.next/static
+COPY --from=builder --chown=bun:bun /app/drizzle ./drizzle
 
-USER nextjs
+USER bun
 EXPOSE 3000
-VOLUME /data
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD wget -qO /dev/null http://localhost:3000/api/health
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD ["bun", "-e", "fetch('http://localhost:3000/api/health').then(r => process.exit(+!r.ok)).catch(() => process.exit(1))"]
 
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["node", "server.js"]
+CMD ["bun", "server.js"]
