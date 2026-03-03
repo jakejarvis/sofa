@@ -10,6 +10,7 @@ import {
 import { toast } from "sonner";
 import type { Season } from "@/lib/types/title";
 import {
+  batchWatchEpisodes,
   markAllWatchedAction,
   unwatchEpisodeAction,
   unwatchSeasonAction,
@@ -133,6 +134,33 @@ export function TitleInteractionProvider({
     }
   }, [titleId, titleName, userStatus]);
 
+  const handleCatchUp = useCallback(
+    async (episodeIds: string[]) => {
+      setEpisodeWatches((w) => {
+        const set = new Set(w);
+        for (const id of episodeIds) set.add(id);
+        return [...set];
+      });
+      // Check if all episodes are now watched
+      setEpisodeWatches((w) => {
+        const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));
+        if (allEpIds.every((id) => w.includes(id))) {
+          setUserStatus("completed");
+        }
+        return w;
+      });
+      try {
+        await batchWatchEpisodes(episodeIds);
+        toast.success(
+          `Caught up — marked ${episodeIds.length} episode${episodeIds.length > 1 ? "s" : ""} as watched`,
+        );
+      } catch {
+        toast.error("Failed to catch up");
+      }
+    },
+    [seasons],
+  );
+
   const handleWatchEpisode = useCallback(
     async (
       episodeId: string,
@@ -162,7 +190,36 @@ export function TitleInteractionProvider({
         );
         try {
           await watchEpisode(episodeId);
-          toast.success(`Watched S${seasonNum} E${epNum}`);
+
+          // Find unwatched episodes before this one
+          const previousUnwatched: string[] = [];
+          for (const s of seasons) {
+            for (const ep of s.episodes) {
+              if (
+                s.seasonNumber < seasonNum ||
+                (s.seasonNumber === seasonNum && ep.episodeNumber < epNum)
+              ) {
+                // Use the latest episodeWatches state
+                if (!episodeWatches.includes(ep.id) && ep.id !== episodeId) {
+                  previousUnwatched.push(ep.id);
+                }
+              }
+            }
+          }
+
+          if (previousUnwatched.length > 0) {
+            const count = previousUnwatched.length;
+            toast.success(`Watched S${seasonNum} E${epNum}`, {
+              description: `${count} earlier episode${count > 1 ? "s" : ""} unwatched`,
+              action: {
+                label: "Catch up",
+                onClick: () => handleCatchUp(previousUnwatched),
+              },
+              duration: 8000,
+            });
+          } else {
+            toast.success(`Watched S${seasonNum} E${epNum}`);
+          }
         } catch {
           setEpisodeWatches((w) => w.filter((id) => id !== episodeId));
           toast.error("Failed to mark episode");
@@ -170,7 +227,7 @@ export function TitleInteractionProvider({
       }
       setWatchingEp(null);
     },
-    [],
+    [seasons, episodeWatches, handleCatchUp],
   );
 
   const handleMarkSeason = useCallback(

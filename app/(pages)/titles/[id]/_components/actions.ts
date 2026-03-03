@@ -76,3 +76,10 @@ export async function unwatchSeasonAction(seasonId: string) {
   const userId = await getSessionUserId();
   await unwatchSeason(userId, seasonId);
 }
+
+export async function batchWatchEpisodes(episodeIds: string[]) {
+  const userId = await getSessionUserId();
+  for (const id of episodeIds) {
+    await logEpisodeWatch(userId, id);
+  }
+}
