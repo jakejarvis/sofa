@@ -1,6 +1,11 @@
 "use client";
 
-import { IconSearch } from "@tabler/icons-react";
+import {
+  IconDeviceTv,
+  IconMovie,
+  IconSearch,
+  IconStarFilled,
+} from "@tabler/icons-react";
 import { Command as CommandPrimitive } from "cmdk";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -163,17 +168,26 @@ export function SearchAutocomplete({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="truncate text-sm font-medium">{r.title}</p>
-                      <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
-                        {r.type}
-                      </span>
+                      {r.type === "movie" ? (
+                        <IconMovie
+                          size={14}
+                          className="shrink-0 text-primary/60"
+                        />
+                      ) : (
+                        <IconDeviceTv
+                          size={14}
+                          className="shrink-0 text-primary/60"
+                        />
+                      )}
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       {r.releaseDate && (
                         <span>{r.releaseDate.slice(0, 4)}</span>
                       )}
                       {r.voteAverage > 0 && (
-                        <span className="text-primary">
-                          ★ {r.voteAverage.toFixed(1)}
+                        <span className="flex items-center gap-0.5 text-primary/80">
+                          <IconStarFilled size={11} />
+                          {r.voteAverage.toFixed(1)}
                         </span>
                       )}
                     </div>

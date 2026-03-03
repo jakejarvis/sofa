@@ -1,5 +1,6 @@
 "use client";
 
+import { IconDeviceTv, IconMovie, IconStarFilled } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,21 +28,22 @@ export function TitleCard({
   onImport,
 }: TitleCardProps) {
   const year = releaseDate?.slice(0, 4);
+  const TypeIcon = type === "movie" ? IconMovie : IconDeviceTv;
 
   const content = (
     <motion.div
-      className="group relative overflow-hidden rounded-xl ring-1 ring-foreground/5 transition-shadow hover:ring-primary/20 hover:shadow-lg hover:shadow-black/25"
+      className="group relative overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06] transition-shadow hover:ring-primary/25 hover:shadow-lg hover:shadow-primary/5"
       whileHover={{ scale: 1.02 }}
-      transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
-      <div className="aspect-[2/3] overflow-hidden rounded-xl bg-card">
+      <div className="aspect-[2/3] overflow-hidden bg-card">
         {posterPath ? (
           <Image
             src={posterPath}
             alt={title}
             width={300}
             height={450}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <div className="relative flex h-full items-center justify-center overflow-hidden bg-gradient-to-br from-card via-secondary to-muted">
@@ -59,18 +61,21 @@ export function TitleCard({
             </div>
           </div>
         )}
-        {/* Hover gradient overlay with metadata */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+        {/* Hover gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
       </div>
-      <div className="mt-2 space-y-0.5">
+
+      {/* Metadata */}
+      <div className="px-3 pb-3 pt-2.5">
         <p className="line-clamp-1 text-sm font-medium leading-snug">{title}</p>
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
-            {type}
-          </span>
+        <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
+          <TypeIcon size={14} className="shrink-0 text-primary/60" />
           {year && <span>{year}</span>}
           {voteAverage != null && voteAverage > 0 && (
-            <span className="text-primary">★ {voteAverage.toFixed(1)}</span>
+            <span className="ml-auto flex items-center gap-0.5 text-primary/80">
+              <IconStarFilled size={11} />
+              {voteAverage.toFixed(1)}
+            </span>
           )}
         </div>
       </div>

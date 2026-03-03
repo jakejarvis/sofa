@@ -2,10 +2,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function TitleCardSkeleton() {
   return (
-    <div className="space-y-2">
-      <Skeleton className="aspect-[2/3] w-full rounded-xl" />
-      <Skeleton className="h-4 w-3/4" />
-      <Skeleton className="h-3 w-1/2" />
+    <div className="overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06]">
+      <Skeleton className="aspect-[2/3] w-full rounded-none" />
+      <div className="px-3 pb-3 pt-2.5 space-y-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
+      </div>
     </div>
   );
 }
