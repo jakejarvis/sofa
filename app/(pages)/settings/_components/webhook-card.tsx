@@ -135,7 +135,7 @@ export function WebhookCard({
         </CardContent>
 
         <CollapsibleContent>
-          <CardContent className="space-y-3 pt-0">
+          <CardContent className="space-y-3 border-t border-border/30 pt-4">
             {connection && (
               <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
                 <span className="text-xs text-muted-foreground">

@@ -1,7 +1,8 @@
 "use client";
 
-import { IconShieldLock, IconUserPlus } from "@tabler/icons-react";
+import { IconServerCog, IconUserPlus } from "@tabler/icons-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -27,8 +28,10 @@ export function ServerSection({
     setToggling(true);
     try {
       await toggleRegistration(checked);
+      toast.success(checked ? "Registration opened" : "Registration closed");
     } catch {
       setRegistrationOpen(previous);
+      toast.error("Failed to update registration setting");
     } finally {
       setToggling(false);
     }
@@ -37,12 +40,12 @@ export function ServerSection({
   return (
     <div>
       <div className="mb-3 flex items-center gap-2">
-        <IconShieldLock size={16} className="text-muted-foreground" />
+        <IconServerCog size={16} className="text-muted-foreground" />
         <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Server
         </h2>
         <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-          Admin
+          Admin only
         </span>
       </div>
       <Card className="border-l-2 border-l-primary/30">

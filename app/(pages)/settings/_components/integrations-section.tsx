@@ -2,6 +2,7 @@
 
 import { IconWebhook } from "@tabler/icons-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   deleteWebhookConnection,
   regenerateWebhookToken,
@@ -22,40 +23,57 @@ export function IntegrationsSection({
     connections.find((c) => c.provider === "jellyfin") ?? null;
 
   async function handleSave(provider: "plex" | "jellyfin", username: string) {
-    const result = await saveWebhookConnection(provider, username);
-    setConnections((prev) => {
-      const existing = prev.find((c) => c.provider === provider);
-      if (existing) {
-        return prev.map((c) =>
-          c.provider === provider
-            ? { ...result, recentEvents: existing.recentEvents }
-            : c,
-        );
-      }
-      return [...prev, { ...result, recentEvents: [] }];
-    });
+    const label = provider === "plex" ? "Plex" : "Jellyfin";
+    const isNew = !connections.find((c) => c.provider === provider);
+    try {
+      const result = await saveWebhookConnection(provider, username);
+      setConnections((prev) => {
+        const existing = prev.find((c) => c.provider === provider);
+        if (existing) {
+          return prev.map((c) =>
+            c.provider === provider
+              ? { ...result, recentEvents: existing.recentEvents }
+              : c,
+          );
+        }
+        return [...prev, { ...result, recentEvents: [] }];
+      });
+      toast.success(isNew ? `${label} connected` : `${label} updated`);
+    } catch {
+      toast.error(`Failed to save ${label} connection`);
+    }
   }
 
   async function handleDelete(provider: "plex" | "jellyfin") {
+    const label = provider === "plex" ? "Plex" : "Jellyfin";
     const previous = connections;
     setConnections((prev) => prev.filter((c) => c.provider !== provider));
     try {
       await deleteWebhookConnection(provider);
+      toast.success(`${label} disconnected`);
     } catch {
       setConnections(previous);
+      toast.error(`Failed to disconnect ${label}`);
     }
   }
 
   async function handleRegenerateToken(provider: "plex" | "jellyfin") {
-    const result = await regenerateWebhookToken(provider);
-    setConnections((prev) =>
-      prev.map((c) =>
-        c.provider === provider ? { ...c, token: result.token } : c,
-      ),
-    );
+    const label = provider === "plex" ? "Plex" : "Jellyfin";
+    try {
+      const result = await regenerateWebhookToken(provider);
+      setConnections((prev) =>
+        prev.map((c) =>
+          c.provider === provider ? { ...c, token: result.token } : c,
+        ),
+      );
+      toast.success(`${label} webhook URL regenerated`);
+    } catch {
+      toast.error(`Failed to regenerate ${label} URL`);
+    }
   }
 
   async function handleToggle(provider: "plex" | "jellyfin", enabled: boolean) {
+    const label = provider === "plex" ? "Plex" : "Jellyfin";
     const previous = connections;
     setConnections((prev) =>
       prev.map((c) => (c.provider === provider ? { ...c, enabled } : c)),
@@ -67,8 +85,10 @@ export function IntegrationsSection({
         conn?.mediaServerUsername ?? "",
         enabled,
       );
+      toast.success(`${label} webhook ${enabled ? "enabled" : "disabled"}`);
     } catch {
       setConnections(previous);
+      toast.error(`Failed to update ${label}`);
     }
   }
 
