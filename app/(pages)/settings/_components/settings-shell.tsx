@@ -13,7 +13,13 @@ const sectionVariants = {
   },
 };
 
-export function SettingsShell({ children }: { children: ReactNode }) {
+export function SettingsShell({
+  children,
+  footer,
+}: {
+  children: ReactNode;
+  footer?: ReactNode;
+}) {
   return (
     <motion.div
       className="mx-auto max-w-2xl space-y-8"
@@ -37,6 +43,8 @@ export function SettingsShell({ children }: { children: ReactNode }) {
       {Children.map(children, (child) => (
         <motion.div variants={sectionVariants}>{child}</motion.div>
       ))}
+
+      {footer && <motion.div variants={sectionVariants}>{footer}</motion.div>}
     </motion.div>
   );
 }

@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth/server";
 import { db } from "@/lib/db/client";
 import { webhookConnections, webhookEventLog } from "@/lib/db/schema";
 import { getSetting } from "@/lib/services/settings";
+import { APP_VERSION, GIT_COMMIT } from "@/lib/version";
 import { AccountSection } from "./_components/account-section";
 import { IntegrationsSection } from "./_components/integrations-section";
 import { ServerSection } from "./_components/server-section";
@@ -58,8 +59,41 @@ export default async function SettingsPage() {
       : Promise.resolve(false),
   ]);
 
+  const repoUrl = "https://github.com/jakejarvis/sofa";
+
   return (
-    <SettingsShell>
+    <SettingsShell
+      footer={
+        <footer className="border-t border-border/50 pt-6 pb-2 text-center text-xs text-muted-foreground">
+          <p>
+            <a
+              href={repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-primary/80 hover:text-primary transition-colors"
+            >
+              Sofa
+            </a>{" "}
+            v{APP_VERSION}
+            {GIT_COMMIT !== "unknown" && (
+              <>
+                {" "}
+                (
+                <a
+                  href={`${repoUrl}/commit/${GIT_COMMIT}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono hover:text-primary transition-colors"
+                >
+                  {GIT_COMMIT}
+                </a>
+                )
+              </>
+            )}
+          </p>
+        </footer>
+      }
+    >
       <AccountSection
         user={{
           name: session.user.name,
