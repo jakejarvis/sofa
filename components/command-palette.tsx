@@ -6,6 +6,7 @@ import {
   IconKeyboard,
   IconMovie,
   IconSearch,
+  IconX,
 } from "@tabler/icons-react";
 import { useHotkey, useHotkeySequence } from "@tanstack/react-hotkeys";
 import { useAtom } from "jotai";
@@ -63,6 +64,15 @@ function addRecentSearch(query: string) {
   const recent = getRecentSearches().filter((q) => q !== query);
   recent.unshift(query);
   localStorage.setItem(RECENT_KEY, JSON.stringify(recent.slice(0, MAX_RECENT)));
+}
+
+function removeRecentSearch(query: string) {
+  const recent = getRecentSearches().filter((q) => q !== query);
+  localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+}
+
+function clearRecentSearches() {
+  localStorage.removeItem(RECENT_KEY);
 }
 
 export function CommandPalette() {
@@ -133,6 +143,16 @@ export function CommandPalette() {
 
   const handleRecentSearch = useCallback((q: string) => {
     setQuery(q);
+  }, []);
+
+  const handleRemoveRecent = useCallback((q: string) => {
+    removeRecentSearch(q);
+    setRecentSearches((prev) => prev.filter((s) => s !== q));
+  }, []);
+
+  const handleClearRecent = useCallback(() => {
+    clearRecentSearches();
+    setRecentSearches([]);
   }, []);
 
   const hasQuery = query.trim().length > 0;
@@ -233,17 +253,46 @@ export function CommandPalette() {
               {!hasQuery && (
                 <>
                   {recentSearches.length > 0 && (
-                    <CommandGroup heading="Recent Searches">
+                    <CommandGroup
+                      heading={
+                        <div className="flex items-center justify-between">
+                          <span>Recent Searches</span>
+                          <button
+                            type="button"
+                            onClick={handleClearRecent}
+                            className="text-[10px] font-normal text-muted-foreground transition-colors hover:text-foreground"
+                          >
+                            Clear all
+                          </button>
+                        </div>
+                      }
+                    >
                       {recentSearches.map((q) => (
                         <CommandItem
                           key={q}
                           onSelect={() => handleRecentSearch(q)}
+                          className="group"
                         >
                           <IconSearch
                             size={14}
                             className="text-muted-foreground"
                           />
-                          {q}
+                          <span className="flex-1">{q}</span>
+                          <span
+                            data-slot="command-shortcut"
+                            className="ml-auto"
+                          >
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveRecent(q);
+                              }}
+                              className="rounded-sm p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-data-[selected=true]:opacity-100"
+                            >
+                              <IconX size={12} />
+                            </button>
+                          </span>
                         </CommandItem>
                       ))}
                     </CommandGroup>
