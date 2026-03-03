@@ -8,6 +8,7 @@ import { episodes } from "@/lib/db/schema";
 import {
   logEpisodeWatch,
   logMovieWatch,
+  markAllEpisodesWatched,
   rateTitleStars,
   removeTitleStatus,
   setTitleStatus,
@@ -23,18 +24,19 @@ async function getSessionUserId() {
 
 export async function updateTitleStatus(
   titleId: string,
-  status: string | null,
+  status: "watchlist" | null,
 ) {
   const userId = await getSessionUserId();
-  if (status === null || status === undefined) {
+  if (status === null) {
     await removeTitleStatus(userId, titleId);
   } else {
-    await setTitleStatus(
-      userId,
-      titleId,
-      status as "watchlist" | "in_progress" | "completed",
-    );
+    await setTitleStatus(userId, titleId, status);
   }
+}
+
+export async function markAllWatchedAction(titleId: string) {
+  const userId = await getSessionUserId();
+  await markAllEpisodesWatched(userId, titleId);
 }
 
 export async function updateTitleRating(titleId: string, ratingStars: number) {

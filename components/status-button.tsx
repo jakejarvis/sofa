@@ -1,38 +1,37 @@
 "use client";
 
 import {
-  IconBookmark,
+  IconBookmarkFilled,
   IconCheck,
-  IconPlayerPlay,
+  IconPlayerPlayFilled,
   IconPlus,
   IconX,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
 
-const statuses = [
-  {
-    value: "watchlist",
+const statusConfig = {
+  watchlist: {
     label: "Watchlist",
-    icon: IconBookmark,
-    colorClass:
-      "border-status-watchlist/30 bg-status-watchlist/10 text-status-watchlist hover:bg-status-watchlist/15",
+    icon: IconBookmarkFilled,
+    class: "text-status-watchlist",
+    bgClass: "bg-status-watchlist/10 hover:bg-status-watchlist/15",
+    borderClass: "ring-status-watchlist/20",
   },
-  {
-    value: "in_progress",
+  in_progress: {
     label: "Watching",
-    icon: IconPlayerPlay,
-    colorClass:
-      "border-status-watching/30 bg-status-watching/10 text-status-watching hover:bg-status-watching/15",
+    icon: IconPlayerPlayFilled,
+    class: "text-status-watching",
+    bgClass: "bg-status-watching/10 hover:bg-status-watching/15",
+    borderClass: "ring-status-watching/20",
   },
-  {
-    value: "completed",
+  completed: {
     label: "Completed",
     icon: IconCheck,
-    colorClass:
-      "border-status-completed/30 bg-status-completed/10 text-status-completed hover:bg-status-completed/15",
+    class: "text-status-completed",
+    bgClass: "bg-status-completed/10 hover:bg-status-completed/15",
+    borderClass: "ring-status-completed/20",
   },
-] as const;
+} as const;
 
 interface StatusButtonProps {
   currentStatus: string | null;
@@ -40,93 +39,57 @@ interface StatusButtonProps {
 }
 
 export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
-  const current = statuses.find((s) => s.value === currentStatus);
-  const CurrentIcon = current?.icon ?? IconPlus;
+  const config =
+    statusConfig[currentStatus as keyof typeof statusConfig] ?? null;
 
   return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className={`inline-flex h-9 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all active:scale-[0.97] ${
-          current
-            ? current.colorClass
-            : "border-border/50 hover:border-primary/30 hover:bg-primary/5"
-        }`}
-      >
-        <CurrentIcon size={15} />
-        {current ? current.label : "Add to List"}
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -4 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -4 }}
-            transition={{
-              type: "spring" as const,
-              stiffness: 500,
-              damping: 30,
-            }}
-            className="absolute left-0 top-full z-20 mt-1.5 w-44 overflow-hidden rounded-xl border border-border/50 bg-popover/95 p-1 shadow-xl shadow-black/30 backdrop-blur-xl"
-          >
-            {statuses.map((s) => {
-              const Icon = s.icon;
-              return (
-                <button
-                  key={s.value}
-                  type="button"
-                  onClick={() => {
-                    onChange(s.value === currentStatus ? null : s.value);
-                    setOpen(false);
-                  }}
-                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent ${
-                    s.value === currentStatus
-                      ? "text-primary"
-                      : "text-foreground"
-                  }`}
-                >
-                  <Icon size={15} />
-                  {s.label}
-                  {s.value === currentStatus && (
-                    <IconCheck size={13} className="ml-auto" />
-                  )}
-                </button>
-              );
-            })}
-            {currentStatus && (
-              <>
-                <div className="my-1 border-t border-border/50" />
-                <button
-                  type="button"
-                  onClick={() => {
-                    onChange(null);
-                    setOpen(false);
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-accent"
-                >
-                  <IconX size={15} />
-                  Remove
-                </button>
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    <AnimatePresence mode="wait" initial={false}>
+      {!config ? (
+        <motion.button
+          key="add"
+          type="button"
+          onClick={() => onChange("watchlist")}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.15 }}
+          className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary/10 px-4 text-sm font-medium text-primary ring-1 ring-primary/20 transition-all hover:bg-primary/15 hover:ring-primary/30 active:scale-[0.97]"
+        >
+          <IconPlus size={14} strokeWidth={2.5} />
+          Watchlist
+        </motion.button>
+      ) : (
+        <motion.button
+          key="status"
+          type="button"
+          onClick={() => onChange(null)}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.15 }}
+          title="Remove from library"
+          className={`group inline-flex h-9 items-center gap-2 rounded-lg px-4 text-sm font-medium ring-1 transition-all active:scale-[0.97] ${config.class} ${config.bgClass} ${config.borderClass} hover:ring-destructive/30 hover:bg-destructive/10 hover:text-destructive`}
+        >
+          <span className="grid [&>svg]:col-start-1 [&>svg]:row-start-1">
+            <config.icon
+              size={14}
+              className="transition-opacity group-hover:opacity-0"
+            />
+            <IconX
+              size={14}
+              className="opacity-0 text-destructive transition-opacity group-hover:opacity-100"
+            />
+          </span>
+          <span className="grid [&>span]:col-start-1 [&>span]:row-start-1">
+            <span className="transition-opacity group-hover:opacity-0">
+              {config.label}
+            </span>
+            <span className="opacity-0 transition-opacity group-hover:opacity-100">
+              Remove
+            </span>
+          </span>
+        </motion.button>
+      )}
+    </AnimatePresence>
   );
 }

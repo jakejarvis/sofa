@@ -10,6 +10,7 @@ import {
 import { toast } from "sonner";
 import type { Season } from "@/lib/types/title";
 import {
+  markAllWatchedAction,
   unwatchEpisodeAction,
   unwatchSeasonAction,
   updateTitleRating,
@@ -38,6 +39,7 @@ interface TitleInteractionState {
   ) => void;
   handleMarkSeason: (season: Season) => void;
   handleUnmarkSeason: (season: Season) => void;
+  handleMarkAllWatched: () => void;
   watchingEp: string | null;
 }
 
@@ -81,30 +83,23 @@ export function TitleInteractionProvider({
   const handleStatusChange = useCallback(
     async (status: string | null) => {
       const prev = userStatus;
-      const prevWatches = episodeWatches;
       setUserStatus(status);
-      if (status === "completed" && titleType === "tv") {
-        const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));
-        setEpisodeWatches(allEpIds);
-      }
       try {
-        await updateTitleStatus(titleId, status);
-        const label =
+        await updateTitleStatus(
+          titleId,
+          status === "watchlist" ? "watchlist" : null,
+        );
+        toast.success(
           status === "watchlist"
             ? "Added to watchlist"
-            : status === "in_progress"
-              ? "Marked as watching"
-              : status === "completed"
-                ? "Marked as completed"
-                : "Removed from list";
-        toast.success(label);
+            : "Removed from library",
+        );
       } catch {
         setUserStatus(prev);
-        setEpisodeWatches(prevWatches);
         toast.error("Failed to update status");
       }
     },
-    [titleId, titleType, userStatus, episodeWatches, seasons],
+    [titleId, userStatus],
   );
 
   const handleRating = useCallback(
@@ -162,7 +157,9 @@ export function TitleInteractionProvider({
         setEpisodeWatches((w) =>
           w.includes(episodeId) ? w : [...w, episodeId],
         );
-        setUserStatus((s) => s ?? "in_progress");
+        setUserStatus((s) =>
+          s === null || s === "watchlist" ? "in_progress" : s,
+        );
         try {
           await watchEpisode(episodeId);
           toast.success(`Watched S${seasonNum} E${epNum}`);
@@ -183,11 +180,20 @@ export function TitleInteractionProvider({
       );
       if (unwatched.length === 0) return;
 
-      setEpisodeWatches((w) => {
-        const set = new Set(w);
-        for (const ep of unwatched) set.add(ep.id);
-        return [...set];
-      });
+      const newWatchSet = new Set(episodeWatches);
+      for (const ep of unwatched) newWatchSet.add(ep.id);
+      const newWatches = [...newWatchSet];
+      setEpisodeWatches(newWatches);
+
+      // Optimistically check if all episodes are now watched
+      const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));
+      if (allEpIds.every((id) => newWatchSet.has(id))) {
+        setUserStatus("completed");
+      } else {
+        setUserStatus((s) =>
+          s === null || s === "watchlist" ? "in_progress" : s,
+        );
+      }
 
       try {
         await watchSeason(season.id);
@@ -198,7 +204,7 @@ export function TitleInteractionProvider({
         toast.error("Failed to mark some episodes");
       }
     },
-    [episodeWatches],
+    [episodeWatches, seasons],
   );
 
   const handleUnmarkSeason = useCallback(async (season: Season) => {
@@ -217,6 +223,22 @@ export function TitleInteractionProvider({
     }
   }, []);
 
+  const handleMarkAllWatched = useCallback(async () => {
+    const prevStatus = userStatus;
+    const prevWatches = episodeWatches;
+    const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));
+    setEpisodeWatches(allEpIds);
+    setUserStatus("completed");
+    try {
+      await markAllWatchedAction(titleId);
+      toast.success("Marked all episodes as watched");
+    } catch {
+      setUserStatus(prevStatus);
+      setEpisodeWatches(prevWatches);
+      toast.error("Failed to mark all episodes as watched");
+    }
+  }, [titleId, userStatus, episodeWatches, seasons]);
+
   const value = useMemo(
     () => ({
       titleId,
@@ -232,6 +254,7 @@ export function TitleInteractionProvider({
       handleWatchEpisode,
       handleMarkSeason,
       handleUnmarkSeason,
+      handleMarkAllWatched,
       watchingEp,
     }),
     [
@@ -248,6 +271,7 @@ export function TitleInteractionProvider({
       handleWatchEpisode,
       handleMarkSeason,
       handleUnmarkSeason,
+      handleMarkAllWatched,
       watchingEp,
     ],
   );

@@ -14,6 +14,7 @@ export async function setTitleStatus(
   userId: string,
   titleId: string,
   status: "watchlist" | "in_progress" | "completed",
+  // biome-ignore lint/correctness/noUnusedFunctionParameters: kept for API consistency with callers
   source: "manual" | "import" | "plex" | "jellyfin" = "manual",
 ) {
   const now = new Date();
@@ -25,10 +26,6 @@ export async function setTitleStatus(
       set: { status, updatedAt: now },
     })
     .run();
-
-  if (status === "completed") {
-    await markAllEpisodesWatched(userId, titleId, source);
-  }
 }
 
 export async function removeTitleStatus(userId: string, titleId: string) {
@@ -119,7 +116,7 @@ export async function logEpisodeWatch(
   await checkAllEpisodesWatched(userId, titleId);
 }
 
-async function markAllEpisodesWatched(
+export async function markAllEpisodesWatched(
   userId: string,
   titleId: string,
   source: "manual" | "import" | "plex" | "jellyfin" = "manual",
@@ -169,6 +166,8 @@ async function markAllEpisodesWatched(
       }
     }
   }
+
+  await setTitleStatus(userId, titleId, "completed", source);
 }
 
 async function checkAllEpisodesWatched(userId: string, titleId: string) {

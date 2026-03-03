@@ -4,11 +4,8 @@ import type { Hotkey } from "@tanstack/react-hotkeys";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useAtomValue } from "jotai";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
 import { commandPaletteOpenAtom } from "@/lib/atoms/command-palette";
 import { useTitleInteraction } from "./title-interaction-provider";
-
-const statusCycle = ["watchlist", "in_progress", "completed"] as const;
 
 export function TitleKeyboardShortcuts() {
   const router = useRouter();
@@ -23,16 +20,10 @@ export function TitleKeyboardShortcuts() {
   const commandPaletteOpen = useAtomValue(commandPaletteOpenAtom);
   const enabled = !commandPaletteOpen;
 
-  const nextStatus = useMemo(() => {
-    const currentIdx = statusCycle.indexOf(
-      userStatus as (typeof statusCycle)[number],
-    );
-    return currentIdx === statusCycle.length - 1
-      ? null
-      : statusCycle[currentIdx + 1];
-  }, [userStatus]);
-
-  useHotkey("W", () => handleStatusChange(nextStatus), { enabled });
+  // W: toggle watchlist (add if not in library, remove if in library)
+  useHotkey("W", () => handleStatusChange(userStatus ? null : "watchlist"), {
+    enabled,
+  });
   useHotkey(
     "M",
     () => {
