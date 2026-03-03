@@ -35,9 +35,9 @@ export function ContinueWatchingCard({
   return (
     <Link
       href={`/titles/${item.title.id}`}
-      className="group relative w-[calc(100vw-3rem)] shrink-0 overflow-hidden rounded-xl border border-border/30 bg-card/50 transition-all hover:border-primary/20 hover:shadow-lg hover:shadow-black/25 sm:w-72"
+      className="group relative w-[calc(100vw-3rem)] shrink-0 overflow-hidden rounded-xl bg-card/50 ring-1 ring-white/[0.06] transition-shadow hover:shadow-lg hover:shadow-black/25 sm:w-72"
     >
-      <div className="relative aspect-video overflow-hidden bg-muted">
+      <div className="relative aspect-video overflow-hidden rounded-t-xl bg-muted">
         {stillUrl ? (
           <Image
             src={stillUrl}
