@@ -4,17 +4,30 @@ import { IconLock } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import type { AuthConfig } from "@/components/auth-form";
 import { AuthForm } from "@/components/auth-form";
 
 export default function RegisterPage() {
   const [registrationOpen, setRegistrationOpen] = useState<boolean | null>(
     null,
   );
+  const [authConfig, setAuthConfig] = useState<AuthConfig>({
+    oidcEnabled: false,
+    oidcProviderName: null,
+    passwordLoginDisabled: false,
+  });
 
   useEffect(() => {
     fetch("/api/registration/status")
       .then((res) => res.json())
-      .then((data) => setRegistrationOpen(data.registrationOpen))
+      .then((data) => {
+        setRegistrationOpen(data.registrationOpen);
+        setAuthConfig({
+          oidcEnabled: data.oidcEnabled ?? false,
+          oidcProviderName: data.oidcProviderName ?? null,
+          passwordLoginDisabled: data.passwordLoginDisabled ?? false,
+        });
+      })
       .catch(() => setRegistrationOpen(false));
   }, []);
 
@@ -63,7 +76,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4">
-      <AuthForm mode="register" />
+      <AuthForm mode="register" authConfig={authConfig} />
     </div>
   );
 }
