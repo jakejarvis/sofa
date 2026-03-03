@@ -1,12 +1,13 @@
 "use client";
 
 import { IconLogout, IconSearch, IconSettings } from "@tabler/icons-react";
+import { useSetAtom } from "jotai";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useKeyboard } from "@/components/keyboard-provider";
 import { SofaLogo } from "@/components/sofa-logo";
 import { Kbd } from "@/components/ui/kbd";
+import { commandPaletteOpenAtom } from "@/lib/atoms/command-palette";
 import { signOut, useSession } from "@/lib/auth/client";
 
 const navLinks = [
@@ -18,7 +19,7 @@ export function NavBar() {
   const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
-  const { setCommandPaletteOpen } = useKeyboard();
+  const setCommandPaletteOpen = useSetAtom(commandPaletteOpenAtom);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">

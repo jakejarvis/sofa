@@ -1,8 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { CommandPalette } from "@/components/command-palette";
-import { KeyboardHelpDialog } from "@/components/keyboard-help-dialog";
-import { KeyboardProvider } from "@/components/keyboard-provider";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
 import { NavBar } from "@/components/nav-bar";
 import { auth } from "@/lib/auth/server";
@@ -16,7 +14,7 @@ export default async function PagesLayout({
   if (!session) redirect("/login");
 
   return (
-    <KeyboardProvider>
+    <>
       <div className="min-h-screen overflow-x-hidden pb-14 sm:pb-0">
         <NavBar />
         {/* Ambient glow */}
@@ -27,7 +25,6 @@ export default async function PagesLayout({
       </div>
       <MobileTabBar />
       <CommandPalette />
-      <KeyboardHelpDialog />
-    </KeyboardProvider>
+    </>
   );
 }
