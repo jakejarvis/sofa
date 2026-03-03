@@ -81,7 +81,12 @@ export function TitleInteractionProvider({
   const handleStatusChange = useCallback(
     async (status: string | null) => {
       const prev = userStatus;
+      const prevWatches = episodeWatches;
       setUserStatus(status);
+      if (status === "completed" && titleType === "tv") {
+        const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));
+        setEpisodeWatches(allEpIds);
+      }
       try {
         await updateTitleStatus(titleId, status);
         const label =
@@ -95,10 +100,11 @@ export function TitleInteractionProvider({
         toast.success(label);
       } catch {
         setUserStatus(prev);
+        setEpisodeWatches(prevWatches);
         toast.error("Failed to update status");
       }
     },
-    [titleId, userStatus],
+    [titleId, titleType, userStatus, episodeWatches, seasons],
   );
 
   const handleRating = useCallback(
