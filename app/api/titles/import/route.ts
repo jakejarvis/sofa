@@ -8,8 +8,9 @@ export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  if (!session)
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const body = await req.json();
   const { tmdbId, type } = body;
