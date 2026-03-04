@@ -2,13 +2,13 @@
 
 import { IconPlayerPlay } from "@tabler/icons-react";
 import { useAtomValue } from "jotai";
-import { StarRating } from "@/components/star-rating";
-import { StatusButton } from "@/components/status-button";
 import {
   titleTypeAtom,
   userRatingAtom,
   userStatusAtom,
 } from "@/lib/atoms/title";
+import { StarRating } from "./star-rating";
+import { StatusButton } from "./status-button";
 import { useTitleActions } from "./use-title-actions";
 
 export function TitleActions() {
