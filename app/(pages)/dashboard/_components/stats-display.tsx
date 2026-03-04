@@ -8,7 +8,7 @@ import {
   IconPlayerPlay,
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,12 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { DashboardStats, TimePeriod } from "@/lib/services/discovery";
+import type {
+  DashboardStats,
+  HistoryBucket,
+  TimePeriod,
+} from "@/lib/services/discovery";
+import { Sparkline } from "./sparkline";
 
 const periodLabels: Record<TimePeriod, string> = {
   today: "Today",
@@ -35,6 +40,7 @@ interface StatCardProps {
   index: number;
   label: React.ReactNode;
   loading?: boolean;
+  sparklineData?: HistoryBucket[];
 }
 
 function StatCard({
@@ -45,6 +51,7 @@ function StatCard({
   index,
   label,
   loading,
+  sparklineData,
 }: StatCardProps) {
   return (
     <motion.div
@@ -56,9 +63,10 @@ function StatCard({
         damping: 24,
         delay: index * 0.08,
       }}
-      className="rounded-xl border border-border/30 bg-card/50 p-4"
+      className="relative overflow-hidden rounded-xl border border-border/30 bg-card/50 p-4"
     >
-      <div className="flex items-center gap-2">
+      {sparklineData && <Sparkline data={sparklineData} color={color} />}
+      <div className="relative z-10 flex items-center gap-2">
         <div
           className={`flex h-6 w-6 items-center justify-center rounded-md ${bgColor}`}
         >
@@ -69,7 +77,7 @@ function StatCard({
         </span>
       </div>
       <motion.p
-        className={`mt-2 font-display text-2xl tabular-nums tracking-tight ${color} transition-opacity ${loading ? "opacity-40" : ""}`}
+        className={`relative z-10 mt-2 font-display text-2xl tabular-nums tracking-tight ${color} transition-opacity ${loading ? "opacity-40" : ""}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: loading ? 0.4 : 1 }}
         transition={{ delay: index * 0.08 + 0.2 }}
@@ -114,6 +122,16 @@ function PeriodSelector({
   );
 }
 
+async function fetchStats(
+  type: "movies" | "episodes",
+  period: TimePeriod,
+): Promise<{ count: number; history: HistoryBucket[] }> {
+  const res = await fetch(
+    `/api/stats?type=${type}&period=${period}&history=true`,
+  );
+  return res.json();
+}
+
 export function StatsDisplay({ stats }: { stats: DashboardStats }) {
   const [moviePeriod, setMoviePeriod] = useState<TimePeriod>("this_month");
   const [episodePeriod, setEpisodePeriod] = useState<TimePeriod>("this_week");
@@ -121,34 +139,36 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
   const [episodeCount, setEpisodeCount] = useState(stats.episodesThisWeek);
   const [movieLoading, setMovieLoading] = useState(false);
   const [episodeLoading, setEpisodeLoading] = useState(false);
+  const [movieHistory, setMovieHistory] = useState<HistoryBucket[]>();
+  const [episodeHistory, setEpisodeHistory] = useState<HistoryBucket[]>();
 
-  async function fetchCount(
-    type: "movies" | "episodes",
-    period: TimePeriod,
-  ): Promise<number> {
-    const res = await fetch(`/api/stats?type=${type}&period=${period}`);
-    const data = await res.json();
-    return data.count;
-  }
+  useEffect(() => {
+    fetchStats("movies", "this_month").then((d) => setMovieHistory(d.history));
+    fetchStats("episodes", "this_week").then((d) =>
+      setEpisodeHistory(d.history),
+    );
+  }, []);
 
   async function handleMoviePeriodChange(period: TimePeriod) {
     setMoviePeriod(period);
     setMovieLoading(true);
-    const count = await fetchCount("movies", period);
-    setMovieCount(count);
+    const data = await fetchStats("movies", period);
+    setMovieCount(data.count);
+    setMovieHistory(data.history);
     setMovieLoading(false);
   }
 
   async function handleEpisodePeriodChange(period: TimePeriod) {
     setEpisodePeriod(period);
     setEpisodeLoading(true);
-    const count = await fetchCount("episodes", period);
-    setEpisodeCount(count);
+    const data = await fetchStats("episodes", period);
+    setEpisodeCount(data.count);
+    setEpisodeHistory(data.history);
     setEpisodeLoading(false);
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       <StatCard
         icon={IconMovie}
         color="text-primary"
@@ -156,6 +176,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         value={movieCount}
         index={0}
         loading={movieLoading}
+        sparklineData={movieHistory}
         label={
           <PeriodSelector
             noun="Movies"
@@ -171,6 +192,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         value={episodeCount}
         index={1}
         loading={episodeLoading}
+        sparklineData={episodeHistory}
         label={
           <PeriodSelector
             noun="Episodes"

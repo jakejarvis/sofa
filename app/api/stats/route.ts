@@ -1,7 +1,11 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth/server";
-import { getWatchCount, type TimePeriod } from "@/lib/services/discovery";
+import {
+  getWatchCount,
+  getWatchHistory,
+  type TimePeriod,
+} from "@/lib/services/discovery";
 
 const validTypes = ["movies", "episodes"] as const;
 const validPeriods: TimePeriod[] = [
@@ -29,11 +33,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
   }
 
-  const count = getWatchCount(
-    session.user.id,
-    type as "movies" | "episodes",
-    period as TimePeriod,
-  );
+  const typedType = type as "movies" | "episodes";
+  const typedPeriod = period as TimePeriod;
+  const count = getWatchCount(session.user.id, typedType, typedPeriod);
+
+  if (searchParams.get("history") === "true") {
+    const history = getWatchHistory(session.user.id, typedType, typedPeriod);
+    return NextResponse.json({ count, history });
+  }
 
   return NextResponse.json({ count });
 }

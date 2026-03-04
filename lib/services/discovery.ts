@@ -17,23 +17,22 @@ export type TimePeriod = "today" | "this_week" | "this_month" | "this_year";
 
 export function periodStartTimestamp(period: TimePeriod): number {
   const now = new Date();
-  let start: Date;
+  const start = new Date(now);
   switch (period) {
     case "today":
-      start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      start.setHours(now.getHours() - 24, now.getMinutes(), 0, 0);
       break;
-    case "this_week": {
-      const dayOfWeek = now.getDay();
-      start = new Date(now);
-      start.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    case "this_week":
+      start.setDate(now.getDate() - 7);
       start.setHours(0, 0, 0, 0);
       break;
-    }
     case "this_month":
-      start = new Date(now.getFullYear(), now.getMonth(), 1);
+      start.setDate(now.getDate() - 30);
+      start.setHours(0, 0, 0, 0);
       break;
     case "this_year":
-      start = new Date(now.getFullYear(), 0, 1);
+      start.setFullYear(now.getFullYear() - 1);
+      start.setHours(0, 0, 0, 0);
       break;
   }
   return Math.floor(start.getTime() / 1000);
@@ -57,6 +56,84 @@ export function getWatchCount(
     )
     .all();
   return row?.count ?? 0;
+}
+
+export interface HistoryBucket {
+  bucket: string;
+  count: number;
+}
+
+export function getWatchHistory(
+  userId: string,
+  table: "movies" | "episodes",
+  period: TimePeriod,
+): HistoryBucket[] {
+  const startTs = periodStartTimestamp(period);
+  const watchTable = table === "movies" ? userMovieWatches : userEpisodeWatches;
+  const now = new Date();
+
+  let fmt: string;
+  let buckets: string[];
+
+  switch (period) {
+    case "today":
+      fmt = "%H";
+      buckets = Array.from({ length: 24 }, (_, i) => {
+        const d = new Date(now);
+        d.setHours(now.getHours() - 23 + i);
+        return d.getHours().toString().padStart(2, "0");
+      });
+      break;
+    case "this_week": {
+      fmt = "%Y-%m-%d";
+      buckets = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(now);
+        d.setDate(now.getDate() - 6 + i);
+        return d.toISOString().slice(0, 10);
+      });
+      break;
+    }
+    case "this_month": {
+      fmt = "%Y-%m-%d";
+      buckets = Array.from({ length: 30 }, (_, i) => {
+        const d = new Date(now);
+        d.setDate(now.getDate() - 29 + i);
+        return d.toISOString().slice(0, 10);
+      });
+      break;
+    }
+    case "this_year":
+      fmt = "%Y-%m";
+      buckets = Array.from({ length: 12 }, (_, i) => {
+        const d = new Date(now);
+        d.setMonth(now.getMonth() - 11 + i);
+        return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, "0")}`;
+      });
+      break;
+  }
+
+  const rows = db
+    .select({
+      bucket:
+        sql<string>`strftime(${fmt}, ${watchTable.watchedAt}, 'unixepoch', 'localtime')`.as(
+          "bucket",
+        ),
+      count: sql<number>`count(*)`.as("cnt"),
+    })
+    .from(watchTable)
+    .where(
+      and(
+        eq(watchTable.userId, userId),
+        sql`${watchTable.watchedAt} >= ${startTs}`,
+      ),
+    )
+    .groupBy(
+      sql`strftime(${fmt}, ${watchTable.watchedAt}, 'unixepoch', 'localtime')`,
+    )
+    .all();
+
+  const countMap = new Map(rows.map((r) => [r.bucket, r.count]));
+  return buckets.map((b) => ({ bucket: b, count: countMap.get(b) ?? 0 }));
 }
 
 export interface DashboardStats {
