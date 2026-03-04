@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { copyFile, mkdir, readdir, stat, unlink } from "node:fs/promises";
+import { mkdir, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 import { format } from "date-fns";
 import { sql } from "drizzle-orm";
@@ -89,7 +89,7 @@ export async function deleteBackup(filename: string): Promise<void> {
     throw new Error("Backup not found");
   }
 
-  await unlink(filePath);
+  await Bun.file(filePath).delete();
   log.info(`Deleted backup: ${filename}`);
 }
 
@@ -146,18 +146,19 @@ export async function restoreFromBackup(buffer: Buffer): Promise<void> {
     // Replace the database
     log.info("Replacing database...");
     closeDatabase();
-    await copyFile(tempPath, DATABASE_URL);
+    await Bun.write(DATABASE_URL, Bun.file(tempPath));
 
     // Clean up WAL/SHM files from the old database
-    const walPath = `${DATABASE_URL}-wal`;
-    const shmPath = `${DATABASE_URL}-shm`;
-    if (await Bun.file(walPath).exists()) await unlink(walPath);
-    if (await Bun.file(shmPath).exists()) await unlink(shmPath);
+    const walFile = Bun.file(`${DATABASE_URL}-wal`);
+    const shmFile = Bun.file(`${DATABASE_URL}-shm`);
+    if (await walFile.exists()) await walFile.delete();
+    if (await shmFile.exists()) await shmFile.delete();
 
     log.info("Database restored successfully");
   } finally {
     // Clean up temp file
-    if (await Bun.file(tempPath).exists()) await unlink(tempPath);
+    const tempFile = Bun.file(tempPath);
+    if (await tempFile.exists()) await tempFile.delete();
   }
 }
 
