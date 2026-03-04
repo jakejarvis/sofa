@@ -14,8 +14,8 @@ import { getTitleThemeStyle } from "@/lib/utils/title-theme";
 import { TitleActions } from "./_components/title-actions";
 import { TitleAvailability } from "./_components/title-availability";
 import { TitleHero } from "./_components/title-hero";
-import { TitleInteractionProvider } from "./_components/title-interaction-provider";
 import { TitleKeyboardShortcuts } from "./_components/title-keyboard-shortcuts";
+import { TitleProvider } from "./_components/title-provider";
 import { TitleRecommendations } from "./_components/title-recommendations";
 import { TitleSeasons } from "./_components/title-seasons";
 
@@ -77,7 +77,7 @@ export default async function TitleDetailPage({
 
   return (
     <div className="relative space-y-10" style={themeStyle}>
-      <TitleInteractionProvider
+      <TitleProvider
         titleId={title.id}
         titleType={title.type}
         titleName={title.title}
@@ -93,7 +93,7 @@ export default async function TitleDetailPage({
         {title.type === "tv" && seasons.length > 0 && <TitleSeasons />}
 
         <TitleKeyboardShortcuts />
-      </TitleInteractionProvider>
+      </TitleProvider>
 
       <Suspense fallback={<RecommendationsSkeleton />}>
         <TitleRecommendations titleId={title.id} />

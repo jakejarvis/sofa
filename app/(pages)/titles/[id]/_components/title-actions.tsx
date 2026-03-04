@@ -1,19 +1,22 @@
 "use client";
 
 import { IconPlayerPlay } from "@tabler/icons-react";
+import { useAtomValue } from "jotai";
 import { StarRating } from "@/components/star-rating";
 import { StatusButton } from "@/components/status-button";
-import { useTitleInteraction } from "./title-interaction-provider";
+import {
+  titleTypeAtom,
+  userRatingAtom,
+  userStatusAtom,
+} from "@/lib/atoms/title";
+import { useTitleActions } from "./use-title-actions";
 
 export function TitleActions() {
-  const {
-    titleType,
-    userStatus,
-    userRating,
-    handleStatusChange,
-    handleRating,
-    handleWatchMovie,
-  } = useTitleInteraction();
+  const titleType = useAtomValue(titleTypeAtom);
+  const userStatus = useAtomValue(userStatusAtom);
+  const userRating = useAtomValue(userRatingAtom);
+  const { handleStatusChange, handleRating, handleWatchMovie } =
+    useTitleActions();
 
   return (
     <div className="flex flex-wrap items-center gap-3">

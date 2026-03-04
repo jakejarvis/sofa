@@ -2,22 +2,22 @@
 
 import type { Hotkey } from "@tanstack/react-hotkeys";
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { useAtomValue } from "jotai";
+import { getDefaultStore, useAtomValue } from "jotai";
 import { useRouter } from "next/navigation";
 import { commandPaletteOpenAtom } from "@/lib/atoms/command-palette";
-import { useTitleInteraction } from "./title-interaction-provider";
+import { titleTypeAtom, userStatusAtom } from "@/lib/atoms/title";
+import { useTitleActions } from "./use-title-actions";
 
 export function TitleKeyboardShortcuts() {
   const router = useRouter();
-  const {
-    titleType,
-    userStatus,
-    handleStatusChange,
-    handleRating,
-    handleWatchMovie,
-  } = useTitleInteraction();
+  const titleType = useAtomValue(titleTypeAtom);
+  const userStatus = useAtomValue(userStatusAtom);
+  const { handleStatusChange, handleRating, handleWatchMovie } =
+    useTitleActions();
 
-  const commandPaletteOpen = useAtomValue(commandPaletteOpenAtom);
+  const commandPaletteOpen = useAtomValue(commandPaletteOpenAtom, {
+    store: getDefaultStore(),
+  });
   const enabled = !commandPaletteOpen;
 
   // W: toggle watchlist (add if not in library, remove if in library)

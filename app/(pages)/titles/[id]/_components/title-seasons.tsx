@@ -6,6 +6,7 @@ import {
   IconChevronDown,
   IconChevronUp,
 } from "@tabler/icons-react";
+import { useAtomValue } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
@@ -21,19 +22,25 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
-import { useTitleInteraction } from "./title-interaction-provider";
+import {
+  episodeWatchesAtom,
+  seasonsAtom,
+  userStatusAtom,
+  watchingEpAtom,
+} from "@/lib/atoms/title";
+import { useTitleActions } from "./use-title-actions";
 
 export function TitleSeasons() {
+  const seasons = useAtomValue(seasonsAtom);
+  const episodeWatches = useAtomValue(episodeWatchesAtom);
+  const userStatus = useAtomValue(userStatusAtom);
+  const watchingEp = useAtomValue(watchingEpAtom);
   const {
-    seasons,
-    episodeWatches,
-    userStatus,
     handleWatchEpisode,
     handleMarkSeason,
     handleUnmarkSeason,
     handleMarkAllWatched,
-    watchingEp,
-  } = useTitleInteraction();
+  } = useTitleActions();
   const [openSeason, setOpenSeason] = useState<number | null>(null);
   const [markAllOpen, setMarkAllOpen] = useState(false);
 
