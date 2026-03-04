@@ -52,7 +52,7 @@ export function AccountSection({
             </p>
           </div>
           <Button
-            variant="ghost"
+            variant="destructive"
             onClick={async () => {
               await signOut();
               router.push("/");
