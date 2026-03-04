@@ -13,6 +13,52 @@ import {
 } from "@/lib/db/schema";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 
+export type TimePeriod = "today" | "this_week" | "this_month" | "this_year";
+
+export function periodStartTimestamp(period: TimePeriod): number {
+  const now = new Date();
+  let start: Date;
+  switch (period) {
+    case "today":
+      start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      break;
+    case "this_week": {
+      const dayOfWeek = now.getDay();
+      start = new Date(now);
+      start.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+      start.setHours(0, 0, 0, 0);
+      break;
+    }
+    case "this_month":
+      start = new Date(now.getFullYear(), now.getMonth(), 1);
+      break;
+    case "this_year":
+      start = new Date(now.getFullYear(), 0, 1);
+      break;
+  }
+  return Math.floor(start.getTime() / 1000);
+}
+
+export function getWatchCount(
+  userId: string,
+  table: "movies" | "episodes",
+  period: TimePeriod,
+): number {
+  const timestamp = periodStartTimestamp(period);
+  const watchTable = table === "movies" ? userMovieWatches : userEpisodeWatches;
+  const [row] = db
+    .select({ count: sql<number>`count(*)` })
+    .from(watchTable)
+    .where(
+      and(
+        eq(watchTable.userId, userId),
+        sql`${watchTable.watchedAt} >= ${timestamp}`,
+      ),
+    )
+    .all();
+  return row?.count ?? 0;
+}
+
 export interface DashboardStats {
   moviesThisMonth: number;
   episodesThisWeek: number;
@@ -21,34 +67,8 @@ export interface DashboardStats {
 }
 
 export function getUserStats(userId: string): DashboardStats {
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const dayOfWeek = now.getDay();
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-  weekStart.setHours(0, 0, 0, 0);
-
-  const [moviesThisMonth] = db
-    .select({ count: sql<number>`count(*)` })
-    .from(userMovieWatches)
-    .where(
-      and(
-        eq(userMovieWatches.userId, userId),
-        sql`${userMovieWatches.watchedAt} >= ${Math.floor(monthStart.getTime() / 1000)}`,
-      ),
-    )
-    .all();
-
-  const [episodesThisWeek] = db
-    .select({ count: sql<number>`count(*)` })
-    .from(userEpisodeWatches)
-    .where(
-      and(
-        eq(userEpisodeWatches.userId, userId),
-        sql`${userEpisodeWatches.watchedAt} >= ${Math.floor(weekStart.getTime() / 1000)}`,
-      ),
-    )
-    .all();
+  const moviesThisMonth = getWatchCount(userId, "movies", "this_month");
+  const episodesThisWeek = getWatchCount(userId, "episodes", "this_week");
 
   const [librarySizeRow] = db
     .select({ count: sql<number>`count(*)` })
@@ -68,8 +88,8 @@ export function getUserStats(userId: string): DashboardStats {
     .all();
 
   return {
-    moviesThisMonth: moviesThisMonth?.count ?? 0,
-    episodesThisWeek: episodesThisWeek?.count ?? 0,
+    moviesThisMonth,
+    episodesThisWeek,
     librarySize: librarySizeRow?.count ?? 0,
     completed: completedCount?.count ?? 0,
   };
