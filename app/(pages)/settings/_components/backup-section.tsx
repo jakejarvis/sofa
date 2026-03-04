@@ -82,25 +82,65 @@ const DAYS_OF_WEEK = [
   "Saturday",
 ] as const;
 
-function describeSchedule(
+function getNextBackupDate(
   frequency: BackupFrequency,
   time: string,
-  _dayOfWeek = 0,
-): string {
+  dayOfWeek: number,
+): Date {
+  const now = new Date();
   const [h, m] = time.split(":").map(Number);
-  const d = new Date(2000, 0, 1, h, m);
-  const timeStr = format(d, "h:mm a");
 
-  switch (frequency) {
-    case "6h":
-      return "Every 6 hours";
-    case "12h":
-      return `Every 12 hours starting ${timeStr}`;
-    case "1d":
-      return `Daily at ${timeStr}`;
-    case "7d":
-      return "Weekly";
+  if (frequency === "6h") {
+    const next = new Date(now);
+    const currentHour = next.getHours();
+    const nextHour = Math.ceil((currentHour + 1) / 6) * 6;
+    next.setHours(nextHour, m, 0, 0);
+    if (next <= now) next.setHours(next.getHours() + 6);
+    return next;
   }
+
+  if (frequency === "12h") {
+    const next = new Date(now);
+    const h2 = (h + 12) % 24;
+    const candidates = [h, h2].sort((a, b) => a - b);
+    for (const candidate of candidates) {
+      next.setHours(candidate, m, 0, 0);
+      if (next > now) return next;
+    }
+    next.setDate(next.getDate() + 1);
+    next.setHours(candidates[0], m, 0, 0);
+    return next;
+  }
+
+  if (frequency === "7d") {
+    const next = new Date(now);
+    const daysUntil = (dayOfWeek - next.getDay() + 7) % 7;
+    if (daysUntil === 0) {
+      next.setHours(h, m, 0, 0);
+      if (next > now) return next;
+      next.setDate(next.getDate() + 7);
+      next.setHours(h, m, 0, 0);
+      return next;
+    }
+    next.setDate(next.getDate() + daysUntil);
+    next.setHours(h, m, 0, 0);
+    return next;
+  }
+
+  // 1d
+  const next = new Date(now);
+  next.setHours(h, m, 0, 0);
+  if (next <= now) next.setDate(next.getDate() + 1);
+  return next;
+}
+
+function formatNextBackup(
+  frequency: BackupFrequency,
+  time: string,
+  dayOfWeek: number,
+): string {
+  const next = getNextBackupDate(frequency, time, dayOfWeek);
+  return `Next backup ${formatDistanceToNow(next, { addSuffix: true })}`;
 }
 
 export function BackupSection({
@@ -140,7 +180,17 @@ export function BackupSection({
     try {
       const backup = await createBackupAction();
       setBackups((prev) => [backup, ...prev]);
-      toast.success("Backup created");
+      toast.success("Backup created", {
+        action: {
+          label: "Download",
+          onClick: () => {
+            const a = document.createElement("a");
+            a.href = `/api/backup/${backup.filename}`;
+            a.download = backup.filename;
+            a.click();
+          },
+        },
+      });
     } catch {
       toast.error("Failed to create backup");
     } finally {
@@ -229,9 +279,7 @@ export function BackupSection({
     setSavingSchedule(true);
     try {
       await setBackupScheduleAction(newFrequency, newTime, newDow);
-      toast.success(
-        `Schedule updated: ${describeSchedule(newFrequency, newTime, newDow)}`,
-      );
+      toast.success("Schedule updated");
     } catch {
       setFrequency(prevFreq);
       setTime(prevTime);
@@ -411,7 +459,10 @@ export function BackupSection({
               <CardTitle>Scheduled</CardTitle>
               <CardDescription>
                 {scheduledEnabled ? (
-                  <span className="inline-flex items-baseline gap-1">
+                  <span className="inline-flex flex-wrap items-baseline gap-1">
+                    <span suppressHydrationWarning>
+                      {formatNextBackup(frequency, time, dow)}.
+                    </span>{" "}
                     Keeping last{" "}
                     <DropdownMenu>
                       <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-0.5 border-b border-dotted border-muted-foreground/50 transition-colors hover:text-foreground">
