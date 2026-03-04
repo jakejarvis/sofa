@@ -46,6 +46,9 @@ export const db = new Proxy({} as ReturnType<typeof drizzle>, {
   },
 });
 
+/** Close the current connection, and clear singletons so the Proxy re-initializes on next access. */
 export function closeDatabase() {
   globalForDb._client?.close();
+  globalForDb._client = undefined;
+  globalForDb._db = undefined;
 }

@@ -10,6 +10,11 @@ import {
 import { createLogger } from "@/lib/logger";
 import { refreshAvailability } from "@/lib/services/availability";
 import {
+  createBackup,
+  ensureBackupDir,
+  pruneBackups,
+} from "@/lib/services/backup";
+import {
   cacheEpisodeStills,
   cacheImagesForTitle,
   cacheProviderLogos,
@@ -20,6 +25,7 @@ import {
   refreshTitle,
   refreshTvChildren,
 } from "@/lib/services/metadata";
+import { getSetting } from "@/lib/services/settings";
 import { getTvDetails } from "@/lib/tmdb/client";
 
 const log = createLogger("cron");
@@ -207,9 +213,25 @@ async function cacheImagesJob() {
   }
 }
 
+async function scheduledBackupJob() {
+  const enabled = getSetting("scheduledBackups");
+  if (enabled !== "true") {
+    log.debug("Scheduled backups disabled, skipping");
+    return;
+  }
+
+  ensureBackupDir();
+  createBackup();
+
+  const maxStr = getSetting("maxBackupRetention");
+  const max = maxStr ? Number.parseInt(maxStr, 10) : 7;
+  pruneBackups(max);
+}
+
 export function startJobs() {
   if (jobs.size > 0) return;
 
+  schedule("scheduledBackup", "0 2 * * *", scheduledBackupJob);
   schedule("nightlyRefreshLibrary", "0 3 * * *", nightlyRefreshLibrary);
   schedule("refreshAvailability", "0 */6 * * *", refreshAvailabilityJob);
   schedule("refreshRecommendations", "0 */12 * * *", refreshRecommendationsJob);

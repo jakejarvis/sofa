@@ -100,7 +100,8 @@
 
   /* https://ui.shadcn.com/docs/components/radix/button#cursor */
   button:not(:disabled),
-  [role="button"]:not(:disabled) {
+  [role="button"]:not(:disabled),
+  [role="switch"]:not(:disabled) {
     cursor: pointer;
   }
 }

@@ -15,6 +15,10 @@ export async function register() {
       ensureImageDirs();
     }
 
+    // Ensure backup directory exists
+    const { ensureBackupDir } = await import("@/lib/services/backup");
+    ensureBackupDir();
+
     // Run database migrations on startup
     const { runMigrations } = await import("@/lib/db/migrate");
     runMigrations();

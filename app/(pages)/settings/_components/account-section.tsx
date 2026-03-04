@@ -2,6 +2,7 @@
 
 import { IconLogout, IconUser } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -50,20 +51,17 @@ export function AccountSection({
               Member since {memberSince}
             </p>
           </div>
-        </CardContent>
-        <CardContent className="pt-0">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={async () => {
               await signOut();
               router.push("/");
               router.refresh();
             }}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-border/50 px-4 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
             <IconLogout size={14} />
             Sign out
-          </button>
+          </Button>
         </CardContent>
       </Card>
     </div>

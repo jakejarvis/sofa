@@ -1,12 +1,16 @@
+import { IconServerCog } from "@tabler/icons-react";
 import { desc, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { Card } from "@/components/ui/card";
 import { auth } from "@/lib/auth/server";
 import { db } from "@/lib/db/client";
 import { webhookConnections, webhookEventLog } from "@/lib/db/schema";
+import { listBackups } from "@/lib/services/backup";
 import { getSetting } from "@/lib/services/settings";
 import { APP_VERSION, GIT_COMMIT } from "@/lib/version";
 import { AccountSection } from "./_components/account-section";
+import { BackupSection } from "./_components/backup-section";
 import { IntegrationsSection } from "./_components/integrations-section";
 import { ServerSection } from "./_components/server-section";
 import { SettingsShell } from "./_components/settings-shell";
@@ -53,6 +57,14 @@ export default async function SettingsPage() {
     ? getSetting("registrationOpen") === "true"
     : false;
 
+  const backups = isAdmin ? listBackups() : [];
+  const scheduledBackupsEnabled = isAdmin
+    ? getSetting("scheduledBackups") === "true"
+    : false;
+  const maxBackupRetention = isAdmin
+    ? Number.parseInt(getSetting("maxBackupRetention") ?? "7", 10)
+    : 7;
+
   const repoUrl = "https://github.com/jakejarvis/sofa";
 
   return (
@@ -97,7 +109,31 @@ export default async function SettingsPage() {
         }}
       />
       <IntegrationsSection initialConnections={connections} />
-      {isAdmin && <ServerSection initialRegistrationOpen={registrationOpen} />}
+      {isAdmin && (
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <IconServerCog size={16} className="text-muted-foreground" />
+            <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Server
+            </h2>
+            <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+              Admin only
+            </span>
+          </div>
+          <div className="space-y-3">
+            <Card className="border-l-2 border-l-primary/30">
+              <ServerSection initialRegistrationOpen={registrationOpen} />
+            </Card>
+            <Card className="border-l-2 border-l-primary/30">
+              <BackupSection
+                initialBackups={backups}
+                initialScheduledEnabled={scheduledBackupsEnabled}
+                initialMaxRetention={maxBackupRetention}
+              />
+            </Card>
+          </div>
+        </div>
+      )}
     </SettingsShell>
   );
 }
