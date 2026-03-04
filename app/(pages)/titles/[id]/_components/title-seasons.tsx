@@ -114,14 +114,11 @@ export function TitleSeasons() {
                     setOpenSeason(isOpen ? null : season.seasonNumber);
                   }
                 }}
-                className="flex w-full cursor-pointer items-center justify-between p-4 text-left transition-colors hover:bg-accent/50"
+                className="group/season flex w-full cursor-pointer items-center justify-between p-4 text-left transition-colors hover:bg-accent/50"
               >
                 <div className="flex items-center gap-3">
                   <span className="font-medium">
                     {season.name ?? `Season ${season.seasonNumber}`}
-                  </span>
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {watchedCount}/{totalCount}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -130,7 +127,7 @@ export function TitleSeasons() {
                       <span className="text-xs tabular-nums text-muted-foreground sm:hidden">
                         {Math.round(progressPercent)}%
                       </span>
-                      <div className="hidden w-24 sm:block">
+                      <div className="hidden w-24 sm:block sm:group-hover/season:hidden">
                         <Progress value={progressPercent} />
                       </div>
                     </>
@@ -142,9 +139,9 @@ export function TitleSeasons() {
                         e.stopPropagation();
                         handleMarkSeason(season);
                       }}
-                      className="rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-primary transition-colors hover:bg-primary/10"
+                      className="w-24 rounded-md px-2 py-1 text-center text-[10px] font-medium uppercase tracking-wider text-primary transition-colors hover:bg-primary/10 sm:hidden sm:group-hover/season:block"
                     >
-                      Mark all
+                      Watch all
                     </button>
                   )}
                   {totalCount > 0 && watchedCount === totalCount && (
@@ -154,10 +151,15 @@ export function TitleSeasons() {
                         e.stopPropagation();
                         handleUnmarkSeason(season);
                       }}
-                      className="rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                      className="w-24 rounded-md px-2 py-1 text-center text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive sm:hidden sm:group-hover/season:block"
                     >
-                      Unmark all
+                      Unwatch all
                     </button>
+                  )}
+                  {totalCount > 0 && (
+                    <span className="hidden font-mono text-xs tabular-nums text-muted-foreground sm:inline">
+                      {watchedCount}/{totalCount}
+                    </span>
                   )}
                   {isOpen ? (
                     <IconChevronUp className="size-4 text-muted-foreground" />
