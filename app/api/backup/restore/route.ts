@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   const buffer = Buffer.from(await file.arrayBuffer());
 
   try {
-    restoreFromBackup(buffer);
+    await restoreFromBackup(buffer);
     return NextResponse.json({ success: true });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Restore failed";

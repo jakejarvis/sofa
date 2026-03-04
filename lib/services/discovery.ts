@@ -63,6 +63,13 @@ export interface HistoryBucket {
   count: number;
 }
 
+function toLocalDateBucket(date: Date): string {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function getWatchHistory(
   userId: string,
   table: "movies" | "episodes",
@@ -89,7 +96,7 @@ export function getWatchHistory(
       buckets = Array.from({ length: 7 }, (_, i) => {
         const d = new Date(now);
         d.setDate(now.getDate() - 6 + i);
-        return d.toISOString().slice(0, 10);
+        return toLocalDateBucket(d);
       });
       break;
     }
@@ -98,7 +105,7 @@ export function getWatchHistory(
       buckets = Array.from({ length: 30 }, (_, i) => {
         const d = new Date(now);
         d.setDate(now.getDate() - 29 + i);
-        return d.toISOString().slice(0, 10);
+        return toLocalDateBucket(d);
       });
       break;
     }

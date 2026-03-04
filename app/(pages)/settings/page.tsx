@@ -57,7 +57,7 @@ export default async function SettingsPage() {
     ? getSetting("registrationOpen") === "true"
     : false;
 
-  const backups = isAdmin ? listBackups() : [];
+  const backups = isAdmin ? await listBackups() : [];
   const scheduledBackupsEnabled = isAdmin
     ? getSetting("scheduledBackups") === "true"
     : false;

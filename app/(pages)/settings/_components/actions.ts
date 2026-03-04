@@ -1,6 +1,5 @@
 "use server";
 
-import crypto from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/server";
@@ -56,7 +55,9 @@ export async function saveWebhookConnection(
     };
   }
 
-  const token = crypto.randomBytes(32).toString("hex");
+  const token = Buffer.from(
+    crypto.getRandomValues(new Uint8Array(32)),
+  ).toString("hex");
   const now = new Date();
 
   const connection = db
@@ -103,7 +104,9 @@ export async function regenerateWebhookToken(provider: "plex" | "jellyfin") {
     throw new Error("Invalid provider");
   }
 
-  const newToken = crypto.randomBytes(32).toString("hex");
+  const newToken = Buffer.from(
+    crypto.getRandomValues(new Uint8Array(32)),
+  ).toString("hex");
 
   const connection = db
     .update(webhookConnections)

@@ -1,14 +1,5 @@
 import { Database } from "bun:sqlite";
-import {
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  statSync,
-  unlinkSync,
-  writeFileSync,
-} from "node:fs";
-import { readFile } from "node:fs/promises";
+import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 import { format } from "date-fns";
 import { sql } from "drizzle-orm";
@@ -31,10 +22,8 @@ export interface BackupInfo {
   createdAt: string;
 }
 
-export function ensureBackupDir() {
-  if (!existsSync(BACKUP_DIR)) {
-    mkdirSync(BACKUP_DIR, { recursive: true });
-  }
+export async function ensureBackupDir() {
+  await mkdir(BACKUP_DIR, { recursive: true });
 }
 
 function isValidBackupFilename(filename: string): boolean {
@@ -46,8 +35,10 @@ function isValidBackupFilename(filename: string): boolean {
   );
 }
 
-export function createBackup(prefix = "sofa-backup"): BackupInfo {
-  ensureBackupDir();
+export async function createBackup(
+  prefix = "sofa-backup",
+): Promise<BackupInfo> {
+  await ensureBackupDir();
 
   const timestamp = format(new Date(), "yyyy-MM-dd-HHmmss");
   const filename = `${prefix}-${timestamp}.db`;
@@ -56,74 +47,74 @@ export function createBackup(prefix = "sofa-backup"): BackupInfo {
   // VACUUM INTO atomically creates a clean, self-contained copy (safe for WAL mode)
   db.run(sql.raw(`VACUUM INTO '${dest.replace(/'/g, "''")}'`));
 
-  const stat = statSync(dest);
-  log.info(`Created backup: ${filename} (${stat.size} bytes)`);
+  const s = await Bun.file(dest).stat();
+  log.info(`Created backup: ${filename} (${s.size} bytes)`);
 
   return {
     filename,
-    sizeBytes: stat.size,
-    createdAt: stat.mtime.toISOString(),
+    sizeBytes: s.size,
+    createdAt: s.mtime.toISOString(),
   };
 }
 
-export function listBackups(): BackupInfo[] {
-  ensureBackupDir();
+export async function listBackups(): Promise<BackupInfo[]> {
+  await ensureBackupDir();
 
-  const files = readdirSync(BACKUP_DIR).filter(
+  const files = (await readdir(BACKUP_DIR)).filter(
     (f) => BACKUP_PATTERN.test(f) || PRE_RESTORE_PATTERN.test(f),
   );
 
-  return files
-    .map((filename) => {
-      const stat = statSync(path.join(BACKUP_DIR, filename));
-      return {
-        filename,
-        sizeBytes: stat.size,
-        createdAt: stat.mtime.toISOString(),
-      };
-    })
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
+  const results: BackupInfo[] = [];
+  for (const filename of files) {
+    const s = await Bun.file(path.join(BACKUP_DIR, filename)).stat();
+    results.push({
+      filename,
+      sizeBytes: s.size,
+      createdAt: s.mtime.toISOString(),
+    });
+  }
+
+  return results.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
 }
 
-export function deleteBackup(filename: string): void {
+export async function deleteBackup(filename: string): Promise<void> {
   if (!isValidBackupFilename(filename)) {
     throw new Error("Invalid backup filename");
   }
 
   const filePath = path.join(BACKUP_DIR, filename);
-  if (!existsSync(filePath)) {
+  if (!(await Bun.file(filePath).exists())) {
     throw new Error("Backup not found");
   }
 
-  unlinkSync(filePath);
+  await Bun.file(filePath).delete();
   log.info(`Deleted backup: ${filename}`);
 }
 
-export function getBackupPath(filename: string): string | null {
+export async function getBackupPath(filename: string): Promise<string | null> {
   if (!isValidBackupFilename(filename)) return null;
 
   const filePath = path.join(BACKUP_DIR, filename);
-  return existsSync(filePath) ? filePath : null;
+  return (await Bun.file(filePath).exists()) ? filePath : null;
 }
 
 export async function readBackupFile(filename: string): Promise<Buffer | null> {
-  const filePath = getBackupPath(filename);
+  const filePath = await getBackupPath(filename);
   if (!filePath) return null;
-  return readFile(filePath);
+  return Buffer.from(await Bun.file(filePath).arrayBuffer());
 }
 
-export function restoreFromBackup(buffer: Buffer): void {
-  ensureBackupDir();
+export async function restoreFromBackup(buffer: Buffer): Promise<void> {
+  await ensureBackupDir();
 
   const timestamp = format(new Date(), "yyyy-MM-dd-HHmmss");
   const tempPath = path.join(BACKUP_DIR, `_restore-temp-${timestamp}.db`);
 
   try {
     // Write uploaded file to temp location
-    writeFileSync(tempPath, buffer);
+    await Bun.write(tempPath, buffer);
 
     // Validate it's a real SQLite database
     const testDb = new Database(tempPath, { readonly: true });
@@ -150,34 +141,37 @@ export function restoreFromBackup(buffer: Buffer): void {
 
     // Create safety backup before replacing
     log.info("Creating pre-restore safety backup...");
-    createBackup("pre-restore");
+    await createBackup("pre-restore");
 
     // Replace the database
     log.info("Replacing database...");
     closeDatabase();
-    copyFileSync(tempPath, DATABASE_URL);
+    await Bun.write(DATABASE_URL, Bun.file(tempPath));
 
     // Clean up WAL/SHM files from the old database
-    const walPath = `${DATABASE_URL}-wal`;
-    const shmPath = `${DATABASE_URL}-shm`;
-    if (existsSync(walPath)) unlinkSync(walPath);
-    if (existsSync(shmPath)) unlinkSync(shmPath);
+    const walFile = Bun.file(`${DATABASE_URL}-wal`);
+    const shmFile = Bun.file(`${DATABASE_URL}-shm`);
+    if (await walFile.exists()) await walFile.delete();
+    if (await shmFile.exists()) await shmFile.delete();
 
     log.info("Database restored successfully");
   } finally {
     // Clean up temp file
-    if (existsSync(tempPath)) unlinkSync(tempPath);
+    const tempFile = Bun.file(tempPath);
+    if (await tempFile.exists()) await tempFile.delete();
   }
 }
 
-export function pruneBackups(maxKeep: number): void {
-  const backups = listBackups().filter((b) => BACKUP_PATTERN.test(b.filename));
+export async function pruneBackups(maxKeep: number): Promise<void> {
+  const backups = (await listBackups()).filter((b) =>
+    BACKUP_PATTERN.test(b.filename),
+  );
 
   if (backups.length <= maxKeep) return;
 
   const toDelete = backups.slice(maxKeep);
   for (const backup of toDelete) {
-    deleteBackup(backup.filename);
+    await deleteBackup(backup.filename);
   }
 
   log.info(`Pruned ${toDelete.length} old backup(s), kept ${maxKeep}`);

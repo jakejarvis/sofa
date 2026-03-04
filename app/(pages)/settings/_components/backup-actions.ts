@@ -19,17 +19,17 @@ async function getAdminSession() {
 
 export async function createBackupAction(): Promise<BackupInfo> {
   await getAdminSession();
-  return createBackup();
+  return await createBackup();
 }
 
 export async function listBackupsAction(): Promise<BackupInfo[]> {
   await getAdminSession();
-  return listBackups();
+  return await listBackups();
 }
 
 export async function deleteBackupAction(filename: string): Promise<void> {
   await getAdminSession();
-  deleteBackup(filename);
+  await deleteBackup(filename);
 }
 
 export async function setScheduledBackupAction(

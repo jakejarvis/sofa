@@ -6,13 +6,12 @@ import {
   text,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
-import { v4 as uuid } from "uuid";
 
 // Helper for UUID primary keys
 const uuidPk = () =>
   text("id")
     .primaryKey()
-    .$defaultFn(() => uuid());
+    .$defaultFn(() => Bun.randomUUIDv7());
 
 // ─── Better Auth tables ──────────────────────────────────────────────
 
