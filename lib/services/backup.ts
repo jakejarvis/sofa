@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { mkdir, readdir, stat } from "node:fs/promises";
+import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 import { format } from "date-fns";
 import { sql } from "drizzle-orm";
@@ -47,7 +47,7 @@ export async function createBackup(
   // VACUUM INTO atomically creates a clean, self-contained copy (safe for WAL mode)
   db.run(sql.raw(`VACUUM INTO '${dest.replace(/'/g, "''")}'`));
 
-  const s = await stat(dest);
+  const s = await Bun.file(dest).stat();
   log.info(`Created backup: ${filename} (${s.size} bytes)`);
 
   return {
@@ -66,7 +66,7 @@ export async function listBackups(): Promise<BackupInfo[]> {
 
   const results: BackupInfo[] = [];
   for (const filename of files) {
-    const s = await stat(path.join(BACKUP_DIR, filename));
+    const s = await Bun.file(path.join(BACKUP_DIR, filename)).stat();
     results.push({
       filename,
       sizeBytes: s.size,
