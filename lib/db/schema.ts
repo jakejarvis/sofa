@@ -11,7 +11,7 @@ import {
 const uuidPk = () =>
   text("id")
     .primaryKey()
-    .$defaultFn(() => crypto.randomUUID());
+    .$defaultFn(() => Bun.randomUUIDv7());
 
 // ─── Better Auth tables ──────────────────────────────────────────────
 

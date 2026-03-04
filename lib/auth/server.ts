@@ -63,7 +63,7 @@ export const auth = betterAuth({
   plugins: [admin(), ...oidcPlugin],
   advanced: {
     database: {
-      generateId: () => crypto.randomUUID(),
+      generateId: () => Bun.randomUUIDv7(),
     },
   },
   hooks: {
