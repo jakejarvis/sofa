@@ -47,13 +47,13 @@ export async function createBackup(
   // VACUUM INTO atomically creates a clean, self-contained copy (safe for WAL mode)
   db.run(sql.raw(`VACUUM INTO '${dest.replace(/'/g, "''")}'`));
 
-  const file = Bun.file(dest);
-  log.info(`Created backup: ${filename} (${file.size} bytes)`);
+  const s = await stat(dest);
+  log.info(`Created backup: ${filename} (${s.size} bytes)`);
 
   return {
     filename,
-    sizeBytes: file.size,
-    createdAt: new Date(file.lastModified).toISOString(),
+    sizeBytes: s.size,
+    createdAt: s.mtime.toISOString(),
   };
 }
 
