@@ -50,7 +50,7 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
           transition={{ duration: 0.15 }}
           className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary/10 px-4 text-sm font-medium text-primary ring-1 ring-primary/20 transition-all hover:bg-primary/15 hover:ring-primary/30 active:scale-[0.97]"
         >
-          <IconPlus size={14} strokeWidth={2.5} />
+          <IconPlus className="size-3.5" strokeWidth={2.5} />
           Watchlist
         </motion.button>
       ) : (
@@ -66,14 +66,8 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
           className={`group inline-flex h-9 items-center gap-2 rounded-lg px-4 text-sm font-medium ring-1 transition-all active:scale-[0.97] ${config.class} ${config.bgClass} ${config.borderClass} hover:ring-destructive/30 hover:bg-destructive/10 hover:text-destructive`}
         >
           <span className="grid [&>svg]:col-start-1 [&>svg]:row-start-1">
-            <config.icon
-              size={14}
-              className="transition-opacity group-hover:opacity-0"
-            />
-            <IconX
-              size={14}
-              className="opacity-0 text-destructive transition-opacity group-hover:opacity-100"
-            />
+            <config.icon className="size-3.5 transition-opacity group-hover:opacity-0" />
+            <IconX className="size-3.5 opacity-0 text-destructive transition-opacity group-hover:opacity-100" />
           </span>
           <span className="grid [&>span]:col-start-1 [&>span]:row-start-1">
             <span className="transition-opacity group-hover:opacity-0">

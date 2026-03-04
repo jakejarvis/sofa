@@ -34,7 +34,7 @@ export async function ContinueWatchingSection({ userId }: { userId: string }) {
   return (
     <FeedSection
       title="Continue Watching"
-      icon={<IconPlayerPlay size={20} className="text-primary" />}
+      icon={<IconPlayerPlay className="size-5 text-primary" />}
     >
       <ContinueWatchingList items={items} />
     </FeedSection>

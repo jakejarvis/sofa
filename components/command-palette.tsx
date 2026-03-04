@@ -235,9 +235,9 @@ export function CommandPalette() {
                         </p>
                         <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                           {r.type === "movie" ? (
-                            <IconMovie size={11} />
+                            <IconMovie className="size-[11px]" />
                           ) : (
-                            <IconDeviceTv size={11} />
+                            <IconDeviceTv className="size-[11px]" />
                           )}
                           <span className="uppercase">{r.type}</span>
                           {r.releaseDate && (
@@ -273,10 +273,7 @@ export function CommandPalette() {
                           onSelect={() => handleRecentSearch(q)}
                           className="group"
                         >
-                          <IconSearch
-                            size={14}
-                            className="text-muted-foreground"
-                          />
+                          <IconSearch className="size-3.5 text-muted-foreground" />
                           <span className="flex-1">{q}</span>
                           <span
                             data-slot="command-shortcut"
@@ -290,7 +287,7 @@ export function CommandPalette() {
                               }}
                               className="rounded-sm p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-data-[selected=true]:opacity-100"
                             >
-                              <IconX size={12} />
+                              <IconX className="size-3" />
                             </button>
                           </span>
                         </CommandItem>
@@ -305,7 +302,7 @@ export function CommandPalette() {
                         router.push("/dashboard");
                       }}
                     >
-                      <IconHome size={14} />
+                      <IconHome className="size-3.5" />
                       Go to Dashboard
                       <CommandShortcut>G H</CommandShortcut>
                     </CommandItem>
@@ -315,7 +312,7 @@ export function CommandPalette() {
                         router.push("/explore");
                       }}
                     >
-                      <IconSearch size={14} />
+                      <IconSearch className="size-3.5" />
                       Go to Explore
                       <CommandShortcut>G E</CommandShortcut>
                     </CommandItem>
@@ -325,7 +322,7 @@ export function CommandPalette() {
                         setHelpOpen(true);
                       }}
                     >
-                      <IconKeyboard size={14} />
+                      <IconKeyboard className="size-3.5" />
                       Keyboard Shortcuts
                       <CommandShortcut>?</CommandShortcut>
                     </CommandItem>

@@ -24,7 +24,7 @@ export async function RecommendationsSection({ userId }: { userId: string }) {
   return (
     <FeedSection
       title="Recommended for You"
-      icon={<IconSparkles size={20} className="text-primary" />}
+      icon={<IconSparkles className="size-5 text-primary" />}
     >
       <TitleGrid items={items} />
     </FeedSection>

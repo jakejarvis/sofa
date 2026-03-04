@@ -27,6 +27,11 @@ import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { BackupInfo } from "@/lib/services/backup";
 import {
   createBackupAction,
@@ -208,38 +213,50 @@ export function BackupSection({
                       )}
                     </div>
                     <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        nativeButton={false}
-                        render={
-                          <a
-                            href={`/api/backup/${backup.filename}`}
-                            download
-                            title="Download"
-                            aria-label="Download backup"
-                          >
-                            <IconCloudDownload />
-                          </a>
-                        }
-                      />
-                      <AlertDialog>
-                        <AlertDialogTrigger
+                      <Tooltip>
+                        <TooltipTrigger
                           render={
                             <Button
                               variant="ghost"
                               size="icon-sm"
-                              disabled={deleting === backup.filename}
-                              title="Delete"
+                              nativeButton={false}
+                              render={
+                                <a
+                                  href={`/api/backup/${backup.filename}`}
+                                  download
+                                  aria-label="Download backup"
+                                >
+                                  <IconCloudDownload />
+                                </a>
+                              }
                             />
                           }
-                        >
-                          {deleting === backup.filename ? (
-                            <Spinner />
-                          ) : (
-                            <IconTrash />
-                          )}
-                        </AlertDialogTrigger>
+                        />
+                        <TooltipContent>Download</TooltipContent>
+                      </Tooltip>
+                      <AlertDialog>
+                        <Tooltip>
+                          <AlertDialogTrigger
+                            render={
+                              <TooltipTrigger
+                                render={
+                                  <Button
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    disabled={deleting === backup.filename}
+                                  />
+                                }
+                              />
+                            }
+                          >
+                            {deleting === backup.filename ? (
+                              <Spinner />
+                            ) : (
+                              <IconTrash />
+                            )}
+                          </AlertDialogTrigger>
+                          <TooltipContent>Delete</TooltipContent>
+                        </Tooltip>
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete backup?</AlertDialogTitle>

@@ -7,6 +7,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { SofaLogo } from "@/components/sofa-logo";
 import { Kbd } from "@/components/ui/kbd";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { commandPaletteOpenAtom } from "@/lib/atoms/command-palette";
 import { signOut, useSession } from "@/lib/auth/client";
 
@@ -29,7 +34,7 @@ export function NavBar() {
             href="/dashboard"
             className="shrink-0 text-foreground transition-colors hover:text-primary"
           >
-            <SofaLogo size={28} />
+            <SofaLogo className="size-7" />
           </Link>
           <div className="hidden items-center gap-1 sm:flex">
             {navLinks.map((link) => {
@@ -61,14 +66,14 @@ export function NavBar() {
           </div>
         </div>
 
-        <div className="flex flex-1 items-center justify-end gap-3 sm:flex-none">
+        <div className="flex flex-1 items-center justify-end gap-2 sm:flex-none sm:gap-1">
           {/* Mobile search trigger */}
           <button
             type="button"
             onClick={() => setCommandPaletteOpen(true)}
             className="flex flex-1 items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:border-primary/20 hover:bg-card sm:hidden"
           >
-            <IconSearch size={14} />
+            <IconSearch className="size-3.5" />
             <span>Search...</span>
           </button>
           {/* Desktop search trigger pill */}
@@ -77,32 +82,34 @@ export function NavBar() {
             onClick={() => setCommandPaletteOpen(true)}
             className="hidden items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:border-primary/20 hover:bg-card sm:inline-flex"
           >
-            <IconSearch size={14} />
+            <IconSearch className="size-3.5" />
             <span>Search...</span>
             <Kbd className="ml-1">⌘K</Kbd>
           </button>
-          <div className="hidden items-center gap-2 rounded-lg border border-border/30 px-2.5 py-1 sm:flex">
-            <span className="text-sm text-muted-foreground">
-              {session?.user?.name}
-            </span>
-            <Link
-              href="/settings"
-              className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          <div className="mx-1.5 hidden h-4 w-px bg-border/50 sm:block" />
+          <Tooltip>
+            <TooltipTrigger
+              render={<Link href="/settings" />}
+              className="hidden items-center gap-1.5 rounded-md px-2 py-1.5 text-sm leading-none text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
             >
-              <IconSettings size={14} />
-            </Link>
-            <button
-              type="button"
+              {session?.user?.name}
+              <IconSettings className="size-3.5" />
+            </TooltipTrigger>
+            <TooltipContent>Settings</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger
               onClick={async () => {
                 await signOut();
                 router.push("/");
                 router.refresh();
               }}
-              className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="hidden h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:inline-flex"
             >
-              <IconLogout size={14} />
-            </button>
-          </div>
+              <IconLogout className="size-[15px]" />
+            </TooltipTrigger>
+            <TooltipContent>Log out</TooltipContent>
+          </Tooltip>
         </div>
       </nav>
     </header>

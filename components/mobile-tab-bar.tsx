@@ -34,8 +34,7 @@ export function MobileTabBar() {
               className="relative flex flex-1 flex-col items-center justify-center gap-0.5"
             >
               <Icon
-                size={20}
-                className={isActive ? "text-primary" : "text-muted-foreground"}
+                className={`size-5 ${isActive ? "text-primary" : "text-muted-foreground"}`}
               />
               <span
                 className={`text-[10px] font-medium ${isActive ? "text-primary" : "text-muted-foreground"}`}

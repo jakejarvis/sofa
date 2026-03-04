@@ -21,7 +21,7 @@ export async function LibrarySection({ userId }: { userId: string }) {
   return (
     <FeedSection
       title="In Your Library"
-      icon={<IconSparkles size={20} className="text-primary" />}
+      icon={<IconSparkles className="size-5 text-primary" />}
     >
       <TitleGrid items={items} />
     </FeedSection>

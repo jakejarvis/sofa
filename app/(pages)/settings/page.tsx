@@ -112,7 +112,7 @@ export default async function SettingsPage() {
       {isAdmin && (
         <div>
           <div className="mb-3 flex items-center gap-2">
-            <IconServerCog size={16} className="text-muted-foreground" />
+            <IconServerCog className="size-4 text-muted-foreground" />
             <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Server
             </h2>

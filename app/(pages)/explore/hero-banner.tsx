@@ -68,7 +68,7 @@ export function HeroBanner({
                   </span>
                   {voteAverage > 0 && (
                     <span className="flex items-center gap-1 text-sm text-primary">
-                      <IconStar size={14} className="fill-primary" />
+                      <IconStar className="size-3.5 fill-primary" />
                       {voteAverage.toFixed(1)}
                     </span>
                   )}
@@ -88,7 +88,7 @@ export function HeroBanner({
                   href={href}
                   className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:shadow-md hover:shadow-primary/20"
                 >
-                  <IconPlus size={16} />
+                  <IconPlus className="size-4" />
                   Add to Library
                 </Link>
               </motion.div>

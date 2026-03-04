@@ -63,7 +63,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
               <div
                 className={`flex h-6 w-6 items-center justify-center rounded-md ${def.bgColor}`}
               >
-                <Icon size={13} className={def.color} />
+                <Icon className={`size-[13px] ${def.color}`} />
               </div>
               <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 {def.label}

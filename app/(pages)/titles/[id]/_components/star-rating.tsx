@@ -40,9 +40,9 @@ export function StarRating({ value, onChange }: StarRatingProps) {
             }}
           >
             {filled ? (
-              <IconStarFilled size={18} className="text-primary" />
+              <IconStarFilled className="size-4.5 text-primary" />
             ) : (
-              <IconStar size={18} className="text-muted-foreground/30" />
+              <IconStar className="size-4.5 text-muted-foreground/30" />
             )}
           </motion.button>
         );

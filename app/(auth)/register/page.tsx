@@ -51,7 +51,7 @@ export default function RegisterPage() {
             }}
           >
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <IconLock size={24} className="text-primary" />
+              <IconLock className="size-6 text-primary" />
             </div>
             <div className="space-y-2">
               <h1 className="font-display text-xl tracking-tight">

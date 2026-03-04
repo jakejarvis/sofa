@@ -48,7 +48,7 @@ export function ContinueWatchingCard({
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-card via-secondary to-muted">
-            <IconPlayerPlay size={32} className="text-muted-foreground/30" />
+            <IconPlayerPlay className="size-8 text-muted-foreground/30" />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -76,7 +76,7 @@ export function ContinueWatchingCard({
           </p>
         </div>
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-          <IconPlayerPlay size={14} />
+          <IconPlayerPlay className="size-3.5" />
         </div>
       </div>
       {progress > 0 && (

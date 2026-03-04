@@ -97,7 +97,7 @@ export function AuthForm({
       >
         <div className="space-y-2 text-center">
           <Link href="/" className="inline-flex justify-center text-primary">
-            <SofaLogo size={36} />
+            <SofaLogo className="size-9" />
           </Link>
           <h1 className="text-lg font-medium">
             {isRegister ? "Create your account" : "Welcome back"}
@@ -124,7 +124,7 @@ export function AuthForm({
               whileTap={{ scale: 0.98 }}
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-border/50 bg-background/50 text-sm font-medium transition-all hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
             >
-              <IconKey size={16} />
+              <IconKey className="size-4" />
               {oidcLoading
                 ? "Redirecting..."
                 : `Sign in with ${authConfig?.oidcProviderName || "SSO"}`}

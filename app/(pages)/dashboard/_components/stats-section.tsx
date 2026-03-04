@@ -18,7 +18,7 @@ export async function StatsSection({ userId }: { userId: string }) {
       {isEmpty && (
         <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-border/50 py-16 text-center">
           <div className="animate-gentle-float rounded-full bg-primary/10 p-4">
-            <IconDeviceTv size={32} className="text-primary" />
+            <IconDeviceTv className="size-8 text-primary" />
           </div>
           <div className="space-y-1">
             <p className="font-medium">Your library is empty</p>

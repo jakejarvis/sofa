@@ -95,7 +95,7 @@ export function IntegrationsSection({
   return (
     <div>
       <div className="mb-3 flex items-center gap-2">
-        <IconWebhook size={16} className="text-muted-foreground" />
+        <IconWebhook className="size-4 text-muted-foreground" />
         <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Integrations
         </h2>

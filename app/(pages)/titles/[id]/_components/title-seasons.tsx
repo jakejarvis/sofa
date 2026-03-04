@@ -56,7 +56,7 @@ export function TitleSeasons() {
                   type="button"
                   className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                 >
-                  <IconChecks size={14} />
+                  <IconChecks className="size-3.5" />
                   Mark All Watched
                 </button>
               }
@@ -160,15 +160,9 @@ export function TitleSeasons() {
                     </button>
                   )}
                   {isOpen ? (
-                    <IconChevronUp
-                      size={16}
-                      className="text-muted-foreground"
-                    />
+                    <IconChevronUp className="size-4 text-muted-foreground" />
                   ) : (
-                    <IconChevronDown
-                      size={16}
-                      className="text-muted-foreground"
-                    />
+                    <IconChevronDown className="size-4 text-muted-foreground" />
                   )}
                 </div>
               </div>
@@ -221,7 +215,7 @@ export function TitleSeasons() {
                                   damping: 15,
                                 }}
                               >
-                                <IconCheck size={14} />
+                                <IconCheck className="size-3.5" />
                               </motion.div>
                             )}
                           </button>

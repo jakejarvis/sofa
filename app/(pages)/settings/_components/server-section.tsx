@@ -37,7 +37,7 @@ export function ServerSection({
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <IconUserPlus size={16} className="text-primary" />
+            <IconUserPlus className="size-4 text-primary" />
           </div>
           <div>
             <CardTitle>Open registration</CardTitle>

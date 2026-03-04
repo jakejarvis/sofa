@@ -1,17 +1,9 @@
-export function SofaLogo({
-  size = 24,
-  className,
-}: {
-  size?: number;
-  className?: string;
-}) {
+export function SofaLogo({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
       viewBox="0 0 24 24"
-      className={className}
+      className={className ?? "size-6"}
       role="img"
       aria-label="Sofa"
     >

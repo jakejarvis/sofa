@@ -139,7 +139,7 @@ export function LandingPage({ posterUrls }: { posterUrls: string[] }) {
               delay: 0.1,
             }}
           >
-            <SofaLogo size={96} className="sm:h-28 sm:w-28 md:h-32 md:w-32" />
+            <SofaLogo className="size-24 sm:size-28 md:size-32" />
           </motion.div>
           <motion.p
             className="mx-auto max-w-md text-lg leading-relaxed text-muted-foreground"

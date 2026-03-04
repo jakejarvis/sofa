@@ -9,6 +9,7 @@ import {
   IconRefresh,
   IconTrash,
 } from "@tabler/icons-react";
+import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -47,17 +48,6 @@ export interface WebhookConnection {
     status: "success" | "ignored" | "error";
     receivedAt: string;
   }[];
-}
-
-export function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
 }
 
 export function WebhookCard({
@@ -122,15 +112,14 @@ export function WebhookCard({
                 <CardDescription>
                   {connection
                     ? connection.lastEventAt
-                      ? `Last event ${timeAgo(connection.lastEventAt)}`
+                      ? `Last event ${formatDistanceToNow(new Date(connection.lastEventAt), { addSuffix: true })}`
                       : "Connected — no events yet"
                     : "Not configured"}
                 </CardDescription>
               </div>
             </div>
             <IconChevronDown
-              size={16}
-              className={`text-muted-foreground transition-transform duration-200 ${cardOpen ? "rotate-180" : ""}`}
+              className={`size-4 text-muted-foreground transition-transform duration-200 ${cardOpen ? "rotate-180" : ""}`}
             />
           </CollapsibleTrigger>
         </CardContent>
@@ -151,10 +140,7 @@ export function WebhookCard({
 
             {isPlex && (
               <div className="flex gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
-                <IconInfoCircle
-                  size={14}
-                  className="mt-0.5 shrink-0 text-primary"
-                />
+                <IconInfoCircle className="mt-0.5 size-3.5 shrink-0 text-primary" />
                 <p className="text-xs leading-relaxed text-foreground/80">
                   Plex webhooks require an active{" "}
                   <a
@@ -240,9 +226,9 @@ export function WebhookCard({
                           }
                         >
                           {copied ? (
-                            <IconCheck size={14} className="text-green-400" />
+                            <IconCheck className="text-green-400" />
                           ) : (
-                            <IconCopy size={14} />
+                            <IconCopy />
                           )}
                         </TooltipTrigger>
                         <TooltipContent>Copy URL</TooltipContent>
@@ -256,7 +242,7 @@ export function WebhookCard({
                       size="sm"
                       onClick={() => onRegenerateToken(provider)}
                     >
-                      <IconRefresh size={12} />
+                      <IconRefresh />
                       Regenerate URL
                     </Button>
                     <Button
@@ -264,7 +250,7 @@ export function WebhookCard({
                       size="sm"
                       onClick={() => onDelete(provider)}
                     >
-                      <IconTrash size={12} />
+                      <IconTrash />
                       Disconnect
                     </Button>
                   </div>
@@ -275,8 +261,7 @@ export function WebhookCard({
             <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
               <CollapsibleTrigger className="flex w-full items-center gap-1.5 rounded-md py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
                 <IconChevronDown
-                  size={12}
-                  className={`transition-transform ${setupOpen ? "rotate-0" : "-rotate-90"}`}
+                  className={`size-3 transition-transform ${setupOpen ? "rotate-0" : "-rotate-90"}`}
                 />
                 Setup instructions
               </CollapsibleTrigger>

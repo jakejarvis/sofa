@@ -66,19 +66,19 @@ export default async function ExplorePage() {
 
       <TitleRow
         heading="Trending Today"
-        icon={<IconFlame size={20} className="text-primary" />}
+        icon={<IconFlame className="size-5 text-primary" />}
         items={trendingItems.slice(0, 20)}
       />
 
       <TitleRow
         heading="Popular Movies"
-        icon={<IconMovie size={20} className="text-primary" />}
+        icon={<IconMovie className="size-5 text-primary" />}
         items={popularMovieItems.slice(0, 20)}
       />
 
       <TitleRow
         heading="Popular TV Shows"
-        icon={<IconDeviceTv size={20} className="text-primary" />}
+        icon={<IconDeviceTv className="size-5 text-primary" />}
         items={popularTvItems.slice(0, 20)}
       />
 

@@ -69,11 +69,11 @@ export function TitleCard({
       <div className="px-3 pb-3 pt-2.5">
         <p className="line-clamp-1 text-sm font-medium leading-snug">{title}</p>
         <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
-          <TypeIcon size={14} className="shrink-0 text-primary/60" />
+          <TypeIcon className="size-3.5 shrink-0 text-primary/60" />
           {year && <span>{year}</span>}
           {voteAverage != null && voteAverage > 0 && (
             <span className="ml-auto flex items-center gap-0.5 text-primary/80">
-              <IconStarFilled size={11} />
+              <IconStarFilled className="size-[11px]" />
               {voteAverage.toFixed(1)}
             </span>
           )}
