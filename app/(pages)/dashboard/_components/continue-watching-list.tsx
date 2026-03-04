@@ -33,11 +33,7 @@ export function ContinueWatchingList({
   items: ContinueWatchingItemProps[];
 }) {
   return (
-    <motion.div
-      variants={staggerContainer}
-      initial="hidden"
-      animate="visible"
-    >
+    <motion.div variants={staggerContainer} initial="hidden" animate="visible">
       <Carousel
         opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}
         plugins={[WheelGesturesPlugin({ forceWheelAxis: "x" })]}

@@ -5,15 +5,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-bun dev              # Start Next.js dev server
-bun build            # Production build
-bun lint             # Biome lint check
-bun format           # Biome format (auto-fix)
-bun db:push          # Push schema changes to SQLite database
-bun db:generate      # Generate Drizzle migration files
-bun db:migrate       # Run Drizzle migrations
-bun db:studio        # Open Drizzle Studio (visual DB browser)
+bun run dev              # Start Next.js dev server
+bun run build            # Production build
+bun run lint             # Biome lint check
+bun run format           # Biome format (auto-fix)
+bun run db:push          # Push schema changes to SQLite database
+bun run db:generate      # Generate Drizzle migration files
+bun run db:migrate       # Run Drizzle migrations
+bun run db:studio        # Open Drizzle Studio (visual DB browser)
 ```
+
+IMPORTANT: Default to using Bun instead of Node.js:
+
+- Use `bun <file>` instead of `node <file>` or `ts-node <file>`
+- Use `bun test` instead of `jest` or `vitest`
+- Use `bun build <file.html|file.ts|file.css>` instead of `webpack` or `esbuild`
+- Use `bun install` instead of `npm install` or `yarn install` or `pnpm install`
+- Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
+- Use `bunx <package> <command>` instead of `npx <package> <command>`
+- Bun automatically loads .env, so don't use dotenv.
 
 ## Architecture
 

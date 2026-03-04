@@ -76,9 +76,11 @@ export function HeroBanner({
                     Trending today
                   </span>
                 </div>
-                <h2 className="font-display text-3xl tracking-tight sm:text-4xl">
-                  {title}
-                </h2>
+                <Link href={href} className="group/title">
+                  <h2 className="font-display text-3xl tracking-tight sm:text-4xl transition-colors group-hover/title:text-primary">
+                    {title}
+                  </h2>
+                </Link>
                 <p className="mt-2 line-clamp-2 max-w-2xl text-sm text-muted-foreground">
                   {overview}
                 </p>
