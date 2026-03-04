@@ -2,10 +2,14 @@
 
 import {
   IconCalendarRepeat,
+  IconChevronDown,
+  IconClock,
   IconCloudDownload,
   IconCloudUpload,
   IconDatabaseExport,
   IconPlus,
+  IconPointer,
+  IconShieldCheck,
   IconTrash,
 } from "@tabler/icons-react";
 import { format, formatDistanceToNow } from "date-fns";
@@ -25,6 +29,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -32,13 +43,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import type { BackupFrequency } from "@/lib/cron";
 import type { BackupInfo } from "@/lib/services/backup";
 import {
   createBackupAction,
   deleteBackupAction,
+  setBackupScheduleAction,
   setMaxBackupsAction,
   setScheduledBackupAction,
-} from "./backup-actions";
+} from "./actions";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -50,14 +63,60 @@ function formatBackupDate(dateStr: string): string {
   return format(new Date(dateStr), "MMM d, h:mm a");
 }
 
+const FREQUENCY_OPTIONS: { value: BackupFrequency; label: string }[] = [
+  { value: "6h", label: "6h" },
+  { value: "12h", label: "12h" },
+  { value: "1d", label: "1d" },
+  { value: "7d", label: "7d" },
+];
+
+const HOURS = Array.from({ length: 24 }, (_, i) => i);
+
+const DAYS_OF_WEEK = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+] as const;
+
+function describeSchedule(
+  frequency: BackupFrequency,
+  time: string,
+  _dayOfWeek = 0,
+): string {
+  const [h, m] = time.split(":").map(Number);
+  const d = new Date(2000, 0, 1, h, m);
+  const timeStr = format(d, "h:mm a");
+
+  switch (frequency) {
+    case "6h":
+      return "Every 6 hours";
+    case "12h":
+      return `Every 12 hours starting ${timeStr}`;
+    case "1d":
+      return `Daily at ${timeStr}`;
+    case "7d":
+      return "Weekly";
+  }
+}
+
 export function BackupSection({
   initialBackups,
   initialScheduledEnabled,
   initialMaxRetention,
+  initialFrequency,
+  initialTime,
+  initialDow,
 }: {
   initialBackups: BackupInfo[];
   initialScheduledEnabled: boolean;
   initialMaxRetention: number;
+  initialFrequency: BackupFrequency;
+  initialTime: string;
+  initialDow: number;
 }) {
   const [backups, setBackups] = useState<BackupInfo[]>(initialBackups);
   const [creating, setCreating] = useState(false);
@@ -67,6 +126,10 @@ export function BackupSection({
     initialScheduledEnabled,
   );
   const [maxRetention, setMaxRetention] = useState(initialMaxRetention);
+  const [frequency, setFrequency] = useState<BackupFrequency>(initialFrequency);
+  const [time, setTime] = useState(initialTime);
+  const [dow, setDow] = useState(initialDow);
+  const [savingSchedule, setSavingSchedule] = useState(false);
   const [togglingSchedule, setTogglingSchedule] = useState(false);
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -152,6 +215,33 @@ export function BackupSection({
     }
   }
 
+  async function handleScheduleChange(
+    newFrequency: BackupFrequency,
+    newTime: string,
+    newDow = dow,
+  ) {
+    const prevFreq = frequency;
+    const prevTime = time;
+    const prevDow = dow;
+    setFrequency(newFrequency);
+    setTime(newTime);
+    setDow(newDow);
+    setSavingSchedule(true);
+    try {
+      await setBackupScheduleAction(newFrequency, newTime, newDow);
+      toast.success(
+        `Schedule updated: ${describeSchedule(newFrequency, newTime, newDow)}`,
+      );
+    } catch {
+      setFrequency(prevFreq);
+      setTime(prevTime);
+      setDow(prevDow);
+      toast.error("Failed to update schedule");
+    } finally {
+      setSavingSchedule(false);
+    }
+  }
+
   return (
     <>
       {/* Create backup header */}
@@ -162,7 +252,7 @@ export function BackupSection({
               <IconDatabaseExport className="size-4 text-primary" />
             </div>
             <div>
-              <CardTitle>Database snapshots</CardTitle>
+              <CardTitle>Database backups</CardTitle>
               <CardDescription>
                 {backups.length > 0
                   ? `${backups.length} backup${backups.length !== 1 ? "s" : ""} stored`
@@ -192,6 +282,28 @@ export function BackupSection({
                   className="overflow-hidden"
                 >
                   <div className="group flex items-center gap-3 rounded-md px-2.5 py-1.5 transition-colors hover:bg-muted/40">
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <span className="flex shrink-0 items-center text-muted-foreground" />
+                        }
+                      >
+                        {backup.source === "scheduled" ? (
+                          <IconClock className="size-3.5" />
+                        ) : backup.source === "pre-restore" ? (
+                          <IconShieldCheck className="size-3.5" />
+                        ) : (
+                          <IconPointer className="size-3.5" />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {backup.source === "scheduled"
+                          ? "Scheduled backup"
+                          : backup.source === "pre-restore"
+                            ? "Pre-restore backup"
+                            : "Manual backup"}
+                      </TooltipContent>
+                    </Tooltip>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-2">
                         <span className="text-xs font-medium text-foreground">
@@ -200,17 +312,15 @@ export function BackupSection({
                         <span className="text-[11px] text-muted-foreground">
                           {formatBytes(backup.sizeBytes)}
                         </span>
-                        <span className="text-[11px] text-muted-foreground/50">
+                        <span
+                          className="text-[11px] text-muted-foreground/50"
+                          suppressHydrationWarning
+                        >
                           {formatDistanceToNow(new Date(backup.createdAt), {
                             addSuffix: true,
                           })}
                         </span>
                       </div>
-                      {backup.filename.startsWith("pre-restore") && (
-                        <span className="text-[10px] text-primary/70">
-                          Pre-restore safety backup
-                        </span>
-                      )}
                     </div>
                     <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
                       <Tooltip>
@@ -219,6 +329,7 @@ export function BackupSection({
                             <Button
                               variant="ghost"
                               size="icon-sm"
+                              className="text-muted-foreground hover:text-foreground"
                               nativeButton={false}
                               render={
                                 <a
@@ -243,6 +354,7 @@ export function BackupSection({
                                   <Button
                                     variant="ghost"
                                     size="icon-sm"
+                                    className="text-muted-foreground hover:text-destructive"
                                     disabled={deleting === backup.filename}
                                   />
                                 }
@@ -288,6 +400,186 @@ export function BackupSection({
         )}
       </AnimatePresence>
 
+      {/* Scheduled backups */}
+      <CardContent className="border-t border-border/30 pt-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted/50">
+              <IconCalendarRepeat className="size-4 text-muted-foreground" />
+            </div>
+            <div>
+              <CardTitle>Scheduled</CardTitle>
+              <CardDescription>
+                {scheduledEnabled ? (
+                  <span className="inline-flex items-baseline gap-1">
+                    Keeping last{" "}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-0.5 border-b border-dotted border-muted-foreground/50 transition-colors hover:text-foreground">
+                        {maxRetention}
+                        <IconChevronDown className="size-2.5" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuRadioGroup
+                          value={String(maxRetention)}
+                          onValueChange={(v) =>
+                            handleMaxRetentionChange(Number(v))
+                          }
+                        >
+                          {[3, 5, 7, 14, 30].map((n) => (
+                            <DropdownMenuRadioItem key={n} value={String(n)}>
+                              {n}
+                            </DropdownMenuRadioItem>
+                          ))}
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>{" "}
+                    backups.
+                  </span>
+                ) : (
+                  "Automatically back up your database on a schedule"
+                )}
+              </CardDescription>
+            </div>
+          </div>
+          <Switch
+            checked={scheduledEnabled}
+            onCheckedChange={handleToggleScheduled}
+            disabled={togglingSchedule}
+          />
+        </div>
+
+        {/* Schedule configurator */}
+        <AnimatePresence initial={false}>
+          {scheduledEnabled && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-4 ml-11 space-y-3">
+                {/* Frequency selector */}
+                <div className="space-y-1.5">
+                  <span className="inline-block text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+                    Frequency
+                  </span>
+                  <div className="flex gap-1">
+                    {FREQUENCY_OPTIONS.map((opt) => (
+                      <Button
+                        key={opt.value}
+                        variant="outline"
+                        size="sm"
+                        disabled={savingSchedule}
+                        onClick={() => handleScheduleChange(opt.value, time)}
+                        className={
+                          frequency === opt.value
+                            ? "border-primary/50 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
+                            : "border-border/50 bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                        }
+                      >
+                        {opt.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Day of week — shown for 7d only */}
+                <AnimatePresence initial={false}>
+                  {frequency === "7d" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="overflow-hidden"
+                    >
+                      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+                        Day:{" "}
+                      </span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border/50 bg-muted/30 px-2.5 py-1 text-xs text-foreground transition-colors hover:bg-muted/50 disabled:opacity-50">
+                          {DAYS_OF_WEEK[dow]}
+                          <IconChevronDown className="size-3 text-muted-foreground" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start">
+                          <DropdownMenuRadioGroup
+                            value={String(dow)}
+                            onValueChange={(v) =>
+                              handleScheduleChange(frequency, time, Number(v))
+                            }
+                          >
+                            {DAYS_OF_WEEK.map((day, i) => (
+                              <DropdownMenuRadioItem
+                                key={day}
+                                value={String(i)}
+                              >
+                                {day}
+                              </DropdownMenuRadioItem>
+                            ))}
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Time selector — shown for 12h, 1d, 7d */}
+                <AnimatePresence initial={false}>
+                  {frequency !== "6h" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="overflow-hidden"
+                    >
+                      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+                        {frequency === "12h" ? "Starting at" : "Time:"}{" "}
+                      </span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border/50 bg-muted/30 px-2.5 py-1 text-xs text-foreground transition-colors hover:bg-muted/50 disabled:opacity-50">
+                          {format(
+                            new Date(
+                              2000,
+                              0,
+                              1,
+                              ...(time.split(":").map(Number) as [
+                                number,
+                                number,
+                              ]),
+                            ),
+                            "h:mm a",
+                          )}
+                          <IconChevronDown className="size-3 text-muted-foreground" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start">
+                          <DropdownMenuRadioGroup
+                            value={time}
+                            onValueChange={(v) =>
+                              handleScheduleChange(frequency, v)
+                            }
+                          >
+                            {HOURS.map((h) => {
+                              const val = `${String(h).padStart(2, "0")}:00`;
+                              return (
+                                <DropdownMenuRadioItem key={h} value={val}>
+                                  {format(new Date(2000, 0, 1, h, 0), "h:mm a")}
+                                </DropdownMenuRadioItem>
+                              );
+                            })}
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </CardContent>
+
       {/* Restore */}
       <CardContent className="border-t border-border/30 pt-4">
         <div className="flex items-center justify-between gap-4">
@@ -298,8 +590,8 @@ export function BackupSection({
             <div>
               <CardTitle>Restore</CardTitle>
               <CardDescription>
-                Upload a .db file to replace the current database. A safety
-                backup is created first.
+                Upload a .db file to replace the current database. A
+                "just-in-case" backup is created first.
               </CardDescription>
             </div>
           </div>
@@ -340,47 +632,6 @@ export function BackupSection({
           </Button>
         </div>
       </CardContent>
-
-      {/* Scheduled backups */}
-      <CardContent className="border-t border-border/30 pt-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted/50">
-              <IconCalendarRepeat className="size-4 text-muted-foreground" />
-            </div>
-            <div>
-              <CardTitle>Scheduled backups</CardTitle>
-              <CardDescription>
-                Daily at 2:00 AM
-                {scheduledEnabled && (
-                  <span className="text-muted-foreground/50">
-                    {" "}
-                    &middot; keeping last{" "}
-                    <select
-                      value={maxRetention}
-                      onChange={(e) =>
-                        handleMaxRetentionChange(Number(e.target.value))
-                      }
-                      className="inline h-auto appearance-none border-b border-dashed border-muted-foreground/30 bg-transparent px-0.5 text-xs text-muted-foreground outline-none hover:border-muted-foreground/60 focus:border-primary"
-                    >
-                      {[3, 5, 7, 14, 30].map((n) => (
-                        <option key={n} value={n}>
-                          {n}
-                        </option>
-                      ))}
-                    </select>
-                  </span>
-                )}
-              </CardDescription>
-            </div>
-          </div>
-          <Switch
-            checked={scheduledEnabled}
-            onCheckedChange={handleToggleScheduled}
-            disabled={togglingSchedule}
-          />
-        </div>
-      </CardContent>
     </>
   );
 }
@@ -403,8 +654,8 @@ function RestoreDialog({
           <AlertDialogTitle>Restore database?</AlertDialogTitle>
           <AlertDialogDescription>
             This will replace your entire database with the uploaded file. A
-            safety backup of your current data will be created first. Active
-            sessions may need to refresh after restore.
+            "just-in-case" backup of your current data will be created first.
+            Active sessions may need to refresh after restore.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

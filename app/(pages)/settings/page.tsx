@@ -64,6 +64,15 @@ export default async function SettingsPage() {
   const maxBackupRetention = isAdmin
     ? Number.parseInt(getSetting("maxBackupRetention") ?? "7", 10)
     : 7;
+  const backupFrequency = isAdmin
+    ? (getSetting("backupScheduleFrequency") ?? "1d")
+    : "1d";
+  const backupTime = isAdmin
+    ? (getSetting("backupScheduleTime") ?? "02:00")
+    : "02:00";
+  const backupDow = isAdmin
+    ? Number.parseInt(getSetting("backupScheduleDow") ?? "0", 10)
+    : 0;
 
   const repoUrl = "https://github.com/jakejarvis/sofa";
 
@@ -129,6 +138,9 @@ export default async function SettingsPage() {
                 initialBackups={backups}
                 initialScheduledEnabled={scheduledBackupsEnabled}
                 initialMaxRetention={maxBackupRetention}
+                initialFrequency={backupFrequency as "6h" | "12h" | "1d" | "7d"}
+                initialTime={backupTime}
+                initialDow={backupDow}
               />
             </Card>
           </div>

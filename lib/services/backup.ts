@@ -13,13 +13,31 @@ const DATABASE_URL =
   process.env.DATABASE_URL || path.join(DATA_DIR, "sqlite.db");
 const BACKUP_DIR = path.join(DATA_DIR, "backups");
 
-const BACKUP_PATTERN = /^sofa-backup-\d{4}-\d{2}-\d{2}-\d{6}\.db$/;
+const MANUAL_PATTERN = /^sofa-manual-\d{4}-\d{2}-\d{2}-\d{6}\.db$/;
+const SCHEDULED_PATTERN = /^sofa-scheduled-\d{4}-\d{2}-\d{2}-\d{6}\.db$/;
 const PRE_RESTORE_PATTERN = /^pre-restore-\d{4}-\d{2}-\d{2}-\d{6}\.db$/;
+
+export type BackupSource = "manual" | "scheduled" | "pre-restore";
 
 export interface BackupInfo {
   filename: string;
   sizeBytes: number;
   createdAt: string;
+  source: BackupSource;
+}
+
+function getBackupSource(filename: string): BackupSource {
+  if (SCHEDULED_PATTERN.test(filename)) return "scheduled";
+  if (PRE_RESTORE_PATTERN.test(filename)) return "pre-restore";
+  return "manual";
+}
+
+function isKnownBackup(filename: string): boolean {
+  return (
+    MANUAL_PATTERN.test(filename) ||
+    SCHEDULED_PATTERN.test(filename) ||
+    PRE_RESTORE_PATTERN.test(filename)
+  );
 }
 
 export async function ensureBackupDir() {
@@ -29,14 +47,12 @@ export async function ensureBackupDir() {
 function isValidBackupFilename(filename: string): boolean {
   const base = path.basename(filename);
   return (
-    base === filename &&
-    !filename.includes("..") &&
-    (BACKUP_PATTERN.test(filename) || PRE_RESTORE_PATTERN.test(filename))
+    base === filename && !filename.includes("..") && isKnownBackup(filename)
   );
 }
 
 export async function createBackup(
-  prefix = "sofa-backup",
+  prefix = "sofa-manual",
 ): Promise<BackupInfo> {
   await ensureBackupDir();
 
@@ -54,15 +70,14 @@ export async function createBackup(
     filename,
     sizeBytes: s.size,
     createdAt: s.mtime.toISOString(),
+    source: getBackupSource(filename),
   };
 }
 
 export async function listBackups(): Promise<BackupInfo[]> {
   await ensureBackupDir();
 
-  const files = (await readdir(BACKUP_DIR)).filter(
-    (f) => BACKUP_PATTERN.test(f) || PRE_RESTORE_PATTERN.test(f),
-  );
+  const files = (await readdir(BACKUP_DIR)).filter((f) => isKnownBackup(f));
 
   const results: BackupInfo[] = [];
   for (const filename of files) {
@@ -71,6 +86,7 @@ export async function listBackups(): Promise<BackupInfo[]> {
       filename,
       sizeBytes: s.size,
       createdAt: s.mtime.toISOString(),
+      source: getBackupSource(filename),
     });
   }
 
@@ -164,7 +180,7 @@ export async function restoreFromBackup(buffer: Buffer): Promise<void> {
 
 export async function pruneBackups(maxKeep: number): Promise<void> {
   const backups = (await listBackups()).filter((b) =>
-    BACKUP_PATTERN.test(b.filename),
+    SCHEDULED_PATTERN.test(b.filename),
   );
 
   if (backups.length <= maxKeep) return;

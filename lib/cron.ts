@@ -29,6 +29,8 @@ import {
 import { getSetting } from "@/lib/services/settings";
 import { getTvDetails } from "@/lib/tmdb/client";
 
+export type BackupFrequency = "6h" | "12h" | "1d" | "7d";
+
 const log = createLogger("cron");
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -229,17 +231,58 @@ async function scheduledBackupJob() {
   }
 
   await ensureBackupDir();
-  await createBackup();
+  await createBackup("sofa-scheduled");
 
   const maxStr = getSetting("maxBackupRetention");
   const max = maxStr ? Number.parseInt(maxStr, 10) : 7;
   await pruneBackups(max);
 }
 
+export function buildBackupCron(
+  frequency: BackupFrequency = "1d",
+  time = "02:00",
+  dayOfWeek = 0,
+): string {
+  const [hour, minute] = time.split(":").map(Number);
+  const h = Number.isFinite(hour) ? hour : 2;
+  const m = Number.isFinite(minute) ? minute : 0;
+  const dow = dayOfWeek >= 0 && dayOfWeek <= 6 ? dayOfWeek : 0;
+
+  switch (frequency) {
+    case "6h":
+      return `${m} */6 * * *`;
+    case "12h":
+      return `${m} ${h},${(h + 12) % 24} * * *`;
+    case "7d":
+      return `${m} ${h} * * ${dow}`;
+    default:
+      return `${m} ${h} * * *`;
+  }
+}
+
+function getBackupCronFromSettings(): string {
+  const frequency = (getSetting("backupScheduleFrequency") ??
+    "1d") as BackupFrequency;
+  const time = getSetting("backupScheduleTime") ?? "02:00";
+  const dayOfWeek = Number.parseInt(getSetting("backupScheduleDow") ?? "0", 10);
+  return buildBackupCron(frequency, time, dayOfWeek);
+}
+
+export function rescheduleBackup() {
+  const existing = jobs.get("scheduledBackup");
+  if (existing) {
+    existing.stop();
+    jobs.delete("scheduledBackup");
+  }
+  const cron = getBackupCronFromSettings();
+  log.info(`Rescheduling backup job with cron: ${cron}`);
+  schedule("scheduledBackup", cron, scheduledBackupJob);
+}
+
 export function startJobs() {
   if (jobs.size > 0) return;
 
-  schedule("scheduledBackup", "0 2 * * *", scheduledBackupJob);
+  schedule("scheduledBackup", getBackupCronFromSettings(), scheduledBackupJob);
   schedule("nightlyRefreshLibrary", "0 3 * * *", nightlyRefreshLibrary);
   schedule("refreshAvailability", "0 */6 * * *", refreshAvailabilityJob);
   schedule("refreshRecommendations", "0 */12 * * *", refreshRecommendationsJob);
