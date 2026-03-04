@@ -183,7 +183,7 @@ export async function pruneBackups(maxKeep: number): Promise<void> {
     SCHEDULED_PATTERN.test(b.filename),
   );
 
-  if (backups.length <= maxKeep) return;
+  if (maxKeep === 0 || backups.length <= maxKeep) return;
 
   const toDelete = backups.slice(maxKeep);
   for (const backup of toDelete) {

@@ -188,8 +188,8 @@ export async function getScheduledBackupSettings(): Promise<{
 
 export async function setMaxBackupsAction(max: number): Promise<void> {
   await getAdminSession();
-  if (max < 1 || max > 30)
-    throw new Error("Max backups must be between 1 and 30");
+  if (max < 0 || (max > 30 && max !== 0))
+    throw new Error("Max backups must be between 1 and 30, or 0 for unlimited");
   setSetting("maxBackupRetention", String(max));
 }
 

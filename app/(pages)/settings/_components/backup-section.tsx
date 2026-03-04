@@ -259,6 +259,11 @@ export function BackupSection({
     setMaxRetention(value);
     try {
       await setMaxBackupsAction(value);
+      toast.success(
+        value === 0
+          ? "Keeping unlimited backups"
+          : `Keeping last ${value} backups`,
+      );
     } catch {
       setMaxRetention(previous);
       toast.error("Failed to update retention setting");
@@ -463,10 +468,12 @@ export function BackupSection({
                     <span suppressHydrationWarning>
                       {formatNextBackup(frequency, time, dow)}.
                     </span>{" "}
-                    Keeping last{" "}
+                    Keeping{" "}
                     <DropdownMenu>
                       <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-0.5 border-b border-dotted border-muted-foreground/50 transition-colors hover:text-foreground">
-                        {maxRetention}
+                        {maxRetention === 0
+                          ? "unlimited"
+                          : `last ${maxRetention}`}
                         <IconChevronDown className="size-2.5" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start">
@@ -476,9 +483,9 @@ export function BackupSection({
                             handleMaxRetentionChange(Number(v))
                           }
                         >
-                          {[3, 5, 7, 14, 30].map((n) => (
+                          {[3, 5, 7, 14, 30, 0].map((n) => (
                             <DropdownMenuRadioItem key={n} value={String(n)}>
-                              {n}
+                              {n === 0 ? "unlimited" : n}
                             </DropdownMenuRadioItem>
                           ))}
                         </DropdownMenuRadioGroup>
