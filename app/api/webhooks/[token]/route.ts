@@ -17,7 +17,7 @@ export async function POST(
   const { token } = await params;
 
   // Look up connection by token — this IS the auth
-  const connection = await db
+  const connection = db
     .select()
     .from(webhookConnections)
     .where(eq(webhookConnections.token, token))

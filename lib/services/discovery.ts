@@ -20,7 +20,7 @@ export interface DashboardStats {
   completed: number;
 }
 
-export async function getUserStats(userId: string): Promise<DashboardStats> {
+export function getUserStats(userId: string): DashboardStats {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const dayOfWeek = now.getDay();
@@ -28,7 +28,7 @@ export async function getUserStats(userId: string): Promise<DashboardStats> {
   weekStart.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
   weekStart.setHours(0, 0, 0, 0);
 
-  const [moviesThisMonth] = await db
+  const [moviesThisMonth] = db
     .select({ count: sql<number>`count(*)` })
     .from(userMovieWatches)
     .where(
@@ -39,7 +39,7 @@ export async function getUserStats(userId: string): Promise<DashboardStats> {
     )
     .all();
 
-  const [episodesThisWeek] = await db
+  const [episodesThisWeek] = db
     .select({ count: sql<number>`count(*)` })
     .from(userEpisodeWatches)
     .where(
@@ -50,13 +50,13 @@ export async function getUserStats(userId: string): Promise<DashboardStats> {
     )
     .all();
 
-  const [librarySizeRow] = await db
+  const [librarySizeRow] = db
     .select({ count: sql<number>`count(*)` })
     .from(userTitleStatus)
     .where(eq(userTitleStatus.userId, userId))
     .all();
 
-  const [completedCount] = await db
+  const [completedCount] = db
     .select({ count: sql<number>`count(*)` })
     .from(userTitleStatus)
     .where(
@@ -96,11 +96,11 @@ export interface ContinueWatchingItem {
   watchedEpisodes: number;
 }
 
-export async function getContinueWatchingFeed(
+export function getContinueWatchingFeed(
   userId: string,
-): Promise<ContinueWatchingItem[]> {
+): ContinueWatchingItem[] {
   // Get in-progress TV shows
-  const inProgress = await db
+  const inProgress = db
     .select({
       titleId: userTitleStatus.titleId,
       updatedAt: userTitleStatus.updatedAt,
@@ -118,7 +118,7 @@ export async function getContinueWatchingFeed(
   const today = new Date().toISOString().slice(0, 10);
 
   for (const row of inProgress) {
-    const title = await db
+    const title = db
       .select()
       .from(titles)
       .where(and(eq(titles.id, row.titleId), eq(titles.type, "tv")))
@@ -126,7 +126,7 @@ export async function getContinueWatchingFeed(
     if (!title) continue;
 
     // Get all seasons for this title, ordered
-    const titleSeasons = await db
+    const titleSeasons = db
       .select()
       .from(seasons)
       .where(eq(seasons.titleId, title.id))
@@ -141,7 +141,7 @@ export async function getContinueWatchingFeed(
 
     // Get most recent watch for this show
     for (const s of titleSeasons) {
-      const eps = await db
+      const eps = db
         .select()
         .from(episodes)
         .where(eq(episodes.seasonId, s.id))
@@ -151,7 +151,7 @@ export async function getContinueWatchingFeed(
       totalEpisodes += eps.length;
 
       for (const ep of eps) {
-        const watch = await db
+        const watch = db
           .select()
           .from(userEpisodeWatches)
           .where(
@@ -210,10 +210,10 @@ export async function getContinueWatchingFeed(
 }
 
 // biome-ignore lint/correctness/noUnusedFunctionParameters: days reserved for future date filtering
-export async function getNewAvailableFeed(userId: string, days = 14) {
+export function getNewAvailableFeed(userId: string, days = 14) {
   // Get titles the user has in any status that have availability offers
   // and recent release/air dates
-  const results = await db
+  const results = db
     .select({
       titleId: titles.id,
       title: titles.title,
@@ -243,52 +243,46 @@ export async function getNewAvailableFeed(userId: string, days = 14) {
   return results;
 }
 
-export async function getRecommendationsFeed(userId: string) {
+export function getRecommendationsFeed(userId: string) {
   // Get recommendations from user's highly-rated or completed titles
-  const userCompletedOrRated = (
-    await db
-      .select({ titleId: userTitleStatus.titleId })
-      .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, userId),
-          eq(userTitleStatus.status, "completed"),
-        ),
-      )
-      .all()
-  ).map((r) => r.titleId);
+  const userCompletedOrRated = db
+    .select({ titleId: userTitleStatus.titleId })
+    .from(userTitleStatus)
+    .where(
+      and(
+        eq(userTitleStatus.userId, userId),
+        eq(userTitleStatus.status, "completed"),
+      ),
+    )
+    .all()
+    .map((r) => r.titleId);
 
-  const ratedIds = (
-    await db
-      .select({ titleId: userRatings.titleId })
-      .from(userRatings)
-      .where(
-        and(
-          eq(userRatings.userId, userId),
-          sql`${userRatings.ratingStars} >= 4`,
-        ),
-      )
-      .all()
-  ).map((r) => r.titleId);
+  const ratedIds = db
+    .select({ titleId: userRatings.titleId })
+    .from(userRatings)
+    .where(
+      and(eq(userRatings.userId, userId), sql`${userRatings.ratingStars} >= 4`),
+    )
+    .all()
+    .map((r) => r.titleId);
 
   const sourceIds = [...new Set([...userCompletedOrRated, ...ratedIds])];
   if (sourceIds.length === 0) return [];
 
   // Get all tracked title IDs to exclude
   const trackedIds = new Set(
-    (
-      await db
-        .select({ titleId: userTitleStatus.titleId })
-        .from(userTitleStatus)
-        .where(eq(userTitleStatus.userId, userId))
-        .all()
-    ).map((r) => r.titleId),
+    db
+      .select({ titleId: userTitleStatus.titleId })
+      .from(userTitleStatus)
+      .where(eq(userTitleStatus.userId, userId))
+      .all()
+      .map((r) => r.titleId),
   );
 
   const recs: Map<string, { titleId: string; score: number }> = new Map();
 
   for (const sourceId of sourceIds) {
-    const recRows = await db
+    const recRows = db
       .select({
         recommendedTitleId: titleRecommendations.recommendedTitleId,
         rank: titleRecommendations.rank,
@@ -316,29 +310,16 @@ export async function getRecommendationsFeed(userId: string) {
     .sort((a, b) => b.score - a.score)
     .slice(0, 20);
 
-  return (
-    await Promise.all(
-      sorted.map(async (r) => {
-        const title = await db
-          .select()
-          .from(titles)
-          .where(eq(titles.id, r.titleId))
-          .get();
-        return title;
-      }),
-    )
-  ).filter(Boolean);
+  return sorted
+    .map((r) => db.select().from(titles).where(eq(titles.id, r.titleId)).get())
+    .filter(Boolean);
 }
 
-export async function getRecommendationsForTitle(titleId: string) {
-  const title = await db
-    .select()
-    .from(titles)
-    .where(eq(titles.id, titleId))
-    .get();
+export function getRecommendationsForTitle(titleId: string) {
+  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title) return [];
 
-  const recs = await db
+  const recs = db
     .select({
       recommendedTitleId: titleRecommendations.recommendedTitleId,
       source: titleRecommendations.source,
@@ -349,20 +330,18 @@ export async function getRecommendationsForTitle(titleId: string) {
     .orderBy(titleRecommendations.rank)
     .all();
 
-  const results = (
-    await Promise.all(
-      recs.map(async (rec) => {
-        const recTitle = await db
-          .select()
-          .from(titles)
-          .where(eq(titles.id, rec.recommendedTitleId))
-          .get();
-        return recTitle
-          ? { ...recTitle, source: rec.source, rank: rec.rank }
-          : null;
-      }),
-    )
-  ).filter((r): r is NonNullable<typeof r> => r !== null);
+  const results = recs
+    .map((rec) => {
+      const recTitle = db
+        .select()
+        .from(titles)
+        .where(eq(titles.id, rec.recommendedTitleId))
+        .get();
+      return recTitle
+        ? { ...recTitle, source: rec.source, rank: rec.rank }
+        : null;
+    })
+    .filter((r): r is NonNullable<typeof r> => r !== null);
 
   return results.map((r) => ({
     id: r.id,

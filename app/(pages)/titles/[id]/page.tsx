@@ -29,7 +29,7 @@ export async function generateMetadata({
   const { id } = await params;
   if (TMDB_ID_PATTERN.test(id)) return { title: "Sofa" };
 
-  const title = await db.select().from(titles).where(eq(titles.id, id)).get();
+  const title = db.select().from(titles).where(eq(titles.id, id)).get();
   if (!title) return { title: "Not Found — Sofa" };
 
   const year = (title.releaseDate ?? title.firstAirDate)?.slice(0, 4);

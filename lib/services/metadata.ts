@@ -35,7 +35,7 @@ export async function importTitle(
   options?: { awaitEnrichment?: boolean },
 ) {
   const awaitEnrichment = options?.awaitEnrichment ?? false;
-  const existing = await db
+  const existing = db
     .select()
     .from(titles)
     .where(eq(titles.tmdbId, tmdbId))
@@ -45,18 +45,15 @@ export async function importTitle(
     // They may be missing if a prior fetch failed or the title was created
     // as a shell by the recommendations system (lastFetchedAt: null).
     if (existing.type === "tv") {
-      const seasonCount = (
-        await db
-          .select()
-          .from(seasons)
-          .where(eq(seasons.titleId, existing.id))
-          .all()
-      ).length;
+      const seasonCount = db
+        .select()
+        .from(seasons)
+        .where(eq(seasons.titleId, existing.id))
+        .all().length;
       if (seasonCount === 0) {
         const show = await getTvDetails(tmdbId);
         if (!existing.lastFetchedAt) {
-          await db
-            .update(titles)
+          db.update(titles)
             .set({
               overview: show.overview,
               posterPath: show.poster_path,
@@ -93,7 +90,7 @@ export async function importTitle(
 
   if (type === "movie") {
     const movie = await getMovieDetails(tmdbId);
-    const row = await db
+    const row = db
       .insert(titles)
       .values({
         tmdbId: movie.id,
@@ -126,7 +123,7 @@ export async function importTitle(
   }
 
   const show = await getTvDetails(tmdbId);
-  const row = await db
+  const row = db
     .insert(titles)
     .values({
       tmdbId: show.id,
@@ -164,19 +161,14 @@ export async function importTitle(
 }
 
 export async function refreshTitle(titleId: string) {
-  const title = await db
-    .select()
-    .from(titles)
-    .where(eq(titles.id, titleId))
-    .get();
+  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title) return null;
 
   const now = new Date();
 
   if (title.type === "movie") {
     const movie = await getMovieDetails(title.tmdbId);
-    await db
-      .update(titles)
+    db.update(titles)
       .set({
         title: movie.title,
         originalTitle: movie.original_title,
@@ -194,8 +186,7 @@ export async function refreshTitle(titleId: string) {
       .run();
   } else {
     const show = await getTvDetails(title.tmdbId);
-    await db
-      .update(titles)
+    db.update(titles)
       .set({
         title: show.name,
         originalTitle: show.original_name,
@@ -214,11 +205,7 @@ export async function refreshTitle(titleId: string) {
     await refreshTvChildren(titleId, title.tmdbId, show.number_of_seasons);
   }
 
-  const updated = await db
-    .select()
-    .from(titles)
-    .where(eq(titles.id, titleId))
-    .get();
+  const updated = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (updated) {
     extractAndStoreColors(updated.id, updated.posterPath).catch(() => {});
     if (imageCacheEnabled()) {
@@ -243,7 +230,7 @@ export async function refreshTvChildren(
     try {
       const seasonData = await getTvSeasonDetails(tmdbId, sn);
 
-      const seasonRow = await db
+      const seasonRow = db
         .insert(seasons)
         .values({
           titleId,
@@ -268,8 +255,7 @@ export async function refreshTvChildren(
         .get();
 
       for (const ep of seasonData.episodes) {
-        await db
-          .insert(episodes)
+        db.insert(episodes)
           .values({
             seasonId: seasonRow.id,
             episodeNumber: ep.episode_number,
@@ -300,11 +286,7 @@ export async function refreshTvChildren(
 }
 
 export async function refreshRecommendations(titleId: string) {
-  const title = await db
-    .select()
-    .from(titles)
-    .where(eq(titles.id, titleId))
-    .get();
+  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title) return;
 
   const now = new Date();
@@ -322,7 +304,7 @@ export async function refreshRecommendations(titleId: string) {
     if (type !== "movie" && type !== "tv") continue;
 
     // Minimal upsert of the recommended title
-    const existing = await db
+    const existing = db
       .select()
       .from(titles)
       .where(eq(titles.tmdbId, r.id))
@@ -331,7 +313,7 @@ export async function refreshRecommendations(titleId: string) {
     if (existing) {
       recTitleId = existing.id;
     } else {
-      const row = await db
+      const row = db
         .insert(titles)
         .values({
           tmdbId: r.id,
@@ -352,7 +334,7 @@ export async function refreshRecommendations(titleId: string) {
         .returning()
         .get();
       if (!row) {
-        const found = await db
+        const found = db
           .select()
           .from(titles)
           .where(eq(titles.tmdbId, r.id))
@@ -364,8 +346,7 @@ export async function refreshRecommendations(titleId: string) {
       }
     }
 
-    await db
-      .insert(titleRecommendations)
+    db.insert(titleRecommendations)
       .values({
         titleId,
         recommendedTitleId: recTitleId,
@@ -390,7 +371,7 @@ export async function refreshRecommendations(titleId: string) {
     const type = r.media_type ?? title.type;
     if (type !== "movie" && type !== "tv") continue;
 
-    const existing = await db
+    const existing = db
       .select()
       .from(titles)
       .where(eq(titles.tmdbId, r.id))
@@ -399,7 +380,7 @@ export async function refreshRecommendations(titleId: string) {
     if (existing) {
       recTitleId = existing.id;
     } else {
-      const row = await db
+      const row = db
         .insert(titles)
         .values({
           tmdbId: r.id,
@@ -420,7 +401,7 @@ export async function refreshRecommendations(titleId: string) {
         .returning()
         .get();
       if (!row) {
-        const found = await db
+        const found = db
           .select()
           .from(titles)
           .where(eq(titles.tmdbId, r.id))
@@ -432,8 +413,7 @@ export async function refreshRecommendations(titleId: string) {
       }
     }
 
-    await db
-      .insert(titleRecommendations)
+    db.insert(titleRecommendations)
       .values({
         titleId,
         recommendedTitleId: recTitleId,
@@ -458,15 +438,14 @@ export async function getTitleWithChildren(id: string): Promise<{
   seasons: Season[];
   availability: AvailabilityOffer[];
 } | null> {
-  let title = await db.select().from(titles).where(eq(titles.id, id)).get();
+  let title = db.select().from(titles).where(eq(titles.id, id)).get();
   if (!title) return null;
 
   // If this is a shell TV title, fetch full details now
   if (title.type === "tv" && !title.lastFetchedAt) {
     try {
       const show = await getTvDetails(title.tmdbId);
-      await db
-        .update(titles)
+      db.update(titles)
         .set({
           overview: show.overview,
           posterPath: show.poster_path,
@@ -477,9 +456,7 @@ export async function getTitleWithChildren(id: string): Promise<{
         .where(eq(titles.id, id))
         .run();
       await refreshTvChildren(id, title.tmdbId, show.number_of_seasons);
-      title =
-        (await db.select().from(titles).where(eq(titles.id, id)).get()) ??
-        title;
+      title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
     } catch {
       // Continue with whatever data we have
     }
@@ -489,8 +466,7 @@ export async function getTitleWithChildren(id: string): Promise<{
   if (title.type === "movie" && !title.lastFetchedAt) {
     try {
       const movie = await getMovieDetails(title.tmdbId);
-      await db
-        .update(titles)
+      db.update(titles)
         .set({
           title: movie.title,
           originalTitle: movie.original_title,
@@ -506,9 +482,7 @@ export async function getTitleWithChildren(id: string): Promise<{
         })
         .where(eq(titles.id, id))
         .run();
-      title =
-        (await db.select().from(titles).where(eq(titles.id, id)).get()) ??
-        title;
+      title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
     } catch {
       // Continue with whatever data we have
     }
@@ -517,26 +491,24 @@ export async function getTitleWithChildren(id: string): Promise<{
   let titleSeasons: Season[] = [];
 
   if (title.type === "tv") {
-    const seasonRows = await db
+    const seasonRows = db
       .select()
       .from(seasons)
       .where(eq(seasons.titleId, title.id))
       .orderBy(seasons.seasonNumber)
       .all();
 
-    titleSeasons = await Promise.all(
-      seasonRows.map(async (s) => ({
-        id: s.id,
-        seasonNumber: s.seasonNumber,
-        name: s.name,
-        episodes: (
-          await db
-            .select()
-            .from(episodes)
-            .where(eq(episodes.seasonId, s.id))
-            .orderBy(episodes.episodeNumber)
-            .all()
-        ).map(
+    titleSeasons = seasonRows.map((s) => ({
+      id: s.id,
+      seasonNumber: s.seasonNumber,
+      name: s.name,
+      episodes: db
+        .select()
+        .from(episodes)
+        .where(eq(episodes.seasonId, s.id))
+        .orderBy(episodes.episodeNumber)
+        .all()
+        .map(
           (ep): Episode => ({
             id: ep.id,
             episodeNumber: ep.episodeNumber,
@@ -547,24 +519,22 @@ export async function getTitleWithChildren(id: string): Promise<{
             runtimeMinutes: ep.runtimeMinutes,
           }),
         ),
-      })),
-    );
+    }));
   }
 
-  const availability = (
-    await db
-      .select()
-      .from(availabilityOffers)
-      .where(eq(availabilityOffers.titleId, title.id))
-      .all()
-  ).map(
-    (a): AvailabilityOffer => ({
-      providerId: a.providerId,
-      providerName: a.providerName,
-      logoPath: tmdbImageUrl(a.logoPath, "w92"),
-      offerType: a.offerType,
-    }),
-  );
+  const availability = db
+    .select()
+    .from(availabilityOffers)
+    .where(eq(availabilityOffers.titleId, title.id))
+    .all()
+    .map(
+      (a): AvailabilityOffer => ({
+        providerId: a.providerId,
+        providerName: a.providerName,
+        logoPath: tmdbImageUrl(a.logoPath, "w92"),
+        offerType: a.offerType,
+      }),
+    );
 
   // Lazy color extraction — await so the palette is available for theming
   let palette = parseColorPalette(title.colorPalette);

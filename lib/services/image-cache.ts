@@ -121,11 +121,7 @@ export async function fetchAndMaybeCache(
 }
 
 export async function cacheImagesForTitle(titleId: string) {
-  const title = await db
-    .select()
-    .from(titles)
-    .where(eq(titles.id, titleId))
-    .get();
+  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title) return;
 
   const tasks: Promise<unknown>[] = [];
@@ -145,7 +141,7 @@ export async function cacheImagesForTitle(titleId: string) {
 
   // Season posters
   if (title.type === "tv") {
-    const allSeasons = await db
+    const allSeasons = db
       .select()
       .from(seasons)
       .where(eq(seasons.titleId, titleId))
@@ -164,14 +160,14 @@ export async function cacheImagesForTitle(titleId: string) {
 }
 
 export async function cacheEpisodeStills(titleId: string) {
-  const allSeasons = await db
+  const allSeasons = db
     .select()
     .from(seasons)
     .where(eq(seasons.titleId, titleId))
     .all();
 
   for (const s of allSeasons) {
-    const eps = await db
+    const eps = db
       .select()
       .from(episodes)
       .where(eq(episodes.seasonId, s.id))
@@ -191,7 +187,7 @@ export async function cacheEpisodeStills(titleId: string) {
 }
 
 export async function cacheProviderLogos(titleId: string) {
-  const offers = await db
+  const offers = db
     .select()
     .from(availabilityOffers)
     .where(eq(availabilityOffers.titleId, titleId))

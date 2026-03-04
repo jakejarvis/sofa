@@ -197,12 +197,9 @@ async function resolveEpisode(event: WebhookEvent): Promise<{
 
 // ─── Deduplication ──────────────────────────────────────────────────
 
-async function isDuplicateMovieWatch(
-  userId: string,
-  titleId: string,
-): Promise<boolean> {
+function isDuplicateMovieWatch(userId: string, titleId: string): boolean {
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-  const recent = await db
+  const recent = db
     .select()
     .from(userMovieWatches)
     .where(
@@ -216,12 +213,9 @@ async function isDuplicateMovieWatch(
   return !!recent;
 }
 
-async function isDuplicateEpisodeWatch(
-  userId: string,
-  episodeId: string,
-): Promise<boolean> {
+function isDuplicateEpisodeWatch(userId: string, episodeId: string): boolean {
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-  const recent = await db
+  const recent = db
     .select()
     .from(userEpisodeWatches)
     .where(
@@ -237,14 +231,13 @@ async function isDuplicateEpisodeWatch(
 
 // ─── Event Logging ──────────────────────────────────────────────────
 
-async function logEvent(
+function logEvent(
   connectionId: string,
   event: WebhookEvent | null,
   status: "success" | "ignored" | "error",
   errorMessage?: string,
 ) {
-  await db
-    .insert(webhookEventLog)
+  db.insert(webhookEventLog)
     .values({
       connectionId,
       eventType: event?.provider === "plex" ? "media.scrobble" : "PlaybackStop",
@@ -256,8 +249,7 @@ async function logEvent(
     })
     .run();
 
-  await db
-    .update(webhookConnections)
+  db.update(webhookConnections)
     .set({ lastEventAt: new Date() })
     .where(eq(webhookConnections.id, connectionId))
     .run();
@@ -275,7 +267,7 @@ export async function processWebhook(
     if (event.mediaType === "movie") {
       const tmdbId = await resolveMovieTmdbId(event);
       if (!tmdbId) {
-        await logEvent(
+        logEvent(
           connectionId,
           event,
           "error",
@@ -286,12 +278,12 @@ export async function processWebhook(
 
       const title = await importTitle(tmdbId, "movie");
       if (!title) {
-        await logEvent(connectionId, event, "error", "Failed to import movie");
+        logEvent(connectionId, event, "error", "Failed to import movie");
         return { status: "error", message: "Failed to import movie" };
       }
 
-      if (await isDuplicateMovieWatch(userId, title.id)) {
-        await logEvent(
+      if (isDuplicateMovieWatch(userId, title.id)) {
+        logEvent(
           connectionId,
           event,
           "ignored",
@@ -300,36 +292,26 @@ export async function processWebhook(
         return { status: "ignored", message: "Duplicate watch" };
       }
 
-      await logMovieWatch(userId, title.id, provider);
-      await logEvent(connectionId, event, "success");
+      logMovieWatch(userId, title.id, provider);
+      logEvent(connectionId, event, "success");
       return { status: "success", message: `Logged watch for ${event.title}` };
     }
 
     if (event.mediaType === "episode") {
       const resolved = await resolveEpisode(event);
       if (!resolved) {
-        await logEvent(
-          connectionId,
-          event,
-          "error",
-          "Could not resolve episode",
-        );
+        logEvent(connectionId, event, "error", "Could not resolve episode");
         return { status: "error", message: "Could not resolve episode" };
       }
 
       const title = await importTitle(resolved.showTmdbId, "tv");
       if (!title) {
-        await logEvent(
-          connectionId,
-          event,
-          "error",
-          "Failed to import TV show",
-        );
+        logEvent(connectionId, event, "error", "Failed to import TV show");
         return { status: "error", message: "Failed to import TV show" };
       }
 
       // Find the episode in our DB
-      const season = await db
+      const season = db
         .select()
         .from(seasons)
         .where(
@@ -341,7 +323,7 @@ export async function processWebhook(
         .get();
 
       if (!season) {
-        await logEvent(
+        logEvent(
           connectionId,
           event,
           "error",
@@ -353,7 +335,7 @@ export async function processWebhook(
         };
       }
 
-      const episode = await db
+      const episode = db
         .select()
         .from(episodes)
         .where(
@@ -365,7 +347,7 @@ export async function processWebhook(
         .get();
 
       if (!episode) {
-        await logEvent(
+        logEvent(
           connectionId,
           event,
           "error",
@@ -377,8 +359,8 @@ export async function processWebhook(
         };
       }
 
-      if (await isDuplicateEpisodeWatch(userId, episode.id)) {
-        await logEvent(
+      if (isDuplicateEpisodeWatch(userId, episode.id)) {
+        logEvent(
           connectionId,
           event,
           "ignored",
@@ -387,12 +369,12 @@ export async function processWebhook(
         return { status: "ignored", message: "Duplicate watch" };
       }
 
-      await logEpisodeWatch(userId, episode.id, provider);
-      await logEvent(connectionId, event, "success");
+      logEpisodeWatch(userId, episode.id, provider);
+      logEvent(connectionId, event, "success");
       return { status: "success", message: `Logged watch for ${event.title}` };
     }
 
-    await logEvent(
+    logEvent(
       connectionId,
       event,
       "ignored",
@@ -401,7 +383,11 @@ export async function processWebhook(
     return { status: "ignored", message: "Unsupported media type" };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    await logEvent(connectionId, event, "error", message).catch(() => {});
+    try {
+      logEvent(connectionId, event, "error", message);
+    } catch {
+      // best-effort
+    }
     return { status: "error", message };
   }
 }

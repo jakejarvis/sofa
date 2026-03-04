@@ -17,47 +17,41 @@ export default async function SettingsPage() {
 
   const isAdmin = session.user.role === "admin";
 
-  const [connections, registrationOpen] = await Promise.all([
-    (async () => {
-      const rows = await db
+  const connections = db
+    .select()
+    .from(webhookConnections)
+    .where(eq(webhookConnections.userId, session.user.id))
+    .all()
+    .map((conn) => {
+      const events = db
         .select()
-        .from(webhookConnections)
-        .where(eq(webhookConnections.userId, session.user.id))
+        .from(webhookEventLog)
+        .where(eq(webhookEventLog.connectionId, conn.id))
+        .orderBy(desc(webhookEventLog.receivedAt))
+        .limit(10)
         .all();
 
-      return Promise.all(
-        rows.map(async (conn) => {
-          const events = await db
-            .select()
-            .from(webhookEventLog)
-            .where(eq(webhookEventLog.connectionId, conn.id))
-            .orderBy(desc(webhookEventLog.receivedAt))
-            .limit(10)
-            .all();
+      return {
+        id: conn.id,
+        provider: conn.provider,
+        token: conn.token,
+        mediaServerUsername: conn.mediaServerUsername,
+        enabled: conn.enabled,
+        lastEventAt: conn.lastEventAt?.toISOString() ?? null,
+        recentEvents: events.map((e) => ({
+          id: e.id,
+          eventType: e.eventType,
+          mediaType: e.mediaType,
+          mediaTitle: e.mediaTitle,
+          status: e.status,
+          receivedAt: e.receivedAt.toISOString(),
+        })),
+      };
+    });
 
-          return {
-            id: conn.id,
-            provider: conn.provider,
-            token: conn.token,
-            mediaServerUsername: conn.mediaServerUsername,
-            enabled: conn.enabled,
-            lastEventAt: conn.lastEventAt?.toISOString() ?? null,
-            recentEvents: events.map((e) => ({
-              id: e.id,
-              eventType: e.eventType,
-              mediaType: e.mediaType,
-              mediaTitle: e.mediaTitle,
-              status: e.status,
-              receivedAt: e.receivedAt.toISOString(),
-            })),
-          };
-        }),
-      );
-    })(),
-    isAdmin
-      ? getSetting("registrationOpen").then((v) => v === "true")
-      : Promise.resolve(false),
-  ]);
+  const registrationOpen = isAdmin
+    ? getSetting("registrationOpen") === "true"
+    : false;
 
   const repoUrl = "https://github.com/jakejarvis/sofa";
 

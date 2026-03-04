@@ -58,8 +58,8 @@ function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-async function getLibraryTitleIds(): Promise<string[]> {
-  const rows = await db
+function getLibraryTitleIds(): string[] {
+  const rows = db
     .select({ titleId: userTitleStatus.titleId })
     .from(userTitleStatus)
     .groupBy(userTitleStatus.titleId)
@@ -69,13 +69,13 @@ async function getLibraryTitleIds(): Promise<string[]> {
 
 // Refresh titles where lastFetchedAt is stale
 async function nightlyRefreshLibrary() {
-  const libraryIds = await getLibraryTitleIds();
+  const libraryIds = getLibraryTitleIds();
   const libraryStale = new Date(Date.now() - 7 * DAY);
   const nonLibraryStale = new Date(Date.now() - 30 * DAY);
 
   // Library titles: 7 days
   for (const titleId of libraryIds) {
-    const t = await db
+    const t = db
       .select()
       .from(titles)
       .where(
@@ -89,7 +89,7 @@ async function nightlyRefreshLibrary() {
   }
 
   // Non-library titles: 30 days
-  const nonLibrary = await db
+  const nonLibrary = db
     .select()
     .from(titles)
     .where(
@@ -111,12 +111,12 @@ async function nightlyRefreshLibrary() {
 
 // Refresh availability for library titles where stale
 async function refreshAvailabilityJob() {
-  const libraryIds = await getLibraryTitleIds();
+  const libraryIds = getLibraryTitleIds();
   const stale = new Date(Date.now() - DAY);
 
   for (const titleId of libraryIds) {
     // Check if any offer is stale
-    const offer = await db
+    const offer = db
       .select()
       .from(availabilityOffers)
       .where(
@@ -128,7 +128,7 @@ async function refreshAvailabilityJob() {
       .get();
 
     // Also handle titles with no offers yet
-    const anyOffer = await db
+    const anyOffer = db
       .select()
       .from(availabilityOffers)
       .where(eq(availabilityOffers.titleId, titleId))
@@ -143,7 +143,7 @@ async function refreshAvailabilityJob() {
 
 // Refresh recommendations for recently active titles
 async function refreshRecommendationsJob() {
-  const libraryIds = await getLibraryTitleIds();
+  const libraryIds = getLibraryTitleIds();
 
   for (const titleId of libraryIds) {
     await refreshRecommendations(titleId);
@@ -156,7 +156,7 @@ async function refreshTvChildrenJob() {
   const returningStatuses = ["Returning Series", "In Production"];
   const stale = new Date(Date.now() - 7 * DAY);
 
-  const tvShows = await db
+  const tvShows = db
     .select()
     .from(titles)
     .where(
@@ -170,7 +170,7 @@ async function refreshTvChildrenJob() {
 
   for (const show of tvShows) {
     // Check if seasons are stale
-    const staleSeason = await db
+    const staleSeason = db
       .select()
       .from(seasons)
       .where(
@@ -190,7 +190,7 @@ async function refreshTvChildrenJob() {
 async function cacheImagesJob() {
   if (!imageCacheEnabled()) return;
 
-  const libraryIds = await getLibraryTitleIds();
+  const libraryIds = getLibraryTitleIds();
 
   for (const titleId of libraryIds) {
     try {

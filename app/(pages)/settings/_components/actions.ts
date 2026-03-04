@@ -28,7 +28,7 @@ export async function saveWebhookConnection(
     throw new Error("Media server username is required");
   }
 
-  const existing = await db
+  const existing = db
     .select()
     .from(webhookConnections)
     .where(
@@ -40,7 +40,7 @@ export async function saveWebhookConnection(
     .get();
 
   if (existing) {
-    const connection = await db
+    const connection = db
       .update(webhookConnections)
       .set({
         mediaServerUsername: mediaServerUsername.trim(),
@@ -59,7 +59,7 @@ export async function saveWebhookConnection(
   const token = crypto.randomBytes(32).toString("hex");
   const now = new Date();
 
-  const connection = await db
+  const connection = db
     .insert(webhookConnections)
     .values({
       userId: session.user.id,
@@ -86,8 +86,7 @@ export async function deleteWebhookConnection(provider: "plex" | "jellyfin") {
     throw new Error("Invalid provider");
   }
 
-  await db
-    .delete(webhookConnections)
+  db.delete(webhookConnections)
     .where(
       and(
         eq(webhookConnections.userId, session.user.id),
@@ -106,7 +105,7 @@ export async function regenerateWebhookToken(provider: "plex" | "jellyfin") {
 
   const newToken = crypto.randomBytes(32).toString("hex");
 
-  const connection = await db
+  const connection = db
     .update(webhookConnections)
     .set({ token: newToken })
     .where(
@@ -136,5 +135,5 @@ export async function toggleRegistration(open: boolean) {
     throw new Error("Forbidden");
   }
 
-  await setSetting("registrationOpen", String(open));
+  setSetting("registrationOpen", String(open));
 }

@@ -51,8 +51,7 @@ export async function extractAndStoreColors(
       lightMuted: palette.LightMuted?.hex ?? null,
     };
 
-    await db
-      .update(titles)
+    db.update(titles)
       .set({ colorPalette: JSON.stringify(colors) })
       .where(eq(titles.id, titleId))
       .run();

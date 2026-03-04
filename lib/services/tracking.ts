@@ -10,7 +10,7 @@ import {
   userTitleStatus,
 } from "@/lib/db/schema";
 
-export async function setTitleStatus(
+export function setTitleStatus(
   userId: string,
   titleId: string,
   status: "watchlist" | "in_progress" | "completed",
@@ -18,8 +18,7 @@ export async function setTitleStatus(
   source: "manual" | "import" | "plex" | "jellyfin" = "manual",
 ) {
   const now = new Date();
-  await db
-    .insert(userTitleStatus)
+  db.insert(userTitleStatus)
     .values({ userId, titleId, status, addedAt: now, updatedAt: now })
     .onConflictDoUpdate({
       target: [userTitleStatus.userId, userTitleStatus.titleId],
@@ -28,9 +27,8 @@ export async function setTitleStatus(
     .run();
 }
 
-export async function removeTitleStatus(userId: string, titleId: string) {
-  await db
-    .delete(userTitleStatus)
+export function removeTitleStatus(userId: string, titleId: string) {
+  db.delete(userTitleStatus)
     .where(
       and(
         eq(userTitleStatus.userId, userId),
@@ -40,19 +38,18 @@ export async function removeTitleStatus(userId: string, titleId: string) {
     .run();
 }
 
-export async function logMovieWatch(
+export function logMovieWatch(
   userId: string,
   titleId: string,
   source: "manual" | "import" | "plex" | "jellyfin" = "manual",
 ) {
   const now = new Date();
-  await db
-    .insert(userMovieWatches)
+  db.insert(userMovieWatches)
     .values({ userId, titleId, watchedAt: now, source })
     .run();
 
   // Auto-set status to completed
-  const existing = await db
+  const existing = db
     .select()
     .from(userTitleStatus)
     .where(
@@ -64,31 +61,26 @@ export async function logMovieWatch(
     .get();
 
   if (!existing) {
-    await setTitleStatus(userId, titleId, "completed", source);
+    setTitleStatus(userId, titleId, "completed", source);
   } else if (existing.status !== "completed") {
-    await setTitleStatus(userId, titleId, "completed", source);
+    setTitleStatus(userId, titleId, "completed", source);
   }
 }
 
-export async function logEpisodeWatch(
+export function logEpisodeWatch(
   userId: string,
   episodeId: string,
   source: "manual" | "import" | "plex" | "jellyfin" = "manual",
 ) {
   const now = new Date();
-  await db
-    .insert(userEpisodeWatches)
+  db.insert(userEpisodeWatches)
     .values({ userId, episodeId, watchedAt: now, source })
     .run();
 
   // Find the title for this episode
-  const ep = await db
-    .select()
-    .from(episodes)
-    .where(eq(episodes.id, episodeId))
-    .get();
+  const ep = db.select().from(episodes).where(eq(episodes.id, episodeId)).get();
   if (!ep) return;
-  const season = await db
+  const season = db
     .select()
     .from(seasons)
     .where(eq(seasons.id, ep.seasonId))
@@ -97,7 +89,7 @@ export async function logEpisodeWatch(
   const titleId = season.titleId;
 
   // Auto-set status to in_progress if not set
-  const existing = await db
+  const existing = db
     .select()
     .from(userTitleStatus)
     .where(
@@ -109,41 +101,37 @@ export async function logEpisodeWatch(
     .get();
 
   if (!existing) {
-    await setTitleStatus(userId, titleId, "in_progress", source);
+    setTitleStatus(userId, titleId, "in_progress", source);
   }
 
   // Check if all episodes are watched -> auto-complete
-  await checkAllEpisodesWatched(userId, titleId);
+  checkAllEpisodesWatched(userId, titleId);
 }
 
-export async function markAllEpisodesWatched(
+export function markAllEpisodesWatched(
   userId: string,
   titleId: string,
   source: "manual" | "import" | "plex" | "jellyfin" = "manual",
 ) {
-  const title = await db
-    .select()
-    .from(titles)
-    .where(eq(titles.id, titleId))
-    .get();
+  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title || title.type !== "tv") return;
 
   const now = new Date();
-  const allSeasons = await db
+  const allSeasons = db
     .select()
     .from(seasons)
     .where(eq(seasons.titleId, titleId))
     .all();
 
   for (const s of allSeasons) {
-    const eps = await db
+    const eps = db
       .select()
       .from(episodes)
       .where(eq(episodes.seasonId, s.id))
       .all();
 
     for (const ep of eps) {
-      const existing = await db
+      const existing = db
         .select()
         .from(userEpisodeWatches)
         .where(
@@ -154,8 +142,7 @@ export async function markAllEpisodesWatched(
         )
         .get();
       if (!existing) {
-        await db
-          .insert(userEpisodeWatches)
+        db.insert(userEpisodeWatches)
           .values({
             userId,
             episodeId: ep.id,
@@ -167,11 +154,11 @@ export async function markAllEpisodesWatched(
     }
   }
 
-  await setTitleStatus(userId, titleId, "completed", source);
+  setTitleStatus(userId, titleId, "completed", source);
 }
 
-async function checkAllEpisodesWatched(userId: string, titleId: string) {
-  const allSeasons = await db
+function checkAllEpisodesWatched(userId: string, titleId: string) {
+  const allSeasons = db
     .select()
     .from(seasons)
     .where(eq(seasons.titleId, titleId))
@@ -181,7 +168,7 @@ async function checkAllEpisodesWatched(userId: string, titleId: string) {
   let watchedEpisodes = 0;
 
   for (const s of allSeasons) {
-    const eps = await db
+    const eps = db
       .select()
       .from(episodes)
       .where(eq(episodes.seasonId, s.id))
@@ -189,7 +176,7 @@ async function checkAllEpisodesWatched(userId: string, titleId: string) {
     totalEpisodes += eps.length;
 
     for (const ep of eps) {
-      const watch = await db
+      const watch = db
         .select()
         .from(userEpisodeWatches)
         .where(
@@ -204,13 +191,12 @@ async function checkAllEpisodesWatched(userId: string, titleId: string) {
   }
 
   if (totalEpisodes > 0 && watchedEpisodes >= totalEpisodes) {
-    await setTitleStatus(userId, titleId, "completed");
+    setTitleStatus(userId, titleId, "completed");
   }
 }
 
-export async function unwatchEpisode(userId: string, episodeId: string) {
-  await db
-    .delete(userEpisodeWatches)
+export function unwatchEpisode(userId: string, episodeId: string) {
+  db.delete(userEpisodeWatches)
     .where(
       and(
         eq(userEpisodeWatches.userId, userId),
@@ -220,20 +206,16 @@ export async function unwatchEpisode(userId: string, episodeId: string) {
     .run();
 
   // Find parent title and downgrade from completed to in_progress
-  const ep = await db
-    .select()
-    .from(episodes)
-    .where(eq(episodes.id, episodeId))
-    .get();
+  const ep = db.select().from(episodes).where(eq(episodes.id, episodeId)).get();
   if (!ep) return;
-  const season = await db
+  const season = db
     .select()
     .from(seasons)
     .where(eq(seasons.id, ep.seasonId))
     .get();
   if (!season) return;
 
-  const existing = await db
+  const existing = db
     .select()
     .from(userTitleStatus)
     .where(
@@ -245,12 +227,12 @@ export async function unwatchEpisode(userId: string, episodeId: string) {
     .get();
 
   if (existing?.status === "completed") {
-    await setTitleStatus(userId, season.titleId, "in_progress");
+    setTitleStatus(userId, season.titleId, "in_progress");
   }
 }
 
-export async function unwatchSeason(userId: string, seasonId: string) {
-  const seasonEps = await db
+export function unwatchSeason(userId: string, seasonId: string) {
+  const seasonEps = db
     .select()
     .from(episodes)
     .where(eq(episodes.seasonId, seasonId))
@@ -258,8 +240,7 @@ export async function unwatchSeason(userId: string, seasonId: string) {
 
   const epIds = seasonEps.map((ep) => ep.id);
   if (epIds.length > 0) {
-    await db
-      .delete(userEpisodeWatches)
+    db.delete(userEpisodeWatches)
       .where(
         and(
           eq(userEpisodeWatches.userId, userId),
@@ -270,14 +251,14 @@ export async function unwatchSeason(userId: string, seasonId: string) {
   }
 
   // Find parent title and downgrade from completed to in_progress
-  const season = await db
+  const season = db
     .select()
     .from(seasons)
     .where(eq(seasons.id, seasonId))
     .get();
   if (!season) return;
 
-  const existing = await db
+  const existing = db
     .select()
     .from(userTitleStatus)
     .where(
@@ -289,27 +270,25 @@ export async function unwatchSeason(userId: string, seasonId: string) {
     .get();
 
   if (existing?.status === "completed") {
-    await setTitleStatus(userId, season.titleId, "in_progress");
+    setTitleStatus(userId, season.titleId, "in_progress");
   }
 }
 
-export async function rateTitleStars(
+export function rateTitleStars(
   userId: string,
   titleId: string,
   ratingStars: number,
 ) {
   const now = new Date();
   if (ratingStars === 0) {
-    await db
-      .delete(userRatings)
+    db.delete(userRatings)
       .where(
         and(eq(userRatings.userId, userId), eq(userRatings.titleId, titleId)),
       )
       .run();
     return;
   }
-  await db
-    .insert(userRatings)
+  db.insert(userRatings)
     .values({ userId, titleId, ratingStars, ratedAt: now })
     .onConflictDoUpdate({
       target: [userRatings.userId, userRatings.titleId],
@@ -318,8 +297,8 @@ export async function rateTitleStars(
     .run();
 }
 
-export async function getUserTitleInfo(userId: string, titleId: string) {
-  const status = await db
+export function getUserTitleInfo(userId: string, titleId: string) {
+  const status = db
     .select()
     .from(userTitleStatus)
     .where(
@@ -330,7 +309,7 @@ export async function getUserTitleInfo(userId: string, titleId: string) {
     )
     .get();
 
-  const rating = await db
+  const rating = db
     .select()
     .from(userRatings)
     .where(
@@ -339,7 +318,7 @@ export async function getUserTitleInfo(userId: string, titleId: string) {
     .get();
 
   // Get watched episode IDs for this title
-  const titleSeasons = await db
+  const titleSeasons = db
     .select()
     .from(seasons)
     .where(eq(seasons.titleId, titleId))
@@ -347,13 +326,13 @@ export async function getUserTitleInfo(userId: string, titleId: string) {
 
   const watchedEpisodeIds: string[] = [];
   for (const s of titleSeasons) {
-    const eps = await db
+    const eps = db
       .select()
       .from(episodes)
       .where(eq(episodes.seasonId, s.id))
       .all();
     for (const ep of eps) {
-      const watch = await db
+      const watch = db
         .select()
         .from(userEpisodeWatches)
         .where(
