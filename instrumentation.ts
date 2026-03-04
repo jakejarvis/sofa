@@ -4,6 +4,9 @@ export async function onRequestError() {
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
+    const { createLogger } = await import("@/lib/logger");
+    const log = createLogger("server");
+
     // Ensure image cache directories exist (all environments)
     const { ensureImageDirs, imageCacheEnabled } = await import(
       "@/lib/services/image-cache"
@@ -24,11 +27,11 @@ export async function register() {
     const { closeDatabase } = await import("@/lib/db/client");
 
     const shutdown = () => {
-      console.log("[shutdown] Stopping scheduler...");
+      log.info("Stopping scheduler...");
       stopJobs();
-      console.log("[shutdown] Closing database...");
+      log.info("Closing database...");
       closeDatabase();
-      console.log("[shutdown] Clean shutdown complete");
+      log.info("Clean shutdown complete");
       process.exit(0);
     };
 

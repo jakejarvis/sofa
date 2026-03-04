@@ -7,6 +7,7 @@ import {
   titles,
   userTitleStatus,
 } from "@/lib/db/schema";
+import { createLogger } from "@/lib/logger";
 import { refreshAvailability } from "@/lib/services/availability";
 import {
   cacheEpisodeStills,
@@ -20,6 +21,8 @@ import {
   refreshTvChildren,
 } from "@/lib/services/metadata";
 import { getTvDetails } from "@/lib/tmdb/client";
+
+const log = createLogger("cron");
 
 const DAY = 24 * 60 * 60 * 1000;
 const RATE_LIMIT_MS = 300;
@@ -42,13 +45,13 @@ function schedule(name: string, cron: string, handler: () => Promise<void>) {
         name,
         protect: true,
         catch: (err: unknown) => {
-          console.error(`[scheduler] Job ${name} failed:`, err);
+          log.error(`Job ${name} failed:`, err);
         },
       },
       async () => {
-        console.log(`[scheduler] Running job: ${name}`);
+        log.info(`Running job: ${name}`);
         await handler();
-        console.log(`[scheduler] Completed job: ${name}`);
+        log.info(`Completed job: ${name}`);
       },
     ),
   );
@@ -213,7 +216,7 @@ export function startJobs() {
   schedule("refreshTvChildren", "30 */12 * * *", refreshTvChildrenJob);
   schedule("cacheImages", "0 1,13 * * *", cacheImagesJob);
 
-  console.log(`[scheduler] Started ${jobs.size} jobs`);
+  log.info(`Started ${jobs.size} jobs`);
 }
 
 export function stopJobs() {

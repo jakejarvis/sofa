@@ -1,8 +1,11 @@
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { createLogger } from "@/lib/logger";
 import { db } from "./client";
 
+const log = createLogger("db");
+
 export function runMigrations() {
-  console.log("[migrate] Running database migrations...");
+  log.info("Running database migrations...");
   migrate(db, { migrationsFolder: "./drizzle" });
-  console.log("[migrate] Database migrations complete");
+  log.info("Database migrations complete");
 }

@@ -3,12 +3,15 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { webhookConnections } from "@/lib/db/schema";
+import { createLogger } from "@/lib/logger";
 import type { WebhookEvent } from "@/lib/services/webhooks";
 import {
   parseJellyfinPayload,
   parsePlexPayload,
   processWebhook,
 } from "@/lib/services/webhooks";
+
+const log = createLogger("webhooks");
 
 export async function POST(
   req: NextRequest,
@@ -49,8 +52,9 @@ export async function POST(
       connection.provider,
       event,
     );
-  } catch {
+  } catch (err) {
     // Swallow errors — never return non-200 to media servers
+    log.debug("Webhook processing failed:", err);
   }
 
   return NextResponse.json({ ok: true });

@@ -9,6 +9,7 @@ import {
   isPasswordLoginDisabled,
 } from "@/lib/config";
 import { db } from "@/lib/db/client";
+import { createLogger } from "@/lib/logger";
 import {
   getUserCount,
   isRegistrationOpen,
@@ -36,7 +37,18 @@ const oidcPlugin = isOidcConfigured()
     ]
   : [];
 
+const authLog = createLogger("auth");
+
 export const auth = betterAuth({
+  logger: {
+    // Suppress unset secret/low entropy warnings during build
+    disabled: process.env.NEXT_PHASE === "phase-production-build",
+    level: "debug",
+    log: (level, message, ...args) => {
+      const fn = authLog[level as keyof typeof authLog];
+      if (fn) fn(message, ...args);
+    },
+  },
   database: drizzleAdapter(db, {
     provider: "sqlite",
   }),

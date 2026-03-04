@@ -7,6 +7,7 @@ import {
   titleRecommendations,
   titles,
 } from "@/lib/db/schema";
+import { createLogger } from "@/lib/logger";
 import {
   getMovieDetails,
   getRecommendations,
@@ -28,6 +29,8 @@ import {
   cacheImagesForTitle,
   imageCacheEnabled,
 } from "./image-cache";
+
+const log = createLogger("metadata");
 
 export async function importTitle(
   tmdbId: number,
@@ -277,10 +280,10 @@ export async function refreshTvChildren(
           })
           .run();
       }
-    } catch {
+    } catch (err) {
       // Skip this season and continue with the rest — partial data is
       // better than aborting entirely. The next refresh cycle will retry.
-      console.error(`Failed to fetch season ${sn} for TMDB ${tmdbId}`);
+      log.error(`Failed to fetch season ${sn} for TMDB ${tmdbId}:`, err);
     }
   }
 }
@@ -457,8 +460,8 @@ export async function getTitleWithChildren(id: string): Promise<{
         .run();
       await refreshTvChildren(id, title.tmdbId, show.number_of_seasons);
       title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
-    } catch {
-      // Continue with whatever data we have
+    } catch (err) {
+      log.debug(`Failed to hydrate shell TV title ${id}:`, err);
     }
   }
 
@@ -483,8 +486,8 @@ export async function getTitleWithChildren(id: string): Promise<{
         .where(eq(titles.id, id))
         .run();
       title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
-    } catch {
-      // Continue with whatever data we have
+    } catch (err) {
+      log.debug(`Failed to hydrate shell movie title ${id}:`, err);
     }
   }
 

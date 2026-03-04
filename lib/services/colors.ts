@@ -3,12 +3,15 @@ import { eq } from "drizzle-orm";
 import { Vibrant } from "node-vibrant/node";
 import { db } from "@/lib/db/client";
 import { titles } from "@/lib/db/schema";
+import { createLogger } from "@/lib/logger";
 import {
   downloadAndCacheImage,
   getLocalImagePath,
   imageCacheEnabled,
   isImageCached,
 } from "@/lib/services/image-cache";
+
+const log = createLogger("colors");
 
 export interface ColorPalette {
   vibrant: string | null;
@@ -58,7 +61,7 @@ export async function extractAndStoreColors(
 
     return colors;
   } catch (err) {
-    console.error(`Failed to extract colors for title ${titleId}:`, err);
+    log.error(`Failed to extract colors for title ${titleId}:`, err);
     return null;
   }
 }
