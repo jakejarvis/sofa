@@ -1,5 +1,3 @@
-import { statSync } from "node:fs";
-import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
@@ -31,15 +29,15 @@ export async function GET(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const buffer = await readFile(backupPath);
-  const stat = statSync(backupPath);
+  const file = Bun.file(backupPath);
+  const buffer = await file.arrayBuffer();
 
   return new NextResponse(new Uint8Array(buffer), {
     status: 200,
     headers: {
       "Content-Type": "application/x-sqlite3",
       "Content-Disposition": `attachment; filename="${safe}"`,
-      "Content-Length": String(stat.size),
+      "Content-Length": String(file.size),
     },
   });
 }

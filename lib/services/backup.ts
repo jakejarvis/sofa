@@ -8,7 +8,6 @@ import {
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { format } from "date-fns";
 import { sql } from "drizzle-orm";
@@ -112,7 +111,7 @@ export function getBackupPath(filename: string): string | null {
 export async function readBackupFile(filename: string): Promise<Buffer | null> {
   const filePath = getBackupPath(filename);
   if (!filePath) return null;
-  return readFile(filePath);
+  return Buffer.from(await Bun.file(filePath).arrayBuffer());
 }
 
 export function restoreFromBackup(buffer: Buffer): void {

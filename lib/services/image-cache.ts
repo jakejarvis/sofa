@@ -1,5 +1,4 @@
-import { existsSync, mkdirSync } from "node:fs";
-import { readFile, rename, writeFile } from "node:fs/promises";
+import { existsSync, mkdirSync, renameSync } from "node:fs";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
@@ -54,8 +53,9 @@ export async function readCachedImage(
   filename: string,
 ): Promise<Buffer | null> {
   const filePath = getLocalImagePath(category, filename);
-  if (!existsSync(filePath)) return null;
-  return readFile(filePath);
+  const file = Bun.file(filePath);
+  if (!(await file.exists())) return null;
+  return Buffer.from(await file.arrayBuffer());
 }
 
 export async function downloadAndCacheImage(
@@ -74,8 +74,8 @@ export async function downloadAndCacheImage(
   const tmpPath = `${finalPath}.tmp.${Date.now()}`;
 
   try {
-    await writeFile(tmpPath, buffer);
-    await rename(tmpPath, finalPath);
+    await Bun.write(tmpPath, buffer);
+    renameSync(tmpPath, finalPath);
   } catch {
     // Best-effort cleanup
   }
@@ -113,8 +113,8 @@ export async function fetchAndMaybeCache(
   // Fire-and-forget save to disk
   const finalPath = getLocalImagePath(category, filename);
   const tmpPath = `${finalPath}.tmp.${Date.now()}`;
-  writeFile(tmpPath, buffer)
-    .then(() => rename(tmpPath, finalPath))
+  Bun.write(tmpPath, buffer)
+    .then(() => renameSync(tmpPath, finalPath))
     .catch(() => {});
 
   return { buffer, contentType };

@@ -2,7 +2,6 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { admin, genericOAuth } from "better-auth/plugins";
-import { v4 as uuid } from "uuid";
 import {
   isOidcAutoRegisterEnabled,
   isOidcConfigured,
@@ -64,7 +63,7 @@ export const auth = betterAuth({
   plugins: [admin(), ...oidcPlugin],
   advanced: {
     database: {
-      generateId: () => uuid(),
+      generateId: () => crypto.randomUUID(),
     },
   },
   hooks: {
