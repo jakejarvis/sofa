@@ -8,7 +8,7 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -42,12 +42,7 @@ function formatBytes(bytes: number): string {
 }
 
 function formatBackupDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  return format(new Date(dateStr), "MMM d, h:mm a");
 }
 
 export function BackupSection({
@@ -159,7 +154,7 @@ export function BackupSection({
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconDatabaseExport size={16} className="text-primary" />
+              <IconDatabaseExport className="size-4 text-primary" />
             </div>
             <div>
               <CardTitle>Database snapshots</CardTitle>
@@ -171,7 +166,7 @@ export function BackupSection({
             </div>
           </div>
           <Button onClick={handleCreateBackup} disabled={creating}>
-            {creating ? <Spinner className="size-3" /> : <IconPlus size={14} />}
+            {creating ? <Spinner className="size-3" /> : <IconPlus />}
             {creating ? "Creating..." : "New backup"}
           </Button>
         </div>
@@ -216,6 +211,7 @@ export function BackupSection({
                       <Button
                         variant="ghost"
                         size="icon-sm"
+                        nativeButton={false}
                         render={
                           <a
                             href={`/api/backup/${backup.filename}`}
@@ -239,7 +235,7 @@ export function BackupSection({
                           }
                         >
                           {deleting === backup.filename ? (
-                            <Spinner className="size-3" />
+                            <Spinner />
                           ) : (
                             <IconTrash />
                           )}
@@ -280,7 +276,7 @@ export function BackupSection({
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted/50">
-              <IconCloudUpload size={16} className="text-muted-foreground" />
+              <IconCloudUpload className="size-4 text-muted-foreground" />
             </div>
             <div>
               <CardTitle>Restore</CardTitle>
@@ -322,11 +318,7 @@ export function BackupSection({
             onClick={() => fileInputRef.current?.click()}
             disabled={restoring}
           >
-            {restoring ? (
-              <Spinner className="size-3" />
-            ) : (
-              <IconCloudUpload size={14} />
-            )}
+            {restoring ? <Spinner /> : <IconCloudUpload />}
             {restoring ? "Restoring..." : "Upload"}
           </Button>
         </div>
@@ -337,7 +329,7 @@ export function BackupSection({
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted/50">
-              <IconCalendarRepeat size={16} className="text-muted-foreground" />
+              <IconCalendarRepeat className="size-4 text-muted-foreground" />
             </div>
             <div>
               <CardTitle>Scheduled backups</CardTitle>
