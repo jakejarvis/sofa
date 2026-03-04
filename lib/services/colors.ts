@@ -32,7 +32,7 @@ export async function extractAndStoreColors(
   let source: string;
   const filename = path.basename(posterPath);
   if (imageCacheEnabled()) {
-    if (!isImageCached("posters", filename)) {
+    if (!(await isImageCached("posters", filename))) {
       await downloadAndCacheImage(posterPath, "posters");
     }
     source = getLocalImagePath("posters", filename);

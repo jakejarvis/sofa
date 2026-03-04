@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, renameSync } from "node:fs";
+import { mkdir, rename } from "node:fs/promises";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
@@ -25,20 +25,17 @@ export function imageCacheEnabled(): boolean {
   return process.env.IMAGE_CACHE_ENABLED !== "false";
 }
 
-export function ensureImageDirs() {
+export async function ensureImageDirs() {
   for (const category of Object.keys(CATEGORY_SIZES)) {
-    const dir = path.join(CACHE_DIR, category);
-    if (!existsSync(dir)) {
-      mkdirSync(dir, { recursive: true });
-    }
+    await mkdir(path.join(CACHE_DIR, category), { recursive: true });
   }
 }
 
-export function isImageCached(
+export async function isImageCached(
   category: ImageCategory,
   filename: string,
-): boolean {
-  return existsSync(getLocalImagePath(category, filename));
+): Promise<boolean> {
+  return Bun.file(getLocalImagePath(category, filename)).exists();
 }
 
 export function getLocalImagePath(
@@ -75,7 +72,7 @@ export async function downloadAndCacheImage(
 
   try {
     await Bun.write(tmpPath, buffer);
-    renameSync(tmpPath, finalPath);
+    await rename(tmpPath, finalPath);
   } catch {
     // Best-effort cleanup
   }
@@ -114,7 +111,7 @@ export async function fetchAndMaybeCache(
   const finalPath = getLocalImagePath(category, filename);
   const tmpPath = `${finalPath}.tmp.${Date.now()}`;
   Bun.write(tmpPath, buffer)
-    .then(() => renameSync(tmpPath, finalPath))
+    .then(() => rename(tmpPath, finalPath))
     .catch(() => {});
 
   return { buffer, contentType };
@@ -128,13 +125,13 @@ export async function cacheImagesForTitle(titleId: string) {
 
   if (
     title.posterPath &&
-    !isImageCached("posters", path.basename(title.posterPath))
+    !(await isImageCached("posters", path.basename(title.posterPath)))
   ) {
     tasks.push(downloadAndCacheImage(title.posterPath, "posters"));
   }
   if (
     title.backdropPath &&
-    !isImageCached("backdrops", path.basename(title.backdropPath))
+    !(await isImageCached("backdrops", path.basename(title.backdropPath)))
   ) {
     tasks.push(downloadAndCacheImage(title.backdropPath, "backdrops"));
   }
@@ -149,7 +146,7 @@ export async function cacheImagesForTitle(titleId: string) {
     for (const s of allSeasons) {
       if (
         s.posterPath &&
-        !isImageCached("posters", path.basename(s.posterPath))
+        !(await isImageCached("posters", path.basename(s.posterPath)))
       ) {
         tasks.push(downloadAndCacheImage(s.posterPath, "posters"));
       }
@@ -177,7 +174,7 @@ export async function cacheEpisodeStills(titleId: string) {
     for (const ep of eps) {
       if (
         ep.stillPath &&
-        !isImageCached("stills", path.basename(ep.stillPath))
+        !(await isImageCached("stills", path.basename(ep.stillPath)))
       ) {
         tasks.push(downloadAndCacheImage(ep.stillPath, "stills"));
       }
@@ -198,7 +195,7 @@ export async function cacheProviderLogos(titleId: string) {
   for (const offer of offers) {
     if (offer.logoPath) {
       const basename = path.basename(offer.logoPath);
-      if (!seen.has(basename) && !isImageCached("logos", basename)) {
+      if (!seen.has(basename) && !(await isImageCached("logos", basename))) {
         seen.add(basename);
         tasks.push(downloadAndCacheImage(offer.logoPath, "logos"));
       }

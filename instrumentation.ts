@@ -12,12 +12,12 @@ export async function register() {
       "@/lib/services/image-cache"
     );
     if (imageCacheEnabled()) {
-      ensureImageDirs();
+      await ensureImageDirs();
     }
 
     // Ensure backup directory exists
     const { ensureBackupDir } = await import("@/lib/services/backup");
-    ensureBackupDir();
+    await ensureBackupDir();
 
     // Run database migrations on startup
     const { runMigrations } = await import("@/lib/db/migrate");

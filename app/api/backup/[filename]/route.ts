@@ -24,7 +24,7 @@ export async function GET(
     return NextResponse.json({ error: "Invalid filename" }, { status: 400 });
   }
 
-  const backupPath = getBackupPath(safe);
+  const backupPath = await getBackupPath(safe);
   if (!backupPath) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

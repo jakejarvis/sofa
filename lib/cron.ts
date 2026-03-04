@@ -220,12 +220,12 @@ async function scheduledBackupJob() {
     return;
   }
 
-  ensureBackupDir();
-  createBackup();
+  await ensureBackupDir();
+  await createBackup();
 
   const maxStr = getSetting("maxBackupRetention");
   const max = maxStr ? Number.parseInt(maxStr, 10) : 7;
-  pruneBackups(max);
+  await pruneBackups(max);
 }
 
 export function startJobs() {
