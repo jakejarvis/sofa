@@ -26,6 +26,7 @@
     "date-fns": "4.1.0",
     "drizzle-orm": "1.0.0-beta.15-859cf75",
     "embla-carousel-react": "8.6.0",
+    "embla-carousel-wheel-gestures": "8.1.0",
     "jotai": "2.18.0",
     "motion": "12.34.5",
     "next": "16.1.6",

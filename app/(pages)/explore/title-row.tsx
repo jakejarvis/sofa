@@ -1,7 +1,13 @@
 "use client";
 
+import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import { motion } from "motion/react";
 import { TitleCard } from "@/components/title-card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 
 interface TitleRowItem {
   tmdbId: number;
@@ -43,28 +49,36 @@ export function TitleRow({ heading, icon, items }: TitleRowProps) {
         <h2 className="font-display text-xl tracking-tight">{heading}</h2>
       </div>
       <motion.div
-        className="feed-scroll -mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:-mx-0 sm:px-0"
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
       >
-        {items.map((item) => (
-          <motion.div
-            key={`${item.type}-${item.tmdbId}`}
-            variants={staggerItem}
-            className="w-[140px] shrink-0 sm:w-[160px]"
-          >
-            <TitleCard
-              tmdbId={item.tmdbId}
-              type={item.type}
-              title={item.title}
-              posterPath={item.posterPath}
-              releaseDate={item.releaseDate}
-              voteAverage={item.voteAverage}
-              href={`/titles/tmdb-${item.tmdbId}-${item.type}`}
-            />
-          </motion.div>
-        ))}
+        <Carousel
+          opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}
+          plugins={[WheelGesturesPlugin({ forceWheelAxis: "x" })]}
+          className="-mx-4 sm:-mx-0"
+        >
+          <CarouselContent className="px-4 sm:px-0">
+            {items.map((item) => (
+              <CarouselItem
+                key={`${item.type}-${item.tmdbId}`}
+                className="basis-auto pl-4 w-[140px] shrink-0 sm:w-[160px]"
+              >
+                <motion.div variants={staggerItem}>
+                  <TitleCard
+                    tmdbId={item.tmdbId}
+                    type={item.type}
+                    title={item.title}
+                    posterPath={item.posterPath}
+                    releaseDate={item.releaseDate}
+                    voteAverage={item.voteAverage}
+                    href={`/titles/tmdb-${item.tmdbId}-${item.type}`}
+                  />
+                </motion.div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
       </motion.div>
     </section>
   );

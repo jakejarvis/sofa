@@ -1,6 +1,12 @@
 "use client";
 
+import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import { motion } from "motion/react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 import {
   ContinueWatchingCard,
   type ContinueWatchingItemProps,
@@ -28,16 +34,25 @@ export function ContinueWatchingList({
 }) {
   return (
     <motion.div
-      className="feed-scroll -mx-4 flex gap-4 overflow-x-auto px-4 pb-2 sm:-mx-0 sm:px-0"
       variants={staggerContainer}
       initial="hidden"
       animate="visible"
     >
-      {items.map((item) => (
-        <motion.div key={item.title.id} variants={staggerItem}>
-          <ContinueWatchingCard item={item} />
-        </motion.div>
-      ))}
+      <Carousel
+        opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}
+        plugins={[WheelGesturesPlugin({ forceWheelAxis: "x" })]}
+        className="-mx-4 sm:-mx-0"
+      >
+        <CarouselContent className="px-4 sm:px-0">
+          {items.map((item) => (
+            <CarouselItem key={item.title.id} className="basis-auto pl-4">
+              <motion.div variants={staggerItem}>
+                <ContinueWatchingCard item={item} />
+              </motion.div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
     </motion.div>
   );
 }
