@@ -337,6 +337,25 @@ export const webhookEventLog = sqliteTable(
   ],
 );
 
+// ─── Cron Run History ────────────────────────────────────────────────
+
+export const cronRuns = sqliteTable(
+  "cronRuns",
+  {
+    id: uuidPk(),
+    jobName: text("jobName").notNull(),
+    status: text("status", {
+      enum: ["running", "success", "error"],
+    }).notNull(),
+    startedAt: int("startedAt", { mode: "timestamp" }).notNull(),
+    finishedAt: int("finishedAt", { mode: "timestamp" }),
+    errorMessage: text("errorMessage"),
+  },
+  (table) => [
+    index("cronRuns_jobName_startedAt").on(table.jobName, table.startedAt),
+  ],
+);
+
 // ─── App Settings ───────────────────────────────────────────────────
 
 export const appSettings = sqliteTable("appSettings", {

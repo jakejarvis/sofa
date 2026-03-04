@@ -3,6 +3,7 @@ import { and, eq, isNotNull, lt, or } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   availabilityOffers,
+  cronRuns,
   seasons,
   titles,
   userTitleStatus,
@@ -45,26 +46,33 @@ const jobs = globalForJobs._jobs;
 function schedule(name: string, cron: string, handler: () => Promise<void>) {
   jobs.set(
     name,
-    new Cron(
-      cron,
-      {
-        name,
-        protect: true,
-        catch: (err: unknown) => {
-          log.error(`Job ${name} failed:`, err);
-        },
-      },
-      async () => {
-        log.info(`Running job: ${name}`);
+    new Cron(cron, { name, protect: true }, async () => {
+      log.info(`Running job: ${name}`);
+      const run = db
+        .insert(cronRuns)
+        .values({ jobName: name, status: "running", startedAt: new Date() })
+        .returning()
+        .get();
+      try {
         await handler();
+        db.update(cronRuns)
+          .set({ status: "success", finishedAt: new Date() })
+          .where(eq(cronRuns.id, run.id))
+          .run();
         log.info(`Completed job: ${name}`);
-      },
-    ),
+      } catch (err) {
+        db.update(cronRuns)
+          .set({
+            status: "error",
+            finishedAt: new Date(),
+            errorMessage: err instanceof Error ? err.message : String(err),
+          })
+          .where(eq(cronRuns.id, run.id))
+          .run();
+        log.error(`Job ${name} failed:`, err);
+      }
+    }),
   );
-}
-
-function delay(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
 }
 
 function getLibraryTitleIds(): string[] {
@@ -93,7 +101,7 @@ async function nightlyRefreshLibrary() {
       .get();
     if (t) {
       await refreshTitle(titleId);
-      await delay(RATE_LIMIT_MS);
+      await Bun.sleep(RATE_LIMIT_MS);
     }
   }
 
@@ -113,7 +121,7 @@ async function nightlyRefreshLibrary() {
   for (const t of nonLibrary) {
     if (!libraryIds.includes(t.id)) {
       await refreshTitle(t.id);
-      await delay(RATE_LIMIT_MS);
+      await Bun.sleep(RATE_LIMIT_MS);
     }
   }
 }
@@ -145,7 +153,7 @@ async function refreshAvailabilityJob() {
 
     if (offer || !anyOffer) {
       await refreshAvailability(titleId);
-      await delay(RATE_LIMIT_MS);
+      await Bun.sleep(RATE_LIMIT_MS);
     }
   }
 }
@@ -156,7 +164,7 @@ async function refreshRecommendationsJob() {
 
   for (const titleId of libraryIds) {
     await refreshRecommendations(titleId);
-    await delay(RATE_LIMIT_MS);
+    await Bun.sleep(RATE_LIMIT_MS);
   }
 }
 
@@ -190,7 +198,7 @@ async function refreshTvChildrenJob() {
     if (staleSeason) {
       const details = await getTvDetails(show.tmdbId);
       await refreshTvChildren(show.id, show.tmdbId, details.number_of_seasons);
-      await delay(RATE_LIMIT_MS);
+      await Bun.sleep(RATE_LIMIT_MS);
     }
   }
 }
@@ -209,7 +217,7 @@ async function cacheImagesJob() {
     } catch {
       // Continue with remaining titles
     }
-    await delay(RATE_LIMIT_MS);
+    await Bun.sleep(RATE_LIMIT_MS);
   }
 }
 
