@@ -12,6 +12,7 @@ export interface AuthConfig {
   oidcEnabled: boolean;
   oidcProviderName: string | null;
   passwordLoginDisabled: boolean;
+  registrationOpen?: boolean;
 }
 
 const fieldVariants = {
@@ -122,7 +123,7 @@ export function AuthForm({
               disabled={oidcLoading}
               variants={fieldVariants}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-border/50 bg-background/50 text-sm font-medium transition-all hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-border/50 bg-background/50 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
             >
               <IconKey className="size-4" />
               {oidcLoading
@@ -213,7 +214,7 @@ export function AuthForm({
               disabled={loading}
               variants={fieldVariants}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-primary font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/20 disabled:pointer-events-none disabled:opacity-50"
+              className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-primary font-medium text-primary-foreground transition-shadow hover:shadow-lg hover:shadow-primary/20 disabled:pointer-events-none disabled:opacity-50"
             >
               {loading
                 ? "Loading..."
@@ -237,31 +238,32 @@ export function AuthForm({
           )}
         </AnimatePresence>
 
-        {showPasswordForm && (
-          <p className="text-center text-sm text-muted-foreground">
-            {isRegister ? (
-              <>
-                Already have an account?{" "}
-                <Link
-                  href="/login"
-                  className="font-medium text-primary transition-colors hover:text-primary/80"
-                >
-                  Sign in
-                </Link>
-              </>
-            ) : (
-              <>
-                Don&apos;t have an account?{" "}
-                <Link
-                  href="/register"
-                  className="font-medium text-primary transition-colors hover:text-primary/80"
-                >
-                  Register
-                </Link>
-              </>
-            )}
-          </p>
-        )}
+        {showPasswordForm &&
+          (isRegister || authConfig?.registrationOpen !== false) && (
+            <p className="text-center text-sm text-muted-foreground">
+              {isRegister ? (
+                <>
+                  Already have an account?{" "}
+                  <Link
+                    href="/login"
+                    className="font-medium text-primary transition-colors hover:text-primary/80"
+                  >
+                    Sign in
+                  </Link>
+                </>
+              ) : (
+                <>
+                  Don&apos;t have an account?{" "}
+                  <Link
+                    href="/register"
+                    className="font-medium text-primary transition-colors hover:text-primary/80"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+            </p>
+          )}
       </motion.div>
     </div>
   );

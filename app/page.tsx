@@ -1,4 +1,6 @@
+import { connection } from "next/server";
 import { LandingPage } from "@/components/landing-page";
+import { getUserCount, isRegistrationOpen } from "@/lib/services/settings";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 
 // Well-known TMDB poster paths for the background collage
@@ -21,6 +23,14 @@ const posterUrls = posterPaths
   .map((p) => tmdbImageUrl(p, "w300"))
   .filter(Boolean) as string[];
 
-export default function Home() {
-  return <LandingPage posterUrls={posterUrls} />;
+export default async function Home() {
+  await connection();
+  const userCount = getUserCount();
+  return (
+    <LandingPage
+      posterUrls={posterUrls}
+      freshInstall={userCount === 0}
+      registrationOpen={isRegistrationOpen()}
+    />
+  );
 }

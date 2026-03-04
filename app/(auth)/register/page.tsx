@@ -1,55 +1,26 @@
-"use client";
-
 import { IconLock } from "@tabler/icons-react";
-import { motion } from "motion/react";
+import { headers } from "next/headers";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import type { AuthConfig } from "@/components/auth-form";
+import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/auth-form";
+import { auth } from "@/lib/auth/server";
+import {
+  getOidcProviderName,
+  isOidcConfigured,
+  isPasswordLoginDisabled,
+} from "@/lib/config";
+import { isRegistrationOpen } from "@/lib/services/settings";
 
-export default function RegisterPage() {
-  const [registrationOpen, setRegistrationOpen] = useState<boolean | null>(
-    null,
-  );
-  const [authConfig, setAuthConfig] = useState<AuthConfig>({
-    oidcEnabled: false,
-    oidcProviderName: null,
-    passwordLoginDisabled: false,
-  });
+export default async function RegisterPage() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (session) redirect("/dashboard");
 
-  useEffect(() => {
-    fetch("/api/registration/status")
-      .then((res) => res.json())
-      .then((data) => {
-        setRegistrationOpen(data.registrationOpen);
-        setAuthConfig({
-          oidcEnabled: data.oidcEnabled ?? false,
-          oidcProviderName: data.oidcProviderName ?? null,
-          passwordLoginDisabled: data.passwordLoginDisabled ?? false,
-        });
-      })
-      .catch(() => setRegistrationOpen(false));
-  }, []);
-
-  if (registrationOpen === null) {
-    return <div className="flex min-h-[80vh] items-center justify-center" />;
-  }
-
-  if (!registrationOpen) {
+  if (!isRegistrationOpen()) {
     return (
       <div className="flex min-h-[80vh] items-center justify-center px-4">
         <div className="relative mx-auto w-full max-w-sm">
           <div className="absolute -inset-4 rounded-2xl bg-primary/3 blur-2xl" />
-          <motion.div
-            className="relative space-y-6 rounded-xl border border-border/50 bg-card/80 p-8 text-center backdrop-blur-sm"
-            initial={{ opacity: 0, y: 20, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{
-              type: "spring" as const,
-              stiffness: 200,
-              damping: 20,
-            }}
-          >
+          <div className="relative space-y-6 rounded-xl border border-border/50 bg-card/80 p-8 text-center backdrop-blur-sm">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
               <IconLock className="size-6 text-primary" />
             </div>
@@ -68,15 +39,24 @@ export default function RegisterPage() {
             >
               Sign in instead
             </Link>
-          </motion.div>
+          </div>
         </div>
       </div>
     );
   }
 
+  const oidcEnabled = isOidcConfigured();
+
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4">
-      <AuthForm mode="register" authConfig={authConfig} />
+      <AuthForm
+        mode="register"
+        authConfig={{
+          oidcEnabled,
+          oidcProviderName: oidcEnabled ? getOidcProviderName() : null,
+          passwordLoginDisabled: isPasswordLoginDisabled(),
+        }}
+      />
     </div>
   );
 }

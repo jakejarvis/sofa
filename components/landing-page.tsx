@@ -40,7 +40,15 @@ const posterLayout = [
   { x: "78%", y: "66%", rotate: 5, delay: 0.23 },
 ];
 
-export function LandingPage({ posterUrls }: { posterUrls: string[] }) {
+export function LandingPage({
+  posterUrls,
+  freshInstall,
+  registrationOpen,
+}: {
+  posterUrls: string[];
+  freshInstall: boolean;
+  registrationOpen: boolean;
+}) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
@@ -169,19 +177,33 @@ export function LandingPage({ posterUrls }: { posterUrls: string[] }) {
             delay: 0.35,
           }}
         >
-          <Link
-            href="/login"
-            className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/20"
-          >
-            <span className="relative z-10">Sign In</span>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-          </Link>
-          <Link
-            href="/register"
-            className="inline-flex h-12 items-center justify-center rounded-lg border border-border px-8 font-medium transition-all hover:border-primary/40 hover:bg-primary/5"
-          >
-            Register
-          </Link>
+          {freshInstall ? (
+            <Link
+              href="/register"
+              className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/20"
+            >
+              <span className="relative z-10">Get Started</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/20"
+              >
+                <span className="relative z-10">Sign In</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+              </Link>
+              {registrationOpen && (
+                <Link
+                  href="/register"
+                  className="inline-flex h-12 items-center justify-center rounded-lg border border-border px-8 font-medium transition-all hover:border-primary/40 hover:bg-primary/5"
+                >
+                  Register
+                </Link>
+              )}
+            </>
+          )}
         </motion.div>
       </main>
 
