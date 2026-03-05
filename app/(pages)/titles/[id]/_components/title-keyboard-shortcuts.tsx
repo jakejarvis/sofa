@@ -4,12 +4,14 @@ import type { Hotkey } from "@tanstack/react-hotkeys";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useAtomValue } from "jotai";
 import { useRouter } from "next/navigation";
+import { useProgress } from "@/components/navigation-progress";
 import { commandPaletteOpenAtom } from "@/lib/atoms/command-palette";
 import { titleTypeAtom, userStatusAtom } from "@/lib/atoms/title";
 import { useTitleActions } from "./use-title-actions";
 
 export function TitleKeyboardShortcuts() {
   const router = useRouter();
+  const progress = useProgress();
   const titleType = useAtomValue(titleTypeAtom);
   const userStatus = useAtomValue(userStatusAtom);
   const { handleStatusChange, handleRating, handleWatchMovie } =
@@ -29,7 +31,14 @@ export function TitleKeyboardShortcuts() {
     },
     { enabled },
   );
-  useHotkey("Escape", () => router.back(), { enabled });
+  useHotkey(
+    "Escape",
+    () => {
+      progress.start();
+      router.back();
+    },
+    { enabled },
+  );
 
   for (const n of [1, 2, 3, 4, 5]) {
     // biome-ignore lint/correctness/useHookAtTopLevel: loop is stable (always 5 iterations)

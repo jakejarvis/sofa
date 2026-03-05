@@ -14,6 +14,7 @@ import { useAtom } from "jotai";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useProgress } from "@/components/navigation-progress";
 import {
   Command,
   CommandEmpty,
@@ -47,6 +48,7 @@ type SearchResult = ReturnType<typeof useSearch>["results"][number];
 
 export function CommandPalette() {
   const router = useRouter();
+  const progress = useProgress();
   const [commandPaletteOpen, setCommandPaletteOpen] = useAtom(
     commandPaletteOpenAtom,
   );
@@ -60,14 +62,22 @@ export function CommandPalette() {
   useHotkey("Mod+K", () => setCommandPaletteOpen((prev) => !prev));
   useHotkey("/", () => setCommandPaletteOpen(true), { enabled });
   useHotkey({ key: "?", shift: true }, () => setHelpOpen(true), { enabled });
-  useHotkeySequence(["G", "H"], () => router.push("/dashboard"), {
-    enabled,
-    timeout: 500,
-  });
-  useHotkeySequence(["G", "E"], () => router.push("/explore"), {
-    enabled,
-    timeout: 500,
-  });
+  useHotkeySequence(
+    ["G", "H"],
+    () => {
+      progress.start();
+      router.push("/dashboard");
+    },
+    { enabled, timeout: 500 },
+  );
+  useHotkeySequence(
+    ["G", "E"],
+    () => {
+      progress.start();
+      router.push("/explore");
+    },
+    { enabled, timeout: 500 },
+  );
 
   // Reset query when palette opens
   useEffect(() => {
@@ -90,13 +100,14 @@ export function CommandPalette() {
   const handleSelect = useCallback(
     (result: SearchResult) => {
       setCommandPaletteOpen(false);
+      progress.start();
       if (result.type === "person") {
         router.push(`/people/tmdb-${result.tmdbId}`);
       } else {
         router.push(`/titles/tmdb-${result.tmdbId}-${result.type}`);
       }
     },
-    [router, setCommandPaletteOpen],
+    [router, setCommandPaletteOpen, progress],
   );
 
   const handleRecentSearch = useCallback((q: string) => {
@@ -285,6 +296,7 @@ export function CommandPalette() {
                     <CommandItem
                       onSelect={() => {
                         setCommandPaletteOpen(false);
+                        progress.start();
                         router.push("/dashboard");
                       }}
                     >
@@ -295,6 +307,7 @@ export function CommandPalette() {
                     <CommandItem
                       onSelect={() => {
                         setCommandPaletteOpen(false);
+                        progress.start();
                         router.push("/explore");
                       }}
                     >
