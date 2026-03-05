@@ -64,9 +64,9 @@ export function TitleRow({
         <Carousel
           opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}
           plugins={[WheelGesturesPlugin({ forceWheelAxis: "x" })]}
-          className="-mx-4 sm:-mx-0"
+          className="-mx-6 sm:-mx-2 carousel-tilt"
         >
-          <CarouselContent className="px-4 sm:px-0">
+          <CarouselContent className="px-6 sm:px-2">
             {items.map((item) => (
               <CarouselItem
                 key={`${item.type}-${item.tmdbId}`}

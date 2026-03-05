@@ -142,4 +142,10 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* Allow tilt/scale effects to overflow carousel viewport vertically */
+  .carousel-tilt > [data-slot="carousel-content"] {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
 }
