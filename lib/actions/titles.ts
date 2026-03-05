@@ -7,6 +7,7 @@ import { db } from "@/lib/db/client";
 import { episodes } from "@/lib/db/schema";
 import {
   logEpisodeWatch,
+  logEpisodeWatchBatch,
   logMovieWatch,
   markAllEpisodesWatched,
   rateTitleStars,
@@ -67,9 +68,10 @@ export async function watchSeason(seasonId: string) {
     .from(episodes)
     .where(eq(episodes.seasonId, seasonId))
     .all();
-  for (const ep of seasonEps) {
-    logEpisodeWatch(userId, ep.id);
-  }
+  logEpisodeWatchBatch(
+    userId,
+    seasonEps.map((ep) => ep.id),
+  );
 }
 
 export async function unwatchSeasonAction(seasonId: string) {
@@ -79,7 +81,5 @@ export async function unwatchSeasonAction(seasonId: string) {
 
 export async function batchWatchEpisodes(episodeIds: string[]) {
   const userId = await getSessionUserId();
-  for (const id of episodeIds) {
-    logEpisodeWatch(userId, id);
-  }
+  logEpisodeWatchBatch(userId, episodeIds);
 }

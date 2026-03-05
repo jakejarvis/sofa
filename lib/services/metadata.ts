@@ -442,94 +442,61 @@ export async function refreshRecommendations(titleId: string) {
     `Fetched ${recs.results.length} recommendations and ${similar.results.length} similar for title ${titleId}`,
   );
 
-  // Process recommendations
+  // Collect all valid results with their source/rank
+  interface RecItem {
+    result: (typeof recs.results)[0];
+    type: "movie" | "tv";
+    source: "tmdb_recommendations" | "tmdb_similar";
+    rank: number;
+  }
+  const allItems: RecItem[] = [];
   for (let i = 0; i < recs.results.length && i < 20; i++) {
     const r = recs.results[i];
     const type = r.media_type ?? title.type;
-    if (type !== "movie" && type !== "tv") continue;
-
-    // Minimal upsert of the recommended title
-    const existing = db
-      .select()
-      .from(titles)
-      .where(eq(titles.tmdbId, r.id))
-      .get();
-    let recTitleId: string;
-    if (existing) {
-      recTitleId = existing.id;
-    } else {
-      const row = db
-        .insert(titles)
-        .values({
-          tmdbId: r.id,
-          type,
-          title: r.title ?? r.name ?? "Unknown",
-          originalTitle: r.original_title ?? r.original_name,
-          overview: r.overview,
-          releaseDate: r.release_date,
-          firstAirDate: r.first_air_date,
-          posterPath: r.poster_path,
-          backdropPath: r.backdrop_path,
-          popularity: r.popularity,
-          voteAverage: r.vote_average,
-          voteCount: r.vote_count,
-          lastFetchedAt: null,
-        })
-        .onConflictDoNothing()
-        .returning()
-        .get();
-      if (!row) {
-        const found = db
-          .select()
-          .from(titles)
-          .where(eq(titles.tmdbId, r.id))
-          .get();
-        if (!found) continue;
-        recTitleId = found.id;
-      } else {
-        recTitleId = row.id;
-      }
-    }
-
-    db.insert(titleRecommendations)
-      .values({
-        titleId,
-        recommendedTitleId: recTitleId,
+    if (type === "movie" || type === "tv") {
+      allItems.push({
+        result: r,
+        type,
         source: "tmdb_recommendations",
         rank: i + 1,
-        lastFetchedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: [
-          titleRecommendations.titleId,
-          titleRecommendations.recommendedTitleId,
-          titleRecommendations.source,
-        ],
-        set: { rank: i + 1, lastFetchedAt: now },
-      })
-      .run();
+      });
+    }
   }
-
-  // Process similar
   for (let i = 0; i < similar.results.length && i < 20; i++) {
     const r = similar.results[i];
     const type = r.media_type ?? title.type;
-    if (type !== "movie" && type !== "tv") continue;
+    if (type === "movie" || type === "tv") {
+      allItems.push({ result: r, type, source: "tmdb_similar", rank: i + 1 });
+    }
+  }
 
-    const existing = db
-      .select()
-      .from(titles)
-      .where(eq(titles.tmdbId, r.id))
-      .get();
-    let recTitleId: string;
-    if (existing) {
-      recTitleId = existing.id;
-    } else {
-      const row = db
+  if (allItems.length === 0) return;
+
+  // Batch prefetch existing titles (1 query)
+  const tmdbIds = [...new Set(allItems.map((item) => item.result.id))];
+  const existingTitles = db
+    .select({ id: titles.id, tmdbId: titles.tmdbId })
+    .from(titles)
+    .where(inArray(titles.tmdbId, tmdbIds))
+    .all();
+  const titleIdMap = new Map<number, string>(
+    existingTitles.map((t) => [t.tmdbId, t.id]),
+  );
+
+  // Insert missing titles + upsert recommendations in a single transaction
+  db.transaction((tx) => {
+    // Insert only new titles
+    const newItems = allItems.filter((item) => !titleIdMap.has(item.result.id));
+    const insertedTmdbIds = new Set<number>();
+    for (const item of newItems) {
+      if (insertedTmdbIds.has(item.result.id)) continue;
+      insertedTmdbIds.add(item.result.id);
+      const r = item.result;
+      const row = tx
         .insert(titles)
         .values({
           tmdbId: r.id,
-          type,
+          type: item.type,
           title: r.title ?? r.name ?? "Unknown",
           originalTitle: r.original_title ?? r.original_name,
           overview: r.overview,
@@ -545,52 +512,104 @@ export async function refreshRecommendations(titleId: string) {
         .onConflictDoNothing()
         .returning()
         .get();
-      if (!row) {
-        const found = db
-          .select()
-          .from(titles)
-          .where(eq(titles.tmdbId, r.id))
-          .get();
-        if (!found) continue;
-        recTitleId = found.id;
-      } else {
-        recTitleId = row.id;
-      }
+      if (row) titleIdMap.set(r.id, row.id);
     }
 
-    db.insert(titleRecommendations)
-      .values({
-        titleId,
-        recommendedTitleId: recTitleId,
-        source: "tmdb_similar",
-        rank: i + 1,
-        lastFetchedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: [
-          titleRecommendations.titleId,
-          titleRecommendations.recommendedTitleId,
-          titleRecommendations.source,
-        ],
-        set: { rank: i + 1, lastFetchedAt: now },
-      })
-      .run();
-  }
+    // One fallback query for any that conflicted
+    const stillMissing = [...insertedTmdbIds].filter(
+      (id) => !titleIdMap.has(id),
+    );
+    if (stillMissing.length > 0) {
+      const fallbacks = tx
+        .select({ id: titles.id, tmdbId: titles.tmdbId })
+        .from(titles)
+        .where(inArray(titles.tmdbId, stillMissing))
+        .all();
+      for (const f of fallbacks) titleIdMap.set(f.tmdbId, f.id);
+    }
+
+    // Upsert all recommendation rows
+    for (const item of allItems) {
+      const recTitleId = titleIdMap.get(item.result.id);
+      if (!recTitleId) continue;
+      tx.insert(titleRecommendations)
+        .values({
+          titleId,
+          recommendedTitleId: recTitleId,
+          source: item.source,
+          rank: item.rank,
+          lastFetchedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: [
+            titleRecommendations.titleId,
+            titleRecommendations.recommendedTitleId,
+            titleRecommendations.source,
+          ],
+          set: { rank: item.rank, lastFetchedAt: now },
+        })
+        .run();
+    }
+  });
 }
 
-export async function getTitleWithChildren(id: string): Promise<{
-  title: ResolvedTitle;
-  seasons: Season[];
-  availability: AvailabilityOffer[];
-  cast: CastMember[];
-} | null> {
-  let title = db.select().from(titles).where(eq(titles.id, id)).get();
-  if (!title) return null;
+/** Fetch seasons from the DB, building the Season[] structure. */
+function fetchSeasonsFromDb(titleId: string): Season[] {
+  const seasonRows = db
+    .select()
+    .from(seasons)
+    .where(eq(seasons.titleId, titleId))
+    .orderBy(seasons.seasonNumber)
+    .all();
 
-  // If this is a shell TV title, fetch full details now
-  if (title.type === "tv" && !title.lastFetchedAt) {
+  if (seasonRows.length === 0) return [];
+
+  const seasonIds = seasonRows.map((s) => s.id);
+  const allEps = db
+    .select()
+    .from(episodes)
+    .where(inArray(episodes.seasonId, seasonIds))
+    .orderBy(episodes.seasonId, episodes.episodeNumber)
+    .all();
+
+  const epsBySeason = new Map<string, Episode[]>();
+  for (const ep of allEps) {
+    const arr = epsBySeason.get(ep.seasonId) ?? [];
+    arr.push({
+      id: ep.id,
+      episodeNumber: ep.episodeNumber,
+      name: ep.name,
+      overview: ep.overview,
+      stillPath: tmdbImageUrl(ep.stillPath, "w1280", "stills"),
+      airDate: ep.airDate,
+      runtimeMinutes: ep.runtimeMinutes,
+    });
+    epsBySeason.set(ep.seasonId, arr);
+  }
+
+  return seasonRows.map((s) => ({
+    id: s.id,
+    seasonNumber: s.seasonNumber,
+    name: s.name,
+    episodes: epsBySeason.get(s.id) ?? [],
+  }));
+}
+
+/**
+ * Ensure a TV title is fully hydrated (seasons/episodes fetched from TMDB).
+ * Returns the hydrated seasons data.
+ */
+export async function ensureTvHydrated(
+  titleId: string,
+  tmdbId: number,
+): Promise<Season[]> {
+  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+  if (!title || title.type !== "tv") return [];
+
+  // Shell title: fetch details + children
+  if (!title.lastFetchedAt) {
     try {
-      const show = await getTvDetails(title.tmdbId);
+      const show = await getTvDetails(tmdbId);
       db.update(titles)
         .set({
           overview: show.overview,
@@ -599,16 +618,49 @@ export async function getTitleWithChildren(id: string): Promise<{
           status: show.status,
           lastFetchedAt: new Date(),
         })
-        .where(eq(titles.id, id))
+        .where(eq(titles.id, titleId))
         .run();
-      await refreshTvChildren(id, title.tmdbId, show.number_of_seasons);
-      title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
+      await refreshTvChildren(titleId, tmdbId, show.number_of_seasons);
     } catch (err) {
-      log.debug(`Failed to hydrate shell TV title ${id}:`, err);
+      log.debug(`Failed to hydrate shell TV title ${titleId}:`, err);
     }
   }
 
-  // If this is a shell movie title, fetch full details now
+  let result = fetchSeasonsFromDb(titleId);
+
+  // Retry hydration when seasons are still missing
+  if (result.length === 0) {
+    try {
+      const show = await getTvDetails(tmdbId);
+      await refreshTvChildren(titleId, tmdbId, show.number_of_seasons);
+      result = fetchSeasonsFromDb(titleId);
+    } catch (err) {
+      log.debug(
+        `Failed to backfill missing seasons for title ${titleId}:`,
+        err,
+      );
+    }
+  }
+
+  return result;
+}
+
+export async function getTitleWithChildren(id: string): Promise<{
+  title: ResolvedTitle;
+  seasons: Season[];
+  needsHydration: boolean;
+  availability: AvailabilityOffer[];
+  cast: CastMember[];
+} | null> {
+  let title = db.select().from(titles).where(eq(titles.id, id)).get();
+  if (!title) return null;
+
+  // For shell TV titles, skip blocking hydration — let Suspense stream it
+  const needsTvHydration =
+    title.type === "tv" &&
+    (!title.lastFetchedAt || fetchSeasonsFromDb(id).length === 0);
+
+  // If this is a shell movie title, fetch full details now (movies are fast)
   if (title.type === "movie" && !title.lastFetchedAt) {
     try {
       const movie = await getMovieDetails(title.tmdbId);
@@ -634,67 +686,8 @@ export async function getTitleWithChildren(id: string): Promise<{
     }
   }
 
-  let titleSeasons: Season[] = [];
-
-  if (title.type === "tv") {
-    let seasonRows = db
-      .select()
-      .from(seasons)
-      .where(eq(seasons.titleId, title.id))
-      .orderBy(seasons.seasonNumber)
-      .all();
-
-    // Retry hydration when a TV title exists but no seasons were stored.
-    if (seasonRows.length === 0) {
-      try {
-        const show = await getTvDetails(title.tmdbId);
-        await refreshTvChildren(id, title.tmdbId, show.number_of_seasons);
-        seasonRows = db
-          .select()
-          .from(seasons)
-          .where(eq(seasons.titleId, title.id))
-          .orderBy(seasons.seasonNumber)
-          .all();
-      } catch (err) {
-        log.debug(`Failed to backfill missing seasons for title ${id}:`, err);
-      }
-    }
-
-    // Batch fetch all episodes for all seasons (1 query)
-    const seasonIds = seasonRows.map((s) => s.id);
-    const allEps =
-      seasonIds.length > 0
-        ? db
-            .select()
-            .from(episodes)
-            .where(inArray(episodes.seasonId, seasonIds))
-            .orderBy(episodes.seasonId, episodes.episodeNumber)
-            .all()
-        : [];
-
-    // Group episodes by season
-    const epsBySeason = new Map<string, Episode[]>();
-    for (const ep of allEps) {
-      const arr = epsBySeason.get(ep.seasonId) ?? [];
-      arr.push({
-        id: ep.id,
-        episodeNumber: ep.episodeNumber,
-        name: ep.name,
-        overview: ep.overview,
-        stillPath: tmdbImageUrl(ep.stillPath, "w1280", "stills"),
-        airDate: ep.airDate,
-        runtimeMinutes: ep.runtimeMinutes,
-      });
-      epsBySeason.set(ep.seasonId, arr);
-    }
-
-    titleSeasons = seasonRows.map((s) => ({
-      id: s.id,
-      seasonNumber: s.seasonNumber,
-      name: s.name,
-      episodes: epsBySeason.get(s.id) ?? [],
-    }));
-  }
+  // For already-hydrated TV titles, fetch seasons from DB directly
+  const titleSeasons = needsTvHydration ? [] : fetchSeasonsFromDb(id);
 
   const availability = db
     .select()
@@ -737,7 +730,13 @@ export async function getTitleWithChildren(id: string): Promise<{
 
   const cast = getCastForTitle(id);
 
-  return { title: resolvedTitle, seasons: titleSeasons, availability, cast };
+  return {
+    title: resolvedTitle,
+    seasons: titleSeasons,
+    needsHydration: needsTvHydration,
+    availability,
+    cast,
+  };
 }
 
 export function pickBestTrailer(videos: TmdbVideo[]): string | null {

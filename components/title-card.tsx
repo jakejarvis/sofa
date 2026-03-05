@@ -11,7 +11,6 @@ import {
   IconPlus,
   IconStarFilled,
 } from "@tabler/icons-react";
-
 import { type MotionStyle, type MotionValue, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";

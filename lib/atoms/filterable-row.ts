@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { loadable } from "jotai/utils";
+import { unwrap } from "jotai/utils";
 import {
   fetchEpisodeProgress,
   fetchUserStatuses,
@@ -35,30 +35,27 @@ const genreResultsAsyncAtom = atom(async (get) => {
   return (data.results ?? []) as TitleRowItem[];
 });
 
-export const genreResultsLoadable = loadable(genreResultsAsyncAtom);
+export const genreResultsAtom = unwrap(genreResultsAsyncAtom);
 
-const genreUserStatusesAsyncAtom = atom(async (get) => {
-  const genre = get(selectedGenreAtom);
-  if (genre === null) return null;
-  const genreResults = await get(genreResultsAsyncAtom);
-  if (!genreResults || genreResults.length === 0) return {};
-  return fetchUserStatuses(
-    genreResults.map((r) => ({ tmdbId: r.tmdbId, type: r.type })),
-  );
-});
+interface GenreEnrichments {
+  statuses: Record<string, TitleStatus>;
+  progress: Record<string, { watched: number; total: number }>;
+}
 
-export const genreUserStatusesLoadable = loadable(genreUserStatusesAsyncAtom);
-
-const genreEpisodeProgressAsyncAtom = atom(async (get) => {
-  const genre = get(selectedGenreAtom);
-  if (genre === null) return null;
-  const genreResults = await get(genreResultsAsyncAtom);
-  if (!genreResults || genreResults.length === 0) return {};
-  return fetchEpisodeProgress(
-    genreResults.map((r) => ({ tmdbId: r.tmdbId, type: r.type })),
-  );
-});
-
-export const genreEpisodeProgressLoadable = loadable(
-  genreEpisodeProgressAsyncAtom,
+const genreEnrichmentsAsyncAtom = atom(
+  async (get): Promise<GenreEnrichments | null> => {
+    const genre = get(selectedGenreAtom);
+    if (genre === null) return null;
+    const genreResults = await get(genreResultsAsyncAtom);
+    if (!genreResults || genreResults.length === 0)
+      return { statuses: {}, progress: {} };
+    const items = genreResults.map((r) => ({ tmdbId: r.tmdbId, type: r.type }));
+    const [statuses, progress] = await Promise.all([
+      fetchUserStatuses(items),
+      fetchEpisodeProgress(items),
+    ]);
+    return { statuses, progress };
+  },
 );
+
+export const genreEnrichmentsAtom = unwrap(genreEnrichmentsAsyncAtom);

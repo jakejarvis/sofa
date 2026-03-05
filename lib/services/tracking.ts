@@ -108,6 +108,120 @@ export function logEpisodeWatch(
   checkAllEpisodesWatched(userId, titleId);
 }
 
+export function logEpisodeWatchBatch(
+  userId: string,
+  episodeIds: string[],
+  source: "manual" | "import" | "plex" | "jellyfin" | "emby" = "manual",
+) {
+  if (episodeIds.length === 0) return;
+
+  db.transaction((tx) => {
+    const now = new Date();
+
+    // Batch INSERT all watch records
+    for (const episodeId of episodeIds) {
+      tx.insert(userEpisodeWatches)
+        .values({ userId, episodeId, watchedAt: now, source })
+        .run();
+    }
+
+    // Resolve episode → season → title hierarchy with batch queries
+    const eps = tx
+      .select()
+      .from(episodes)
+      .where(inArray(episodes.id, episodeIds))
+      .all();
+    if (eps.length === 0) return;
+
+    const seasonIds = [...new Set(eps.map((e) => e.seasonId))];
+    const seasonRows = tx
+      .select()
+      .from(seasons)
+      .where(inArray(seasons.id, seasonIds))
+      .all();
+    if (seasonRows.length === 0) return;
+
+    const titleId = seasonRows[0].titleId;
+
+    // Set status to in_progress if not already set
+    const existing = tx
+      .select()
+      .from(userTitleStatus)
+      .where(
+        and(
+          eq(userTitleStatus.userId, userId),
+          eq(userTitleStatus.titleId, titleId),
+        ),
+      )
+      .get();
+
+    if (!existing) {
+      const statusNow = new Date();
+      tx.insert(userTitleStatus)
+        .values({
+          userId,
+          titleId,
+          status: "in_progress",
+          addedAt: statusNow,
+          updatedAt: statusNow,
+        })
+        .onConflictDoUpdate({
+          target: [userTitleStatus.userId, userTitleStatus.titleId],
+          set: { status: "in_progress", updatedAt: statusNow },
+        })
+        .run();
+    }
+
+    // Check completion once (not per-episode)
+    const allSeasons = tx
+      .select()
+      .from(seasons)
+      .where(eq(seasons.titleId, titleId))
+      .all();
+    if (allSeasons.length === 0) return;
+
+    const allSeasonIds = allSeasons.map((s) => s.id);
+    const allEps = tx
+      .select()
+      .from(episodes)
+      .where(inArray(episodes.seasonId, allSeasonIds))
+      .all();
+    const totalEpisodes = allEps.length;
+    if (totalEpisodes === 0) return;
+
+    const allEpIds = allEps.map((ep) => ep.id);
+    const [watchCount] = tx
+      .select({
+        count: sql<number>`count(distinct ${userEpisodeWatches.episodeId})`,
+      })
+      .from(userEpisodeWatches)
+      .where(
+        and(
+          eq(userEpisodeWatches.userId, userId),
+          inArray(userEpisodeWatches.episodeId, allEpIds),
+        ),
+      )
+      .all();
+
+    if (watchCount.count >= totalEpisodes) {
+      const completeNow = new Date();
+      tx.insert(userTitleStatus)
+        .values({
+          userId,
+          titleId,
+          status: "completed",
+          addedAt: completeNow,
+          updatedAt: completeNow,
+        })
+        .onConflictDoUpdate({
+          target: [userTitleStatus.userId, userTitleStatus.titleId],
+          set: { status: "completed", updatedAt: completeNow },
+        })
+        .run();
+    }
+  });
+}
+
 export function markAllEpisodesWatched(
   userId: string,
   titleId: string,
@@ -151,13 +265,15 @@ export function markAllEpisodesWatched(
         )
       : new Set<string>();
 
-  for (const ep of allEps) {
-    if (!existingWatches.has(ep.id)) {
-      db.insert(userEpisodeWatches)
-        .values({ userId, episodeId: ep.id, watchedAt: now, source })
-        .run();
+  db.transaction((tx) => {
+    for (const ep of allEps) {
+      if (!existingWatches.has(ep.id)) {
+        tx.insert(userEpisodeWatches)
+          .values({ userId, episodeId: ep.id, watchedAt: now, source })
+          .run();
+      }
     }
-  }
+  });
 
   setTitleStatus(userId, titleId, "completed", source);
 }

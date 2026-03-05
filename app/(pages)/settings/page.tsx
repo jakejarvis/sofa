@@ -3,7 +3,7 @@ import {
   IconServer2,
   IconShieldLock,
 } from "@tabler/icons-react";
-import { desc, eq, inArray } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { getSession } from "@/lib/auth/session";
@@ -40,23 +40,20 @@ export default async function SettingsPage() {
 
   const connIds = connRows.map((c) => c.id);
 
-  // Batch fetch all event logs for all connections (1 query)
-  const allEvents =
-    connIds.length > 0
-      ? db
-          .select()
-          .from(webhookEventLog)
-          .where(inArray(webhookEventLog.connectionId, connIds))
-          .orderBy(desc(webhookEventLog.receivedAt))
-          .all()
-      : [];
-
-  // Group events by connection, keeping only 10 most recent per connection
-  const eventsByConn = new Map<string, typeof allEvents>();
-  for (const e of allEvents) {
-    const arr = eventsByConn.get(e.connectionId) ?? [];
-    if (arr.length < 10) arr.push(e);
-    eventsByConn.set(e.connectionId, arr);
+  // Fetch only the 10 most recent events per connection (index-optimized)
+  const eventsByConn = new Map<
+    string,
+    (typeof webhookEventLog.$inferSelect)[]
+  >();
+  for (const connId of connIds) {
+    const events = db
+      .select()
+      .from(webhookEventLog)
+      .where(eq(webhookEventLog.connectionId, connId))
+      .orderBy(desc(webhookEventLog.receivedAt))
+      .limit(10)
+      .all();
+    eventsByConn.set(connId, events);
   }
 
   const connections = connRows.map((conn) => ({

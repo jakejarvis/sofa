@@ -7,10 +7,10 @@ import {
   IconChevronUp,
   IconDeviceTvOld,
 } from "@tabler/icons-react";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,9 +29,23 @@ import {
   userStatusAtom,
   watchingEpAtom,
 } from "@/lib/atoms/title";
+import type { Season } from "@/lib/types/title";
 import { useTitleActions } from "./use-title-actions";
 
-export function TitleSeasons() {
+export function TitleSeasons({
+  seasons: streamedSeasons,
+}: {
+  seasons?: Season[];
+} = {}) {
+  const setSeasons = useSetAtom(seasonsAtom);
+
+  // When seasons are streamed via Suspense, sync them into the Jotai store
+  useEffect(() => {
+    if (streamedSeasons && streamedSeasons.length > 0) {
+      setSeasons(streamedSeasons);
+    }
+  }, [streamedSeasons, setSeasons]);
+
   const seasons = useAtomValue(seasonsAtom);
   const episodeWatches = useAtomValue(episodeWatchesAtom);
   const userStatus = useAtomValue(userStatusAtom);

@@ -2,7 +2,10 @@ import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
-import { RecommendationsSkeleton } from "@/components/skeletons";
+import {
+  RecommendationsSkeleton,
+  SeasonsSkeleton,
+} from "@/components/skeletons";
 import { getSession } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import { titles } from "@/lib/db/schema";
@@ -10,6 +13,7 @@ import { getTitleWithChildren, importTitle } from "@/lib/services/metadata";
 import { getUserTitleInfo } from "@/lib/services/tracking";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { getTitleThemeStyle } from "@/lib/utils/title-theme";
+import { AsyncTitleSeasons } from "./_components/async-title-seasons";
 import { TitleActions } from "./_components/title-actions";
 import { TitleAvailability } from "./_components/title-availability";
 import { TitleCast } from "./_components/title-cast";
@@ -71,7 +75,7 @@ export default async function TitleDetailPage({
   ]);
   if (!result) notFound();
 
-  const { title, seasons, availability, cast } = result;
+  const { title, seasons, needsHydration, availability, cast } = result;
 
   const themeStyle = getTitleThemeStyle(title.colorPalette);
 
@@ -94,7 +98,14 @@ export default async function TitleDetailPage({
           <TitleAvailability availability={availability} />
         </TitleHero>
 
-        {title.type === "tv" && seasons.length > 0 && <TitleSeasons />}
+        {title.type === "tv" && needsHydration && (
+          <Suspense fallback={<SeasonsSkeleton />}>
+            <AsyncTitleSeasons titleId={title.id} tmdbId={title.tmdbId} />
+          </Suspense>
+        )}
+        {title.type === "tv" && !needsHydration && seasons.length > 0 && (
+          <TitleSeasons />
+        )}
 
         <TitleCast cast={cast} titleType={title.type} />
 

@@ -12,9 +12,8 @@ import {
 } from "@/components/ui/carousel";
 import {
   defaultItemsAtom,
-  genreEpisodeProgressLoadable,
-  genreResultsLoadable,
-  genreUserStatusesLoadable,
+  genreEnrichmentsAtom,
+  genreResultsAtom,
   initialEpisodeProgressAtom,
   initialUserStatusesAtom,
   mediaTypeAtom,
@@ -81,33 +80,23 @@ function FilterableTitleRowInner({
 }) {
   const [selectedGenre, setSelectedGenre] = useAtom(selectedGenreAtom);
   const defaults = useAtomValue(defaultItemsAtom);
-  const genreResults = useAtomValue(genreResultsLoadable);
+  const genreResults = useAtomValue(genreResultsAtom);
   const initialStatuses = useAtomValue(initialUserStatusesAtom);
-  const genreStatuses = useAtomValue(genreUserStatusesLoadable);
   const initialProgress = useAtomValue(initialEpisodeProgressAtom);
-  const genreProgress = useAtomValue(genreEpisodeProgressLoadable);
+  const genreEnrichments = useAtomValue(genreEnrichmentsAtom);
 
-  const loading = selectedGenre !== null && genreResults.state === "loading";
-  const items =
-    selectedGenre === null
-      ? defaults
-      : genreResults.state === "hasData" && genreResults.data !== null
-        ? genreResults.data
-        : [];
+  const loading = selectedGenre !== null && genreResults === undefined;
+  const items = selectedGenre === null ? defaults : (genreResults ?? []);
 
   const userStatuses =
     selectedGenre === null
       ? initialStatuses
-      : genreStatuses.state === "hasData" && genreStatuses.data !== null
-        ? genreStatuses.data
-        : initialStatuses;
+      : (genreEnrichments?.statuses ?? initialStatuses);
 
   const episodeProgress =
     selectedGenre === null
       ? initialProgress
-      : genreProgress.state === "hasData" && genreProgress.data !== null
-        ? genreProgress.data
-        : initialProgress;
+      : (genreEnrichments?.progress ?? initialProgress);
 
   function toggleGenre(genreId: number) {
     setSelectedGenre(selectedGenre === genreId ? null : genreId);

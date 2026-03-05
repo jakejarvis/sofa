@@ -193,6 +193,7 @@ export const userMovieWatches = sqliteTable(
       table.watchedAt,
     ),
     index("userMovieWatches_titleId").on(table.titleId),
+    index("userMovieWatches_userId_titleId").on(table.userId, table.titleId),
   ],
 );
 
@@ -219,6 +220,10 @@ export const userEpisodeWatches = sqliteTable(
       table.watchedAt,
     ),
     index("userEpisodeWatches_episodeId").on(table.episodeId),
+    index("userEpisodeWatches_userId_episodeId").on(
+      table.userId,
+      table.episodeId,
+    ),
   ],
 );
 

@@ -17,9 +17,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   episodePeriodAtom,
-  episodeStatsLoadable,
+  episodeStatsAtom,
   moviePeriodAtom,
-  movieStatsLoadable,
+  movieStatsAtom,
 } from "@/lib/atoms/stats";
 import type {
   DashboardStats,
@@ -120,24 +120,14 @@ function PeriodSelector({
 export function StatsDisplay({ stats }: { stats: DashboardStats }) {
   const [moviePeriod, setMoviePeriod] = useAtom(moviePeriodAtom);
   const [episodePeriod, setEpisodePeriod] = useAtom(episodePeriodAtom);
-  const movieStats = useAtomValue(movieStatsLoadable);
-  const episodeStats = useAtomValue(episodeStatsLoadable);
+  const movieStats = useAtomValue(movieStatsAtom);
+  const episodeStats = useAtomValue(episodeStatsAtom);
 
-  const _movieLoading = movieStats.state === "loading";
-  const movieCount =
-    movieStats.state === "hasData"
-      ? movieStats.data.count
-      : stats.moviesThisMonth;
-  const movieHistory =
-    movieStats.state === "hasData" ? movieStats.data.history : undefined;
+  const movieCount = movieStats?.count ?? stats.moviesThisMonth;
+  const movieHistory = movieStats?.history;
 
-  const _episodeLoading = episodeStats.state === "loading";
-  const episodeCount =
-    episodeStats.state === "hasData"
-      ? episodeStats.data.count
-      : stats.episodesThisWeek;
-  const episodeHistory =
-    episodeStats.state === "hasData" ? episodeStats.data.history : undefined;
+  const episodeCount = episodeStats?.count ?? stats.episodesThisWeek;
+  const episodeHistory = episodeStats?.history;
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

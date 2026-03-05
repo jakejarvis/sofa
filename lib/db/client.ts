@@ -45,7 +45,11 @@ function getClient() {
 
 function getDb() {
   if (!globalForDb._db) {
-    globalForDb._db = drizzle({ client: getClient(), schema, logger: drizzleLogger });
+    globalForDb._db = drizzle({
+      client: getClient(),
+      schema,
+      logger: drizzleLogger,
+    });
   }
   return globalForDb._db;
 }

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { persons, titleCast, titles } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
@@ -17,79 +17,67 @@ const NOTABLE_DEPARTMENTS = new Set([
   "Executive Producer",
 ]);
 
-function upsertPerson(
-  tmdbId: number,
-  name: string,
-  profilePath: string | null,
-  popularity?: number,
-): string {
-  const existing = db
-    .select()
-    .from(persons)
-    .where(eq(persons.tmdbId, tmdbId))
-    .get();
-  if (existing) return existing.id;
-
-  const row = db
-    .insert(persons)
-    .values({
-      tmdbId,
-      name,
-      profilePath,
-      popularity: popularity ?? null,
-    })
-    .onConflictDoNothing()
-    .returning()
-    .get();
-
-  if (row) return row.id;
-
-  // Race condition: another insert beat us
-  const found = db
-    .select()
-    .from(persons)
-    .where(eq(persons.tmdbId, tmdbId))
-    .get();
-  // biome-ignore lint/style/noNonNullAssertion: guaranteed by onConflictDoNothing + prior existence check
-  return found!.id;
+interface PersonData {
+  tmdbId: number;
+  name: string;
+  profilePath: string | null;
+  popularity?: number;
 }
 
-function upsertTitleCast(
-  titleId: string,
-  personId: string,
-  character: string | null,
-  department: string,
-  job: string | null,
-  displayOrder: number,
-  episodeCount: number | null,
-) {
-  const now = new Date();
-  db.insert(titleCast)
-    .values({
-      titleId,
-      personId,
-      character,
-      department,
-      job,
-      displayOrder,
-      episodeCount,
-      lastFetchedAt: now,
-    })
-    .onConflictDoUpdate({
-      target: [
-        titleCast.titleId,
-        titleCast.personId,
-        titleCast.department,
-        titleCast.character,
-      ],
-      set: {
-        job,
-        displayOrder,
-        episodeCount,
-        lastFetchedAt: now,
-      },
-    })
-    .run();
+function batchUpsertPersons(people: PersonData[]): Map<number, string> {
+  if (people.length === 0) return new Map();
+
+  // Deduplicate by tmdbId
+  const uniqueByTmdbId = new Map<number, PersonData>();
+  for (const p of people) {
+    if (!uniqueByTmdbId.has(p.tmdbId)) uniqueByTmdbId.set(p.tmdbId, p);
+  }
+  const uniquePeople = [...uniqueByTmdbId.values()];
+  const tmdbIds = uniquePeople.map((p) => p.tmdbId);
+
+  // Batch prefetch existing persons (1 query)
+  const existing = db
+    .select({ id: persons.id, tmdbId: persons.tmdbId })
+    .from(persons)
+    .where(inArray(persons.tmdbId, tmdbIds))
+    .all();
+  const idMap = new Map<number, string>(existing.map((p) => [p.tmdbId, p.id]));
+
+  // Insert only new persons in a transaction
+  const newPeople = uniquePeople.filter((p) => !idMap.has(p.tmdbId));
+  if (newPeople.length > 0) {
+    db.transaction((tx) => {
+      for (const p of newPeople) {
+        const row = tx
+          .insert(persons)
+          .values({
+            tmdbId: p.tmdbId,
+            name: p.name,
+            profilePath: p.profilePath,
+            popularity: p.popularity ?? null,
+          })
+          .onConflictDoNothing()
+          .returning()
+          .get();
+        if (row) idMap.set(p.tmdbId, row.id);
+      }
+    });
+
+    // One fallback query for any that conflicted
+    const stillMissing = newPeople
+      .filter((p) => !idMap.has(p.tmdbId))
+      .map((p) => p.tmdbId);
+    if (stillMissing.length > 0) {
+      const fallbacks = db
+        .select({ id: persons.id, tmdbId: persons.tmdbId })
+        .from(persons)
+        .where(inArray(persons.tmdbId, stillMissing))
+        .all();
+      for (const f of fallbacks) idMap.set(f.tmdbId, f.id);
+    }
+  }
+
+  return idMap;
 }
 
 export async function refreshCredits(titleId: string) {
@@ -101,105 +89,213 @@ export async function refreshCredits(titleId: string) {
   try {
     if (title.type === "movie") {
       const credits = await getMovieCredits(title.tmdbId);
-
-      // Top 20 cast
       const castSlice = credits.cast.slice(0, 20);
-      for (let i = 0; i < castSlice.length; i++) {
-        const c = castSlice[i];
-        const personId = upsertPerson(
-          c.id,
-          c.name,
-          c.profile_path,
-          c.popularity,
-        );
-        upsertTitleCast(
-          titleId,
-          personId,
-          c.character,
-          "Acting",
-          null,
-          i,
-          null,
-        );
-      }
 
-      // Notable crew
+      // Collect notable crew
       const seenCrew = new Set<string>();
-      let crewOrder = 100;
+      const notableCrew: typeof credits.crew = [];
       for (const c of credits.crew) {
         if (!NOTABLE_DEPARTMENTS.has(c.job)) continue;
         const key = `${c.id}-${c.job}`;
         if (seenCrew.has(key)) continue;
         seenCrew.add(key);
-
-        const personId = upsertPerson(
-          c.id,
-          c.name,
-          c.profile_path,
-          c.popularity,
-        );
-        upsertTitleCast(
-          titleId,
-          personId,
-          null,
-          c.department,
-          c.job,
-          crewOrder++,
-          null,
-        );
+        notableCrew.push(c);
       }
+
+      // Batch upsert all people at once
+      const allPeople: PersonData[] = [
+        ...castSlice.map((c) => ({
+          tmdbId: c.id,
+          name: c.name,
+          profilePath: c.profile_path,
+          popularity: c.popularity,
+        })),
+        ...notableCrew.map((c) => ({
+          tmdbId: c.id,
+          name: c.name,
+          profilePath: c.profile_path,
+          popularity: c.popularity,
+        })),
+      ];
+      const personIds = batchUpsertPersons(allPeople);
+
+      // Batch insert titleCast rows
+      db.transaction((tx) => {
+        const now = new Date();
+        for (let i = 0; i < castSlice.length; i++) {
+          const c = castSlice[i];
+          const personId = personIds.get(c.id);
+          if (!personId) continue;
+          tx.insert(titleCast)
+            .values({
+              titleId,
+              personId,
+              character: c.character,
+              department: "Acting",
+              job: null,
+              displayOrder: i,
+              episodeCount: null,
+              lastFetchedAt: now,
+            })
+            .onConflictDoUpdate({
+              target: [
+                titleCast.titleId,
+                titleCast.personId,
+                titleCast.department,
+                titleCast.character,
+              ],
+              set: {
+                job: null,
+                displayOrder: i,
+                episodeCount: null,
+                lastFetchedAt: now,
+              },
+            })
+            .run();
+        }
+        let crewOrder = 100;
+        for (const c of notableCrew) {
+          const personId = personIds.get(c.id);
+          if (!personId) continue;
+          tx.insert(titleCast)
+            .values({
+              titleId,
+              personId,
+              character: null,
+              department: c.department,
+              job: c.job,
+              displayOrder: crewOrder,
+              episodeCount: null,
+              lastFetchedAt: now,
+            })
+            .onConflictDoUpdate({
+              target: [
+                titleCast.titleId,
+                titleCast.personId,
+                titleCast.department,
+                titleCast.character,
+              ],
+              set: {
+                job: c.job,
+                displayOrder: crewOrder,
+                episodeCount: null,
+                lastFetchedAt: now,
+              },
+            })
+            .run();
+          crewOrder++;
+        }
+      });
     } else {
       const credits = await getTvAggregateCredits(title.tmdbId);
-
-      // Top 20 cast
       const castSlice = credits.cast.slice(0, 20);
-      for (let i = 0; i < castSlice.length; i++) {
-        const c = castSlice[i];
-        const personId = upsertPerson(
-          c.id,
-          c.name,
-          c.profile_path,
-          c.popularity,
-        );
-        const character = c.roles?.[0]?.character ?? null;
-        upsertTitleCast(
-          titleId,
-          personId,
-          character,
-          "Acting",
-          null,
-          i,
-          c.total_episode_count,
-        );
-      }
 
-      // Notable crew
+      // Collect notable crew
       const seenCrew = new Set<string>();
-      let crewOrder = 100;
+      const notableCrew: Array<{
+        person: (typeof credits.crew)[0];
+        job: string;
+        episodeCount: number;
+      }> = [];
       for (const c of credits.crew) {
         for (const j of c.jobs) {
           if (!NOTABLE_DEPARTMENTS.has(j.job)) continue;
           const key = `${c.id}-${j.job}`;
           if (seenCrew.has(key)) continue;
           seenCrew.add(key);
-
-          const personId = upsertPerson(
-            c.id,
-            c.name,
-            c.profile_path,
-            c.popularity,
-          );
-          upsertTitleCast(
-            titleId,
-            personId,
-            null,
-            c.department,
-            j.job,
-            crewOrder++,
-            j.episode_count,
-          );
+          notableCrew.push({
+            person: c,
+            job: j.job,
+            episodeCount: j.episode_count,
+          });
         }
       }
+
+      // Batch upsert all people at once
+      const allPeople: PersonData[] = [
+        ...castSlice.map((c) => ({
+          tmdbId: c.id,
+          name: c.name,
+          profilePath: c.profile_path,
+          popularity: c.popularity,
+        })),
+        ...notableCrew.map((c) => ({
+          tmdbId: c.person.id,
+          name: c.person.name,
+          profilePath: c.person.profile_path,
+          popularity: c.person.popularity,
+        })),
+      ];
+      const personIds = batchUpsertPersons(allPeople);
+
+      // Batch insert titleCast rows
+      db.transaction((tx) => {
+        const now = new Date();
+        for (let i = 0; i < castSlice.length; i++) {
+          const c = castSlice[i];
+          const personId = personIds.get(c.id);
+          if (!personId) continue;
+          const character = c.roles?.[0]?.character ?? null;
+          tx.insert(titleCast)
+            .values({
+              titleId,
+              personId,
+              character,
+              department: "Acting",
+              job: null,
+              displayOrder: i,
+              episodeCount: c.total_episode_count,
+              lastFetchedAt: now,
+            })
+            .onConflictDoUpdate({
+              target: [
+                titleCast.titleId,
+                titleCast.personId,
+                titleCast.department,
+                titleCast.character,
+              ],
+              set: {
+                job: null,
+                displayOrder: i,
+                episodeCount: c.total_episode_count,
+                lastFetchedAt: now,
+              },
+            })
+            .run();
+        }
+        let crewOrder = 100;
+        for (const c of notableCrew) {
+          const personId = personIds.get(c.person.id);
+          if (!personId) continue;
+          tx.insert(titleCast)
+            .values({
+              titleId,
+              personId,
+              character: null,
+              department: c.person.department,
+              job: c.job,
+              displayOrder: crewOrder,
+              episodeCount: c.episodeCount,
+              lastFetchedAt: now,
+            })
+            .onConflictDoUpdate({
+              target: [
+                titleCast.titleId,
+                titleCast.personId,
+                titleCast.department,
+                titleCast.character,
+              ],
+              set: {
+                job: c.job,
+                displayOrder: crewOrder,
+                episodeCount: c.episodeCount,
+                lastFetchedAt: now,
+              },
+            })
+            .run();
+          crewOrder++;
+        }
+      });
     }
 
     log.debug(`Credits refreshed for "${title.title}"`);

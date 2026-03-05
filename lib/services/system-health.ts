@@ -1,6 +1,6 @@
 import { access, constants, readdir, stat } from "node:fs/promises";
 import path from "node:path";
-import { count, desc, inArray } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { cronRuns, episodes, titles, user } from "@/lib/db/schema";
 import { listBackups } from "@/lib/services/backup";
@@ -151,20 +151,17 @@ function getJobsHealth(): SystemHealthData["jobs"] {
   const schedules = getJobSchedules();
   const scheduleMap = new Map(schedules.map((s) => [s.jobName, s]));
 
-  // Batch fetch the latest cron run for each job (1 query)
-  const allLatestRuns = db
-    .select()
-    .from(cronRuns)
-    .where(inArray(cronRuns.jobName, JOB_NAMES))
-    .orderBy(desc(cronRuns.startedAt))
-    .all();
-
-  // Keep only the most recent run per job
-  const latestByJob = new Map<string, (typeof allLatestRuns)[0]>();
-  for (const run of allLatestRuns) {
-    if (!latestByJob.has(run.jobName)) {
-      latestByJob.set(run.jobName, run);
-    }
+  // Fetch only the latest cron run per job (index-optimized LIMIT 1 each)
+  const latestByJob = new Map<string, typeof cronRuns.$inferSelect>();
+  for (const jobName of JOB_NAMES) {
+    const latest = db
+      .select()
+      .from(cronRuns)
+      .where(eq(cronRuns.jobName, jobName))
+      .orderBy(desc(cronRuns.startedAt))
+      .limit(1)
+      .get();
+    if (latest) latestByJob.set(jobName, latest);
   }
 
   return JOB_NAMES.map((jobName) => {
@@ -202,24 +199,30 @@ async function getImageCacheHealth(): Promise<SystemHealthData["imageCache"]> {
   let totalSizeBytes = 0;
   let imageCount = 0;
 
-  for (const category of categoryNames) {
-    const dir = path.join(CACHE_DIR, category);
-    try {
-      const files = await readdir(dir);
-      let sizeBytes = 0;
-      for (const file of files) {
-        try {
-          const s = await stat(path.join(dir, file));
-          if (s.isFile()) sizeBytes += s.size;
-        } catch {}
+  await Promise.all(
+    categoryNames.map(async (category) => {
+      const dir = path.join(CACHE_DIR, category);
+      try {
+        const files = await readdir(dir);
+        const sizes = await Promise.all(
+          files.map(async (file) => {
+            try {
+              const s = await stat(path.join(dir, file));
+              return s.isFile() ? s.size : 0;
+            } catch {
+              return 0;
+            }
+          }),
+        );
+        const sizeBytes = sizes.reduce((sum, s) => sum + s, 0);
+        categories[category] = { count: files.length, sizeBytes };
+        totalSizeBytes += sizeBytes;
+        imageCount += files.length;
+      } catch {
+        categories[category] = { count: 0, sizeBytes: 0 };
       }
-      categories[category] = { count: files.length, sizeBytes };
-      totalSizeBytes += sizeBytes;
-      imageCount += files.length;
-    } catch {
-      categories[category] = { count: 0, sizeBytes: 0 };
-    }
-  }
+    }),
+  );
 
   return { enabled: true, totalSizeBytes, imageCount, categories };
 }

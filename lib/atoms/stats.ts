@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { loadable } from "jotai/utils";
+import { unwrap } from "jotai/utils";
 import type { HistoryBucket, TimePeriod } from "@/lib/services/discovery";
 
 export const moviePeriodAtom = atom<TimePeriod>("this_month");
@@ -25,5 +25,5 @@ const episodeStatsAsyncAtom = atom(async (get) => {
   return fetchStats("episodes", period);
 });
 
-export const movieStatsLoadable = loadable(movieStatsAsyncAtom);
-export const episodeStatsLoadable = loadable(episodeStatsAsyncAtom);
+export const movieStatsAtom = unwrap(movieStatsAsyncAtom);
+export const episodeStatsAtom = unwrap(episodeStatsAsyncAtom);

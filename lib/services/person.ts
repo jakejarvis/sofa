@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { persons, titleCast, titles } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
@@ -173,58 +173,77 @@ export async function fetchFullFilmography(
 
   const credits = await getPersonCombinedCredits(person.tmdbId);
 
-  const results: PersonCredit[] = [];
+  // Filter to valid cast entries
+  const validCast = credits.cast.filter(
+    (c) => c.media_type === "movie" || c.media_type === "tv",
+  );
+  if (validCast.length === 0) return [];
 
-  for (const c of credits.cast) {
-    const type = c.media_type;
-    if (type !== "movie" && type !== "tv") continue;
+  // Batch prefetch existing titles (1 query)
+  const tmdbIds = [...new Set(validCast.map((c) => c.id))];
+  const existingTitles = db
+    .select({ id: titles.id, tmdbId: titles.tmdbId })
+    .from(titles)
+    .where(inArray(titles.tmdbId, tmdbIds))
+    .all();
+  const titleIdMap = new Map<number, string>(
+    existingTitles.map((t) => [t.tmdbId, t.id]),
+  );
 
-    // Create shell title if not in DB
-    const existing = db
-      .select()
-      .from(titles)
-      .where(eq(titles.tmdbId, c.id))
-      .get();
-    let titleId: string;
-    if (existing) {
-      titleId = existing.id;
-    } else {
-      const row = db
-        .insert(titles)
-        .values({
-          tmdbId: c.id,
-          type,
-          title: c.title ?? c.name ?? "Unknown",
-          overview: c.overview,
-          releaseDate: c.release_date,
-          firstAirDate: c.first_air_date,
-          posterPath: c.poster_path,
-          backdropPath: c.backdrop_path,
-          popularity: c.popularity,
-          voteAverage: c.vote_average,
-          voteCount: c.vote_count,
-          lastFetchedAt: null,
-        })
-        .onConflictDoNothing()
-        .returning()
-        .get();
-      if (!row) {
-        const found = db
-          .select()
-          .from(titles)
-          .where(eq(titles.tmdbId, c.id))
+  // Batch insert missing titles in a transaction
+  const newCast = validCast.filter((c) => !titleIdMap.has(c.id));
+  if (newCast.length > 0) {
+    const insertedTmdbIds = new Set<number>();
+    db.transaction((tx) => {
+      for (const c of newCast) {
+        if (insertedTmdbIds.has(c.id)) continue;
+        insertedTmdbIds.add(c.id);
+        const row = tx
+          .insert(titles)
+          .values({
+            tmdbId: c.id,
+            type: c.media_type as "movie" | "tv",
+            title: c.title ?? c.name ?? "Unknown",
+            overview: c.overview,
+            releaseDate: c.release_date,
+            firstAirDate: c.first_air_date,
+            posterPath: c.poster_path,
+            backdropPath: c.backdrop_path,
+            popularity: c.popularity,
+            voteAverage: c.vote_average,
+            voteCount: c.vote_count,
+            lastFetchedAt: null,
+          })
+          .onConflictDoNothing()
+          .returning()
           .get();
-        if (!found) continue;
-        titleId = found.id;
-      } else {
-        titleId = row.id;
+        if (row) titleIdMap.set(c.id, row.id);
       }
-    }
+    });
 
+    // One fallback query for any that conflicted
+    const stillMissing = [...insertedTmdbIds].filter(
+      (id) => !titleIdMap.has(id),
+    );
+    if (stillMissing.length > 0) {
+      const fallbacks = db
+        .select({ id: titles.id, tmdbId: titles.tmdbId })
+        .from(titles)
+        .where(inArray(titles.tmdbId, stillMissing))
+        .all();
+      for (const f of fallbacks) titleIdMap.set(f.tmdbId, f.id);
+    }
+  }
+
+  // Build results from map (0 queries)
+  const results: PersonCredit[] = [];
+  for (const c of validCast) {
+    const tid = titleIdMap.get(c.id);
+    if (!tid) continue;
     results.push({
-      titleId,
+      titleId: tid,
       tmdbId: c.id,
-      type,
+      type: c.media_type as "movie" | "tv",
       title: c.title ?? c.name ?? "Unknown",
       posterPath: tmdbImageUrl(c.poster_path, "w500"),
       releaseDate: c.release_date ?? null,

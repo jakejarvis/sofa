@@ -2,9 +2,9 @@
 
 import { IconCalendarWeek, IconChevronDown } from "@tabler/icons-react";
 import { format, formatDistanceToNow } from "date-fns";
-import { createStore, Provider, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
+import { useHydrateAtoms } from "jotai/utils";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import {
@@ -116,23 +116,20 @@ export function BackupScheduleSection({
   initialTime: string;
   initialDow: number;
 }) {
-  const [store] = useState(() => {
-    const s = createStore();
-    s.set(backupScheduleAtom, {
-      enabled: initialScheduledEnabled,
-      maxRetention: initialMaxRetention,
-      frequency: initialFrequency,
-      time: initialTime,
-      dow: initialDow,
-    });
-    return s;
-  });
+  useHydrateAtoms([
+    [
+      backupScheduleAtom,
+      {
+        enabled: initialScheduledEnabled,
+        maxRetention: initialMaxRetention,
+        frequency: initialFrequency,
+        time: initialTime,
+        dow: initialDow,
+      },
+    ],
+  ]);
 
-  return (
-    <Provider store={store}>
-      <BackupScheduleInner />
-    </Provider>
-  );
+  return <BackupScheduleInner />;
 }
 
 function BackupScheduleInner() {

@@ -1,3 +1,4 @@
+import { Provider as StoreProvider } from "jotai";
 import { redirect } from "next/navigation";
 import { CommandPalette } from "@/components/command-palette";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
@@ -14,7 +15,7 @@ export default async function PagesLayout({
   if (!session) redirect("/login");
 
   return (
-    <>
+    <StoreProvider>
       <div className="min-h-screen pb-14 sm:pb-0">
         <NavBar />
         {/* Ambient glow */}
@@ -26,6 +27,6 @@ export default async function PagesLayout({
       <MobileTabBar />
       <CommandPalette />
       <UpdateToast />
-    </>
+    </StoreProvider>
   );
 }
