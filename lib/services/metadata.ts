@@ -36,7 +36,50 @@ import {
 
 const log = createLogger("metadata");
 
-export async function importTitle(
+/**
+ * Insert a title row, or return the existing one if a concurrent insert won the race.
+ * Catches SQLITE_CONSTRAINT_UNIQUE and falls back to a SELECT.
+ */
+function insertTitleOrGet(values: typeof titles.$inferInsert, tmdbId: number) {
+  try {
+    return db.insert(titles).values(values).returning().get();
+  } catch (err: unknown) {
+    if (
+      err instanceof Error &&
+      "code" in err &&
+      err.code === "SQLITE_CONSTRAINT_UNIQUE"
+    ) {
+      log.debug(`TMDB ${tmdbId} was inserted concurrently, returning existing`);
+      return db.select().from(titles).where(eq(titles.tmdbId, tmdbId)).get();
+    }
+    throw err;
+  }
+}
+
+type ImportResult = ReturnType<typeof _importTitle>;
+
+/** In-flight import promises keyed by tmdbId — coalesces concurrent calls */
+const inflightImports = new Map<number, ImportResult>();
+
+export function importTitle(
+  tmdbId: number,
+  type: "movie" | "tv",
+  options?: { awaitEnrichment?: boolean },
+): ImportResult {
+  const inflight = inflightImports.get(tmdbId);
+  if (inflight) {
+    log.debug(`Import already in-flight for TMDB ${tmdbId}, coalescing`);
+    return inflight;
+  }
+
+  const promise = _importTitle(tmdbId, type, options).finally(() => {
+    inflightImports.delete(tmdbId);
+  }) as ImportResult;
+  inflightImports.set(tmdbId, promise);
+  return promise;
+}
+
+async function _importTitle(
   tmdbId: number,
   type: "movie" | "tv",
   options?: { awaitEnrichment?: boolean },
@@ -118,9 +161,8 @@ export async function importTitle(
 
   if (type === "movie") {
     const movie = await getMovieDetails(tmdbId);
-    const row = db
-      .insert(titles)
-      .values({
+    const row = insertTitleOrGet(
+      {
         tmdbId: movie.id,
         type: "movie",
         title: movie.title,
@@ -134,9 +176,10 @@ export async function importTitle(
         voteCount: movie.vote_count,
         status: movie.status,
         lastFetchedAt: now,
-      })
-      .returning()
-      .get();
+      },
+      tmdbId,
+    );
+    if (!row) return undefined;
     if (awaitEnrichment) {
       await Promise.all([
         refreshAvailability(row.id).catch((err) =>
@@ -179,9 +222,8 @@ export async function importTitle(
   }
 
   const show = await getTvDetails(tmdbId);
-  const row = db
-    .insert(titles)
-    .values({
+  const row = insertTitleOrGet(
+    {
       tmdbId: show.id,
       type: "tv",
       title: show.name,
@@ -195,9 +237,10 @@ export async function importTitle(
       voteCount: show.vote_count,
       status: show.status,
       lastFetchedAt: now,
-    })
-    .returning()
-    .get();
+    },
+    tmdbId,
+  );
+  if (!row) return undefined;
 
   await refreshTvChildren(row.id, tmdbId, show.number_of_seasons);
   if (awaitEnrichment) {
