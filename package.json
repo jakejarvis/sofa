@@ -26,7 +26,7 @@
     "cmdk": "1.1.1",
     "croner": "10.0.2-dev.2",
     "date-fns": "4.1.0",
-    "drizzle-orm": "1.0.0-beta.15-859cf75",
+    "drizzle-orm": "1.0.0-beta.16-ea816b6",
     "embla-carousel-react": "8.6.0",
     "embla-carousel-wheel-gestures": "8.1.0",
     "jotai": "2.18.0",
@@ -56,7 +56,7 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "babel-plugin-react-compiler": "1.0.0",
-    "drizzle-kit": "1.0.0-beta.15-859cf75",
+    "drizzle-kit": "1.0.0-beta.16-ea816b6",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3"
   },
