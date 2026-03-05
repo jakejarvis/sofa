@@ -115,6 +115,7 @@ function getLibraryTitleIds(): string[] {
 // Refresh titles where lastFetchedAt is stale
 async function nightlyRefreshLibrary() {
   const libraryIds = getLibraryTitleIds();
+  log.debug(`Checking ${libraryIds.length} library titles for staleness`);
   const libraryStale = new Date(Date.now() - 7 * DAY);
   const nonLibraryStale = new Date(Date.now() - 30 * DAY);
 
@@ -157,6 +158,7 @@ async function nightlyRefreshLibrary() {
 // Refresh availability for library titles where stale
 async function refreshAvailabilityJob() {
   const libraryIds = getLibraryTitleIds();
+  log.debug(`Checking availability for ${libraryIds.length} library titles`);
   const stale = new Date(Date.now() - DAY);
 
   for (const titleId of libraryIds) {
@@ -189,6 +191,9 @@ async function refreshAvailabilityJob() {
 // Refresh recommendations for recently active titles
 async function refreshRecommendationsJob() {
   const libraryIds = getLibraryTitleIds();
+  log.debug(
+    `Refreshing recommendations for ${libraryIds.length} library titles`,
+  );
 
   for (const titleId of libraryIds) {
     await refreshRecommendations(titleId);
@@ -213,6 +218,8 @@ async function refreshTvChildrenJob() {
     )
     .all();
 
+  log.debug(`Checking ${tvShows.length} returning TV shows for stale episodes`);
+
   for (const show of tvShows) {
     // Check if seasons are stale
     const staleSeason = db
@@ -236,6 +243,7 @@ async function cacheImagesJob() {
   if (!imageCacheEnabled()) return;
 
   const libraryIds = getLibraryTitleIds();
+  log.debug(`Caching images for ${libraryIds.length} library titles`);
 
   for (const titleId of libraryIds) {
     try {
@@ -244,8 +252,8 @@ async function cacheImagesJob() {
         cacheEpisodeStills(titleId),
         cacheProviderLogos(titleId),
       ]);
-    } catch {
-      // Continue with remaining titles
+    } catch (err) {
+      log.warn(`Failed to cache images for title ${titleId}:`, err);
     }
     await Bun.sleep(RATE_LIMIT_MS);
   }

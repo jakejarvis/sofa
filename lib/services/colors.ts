@@ -43,6 +43,9 @@ export async function extractAndStoreColors(
   }
 
   try {
+    log.debug(
+      `Extracting colors for title ${titleId} from ${imageCacheEnabled() ? "cache" : "remote"}`,
+    );
     const palette = await Vibrant.from(source).getPalette();
 
     const colors: ColorPalette = {
@@ -59,6 +62,9 @@ export async function extractAndStoreColors(
       .where(eq(titles.id, titleId))
       .run();
 
+    log.debug(
+      `Extracted colors for title ${titleId}: colors=${JSON.stringify(colors)}`,
+    );
     return colors;
   } catch (err) {
     log.error(`Failed to extract colors for title ${titleId}:`, err);

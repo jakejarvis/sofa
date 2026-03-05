@@ -1,3 +1,4 @@
+import { createLogger } from "@/lib/logger";
 import type {
   TmdbFindResult,
   TmdbGenreListResponse,
@@ -8,6 +9,8 @@ import type {
   TmdbTvDetails,
   TmdbWatchProviderResponse,
 } from "./types";
+
+const log = createLogger("tmdb");
 
 const BASE_URL =
   process.env.TMDB_API_BASE_URL || "https://api.themoviedb.org/3";
@@ -29,6 +32,7 @@ async function tmdbFetch<T>(
     }
   }
 
+  const start = performance.now();
   const res = await fetch(url.toString(), {
     ...fetchOptions,
     headers: {
@@ -37,11 +41,16 @@ async function tmdbFetch<T>(
       ...fetchOptions?.headers,
     },
   });
+  const elapsed = Math.round(performance.now() - start);
 
   if (!res.ok) {
+    log.warn(
+      `${url.toString()} -> ${res.status} ${res.statusText} (${elapsed}ms)`,
+    );
     throw new Error(`TMDB API error: ${res.status} ${res.statusText}`);
   }
 
+  log.debug(`${url.toString()} -> ${res.status} (${elapsed}ms)`);
   return res.json() as Promise<T>;
 }
 

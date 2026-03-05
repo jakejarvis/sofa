@@ -8,9 +8,12 @@ import {
   webhookConnections,
   webhookEventLog,
 } from "@/lib/db/schema";
+import { createLogger } from "@/lib/logger";
 import { findByExternalId, searchTv } from "@/lib/tmdb/client";
 import { importTitle } from "./metadata";
 import { logEpisodeWatch, logMovieWatch } from "./tracking";
+
+const log = createLogger("webhooks");
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -301,10 +304,14 @@ export async function processWebhook(
   provider: "plex" | "jellyfin" | "emby",
   event: WebhookEvent,
 ): Promise<{ status: "success" | "ignored" | "error"; message: string }> {
+  log.info(`Received ${provider} webhook: ${event.mediaType} "${event.title}"`);
   try {
     if (event.mediaType === "movie") {
       const tmdbId = await resolveMovieTmdbId(event);
       if (!tmdbId) {
+        log.warn(
+          `Could not resolve TMDB ID for movie "${event.title}" from ${provider}`,
+        );
         logEvent(
           connectionId,
           event,
@@ -321,6 +328,7 @@ export async function processWebhook(
       }
 
       if (isDuplicateMovieWatch(userId, title.id)) {
+        log.debug(`Duplicate movie watch ignored: "${event.title}"`);
         logEvent(
           connectionId,
           event,
@@ -331,6 +339,7 @@ export async function processWebhook(
       }
 
       logMovieWatch(userId, title.id, provider);
+      log.info(`Logged movie watch: "${event.title}" (TMDB ${tmdbId})`);
       logEvent(connectionId, event, "success");
       return { status: "success", message: `Logged watch for ${event.title}` };
     }
@@ -338,6 +347,7 @@ export async function processWebhook(
     if (event.mediaType === "episode") {
       const resolved = await resolveEpisode(event);
       if (!resolved) {
+        log.warn(`Could not resolve episode "${event.title}" from ${provider}`);
         logEvent(connectionId, event, "error", "Could not resolve episode");
         return { status: "error", message: "Could not resolve episode" };
       }
@@ -398,6 +408,7 @@ export async function processWebhook(
       }
 
       if (isDuplicateEpisodeWatch(userId, episode.id)) {
+        log.debug(`Duplicate episode watch ignored: "${event.title}"`);
         logEvent(
           connectionId,
           event,
@@ -408,6 +419,9 @@ export async function processWebhook(
       }
 
       logEpisodeWatch(userId, episode.id, provider);
+      log.info(
+        `Logged episode watch: "${event.title}" S${resolved.seasonNumber}E${resolved.episodeNumber}`,
+      );
       logEvent(connectionId, event, "success");
       return { status: "success", message: `Logged watch for ${event.title}` };
     }

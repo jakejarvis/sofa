@@ -37,6 +37,8 @@ export async function importTitle(
   type: "movie" | "tv",
   options?: { awaitEnrichment?: boolean },
 ) {
+  log.debug(`Importing ${type} TMDB ${tmdbId}`);
+
   const awaitEnrichment = options?.awaitEnrichment ?? false;
   const existing = db
     .select()
@@ -70,19 +72,31 @@ export async function importTitle(
         await refreshTvChildren(existing.id, tmdbId, show.number_of_seasons);
         if (awaitEnrichment) {
           await Promise.all([
-            refreshAvailability(existing.id).catch(() => {}),
-            refreshRecommendations(existing.id).catch(() => {}),
-            extractAndStoreColors(existing.id, show.poster_path).catch(
-              () => {},
+            refreshAvailability(existing.id).catch((err) =>
+              log.debug("Availability enrichment failed:", err),
+            ),
+            refreshRecommendations(existing.id).catch((err) =>
+              log.debug("Recommendations enrichment failed:", err),
+            ),
+            extractAndStoreColors(existing.id, show.poster_path).catch((err) =>
+              log.debug("Color extraction failed:", err),
             ),
           ]);
         } else {
-          refreshAvailability(existing.id).catch(() => {});
-          refreshRecommendations(existing.id).catch(() => {});
+          refreshAvailability(existing.id).catch((err) =>
+            log.debug("Availability enrichment failed:", err),
+          );
+          refreshRecommendations(existing.id).catch((err) =>
+            log.debug("Recommendations enrichment failed:", err),
+          );
         }
         if (imageCacheEnabled()) {
-          cacheImagesForTitle(existing.id).catch(() => {});
-          cacheEpisodeStills(existing.id).catch(() => {});
+          cacheImagesForTitle(existing.id).catch((err) =>
+            log.debug("Image caching failed:", err),
+          );
+          cacheEpisodeStills(existing.id).catch((err) =>
+            log.debug("Episode stills caching failed:", err),
+          );
         }
         return db.select().from(titles).where(eq(titles.id, existing.id)).get();
       }
@@ -115,16 +129,33 @@ export async function importTitle(
       .get();
     if (awaitEnrichment) {
       await Promise.all([
-        refreshAvailability(row.id).catch(() => {}),
-        refreshRecommendations(row.id).catch(() => {}),
-        extractAndStoreColors(row.id, movie.poster_path).catch(() => {}),
+        refreshAvailability(row.id).catch((err) =>
+          log.debug("Availability enrichment failed:", err),
+        ),
+        refreshRecommendations(row.id).catch((err) =>
+          log.debug("Recommendations enrichment failed:", err),
+        ),
+        extractAndStoreColors(row.id, movie.poster_path).catch((err) =>
+          log.debug("Color extraction failed:", err),
+        ),
       ]);
     } else {
-      refreshAvailability(row.id).catch(() => {});
-      refreshRecommendations(row.id).catch(() => {});
-      extractAndStoreColors(row.id, movie.poster_path).catch(() => {});
+      refreshAvailability(row.id).catch((err) =>
+        log.debug("Availability enrichment failed:", err),
+      );
+      refreshRecommendations(row.id).catch((err) =>
+        log.debug("Recommendations enrichment failed:", err),
+      );
+      extractAndStoreColors(row.id, movie.poster_path).catch((err) =>
+        log.debug("Color extraction failed:", err),
+      );
     }
-    if (imageCacheEnabled()) cacheImagesForTitle(row.id).catch(() => {});
+    if (imageCacheEnabled()) {
+      cacheImagesForTitle(row.id).catch((err) =>
+        log.debug("Image caching failed:", err),
+      );
+    }
+    log.info(`Imported movie "${movie.title}" (TMDB ${tmdbId})`);
     return row;
   }
 
@@ -152,19 +183,36 @@ export async function importTitle(
   await refreshTvChildren(row.id, tmdbId, show.number_of_seasons);
   if (awaitEnrichment) {
     await Promise.all([
-      refreshAvailability(row.id).catch(() => {}),
-      refreshRecommendations(row.id).catch(() => {}),
-      extractAndStoreColors(row.id, show.poster_path).catch(() => {}),
+      refreshAvailability(row.id).catch((err) =>
+        log.debug("Availability enrichment failed:", err),
+      ),
+      refreshRecommendations(row.id).catch((err) =>
+        log.debug("Recommendations enrichment failed:", err),
+      ),
+      extractAndStoreColors(row.id, show.poster_path).catch((err) =>
+        log.debug("Color extraction failed:", err),
+      ),
     ]);
   } else {
-    refreshAvailability(row.id).catch(() => {});
-    refreshRecommendations(row.id).catch(() => {});
-    extractAndStoreColors(row.id, show.poster_path).catch(() => {});
+    refreshAvailability(row.id).catch((err) =>
+      log.debug("Availability enrichment failed:", err),
+    );
+    refreshRecommendations(row.id).catch((err) =>
+      log.debug("Recommendations enrichment failed:", err),
+    );
+    extractAndStoreColors(row.id, show.poster_path).catch((err) =>
+      log.debug("Color extraction failed:", err),
+    );
   }
   if (imageCacheEnabled()) {
-    cacheImagesForTitle(row.id).catch(() => {});
-    cacheEpisodeStills(row.id).catch(() => {});
+    cacheImagesForTitle(row.id).catch((err) =>
+      log.debug("Image caching failed:", err),
+    );
+    cacheEpisodeStills(row.id).catch((err) =>
+      log.debug("Episode stills caching failed:", err),
+    );
   }
+  log.info(`Imported TV show "${show.name}" (TMDB ${tmdbId})`);
   return row;
 }
 
@@ -215,10 +263,18 @@ export async function refreshTitle(titleId: string) {
 
   const updated = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (updated) {
-    extractAndStoreColors(updated.id, updated.posterPath).catch(() => {});
+    extractAndStoreColors(updated.id, updated.posterPath).catch((err) =>
+      log.debug("Color extraction failed:", err),
+    );
     if (imageCacheEnabled()) {
-      cacheImagesForTitle(updated.id).catch(() => {});
-      if (updated.type === "tv") cacheEpisodeStills(updated.id).catch(() => {});
+      cacheImagesForTitle(updated.id).catch((err) =>
+        log.debug("Image caching failed:", err),
+      );
+      if (updated.type === "tv") {
+        cacheEpisodeStills(updated.id).catch((err) =>
+          log.debug("Episode stills caching failed:", err),
+        );
+      }
     }
   }
   return updated;
@@ -304,6 +360,10 @@ export async function refreshRecommendations(titleId: string) {
     getRecommendations(title.tmdbId, title.type),
     getSimilar(title.tmdbId, title.type),
   ]);
+
+  log.debug(
+    `Fetched ${recs.results.length} recommendations and ${similar.results.length} similar for title ${titleId}`,
+  );
 
   // Process recommendations
   for (let i = 0; i < recs.results.length && i < 20; i++) {

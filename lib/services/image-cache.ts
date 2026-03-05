@@ -3,6 +3,9 @@ import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { availabilityOffers, episodes, seasons, titles } from "@/lib/db/schema";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("image-cache");
 
 export type ImageCategory = "posters" | "backdrops" | "stills" | "logos";
 
@@ -63,7 +66,10 @@ export async function downloadAndCacheImage(
   const url = `${IMAGE_BASE_URL}/${size}${tmdbPath}`;
 
   const res = await fetch(url);
-  if (!res.ok) return null;
+  if (!res.ok) {
+    log.warn(`Download failed: ${url} -> ${res.status}`);
+    return null;
+  }
 
   const buffer = Buffer.from(await res.arrayBuffer());
   const filename = path.basename(tmdbPath);
@@ -73,8 +79,9 @@ export async function downloadAndCacheImage(
   try {
     await Bun.write(tmpPath, buffer);
     await rename(tmpPath, finalPath);
-  } catch {
-    // Best-effort cleanup
+    log.debug(`Cached ${category}/${filename} (${buffer.length} bytes)`);
+  } catch (err) {
+    log.warn(`Failed to write cached image ${filename}:`, err);
   }
 
   return buffer;
@@ -88,6 +95,7 @@ export async function fetchAndMaybeCache(
   const filename = path.basename(tmdbPath);
   const cached = await readCachedImage(category, filename);
   if (cached) {
+    log.debug(`Cache hit: ${category}/${filename}`);
     const ext = path.extname(filename).toLowerCase();
     const contentType =
       ext === ".png"
@@ -102,7 +110,10 @@ export async function fetchAndMaybeCache(
   const size = CATEGORY_SIZES[category];
   const url = `${IMAGE_BASE_URL}/${size}${tmdbPath}`;
   const res = await fetch(url);
-  if (!res.ok) return null;
+  if (!res.ok) {
+    log.warn(`Fetch failed: ${url} -> ${res.status}`);
+    return null;
+  }
 
   const buffer = Buffer.from(await res.arrayBuffer());
   const contentType = res.headers.get("content-type") || "image/jpeg";
@@ -112,7 +123,7 @@ export async function fetchAndMaybeCache(
   const tmpPath = `${finalPath}.tmp.${Date.now()}`;
   Bun.write(tmpPath, buffer)
     .then(() => rename(tmpPath, finalPath))
-    .catch(() => {});
+    .catch((err) => log.warn(`Failed to cache ${category}/${filename}:`, err));
 
   return { buffer, contentType };
 }
@@ -151,6 +162,10 @@ export async function cacheImagesForTitle(titleId: string) {
         tasks.push(downloadAndCacheImage(s.posterPath, "posters"));
       }
     }
+  }
+
+  if (tasks.length > 0) {
+    log.debug(`Caching ${tasks.length} images for title ${titleId}`);
   }
 
   await Promise.allSettled(tasks);

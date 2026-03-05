@@ -255,7 +255,7 @@ function CardInner({
 /** Linked title card for library grids, recommendations, dashboards */
 export function TitleCard({
   id,
-  tmdbId,
+  tmdbId: _tmdbId,
   type,
   title,
   posterPath,

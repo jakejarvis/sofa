@@ -1,7 +1,10 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { availabilityOffers, titles } from "@/lib/db/schema";
+import { createLogger } from "@/lib/logger";
 import { getWatchProviders } from "@/lib/tmdb/client";
+
+const log = createLogger("availability");
 
 export async function refreshAvailability(titleId: string) {
   const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
@@ -9,7 +12,10 @@ export async function refreshAvailability(titleId: string) {
 
   const data = await getWatchProviders(title.tmdbId, title.type);
   const us = data.results?.US;
-  if (!us) return;
+  if (!us) {
+    log.debug(`No US providers for title ${titleId}`);
+    return;
+  }
 
   const now = new Date();
   const offerTypes = ["flatrate", "rent", "buy", "free", "ads"] as const;
@@ -44,6 +50,9 @@ export async function refreshAvailability(titleId: string) {
         .run();
     }
   }
+
+  const total = offerTypes.reduce((n, t) => n + (us[t]?.length ?? 0), 0);
+  log.debug(`Refreshed availability for title ${titleId}: ${total} offers`);
 }
 
 export function getAvailability(titleId: string) {
