@@ -9,7 +9,7 @@ import {
   IconPlayerPlay,
   IconRefresh,
 } from "@tabler/icons-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { StatusDot } from "@/components/status-dot";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useSystemHealth } from "@/hooks/use-system-health";
 import { useTimeAgo } from "@/hooks/use-time-ago";
 import type { SystemHealthData } from "@/lib/services/system-health";
 
@@ -129,30 +130,15 @@ function LiveTimeAgo({
 
 /** Renders 3 separate cards: System status, Background jobs, Storage */
 export function SystemHealthCards() {
-  const [data, setData] = useState<SystemHealthData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const fetchHealth = useCallback(async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    try {
-      const res = await fetch("/api/admin/system-health");
-      if (!res.ok) throw new Error("Failed to fetch");
-      const health: SystemHealthData = await res.json();
-      setData(health);
-    } catch {
-      if (isRefresh) toast.error("Failed to refresh system health");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
+  const { data, error, isLoading, isValidating, refresh } = useSystemHealth();
 
   useEffect(() => {
-    fetchHealth();
-  }, [fetchHealth]);
+    if (error && !isLoading) {
+      toast.error("Failed to refresh system health");
+    }
+  }, [error, isLoading]);
 
-  if (loading) return <SkeletonCards />;
+  if (isLoading) return <SkeletonCards />;
   if (!data) return null;
 
   return (
@@ -178,12 +164,12 @@ export function SystemHealthCards() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => fetchHealth(true)}
-                    disabled={refreshing}
+                    onClick={() => refresh()}
+                    disabled={isValidating}
                   />
                 }
               >
-                {refreshing ? <Spinner /> : <IconRefresh />}
+                {isValidating ? <Spinner /> : <IconRefresh />}
               </TooltipTrigger>
               <TooltipContent>Refresh</TooltipContent>
             </Tooltip>
@@ -277,10 +263,7 @@ export function SystemHealthCards() {
       </Card>
 
       {/* ── Card 2: Background Jobs ── */}
-      <BackgroundJobsCard
-        jobs={data.jobs}
-        onRefresh={() => fetchHealth(true)}
-      />
+      <BackgroundJobsCard jobs={data.jobs} onRefresh={refresh} />
 
       {/* ── Card 3: Storage ── */}
       <Card className="border-l-2 border-l-primary/30">

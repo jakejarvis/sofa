@@ -33,6 +33,7 @@ import {
 import { Kbd } from "@/components/ui/kbd";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useSearch } from "@/hooks/use-search";
 import {
   commandPaletteOpenAtom,
   helpOpenAtom,
@@ -41,14 +42,7 @@ import {
 } from "@/lib/atoms/command-palette";
 import { SHORTCUT_DESCRIPTIONS } from "@/lib/constants/shortcuts";
 
-interface SearchResult {
-  tmdbId: number;
-  type: "movie" | "tv";
-  title: string;
-  posterPath: string | null;
-  releaseDate: string | null;
-  voteAverage: number;
-}
+type SearchResult = ReturnType<typeof useSearch>["results"][number];
 
 export function CommandPalette() {
   const router = useRouter();
@@ -58,9 +52,8 @@ export function CommandPalette() {
   const [helpOpen, setHelpOpen] = useAtom(helpOpenAtom);
   const [recentSearches, setRecentSearches] = useAtom(recentSearchesAtom);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
   const debouncedQuery = useDebounce(query, 300);
+  const { results, isLoading: loading } = useSearch(debouncedQuery);
   const enabled = !commandPaletteOpen;
 
   useHotkey("Mod+K", () => setCommandPaletteOpen((prev) => !prev));
@@ -75,41 +68,23 @@ export function CommandPalette() {
     timeout: 500,
   });
 
-  // Reset ephemeral state when palette opens
+  // Reset query when palette opens
   useEffect(() => {
     if (commandPaletteOpen) {
       setQuery("");
-      setResults([]);
     }
   }, [commandPaletteOpen]);
 
-  // Search TMDB
+  // Save to recent searches when results arrive
   useEffect(() => {
-    if (!debouncedQuery.trim()) {
-      setResults([]);
-      return;
-    }
-    let cancelled = false;
-    setLoading(true);
-    fetch(`/api/search?query=${encodeURIComponent(debouncedQuery)}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (!cancelled) {
-          setResults((data.results ?? []).slice(0, 8));
-          const trimmed = debouncedQuery.trim();
-          setRecentSearches((prev) => {
-            const filtered = prev.filter((q) => q !== trimmed);
-            return [trimmed, ...filtered].slice(0, MAX_RECENT);
-          });
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+    const trimmed = debouncedQuery.trim();
+    if (trimmed && results.length > 0) {
+      setRecentSearches((prev) => {
+        const filtered = prev.filter((q) => q !== trimmed);
+        return [trimmed, ...filtered].slice(0, MAX_RECENT);
       });
-    return () => {
-      cancelled = true;
-    };
-  }, [debouncedQuery, setRecentSearches]);
+    }
+  }, [debouncedQuery, results, setRecentSearches]);
 
   const handleSelect = useCallback(
     (result: SearchResult) => {
