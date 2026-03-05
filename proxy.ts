@@ -9,7 +9,7 @@ export function proxy(request: NextRequest) {
 
   if (pathname === "/") {
     if (sessionCookie) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.rewrite(new URL("/dashboard", request.url));
     }
     return NextResponse.next();
   }
