@@ -1,8 +1,9 @@
 "use client";
 
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
+import { createStore, Provider, useAtom, useAtomValue } from "jotai";
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TitleCardSkeleton } from "@/components/skeletons";
 import { TitleCard } from "@/components/title-card";
 import {
@@ -10,6 +11,12 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import {
+  defaultItemsAtom,
+  genreResultsLoadable,
+  mediaTypeAtom,
+  selectedGenreAtom,
+} from "@/lib/atoms/filterable-row";
 
 interface Genre {
   id: number;
@@ -55,38 +62,40 @@ export function FilterableTitleRow({
   defaultItems,
   genres,
 }: FilterableTitleRowProps) {
-  const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
-  const [results, setResults] = useState<TitleRowItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [store] = useState(() => {
+    const s = createStore();
+    s.set(mediaTypeAtom, mediaType);
+    s.set(defaultItemsAtom, defaultItems);
+    return s;
+  });
 
-  const items = selectedGenre === null ? defaultItems : results;
+  return (
+    <Provider store={store}>
+      <FilterableTitleRowInner heading={heading} icon={icon} genres={genres} />
+    </Provider>
+  );
+}
 
-  useEffect(() => {
-    if (selectedGenre === null) {
-      setResults([]);
-      return;
-    }
+function FilterableTitleRowInner({
+  heading,
+  icon,
+  genres,
+}: {
+  heading: string;
+  icon: React.ReactNode;
+  genres: Genre[];
+}) {
+  const [selectedGenre, setSelectedGenre] = useAtom(selectedGenreAtom);
+  const defaults = useAtomValue(defaultItemsAtom);
+  const genreResults = useAtomValue(genreResultsLoadable);
 
-    let cancelled = false;
-    setLoading(true);
-
-    fetch(
-      `/api/explore/discover?type=${mediaType}&genre=${selectedGenre}&sort_by=popularity.desc`,
-    )
-      .then((r) => r.json())
-      .then((data) => {
-        if (!cancelled) {
-          setResults(data.results ?? []);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedGenre, mediaType]);
+  const loading = selectedGenre !== null && genreResults.state === "loading";
+  const items =
+    selectedGenre === null
+      ? defaults
+      : genreResults.state === "hasData" && genreResults.data !== null
+        ? genreResults.data
+        : [];
 
   function toggleGenre(genreId: number) {
     setSelectedGenre(selectedGenre === genreId ? null : genreId);

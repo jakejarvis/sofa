@@ -31,6 +31,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useConnectionActions } from "@/lib/atoms/integrations";
 import { EmbyIcon, JellyfinIcon, PlexIcon } from "./icons";
 
 export interface WebhookConnection {
@@ -51,22 +52,16 @@ export interface WebhookConnection {
 
 export function WebhookCard({
   provider,
-  connection,
-  onConnect,
-  onDelete,
-  onRegenerateToken,
-  onToggle,
 }: {
   provider: "plex" | "jellyfin" | "emby";
-  connection: WebhookConnection | null;
-  onConnect: (provider: "plex" | "jellyfin" | "emby") => Promise<void>;
-  onDelete: (provider: "plex" | "jellyfin" | "emby") => Promise<void>;
-  onRegenerateToken: (provider: "plex" | "jellyfin" | "emby") => Promise<void>;
-  onToggle: (
-    provider: "plex" | "jellyfin" | "emby",
-    enabled: boolean,
-  ) => Promise<void>;
 }) {
+  const {
+    connection,
+    handleConnect,
+    handleDelete,
+    handleRegenerateToken,
+    handleToggle,
+  } = useConnectionActions(provider);
   const [connecting, setConnecting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
@@ -81,10 +76,10 @@ export function WebhookCard({
     ? `${window.location.origin}/api/webhooks/${connection.token}`
     : null;
 
-  async function handleConnect() {
+  async function onConnect() {
     setConnecting(true);
     try {
-      await onConnect(provider);
+      await handleConnect();
     } finally {
       setConnecting(false);
     }
@@ -132,7 +127,7 @@ export function WebhookCard({
                 </span>
                 <Switch
                   checked={connection.enabled}
-                  onCheckedChange={(checked) => onToggle(provider, checked)}
+                  onCheckedChange={(checked) => handleToggle(checked)}
                 />
               </div>
             )}
@@ -177,7 +172,7 @@ export function WebhookCard({
 
             {!connection ? (
               <Button
-                onClick={handleConnect}
+                onClick={onConnect}
                 disabled={connecting}
                 className="w-full"
               >
@@ -231,7 +226,7 @@ export function WebhookCard({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => onRegenerateToken(provider)}
+                        onClick={() => handleRegenerateToken()}
                       >
                         <IconRefresh />
                         Regenerate URL
@@ -239,7 +234,7 @@ export function WebhookCard({
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => onDelete(provider)}
+                        onClick={() => handleDelete()}
                       >
                         <IconTrash />
                         Disconnect

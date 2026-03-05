@@ -36,6 +36,8 @@ import { useDebounce } from "@/hooks/use-debounce";
 import {
   commandPaletteOpenAtom,
   helpOpenAtom,
+  MAX_RECENT,
+  recentSearchesAtom,
 } from "@/lib/atoms/command-palette";
 import { SHORTCUT_DESCRIPTIONS } from "@/lib/constants/shortcuts";
 
@@ -48,43 +50,16 @@ interface SearchResult {
   voteAverage: number;
 }
 
-const RECENT_KEY = "cp:recent-searches";
-const MAX_RECENT = 5;
-
-function getRecentSearches(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]");
-  } catch {
-    return [];
-  }
-}
-
-function addRecentSearch(query: string) {
-  const recent = getRecentSearches().filter((q) => q !== query);
-  recent.unshift(query);
-  localStorage.setItem(RECENT_KEY, JSON.stringify(recent.slice(0, MAX_RECENT)));
-}
-
-function removeRecentSearch(query: string) {
-  const recent = getRecentSearches().filter((q) => q !== query);
-  localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
-}
-
-function clearRecentSearches() {
-  localStorage.removeItem(RECENT_KEY);
-}
-
 export function CommandPalette() {
   const router = useRouter();
   const [commandPaletteOpen, setCommandPaletteOpen] = useAtom(
     commandPaletteOpenAtom,
   );
   const [helpOpen, setHelpOpen] = useAtom(helpOpenAtom);
+  const [recentSearches, setRecentSearches] = useAtom(recentSearchesAtom);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const debouncedQuery = useDebounce(query, 300);
   const enabled = !commandPaletteOpen;
 
@@ -100,10 +75,9 @@ export function CommandPalette() {
     timeout: 500,
   });
 
-  // Load recent searches when palette opens
+  // Reset ephemeral state when palette opens
   useEffect(() => {
     if (commandPaletteOpen) {
-      setRecentSearches(getRecentSearches());
       setQuery("");
       setResults([]);
     }
@@ -122,7 +96,11 @@ export function CommandPalette() {
       .then((data) => {
         if (!cancelled) {
           setResults((data.results ?? []).slice(0, 8));
-          addRecentSearch(debouncedQuery.trim());
+          const trimmed = debouncedQuery.trim();
+          setRecentSearches((prev) => {
+            const filtered = prev.filter((q) => q !== trimmed);
+            return [trimmed, ...filtered].slice(0, MAX_RECENT);
+          });
         }
       })
       .finally(() => {
@@ -131,7 +109,7 @@ export function CommandPalette() {
     return () => {
       cancelled = true;
     };
-  }, [debouncedQuery]);
+  }, [debouncedQuery, setRecentSearches]);
 
   const handleSelect = useCallback(
     (result: SearchResult) => {
@@ -145,15 +123,16 @@ export function CommandPalette() {
     setQuery(q);
   }, []);
 
-  const handleRemoveRecent = useCallback((q: string) => {
-    removeRecentSearch(q);
-    setRecentSearches((prev) => prev.filter((s) => s !== q));
-  }, []);
+  const handleRemoveRecent = useCallback(
+    (q: string) => {
+      setRecentSearches((prev) => prev.filter((s) => s !== q));
+    },
+    [setRecentSearches],
+  );
 
   const handleClearRecent = useCallback(() => {
-    clearRecentSearches();
     setRecentSearches([]);
-  }, []);
+  }, [setRecentSearches]);
 
   const hasQuery = query.trim().length > 0;
 

@@ -7,8 +7,8 @@ import {
   IconMovie,
   IconPlayerPlay,
 } from "@tabler/icons-react";
+import { useAtom, useAtomValue } from "jotai";
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +16,12 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  episodePeriodAtom,
+  episodeStatsLoadable,
+  moviePeriodAtom,
+  movieStatsLoadable,
+} from "@/lib/atoms/stats";
 import type {
   DashboardStats,
   HistoryBucket,
@@ -122,50 +128,27 @@ function PeriodSelector({
   );
 }
 
-async function fetchStats(
-  type: "movies" | "episodes",
-  period: TimePeriod,
-): Promise<{ count: number; history: HistoryBucket[] }> {
-  const res = await fetch(
-    `/api/stats?type=${type}&period=${period}&history=true`,
-  );
-  return res.json();
-}
-
 export function StatsDisplay({ stats }: { stats: DashboardStats }) {
-  const [moviePeriod, setMoviePeriod] = useState<TimePeriod>("this_month");
-  const [episodePeriod, setEpisodePeriod] = useState<TimePeriod>("this_week");
-  const [movieCount, setMovieCount] = useState(stats.moviesThisMonth);
-  const [episodeCount, setEpisodeCount] = useState(stats.episodesThisWeek);
-  const [movieLoading, setMovieLoading] = useState(false);
-  const [episodeLoading, setEpisodeLoading] = useState(false);
-  const [movieHistory, setMovieHistory] = useState<HistoryBucket[]>();
-  const [episodeHistory, setEpisodeHistory] = useState<HistoryBucket[]>();
+  const [moviePeriod, setMoviePeriod] = useAtom(moviePeriodAtom);
+  const [episodePeriod, setEpisodePeriod] = useAtom(episodePeriodAtom);
+  const movieStats = useAtomValue(movieStatsLoadable);
+  const episodeStats = useAtomValue(episodeStatsLoadable);
 
-  useEffect(() => {
-    fetchStats("movies", "this_month").then((d) => setMovieHistory(d.history));
-    fetchStats("episodes", "this_week").then((d) =>
-      setEpisodeHistory(d.history),
-    );
-  }, []);
+  const movieLoading = movieStats.state === "loading";
+  const movieCount =
+    movieStats.state === "hasData"
+      ? movieStats.data.count
+      : stats.moviesThisMonth;
+  const movieHistory =
+    movieStats.state === "hasData" ? movieStats.data.history : undefined;
 
-  async function handleMoviePeriodChange(period: TimePeriod) {
-    setMoviePeriod(period);
-    setMovieLoading(true);
-    const data = await fetchStats("movies", period);
-    setMovieCount(data.count);
-    setMovieHistory(data.history);
-    setMovieLoading(false);
-  }
-
-  async function handleEpisodePeriodChange(period: TimePeriod) {
-    setEpisodePeriod(period);
-    setEpisodeLoading(true);
-    const data = await fetchStats("episodes", period);
-    setEpisodeCount(data.count);
-    setEpisodeHistory(data.history);
-    setEpisodeLoading(false);
-  }
+  const episodeLoading = episodeStats.state === "loading";
+  const episodeCount =
+    episodeStats.state === "hasData"
+      ? episodeStats.data.count
+      : stats.episodesThisWeek;
+  const episodeHistory =
+    episodeStats.state === "hasData" ? episodeStats.data.history : undefined;
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -181,7 +164,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
           <PeriodSelector
             noun="Movies"
             period={moviePeriod}
-            onPeriodChange={handleMoviePeriodChange}
+            onPeriodChange={setMoviePeriod}
           />
         }
       />
@@ -197,7 +180,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
           <PeriodSelector
             noun="Episodes"
             period={episodePeriod}
-            onPeriodChange={handleEpisodePeriodChange}
+            onPeriodChange={setEpisodePeriod}
           />
         }
       />

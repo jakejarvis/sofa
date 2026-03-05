@@ -2,9 +2,9 @@
 
 import { IconCalendarRepeat, IconChevronDown } from "@tabler/icons-react";
 import { format, formatDistanceToNow } from "date-fns";
+import { createStore, Provider, useAtomValue } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import {
@@ -16,10 +16,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import {
-  setBackupScheduleAction,
-  setMaxBackupsAction,
-  setScheduledBackupAction,
-} from "@/lib/actions/settings";
+  backupScheduleAtom,
+  savingScheduleAtom,
+  togglingScheduleAtom,
+  useBackupScheduleActions,
+} from "@/lib/atoms/backup-schedule";
 import type { BackupFrequency } from "@/lib/cron";
 
 const FREQUENCY_OPTIONS: { value: BackupFrequency; label: string }[] = [
@@ -115,68 +116,33 @@ export function BackupScheduleSection({
   initialTime: string;
   initialDow: number;
 }) {
-  const [scheduledEnabled, setScheduledEnabled] = useState(
-    initialScheduledEnabled,
+  const [store] = useState(() => {
+    const s = createStore();
+    s.set(backupScheduleAtom, {
+      enabled: initialScheduledEnabled,
+      maxRetention: initialMaxRetention,
+      frequency: initialFrequency,
+      time: initialTime,
+      dow: initialDow,
+    });
+    return s;
+  });
+
+  return (
+    <Provider store={store}>
+      <BackupScheduleInner />
+    </Provider>
   );
-  const [maxRetention, setMaxRetention] = useState(initialMaxRetention);
-  const [frequency, setFrequency] = useState<BackupFrequency>(initialFrequency);
-  const [time, setTime] = useState(initialTime);
-  const [dow, setDow] = useState(initialDow);
-  const [savingSchedule, setSavingSchedule] = useState(false);
-  const [togglingSchedule, setTogglingSchedule] = useState(false);
+}
 
-  async function handleToggleScheduled(checked: boolean) {
-    const previous = scheduledEnabled;
-    setScheduledEnabled(checked);
-    setTogglingSchedule(true);
-    try {
-      await setScheduledBackupAction(checked);
-      toast.success(
-        checked ? "Scheduled backups enabled" : "Scheduled backups disabled",
-      );
-    } catch {
-      setScheduledEnabled(previous);
-      toast.error("Failed to update scheduled backup setting");
-    } finally {
-      setTogglingSchedule(false);
-    }
-  }
+function BackupScheduleInner() {
+  const schedule = useAtomValue(backupScheduleAtom);
+  const savingSchedule = useAtomValue(savingScheduleAtom);
+  const togglingSchedule = useAtomValue(togglingScheduleAtom);
+  const { toggleScheduled, changeMaxRetention, changeSchedule } =
+    useBackupScheduleActions();
 
-  async function handleMaxRetentionChange(value: number) {
-    const previous = maxRetention;
-    setMaxRetention(value);
-    try {
-      await setMaxBackupsAction(value);
-    } catch {
-      setMaxRetention(previous);
-      toast.error("Failed to update retention setting");
-    }
-  }
-
-  async function handleScheduleChange(
-    newFrequency: BackupFrequency,
-    newTime: string,
-    newDow = dow,
-  ) {
-    const prevFreq = frequency;
-    const prevTime = time;
-    const prevDow = dow;
-    setFrequency(newFrequency);
-    setTime(newTime);
-    setDow(newDow);
-    setSavingSchedule(true);
-    try {
-      await setBackupScheduleAction(newFrequency, newTime, newDow);
-      toast.success("Schedule updated");
-    } catch {
-      setFrequency(prevFreq);
-      setTime(prevTime);
-      setDow(prevDow);
-      toast.error("Failed to update schedule");
-    } finally {
-      setSavingSchedule(false);
-    }
-  }
+  const { enabled, maxRetention, frequency, time, dow } = schedule;
 
   return (
     <>
@@ -189,7 +155,7 @@ export function BackupScheduleSection({
             <div>
               <CardTitle>Backup schedule</CardTitle>
               <CardDescription>
-                {scheduledEnabled ? (
+                {enabled ? (
                   <span className="inline-flex flex-wrap items-baseline gap-1">
                     <span suppressHydrationWarning>
                       {formatNextBackup(frequency, time, dow)}.
@@ -205,9 +171,7 @@ export function BackupScheduleSection({
                       <DropdownMenuContent align="start">
                         <DropdownMenuRadioGroup
                           value={String(maxRetention)}
-                          onValueChange={(v) =>
-                            handleMaxRetentionChange(Number(v))
-                          }
+                          onValueChange={(v) => changeMaxRetention(Number(v))}
                         >
                           {[3, 5, 7, 14, 30, 0].map((n) => (
                             <DropdownMenuRadioItem key={n} value={String(n)}>
@@ -226,15 +190,15 @@ export function BackupScheduleSection({
             </div>
           </div>
           <Switch
-            checked={scheduledEnabled}
-            onCheckedChange={handleToggleScheduled}
+            checked={enabled}
+            onCheckedChange={toggleScheduled}
             disabled={togglingSchedule}
           />
         </div>
       </CardContent>
 
       <AnimatePresence initial={false}>
-        {scheduledEnabled && (
+        {enabled && (
           <CardContent className="border-t border-border/30 pt-4">
             <motion.div
               initial={{ opacity: 0, height: 0 }}
@@ -256,7 +220,7 @@ export function BackupScheduleSection({
                         variant="outline"
                         size="sm"
                         disabled={savingSchedule}
-                        onClick={() => handleScheduleChange(opt.value, time)}
+                        onClick={() => changeSchedule(opt.value, time)}
                         className={
                           frequency === opt.value
                             ? "border-primary/50 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
@@ -291,7 +255,7 @@ export function BackupScheduleSection({
                           <DropdownMenuRadioGroup
                             value={String(dow)}
                             onValueChange={(v) =>
-                              handleScheduleChange(frequency, time, Number(v))
+                              changeSchedule(frequency, time, Number(v))
                             }
                           >
                             {DAYS_OF_WEEK.map((day, i) => (
@@ -341,9 +305,7 @@ export function BackupScheduleSection({
                         <DropdownMenuContent align="start">
                           <DropdownMenuRadioGroup
                             value={time}
-                            onValueChange={(v) =>
-                              handleScheduleChange(frequency, v)
-                            }
+                            onValueChange={(v) => changeSchedule(frequency, v)}
                           >
                             {HOURS.map((h) => {
                               const val = `${String(h).padStart(2, "0")}:00`;
