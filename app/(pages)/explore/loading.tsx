@@ -4,9 +4,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 function TitleRowSkeleton({ withGenreChips }: { withGenreChips?: boolean }) {
   return (
     <div className="space-y-4">
-      <Skeleton className="h-7 w-40" />
+      <div className="flex items-center gap-2">
+        <Skeleton className="size-5 rounded" />
+        <Skeleton className="h-6 w-40" />
+      </div>
       {withGenreChips && (
-        <div className="flex gap-2">
+        <div className="-mx-4 flex gap-2 overflow-x-hidden px-4 sm:-mx-0 sm:flex-wrap sm:px-0">
           {Array.from({ length: 7 }).map((_, i) => (
             <Skeleton
               // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
@@ -16,7 +19,7 @@ function TitleRowSkeleton({ withGenreChips }: { withGenreChips?: boolean }) {
           ))}
         </div>
       )}
-      <div className="flex gap-4">
+      <div className="-mx-4 flex gap-4 overflow-hidden px-4 sm:-mx-0 sm:px-0">
         {Array.from({ length: 6 }).map((_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
           <div key={`card-${i}`} className="w-[140px] shrink-0 sm:w-[160px]">
@@ -31,8 +34,8 @@ function TitleRowSkeleton({ withGenreChips }: { withGenreChips?: boolean }) {
 export default function ExploreLoading() {
   return (
     <div className="space-y-10">
-      {/* Hero skeleton */}
-      <div className="-mx-4 -mt-6 sm:-mx-6">
+      {/* Hero skeleton — full viewport width like the actual HeroBanner */}
+      <div className="-mt-6 mb-4 ml-[calc(-50vw+50%)] mr-[calc(-50vw+50%)]">
         <Skeleton className="aspect-[21/9] min-h-[280px] max-h-[420px] w-full rounded-none" />
       </div>
 
