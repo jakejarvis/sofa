@@ -1,4 +1,4 @@
-import { and, count, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   episodes,
@@ -183,7 +183,9 @@ function checkAllEpisodesWatched(userId: string, titleId: string) {
 
   const epIds = allEps.map((ep) => ep.id);
   const [watchCount] = db
-    .select({ count: count(userEpisodeWatches.id) })
+    .select({
+      count: sql<number>`count(distinct ${userEpisodeWatches.episodeId})`,
+    })
     .from(userEpisodeWatches)
     .where(
       and(
@@ -343,9 +345,11 @@ export function getEpisodeProgressByTmdbIds(
   const rows = db
     .select({
       tmdbId: titles.tmdbId,
-      totalEpisodes: count(episodes.id),
+      totalEpisodes: sql<number>`count(distinct ${episodes.id})`.as(
+        "totalEpisodes",
+      ),
       watchedEpisodes:
-        sql<number>`sum(case when ${userEpisodeWatches.id} is not null then 1 else 0 end)`.as(
+        sql<number>`count(distinct case when ${userEpisodeWatches.id} is not null then ${episodes.id} end)`.as(
           "watchedEpisodes",
         ),
     })
@@ -417,17 +421,21 @@ export function getUserTitleInfo(userId: string, titleId: string) {
   // Batch fetch all watches for these episodes
   const watchedEpisodeIds =
     epIds.length > 0
-      ? db
-          .select({ episodeId: userEpisodeWatches.episodeId })
-          .from(userEpisodeWatches)
-          .where(
-            and(
-              eq(userEpisodeWatches.userId, userId),
-              inArray(userEpisodeWatches.episodeId, epIds),
-            ),
-          )
-          .all()
-          .map((w) => w.episodeId)
+      ? Array.from(
+          new Set(
+            db
+              .select({ episodeId: userEpisodeWatches.episodeId })
+              .from(userEpisodeWatches)
+              .where(
+                and(
+                  eq(userEpisodeWatches.userId, userId),
+                  inArray(userEpisodeWatches.episodeId, epIds),
+                ),
+              )
+              .all()
+              .map((w) => w.episodeId),
+          ),
+        )
       : [];
 
   return {

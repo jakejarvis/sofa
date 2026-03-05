@@ -559,12 +559,28 @@ export async function getTitleWithChildren(id: string): Promise<{
   let titleSeasons: Season[] = [];
 
   if (title.type === "tv") {
-    const seasonRows = db
+    let seasonRows = db
       .select()
       .from(seasons)
       .where(eq(seasons.titleId, title.id))
       .orderBy(seasons.seasonNumber)
       .all();
+
+    // Retry hydration when a TV title exists but no seasons were stored.
+    if (seasonRows.length === 0) {
+      try {
+        const show = await getTvDetails(title.tmdbId);
+        await refreshTvChildren(id, title.tmdbId, show.number_of_seasons);
+        seasonRows = db
+          .select()
+          .from(seasons)
+          .where(eq(seasons.titleId, title.id))
+          .orderBy(seasons.seasonNumber)
+          .all();
+      } catch (err) {
+        log.debug(`Failed to backfill missing seasons for title ${id}:`, err);
+      }
+    }
 
     // Batch fetch all episodes for all seasons (1 query)
     const seasonIds = seasonRows.map((s) => s.id);

@@ -24,8 +24,17 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const query = req.nextUrl.searchParams.get("query");
-  const type = req.nextUrl.searchParams.get("type");
+  const query = req.nextUrl.searchParams.get("query")?.trim();
+  const rawType = req.nextUrl.searchParams.get("type");
+  const type: "movie" | "tv" | null =
+    rawType === "movie" || rawType === "tv" ? rawType : null;
+
+  if (rawType && !type) {
+    return NextResponse.json(
+      { error: "type must be movie or tv" },
+      { status: 400 },
+    );
+  }
 
   if (!query)
     return NextResponse.json(
@@ -34,29 +43,47 @@ export async function GET(req: NextRequest) {
     );
 
   let results: TmdbSearchResponse;
-  if (type === "movie") {
-    results = await searchMovies(query);
-  } else if (type === "tv") {
-    results = await searchTv(query);
-  } else {
-    results = await searchMulti(query);
+  try {
+    if (type === "movie") {
+      results = await searchMovies(query);
+    } else if (type === "tv") {
+      results = await searchTv(query);
+    } else {
+      results = await searchMulti(query);
+    }
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to fetch search results" },
+      { status: 502 },
+    );
   }
 
-  // Filter out person results from multi search
-  const filtered = results.results.filter(
-    (r) => r.media_type !== "person" || type,
-  );
+  // Filter out person results for multi search
+  const filtered =
+    type === "movie" || type === "tv"
+      ? results.results
+      : results.results.filter((r) => r.media_type !== "person");
 
   return NextResponse.json({
-    results: filtered.map((r) => ({
-      tmdbId: r.id,
-      type: r.media_type ?? type,
-      title: r.title ?? r.name,
-      overview: r.overview,
-      releaseDate: r.release_date ?? r.first_air_date,
-      posterPath: tmdbImageUrl(r.poster_path, "w500"),
-      popularity: r.popularity,
-      voteAverage: r.vote_average,
-    })),
+    results: filtered
+      .map((r) => {
+        const mediaType =
+          r.media_type === "movie" || r.media_type === "tv"
+            ? r.media_type
+            : type;
+        if (!mediaType) return null;
+
+        return {
+          tmdbId: r.id,
+          type: mediaType,
+          title: r.title ?? r.name,
+          overview: r.overview,
+          releaseDate: r.release_date ?? r.first_air_date,
+          posterPath: tmdbImageUrl(r.poster_path, "w500"),
+          popularity: r.popularity,
+          voteAverage: r.vote_average,
+        };
+      })
+      .filter((r): r is NonNullable<typeof r> => r !== null),
   });
 }

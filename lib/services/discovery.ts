@@ -273,9 +273,13 @@ export function getContinueWatchingFeed(
 
   // Build lookup maps
   const watchedEpisodeIds = new Set(allWatches.map((w) => w.episodeId));
-  const watchDateMap = new Map(
-    allWatches.map((w) => [w.episodeId, w.watchedAt]),
-  );
+  const watchDateMap = new Map<string, Date>();
+  for (const watch of allWatches) {
+    const existing = watchDateMap.get(watch.episodeId);
+    if (!existing || watch.watchedAt > existing) {
+      watchDateMap.set(watch.episodeId, watch.watchedAt);
+    }
+  }
 
   // Group seasons by title
   const seasonsByTitle = new Map<string, typeof allSeasons>();

@@ -29,6 +29,17 @@ export interface WebhookEvent {
   showTitle?: string;
 }
 
+function toOptionalInt(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isInteger(value)) {
+    return value;
+  }
+  if (typeof value === "string" && value.trim().length > 0) {
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isNaN(parsed)) return parsed;
+  }
+  return undefined;
+}
+
 // ─── Payload Parsers ────────────────────────────────────────────────
 
 export function parsePlexPayload(formData: FormData): WebhookEvent | null {
@@ -63,7 +74,7 @@ export function parsePlexPayload(formData: FormData): WebhookEvent | null {
   if (Array.isArray(guids)) {
     for (const g of guids) {
       const id = g.id ?? "";
-      if (id.startsWith("tmdb://")) tmdbId = Number.parseInt(id.slice(7), 10);
+      if (id.startsWith("tmdb://")) tmdbId = toOptionalInt(id.slice(7));
       else if (id.startsWith("imdb://")) imdbId = id.slice(7);
       else if (id.startsWith("tvdb://")) tvdbId = id.slice(7);
     }
@@ -73,11 +84,11 @@ export function parsePlexPayload(formData: FormData): WebhookEvent | null {
     provider: "plex",
     mediaType: isMovie ? "movie" : "episode",
     title: (metadata.title ?? metadata.Title ?? "") as string,
-    tmdbId: tmdbId && !Number.isNaN(tmdbId) ? tmdbId : undefined,
+    tmdbId,
     imdbId,
     tvdbId,
-    seasonNumber: metadata.parentIndex as number | undefined,
-    episodeNumber: metadata.index as number | undefined,
+    seasonNumber: toOptionalInt(metadata.parentIndex),
+    episodeNumber: toOptionalInt(metadata.index),
     showTitle: (metadata.grandparentTitle ?? metadata.parentTitle) as
       | string
       | undefined,
@@ -96,18 +107,17 @@ export function parseJellyfinPayload(
   const isEpisode = itemType === "Episode";
   if (!isMovie && !isEpisode) return null;
 
-  const tmdbRaw = body.Provider_tmdb as string | undefined;
-  const tmdbId = tmdbRaw ? Number.parseInt(tmdbRaw, 10) : undefined;
+  const tmdbId = toOptionalInt(body.Provider_tmdb);
 
   return {
     provider: "jellyfin",
     mediaType: isMovie ? "movie" : "episode",
     title: (body.Name ?? "") as string,
-    tmdbId: tmdbId && !Number.isNaN(tmdbId) ? tmdbId : undefined,
+    tmdbId,
     imdbId: (body.Provider_imdb as string) || undefined,
     tvdbId: (body.Provider_tvdb as string) || undefined,
-    seasonNumber: body.SeasonNumber as number | undefined,
-    episodeNumber: body.EpisodeNumber as number | undefined,
+    seasonNumber: toOptionalInt(body.SeasonNumber),
+    episodeNumber: toOptionalInt(body.EpisodeNumber),
     showTitle: (body.SeriesName ?? body.ShowName) as string | undefined,
   };
 }
@@ -129,18 +139,17 @@ export function parseEmbyPayload(
   if (!isMovie && !isEpisode) return null;
 
   const providerIds = (item.ProviderIds ?? {}) as Record<string, string>;
-  const tmdbRaw = providerIds.Tmdb;
-  const tmdbId = tmdbRaw ? Number.parseInt(tmdbRaw, 10) : undefined;
+  const tmdbId = toOptionalInt(providerIds.Tmdb);
 
   return {
     provider: "emby",
     mediaType: isMovie ? "movie" : "episode",
     title: (item.Name ?? "") as string,
-    tmdbId: tmdbId && !Number.isNaN(tmdbId) ? tmdbId : undefined,
+    tmdbId,
     imdbId: providerIds.Imdb || undefined,
     tvdbId: providerIds.Tvdb || undefined,
-    seasonNumber: item.ParentIndexNumber as number | undefined,
-    episodeNumber: item.IndexNumber as number | undefined,
+    seasonNumber: toOptionalInt(item.ParentIndexNumber),
+    episodeNumber: toOptionalInt(item.IndexNumber),
     showTitle: (item.SeriesName ?? item.ShowName) as string | undefined,
   };
 }

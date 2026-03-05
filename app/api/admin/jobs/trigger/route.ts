@@ -12,8 +12,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const body = await request.json();
-  const jobName = body?.jobName;
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+  const jobName = (body as { jobName?: unknown })?.jobName;
 
   if (!jobName || typeof jobName !== "string") {
     return NextResponse.json(

@@ -31,6 +31,7 @@ export function useTitleActions() {
   const catchUp = useCallback(
     async (episodeIds: string[]) => {
       const currentWatches = store.get(episodeWatchesAtom);
+      const prevStatus = store.get(userStatusAtom);
       const newWatchSet = new Set(currentWatches);
       for (const id of episodeIds) newWatchSet.add(id);
       store.set(episodeWatchesAtom, [...newWatchSet]);
@@ -47,6 +48,8 @@ export function useTitleActions() {
           `Caught up — marked ${episodeIds.length} episode${episodeIds.length > 1 ? "s" : ""} as watched`,
         );
       } catch {
+        store.set(episodeWatchesAtom, currentWatches);
+        store.set(userStatusAtom, prevStatus);
         toast.error("Failed to catch up");
       }
     },
@@ -116,12 +119,13 @@ export function useTitleActions() {
       store.set(watchingEpAtom, episodeId);
 
       if (isWatched) {
+        const prevStatus = store.get(userStatusAtom);
         store.set(
           episodeWatchesAtom,
           store.get(episodeWatchesAtom).filter((id) => id !== episodeId),
         );
-        const status = store.get(userStatusAtom);
-        if (status === "completed") store.set(userStatusAtom, "in_progress");
+        if (prevStatus === "completed")
+          store.set(userStatusAtom, "in_progress");
 
         try {
           await unwatchEpisodeAction(episodeId);
@@ -130,15 +134,16 @@ export function useTitleActions() {
           const w = store.get(episodeWatchesAtom);
           if (!w.includes(episodeId))
             store.set(episodeWatchesAtom, [...w, episodeId]);
+          store.set(userStatusAtom, prevStatus);
           toast.error("Failed to unmark episode");
         }
       } else {
         const currentWatches = store.get(episodeWatchesAtom);
+        const prevStatus = store.get(userStatusAtom);
         if (!currentWatches.includes(episodeId)) {
           store.set(episodeWatchesAtom, [...currentWatches, episodeId]);
         }
-        const status = store.get(userStatusAtom);
-        if (status === null || status === "watchlist") {
+        if (prevStatus === null || prevStatus === "watchlist") {
           store.set(userStatusAtom, "in_progress");
         }
 
@@ -179,6 +184,7 @@ export function useTitleActions() {
             episodeWatchesAtom,
             store.get(episodeWatchesAtom).filter((id) => id !== episodeId),
           );
+          store.set(userStatusAtom, prevStatus);
           toast.error("Failed to mark episode");
         }
       }
@@ -190,6 +196,8 @@ export function useTitleActions() {
 
   const handleMarkSeason = useCallback(
     async (season: Season) => {
+      const prevWatches = store.get(episodeWatchesAtom);
+      const prevStatus = store.get(userStatusAtom);
       const episodeWatches = store.get(episodeWatchesAtom);
       const unwatched = season.episodes.filter(
         (ep) => !episodeWatches.includes(ep.id),
@@ -217,6 +225,8 @@ export function useTitleActions() {
           `Watched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
         );
       } catch {
+        store.set(episodeWatchesAtom, prevWatches);
+        store.set(userStatusAtom, prevStatus);
         toast.error("Failed to mark some episodes");
       }
     },
@@ -225,6 +235,8 @@ export function useTitleActions() {
 
   const handleUnmarkSeason = useCallback(
     async (season: Season) => {
+      const prevWatches = store.get(episodeWatchesAtom);
+      const prevStatus = store.get(userStatusAtom);
       const seasonEpIds = new Set(season.episodes.map((ep) => ep.id));
       store.set(
         episodeWatchesAtom,
@@ -239,6 +251,8 @@ export function useTitleActions() {
           `Unwatched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
         );
       } catch {
+        store.set(episodeWatchesAtom, prevWatches);
+        store.set(userStatusAtom, prevStatus);
         toast.error("Failed to unmark some episodes");
       }
     },

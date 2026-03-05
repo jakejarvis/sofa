@@ -12,16 +12,38 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await req.json();
-  const { tmdbId, type } = body;
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
 
-  if (!tmdbId || !type || !["movie", "tv"].includes(type)) {
+  const parsed = body as { tmdbId?: unknown; type?: unknown };
+  const type = parsed.type;
+  const tmdbId =
+    typeof parsed.tmdbId === "number"
+      ? parsed.tmdbId
+      : Number.parseInt(String(parsed.tmdbId), 10);
+
+  if (
+    !Number.isInteger(tmdbId) ||
+    tmdbId < 1 ||
+    (type !== "movie" && type !== "tv")
+  ) {
     return NextResponse.json(
-      { error: "tmdbId and type (movie|tv) are required" },
+      { error: "tmdbId (positive integer) and type (movie|tv) are required" },
       { status: 400 },
     );
   }
 
-  const title = await importTitle(tmdbId, type, { awaitEnrichment: true });
-  return NextResponse.json({ id: title?.id });
+  try {
+    const title = await importTitle(tmdbId, type, { awaitEnrichment: true });
+    return NextResponse.json({ id: title?.id });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to resolve title" },
+      { status: 502 },
+    );
+  }
 }
