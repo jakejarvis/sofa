@@ -1,7 +1,6 @@
 "use client";
 
 import { IconMovie } from "@tabler/icons-react";
-import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -9,21 +8,6 @@ import type { PersonCredit } from "@/lib/types/title";
 
 type Filter = "all" | "movie" | "tv";
 type Sort = "newest" | "rating";
-
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.04 } },
-};
-
-const staggerItem = {
-  hidden: { opacity: 0, y: 12, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: "spring" as const, stiffness: 300, damping: 24 },
-  },
-};
 
 interface FilmographyGridProps {
   credits: PersonCredit[];
@@ -103,15 +87,16 @@ export function FilmographyGrid({ credits }: FilmographyGridProps) {
         ))}
       </div>
 
-      <motion.div
+      <div
         key={`${filter}-${sort}`}
-        variants={staggerContainer}
-        initial="hidden"
-        animate="visible"
         className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
       >
-        {filtered.map((credit) => (
-          <motion.div key={credit.titleId} variants={staggerItem}>
+        {filtered.map((credit, i) => (
+          <div
+            key={credit.titleId}
+            className="animate-stagger-item"
+            style={{ "--stagger-index": i } as React.CSSProperties}
+          >
             <Link href={`/titles/${credit.titleId}`} className="group">
               <div className="overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06] transition-all group-hover:ring-primary/25">
                 <div className="aspect-[2/3] w-full bg-muted">
@@ -150,9 +135,9 @@ export function FilmographyGrid({ credits }: FilmographyGridProps) {
                 </div>
               </div>
             </Link>
-          </motion.div>
+          </div>
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 }

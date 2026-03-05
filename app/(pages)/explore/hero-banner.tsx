@@ -1,7 +1,6 @@
 "use client";
 
 import { IconPlus, IconStar } from "@tabler/icons-react";
-import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -25,12 +24,7 @@ export function HeroBanner({
   const href = `/titles/tmdb-${tmdbId}-${type}`;
 
   return (
-    <motion.div
-      className="relative -mt-6 mb-4 ml-[calc(-50vw+50%)] mr-[calc(-50vw+50%)] overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-    >
+    <div className="animate-stagger-item relative -mt-6 mb-4 ml-[calc(-50vw+50%)] mr-[calc(-50vw+50%)] overflow-hidden">
       <div className="relative w-full min-h-[280px] max-h-[420px] aspect-[21/9]">
         {backdropPath ? (
           <Image
@@ -52,15 +46,9 @@ export function HeroBanner({
         <div className="absolute inset-0 flex items-end">
           <div className="w-full px-4 pb-8 sm:px-6">
             <div className="mx-auto max-w-6xl">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 24,
-                  delay: 0.2,
-                }}
+              <div
+                className="animate-stagger-item"
+                style={{ "--stagger-index": 3 } as React.CSSProperties}
               >
                 <div className="mb-3 flex items-center gap-2">
                   <span className="rounded bg-primary/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
@@ -91,11 +79,11 @@ export function HeroBanner({
                   <IconPlus className="size-4" />
                   Add to Library
                 </Link>
-              </motion.div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

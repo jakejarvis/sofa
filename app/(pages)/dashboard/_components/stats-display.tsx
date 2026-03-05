@@ -8,7 +8,6 @@ import {
   IconPlayerPlay,
 } from "@tabler/icons-react";
 import { useAtom, useAtomValue } from "jotai";
-import { motion } from "motion/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,20 +55,12 @@ function StatCard({
   value,
   index,
   label,
-  loading,
   sparklineData,
 }: StatCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        type: "spring",
-        stiffness: 300,
-        damping: 24,
-        delay: index * 0.08,
-      }}
-      className="relative overflow-hidden rounded-xl border border-border/30 bg-card/50 p-4"
+    <div
+      className="animate-stagger-item relative overflow-hidden rounded-xl border border-border/30 bg-card/50 p-4"
+      style={{ "--stagger-index": index } as React.CSSProperties}
     >
       {sparklineData && <Sparkline data={sparklineData} color={color} />}
       <div className="relative z-10 flex items-center gap-2">
@@ -83,11 +74,12 @@ function StatCard({
         </span>
       </div>
       <p
-        className={`relative z-10 mt-2 font-display text-2xl tabular-nums tracking-tight ${color} transition-opacity duration-300 ${loading ? "opacity-40" : "opacity-100"}`}
+        suppressHydrationWarning
+        className={`relative z-10 mt-2 font-display text-2xl tabular-nums tracking-tight ${color} transition-opacity duration-300`}
       >
         {value}
       </p>
-    </motion.div>
+    </div>
   );
 }
 
@@ -131,7 +123,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
   const movieStats = useAtomValue(movieStatsLoadable);
   const episodeStats = useAtomValue(episodeStatsLoadable);
 
-  const movieLoading = movieStats.state === "loading";
+  const _movieLoading = movieStats.state === "loading";
   const movieCount =
     movieStats.state === "hasData"
       ? movieStats.data.count
@@ -139,7 +131,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
   const movieHistory =
     movieStats.state === "hasData" ? movieStats.data.history : undefined;
 
-  const episodeLoading = episodeStats.state === "loading";
+  const _episodeLoading = episodeStats.state === "loading";
   const episodeCount =
     episodeStats.state === "hasData"
       ? episodeStats.data.count
@@ -155,7 +147,6 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         bgColor="bg-primary/10"
         value={movieCount}
         index={0}
-        loading={movieLoading}
         sparklineData={movieHistory}
         label={
           <PeriodSelector
@@ -171,7 +162,6 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         bgColor="bg-status-watching/10"
         value={episodeCount}
         index={1}
-        loading={episodeLoading}
         sparklineData={episodeHistory}
         label={
           <PeriodSelector

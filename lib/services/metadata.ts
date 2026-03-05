@@ -667,13 +667,10 @@ export async function getTitleWithChildren(id: string): Promise<{
       }),
     );
 
-  // Lazy color extraction — await so the palette is available for theming
-  let palette = parseColorPalette(title.colorPalette);
+  // Color extraction — use cached palette if available, otherwise fire-and-forget
+  const palette = parseColorPalette(title.colorPalette);
   if (!palette && title.posterPath) {
-    palette =
-      (await extractAndStoreColors(title.id, title.posterPath).catch(
-        () => null,
-      )) ?? null;
+    extractAndStoreColors(title.id, title.posterPath).catch(() => {});
   }
 
   const resolvedTitle: ResolvedTitle = {

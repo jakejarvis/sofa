@@ -1,7 +1,6 @@
 "use client";
 
 import { IconCalendar, IconMapPin } from "@tabler/icons-react";
-import { motion } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
 import type { ResolvedPerson } from "@/lib/types/title";
@@ -28,12 +27,7 @@ export function PersonHero({ person }: PersonHeroProps) {
     : null;
 
   return (
-    <motion.div
-      className="flex flex-col gap-6 sm:flex-row sm:gap-8"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 28 }}
-    >
+    <div className="animate-stagger-item flex flex-col gap-6 sm:flex-row sm:gap-8">
       <div className="size-40 shrink-0 self-center overflow-hidden rounded-2xl ring-1 ring-white/10 shadow-2xl sm:size-56 sm:self-start">
         {person.profilePath ? (
           <Image
@@ -105,6 +99,6 @@ export function PersonHero({ person }: PersonHeroProps) {
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

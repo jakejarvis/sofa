@@ -154,28 +154,20 @@ export function getUserStats(userId: string): DashboardStats {
   const moviesThisMonth = getWatchCount(userId, "movies", "this_month");
   const episodesThisWeek = getWatchCount(userId, "episodes", "this_week");
 
-  const [librarySizeRow] = db
-    .select({ count: sql<number>`count(*)` })
+  const [statusCounts] = db
+    .select({
+      librarySize: sql<number>`count(*)`,
+      completed: sql<number>`sum(case when ${userTitleStatus.status} = 'completed' then 1 else 0 end)`,
+    })
     .from(userTitleStatus)
     .where(eq(userTitleStatus.userId, userId))
-    .all();
-
-  const [completedCount] = db
-    .select({ count: sql<number>`count(*)` })
-    .from(userTitleStatus)
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(userTitleStatus.status, "completed"),
-      ),
-    )
     .all();
 
   return {
     moviesThisMonth,
     episodesThisWeek,
-    librarySize: librarySizeRow?.count ?? 0,
-    completed: completedCount?.count ?? 0,
+    librarySize: statusCounts?.librarySize ?? 0,
+    completed: statusCounts?.completed ?? 0,
   };
 }
 

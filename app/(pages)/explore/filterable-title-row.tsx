@@ -2,7 +2,6 @@
 
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import { createStore, Provider, useAtom, useAtomValue } from "jotai";
-import { motion } from "motion/react";
 import { useState } from "react";
 import { TitleCardSkeleton } from "@/components/skeletons";
 import { ExploreTitleCard } from "@/components/title-card";
@@ -45,21 +44,6 @@ interface FilterableTitleRowProps {
   userStatuses?: Record<string, "watchlist" | "in_progress" | "completed">;
   episodeProgress?: Record<string, { watched: number; total: number }>;
 }
-
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.05 } },
-};
-
-const staggerItem = {
-  hidden: { opacity: 0, y: 12, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: "spring" as const, stiffness: 300, damping: 24 },
-  },
-};
 
 export function FilterableTitleRow({
   heading,
@@ -178,12 +162,7 @@ function FilterableTitleRowInner({
 
       {/* Carousel */}
       {!loading && items.length > 0 && (
-        <motion.div
-          key={selectedGenre ?? "default"}
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-        >
+        <div key={selectedGenre ?? "default"}>
           <Carousel
             opts={{
               align: "start",
@@ -194,12 +173,15 @@ function FilterableTitleRowInner({
             className="-mx-6 sm:-mx-2 carousel-tilt"
           >
             <CarouselContent className="px-6 sm:px-2">
-              {items.slice(0, 20).map((item) => (
+              {items.slice(0, 20).map((item, i) => (
                 <CarouselItem
                   key={`${item.type}-${item.tmdbId}`}
                   className="basis-auto pl-4 w-[140px] shrink-0 sm:w-[160px]"
                 >
-                  <motion.div variants={staggerItem}>
+                  <div
+                    className="animate-stagger-item"
+                    style={{ "--stagger-index": i } as React.CSSProperties}
+                  >
                     <ExploreTitleCard
                       tmdbId={item.tmdbId}
                       type={item.type}
@@ -213,12 +195,12 @@ function FilterableTitleRowInner({
                         episodeProgress[`${item.tmdbId}-${item.type}`]
                       }
                     />
-                  </motion.div>
+                  </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
           </Carousel>
-        </motion.div>
+        </div>
       )}
     </section>
   );
