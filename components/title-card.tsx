@@ -24,17 +24,24 @@ import { quickAddToWatchlist } from "@/lib/actions/watchlist";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
-interface TitleCardProps {
-  id?: string;
-  tmdbId: number;
-  type: string;
+interface CardInnerProps {
   title: string;
+  type: string;
   posterPath: string | null;
   releaseDate?: string | null;
   voteAverage?: number | null;
-  href?: string;
-  onImport?: () => void;
-  showQuickAdd?: boolean;
+  userStatus?: TitleStatus | null;
+  episodeProgress?: { watched: number; total: number } | null;
+}
+
+interface TitleCardProps extends CardInnerProps {
+  id: string;
+  tmdbId: number;
+}
+
+interface ExploreTitleCardProps extends CardInnerProps {
+  tmdbId: number;
+  href: string;
   userStatus?: TitleStatus | null;
   episodeProgress?: { watched: number; total: number } | null;
 }
@@ -129,20 +136,6 @@ function QuickAddButton({
   );
 }
 
-function StatusBadge({ status }: { status: TitleStatus }) {
-  const config = statusConfig[status];
-  const StatusIcon = config.icon;
-
-  return (
-    <div
-      className={`absolute bottom-2 left-2 z-10 flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold leading-tight shadow-md backdrop-blur-sm ${config.badgeClass}`}
-    >
-      <StatusIcon className="size-3" />
-      {config.label}
-    </div>
-  );
-}
-
 function ProgressBar({ watched, total }: { watched: number; total: number }) {
   const pct = total > 0 ? (watched / total) * 100 : 0;
   return (
@@ -163,26 +156,25 @@ function ProgressBar({ watched, total }: { watched: number; total: number }) {
   );
 }
 
-export function TitleCard({
-  id,
-  tmdbId,
-  type,
+function CardInner({
   title,
+  type,
   posterPath,
   releaseDate,
   voteAverage,
-  href,
-  onImport,
-  showQuickAdd,
   userStatus,
   episodeProgress,
-}: TitleCardProps) {
+}: CardInnerProps) {
   const year = releaseDate?.slice(0, 4);
   const TypeIcon = type === "movie" ? IconMovie : IconDeviceTv;
 
-  const cardInner = (
+  const ringClass = userStatus
+    ? "ring-primary/25 shadow-sm shadow-primary/5"
+    : "ring-white/[0.06]";
+
+  return (
     <motion.div
-      className="relative overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06] transition-shadow hover:ring-primary/25 hover:shadow-lg hover:shadow-primary/5"
+      className={`relative overflow-hidden rounded-xl bg-card ring-1 transition-shadow hover:ring-primary/25 hover:shadow-lg hover:shadow-primary/5 ${ringClass}`}
       whileHover={{ scale: 1.02 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
@@ -211,15 +203,33 @@ export function TitleCard({
             </div>
           </div>
         )}
-        {/* Status badge on poster */}
-        {userStatus && <StatusBadge status={userStatus} />}
-        {/* Hover gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
       </div>
 
-      {/* Metadata */}
       <div className="px-3 pb-3 pt-2.5">
-        <p className="line-clamp-1 text-sm font-medium leading-snug">{title}</p>
+        <div className="flex items-center gap-1.5">
+          {userStatus && (
+            <Tooltip>
+              <TooltipTrigger
+                className="cursor-default shrink-0"
+                render={<div className="flex items-center" />}
+              >
+                <span className="relative flex size-2">
+                  <span
+                    className={`absolute inline-flex h-full w-full rounded-full opacity-40 ${userStatus === "completed" ? "bg-status-completed" : "bg-status-watching"}`}
+                  />
+                  <span
+                    className={`relative inline-flex size-2 rounded-full ${userStatus === "completed" ? "bg-status-completed" : "bg-status-watching"}`}
+                  />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{statusConfig[userStatus].label}</TooltipContent>
+            </Tooltip>
+          )}
+          <p className="line-clamp-1 text-sm font-medium leading-snug">
+            {title}
+          </p>
+        </div>
         <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
           <TypeIcon className="size-3.5 shrink-0 text-primary/60" />
           {year && <span>{year}</span>}
@@ -232,7 +242,6 @@ export function TitleCard({
         </div>
       </div>
 
-      {/* Episode progress bar */}
       {episodeProgress && episodeProgress.watched > 0 && (
         <ProgressBar
           watched={episodeProgress.watched}
@@ -241,29 +250,65 @@ export function TitleCard({
       )}
     </motion.div>
   );
+}
 
-  if (href || id) {
-    return (
-      <div className="relative group">
-        {showQuickAdd && (
-          <QuickAddButton
-            tmdbId={tmdbId}
-            type={type as "movie" | "tv"}
-            userStatus={userStatus}
-          />
-        )}
-        <Link href={href ?? `/titles/${id}`}>{cardInner}</Link>
-      </div>
-    );
-  }
+/** Linked title card for library grids, recommendations, dashboards */
+export function TitleCard({
+  id,
+  tmdbId,
+  type,
+  title,
+  posterPath,
+  releaseDate,
+  voteAverage,
+  userStatus,
+  episodeProgress,
+}: TitleCardProps) {
+  return (
+    <Link href={`/titles/${id}`} className="group">
+      <CardInner
+        title={title}
+        type={type}
+        posterPath={posterPath}
+        releaseDate={releaseDate}
+        voteAverage={voteAverage}
+        userStatus={userStatus}
+        episodeProgress={episodeProgress}
+      />
+    </Link>
+  );
+}
 
-  if (onImport) {
-    return (
-      <button type="button" onClick={onImport} className="w-full text-left">
-        {cardInner}
-      </button>
-    );
-  }
-
-  return cardInner;
+/** Explore/browse card with quick-add button and custom href */
+export function ExploreTitleCard({
+  tmdbId,
+  type,
+  title,
+  posterPath,
+  releaseDate,
+  voteAverage,
+  href,
+  userStatus,
+  episodeProgress,
+}: ExploreTitleCardProps) {
+  return (
+    <div className="relative group">
+      <QuickAddButton
+        tmdbId={tmdbId}
+        type={type as "movie" | "tv"}
+        userStatus={userStatus}
+      />
+      <Link href={href}>
+        <CardInner
+          title={title}
+          type={type}
+          posterPath={posterPath}
+          releaseDate={releaseDate}
+          voteAverage={voteAverage}
+          userStatus={userStatus}
+          episodeProgress={episodeProgress}
+        />
+      </Link>
+    </div>
+  );
 }

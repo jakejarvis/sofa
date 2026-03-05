@@ -5,7 +5,7 @@ import { createStore, Provider, useAtom, useAtomValue } from "jotai";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { TitleCardSkeleton } from "@/components/skeletons";
-import { TitleCard } from "@/components/title-card";
+import { ExploreTitleCard } from "@/components/title-card";
 import {
   Carousel,
   CarouselContent,
@@ -200,7 +200,7 @@ function FilterableTitleRowInner({
                   className="basis-auto pl-4 w-[140px] shrink-0 sm:w-[160px]"
                 >
                   <motion.div variants={staggerItem}>
-                    <TitleCard
+                    <ExploreTitleCard
                       tmdbId={item.tmdbId}
                       type={item.type}
                       title={item.title}
@@ -208,7 +208,6 @@ function FilterableTitleRowInner({
                       releaseDate={item.releaseDate}
                       voteAverage={item.voteAverage}
                       href={`/titles/tmdb-${item.tmdbId}-${item.type}`}
-                      showQuickAdd
                       userStatus={userStatuses[`${item.tmdbId}-${item.type}`]}
                       episodeProgress={
                         episodeProgress[`${item.tmdbId}-${item.type}`]

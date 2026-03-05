@@ -2,7 +2,7 @@
 
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import { motion } from "motion/react";
-import { TitleCard } from "@/components/title-card";
+import { ExploreTitleCard } from "@/components/title-card";
 import {
   Carousel,
   CarouselContent,
@@ -73,7 +73,7 @@ export function TitleRow({
                 className="basis-auto pl-4 w-[140px] shrink-0 sm:w-[160px]"
               >
                 <motion.div variants={staggerItem}>
-                  <TitleCard
+                  <ExploreTitleCard
                     tmdbId={item.tmdbId}
                     type={item.type}
                     title={item.title}
@@ -81,7 +81,6 @@ export function TitleRow({
                     releaseDate={item.releaseDate}
                     voteAverage={item.voteAverage}
                     href={`/titles/tmdb-${item.tmdbId}-${item.type}`}
-                    showQuickAdd
                     userStatus={userStatuses?.[`${item.tmdbId}-${item.type}`]}
                     episodeProgress={
                       episodeProgress?.[`${item.tmdbId}-${item.type}`]
