@@ -1,9 +1,11 @@
 import { Database } from "bun:sqlite";
+import { renameSync, unlinkSync } from "node:fs";
 import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 import { format } from "date-fns";
 import { sql } from "drizzle-orm";
 import { closeDatabase, db } from "@/lib/db/client";
+import { runMigrations } from "@/lib/db/migrate";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("backup");
@@ -13,11 +15,14 @@ const DATABASE_URL =
   process.env.DATABASE_URL || path.join(DATA_DIR, "sqlite.db");
 const BACKUP_DIR = path.join(DATA_DIR, "backups");
 
-const MANUAL_PATTERN = /^sofa-manual-\d{4}-\d{2}-\d{2}-\d{6}\.db$/;
-const SCHEDULED_PATTERN = /^sofa-scheduled-\d{4}-\d{2}-\d{2}-\d{6}\.db$/;
-const PRE_RESTORE_PATTERN = /^pre-restore-\d{4}-\d{2}-\d{2}-\d{6}\.db$/;
+const MANUAL_PATTERN = /^sofa-manual-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
+const SCHEDULED_PATTERN =
+  /^sofa-scheduled-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
+const PRE_RESTORE_PATTERN =
+  /^pre-restore-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
 
 export type BackupSource = "manual" | "scheduled" | "pre-restore";
+type BackupPrefix = "sofa-manual" | "sofa-scheduled" | "pre-restore";
 
 export interface BackupInfo {
   filename: string;
@@ -25,6 +30,28 @@ export interface BackupInfo {
   createdAt: string;
   source: BackupSource;
 }
+
+const REQUIRED_TABLES = [
+  "account",
+  "appSettings",
+  "availabilityOffers",
+  "cronRuns",
+  "episodes",
+  "seasons",
+  "session",
+  "titleRecommendations",
+  "titles",
+  "user",
+  "userEpisodeWatches",
+  "userMovieWatches",
+  "userRatings",
+  "userTitleStatus",
+  "verification",
+  "webhookConnections",
+  "webhookEventLog",
+] as const;
+
+let backupOpQueue: Promise<void> = Promise.resolve();
 
 function getBackupSource(filename: string): BackupSource {
   if (SCHEDULED_PATTERN.test(filename)) return "scheduled";
@@ -44,6 +71,64 @@ export async function ensureBackupDir() {
   await mkdir(BACKUP_DIR, { recursive: true });
 }
 
+async function withBackupLock<T>(fn: () => Promise<T>): Promise<T> {
+  const previous = backupOpQueue;
+  let release: (() => void) | undefined;
+  backupOpQueue = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+
+  await previous;
+  try {
+    return await fn();
+  } finally {
+    release?.();
+  }
+}
+
+function unlinkIfExistsSync(filePath: string): void {
+  try {
+    unlinkSync(filePath);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
+      throw err;
+    }
+  }
+}
+
+function validateBackupDatabase(filePath: string): void {
+  const testDb = new Database(filePath, { readonly: true });
+  try {
+    const integrityRows = testDb.query("PRAGMA integrity_check").all() as {
+      integrity_check: string;
+    }[];
+    if (
+      integrityRows.length === 0 ||
+      integrityRows.some((row) => row.integrity_check !== "ok")
+    ) {
+      throw new Error("Database integrity check failed");
+    }
+
+    const foreignKeyErrors = testDb.query("PRAGMA foreign_key_check").all();
+    if (foreignKeyErrors.length > 0) {
+      throw new Error("Database foreign key check failed");
+    }
+
+    const tableRows = testDb
+      .query("SELECT name FROM sqlite_master WHERE type='table'")
+      .all() as { name: string }[];
+    const tableSet = new Set(tableRows.map((row) => row.name));
+    const missing = REQUIRED_TABLES.filter((table) => !tableSet.has(table));
+    if (missing.length > 0) {
+      throw new Error(
+        `Invalid backup: missing required tables (${missing.join(", ")})`,
+      );
+    }
+  } finally {
+    testDb.close();
+  }
+}
+
 function isValidBackupFilename(filename: string): boolean {
   const base = path.basename(filename);
   return (
@@ -51,12 +136,10 @@ function isValidBackupFilename(filename: string): boolean {
   );
 }
 
-export async function createBackup(
-  prefix = "sofa-manual",
-): Promise<BackupInfo> {
+async function createBackupInternal(prefix: BackupPrefix): Promise<BackupInfo> {
   await ensureBackupDir();
 
-  const timestamp = format(new Date(), "yyyy-MM-dd-HHmmss");
+  const timestamp = format(new Date(), "yyyy-MM-dd-HHmmssSSS");
   const filename = `${prefix}-${timestamp}.db`;
   const dest = path.join(BACKUP_DIR, filename);
 
@@ -72,6 +155,12 @@ export async function createBackup(
     createdAt: s.mtime.toISOString(),
     source: getBackupSource(filename),
   };
+}
+
+export async function createBackup(
+  prefix: BackupPrefix = "sofa-manual",
+): Promise<BackupInfo> {
+  return withBackupLock(async () => createBackupInternal(prefix));
 }
 
 export async function listBackups(): Promise<BackupInfo[]> {
@@ -95,7 +184,7 @@ export async function listBackups(): Promise<BackupInfo[]> {
   );
 }
 
-export async function deleteBackup(filename: string): Promise<void> {
+async function deleteBackupInternal(filename: string): Promise<void> {
   if (!isValidBackupFilename(filename)) {
     throw new Error("Invalid backup filename");
   }
@@ -107,6 +196,10 @@ export async function deleteBackup(filename: string): Promise<void> {
 
   await Bun.file(filePath).delete();
   log.info(`Deleted backup: ${filename}`);
+}
+
+export async function deleteBackup(filename: string): Promise<void> {
+  await withBackupLock(async () => deleteBackupInternal(filename));
 }
 
 export async function getBackupPath(filename: string): Promise<string | null> {
@@ -123,72 +216,55 @@ export async function readBackupFile(filename: string): Promise<Buffer | null> {
 }
 
 export async function restoreFromBackup(buffer: Buffer): Promise<void> {
-  await ensureBackupDir();
+  await withBackupLock(async () => {
+    await ensureBackupDir();
 
-  const timestamp = format(new Date(), "yyyy-MM-dd-HHmmss");
-  const tempPath = path.join(BACKUP_DIR, `_restore-temp-${timestamp}.db`);
+    const dbDir = path.dirname(DATABASE_URL);
+    await mkdir(dbDir, { recursive: true });
 
-  try {
-    // Write uploaded file to temp location
-    await Bun.write(tempPath, buffer);
+    const timestamp = format(new Date(), "yyyy-MM-dd-HHmmssSSS");
+    const tempPath = path.join(
+      dbDir,
+      `.restore-temp-${timestamp}-${crypto.randomUUID()}.db`,
+    );
 
-    // Validate it's a real SQLite database
-    const testDb = new Database(tempPath, { readonly: true });
     try {
-      const result = testDb.query("PRAGMA integrity_check").get() as {
-        integrity_check: string;
-      };
-      if (result?.integrity_check !== "ok") {
-        throw new Error("Database integrity check failed");
-      }
+      await Bun.write(tempPath, buffer);
+      validateBackupDatabase(tempPath);
 
-      // Check for key app tables
-      const tables = testDb
-        .query(
-          "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('user', 'titles', 'userTitleStatus')",
-        )
-        .all() as { name: string }[];
-      if (tables.length < 2) {
-        throw new Error("Invalid backup: missing expected application tables");
-      }
+      log.info("Creating pre-restore safety backup...");
+      await createBackupInternal("pre-restore");
+
+      // Keep the close+replace window synchronous to avoid event-loop interleaving.
+      log.info("Replacing database...");
+      closeDatabase();
+      renameSync(tempPath, DATABASE_URL);
+      unlinkIfExistsSync(`${DATABASE_URL}-wal`);
+      unlinkIfExistsSync(`${DATABASE_URL}-shm`);
+
+      // Ensure restored backups from older app versions are brought up-to-date.
+      runMigrations();
+      log.info("Database restored successfully");
     } finally {
-      testDb.close();
+      const tempFile = Bun.file(tempPath);
+      if (await tempFile.exists()) await tempFile.delete();
     }
-
-    // Create safety backup before replacing
-    log.info("Creating pre-restore safety backup...");
-    await createBackup("pre-restore");
-
-    // Replace the database
-    log.info("Replacing database...");
-    closeDatabase();
-    await Bun.write(DATABASE_URL, Bun.file(tempPath));
-
-    // Clean up WAL/SHM files from the old database
-    const walFile = Bun.file(`${DATABASE_URL}-wal`);
-    const shmFile = Bun.file(`${DATABASE_URL}-shm`);
-    if (await walFile.exists()) await walFile.delete();
-    if (await shmFile.exists()) await shmFile.delete();
-
-    log.info("Database restored successfully");
-  } finally {
-    // Clean up temp file
-    const tempFile = Bun.file(tempPath);
-    if (await tempFile.exists()) await tempFile.delete();
-  }
+  });
 }
 
 export async function pruneBackups(maxKeep: number): Promise<void> {
-  const backups = (await listBackups()).filter((b) =>
-    SCHEDULED_PATTERN.test(b.filename),
-  );
+  await withBackupLock(async () => {
+    const backups = (await listBackups()).filter((b) =>
+      SCHEDULED_PATTERN.test(b.filename),
+    );
 
-  if (maxKeep === 0 || backups.length <= maxKeep) return;
+    if (maxKeep === 0 || backups.length <= maxKeep) return;
 
-  const toDelete = backups.slice(maxKeep);
-  for (const backup of toDelete) {
-    await deleteBackup(backup.filename);
-  }
+    const toDelete = backups.slice(maxKeep);
+    for (const backup of toDelete) {
+      await deleteBackupInternal(backup.filename);
+    }
 
-  log.info(`Pruned ${toDelete.length} old backup(s), kept ${maxKeep}`);
+    log.info(`Pruned ${toDelete.length} old backup(s), kept ${maxKeep}`);
+  });
 }
