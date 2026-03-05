@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, count, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   episodes,
@@ -326,6 +326,48 @@ export function getUserStatusesByTmdbIds(
       | "watchlist"
       | "in_progress"
       | "completed";
+  }
+  return result;
+}
+
+export function getEpisodeProgressByTmdbIds(
+  userId: string,
+  tmdbIds: { tmdbId: number; type: string }[],
+): Record<string, { watched: number; total: number }> {
+  const tvIds = tmdbIds.filter((t) => t.type === "tv").map((t) => t.tmdbId);
+  if (tvIds.length === 0) return {};
+
+  const rows = db
+    .select({
+      tmdbId: titles.tmdbId,
+      totalEpisodes: count(episodes.id),
+      watchedEpisodes:
+        sql<number>`sum(case when ${userEpisodeWatches.id} is not null then 1 else 0 end)`.as(
+          "watchedEpisodes",
+        ),
+    })
+    .from(titles)
+    .innerJoin(seasons, eq(seasons.titleId, titles.id))
+    .innerJoin(episodes, eq(episodes.seasonId, seasons.id))
+    .leftJoin(
+      userEpisodeWatches,
+      and(
+        eq(userEpisodeWatches.episodeId, episodes.id),
+        eq(userEpisodeWatches.userId, userId),
+      ),
+    )
+    .where(and(inArray(titles.tmdbId, tvIds), eq(titles.type, "tv")))
+    .groupBy(titles.tmdbId)
+    .all();
+
+  const result: Record<string, { watched: number; total: number }> = {};
+  for (const row of rows) {
+    if (row.watchedEpisodes > 0) {
+      result[`${row.tmdbId}-tv`] = {
+        watched: row.watchedEpisodes,
+        total: row.totalEpisodes,
+      };
+    }
   }
   return result;
 }

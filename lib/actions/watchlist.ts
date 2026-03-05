@@ -7,6 +7,7 @@ import { db } from "@/lib/db/client";
 import { userTitleStatus } from "@/lib/db/schema";
 import { importTitle } from "@/lib/services/metadata";
 import {
+  getEpisodeProgressByTmdbIds,
   getUserStatusesByTmdbIds,
   setTitleStatus,
 } from "@/lib/services/tracking";
@@ -17,6 +18,14 @@ export async function fetchUserStatuses(
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return {};
   return getUserStatusesByTmdbIds(session.user.id, tmdbIds);
+}
+
+export async function fetchEpisodeProgress(
+  tmdbIds: { tmdbId: number; type: string }[],
+): Promise<Record<string, { watched: number; total: number }>> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return {};
+  return getEpisodeProgressByTmdbIds(session.user.id, tmdbIds);
 }
 
 export async function quickAddToWatchlist(

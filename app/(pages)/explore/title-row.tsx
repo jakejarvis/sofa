@@ -23,6 +23,7 @@ interface TitleRowProps {
   icon: React.ReactNode;
   items: TitleRowItem[];
   userStatuses?: Record<string, "watchlist" | "in_progress" | "completed">;
+  episodeProgress?: Record<string, { watched: number; total: number }>;
 }
 
 const staggerContainer = {
@@ -45,6 +46,7 @@ export function TitleRow({
   icon,
   items,
   userStatuses,
+  episodeProgress,
 }: TitleRowProps) {
   if (items.length === 0) return null;
 
@@ -81,6 +83,9 @@ export function TitleRow({
                     href={`/titles/tmdb-${item.tmdbId}-${item.type}`}
                     showQuickAdd
                     userStatus={userStatuses?.[`${item.tmdbId}-${item.type}`]}
+                    episodeProgress={
+                      episodeProgress?.[`${item.tmdbId}-${item.type}`]
+                    }
                   />
                 </motion.div>
               </CarouselItem>

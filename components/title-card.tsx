@@ -36,6 +36,7 @@ interface TitleCardProps {
   onImport?: () => void;
   showQuickAdd?: boolean;
   userStatus?: TitleStatus | null;
+  episodeProgress?: { watched: number; total: number } | null;
 }
 
 type QuickAddState = "idle" | "loading" | "added";
@@ -142,6 +143,26 @@ function StatusBadge({ status }: { status: TitleStatus }) {
   );
 }
 
+function ProgressBar({ watched, total }: { watched: number; total: number }) {
+  const pct = total > 0 ? (watched / total) * 100 : 0;
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        className="absolute bottom-0 left-0 right-0 z-10 h-1 bg-white/10 cursor-default"
+        render={<div />}
+      >
+        <div
+          className="h-full bg-status-watching transition-all duration-500 ease-out"
+          style={{ width: `${pct}%` }}
+        />
+      </TooltipTrigger>
+      <TooltipContent side="top">
+        {watched}/{total} episodes
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 export function TitleCard({
   id,
   tmdbId,
@@ -154,6 +175,7 @@ export function TitleCard({
   onImport,
   showQuickAdd,
   userStatus,
+  episodeProgress,
 }: TitleCardProps) {
   const year = releaseDate?.slice(0, 4);
   const TypeIcon = type === "movie" ? IconMovie : IconDeviceTv;
@@ -209,6 +231,14 @@ export function TitleCard({
           )}
         </div>
       </div>
+
+      {/* Episode progress bar */}
+      {episodeProgress && episodeProgress.watched > 0 && (
+        <ProgressBar
+          watched={episodeProgress.watched}
+          total={episodeProgress.total}
+        />
+      )}
     </motion.div>
   );
 

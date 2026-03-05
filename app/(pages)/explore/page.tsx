@@ -1,7 +1,10 @@
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/server";
-import { getUserStatusesByTmdbIds } from "@/lib/services/tracking";
+import {
+  getEpisodeProgressByTmdbIds,
+  getUserStatusesByTmdbIds,
+} from "@/lib/services/tracking";
 import { getGenres, getPopular, getTrending } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { FilterableTitleRow } from "./filterable-title-row";
@@ -49,9 +52,10 @@ export default async function ExplorePage() {
   const popularMovieItems = mapResults(popularMovies.results, "movie");
   const popularTvItems = mapResults(popularTv.results, "tv");
 
-  // Fetch user statuses for all visible TMDB IDs
+  // Fetch user statuses and episode progress for all visible TMDB IDs
   let userStatuses: Record<string, "watchlist" | "in_progress" | "completed"> =
     {};
+  let episodeProgress: Record<string, { watched: number; total: number }> = {};
   const session = await auth.api.getSession({ headers: await headers() });
   if (session) {
     const allItems = [
@@ -59,10 +63,12 @@ export default async function ExplorePage() {
       ...popularMovieItems,
       ...popularTvItems,
     ];
-    userStatuses = getUserStatusesByTmdbIds(
-      session.user.id,
-      allItems.map((i) => ({ tmdbId: i.tmdbId, type: i.type })),
-    );
+    const tmdbLookups = allItems.map((i) => ({
+      tmdbId: i.tmdbId,
+      type: i.type,
+    }));
+    userStatuses = getUserStatusesByTmdbIds(session.user.id, tmdbLookups);
+    episodeProgress = getEpisodeProgressByTmdbIds(session.user.id, tmdbLookups);
   }
 
   const heroTitle = trending.results.find(
@@ -88,6 +94,7 @@ export default async function ExplorePage() {
         icon={<IconFlame className="size-5 text-primary" />}
         items={trendingItems.slice(0, 20)}
         userStatuses={userStatuses}
+        episodeProgress={episodeProgress}
       />
 
       <FilterableTitleRow
@@ -97,6 +104,7 @@ export default async function ExplorePage() {
         defaultItems={popularMovieItems.slice(0, 20)}
         genres={movieGenres.genres}
         userStatuses={userStatuses}
+        episodeProgress={episodeProgress}
       />
 
       <FilterableTitleRow
@@ -106,6 +114,7 @@ export default async function ExplorePage() {
         defaultItems={popularTvItems.slice(0, 20)}
         genres={tvGenres.genres}
         userStatuses={userStatuses}
+        episodeProgress={episodeProgress}
       />
     </div>
   );
