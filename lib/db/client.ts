@@ -1,7 +1,17 @@
 import { Database } from "bun:sqlite";
 import path from "node:path";
+import type { Logger } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
+import { createLogger } from "@/lib/logger";
 import * as schema from "./schema";
+
+const log = createLogger("drizzle");
+
+const drizzleLogger: Logger = {
+  logQuery(query: string, params: unknown[]) {
+    log.debug(query, params.length ? params : "");
+  },
+};
 
 // Lazy-init singleton via globalThis. Next.js evaluates module-level code at
 // build time (when no database exists) and re-imports modules on HMR in dev
@@ -35,7 +45,7 @@ function getClient() {
 
 function getDb() {
   if (!globalForDb._db) {
-    globalForDb._db = drizzle({ client: getClient(), schema });
+    globalForDb._db = drizzle({ client: getClient(), schema, logger: drizzleLogger });
   }
   return globalForDb._db;
 }
