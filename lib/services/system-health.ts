@@ -65,6 +65,7 @@ const JOB_NAMES = [
   "refreshTvChildren",
   "cacheImages",
   "scheduledBackup",
+  "updateCheck",
 ];
 
 function getDatabaseHealth(): SystemHealthData["database"] {

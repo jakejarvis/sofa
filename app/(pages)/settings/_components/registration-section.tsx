@@ -7,7 +7,7 @@ import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { toggleRegistration } from "@/lib/actions/settings";
 
-export function ServerSection({
+export function RegistrationSection({
   initialRegistrationOpen,
 }: {
   initialRegistrationOpen: boolean;

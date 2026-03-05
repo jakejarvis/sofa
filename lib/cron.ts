@@ -27,6 +27,7 @@ import {
   refreshTvChildren,
 } from "@/lib/services/metadata";
 import { getSetting } from "@/lib/services/settings";
+import { performUpdateCheck } from "@/lib/services/update-check";
 import { getTvDetails } from "@/lib/tmdb/client";
 
 export type BackupFrequency = "6h" | "12h" | "1d" | "7d";
@@ -288,6 +289,9 @@ export function startJobs() {
   schedule("refreshRecommendations", "0 */12 * * *", refreshRecommendationsJob);
   schedule("refreshTvChildren", "30 */12 * * *", refreshTvChildrenJob);
   schedule("cacheImages", "0 1,13 * * *", cacheImagesJob);
+  schedule("updateCheck", "0 */6 * * *", async () => {
+    await performUpdateCheck();
+  });
 
   log.info(`Started ${jobs.size} jobs`);
 }

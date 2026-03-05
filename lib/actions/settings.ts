@@ -149,6 +149,11 @@ export async function toggleRegistration(open: boolean) {
   setSetting("registrationOpen", String(open));
 }
 
+export async function toggleUpdateCheck(enabled: boolean) {
+  await getAdminSession();
+  setSetting("updateCheckEnabled", String(enabled));
+}
+
 // --- Backup actions ---
 
 export async function createBackupAction(): Promise<BackupInfo> {

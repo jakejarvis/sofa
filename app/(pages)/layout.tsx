@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { CommandPalette } from "@/components/command-palette";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
 import { NavBar } from "@/components/nav-bar";
+import { UpdateToast } from "@/components/update-toast";
 import { auth } from "@/lib/auth/server";
 
 export default async function PagesLayout({
@@ -25,6 +26,7 @@ export default async function PagesLayout({
       </div>
       <MobileTabBar />
       <CommandPalette />
+      <UpdateToast />
     </>
   );
 }

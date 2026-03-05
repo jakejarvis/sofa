@@ -12,15 +12,20 @@ import { db } from "@/lib/db/client";
 import { webhookConnections, webhookEventLog } from "@/lib/db/schema";
 import { listBackups } from "@/lib/services/backup";
 import { getSetting } from "@/lib/services/settings";
+import {
+  getCachedUpdateCheck,
+  isUpdateCheckEnabled,
+} from "@/lib/services/update-check";
 import { APP_VERSION, GIT_COMMIT } from "@/lib/version";
 import { AccountSection } from "./_components/account-section";
 import { BackupRestoreSection } from "./_components/backup-restore-section";
 import { BackupScheduleSection } from "./_components/backup-schedule-section";
 import { BackupSection } from "./_components/backup-section";
 import { IntegrationsSection } from "./_components/integrations-section";
-import { ServerSection } from "./_components/server-section";
+import { RegistrationSection } from "./_components/registration-section";
 import { SettingsShell } from "./_components/settings-shell";
 import { SystemHealthCards } from "./_components/system-health-section";
+import { UpdateCheckSection } from "./_components/update-check-section";
 
 export default async function SettingsPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -80,6 +85,10 @@ export default async function SettingsPage() {
     ? Number.parseInt(getSetting("backupScheduleDow") ?? "0", 10)
     : 0;
 
+  const updateCheckEnabled = isAdmin ? isUpdateCheckEnabled() : true;
+  const updateCheck =
+    isAdmin && updateCheckEnabled ? getCachedUpdateCheck() : null;
+
   const repoUrl = "https://github.com/jakejarvis/sofa";
 
   return (
@@ -110,6 +119,22 @@ export default async function SettingsPage() {
                 </a>
                 )
               </>
+            )}
+            {updateCheck?.updateAvailable && (
+              <span className="ml-1.5 inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+                </span>
+                <a
+                  href={updateCheck.releaseUrl ?? `${repoUrl}/releases`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  v{updateCheck.latestVersion} available
+                </a>
+              </span>
             )}
           </p>
         </footer>
@@ -153,7 +178,12 @@ export default async function SettingsPage() {
             </div>
             <div className="space-y-3">
               <Card className="border-l-2 border-l-primary/30">
-                <ServerSection initialRegistrationOpen={registrationOpen} />
+                <RegistrationSection
+                  initialRegistrationOpen={registrationOpen}
+                />
+              </Card>
+              <Card className="border-l-2 border-l-primary/30">
+                <UpdateCheckSection initialEnabled={updateCheckEnabled} />
               </Card>
             </div>
           </div>

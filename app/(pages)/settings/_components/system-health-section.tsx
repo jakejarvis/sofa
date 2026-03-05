@@ -27,6 +27,7 @@ const JOB_LABELS: Record<string, string> = {
   refreshTvChildren: "TV episodes",
   cacheImages: "Image cache",
   scheduledBackup: "Backup",
+  updateCheck: "Update check",
 };
 
 function formatBytes(bytes: number): string {
