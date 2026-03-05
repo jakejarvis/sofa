@@ -11,7 +11,7 @@ import {
   IconPlus,
   IconStarFilled,
 } from "@tabler/icons-react";
-import { motion } from "motion/react";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -173,10 +173,8 @@ function CardInner({
     : "ring-white/[0.06]";
 
   return (
-    <motion.div
-      className={`relative overflow-hidden rounded-xl bg-card ring-1 transition-shadow hover:ring-primary/25 hover:shadow-lg hover:shadow-primary/5 ${ringClass}`}
-      whileHover={{ scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+    <div
+      className={`relative overflow-hidden rounded-xl bg-card ring-1 transition-all duration-200 ease-out hover:scale-[1.02] hover:ring-primary/25 hover:shadow-lg hover:shadow-primary/5 ${ringClass}`}
     >
       <div className="aspect-[2/3] overflow-hidden bg-card">
         {posterPath ? (
@@ -248,7 +246,7 @@ function CardInner({
           total={episodeProgress.total}
         />
       )}
-    </motion.div>
+    </div>
   );
 }
 

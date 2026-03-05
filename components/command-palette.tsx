@@ -91,7 +91,7 @@ export function CommandPalette() {
     (result: SearchResult) => {
       setCommandPaletteOpen(false);
       if (result.type === "person") {
-        router.push(`/person/tmdb-${result.tmdbId}`);
+        router.push(`/people/tmdb-${result.tmdbId}`);
       } else {
         router.push(`/titles/tmdb-${result.tmdbId}-${result.type}`);
       }

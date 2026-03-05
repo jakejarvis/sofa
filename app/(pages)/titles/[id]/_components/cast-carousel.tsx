@@ -29,11 +29,10 @@ const staggerItem = {
 
 interface CastCarouselProps {
   actors: CastMember[];
-  crew: CastMember[];
   titleType: "movie" | "tv";
 }
 
-export function CastCarousel({ actors, crew, titleType }: CastCarouselProps) {
+export function CastCarousel({ actors, titleType }: CastCarouselProps) {
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
@@ -64,7 +63,7 @@ export function CastCarousel({ actors, crew, titleType }: CastCarouselProps) {
                 >
                   <motion.div variants={staggerItem}>
                     <Link
-                      href={`/person/${member.personId}`}
+                      href={`/people/${member.personId}`}
                       className="group flex flex-col items-center gap-2"
                     >
                       <div className="size-20 overflow-hidden rounded-full ring-1 ring-white/10 transition-all group-hover:ring-primary/25 sm:size-24">
@@ -105,23 +104,6 @@ export function CastCarousel({ actors, crew, titleType }: CastCarouselProps) {
             </CarouselContent>
           </Carousel>
         </motion.div>
-      )}
-
-      {crew.length > 0 && (
-        <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted-foreground">
-          {crew.map((member) => (
-            <Link
-              key={member.id}
-              href={`/person/${member.personId}`}
-              className="transition-colors hover:text-foreground"
-            >
-              {member.name}
-              <span className="ml-1 text-xs text-muted-foreground/60">
-                ({member.job})
-              </span>
-            </Link>
-          ))}
-        </div>
       )}
     </section>
   );

@@ -95,122 +95,51 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground;
+  }
+  /* Film grain texture overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   }
 
+  /* Restore hand cursor on interactive elements */
   /* https://ui.shadcn.com/docs/components/radix/button#cursor */
   button:not(:disabled),
   [role="button"]:not(:disabled),
   [role="switch"]:not(:disabled) {
     cursor: pointer;
   }
-}
 
-/* Film grain texture overlay */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0.015;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-}
-
-/* Custom keyframe animations */
-@keyframes card-enter {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(1 0 0 / 15%);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(1 0 0 / 25%);
   }
 }
 
-@keyframes check-pop {
-  0% {
-    transform: scale(0);
+@layer utilities {
+  /* Horizontal scroll row for feeds */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
-  60% {
-    transform: scale(1.15);
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes star-fill {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.25);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes gentle-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-/* Warm skeleton pulse override */
-@keyframes warm-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
-}
-
-[data-slot="skeleton"] {
-  animation: warm-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  background: oklch(0.25 0.01 55);
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: oklch(1 0 0 / 15%);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: oklch(1 0 0 / 25%);
-}
-
-/* Horizontal scroll row for feeds */
-.feed-scroll {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.feed-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-/* Utility animations */
-.animate-gentle-float {
-  animation: gentle-float 3s ease-in-out infinite;
-}
-.animate-check-pop {
-  animation: check-pop 0.3s ease-out;
-}
-.animate-star-fill {
-  animation: star-fill 0.3s ease-out;
 }

@@ -1,4 +1,4 @@
-import { IconSparkles } from "@tabler/icons-react";
+import { IconBooks } from "@tabler/icons-react";
 import { getNewAvailableFeed } from "@/lib/services/discovery";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { FeedSection } from "./feed-section";
@@ -21,7 +21,7 @@ export async function LibrarySection({ userId }: { userId: string }) {
   return (
     <FeedSection
       title="In Your Library"
-      icon={<IconSparkles className="size-5 text-primary" />}
+      icon={<IconBooks className="size-5 text-primary" />}
     >
       <TitleGrid items={items} />
     </FeedSection>

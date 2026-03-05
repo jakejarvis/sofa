@@ -17,7 +17,7 @@ export async function StatsSection({ userId }: { userId: string }) {
       <StatsDisplay stats={stats} />
       {isEmpty && (
         <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-border/50 py-16 text-center">
-          <div className="animate-gentle-float rounded-full bg-primary/10 p-4">
+          <div className="rounded-full bg-primary/10 p-4">
             <IconDeviceTv className="size-8 text-primary" />
           </div>
           <div className="space-y-1">

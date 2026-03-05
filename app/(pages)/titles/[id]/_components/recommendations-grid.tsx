@@ -1,5 +1,6 @@
 "use client";
 
+import { IconSparkles } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import { TitleCard } from "@/components/title-card";
 import type { RecommendedTitle } from "@/lib/types/title";
@@ -26,7 +27,10 @@ export function RecommendationsGrid({
 }) {
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-2xl tracking-tight">Recommended</h2>
+      <div className="flex items-center gap-2">
+        <IconSparkles className="size-5 text-primary" />
+        <h2 className="font-display text-2xl tracking-tight">Recommended</h2>
+      </div>
       <motion.div
         className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
         variants={staggerContainer}

@@ -94,9 +94,9 @@ export default async function TitleDetailPage({
           <TitleAvailability availability={availability} />
         </TitleHero>
 
-        <TitleCast cast={cast} titleType={title.type} />
-
         {title.type === "tv" && seasons.length > 0 && <TitleSeasons />}
+
+        <TitleCast cast={cast} titleType={title.type} />
 
         <TitleKeyboardShortcuts />
       </TitleProvider>

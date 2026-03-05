@@ -5,6 +5,7 @@ import {
   IconChecks,
   IconChevronDown,
   IconChevronUp,
+  IconDeviceTvOld,
 } from "@tabler/icons-react";
 import { useAtomValue } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
@@ -47,7 +48,10 @@ export function TitleSeasons() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-2xl tracking-tight">Seasons</h2>
+        <div className="flex items-center gap-2">
+          <IconDeviceTvOld className="size-5 text-primary" />
+          <h2 className="font-display text-2xl tracking-tight">Seasons</h2>
+        </div>
         {userStatus && userStatus !== "completed" && (
           <AlertDialog open={markAllOpen} onOpenChange={setMarkAllOpen}>
             <AlertDialogTrigger

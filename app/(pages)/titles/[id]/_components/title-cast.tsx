@@ -8,9 +8,8 @@ interface TitleCastProps {
 
 export function TitleCast({ cast, titleType }: TitleCastProps) {
   const actors = cast.filter((c) => c.department === "Acting");
-  const crew = cast.filter((c) => c.department !== "Acting");
 
-  if (actors.length === 0 && crew.length === 0) return null;
+  if (actors.length === 0) return null;
 
-  return <CastCarousel actors={actors} crew={crew} titleType={titleType} />;
+  return <CastCarousel actors={actors} titleType={titleType} />;
 }

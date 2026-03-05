@@ -82,14 +82,11 @@ function StatCard({
           {label}
         </span>
       </div>
-      <motion.p
-        className={`relative z-10 mt-2 font-display text-2xl tabular-nums tracking-tight ${color} transition-opacity ${loading ? "opacity-40" : ""}`}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: loading ? 0.4 : 1 }}
-        transition={{ delay: index * 0.08 + 0.2 }}
+      <p
+        className={`relative z-10 mt-2 font-display text-2xl tabular-nums tracking-tight ${color} transition-opacity duration-300 ${loading ? "opacity-40" : "opacity-100"}`}
       >
         {value}
-      </motion.p>
+      </p>
     </motion.div>
   );
 }

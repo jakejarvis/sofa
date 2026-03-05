@@ -137,7 +137,7 @@ function FilterableTitleRowInner({
       </div>
 
       {/* Genre chips */}
-      <div className="feed-scroll -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-0 sm:flex-wrap sm:px-0">
+      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-0 sm:flex-wrap sm:px-0">
         {genres.map((genre) => (
           <button
             key={genre.id}
