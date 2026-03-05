@@ -29,17 +29,13 @@ async function getAdminSession() {
 // --- Webhook actions ---
 
 export async function saveWebhookConnection(
-  provider: "plex" | "jellyfin",
-  mediaServerUsername: string,
+  provider: "plex" | "jellyfin" | "emby",
   enabled?: boolean,
 ) {
   const session = await getSession();
 
-  if (!["plex", "jellyfin"].includes(provider)) {
+  if (!["plex", "jellyfin", "emby"].includes(provider)) {
     throw new Error("Invalid provider");
-  }
-  if (!mediaServerUsername?.trim()) {
-    throw new Error("Media server username is required");
   }
 
   const existing = db
@@ -57,7 +53,6 @@ export async function saveWebhookConnection(
     const connection = db
       .update(webhookConnections)
       .set({
-        mediaServerUsername: mediaServerUsername.trim(),
         enabled: typeof enabled === "boolean" ? enabled : existing.enabled,
       })
       .where(eq(webhookConnections.id, existing.id))
@@ -81,7 +76,6 @@ export async function saveWebhookConnection(
       userId: session.user.id,
       provider,
       token,
-      mediaServerUsername: mediaServerUsername.trim(),
       enabled: true,
       createdAt: now,
     })
@@ -95,10 +89,12 @@ export async function saveWebhookConnection(
   };
 }
 
-export async function deleteWebhookConnection(provider: "plex" | "jellyfin") {
+export async function deleteWebhookConnection(
+  provider: "plex" | "jellyfin" | "emby",
+) {
   const session = await getSession();
 
-  if (!["plex", "jellyfin"].includes(provider)) {
+  if (!["plex", "jellyfin", "emby"].includes(provider)) {
     throw new Error("Invalid provider");
   }
 
@@ -112,10 +108,12 @@ export async function deleteWebhookConnection(provider: "plex" | "jellyfin") {
     .run();
 }
 
-export async function regenerateWebhookToken(provider: "plex" | "jellyfin") {
+export async function regenerateWebhookToken(
+  provider: "plex" | "jellyfin" | "emby",
+) {
   const session = await getSession();
 
-  if (!["plex", "jellyfin"].includes(provider)) {
+  if (!["plex", "jellyfin", "emby"].includes(provider)) {
     throw new Error("Invalid provider");
   }
 

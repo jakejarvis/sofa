@@ -19,6 +19,25 @@ export function PlexIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function EmbyIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      {...props}
+    >
+      {/* Icon from Simple Icons by Simple Icons Collaborators - https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md */}
+      <path
+        fill="currentColor"
+        d="M11.041 0L0 17.98l11.041 6.02 12.959-6.02zm.058 6.905l7.348 10.607-7.348 3.986-7.306-3.986z"
+      />
+    </svg>
+  );
+}
+
 export function JellyfinIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg

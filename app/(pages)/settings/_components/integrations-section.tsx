@@ -21,31 +21,23 @@ export function IntegrationsSection({
   const plexConnection = connections.find((c) => c.provider === "plex") ?? null;
   const jellyfinConnection =
     connections.find((c) => c.provider === "jellyfin") ?? null;
+  const embyConnection = connections.find((c) => c.provider === "emby") ?? null;
 
-  async function handleSave(provider: "plex" | "jellyfin", username: string) {
-    const label = provider === "plex" ? "Plex" : "Jellyfin";
-    const isNew = !connections.find((c) => c.provider === provider);
+  async function handleConnect(provider: "plex" | "jellyfin" | "emby") {
+    const label =
+      provider === "plex" ? "Plex" : provider === "emby" ? "Emby" : "Jellyfin";
     try {
-      const result = await saveWebhookConnection(provider, username);
-      setConnections((prev) => {
-        const existing = prev.find((c) => c.provider === provider);
-        if (existing) {
-          return prev.map((c) =>
-            c.provider === provider
-              ? { ...result, recentEvents: existing.recentEvents }
-              : c,
-          );
-        }
-        return [...prev, { ...result, recentEvents: [] }];
-      });
-      toast.success(isNew ? `${label} connected` : `${label} updated`);
+      const result = await saveWebhookConnection(provider);
+      setConnections((prev) => [...prev, { ...result, recentEvents: [] }]);
+      toast.success(`${label} connected`);
     } catch {
-      toast.error(`Failed to save ${label} connection`);
+      toast.error(`Failed to connect ${label}`);
     }
   }
 
-  async function handleDelete(provider: "plex" | "jellyfin") {
-    const label = provider === "plex" ? "Plex" : "Jellyfin";
+  async function handleDelete(provider: "plex" | "jellyfin" | "emby") {
+    const label =
+      provider === "plex" ? "Plex" : provider === "emby" ? "Emby" : "Jellyfin";
     const previous = connections;
     setConnections((prev) => prev.filter((c) => c.provider !== provider));
     try {
@@ -57,8 +49,9 @@ export function IntegrationsSection({
     }
   }
 
-  async function handleRegenerateToken(provider: "plex" | "jellyfin") {
-    const label = provider === "plex" ? "Plex" : "Jellyfin";
+  async function handleRegenerateToken(provider: "plex" | "jellyfin" | "emby") {
+    const label =
+      provider === "plex" ? "Plex" : provider === "emby" ? "Emby" : "Jellyfin";
     try {
       const result = await regenerateWebhookToken(provider);
       setConnections((prev) =>
@@ -72,19 +65,18 @@ export function IntegrationsSection({
     }
   }
 
-  async function handleToggle(provider: "plex" | "jellyfin", enabled: boolean) {
-    const label = provider === "plex" ? "Plex" : "Jellyfin";
+  async function handleToggle(
+    provider: "plex" | "jellyfin" | "emby",
+    enabled: boolean,
+  ) {
+    const label =
+      provider === "plex" ? "Plex" : provider === "emby" ? "Emby" : "Jellyfin";
     const previous = connections;
     setConnections((prev) =>
       prev.map((c) => (c.provider === provider ? { ...c, enabled } : c)),
     );
     try {
-      const conn = connections.find((c) => c.provider === provider);
-      await saveWebhookConnection(
-        provider,
-        conn?.mediaServerUsername ?? "",
-        enabled,
-      );
+      await saveWebhookConnection(provider, enabled);
       toast.success(`${label} webhook ${enabled ? "enabled" : "disabled"}`);
     } catch {
       setConnections(previous);
@@ -104,7 +96,7 @@ export function IntegrationsSection({
         <WebhookCard
           provider="plex"
           connection={plexConnection}
-          onSave={handleSave}
+          onConnect={handleConnect}
           onDelete={handleDelete}
           onRegenerateToken={handleRegenerateToken}
           onToggle={handleToggle}
@@ -112,7 +104,15 @@ export function IntegrationsSection({
         <WebhookCard
           provider="jellyfin"
           connection={jellyfinConnection}
-          onSave={handleSave}
+          onConnect={handleConnect}
+          onDelete={handleDelete}
+          onRegenerateToken={handleRegenerateToken}
+          onToggle={handleToggle}
+        />
+        <WebhookCard
+          provider="emby"
+          connection={embyConnection}
+          onConnect={handleConnect}
           onDelete={handleDelete}
           onRegenerateToken={handleRegenerateToken}
           onToggle={handleToggle}

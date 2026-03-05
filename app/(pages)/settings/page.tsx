@@ -46,7 +46,6 @@ export default async function SettingsPage() {
         id: conn.id,
         provider: conn.provider,
         token: conn.token,
-        mediaServerUsername: conn.mediaServerUsername,
         enabled: conn.enabled,
         lastEventAt: conn.lastEventAt?.toISOString() ?? null,
         recentEvents: events.map((e) => ({

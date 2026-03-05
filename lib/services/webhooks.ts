@@ -15,7 +15,7 @@ import { logEpisodeWatch, logMovieWatch } from "./tracking";
 // ─── Types ──────────────────────────────────────────────────────────
 
 export interface WebhookEvent {
-  provider: "plex" | "jellyfin";
+  provider: "plex" | "jellyfin" | "emby";
   mediaType: "movie" | "episode";
   title: string;
   tmdbId?: number;
@@ -106,6 +106,39 @@ export function parseJellyfinPayload(
     seasonNumber: body.SeasonNumber as number | undefined,
     episodeNumber: body.EpisodeNumber as number | undefined,
     showTitle: (body.SeriesName ?? body.ShowName) as string | undefined,
+  };
+}
+
+export function parseEmbyPayload(
+  body: Record<string, unknown>,
+): WebhookEvent | null {
+  // Emby sends "playback.stop" or "PlaybackStop" depending on webhook plugin version
+  const event = body.Event as string | undefined;
+  if (event !== "playback.stop" && event !== "PlaybackStop") return null;
+  if (body.PlayedToCompletion !== true) return null;
+
+  const item = body.Item as Record<string, unknown> | undefined;
+  if (!item) return null;
+
+  const itemType = item.Type as string | undefined;
+  const isMovie = itemType === "Movie";
+  const isEpisode = itemType === "Episode";
+  if (!isMovie && !isEpisode) return null;
+
+  const providerIds = (item.ProviderIds ?? {}) as Record<string, string>;
+  const tmdbRaw = providerIds.Tmdb;
+  const tmdbId = tmdbRaw ? Number.parseInt(tmdbRaw, 10) : undefined;
+
+  return {
+    provider: "emby",
+    mediaType: isMovie ? "movie" : "episode",
+    title: (item.Name ?? "") as string,
+    tmdbId: tmdbId && !Number.isNaN(tmdbId) ? tmdbId : undefined,
+    imdbId: providerIds.Imdb || undefined,
+    tvdbId: providerIds.Tvdb || undefined,
+    seasonNumber: item.ParentIndexNumber as number | undefined,
+    episodeNumber: item.IndexNumber as number | undefined,
+    showTitle: (item.SeriesName ?? item.ShowName) as string | undefined,
   };
 }
 
@@ -240,7 +273,12 @@ function logEvent(
   db.insert(webhookEventLog)
     .values({
       connectionId,
-      eventType: event?.provider === "plex" ? "media.scrobble" : "PlaybackStop",
+      eventType:
+        event?.provider === "plex"
+          ? "media.scrobble"
+          : event?.provider === "emby"
+            ? "playback.stop"
+            : "PlaybackStop",
       mediaType: event?.mediaType ?? null,
       mediaTitle: event?.title ?? null,
       status,
@@ -260,7 +298,7 @@ function logEvent(
 export async function processWebhook(
   connectionId: string,
   userId: string,
-  provider: "plex" | "jellyfin",
+  provider: "plex" | "jellyfin" | "emby",
   event: WebhookEvent,
 ): Promise<{ status: "success" | "ignored" | "error"; message: string }> {
   try {

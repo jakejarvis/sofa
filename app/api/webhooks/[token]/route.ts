@@ -6,6 +6,7 @@ import { webhookConnections } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
 import type { WebhookEvent } from "@/lib/services/webhooks";
 import {
+  parseEmbyPayload,
   parseJellyfinPayload,
   parsePlexPayload,
   processWebhook,
@@ -36,6 +37,9 @@ export async function POST(
     if (connection.provider === "plex") {
       const formData = await req.formData();
       event = parsePlexPayload(formData);
+    } else if (connection.provider === "emby") {
+      const body = await req.json();
+      event = parseEmbyPayload(body);
     } else {
       const body = await req.json();
       event = parseJellyfinPayload(body);

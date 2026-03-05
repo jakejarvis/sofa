@@ -15,7 +15,7 @@ export function setTitleStatus(
   titleId: string,
   status: "watchlist" | "in_progress" | "completed",
   // biome-ignore lint/correctness/noUnusedFunctionParameters: kept for API consistency with callers
-  source: "manual" | "import" | "plex" | "jellyfin" = "manual",
+  source: "manual" | "import" | "plex" | "jellyfin" | "emby" = "manual",
 ) {
   const now = new Date();
   db.insert(userTitleStatus)
@@ -41,7 +41,7 @@ export function removeTitleStatus(userId: string, titleId: string) {
 export function logMovieWatch(
   userId: string,
   titleId: string,
-  source: "manual" | "import" | "plex" | "jellyfin" = "manual",
+  source: "manual" | "import" | "plex" | "jellyfin" | "emby" = "manual",
 ) {
   const now = new Date();
   db.insert(userMovieWatches)
@@ -70,7 +70,7 @@ export function logMovieWatch(
 export function logEpisodeWatch(
   userId: string,
   episodeId: string,
-  source: "manual" | "import" | "plex" | "jellyfin" = "manual",
+  source: "manual" | "import" | "plex" | "jellyfin" | "emby" = "manual",
 ) {
   const now = new Date();
   db.insert(userEpisodeWatches)
@@ -111,7 +111,7 @@ export function logEpisodeWatch(
 export function markAllEpisodesWatched(
   userId: string,
   titleId: string,
-  source: "manual" | "import" | "plex" | "jellyfin" = "manual",
+  source: "manual" | "import" | "plex" | "jellyfin" | "emby" = "manual",
 ) {
   const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title || title.type !== "tv") return;

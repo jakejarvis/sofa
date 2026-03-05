@@ -31,13 +31,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { JellyfinIcon, PlexIcon } from "./icons";
+import { EmbyIcon, JellyfinIcon, PlexIcon } from "./icons";
 
 export interface WebhookConnection {
   id: string;
-  provider: "plex" | "jellyfin";
+  provider: "plex" | "jellyfin" | "emby";
   token: string;
-  mediaServerUsername: string;
   enabled: boolean;
   lastEventAt: string | null;
   recentEvents: {
@@ -53,41 +52,41 @@ export interface WebhookConnection {
 export function WebhookCard({
   provider,
   connection,
-  onSave,
+  onConnect,
   onDelete,
   onRegenerateToken,
   onToggle,
 }: {
-  provider: "plex" | "jellyfin";
+  provider: "plex" | "jellyfin" | "emby";
   connection: WebhookConnection | null;
-  onSave: (provider: "plex" | "jellyfin", username: string) => Promise<void>;
-  onDelete: (provider: "plex" | "jellyfin") => Promise<void>;
-  onRegenerateToken: (provider: "plex" | "jellyfin") => Promise<void>;
-  onToggle: (provider: "plex" | "jellyfin", enabled: boolean) => Promise<void>;
+  onConnect: (provider: "plex" | "jellyfin" | "emby") => Promise<void>;
+  onDelete: (provider: "plex" | "jellyfin" | "emby") => Promise<void>;
+  onRegenerateToken: (provider: "plex" | "jellyfin" | "emby") => Promise<void>;
+  onToggle: (
+    provider: "plex" | "jellyfin" | "emby",
+    enabled: boolean,
+  ) => Promise<void>;
 }) {
-  const [username, setUsername] = useState(
-    connection?.mediaServerUsername ?? "",
-  );
-  const [saving, setSaving] = useState(false);
+  const [connecting, setConnecting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
 
   const isPlex = provider === "plex";
-  const label = isPlex ? "Plex" : "Jellyfin";
-  const Icon = isPlex ? PlexIcon : JellyfinIcon;
+  const isEmby = provider === "emby";
+  const label = isPlex ? "Plex" : isEmby ? "Emby" : "Jellyfin";
+  const Icon = isPlex ? PlexIcon : isEmby ? EmbyIcon : JellyfinIcon;
 
   const webhookUrl = connection
     ? `${window.location.origin}/api/webhooks/${connection.token}`
     : null;
 
-  async function handleSave() {
-    if (!username.trim()) return;
-    setSaving(true);
+  async function handleConnect() {
+    setConnecting(true);
     try {
-      await onSave(provider, username.trim());
+      await onConnect(provider);
     } finally {
-      setSaving(false);
+      setConnecting(false);
     }
   }
 
@@ -147,116 +146,109 @@ export function WebhookCard({
                     href="https://www.plex.tv/plex-pass/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-medium text-foreground inline-flex items-center gap-0.5 hover:underline underline-offset-2"
+                    className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
                   >
                     <span>Plex Pass</span>
-                    <IconExternalLink className="size-3 inline-block translate-y-[-1px]" />
+                    <IconExternalLink className="inline-block size-3 translate-y-[-1px]" />
                   </a>{" "}
                   subscription.
                 </p>
               </div>
             )}
 
-            <div>
-              <label
-                htmlFor={`${provider}-username`}
-                className="mb-1 block text-xs text-muted-foreground"
-              >
-                {label} username
-              </label>
-              <div className="flex gap-2">
-                <Input
-                  id={`${provider}-username`}
-                  placeholder={`Your ${label} username`}
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSave()}
-                />
-                {!connection ? (
-                  <Button
-                    onClick={handleSave}
-                    disabled={saving || !username.trim()}
+            {isEmby && (
+              <div className="flex gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
+                <IconInfoCircle className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                <p className="text-xs leading-relaxed text-foreground/80">
+                  Emby webhooks require an active{" "}
+                  <a
+                    href="https://emby.media/premiere.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
                   >
-                    {saving ? "Saving..." : "Connect"}
-                  </Button>
-                ) : (
-                  username.trim() !== connection.mediaServerUsername && (
-                    <Button
-                      onClick={handleSave}
-                      disabled={saving || !username.trim()}
-                      variant="outline"
-                    >
-                      Update
-                    </Button>
-                  )
-                )}
+                    <span>Emby Premiere</span>
+                    <IconExternalLink className="inline-block size-3 translate-y-[-1px]" />
+                  </a>{" "}
+                  subscription.
+                </p>
               </div>
-            </div>
+            )}
 
-            <AnimatePresence>
-              {webhookUrl && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="space-y-3 overflow-hidden"
-                >
-                  <div>
-                    <label
-                      htmlFor={`${provider}-webhook-url`}
-                      className="mb-1 block text-xs text-muted-foreground"
-                    >
-                      Webhook URL
-                    </label>
-                    <div className="flex gap-2">
-                      <Input
-                        id={`${provider}-webhook-url`}
-                        readOnly
-                        value={webhookUrl}
-                        className="font-mono text-[10px] text-muted-foreground"
-                      />
-                      <Tooltip>
-                        <TooltipTrigger
-                          render={
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={handleCopy}
-                            />
-                          }
-                        >
-                          {copied ? (
-                            <IconCheck className="text-green-400" />
-                          ) : (
-                            <IconCopy />
-                          )}
-                        </TooltipTrigger>
-                        <TooltipContent>Copy URL</TooltipContent>
-                      </Tooltip>
+            {!connection ? (
+              <Button
+                onClick={handleConnect}
+                disabled={connecting}
+                className="w-full"
+              >
+                {connecting ? "Connecting..." : `Connect ${label}`}
+              </Button>
+            ) : (
+              <AnimatePresence>
+                {webhookUrl && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="space-y-3 overflow-hidden"
+                  >
+                    <div>
+                      <label
+                        htmlFor={`${provider}-webhook-url`}
+                        className="mb-1 block text-xs text-muted-foreground"
+                      >
+                        Webhook URL
+                      </label>
+                      <div className="flex gap-2">
+                        <Input
+                          id={`${provider}-webhook-url`}
+                          readOnly
+                          value={webhookUrl}
+                          className="font-mono text-[10px] text-muted-foreground"
+                        />
+                        <Tooltip>
+                          <TooltipTrigger
+                            render={
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={handleCopy}
+                              />
+                            }
+                          >
+                            {copied ? (
+                              <IconCheck className="text-green-400" />
+                            ) : (
+                              <IconCopy />
+                            )}
+                          </TooltipTrigger>
+                          <TooltipContent>Copy URL</TooltipContent>
+                        </Tooltip>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onRegenerateToken(provider)}
-                    >
-                      <IconRefresh />
-                      Regenerate URL
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => onDelete(provider)}
-                    >
-                      <IconTrash />
-                      Disconnect
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onRegenerateToken(provider)}
+                      >
+                        <IconRefresh />
+                        Regenerate URL
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => onDelete(provider)}
+                      >
+                        <IconTrash />
+                        Disconnect
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )}
 
             <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
               <CollapsibleTrigger className="flex w-full items-center gap-1.5 rounded-md py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
@@ -286,9 +278,26 @@ export function WebhookCard({
                         Sofa will automatically log movies and episodes when you
                         finish watching them
                       </li>
+                    </ol>
+                  ) : isEmby ? (
+                    <ol className="list-inside list-decimal space-y-1.5">
                       <li>
-                        Make sure the username above matches your Plex account
-                        name
+                        Open Emby, go to{" "}
+                        <span className="font-medium text-foreground">
+                          Settings &gt; Webhooks
+                        </span>
+                      </li>
+                      <li>Add a new webhook and paste the URL above</li>
+                      <li>
+                        Enable the{" "}
+                        <span className="font-medium text-foreground">
+                          Playback Stop
+                        </span>{" "}
+                        event type
+                      </li>
+                      <li>
+                        Sofa will automatically log movies and episodes when you
+                        finish watching them
                       </li>
                     </ol>
                   ) : (
@@ -319,10 +328,6 @@ export function WebhookCard({
                           Playback Stop
                         </span>{" "}
                         notification type
-                      </li>
-                      <li>
-                        Make sure the username above matches your Jellyfin
-                        username
                       </li>
                     </ol>
                   )}

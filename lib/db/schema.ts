@@ -181,7 +181,7 @@ export const userMovieWatches = sqliteTable(
       .references(() => titles.id, { onDelete: "cascade" }),
     watchedAt: int("watchedAt", { mode: "timestamp" }).notNull(),
     source: text("source", {
-      enum: ["manual", "import", "plex", "jellyfin"],
+      enum: ["manual", "import", "plex", "jellyfin", "emby"],
     })
       .notNull()
       .default("manual"),
@@ -207,7 +207,7 @@ export const userEpisodeWatches = sqliteTable(
       .references(() => episodes.id, { onDelete: "cascade" }),
     watchedAt: int("watchedAt", { mode: "timestamp" }).notNull(),
     source: text("source", {
-      enum: ["manual", "import", "plex", "jellyfin"],
+      enum: ["manual", "import", "plex", "jellyfin", "emby"],
     })
       .notNull()
       .default("manual"),
@@ -297,9 +297,10 @@ export const webhookConnections = sqliteTable(
     userId: text("userId")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    provider: text("provider", { enum: ["plex", "jellyfin"] }).notNull(),
+    provider: text("provider", {
+      enum: ["plex", "jellyfin", "emby"],
+    }).notNull(),
     token: text("token").notNull().unique(),
-    mediaServerUsername: text("mediaServerUsername").notNull(),
     enabled: int("enabled", { mode: "boolean" }).notNull().default(true),
     createdAt: int("createdAt", { mode: "timestamp" }).notNull(),
     lastEventAt: int("lastEventAt", { mode: "timestamp" }),
