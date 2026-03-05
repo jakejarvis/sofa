@@ -123,6 +123,24 @@ export interface TmdbFindResult {
   }[];
 }
 
+export interface TmdbVideo {
+  id: string;
+  key: string;
+  name: string;
+  site: string;
+  type: string;
+  official: boolean;
+  published_at: string;
+  size: number;
+  iso_639_1: string;
+  iso_3166_1: string;
+}
+
+export interface TmdbVideosResponse {
+  id: number;
+  results: TmdbVideo[];
+}
+
 export interface TmdbGenre {
   id: number;
   name: string;

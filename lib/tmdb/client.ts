@@ -7,6 +7,7 @@ import type {
   TmdbSearchResponse,
   TmdbSeasonDetails,
   TmdbTvDetails,
+  TmdbVideosResponse,
   TmdbWatchProviderResponse,
 } from "./types";
 
@@ -139,6 +140,10 @@ export async function discover(
     { ...params, page: String(page) },
     { next: { revalidate: 3600 } },
   );
+}
+
+export async function getVideos(tmdbId: number, type: "movie" | "tv") {
+  return tmdbFetch<TmdbVideosResponse>(`/${type}/${tmdbId}/videos`);
 }
 
 export async function findByExternalId(

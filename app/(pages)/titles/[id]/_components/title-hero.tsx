@@ -2,13 +2,16 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import type { ColorPalette, ResolvedTitle } from "@/lib/types/title";
+import { TrailerDialog } from "./trailer-dialog";
 
 export function TitleHero({
   title,
+  trailerVideoKey,
   actions,
   children,
 }: {
   title: ResolvedTitle;
+  trailerVideoKey?: string | null;
   actions: ReactNode;
   children?: ReactNode;
 }) {
@@ -119,6 +122,7 @@ export function TitleHero({
               >
                 <TmdbLogo className="h-2.5 w-auto" />
               </a>
+              {trailerVideoKey && <TrailerDialog videoKey={trailerVideoKey} />}
             </div>
           </div>
 

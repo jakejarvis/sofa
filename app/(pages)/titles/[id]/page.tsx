@@ -85,7 +85,11 @@ export default async function TitleDetailPage({
         initialEpisodeWatches={userInfo?.episodeWatches ?? []}
         seasons={seasons}
       >
-        <TitleHero title={title} actions={<TitleActions />}>
+        <TitleHero
+          title={title}
+          trailerVideoKey={title.trailerVideoKey}
+          actions={<TitleActions />}
+        >
           <TitleAvailability availability={availability} />
         </TitleHero>
 

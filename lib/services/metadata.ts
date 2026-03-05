@@ -14,8 +14,10 @@ import {
   getSimilar,
   getTvDetails,
   getTvSeasonDetails,
+  getVideos,
 } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
+import type { TmdbVideo } from "@/lib/tmdb/types";
 import type {
   AvailabilityOffer,
   Episode,
@@ -150,6 +152,9 @@ export async function importTitle(
         log.debug("Color extraction failed:", err),
       );
     }
+    refreshTrailer(row.id).catch((err) =>
+      log.debug("Trailer enrichment failed:", err),
+    );
     if (imageCacheEnabled()) {
       cacheImagesForTitle(row.id).catch((err) =>
         log.debug("Image caching failed:", err),
@@ -204,6 +209,9 @@ export async function importTitle(
       log.debug("Color extraction failed:", err),
     );
   }
+  refreshTrailer(row.id).catch((err) =>
+    log.debug("Trailer enrichment failed:", err),
+  );
   if (imageCacheEnabled()) {
     cacheImagesForTitle(row.id).catch((err) =>
       log.debug("Image caching failed:", err),
@@ -265,6 +273,9 @@ export async function refreshTitle(titleId: string) {
   if (updated) {
     extractAndStoreColors(updated.id, updated.posterPath).catch((err) =>
       log.debug("Color extraction failed:", err),
+    );
+    refreshTrailer(updated.id).catch((err) =>
+      log.debug("Trailer enrichment failed:", err),
     );
     if (imageCacheEnabled()) {
       cacheImagesForTitle(updated.id).catch((err) =>
@@ -657,9 +668,57 @@ export async function getTitleWithChildren(id: string): Promise<{
     voteCount: title.voteCount,
     status: title.status,
     colorPalette: palette,
+    trailerVideoKey: title.trailerVideoKey,
   };
 
   return { title: resolvedTitle, seasons: titleSeasons, availability };
+}
+
+export function pickBestTrailer(videos: TmdbVideo[]): string | null {
+  let candidates = videos.filter((v) => v.site === "YouTube");
+  if (candidates.length === 0) return null;
+
+  // Prefer English, fall back to any language
+  const english = candidates.filter((v) => v.iso_639_1 === "en");
+  if (english.length > 0) candidates = english;
+
+  const byDate = (a: TmdbVideo, b: TmdbVideo) =>
+    (b.published_at ?? "").localeCompare(a.published_at ?? "");
+
+  // Tier 1: official trailers
+  const officialTrailers = candidates
+    .filter((v) => v.official && v.type === "Trailer")
+    .sort(byDate);
+  if (officialTrailers.length > 0) return officialTrailers[0].key;
+
+  // Tier 2: any trailer
+  const trailers = candidates.filter((v) => v.type === "Trailer").sort(byDate);
+  if (trailers.length > 0) return trailers[0].key;
+
+  // Tier 3: teasers
+  const teasers = candidates.filter((v) => v.type === "Teaser").sort(byDate);
+  if (teasers.length > 0) return teasers[0].key;
+
+  return null;
+}
+
+export async function refreshTrailer(titleId: string) {
+  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+  if (!title) return;
+
+  try {
+    const response = await getVideos(title.tmdbId, title.type);
+    const key = pickBestTrailer(response.results);
+    db.update(titles)
+      .set({ trailerVideoKey: key })
+      .where(eq(titles.id, titleId))
+      .run();
+    log.debug(
+      `Trailer for "${title.title}": ${key ? `YouTube ${key}` : "none found"}`,
+    );
+  } catch (err) {
+    log.debug(`Failed to fetch trailer for title ${titleId}:`, err);
+  }
 }
 
 function delay(ms: number) {

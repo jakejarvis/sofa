@@ -58,4 +58,5 @@ export interface ResolvedTitle {
   voteCount: number | null;
   status: string | null;
   colorPalette: ColorPalette | null;
+  trailerVideoKey: string | null;
 }

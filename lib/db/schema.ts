@@ -92,6 +92,7 @@ export const titles = sqliteTable(
     voteCount: int("voteCount"),
     status: text("status"),
     colorPalette: text("colorPalette"),
+    trailerVideoKey: text("trailerVideoKey"),
     lastFetchedAt: int("lastFetchedAt", { mode: "timestamp" }),
   },
   (table) => [
