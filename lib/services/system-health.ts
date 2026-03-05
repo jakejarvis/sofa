@@ -1,6 +1,6 @@
 import { access, constants, readdir, stat } from "node:fs/promises";
 import path from "node:path";
-import { count, desc, eq } from "drizzle-orm";
+import { count, desc, inArray } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { cronRuns, episodes, titles, user } from "@/lib/db/schema";
 import { listBackups } from "@/lib/services/backup";
@@ -151,15 +151,24 @@ function getJobsHealth(): SystemHealthData["jobs"] {
   const schedules = getJobSchedules();
   const scheduleMap = new Map(schedules.map((s) => [s.jobName, s]));
 
-  return JOB_NAMES.map((jobName) => {
-    const latest = db
-      .select()
-      .from(cronRuns)
-      .where(eq(cronRuns.jobName, jobName))
-      .orderBy(desc(cronRuns.startedAt))
-      .limit(1)
-      .get();
+  // Batch fetch the latest cron run for each job (1 query)
+  const allLatestRuns = db
+    .select()
+    .from(cronRuns)
+    .where(inArray(cronRuns.jobName, JOB_NAMES))
+    .orderBy(desc(cronRuns.startedAt))
+    .all();
 
+  // Keep only the most recent run per job
+  const latestByJob = new Map<string, (typeof allLatestRuns)[0]>();
+  for (const run of allLatestRuns) {
+    if (!latestByJob.has(run.jobName)) {
+      latestByJob.set(run.jobName, run);
+    }
+  }
+
+  return JOB_NAMES.map((jobName) => {
+    const latest = latestByJob.get(jobName);
     const isCurrentlyRunning = latest?.status === "running";
     const schedule = scheduleMap.get(jobName);
 

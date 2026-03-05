@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   availabilityOffers,
@@ -69,15 +69,16 @@ export async function importTitle(
         }
         await refreshTvChildren(existing.id, tmdbId, show.number_of_seasons);
         if (awaitEnrichment) {
-          await refreshAvailability(existing.id).catch(() => {});
+          await Promise.all([
+            refreshAvailability(existing.id).catch(() => {}),
+            refreshRecommendations(existing.id).catch(() => {}),
+            extractAndStoreColors(existing.id, show.poster_path).catch(
+              () => {},
+            ),
+          ]);
         } else {
           refreshAvailability(existing.id).catch(() => {});
-        }
-        await refreshRecommendations(existing.id).catch(() => {});
-        if (awaitEnrichment) {
-          await extractAndStoreColors(existing.id, show.poster_path).catch(
-            () => {},
-          );
+          refreshRecommendations(existing.id).catch(() => {});
         }
         if (imageCacheEnabled()) {
           cacheImagesForTitle(existing.id).catch(() => {});
@@ -113,12 +114,14 @@ export async function importTitle(
       .returning()
       .get();
     if (awaitEnrichment) {
-      await refreshAvailability(row.id).catch(() => {});
-      await refreshRecommendations(row.id).catch(() => {});
-      await extractAndStoreColors(row.id, movie.poster_path).catch(() => {});
+      await Promise.all([
+        refreshAvailability(row.id).catch(() => {}),
+        refreshRecommendations(row.id).catch(() => {}),
+        extractAndStoreColors(row.id, movie.poster_path).catch(() => {}),
+      ]);
     } else {
       refreshAvailability(row.id).catch(() => {});
-      await refreshRecommendations(row.id).catch(() => {});
+      refreshRecommendations(row.id).catch(() => {});
       extractAndStoreColors(row.id, movie.poster_path).catch(() => {});
     }
     if (imageCacheEnabled()) cacheImagesForTitle(row.id).catch(() => {});
@@ -148,12 +151,14 @@ export async function importTitle(
 
   await refreshTvChildren(row.id, tmdbId, show.number_of_seasons);
   if (awaitEnrichment) {
-    await refreshAvailability(row.id).catch(() => {});
-    await refreshRecommendations(row.id).catch(() => {});
-    await extractAndStoreColors(row.id, show.poster_path).catch(() => {});
+    await Promise.all([
+      refreshAvailability(row.id).catch(() => {}),
+      refreshRecommendations(row.id).catch(() => {}),
+      extractAndStoreColors(row.id, show.poster_path).catch(() => {}),
+    ]);
   } else {
     refreshAvailability(row.id).catch(() => {});
-    await refreshRecommendations(row.id).catch(() => {});
+    refreshRecommendations(row.id).catch(() => {});
     extractAndStoreColors(row.id, show.poster_path).catch(() => {});
   }
   if (imageCacheEnabled()) {
@@ -501,27 +506,39 @@ export async function getTitleWithChildren(id: string): Promise<{
       .orderBy(seasons.seasonNumber)
       .all();
 
+    // Batch fetch all episodes for all seasons (1 query)
+    const seasonIds = seasonRows.map((s) => s.id);
+    const allEps =
+      seasonIds.length > 0
+        ? db
+            .select()
+            .from(episodes)
+            .where(inArray(episodes.seasonId, seasonIds))
+            .orderBy(episodes.seasonId, episodes.episodeNumber)
+            .all()
+        : [];
+
+    // Group episodes by season
+    const epsBySeason = new Map<string, Episode[]>();
+    for (const ep of allEps) {
+      const arr = epsBySeason.get(ep.seasonId) ?? [];
+      arr.push({
+        id: ep.id,
+        episodeNumber: ep.episodeNumber,
+        name: ep.name,
+        overview: ep.overview,
+        stillPath: tmdbImageUrl(ep.stillPath, "w1280", "stills"),
+        airDate: ep.airDate,
+        runtimeMinutes: ep.runtimeMinutes,
+      });
+      epsBySeason.set(ep.seasonId, arr);
+    }
+
     titleSeasons = seasonRows.map((s) => ({
       id: s.id,
       seasonNumber: s.seasonNumber,
       name: s.name,
-      episodes: db
-        .select()
-        .from(episodes)
-        .where(eq(episodes.seasonId, s.id))
-        .orderBy(episodes.episodeNumber)
-        .all()
-        .map(
-          (ep): Episode => ({
-            id: ep.id,
-            episodeNumber: ep.episodeNumber,
-            name: ep.name,
-            overview: ep.overview,
-            stillPath: tmdbImageUrl(ep.stillPath, "w1280", "stills"),
-            airDate: ep.airDate,
-            runtimeMinutes: ep.runtimeMinutes,
-          }),
-        ),
+      episodes: epsBySeason.get(s.id) ?? [],
     }));
   }
 

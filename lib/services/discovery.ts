@@ -1,4 +1,4 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   availabilityOffers,
@@ -218,58 +218,104 @@ export function getContinueWatchingFeed(
     )
     .all();
 
-  const items: ContinueWatchingItem[] = [];
-  const today = new Date().toISOString().slice(0, 10);
+  if (inProgress.length === 0) return [];
 
-  for (const row of inProgress) {
-    const title = db
-      .select()
-      .from(titles)
-      .where(and(eq(titles.id, row.titleId), eq(titles.type, "tv")))
-      .get();
-    if (!title) continue;
+  const titleIds = inProgress.map((r) => r.titleId);
 
-    // Get all seasons for this title, ordered
-    const titleSeasons = db
-      .select()
-      .from(seasons)
-      .where(eq(seasons.titleId, title.id))
-      .orderBy(seasons.seasonNumber)
-      .all();
+  // Batch fetch all TV titles (1 query)
+  const tvTitles = db
+    .select()
+    .from(titles)
+    .where(and(inArray(titles.id, titleIds), eq(titles.type, "tv")))
+    .all();
 
-    // Find first unwatched episode
-    let nextEpisode: ContinueWatchingItem["nextEpisode"] = null;
-    let lastWatchedAt: Date | null = null;
-    let totalEpisodes = 0;
-    let watchedEpisodes = 0;
+  if (tvTitles.length === 0) return [];
 
-    // Get most recent watch for this show
-    for (const s of titleSeasons) {
-      const eps = db
-        .select()
-        .from(episodes)
-        .where(eq(episodes.seasonId, s.id))
-        .orderBy(episodes.episodeNumber)
-        .all();
+  const tvTitleIds = tvTitles.map((t) => t.id);
+  const titleMap = new Map(tvTitles.map((t) => [t.id, t]));
 
-      totalEpisodes += eps.length;
+  // Batch fetch all seasons for these titles (1 query)
+  const allSeasons = db
+    .select()
+    .from(seasons)
+    .where(inArray(seasons.titleId, tvTitleIds))
+    .orderBy(seasons.titleId, seasons.seasonNumber)
+    .all();
 
-      for (const ep of eps) {
-        const watch = db
+  const seasonIds = allSeasons.map((s) => s.id);
+
+  // Batch fetch all episodes for these seasons (1 query)
+  const allEpisodes =
+    seasonIds.length > 0
+      ? db
+          .select()
+          .from(episodes)
+          .where(inArray(episodes.seasonId, seasonIds))
+          .orderBy(episodes.seasonId, episodes.episodeNumber)
+          .all()
+      : [];
+
+  // Batch fetch all watches for this user for these episodes (1 query)
+  const episodeIds = allEpisodes.map((ep) => ep.id);
+  const allWatches =
+    episodeIds.length > 0
+      ? db
           .select()
           .from(userEpisodeWatches)
           .where(
             and(
               eq(userEpisodeWatches.userId, userId),
-              eq(userEpisodeWatches.episodeId, ep.id),
+              inArray(userEpisodeWatches.episodeId, episodeIds),
             ),
           )
-          .get();
+          .all()
+      : [];
 
-        if (watch) {
+  // Build lookup maps
+  const watchedEpisodeIds = new Set(allWatches.map((w) => w.episodeId));
+  const watchDateMap = new Map(
+    allWatches.map((w) => [w.episodeId, w.watchedAt]),
+  );
+
+  // Group seasons by title
+  const seasonsByTitle = new Map<string, typeof allSeasons>();
+  for (const s of allSeasons) {
+    const arr = seasonsByTitle.get(s.titleId) ?? [];
+    arr.push(s);
+    seasonsByTitle.set(s.titleId, arr);
+  }
+
+  // Group episodes by season
+  const episodesBySeason = new Map<string, typeof allEpisodes>();
+  for (const ep of allEpisodes) {
+    const arr = episodesBySeason.get(ep.seasonId) ?? [];
+    arr.push(ep);
+    episodesBySeason.set(ep.seasonId, arr);
+  }
+
+  const items: ContinueWatchingItem[] = [];
+  const today = new Date().toISOString().slice(0, 10);
+
+  for (const row of inProgress) {
+    const title = titleMap.get(row.titleId);
+    if (!title) continue;
+
+    const titleSeasonsArr = seasonsByTitle.get(title.id) ?? [];
+    let nextEpisode: ContinueWatchingItem["nextEpisode"] = null;
+    let lastWatchedAt: Date | null = null;
+    let totalEpisodes = 0;
+    let watchedEpisodes = 0;
+
+    for (const s of titleSeasonsArr) {
+      const eps = episodesBySeason.get(s.id) ?? [];
+      totalEpisodes += eps.length;
+
+      for (const ep of eps) {
+        if (watchedEpisodeIds.has(ep.id)) {
           watchedEpisodes++;
-          if (!lastWatchedAt || watch.watchedAt > lastWatchedAt) {
-            lastWatchedAt = watch.watchedAt;
+          const watchDate = watchDateMap.get(ep.id);
+          if (watchDate && (!lastWatchedAt || watchDate > lastWatchedAt)) {
+            lastWatchedAt = watchDate;
           }
         } else if (!nextEpisode) {
           // Skip episodes not yet aired
@@ -383,30 +429,29 @@ export function getRecommendationsFeed(userId: string) {
       .map((r) => r.titleId),
   );
 
+  // Batch fetch all recommendations for all source IDs (1 query)
+  const allRecRows = db
+    .select({
+      recommendedTitleId: titleRecommendations.recommendedTitleId,
+      rank: titleRecommendations.rank,
+    })
+    .from(titleRecommendations)
+    .where(inArray(titleRecommendations.titleId, sourceIds))
+    .all();
+
   const recs: Map<string, { titleId: string; score: number }> = new Map();
 
-  for (const sourceId of sourceIds) {
-    const recRows = db
-      .select({
-        recommendedTitleId: titleRecommendations.recommendedTitleId,
-        rank: titleRecommendations.rank,
-      })
-      .from(titleRecommendations)
-      .where(eq(titleRecommendations.titleId, sourceId))
-      .all();
-
-    for (const rec of recRows) {
-      if (trackedIds.has(rec.recommendedTitleId)) continue;
-      const existing = recs.get(rec.recommendedTitleId);
-      const score = 100 - rec.rank;
-      if (existing) {
-        existing.score += score;
-      } else {
-        recs.set(rec.recommendedTitleId, {
-          titleId: rec.recommendedTitleId,
-          score,
-        });
-      }
+  for (const rec of allRecRows) {
+    if (trackedIds.has(rec.recommendedTitleId)) continue;
+    const existing = recs.get(rec.recommendedTitleId);
+    const score = 100 - rec.rank;
+    if (existing) {
+      existing.score += score;
+    } else {
+      recs.set(rec.recommendedTitleId, {
+        titleId: rec.recommendedTitleId,
+        score,
+      });
     }
   }
 
@@ -414,9 +459,18 @@ export function getRecommendationsFeed(userId: string) {
     .sort((a, b) => b.score - a.score)
     .slice(0, 20);
 
-  return sorted
-    .map((r) => db.select().from(titles).where(eq(titles.id, r.titleId)).get())
-    .filter(Boolean);
+  if (sorted.length === 0) return [];
+
+  // Batch fetch all recommended titles (1 query)
+  const recTitleIds = sorted.map((r) => r.titleId);
+  const recTitles = db
+    .select()
+    .from(titles)
+    .where(inArray(titles.id, recTitleIds))
+    .all();
+  const recTitleMap = new Map(recTitles.map((t) => [t.id, t]));
+
+  return sorted.map((r) => recTitleMap.get(r.titleId)).filter(Boolean);
 }
 
 export function getRecommendationsForTitle(titleId: string) {
@@ -434,27 +488,31 @@ export function getRecommendationsForTitle(titleId: string) {
     .orderBy(titleRecommendations.rank)
     .all();
 
-  const results = recs
+  if (recs.length === 0) return [];
+
+  // Batch fetch all recommended titles (1 query)
+  const recTitleIds = recs.map((r) => r.recommendedTitleId);
+  const recTitles = db
+    .select()
+    .from(titles)
+    .where(inArray(titles.id, recTitleIds))
+    .all();
+  const recTitleMap = new Map(recTitles.map((t) => [t.id, t]));
+
+  return recs
     .map((rec) => {
-      const recTitle = db
-        .select()
-        .from(titles)
-        .where(eq(titles.id, rec.recommendedTitleId))
-        .get();
-      return recTitle
-        ? { ...recTitle, source: rec.source, rank: rec.rank }
-        : null;
+      const r = recTitleMap.get(rec.recommendedTitleId);
+      if (!r) return null;
+      return {
+        id: r.id,
+        tmdbId: r.tmdbId,
+        type: r.type as "movie" | "tv",
+        title: r.title,
+        posterPath: tmdbImageUrl(r.posterPath, "w500"),
+        releaseDate: r.releaseDate,
+        firstAirDate: r.firstAirDate,
+        voteAverage: r.voteAverage,
+      };
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);
-
-  return results.map((r) => ({
-    id: r.id,
-    tmdbId: r.tmdbId,
-    type: r.type as "movie" | "tv",
-    title: r.title,
-    posterPath: tmdbImageUrl(r.posterPath, "w500"),
-    releaseDate: r.releaseDate,
-    firstAirDate: r.firstAirDate,
-    voteAverage: r.voteAverage,
-  }));
 }

@@ -123,34 +123,39 @@ export function markAllEpisodesWatched(
     .where(eq(seasons.titleId, titleId))
     .all();
 
-  for (const s of allSeasons) {
-    const eps = db
-      .select()
-      .from(episodes)
-      .where(eq(episodes.seasonId, s.id))
-      .all();
+  const seasonIds = allSeasons.map((s) => s.id);
+  const allEps =
+    seasonIds.length > 0
+      ? db
+          .select()
+          .from(episodes)
+          .where(inArray(episodes.seasonId, seasonIds))
+          .all()
+      : [];
 
-    for (const ep of eps) {
-      const existing = db
-        .select()
-        .from(userEpisodeWatches)
-        .where(
-          and(
-            eq(userEpisodeWatches.userId, userId),
-            eq(userEpisodeWatches.episodeId, ep.id),
-          ),
+  const epIds = allEps.map((ep) => ep.id);
+  const existingWatches =
+    epIds.length > 0
+      ? new Set(
+          db
+            .select({ episodeId: userEpisodeWatches.episodeId })
+            .from(userEpisodeWatches)
+            .where(
+              and(
+                eq(userEpisodeWatches.userId, userId),
+                inArray(userEpisodeWatches.episodeId, epIds),
+              ),
+            )
+            .all()
+            .map((w) => w.episodeId),
         )
-        .get();
-      if (!existing) {
-        db.insert(userEpisodeWatches)
-          .values({
-            userId,
-            episodeId: ep.id,
-            watchedAt: now,
-            source,
-          })
-          .run();
-      }
+      : new Set<string>();
+
+  for (const ep of allEps) {
+    if (!existingWatches.has(ep.id)) {
+      db.insert(userEpisodeWatches)
+        .values({ userId, episodeId: ep.id, watchedAt: now, source })
+        .run();
     }
   }
 
@@ -164,33 +169,31 @@ function checkAllEpisodesWatched(userId: string, titleId: string) {
     .where(eq(seasons.titleId, titleId))
     .all();
 
-  let totalEpisodes = 0;
-  let watchedEpisodes = 0;
+  if (allSeasons.length === 0) return;
 
-  for (const s of allSeasons) {
-    const eps = db
-      .select()
-      .from(episodes)
-      .where(eq(episodes.seasonId, s.id))
-      .all();
-    totalEpisodes += eps.length;
+  const seasonIds = allSeasons.map((s) => s.id);
+  const allEps = db
+    .select()
+    .from(episodes)
+    .where(inArray(episodes.seasonId, seasonIds))
+    .all();
 
-    for (const ep of eps) {
-      const watch = db
-        .select()
-        .from(userEpisodeWatches)
-        .where(
-          and(
-            eq(userEpisodeWatches.userId, userId),
-            eq(userEpisodeWatches.episodeId, ep.id),
-          ),
-        )
-        .get();
-      if (watch) watchedEpisodes++;
-    }
-  }
+  const totalEpisodes = allEps.length;
+  if (totalEpisodes === 0) return;
 
-  if (totalEpisodes > 0 && watchedEpisodes >= totalEpisodes) {
+  const epIds = allEps.map((ep) => ep.id);
+  const [watchCount] = db
+    .select({ count: count(userEpisodeWatches.id) })
+    .from(userEpisodeWatches)
+    .where(
+      and(
+        eq(userEpisodeWatches.userId, userId),
+        inArray(userEpisodeWatches.episodeId, epIds),
+      ),
+    )
+    .all();
+
+  if (watchCount.count >= totalEpisodes) {
     setTitleStatus(userId, titleId, "completed");
   }
 }
@@ -392,34 +395,40 @@ export function getUserTitleInfo(userId: string, titleId: string) {
     )
     .get();
 
-  // Get watched episode IDs for this title
+  // Batch fetch all episode IDs for this title
   const titleSeasons = db
     .select()
     .from(seasons)
     .where(eq(seasons.titleId, titleId))
     .all();
 
-  const watchedEpisodeIds: string[] = [];
-  for (const s of titleSeasons) {
-    const eps = db
-      .select()
-      .from(episodes)
-      .where(eq(episodes.seasonId, s.id))
-      .all();
-    for (const ep of eps) {
-      const watch = db
-        .select()
-        .from(userEpisodeWatches)
-        .where(
-          and(
-            eq(userEpisodeWatches.userId, userId),
-            eq(userEpisodeWatches.episodeId, ep.id),
-          ),
-        )
-        .get();
-      if (watch) watchedEpisodeIds.push(ep.id);
-    }
-  }
+  const seasonIds = titleSeasons.map((s) => s.id);
+  const allEps =
+    seasonIds.length > 0
+      ? db
+          .select()
+          .from(episodes)
+          .where(inArray(episodes.seasonId, seasonIds))
+          .all()
+      : [];
+
+  const epIds = allEps.map((ep) => ep.id);
+
+  // Batch fetch all watches for these episodes
+  const watchedEpisodeIds =
+    epIds.length > 0
+      ? db
+          .select({ episodeId: userEpisodeWatches.episodeId })
+          .from(userEpisodeWatches)
+          .where(
+            and(
+              eq(userEpisodeWatches.userId, userId),
+              inArray(userEpisodeWatches.episodeId, epIds),
+            ),
+          )
+          .all()
+          .map((w) => w.episodeId)
+      : [];
 
   return {
     status: status?.status ?? null,

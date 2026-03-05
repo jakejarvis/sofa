@@ -1,6 +1,5 @@
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import {
   getEpisodeProgressByTmdbIds,
   getUserStatusesByTmdbIds,
@@ -39,13 +38,15 @@ function mapResults(
 }
 
 export default async function ExplorePage() {
-  const [trending, popularMovies, popularTv, movieGenres, tvGenres] =
+  // Fetch session in parallel with TMDB calls
+  const [trending, popularMovies, popularTv, movieGenres, tvGenres, session] =
     await Promise.all([
       getTrending("all", "day"),
       getPopular("movie"),
       getPopular("tv"),
       getGenres("movie"),
       getGenres("tv"),
+      getSession(),
     ]);
 
   const trendingItems = mapResults(trending.results, "movie");
@@ -56,7 +57,6 @@ export default async function ExplorePage() {
   let userStatuses: Record<string, "watchlist" | "in_progress" | "completed"> =
     {};
   let episodeProgress: Record<string, { watched: number; total: number }> = {};
-  const session = await auth.api.getSession({ headers: await headers() });
   if (session) {
     const allItems = [
       ...trendingItems,

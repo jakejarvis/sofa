@@ -239,9 +239,11 @@ async function cacheImagesJob() {
 
   for (const titleId of libraryIds) {
     try {
-      await cacheImagesForTitle(titleId);
-      await cacheEpisodeStills(titleId);
-      await cacheProviderLogos(titleId);
+      await Promise.all([
+        cacheImagesForTitle(titleId),
+        cacheEpisodeStills(titleId),
+        cacheProviderLogos(titleId),
+      ]);
     } catch {
       // Continue with remaining titles
     }

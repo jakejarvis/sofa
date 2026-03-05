@@ -1,6 +1,6 @@
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { APIError, createAuthMiddleware } from "better-auth/api";
+import { betterAuth } from "better-auth/minimal";
 import { admin, genericOAuth } from "better-auth/plugins";
 import {
   isOidcAutoRegisterEnabled,

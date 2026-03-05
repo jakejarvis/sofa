@@ -1,17 +1,16 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { CommandPalette } from "@/components/command-palette";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
 import { NavBar } from "@/components/nav-bar";
 import { UpdateToast } from "@/components/update-toast";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 
 export default async function PagesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) redirect("/login");
 
   return (

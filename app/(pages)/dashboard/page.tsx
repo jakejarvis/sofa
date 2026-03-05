@@ -1,11 +1,10 @@
-import { headers } from "next/headers";
 import { Suspense } from "react";
 import {
   ContinueWatchingSectionSkeleton,
   StatsSectionSkeleton,
   TitleGridSectionSkeleton,
 } from "@/components/skeletons";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { ContinueWatchingSection } from "./_components/continue-watching-section";
 import { LibrarySection } from "./_components/library-section";
 import { RecommendationsSection } from "./_components/recommendations-section";
@@ -13,7 +12,7 @@ import { StatsSection } from "./_components/stats-section";
 import { WelcomeHeader } from "./_components/welcome-header";
 
 export default async function DashboardPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) return null;
 
   return (

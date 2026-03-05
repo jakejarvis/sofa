@@ -1,10 +1,9 @@
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { RecommendationsSkeleton } from "@/components/skeletons";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import { titles } from "@/lib/db/schema";
 import { getTitleWithChildren, importTitle } from "@/lib/services/metadata";
@@ -64,7 +63,7 @@ export default async function TitleDetailPage({
   }
 
   // Fetch title + user info in parallel
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   const [result, userInfo] = await Promise.all([
     getTitleWithChildren(id),
     session ? getUserTitleInfo(session.user.id, id) : null,

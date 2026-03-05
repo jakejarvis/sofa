@@ -3,11 +3,10 @@ import {
   IconServer2,
   IconShieldLock,
 } from "@tabler/icons-react";
-import { desc, eq } from "drizzle-orm";
-import { headers } from "next/headers";
+import { desc, eq, inArray } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import { webhookConnections, webhookEventLog } from "@/lib/db/schema";
 import { listBackups } from "@/lib/services/backup";
@@ -28,41 +27,53 @@ import { SystemHealthCards } from "./_components/system-health-section";
 import { UpdateCheckSection } from "./_components/update-check-section";
 
 export default async function SettingsPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session?.user) redirect("/login");
 
   const isAdmin = session.user.role === "admin";
 
-  const connections = db
+  const connRows = db
     .select()
     .from(webhookConnections)
     .where(eq(webhookConnections.userId, session.user.id))
-    .all()
-    .map((conn) => {
-      const events = db
-        .select()
-        .from(webhookEventLog)
-        .where(eq(webhookEventLog.connectionId, conn.id))
-        .orderBy(desc(webhookEventLog.receivedAt))
-        .limit(10)
-        .all();
+    .all();
 
-      return {
-        id: conn.id,
-        provider: conn.provider,
-        token: conn.token,
-        enabled: conn.enabled,
-        lastEventAt: conn.lastEventAt?.toISOString() ?? null,
-        recentEvents: events.map((e) => ({
-          id: e.id,
-          eventType: e.eventType,
-          mediaType: e.mediaType,
-          mediaTitle: e.mediaTitle,
-          status: e.status,
-          receivedAt: e.receivedAt.toISOString(),
-        })),
-      };
-    });
+  const connIds = connRows.map((c) => c.id);
+
+  // Batch fetch all event logs for all connections (1 query)
+  const allEvents =
+    connIds.length > 0
+      ? db
+          .select()
+          .from(webhookEventLog)
+          .where(inArray(webhookEventLog.connectionId, connIds))
+          .orderBy(desc(webhookEventLog.receivedAt))
+          .all()
+      : [];
+
+  // Group events by connection, keeping only 10 most recent per connection
+  const eventsByConn = new Map<string, typeof allEvents>();
+  for (const e of allEvents) {
+    const arr = eventsByConn.get(e.connectionId) ?? [];
+    if (arr.length < 10) arr.push(e);
+    eventsByConn.set(e.connectionId, arr);
+  }
+
+  const connections = connRows.map((conn) => ({
+    id: conn.id,
+    provider: conn.provider,
+    token: conn.token,
+    enabled: conn.enabled,
+    lastEventAt: conn.lastEventAt?.toISOString() ?? null,
+    recentEvents: (eventsByConn.get(conn.id) ?? []).map((e) => ({
+      id: e.id,
+      eventType: e.eventType,
+      mediaType: e.mediaType,
+      mediaTitle: e.mediaTitle,
+      status: e.status,
+      receivedAt: e.receivedAt.toISOString(),
+    })),
+  }));
 
   const registrationOpen = isAdmin
     ? getSetting("registrationOpen") === "true"
