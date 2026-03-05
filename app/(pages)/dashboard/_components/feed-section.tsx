@@ -14,8 +14,10 @@ export function FeedSection({
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
-        {icon}
-        <h2 className="font-display text-xl tracking-tight">{title}</h2>
+        <span aria-hidden={true}>{icon}</span>
+        <h2 className="font-display text-xl tracking-tight text-balance">
+          {title}
+        </h2>
       </div>
       {children}
     </section>

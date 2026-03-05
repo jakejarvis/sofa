@@ -99,7 +99,10 @@ export function BackupSection({
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconDatabaseExport className="size-4 text-primary" />
+              <IconDatabaseExport
+                aria-hidden={true}
+                className="size-4 text-primary"
+              />
             </div>
             <div>
               <CardTitle>Database backups</CardTitle>
@@ -111,8 +114,12 @@ export function BackupSection({
             </div>
           </div>
           <Button onClick={handleCreateBackup} disabled={creating}>
-            {creating ? <Spinner className="size-3" /> : <IconPlus />}
-            {creating ? "Creating..." : "New backup"}
+            {creating ? (
+              <Spinner className="size-3" />
+            ) : (
+              <IconPlus aria-hidden={true} />
+            )}
+            {creating ? "Creating\u2026" : "New backup"}
           </Button>
         </div>
       </CardContent>
@@ -139,11 +146,17 @@ export function BackupSection({
                         }
                       >
                         {backup.source === "scheduled" ? (
-                          <IconClock className="size-3.5" />
+                          <IconClock aria-hidden={true} className="size-3.5" />
                         ) : backup.source === "pre-restore" ? (
-                          <IconShieldCheck className="size-3.5" />
+                          <IconShieldCheck
+                            aria-hidden={true}
+                            className="size-3.5"
+                          />
                         ) : (
-                          <IconPointer className="size-3.5" />
+                          <IconPointer
+                            aria-hidden={true}
+                            className="size-3.5"
+                          />
                         )}
                       </TooltipTrigger>
                       <TooltipContent>
@@ -172,7 +185,7 @@ export function BackupSection({
                         </span>
                       </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                       <Tooltip>
                         <TooltipTrigger
                           render={
@@ -204,6 +217,7 @@ export function BackupSection({
                                   <Button
                                     variant="ghost"
                                     size="icon-sm"
+                                    aria-label="Delete backup"
                                     className="text-muted-foreground hover:text-destructive"
                                     disabled={deleting === backup.filename}
                                   />

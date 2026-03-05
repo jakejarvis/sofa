@@ -48,7 +48,7 @@ export function PersonHero({ person }: PersonHeroProps) {
       </div>
 
       <div className="min-w-0 flex-1 space-y-3">
-        <h1 className="font-display text-3xl tracking-tight sm:text-5xl">
+        <h1 className="font-display text-3xl tracking-tight text-balance sm:text-5xl">
           {person.name}
         </h1>
 
@@ -61,7 +61,7 @@ export function PersonHero({ person }: PersonHeroProps) {
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
           {person.birthday && (
             <span className="flex items-center gap-1.5">
-              <IconCalendar className="size-3.5" />
+              <IconCalendar aria-hidden={true} className="size-3.5" />
               {person.birthday}
               {age !== null && (
                 <span className="text-muted-foreground/60">
@@ -72,7 +72,7 @@ export function PersonHero({ person }: PersonHeroProps) {
           )}
           {person.placeOfBirth && (
             <span className="flex items-center gap-1.5">
-              <IconMapPin className="size-3.5" />
+              <IconMapPin aria-hidden={true} className="size-3.5" />
               {person.placeOfBirth}
             </span>
           )}

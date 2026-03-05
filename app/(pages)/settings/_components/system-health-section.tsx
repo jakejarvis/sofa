@@ -149,7 +149,10 @@ export function SystemHealthCards() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                <IconActivity className="size-4 text-primary" />
+                <IconActivity
+                  aria-hidden={true}
+                  className="size-4 text-primary"
+                />
               </div>
               <div>
                 <CardTitle>Health status</CardTitle>
@@ -164,6 +167,7 @@ export function SystemHealthCards() {
                   <Button
                     variant="ghost"
                     size="icon"
+                    aria-label="Refresh system health"
                     onClick={() => refresh()}
                     disabled={isValidating}
                   />
@@ -236,9 +240,15 @@ export function SystemHealthCards() {
             <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
               Environment
               {data.environment.dataDirWritable ? (
-                <IconCheck className="size-3 text-green-500" />
+                <IconCheck
+                  aria-hidden={true}
+                  className="size-3 text-green-500"
+                />
               ) : (
-                <IconAlertTriangle className="size-3 text-destructive" />
+                <IconAlertTriangle
+                  aria-hidden={true}
+                  className="size-3 text-destructive"
+                />
               )}
             </span>
             <div className="space-y-1">
@@ -270,7 +280,10 @@ export function SystemHealthCards() {
         <CardContent>
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconDatabase className="size-4 text-primary" />
+              <IconDatabase
+                aria-hidden={true}
+                className="size-4 text-primary"
+              />
             </div>
             <div>
               <CardTitle>Storage</CardTitle>
@@ -386,7 +399,10 @@ function BackgroundJobsCard({
       <CardContent>
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <IconCalendarCheck className="size-4 text-primary" />
+            <IconCalendarCheck
+              aria-hidden={true}
+              className="size-4 text-primary"
+            />
           </div>
           <div>
             <CardTitle>Background jobs</CardTitle>
@@ -535,6 +551,7 @@ function BackgroundJobsCard({
                           <Button
                             variant="ghost"
                             size="icon"
+                            aria-label="Trigger job"
                             className="size-6"
                             disabled={isRunning}
                             onClick={() => handleTrigger(job.jobName)}
@@ -544,7 +561,10 @@ function BackgroundJobsCard({
                         {isRunning ? (
                           <Spinner className="size-3" />
                         ) : (
-                          <IconPlayerPlay className="size-3 text-muted-foreground/50" />
+                          <IconPlayerPlay
+                            aria-hidden={true}
+                            className="size-3 text-muted-foreground/50"
+                          />
                         )}
                       </TooltipTrigger>
                       <TooltipContent>Run now</TooltipContent>

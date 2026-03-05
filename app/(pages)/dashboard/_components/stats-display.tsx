@@ -67,7 +67,7 @@ function StatCard({
         <div
           className={`flex h-6 w-6 items-center justify-center rounded-md ${bgColor}`}
         >
-          <Icon className={`size-[13px] ${color}`} />
+          <Icon aria-hidden={true} className={`size-[13px] ${color}`} />
         </div>
         <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
           {label}
@@ -75,7 +75,7 @@ function StatCard({
       </div>
       <p
         suppressHydrationWarning
-        className={`relative z-10 mt-2 font-display text-2xl tabular-nums tracking-tight ${color} transition-opacity duration-300`}
+        className={`relative z-10 mt-2 font-display text-2xl tabular-nums tracking-tight ${color} motion-safe:transition-opacity motion-safe:duration-300`}
       >
         {value}
       </p>
@@ -98,7 +98,7 @@ function PeriodSelector({
       <DropdownMenu>
         <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-0.5 border-b border-dotted border-muted-foreground/50 uppercase text-foreground/80 transition-colors hover:text-foreground">
           {periodLabels[period]}
-          <IconChevronDown className="size-2.5" />
+          <IconChevronDown aria-hidden={true} className="size-2.5" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
           <DropdownMenuRadioGroup

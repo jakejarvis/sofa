@@ -63,7 +63,7 @@ export function TitleSeasons({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <IconDeviceTvOld className="size-5 text-primary" />
+          <IconDeviceTvOld aria-hidden={true} className="size-5 text-primary" />
           <h2 className="font-display text-2xl tracking-tight">Seasons</h2>
         </div>
         {userStatus && userStatus !== "completed" && (
@@ -74,7 +74,7 @@ export function TitleSeasons({
                   type="button"
                   className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                 >
-                  <IconChecks className="size-3.5" />
+                  <IconChecks aria-hidden={true} className="size-3.5" />
                   Mark All Watched
                 </button>
               }
@@ -180,9 +180,15 @@ export function TitleSeasons({
                     </span>
                   )}
                   {isOpen ? (
-                    <IconChevronUp className="size-4 text-muted-foreground" />
+                    <IconChevronUp
+                      aria-hidden={true}
+                      className="size-4 text-muted-foreground"
+                    />
                   ) : (
-                    <IconChevronDown className="size-4 text-muted-foreground" />
+                    <IconChevronDown
+                      aria-hidden={true}
+                      className="size-4 text-muted-foreground"
+                    />
                   )}
                 </div>
               </div>
@@ -210,6 +216,7 @@ export function TitleSeasons({
                         >
                           <button
                             type="button"
+                            aria-label={`Mark episode ${ep.episodeNumber} as ${isWatched ? "unwatched" : "watched"}`}
                             onClick={() =>
                               handleWatchEpisode(
                                 ep.id,

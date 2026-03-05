@@ -106,7 +106,9 @@ function FilterableTitleRowInner({
     <section className="space-y-4">
       <div className="flex items-center gap-2">
         {icon}
-        <h2 className="font-display text-xl tracking-tight">{heading}</h2>
+        <h2 className="font-display text-xl tracking-tight text-balance">
+          {heading}
+        </h2>
       </div>
 
       {/* Genre chips */}
@@ -116,7 +118,7 @@ function FilterableTitleRowInner({
             key={genre.id}
             type="button"
             onClick={() => toggleGenre(genre.id)}
-            className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-all ${
+            className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
               selectedGenre === genre.id
                 ? "border-primary bg-primary/10 text-primary"
                 : "border-border/50 bg-card/50 text-muted-foreground hover:border-primary/20 hover:text-foreground"

@@ -52,7 +52,10 @@ export function BackupRestoreSection() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <IconCloudUpload className="size-4 text-primary" />
+            <IconCloudUpload
+              aria-hidden={true}
+              className="size-4 text-primary"
+            />
           </div>
           <div>
             <CardTitle>Restore</CardTitle>
@@ -115,8 +118,8 @@ export function BackupRestoreSection() {
           onClick={() => fileInputRef.current?.click()}
           disabled={restoring}
         >
-          {restoring ? <Spinner /> : <IconCloudUpload />}
-          {restoring ? "Restoring..." : "Upload"}
+          {restoring ? <Spinner /> : <IconCloudUpload aria-hidden={true} />}
+          {restoring ? "Restoring\u2026" : "Upload"}
         </Button>
       </div>
     </CardContent>

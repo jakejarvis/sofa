@@ -22,10 +22,10 @@ export default async function RegisterPage() {
           <div className="absolute -inset-4 rounded-2xl bg-primary/3 blur-2xl" />
           <div className="relative space-y-6 rounded-xl border border-border/50 bg-card/80 p-8 text-center backdrop-blur-sm">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <IconLock className="size-6 text-primary" />
+              <IconLock aria-hidden={true} className="size-6 text-primary" />
             </div>
             <div className="space-y-2">
-              <h1 className="font-display text-xl tracking-tight">
+              <h1 className="font-display text-xl tracking-tight text-balance">
                 Registration Closed
               </h1>
               <p className="text-sm text-muted-foreground">

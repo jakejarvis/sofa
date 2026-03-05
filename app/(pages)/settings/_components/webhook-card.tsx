@@ -108,6 +108,7 @@ export function WebhookCard({
               </div>
             </div>
             <IconChevronDown
+              aria-hidden={true}
               className={`size-4 text-muted-foreground transition-transform duration-200 ${cardOpen ? "rotate-180" : ""}`}
             />
           </CollapsibleTrigger>
@@ -117,7 +118,10 @@ export function WebhookCard({
           <CardContent className="space-y-3 border-t border-border/30 pt-4">
             {isPlex && (
               <div className="flex gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
-                <IconInfoCircle className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                <IconInfoCircle
+                  aria-hidden={true}
+                  className="mt-0.5 size-3.5 shrink-0 text-primary"
+                />
                 <p className="text-xs leading-relaxed text-foreground/80">
                   Requires an active{" "}
                   <a
@@ -127,7 +131,10 @@ export function WebhookCard({
                     className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
                   >
                     <span>Plex Pass</span>
-                    <IconExternalLink className="inline-block size-3 translate-y-[-1px]" />
+                    <IconExternalLink
+                      aria-hidden={true}
+                      className="inline-block size-3 translate-y-[-1px]"
+                    />
                   </a>{" "}
                   subscription.
                 </p>
@@ -136,7 +143,10 @@ export function WebhookCard({
 
             {isEmby && (
               <div className="flex gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
-                <IconInfoCircle className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                <IconInfoCircle
+                  aria-hidden={true}
+                  className="mt-0.5 size-3.5 shrink-0 text-primary"
+                />
                 <p className="text-xs leading-relaxed text-foreground/80">
                   Requires{" "}
                   <span className="font-medium text-foreground">
@@ -150,7 +160,10 @@ export function WebhookCard({
                     className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
                   >
                     <span>Emby Premiere</span>
-                    <IconExternalLink className="inline-block size-3 translate-y-[-1px]" />
+                    <IconExternalLink
+                      aria-hidden={true}
+                      className="inline-block size-3 translate-y-[-1px]"
+                    />
                   </a>{" "}
                   license.
                 </p>
@@ -164,7 +177,7 @@ export function WebhookCard({
                 size="lg"
                 className="w-full"
               >
-                {connecting ? "Connecting..." : `Connect ${label}`}
+                {connecting ? "Connecting\u2026" : `Connect ${label}`}
               </Button>
             ) : (
               <AnimatePresence>
@@ -236,6 +249,7 @@ export function WebhookCard({
             <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
               <CollapsibleTrigger className="flex w-full items-center gap-1.5 rounded-md py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
                 <IconChevronDown
+                  aria-hidden={true}
                   className={`size-3 transition-transform ${setupOpen ? "rotate-0" : "-rotate-90"}`}
                 />
                 Setup instructions
@@ -254,7 +268,10 @@ export function WebhookCard({
                             className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
                           >
                             Settings &gt; Webhooks
-                            <IconExternalLink className="inline-block size-3 translate-y-[-1px]" />
+                            <IconExternalLink
+                              aria-hidden={true}
+                              className="inline-block size-3 translate-y-[-1px]"
+                            />
                           </a>
                         </li>
                         <li>
@@ -293,7 +310,10 @@ export function WebhookCard({
                             className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
                           >
                             Webhook plugin
-                            <IconExternalLink className="inline-block size-3 translate-y-[-1px]" />
+                            <IconExternalLink
+                              aria-hidden={true}
+                              className="inline-block size-3 translate-y-[-1px]"
+                            />
                           </a>{" "}
                           from Jellyfin&apos;s plugin catalog
                         </li>
@@ -325,7 +345,10 @@ export function WebhookCard({
                     </li>
                   </ol>
                   <p className="mt-2 -ml-0.5">
-                    <IconBook2 className="inline-block size-3 translate-y-[-1px] mr-1" />
+                    <IconBook2
+                      aria-hidden={true}
+                      className="inline-block size-3 translate-y-[-1px] mr-1"
+                    />
                     Need more help?{" "}
                     <a
                       href={
@@ -340,7 +363,10 @@ export function WebhookCard({
                       className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
                     >
                       Open docs{" "}
-                      <IconExternalLink className="inline-block size-3 translate-y-[-1px]" />
+                      <IconExternalLink
+                        aria-hidden={true}
+                        className="inline-block size-3 translate-y-[-1px]"
+                      />
                     </a>
                   </p>
                 </div>

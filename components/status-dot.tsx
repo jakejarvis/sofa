@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import {
   Tooltip,
   TooltipContent,
@@ -42,6 +42,7 @@ export function StatusDot({
   const { bg, shadow } = colors[status];
   const pulse = status !== "inactive";
   const tooltipText = label ?? defaultLabels[status];
+  const prefersReducedMotion = useReducedMotion();
 
   const dotEl = pulse ? (
     <motion.span
@@ -50,9 +51,16 @@ export function StatusDot({
         bg,
         className,
       )}
-      animate={{
-        boxShadow: [shadow, pulseColors[status as keyof typeof pulseColors]],
-      }}
+      animate={
+        prefersReducedMotion
+          ? {}
+          : {
+              boxShadow: [
+                shadow,
+                pulseColors[status as keyof typeof pulseColors],
+              ],
+            }
+      }
       transition={{
         duration: 1.2,
         repeat: Number.POSITIVE_INFINITY,

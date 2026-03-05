@@ -180,7 +180,7 @@ export function LandingPage({
           {freshInstall ? (
             <Link
               href="/register"
-              className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/20"
+              className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-shadow hover:shadow-lg hover:shadow-primary/20"
             >
               <span className="relative z-10">Get Started</span>
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
@@ -189,7 +189,7 @@ export function LandingPage({
             <>
               <Link
                 href="/login"
-                className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/20"
+                className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-shadow hover:shadow-lg hover:shadow-primary/20"
               >
                 <span className="relative z-10">Sign In</span>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
@@ -197,7 +197,7 @@ export function LandingPage({
               {registrationOpen && (
                 <Link
                   href="/register"
-                  className="inline-flex h-12 items-center justify-center rounded-lg border border-border px-8 font-medium transition-all hover:border-primary/40 hover:bg-primary/5"
+                  className="inline-flex h-12 items-center justify-center rounded-lg border border-border px-8 font-medium transition-colors hover:border-primary/40 hover:bg-primary/5"
                 >
                   Register
                 </Link>

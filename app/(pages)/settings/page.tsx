@@ -162,7 +162,10 @@ export default async function SettingsPage() {
           {/* Server health */}
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <IconServer2 className="size-4 text-muted-foreground" />
+              <IconServer2
+                aria-hidden={true}
+                className="size-4 text-muted-foreground"
+              />
               <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Server
               </h2>
@@ -176,7 +179,10 @@ export default async function SettingsPage() {
           {/* Security */}
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <IconShieldLock className="size-4 text-muted-foreground" />
+              <IconShieldLock
+                aria-hidden={true}
+                className="size-4 text-muted-foreground"
+              />
               <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Security
               </h2>
@@ -199,7 +205,10 @@ export default async function SettingsPage() {
           {/* Backups */}
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <IconDatabaseExport className="size-4 text-muted-foreground" />
+              <IconDatabaseExport
+                aria-hidden={true}
+                className="size-4 text-muted-foreground"
+              />
               <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Backups
               </h2>

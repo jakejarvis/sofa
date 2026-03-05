@@ -152,7 +152,7 @@ export function CommandPalette() {
         >
           <Command shouldFilter={false}>
             <CommandInput
-              placeholder="Search movies & TV shows..."
+              placeholder="Search movies & TV shows\u2026"
               value={query}
               onValueChange={setQuery}
             />
@@ -196,7 +196,10 @@ export function CommandPalette() {
                             />
                           ) : (
                             <div className="flex h-full items-center justify-center">
-                              <IconUser className="size-4 text-muted-foreground" />
+                              <IconUser
+                                aria-hidden={true}
+                                className="size-4 text-muted-foreground"
+                              />
                             </div>
                           )}
                         </div>
@@ -223,11 +226,20 @@ export function CommandPalette() {
                         </p>
                         <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                           {r.type === "person" ? (
-                            <IconUser className="size-[11px]" />
+                            <IconUser
+                              aria-hidden={true}
+                              className="size-[11px]"
+                            />
                           ) : r.type === "movie" ? (
-                            <IconMovie className="size-[11px]" />
+                            <IconMovie
+                              aria-hidden={true}
+                              className="size-[11px]"
+                            />
                           ) : (
-                            <IconDeviceTv className="size-[11px]" />
+                            <IconDeviceTv
+                              aria-hidden={true}
+                              className="size-[11px]"
+                            />
                           )}
                           <span className="uppercase">{r.type}</span>
                           {r.type !== "person" && r.releaseDate && (
@@ -270,7 +282,10 @@ export function CommandPalette() {
                           onSelect={() => handleRecentSearch(q)}
                           className="group"
                         >
-                          <IconSearch className="size-3.5 text-muted-foreground" />
+                          <IconSearch
+                            aria-hidden={true}
+                            className="size-3.5 text-muted-foreground"
+                          />
                           <span className="flex-1">{q}</span>
                           <span
                             data-slot="command-shortcut"
@@ -278,6 +293,7 @@ export function CommandPalette() {
                           >
                             <button
                               type="button"
+                              aria-label="Remove from recent searches"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemoveRecent(q);
@@ -300,7 +316,7 @@ export function CommandPalette() {
                         router.push("/dashboard");
                       }}
                     >
-                      <IconHome className="size-3.5" />
+                      <IconHome aria-hidden={true} className="size-3.5" />
                       Go to Dashboard
                       <CommandShortcut>G H</CommandShortcut>
                     </CommandItem>
@@ -311,7 +327,7 @@ export function CommandPalette() {
                         router.push("/explore");
                       }}
                     >
-                      <IconSearch className="size-3.5" />
+                      <IconSearch aria-hidden={true} className="size-3.5" />
                       Go to Explore
                       <CommandShortcut>G E</CommandShortcut>
                     </CommandItem>
@@ -321,7 +337,7 @@ export function CommandPalette() {
                         setHelpOpen(true);
                       }}
                     >
-                      <IconKeyboard className="size-3.5" />
+                      <IconKeyboard aria-hidden={true} className="size-3.5" />
                       Keyboard Shortcuts
                       <CommandShortcut>?</CommandShortcut>
                     </CommandItem>

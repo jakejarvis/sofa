@@ -91,7 +91,7 @@ export default async function ExplorePage() {
 
       <TitleRow
         heading="Trending Today"
-        icon={<IconFlame className="size-5 text-primary" />}
+        icon={<IconFlame aria-hidden={true} className="size-5 text-primary" />}
         items={trendingItems.slice(0, 20)}
         userStatuses={userStatuses}
         episodeProgress={episodeProgress}
@@ -99,7 +99,7 @@ export default async function ExplorePage() {
 
       <FilterableTitleRow
         heading="Popular Movies"
-        icon={<IconMovie className="size-5 text-primary" />}
+        icon={<IconMovie aria-hidden={true} className="size-5 text-primary" />}
         mediaType="movie"
         defaultItems={popularMovieItems.slice(0, 20)}
         genres={movieGenres.genres}
@@ -109,7 +109,9 @@ export default async function ExplorePage() {
 
       <FilterableTitleRow
         heading="Popular TV Shows"
-        icon={<IconDeviceTv className="size-5 text-primary" />}
+        icon={
+          <IconDeviceTv aria-hidden={true} className="size-5 text-primary" />
+        }
         mediaType="tv"
         defaultItems={popularTvItems.slice(0, 20)}
         genres={tvGenres.genres}

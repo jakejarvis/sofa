@@ -96,7 +96,7 @@ export function TitleHero({
 
         <div className="flex-1 space-y-5">
           <div>
-            <h1 className="font-display text-2xl tracking-tight sm:text-5xl">
+            <h1 className="font-display text-2xl tracking-tight text-balance sm:text-5xl">
               {title.title}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
@@ -123,6 +123,7 @@ export function TitleHero({
                 href={`https://www.themoviedb.org/${title.type === "movie" ? "movie" : "tv"}/${title.tmdbId}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="View on TMDB"
                 className="inline-flex h-5 items-center rounded border border-border/50 px-2 text-xs text-muted-foreground transition-colors hover:border-border hover:text-foreground"
               >
                 <TmdbLogo className="h-2.5 w-auto" />
@@ -131,7 +132,7 @@ export function TitleHero({
           </div>
 
           {title.overview && (
-            <p className="max-w-2xl leading-relaxed text-muted-foreground">
+            <p className="max-w-2xl break-words leading-relaxed text-muted-foreground">
               {title.overview}
             </p>
           )}

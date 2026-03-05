@@ -153,7 +153,7 @@ function ProgressBar({ watched, total }: { watched: number; total: number }) {
         render={<div />}
       >
         <div
-          className="h-full bg-status-watching transition-all duration-500 ease-out"
+          className="h-full bg-status-watching transition-[width] duration-500 ease-out"
           style={{ width: `${pct}%` }}
         />
       </TooltipTrigger>
@@ -249,11 +249,14 @@ function CardInner({
           </p>
         </div>
         <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
-          <TypeIcon className="size-3.5 shrink-0 text-primary/60" />
+          <TypeIcon
+            aria-hidden={true}
+            className="size-3.5 shrink-0 text-primary/60"
+          />
           {year && <span>{year}</span>}
           {voteAverage != null && voteAverage > 0 && (
             <span className="ml-auto flex items-center gap-0.5 text-primary/80">
-              <IconStarFilled className="size-[11px]" />
+              <IconStarFilled aria-hidden={true} className="size-[11px]" />
               {voteAverage.toFixed(1)}
             </span>
           )}

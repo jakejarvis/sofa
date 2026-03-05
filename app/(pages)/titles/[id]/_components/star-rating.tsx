@@ -25,6 +25,9 @@ export function StarRating({ value, onChange }: StarRatingProps) {
           <motion.button
             key={star}
             type="button"
+            role="radio"
+            aria-checked={star === value}
+            aria-label={`Rate ${star} star${star !== 1 ? "s" : ""}`}
             onClick={() => onChange(star === value ? 0 : star)}
             onMouseEnter={() => setHover(star)}
             className="p-0.5"

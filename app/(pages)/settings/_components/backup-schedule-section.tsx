@@ -147,7 +147,10 @@ function BackupScheduleInner() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconCalendarWeek className="size-4 text-primary" />
+              <IconCalendarWeek
+                aria-hidden={true}
+                className="size-4 text-primary"
+              />
             </div>
             <div>
               <CardTitle>Backup schedule</CardTitle>
@@ -163,7 +166,10 @@ function BackupScheduleInner() {
                         {maxRetention === 0
                           ? "unlimited"
                           : `last ${maxRetention}`}
-                        <IconChevronDown className="size-2.5" />
+                        <IconChevronDown
+                          aria-hidden={true}
+                          className="size-2.5"
+                        />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start">
                         <DropdownMenuRadioGroup
@@ -190,6 +196,7 @@ function BackupScheduleInner() {
             checked={enabled}
             onCheckedChange={toggleScheduled}
             disabled={togglingSchedule}
+            aria-label="Toggle scheduled backups"
           />
         </div>
       </CardContent>
@@ -246,7 +253,10 @@ function BackupScheduleInner() {
                       <DropdownMenu>
                         <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border/50 bg-muted/30 px-2.5 py-1 text-xs text-foreground transition-colors hover:bg-muted/50 disabled:opacity-50">
                           {DAYS_OF_WEEK[dow]}
-                          <IconChevronDown className="size-3 text-muted-foreground" />
+                          <IconChevronDown
+                            aria-hidden={true}
+                            className="size-3 text-muted-foreground"
+                          />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start">
                           <DropdownMenuRadioGroup
@@ -297,7 +307,10 @@ function BackupScheduleInner() {
                             ),
                             "h:mm a",
                           )}
-                          <IconChevronDown className="size-3 text-muted-foreground" />
+                          <IconChevronDown
+                            aria-hidden={true}
+                            className="size-3 text-muted-foreground"
+                          />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start">
                           <DropdownMenuRadioGroup

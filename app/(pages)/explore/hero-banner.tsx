@@ -56,7 +56,10 @@ export function HeroBanner({
                   </span>
                   {voteAverage > 0 && (
                     <span className="flex items-center gap-1 text-sm text-primary">
-                      <IconStar className="size-3.5 fill-primary" />
+                      <IconStar
+                        aria-hidden={true}
+                        className="size-3.5 fill-primary"
+                      />
                       {voteAverage.toFixed(1)}
                     </span>
                   )}
@@ -65,7 +68,7 @@ export function HeroBanner({
                   </span>
                 </div>
                 <Link href={href} className="group/title">
-                  <h2 className="font-display text-3xl tracking-tight sm:text-4xl transition-colors group-hover/title:text-primary">
+                  <h2 className="font-display text-3xl tracking-tight text-balance sm:text-4xl transition-colors group-hover/title:text-primary">
                     {title}
                   </h2>
                 </Link>
@@ -74,9 +77,9 @@ export function HeroBanner({
                 </p>
                 <Link
                   href={href}
-                  className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:shadow-md hover:shadow-primary/20"
+                  className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-shadow hover:shadow-md hover:shadow-primary/20"
                 >
-                  <IconPlus className="size-4" />
+                  <IconPlus aria-hidden={true} className="size-4" />
                   Add to Library
                 </Link>
               </div>

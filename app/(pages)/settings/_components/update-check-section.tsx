@@ -37,7 +37,10 @@ export function UpdateCheckSection({
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <IconWorldUpload className="size-4 text-primary" />
+            <IconWorldUpload
+              aria-hidden={true}
+              className="size-4 text-primary"
+            />
           </div>
           <div>
             <CardTitle>Automatic update checks</CardTitle>
@@ -50,6 +53,7 @@ export function UpdateCheckSection({
           checked={enabled}
           onCheckedChange={handleToggle}
           disabled={toggling}
+          aria-label="Toggle automatic update checks"
         />
       </div>
     </CardContent>

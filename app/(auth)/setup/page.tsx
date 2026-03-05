@@ -24,7 +24,7 @@ const steps = [
           className="inline-flex items-center gap-1 font-medium text-primary underline decoration-primary/30 underline-offset-2 transition-colors hover:decoration-primary"
         >
           themoviedb.org
-          <IconExternalLink className="size-3.5" />
+          <IconExternalLink aria-hidden={true} className="size-3.5" />
         </a>{" "}
         and sign up for a free account.
       </>
@@ -43,7 +43,7 @@ const steps = [
           className="inline-flex items-center gap-1 font-medium text-primary underline decoration-primary/30 underline-offset-2 transition-colors hover:decoration-primary"
         >
           Settings &rarr; API
-          <IconExternalLink className="size-3.5" />
+          <IconExternalLink aria-hidden={true} className="size-3.5" />
         </a>{" "}
         and request an API key. Choose &ldquo;Developer&rdquo; when asked. You
         need the{" "}
@@ -133,10 +133,10 @@ export default function SetupPage() {
       {/* Header */}
       <motion.div variants={sectionVariants} className="space-y-3">
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
-          <IconKey className="size-3.5" />
+          <IconKey aria-hidden={true} className="size-3.5" />
           Setup required
         </div>
-        <h1 className="font-display text-3xl tracking-tight sm:text-4xl">
+        <h1 className="font-display text-3xl tracking-tight text-balance sm:text-4xl">
           Connect to TMDB
         </h1>
         <p className="max-w-lg text-muted-foreground leading-relaxed">
@@ -164,7 +164,7 @@ export default function SetupPage() {
               </span>
             </div>
             <div className="space-y-1">
-              <h3 className="font-medium">{step.title}</h3>
+              <h2 className="font-medium">{step.title}</h2>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {step.description}
               </p>
@@ -188,12 +188,15 @@ export default function SetupPage() {
                         >
                           {copiedIdx === idx ? (
                             <>
-                              <IconCheck className="size-3 text-green-400" />
+                              <IconCheck
+                                aria-hidden={true}
+                                className="size-3 text-green-400"
+                              />
                               Copied
                             </>
                           ) : (
                             <>
-                              <IconCopy className="size-3" />
+                              <IconCopy aria-hidden={true} className="size-3" />
                               Copy
                             </>
                           )}
@@ -217,14 +220,17 @@ export default function SetupPage() {
           {configured === true ? (
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/10">
-                <IconCheck className="size-5 text-green-400" />
+                <IconCheck
+                  aria-hidden={true}
+                  className="size-5 text-green-400"
+                />
               </div>
               <div>
                 <p className="font-medium text-green-400">
                   TMDB API key detected
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Redirecting you to Sofa...
+                  Redirecting you to Sofa…
                 </p>
               </div>
             </div>
@@ -247,7 +253,7 @@ export default function SetupPage() {
                 {checking ? (
                   <>
                     <span className="h-3 w-3 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
-                    Checking...
+                    Checking…
                   </>
                 ) : (
                   "Check configuration"

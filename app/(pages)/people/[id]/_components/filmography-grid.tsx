@@ -53,8 +53,10 @@ export function FilmographyGrid({ credits }: FilmographyGridProps) {
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <IconMovie className="size-5 text-primary" />
-          <h2 className="font-display text-xl tracking-tight">Filmography</h2>
+          <IconMovie aria-hidden={true} className="size-5 text-primary" />
+          <h2 className="font-display text-xl tracking-tight text-balance">
+            Filmography
+          </h2>
           <span className="text-sm text-muted-foreground">
             ({filtered.length})
           </span>
@@ -63,6 +65,7 @@ export function FilmographyGrid({ credits }: FilmographyGridProps) {
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value as Sort)}
+          aria-label="Sort filmography"
           className="rounded-lg border border-border/50 bg-card px-2 py-1 text-xs text-foreground"
         >
           <option value="newest">Newest</option>
@@ -110,7 +113,7 @@ export function FilmographyGrid({ credits }: FilmographyGridProps) {
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-muted-foreground/30">
-                      <IconMovie className="size-10" />
+                      <IconMovie aria-hidden={true} className="size-10" />
                     </div>
                   )}
                 </div>

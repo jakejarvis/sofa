@@ -38,7 +38,9 @@ export function TitleRow({
     <section className="space-y-4">
       <div className="flex items-center gap-2">
         {icon}
-        <h2 className="font-display text-xl tracking-tight">{heading}</h2>
+        <h2 className="font-display text-xl tracking-tight text-balance">
+          {heading}
+        </h2>
       </div>
       <Carousel
         opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}

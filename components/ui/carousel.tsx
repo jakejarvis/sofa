@@ -123,6 +123,7 @@ function Carousel({
         className={cn("relative", className)}
         role="region"
         aria-roledescription="carousel"
+        aria-label="Carousel"
         data-slot="carousel"
         {...props}
       >

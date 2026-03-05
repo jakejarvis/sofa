@@ -20,7 +20,7 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
-        <IconUsers className="size-5 text-primary" />
+        <IconUsers aria-hidden={true} className="size-5 text-primary" />
         <h2 className="font-display text-xl tracking-tight">Cast</h2>
       </div>
 
@@ -55,11 +55,14 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
                           alt={member.name}
                           width={96}
                           height={96}
-                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                          className="h-full w-full object-cover motion-safe:transition-transform motion-safe:group-hover:scale-105"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                          <IconUser className="size-8 text-muted-foreground/50" />
+                          <IconUser
+                            aria-hidden={true}
+                            className="size-8 text-muted-foreground/50"
+                          />
                         </div>
                       )}
                     </div>

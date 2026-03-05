@@ -26,8 +26,9 @@ export function TrailerDialog({
       {variant === "backdrop" ? (
         <button
           type="button"
+          aria-label="Play trailer"
           onClick={() => setOpen(true)}
-          className="group flex size-12 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20 backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-white/20 hover:ring-white/30 active:scale-100 sm:size-16"
+          className="group flex size-12 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20 backdrop-blur-md transition-[transform,background-color,box-shadow] duration-300 hover:scale-105 hover:bg-white/20 hover:ring-white/30 active:scale-100 sm:size-16"
         >
           <IconPlayerPlayFilled className="size-6 text-white drop-shadow-lg sm:size-8" />
         </button>
@@ -37,7 +38,7 @@ export function TrailerDialog({
           onClick={() => setOpen(true)}
           className="inline-flex h-5 items-center gap-1 rounded border border-border/50 px-2 text-xs text-muted-foreground transition-colors hover:border-border hover:text-foreground"
         >
-          <IconPlayerPlayFilled className="h-2.5 w-2.5" />
+          <IconPlayerPlayFilled aria-hidden={true} className="h-2.5 w-2.5" />
           Trailer
         </button>
       )}

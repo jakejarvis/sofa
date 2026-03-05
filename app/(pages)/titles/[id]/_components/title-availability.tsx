@@ -25,7 +25,7 @@ function ProviderBadge({
 }) {
   return (
     <Tooltip>
-      <TooltipTrigger className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card transition-transform hover:scale-105">
+      <TooltipTrigger className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card motion-safe:transition-transform motion-safe:hover:scale-105">
         {logoPath ? (
           <Image
             src={logoPath}
@@ -62,9 +62,9 @@ export function TitleAvailability({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         Where to Watch
-      </h3>
+      </h2>
       <div className="flex flex-wrap gap-4">
         {Object.entries(availByType).map(([type, offers]) => (
           <div key={type} className="space-y-1.5">

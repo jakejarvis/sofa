@@ -100,7 +100,7 @@ export function AuthForm({
           <Link href="/" className="inline-flex justify-center text-primary">
             <SofaLogo className="size-9" />
           </Link>
-          <h1 className="text-lg font-medium">
+          <h1 className="text-lg font-medium text-balance">
             {isRegister ? "Create your account" : "Welcome back"}
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -125,9 +125,9 @@ export function AuthForm({
               whileTap={{ scale: 0.98 }}
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-border/50 bg-background/50 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
             >
-              <IconKey className="size-4" />
+              <IconKey aria-hidden={true} className="size-4" />
               {oidcLoading
-                ? "Redirecting..."
+                ? "Redirecting\u2026"
                 : `Sign in with ${authConfig?.oidcProviderName || "SSO"}`}
             </motion.button>
           </motion.div>
@@ -164,10 +164,11 @@ export function AuthForm({
                   id="name"
                   type="text"
                   required
+                  autoComplete="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20"
-                  placeholder="Your name"
+                  className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  placeholder="Your name\u2026"
                 />
               </motion.div>
             )}
@@ -183,9 +184,11 @@ export function AuthForm({
                 id="email"
                 type="email"
                 required
+                autoComplete="email"
+                spellCheck={false}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20"
+                className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 placeholder="wwhite@graymatter.biz"
               />
             </motion.div>
@@ -202,10 +205,13 @@ export function AuthForm({
                 type="password"
                 required
                 minLength={8}
+                autoComplete={
+                  mode === "login" ? "current-password" : "new-password"
+                }
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20"
-                placeholder="Min 8 characters"
+                className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                placeholder="Min 8 characters\u2026"
               />
             </motion.div>
 
@@ -217,7 +223,7 @@ export function AuthForm({
               className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-primary font-medium text-primary-foreground transition-shadow hover:shadow-lg hover:shadow-primary/20 disabled:pointer-events-none disabled:opacity-50"
             >
               {loading
-                ? "Loading..."
+                ? "Loading\u2026"
                 : isRegister
                   ? "Create account"
                   : "Sign in"}
@@ -228,6 +234,7 @@ export function AuthForm({
         <AnimatePresence>
           {error && (
             <motion.div
+              role="alert"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}

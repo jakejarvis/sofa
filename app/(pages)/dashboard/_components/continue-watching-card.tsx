@@ -44,18 +44,21 @@ export function ContinueWatchingCard({
             alt={item.nextEpisode?.name ?? item.title.title}
             width={500}
             height={281}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-card via-secondary to-muted">
-            <IconPlayerPlay className="size-8 text-muted-foreground/30" />
+            <IconPlayerPlay
+              aria-hidden={true}
+              className="size-8 text-muted-foreground/30"
+            />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         {item.nextEpisode && (
           <div className="absolute bottom-2.5 left-3 right-3">
             <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-primary">
-              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+              <span className="inline-block h-1.5 w-1.5 motion-safe:animate-pulse rounded-full bg-primary" />
               Up next
             </p>
             <p className="mt-0.5 truncate text-sm font-medium text-white">
@@ -76,13 +79,13 @@ export function ContinueWatchingCard({
           </p>
         </div>
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-          <IconPlayerPlay className="size-3.5" />
+          <IconPlayerPlay aria-hidden={true} className="size-3.5" />
         </div>
       </div>
       {progress > 0 && (
         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-muted">
           <div
-            className="h-full bg-primary transition-all"
+            className="h-full bg-primary transition-[width]"
             style={{ width: `${progress}%` }}
           />
         </div>

@@ -27,7 +27,7 @@ export function AccountSection({
   return (
     <div>
       <div className="mb-3 flex items-center gap-2">
-        <IconUser className="size-4 text-muted-foreground" />
+        <IconUser aria-hidden={true} className="size-4 text-muted-foreground" />
         <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Account
         </h2>
@@ -59,7 +59,7 @@ export function AccountSection({
               router.refresh();
             }}
           >
-            <IconLogout />
+            <IconLogout aria-hidden={true} />
             Sign out
           </Button>
         </CardContent>

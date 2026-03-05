@@ -4,6 +4,7 @@ export function TmdbLogo({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 190.24 81.52"
       className={className}
+      role="img"
       aria-label="TMDB"
     >
       <defs>

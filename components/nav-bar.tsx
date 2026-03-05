@@ -71,19 +71,19 @@ export function NavBar() {
           <button
             type="button"
             onClick={() => setCommandPaletteOpen(true)}
-            className="flex flex-1 items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:border-primary/20 hover:bg-card sm:hidden"
+            className="flex flex-1 items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/20 hover:bg-card sm:hidden"
           >
-            <IconSearch className="size-3.5" />
-            <span>Search...</span>
+            <IconSearch aria-hidden={true} className="size-3.5" />
+            <span>Search…</span>
           </button>
           {/* Desktop search trigger pill */}
           <button
             type="button"
             onClick={() => setCommandPaletteOpen(true)}
-            className="hidden items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:border-primary/20 hover:bg-card sm:inline-flex"
+            className="hidden items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/20 hover:bg-card sm:inline-flex"
           >
-            <IconSearch className="size-3.5" />
-            <span>Search...</span>
+            <IconSearch aria-hidden={true} className="size-3.5" />
+            <span>Search…</span>
             <Kbd className="ml-1">⌘K</Kbd>
           </button>
           <div className="mx-1.5 hidden h-4 w-px bg-border/50 sm:block" />
@@ -93,7 +93,7 @@ export function NavBar() {
               className="hidden items-center gap-1.5 rounded-md px-2 py-1.5 text-sm leading-none text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
             >
               {session?.user?.name}
-              <IconSettings className="size-3.5" />
+              <IconSettings aria-hidden={true} className="size-3.5" />
             </TooltipTrigger>
             <TooltipContent>Settings</TooltipContent>
           </Tooltip>
@@ -104,6 +104,7 @@ export function NavBar() {
                 router.push("/");
                 router.refresh();
               }}
+              aria-label="Sign out"
               className="hidden h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:inline-flex"
             >
               <IconLogout className="size-[15px]" />

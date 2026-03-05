@@ -166,3 +166,10 @@
     transform: translateY(0);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-stagger-item,
+  .animate-pulse {
+    animation: none;
+  }
+}

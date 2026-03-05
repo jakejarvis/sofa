@@ -1,3 +1,4 @@
+import { MotionConfig } from "motion/react";
 import type { Metadata } from "next";
 import { DM_Sans, DM_Serif_Display, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +25,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Sofa",
   description: "Track your movies and TV shows",
+  themeColor: "#090706",
 };
 
 export default function RootLayout({
@@ -32,11 +34,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ colorScheme: "dark" }}>
       <body
         className={`${dmSans.variable} ${dmSerif.variable} ${geistMono.variable} overflow-x-hidden font-sans antialiased`}
+        style={{ touchAction: "manipulation" }}
       >
-        <TooltipProvider>{children}</TooltipProvider>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+        >
+          Skip to main content
+        </a>
+        <MotionConfig reducedMotion="user">
+          <TooltipProvider>{children}</TooltipProvider>
+        </MotionConfig>
         <Toaster position="bottom-right" />
       </body>
     </html>
