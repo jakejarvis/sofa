@@ -297,6 +297,39 @@ export function rateTitleStars(
     .run();
 }
 
+export function getUserStatusesByTmdbIds(
+  userId: string,
+  tmdbIds: { tmdbId: number; type: string }[],
+): Record<string, "watchlist" | "in_progress" | "completed"> {
+  if (tmdbIds.length === 0) return {};
+
+  const allTmdbIds = tmdbIds.map((t) => t.tmdbId);
+  const rows = db
+    .select({
+      tmdbId: titles.tmdbId,
+      type: titles.type,
+      status: userTitleStatus.status,
+    })
+    .from(userTitleStatus)
+    .innerJoin(titles, eq(userTitleStatus.titleId, titles.id))
+    .where(
+      and(
+        eq(userTitleStatus.userId, userId),
+        inArray(titles.tmdbId, allTmdbIds),
+      ),
+    )
+    .all();
+
+  const result: Record<string, "watchlist" | "in_progress" | "completed"> = {};
+  for (const row of rows) {
+    result[`${row.tmdbId}-${row.type}`] = row.status as
+      | "watchlist"
+      | "in_progress"
+      | "completed";
+  }
+  return result;
+}
+
 export function getUserTitleInfo(userId: string, titleId: string) {
   const status = db
     .select()

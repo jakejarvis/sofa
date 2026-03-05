@@ -14,6 +14,8 @@ import {
 import {
   defaultItemsAtom,
   genreResultsLoadable,
+  genreUserStatusesLoadable,
+  initialUserStatusesAtom,
   mediaTypeAtom,
   selectedGenreAtom,
 } from "@/lib/atoms/filterable-row";
@@ -38,6 +40,7 @@ interface FilterableTitleRowProps {
   mediaType: "movie" | "tv";
   defaultItems: TitleRowItem[];
   genres: Genre[];
+  userStatuses?: Record<string, "watchlist" | "in_progress" | "completed">;
 }
 
 const staggerContainer = {
@@ -61,11 +64,13 @@ export function FilterableTitleRow({
   mediaType,
   defaultItems,
   genres,
+  userStatuses,
 }: FilterableTitleRowProps) {
   const [store] = useState(() => {
     const s = createStore();
     s.set(mediaTypeAtom, mediaType);
     s.set(defaultItemsAtom, defaultItems);
+    s.set(initialUserStatusesAtom, userStatuses ?? {});
     return s;
   });
 
@@ -88,6 +93,8 @@ function FilterableTitleRowInner({
   const [selectedGenre, setSelectedGenre] = useAtom(selectedGenreAtom);
   const defaults = useAtomValue(defaultItemsAtom);
   const genreResults = useAtomValue(genreResultsLoadable);
+  const initialStatuses = useAtomValue(initialUserStatusesAtom);
+  const genreStatuses = useAtomValue(genreUserStatusesLoadable);
 
   const loading = selectedGenre !== null && genreResults.state === "loading";
   const items =
@@ -96,6 +103,13 @@ function FilterableTitleRowInner({
       : genreResults.state === "hasData" && genreResults.data !== null
         ? genreResults.data
         : [];
+
+  const userStatuses =
+    selectedGenre === null
+      ? initialStatuses
+      : genreStatuses.state === "hasData" && genreStatuses.data !== null
+        ? genreStatuses.data
+        : initialStatuses;
 
   function toggleGenre(genreId: number) {
     setSelectedGenre(selectedGenre === genreId ? null : genreId);
@@ -181,6 +195,7 @@ function FilterableTitleRowInner({
                       voteAverage={item.voteAverage}
                       href={`/titles/tmdb-${item.tmdbId}-${item.type}`}
                       showQuickAdd
+                      userStatus={userStatuses[`${item.tmdbId}-${item.type}`]}
                     />
                   </motion.div>
                 </CarouselItem>

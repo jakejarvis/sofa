@@ -1,10 +1,13 @@
 "use client";
 
 import {
+  IconBookmarkFilled,
   IconCheck,
+  IconCircleCheckFilled,
   IconDeviceTv,
   IconLoader,
   IconMovie,
+  IconPlayerPlayFilled,
   IconPlus,
   IconStarFilled,
 } from "@tabler/icons-react";
@@ -19,6 +22,8 @@ import {
 } from "@/components/ui/tooltip";
 import { quickAddToWatchlist } from "@/lib/actions/watchlist";
 
+type TitleStatus = "watchlist" | "in_progress" | "completed";
+
 interface TitleCardProps {
   id?: string;
   tmdbId: number;
@@ -30,18 +35,47 @@ interface TitleCardProps {
   href?: string;
   onImport?: () => void;
   showQuickAdd?: boolean;
+  userStatus?: TitleStatus | null;
 }
 
 type QuickAddState = "idle" | "loading" | "added";
 
+const statusConfig = {
+  watchlist: {
+    icon: IconBookmarkFilled,
+    label: "On Watchlist",
+    badgeClass: "bg-status-watching/90 text-white",
+  },
+  in_progress: {
+    icon: IconPlayerPlayFilled,
+    label: "Watching",
+    badgeClass: "bg-status-watching/90 text-white",
+  },
+  completed: {
+    icon: IconCircleCheckFilled,
+    label: "Completed",
+    badgeClass: "bg-status-completed/90 text-white",
+  },
+} as const;
+
 function QuickAddButton({
   tmdbId,
   type,
+  userStatus,
 }: {
   tmdbId: number;
   type: "movie" | "tv";
+  userStatus?: TitleStatus | null;
 }) {
-  const [state, setState] = useState<QuickAddState>("idle");
+  const [state, setState] = useState<QuickAddState>(
+    userStatus ? "added" : "idle",
+  );
+  const [addedStatus, setAddedStatus] = useState<TitleStatus | null>(
+    userStatus ?? null,
+  );
+
+  const effectiveStatus = addedStatus;
+  const config = effectiveStatus ? statusConfig[effectiveStatus] : null;
 
   async function handleClick(e: React.MouseEvent) {
     e.preventDefault();
@@ -49,11 +83,31 @@ function QuickAddButton({
     if (state === "loading" || state === "added") return;
     setState("loading");
     try {
-      await quickAddToWatchlist(tmdbId, type);
+      const result = await quickAddToWatchlist(tmdbId, type);
       setState("added");
+      setAddedStatus(result.alreadyAdded ? null : "watchlist");
+      if (result.alreadyAdded) {
+        // Already existed — keep as added but we don't know exact status
+        setAddedStatus("watchlist");
+      }
     } catch {
       setState("idle");
     }
+  }
+
+  if (state === "added" && config) {
+    const StatusIcon = config.icon;
+    return (
+      <Tooltip>
+        <TooltipTrigger
+          className="absolute top-2 right-2 z-10 flex size-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white cursor-default"
+          render={<div />}
+        >
+          <StatusIcon className="size-4" />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">{config.label}</TooltipContent>
+      </Tooltip>
+    );
   }
 
   return (
@@ -74,6 +128,20 @@ function QuickAddButton({
   );
 }
 
+function StatusBadge({ status }: { status: TitleStatus }) {
+  const config = statusConfig[status];
+  const StatusIcon = config.icon;
+
+  return (
+    <div
+      className={`absolute bottom-2 left-2 z-10 flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold leading-tight shadow-md backdrop-blur-sm ${config.badgeClass}`}
+    >
+      <StatusIcon className="size-3" />
+      {config.label}
+    </div>
+  );
+}
+
 export function TitleCard({
   id,
   tmdbId,
@@ -85,6 +153,7 @@ export function TitleCard({
   href,
   onImport,
   showQuickAdd,
+  userStatus,
 }: TitleCardProps) {
   const year = releaseDate?.slice(0, 4);
   const TypeIcon = type === "movie" ? IconMovie : IconDeviceTv;
@@ -120,6 +189,8 @@ export function TitleCard({
             </div>
           </div>
         )}
+        {/* Status badge on poster */}
+        {userStatus && <StatusBadge status={userStatus} />}
         {/* Hover gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
       </div>
@@ -145,7 +216,11 @@ export function TitleCard({
     return (
       <div className="relative group">
         {showQuickAdd && (
-          <QuickAddButton tmdbId={tmdbId} type={type as "movie" | "tv"} />
+          <QuickAddButton
+            tmdbId={tmdbId}
+            type={type as "movie" | "tv"}
+            userStatus={userStatus}
+          />
         )}
         <Link href={href ?? `/titles/${id}`}>{cardInner}</Link>
       </div>

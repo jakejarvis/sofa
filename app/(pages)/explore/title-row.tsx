@@ -22,6 +22,7 @@ interface TitleRowProps {
   heading: string;
   icon: React.ReactNode;
   items: TitleRowItem[];
+  userStatuses?: Record<string, "watchlist" | "in_progress" | "completed">;
 }
 
 const staggerContainer = {
@@ -39,7 +40,12 @@ const staggerItem = {
   },
 };
 
-export function TitleRow({ heading, icon, items }: TitleRowProps) {
+export function TitleRow({
+  heading,
+  icon,
+  items,
+  userStatuses,
+}: TitleRowProps) {
   if (items.length === 0) return null;
 
   return (
@@ -74,6 +80,7 @@ export function TitleRow({ heading, icon, items }: TitleRowProps) {
                     voteAverage={item.voteAverage}
                     href={`/titles/tmdb-${item.tmdbId}-${item.type}`}
                     showQuickAdd
+                    userStatus={userStatuses?.[`${item.tmdbId}-${item.type}`]}
                   />
                 </motion.div>
               </CarouselItem>

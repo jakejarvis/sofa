@@ -1,4 +1,7 @@
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth/server";
+import { getUserStatusesByTmdbIds } from "@/lib/services/tracking";
 import { getGenres, getPopular, getTrending } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { FilterableTitleRow } from "./filterable-title-row";
@@ -46,6 +49,22 @@ export default async function ExplorePage() {
   const popularMovieItems = mapResults(popularMovies.results, "movie");
   const popularTvItems = mapResults(popularTv.results, "tv");
 
+  // Fetch user statuses for all visible TMDB IDs
+  let userStatuses: Record<string, "watchlist" | "in_progress" | "completed"> =
+    {};
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (session) {
+    const allItems = [
+      ...trendingItems,
+      ...popularMovieItems,
+      ...popularTvItems,
+    ];
+    userStatuses = getUserStatusesByTmdbIds(
+      session.user.id,
+      allItems.map((i) => ({ tmdbId: i.tmdbId, type: i.type })),
+    );
+  }
+
   const heroTitle = trending.results.find(
     (r) =>
       r.backdrop_path && (r.media_type === "movie" || r.media_type === "tv"),
@@ -68,6 +87,7 @@ export default async function ExplorePage() {
         heading="Trending Today"
         icon={<IconFlame className="size-5 text-primary" />}
         items={trendingItems.slice(0, 20)}
+        userStatuses={userStatuses}
       />
 
       <FilterableTitleRow
@@ -76,6 +96,7 @@ export default async function ExplorePage() {
         mediaType="movie"
         defaultItems={popularMovieItems.slice(0, 20)}
         genres={movieGenres.genres}
+        userStatuses={userStatuses}
       />
 
       <FilterableTitleRow
@@ -84,6 +105,7 @@ export default async function ExplorePage() {
         mediaType="tv"
         defaultItems={popularTvItems.slice(0, 20)}
         genres={tvGenres.genres}
+        userStatuses={userStatuses}
       />
     </div>
   );

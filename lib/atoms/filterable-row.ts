@@ -1,5 +1,8 @@
 import { atom } from "jotai";
 import { loadable } from "jotai/utils";
+import { fetchUserStatuses } from "@/lib/actions/watchlist";
+
+type TitleStatus = "watchlist" | "in_progress" | "completed";
 
 interface TitleRowItem {
   tmdbId: number;
@@ -13,6 +16,7 @@ interface TitleRowItem {
 export const selectedGenreAtom = atom<number | null>(null);
 export const mediaTypeAtom = atom<"movie" | "tv">("movie");
 export const defaultItemsAtom = atom<TitleRowItem[]>([]);
+export const initialUserStatusesAtom = atom<Record<string, TitleStatus>>({});
 
 const genreResultsAsyncAtom = atom(async (get) => {
   const genre = get(selectedGenreAtom);
@@ -26,3 +30,15 @@ const genreResultsAsyncAtom = atom(async (get) => {
 });
 
 export const genreResultsLoadable = loadable(genreResultsAsyncAtom);
+
+const genreUserStatusesAsyncAtom = atom(async (get) => {
+  const genre = get(selectedGenreAtom);
+  if (genre === null) return null;
+  const genreResults = await get(genreResultsAsyncAtom);
+  if (!genreResults || genreResults.length === 0) return {};
+  return fetchUserStatuses(
+    genreResults.map((r) => ({ tmdbId: r.tmdbId, type: r.type })),
+  );
+});
+
+export const genreUserStatusesLoadable = loadable(genreUserStatusesAsyncAtom);
