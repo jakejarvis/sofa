@@ -4,9 +4,9 @@ export function TitleCardSkeleton() {
   return (
     <div className="overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06]">
       <Skeleton className="aspect-[2/3] w-full rounded-none" />
-      <div className="px-3 pb-3 pt-2.5 space-y-2">
+      <div className="px-3 pb-3 pt-2.5">
         <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-3 w-1/2" />
+        <Skeleton className="mt-1.5 h-3 w-1/2" />
       </div>
     </div>
   );

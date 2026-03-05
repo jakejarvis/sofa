@@ -1,7 +1,7 @@
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react";
 import { getGenres, getPopular, getTrending } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import { GenreBrowser } from "./genre-browser";
+import { FilterableTitleRow } from "./filterable-title-row";
 import { HeroBanner } from "./hero-banner";
 import { TitleRow } from "./title-row";
 
@@ -70,21 +70,20 @@ export default async function ExplorePage() {
         items={trendingItems.slice(0, 20)}
       />
 
-      <TitleRow
+      <FilterableTitleRow
         heading="Popular Movies"
         icon={<IconMovie className="size-5 text-primary" />}
-        items={popularMovieItems.slice(0, 20)}
+        mediaType="movie"
+        defaultItems={popularMovieItems.slice(0, 20)}
+        genres={movieGenres.genres}
       />
 
-      <TitleRow
+      <FilterableTitleRow
         heading="Popular TV Shows"
         icon={<IconDeviceTv className="size-5 text-primary" />}
-        items={popularTvItems.slice(0, 20)}
-      />
-
-      <GenreBrowser
-        movieGenres={movieGenres.genres}
-        tvGenres={tvGenres.genres}
+        mediaType="tv"
+        defaultItems={popularTvItems.slice(0, 20)}
+        genres={tvGenres.genres}
       />
     </div>
   );
