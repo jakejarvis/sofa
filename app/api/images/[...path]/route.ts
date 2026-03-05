@@ -11,6 +11,7 @@ const VALID_CATEGORIES = new Set<ImageCategory>([
   "backdrops",
   "stills",
   "logos",
+  "profiles",
 ]);
 
 const IMMUTABLE_CACHE = "public, max-age=31536000, immutable";

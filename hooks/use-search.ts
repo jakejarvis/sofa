@@ -4,11 +4,14 @@ import { fetcher } from "@/lib/swr/fetcher";
 interface SearchResponse {
   results: {
     tmdbId: number;
-    type: "movie" | "tv";
+    type: "movie" | "tv" | "person";
     title: string;
     posterPath: string | null;
+    profilePath?: string | null;
     releaseDate: string | null;
     voteAverage: number;
+    knownFor?: string[];
+    knownForDepartment?: string;
   }[];
 }
 

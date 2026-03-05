@@ -149,3 +149,91 @@ export interface TmdbGenre {
 export interface TmdbGenreListResponse {
   genres: TmdbGenre[];
 }
+
+// ─── Person / Credits types ─────────────────────────────────────────
+
+export interface TmdbCastMember {
+  id: number;
+  name: string;
+  profile_path: string | null;
+  character: string;
+  order: number;
+  popularity: number;
+}
+
+export interface TmdbCrewMember {
+  id: number;
+  name: string;
+  profile_path: string | null;
+  department: string;
+  job: string;
+  popularity: number;
+}
+
+export interface TmdbMovieCreditsResponse {
+  id: number;
+  cast: TmdbCastMember[];
+  crew: TmdbCrewMember[];
+}
+
+export interface TmdbTvAggregateCastMember {
+  id: number;
+  name: string;
+  profile_path: string | null;
+  roles: { character: string; episode_count: number }[];
+  total_episode_count: number;
+  order: number;
+  popularity: number;
+}
+
+export interface TmdbTvAggregateCrewMember {
+  id: number;
+  name: string;
+  profile_path: string | null;
+  jobs: { job: string; episode_count: number }[];
+  department: string;
+  total_episode_count: number;
+  popularity: number;
+}
+
+export interface TmdbTvAggregateCreditsResponse {
+  id: number;
+  cast: TmdbTvAggregateCastMember[];
+  crew: TmdbTvAggregateCrewMember[];
+}
+
+export interface TmdbPersonDetails {
+  id: number;
+  name: string;
+  biography: string;
+  birthday: string | null;
+  deathday: string | null;
+  place_of_birth: string | null;
+  profile_path: string | null;
+  known_for_department: string;
+  imdb_id: string | null;
+  also_known_as: string[];
+  popularity: number;
+}
+
+export interface TmdbPersonCombinedCredits {
+  id: number;
+  cast: (TmdbSearchResult & { character?: string; episode_count?: number })[];
+  crew: (TmdbSearchResult & { department?: string; job?: string })[];
+}
+
+export interface TmdbPersonSearchResult {
+  id: number;
+  name: string;
+  profile_path: string | null;
+  known_for_department: string;
+  popularity: number;
+  known_for: TmdbSearchResult[];
+}
+
+export interface TmdbPersonSearchResponse {
+  page: number;
+  results: TmdbPersonSearchResult[];
+  total_pages: number;
+  total_results: number;
+}

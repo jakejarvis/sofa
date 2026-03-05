@@ -2,18 +2,31 @@ import { mkdir, rename } from "node:fs/promises";
 import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { availabilityOffers, episodes, seasons, titles } from "@/lib/db/schema";
+import {
+  availabilityOffers,
+  episodes,
+  persons,
+  seasons,
+  titleCast,
+  titles,
+} from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("image-cache");
 
-export type ImageCategory = "posters" | "backdrops" | "stills" | "logos";
+export type ImageCategory =
+  | "posters"
+  | "backdrops"
+  | "stills"
+  | "logos"
+  | "profiles";
 
 const CATEGORY_SIZES: Record<ImageCategory, string> = {
   posters: "w500",
   backdrops: "w1280",
   stills: "w1280",
   logos: "w92",
+  profiles: "w185",
 };
 
 const IMAGE_BASE_URL =
@@ -215,6 +228,31 @@ export async function cacheProviderLogos(titleId: string) {
         tasks.push(downloadAndCacheImage(offer.logoPath, "logos"));
       }
     }
+  }
+  await Promise.allSettled(tasks);
+}
+
+export async function cacheProfilePhotos(titleId: string) {
+  const castRows = db
+    .select({ profilePath: persons.profilePath })
+    .from(titleCast)
+    .innerJoin(persons, eq(titleCast.personId, persons.id))
+    .where(eq(titleCast.titleId, titleId))
+    .all();
+
+  const tasks: Promise<unknown>[] = [];
+  const seen = new Set<string>();
+  for (const row of castRows) {
+    if (row.profilePath) {
+      const basename = path.basename(row.profilePath);
+      if (!seen.has(basename) && !(await isImageCached("profiles", basename))) {
+        seen.add(basename);
+        tasks.push(downloadAndCacheImage(row.profilePath, "profiles"));
+      }
+    }
+  }
+  if (tasks.length > 0) {
+    log.debug(`Caching ${tasks.length} profile photos for title ${titleId}`);
   }
   await Promise.allSettled(tasks);
 }

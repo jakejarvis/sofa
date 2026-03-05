@@ -5,6 +5,7 @@ import {
   availabilityOffers,
   cronRuns,
   seasons,
+  titleCast,
   titles,
   userTitleStatus,
 } from "@/lib/db/schema";
@@ -15,9 +16,11 @@ import {
   ensureBackupDir,
   pruneBackups,
 } from "@/lib/services/backup";
+import { refreshCredits } from "@/lib/services/credits";
 import {
   cacheEpisodeStills,
   cacheImagesForTitle,
+  cacheProfilePhotos,
   cacheProviderLogos,
   imageCacheEnabled,
 } from "@/lib/services/image-cache";
@@ -251,11 +254,37 @@ async function cacheImagesJob() {
         cacheImagesForTitle(titleId),
         cacheEpisodeStills(titleId),
         cacheProviderLogos(titleId),
+        cacheProfilePhotos(titleId),
       ]);
     } catch (err) {
       log.warn(`Failed to cache images for title ${titleId}:`, err);
     }
     await Bun.sleep(RATE_LIMIT_MS);
+  }
+}
+
+// Refresh credits for library titles where cast is stale or missing
+async function refreshCreditsJob() {
+  const libraryIds = getLibraryTitleIds();
+  log.debug(`Checking credits for ${libraryIds.length} library titles`);
+  const stale = new Date(Date.now() - 30 * DAY);
+
+  for (const titleId of libraryIds) {
+    const castEntry = db
+      .select()
+      .from(titleCast)
+      .where(eq(titleCast.titleId, titleId))
+      .limit(1)
+      .get();
+
+    const needsRefresh =
+      !castEntry ||
+      (castEntry.lastFetchedAt && castEntry.lastFetchedAt < stale);
+
+    if (needsRefresh) {
+      await refreshCredits(titleId);
+      await Bun.sleep(RATE_LIMIT_MS);
+    }
   }
 }
 
@@ -324,6 +353,7 @@ export function startJobs() {
   schedule("refreshRecommendations", "0 */12 * * *", refreshRecommendationsJob);
   schedule("refreshTvChildren", "30 */12 * * *", refreshTvChildrenJob);
   schedule("cacheImages", "0 1,13 * * *", cacheImagesJob);
+  schedule("refreshCredits", "0 2 * * *", refreshCreditsJob);
   schedule("updateCheck", "0 */6 * * *", async () => {
     await performUpdateCheck();
   });

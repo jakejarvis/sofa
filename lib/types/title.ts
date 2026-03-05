@@ -42,6 +42,46 @@ export interface ColorPalette {
   lightMuted: string | null;
 }
 
+export interface CastMember {
+  id: string;
+  personId: string;
+  name: string;
+  character: string | null;
+  department: string;
+  job: string | null;
+  displayOrder: number;
+  episodeCount: number | null;
+  profilePath: string | null;
+  tmdbId: number;
+}
+
+export interface ResolvedPerson {
+  id: string;
+  tmdbId: number;
+  name: string;
+  biography: string | null;
+  birthday: string | null;
+  deathday: string | null;
+  placeOfBirth: string | null;
+  profilePath: string | null;
+  knownForDepartment: string | null;
+  imdbId: string | null;
+}
+
+export interface PersonCredit {
+  titleId: string;
+  tmdbId: number;
+  type: "movie" | "tv";
+  title: string;
+  posterPath: string | null;
+  releaseDate: string | null;
+  firstAirDate: string | null;
+  voteAverage: number | null;
+  character: string | null;
+  department: string;
+  job: string | null;
+}
+
 export interface ResolvedTitle {
   id: string;
   tmdbId: number;

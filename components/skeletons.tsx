@@ -82,6 +82,50 @@ export function TitleGridSectionSkeleton() {
   );
 }
 
+export function CastSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Skeleton className="size-5 rounded" />
+        <Skeleton className="h-6 w-20" />
+      </div>
+      <div className="flex gap-4 overflow-hidden">
+        {Array.from({ length: 8 }).map((_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
+          <div key={i} className="flex shrink-0 flex-col items-center gap-2">
+            <Skeleton className="size-20 rounded-full sm:size-24" />
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-2.5 w-12" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function PersonDetailSkeleton() {
+  return (
+    <div className="space-y-10">
+      <div className="flex flex-col gap-6 sm:flex-row sm:gap-8">
+        <Skeleton className="size-40 shrink-0 rounded-2xl sm:size-56" />
+        <div className="flex-1 space-y-4">
+          <Skeleton className="h-10 w-2/3 sm:h-14" />
+          <Skeleton className="h-5 w-24 rounded-full" />
+          <div className="flex gap-4">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-4 w-36" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+            <Skeleton className="h-4 w-4/6" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function RecommendationsSkeleton() {
   return (
     <div className="space-y-4">

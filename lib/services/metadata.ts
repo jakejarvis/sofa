@@ -20,12 +20,14 @@ import { tmdbImageUrl } from "@/lib/tmdb/image";
 import type { TmdbVideo } from "@/lib/tmdb/types";
 import type {
   AvailabilityOffer,
+  CastMember,
   Episode,
   ResolvedTitle,
   Season,
 } from "@/lib/types/title";
 import { refreshAvailability } from "./availability";
 import { extractAndStoreColors, parseColorPalette } from "./colors";
+import { getCastForTitle, refreshCredits } from "./credits";
 import {
   cacheEpisodeStills,
   cacheImagesForTitle,
@@ -83,6 +85,9 @@ export async function importTitle(
             extractAndStoreColors(existing.id, show.poster_path).catch((err) =>
               log.debug("Color extraction failed:", err),
             ),
+            refreshCredits(existing.id).catch((err) =>
+              log.debug("Credits enrichment failed:", err),
+            ),
           ]);
         } else {
           refreshAvailability(existing.id).catch((err) =>
@@ -90,6 +95,9 @@ export async function importTitle(
           );
           refreshRecommendations(existing.id).catch((err) =>
             log.debug("Recommendations enrichment failed:", err),
+          );
+          refreshCredits(existing.id).catch((err) =>
+            log.debug("Credits enrichment failed:", err),
           );
         }
         if (imageCacheEnabled()) {
@@ -140,6 +148,9 @@ export async function importTitle(
         extractAndStoreColors(row.id, movie.poster_path).catch((err) =>
           log.debug("Color extraction failed:", err),
         ),
+        refreshCredits(row.id).catch((err) =>
+          log.debug("Credits enrichment failed:", err),
+        ),
       ]);
     } else {
       refreshAvailability(row.id).catch((err) =>
@@ -150,6 +161,9 @@ export async function importTitle(
       );
       extractAndStoreColors(row.id, movie.poster_path).catch((err) =>
         log.debug("Color extraction failed:", err),
+      );
+      refreshCredits(row.id).catch((err) =>
+        log.debug("Credits enrichment failed:", err),
       );
     }
     refreshTrailer(row.id).catch((err) =>
@@ -197,6 +211,9 @@ export async function importTitle(
       extractAndStoreColors(row.id, show.poster_path).catch((err) =>
         log.debug("Color extraction failed:", err),
       ),
+      refreshCredits(row.id).catch((err) =>
+        log.debug("Credits enrichment failed:", err),
+      ),
     ]);
   } else {
     refreshAvailability(row.id).catch((err) =>
@@ -207,6 +224,9 @@ export async function importTitle(
     );
     extractAndStoreColors(row.id, show.poster_path).catch((err) =>
       log.debug("Color extraction failed:", err),
+    );
+    refreshCredits(row.id).catch((err) =>
+      log.debug("Credits enrichment failed:", err),
     );
   }
   refreshTrailer(row.id).catch((err) =>
@@ -276,6 +296,9 @@ export async function refreshTitle(titleId: string) {
     );
     refreshTrailer(updated.id).catch((err) =>
       log.debug("Trailer enrichment failed:", err),
+    );
+    refreshCredits(updated.id).catch((err) =>
+      log.debug("Credits enrichment failed:", err),
     );
     if (imageCacheEnabled()) {
       cacheImagesForTitle(updated.id).catch((err) =>
@@ -516,6 +539,7 @@ export async function getTitleWithChildren(id: string): Promise<{
   title: ResolvedTitle;
   seasons: Season[];
   availability: AvailabilityOffer[];
+  cast: CastMember[];
 } | null> {
   let title = db.select().from(titles).where(eq(titles.id, id)).get();
   if (!title) return null;
@@ -671,7 +695,9 @@ export async function getTitleWithChildren(id: string): Promise<{
     trailerVideoKey: title.trailerVideoKey,
   };
 
-  return { title: resolvedTitle, seasons: titleSeasons, availability };
+  const cast = getCastForTitle(id);
+
+  return { title: resolvedTitle, seasons: titleSeasons, availability, cast };
 }
 
 export function pickBestTrailer(videos: TmdbVideo[]): string | null {

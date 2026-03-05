@@ -2,7 +2,12 @@ import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/server";
 import { isTmdbConfigured } from "@/lib/config";
-import { searchMovies, searchMulti, searchTv } from "@/lib/tmdb/client";
+import {
+  searchMovies,
+  searchMulti,
+  searchPerson,
+  searchTv,
+} from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 import type { TmdbSearchResponse } from "@/lib/tmdb/types";
 
@@ -26,12 +31,14 @@ export async function GET(req: NextRequest) {
 
   const query = req.nextUrl.searchParams.get("query")?.trim();
   const rawType = req.nextUrl.searchParams.get("type");
-  const type: "movie" | "tv" | null =
-    rawType === "movie" || rawType === "tv" ? rawType : null;
+  const type: "movie" | "tv" | "person" | null =
+    rawType === "movie" || rawType === "tv" || rawType === "person"
+      ? rawType
+      : null;
 
   if (rawType && !type) {
     return NextResponse.json(
-      { error: "type must be movie or tv" },
+      { error: "type must be movie, tv, or person" },
       { status: 400 },
     );
   }
@@ -42,8 +49,26 @@ export async function GET(req: NextRequest) {
       { status: 400 },
     );
 
-  let results: TmdbSearchResponse;
   try {
+    // Person-specific search
+    if (type === "person") {
+      const personResults = await searchPerson(query);
+      return NextResponse.json({
+        results: personResults.results.map((r) => ({
+          tmdbId: r.id,
+          type: "person" as const,
+          title: r.name,
+          profilePath: tmdbImageUrl(r.profile_path, "w185"),
+          knownForDepartment: r.known_for_department,
+          knownFor: r.known_for
+            ?.slice(0, 3)
+            .map((k) => k.title ?? k.name)
+            .filter(Boolean),
+        })),
+      });
+    }
+
+    let results: TmdbSearchResponse;
     if (type === "movie") {
       results = await searchMovies(query);
     } else if (type === "tv") {
@@ -51,22 +76,24 @@ export async function GET(req: NextRequest) {
     } else {
       results = await searchMulti(query);
     }
-  } catch {
-    return NextResponse.json(
-      { error: "Failed to fetch search results" },
-      { status: 502 },
-    );
-  }
 
-  // Filter out person results for multi search
-  const filtered =
-    type === "movie" || type === "tv"
-      ? results.results
-      : results.results.filter((r) => r.media_type !== "person");
-
-  return NextResponse.json({
-    results: filtered
+    const mapped = results.results
       .map((r) => {
+        // Include person results from multi search
+        if (r.media_type === "person") {
+          return {
+            tmdbId: r.id,
+            type: "person" as const,
+            title: r.name ?? "Unknown",
+            posterPath: null,
+            profilePath: tmdbImageUrl(r.poster_path, "w185"),
+            overview: "",
+            releaseDate: null,
+            popularity: r.popularity,
+            voteAverage: 0,
+          };
+        }
+
         const mediaType =
           r.media_type === "movie" || r.media_type === "tv"
             ? r.media_type
@@ -84,6 +111,13 @@ export async function GET(req: NextRequest) {
           voteAverage: r.vote_average,
         };
       })
-      .filter((r): r is NonNullable<typeof r> => r !== null),
-  });
+      .filter((r): r is NonNullable<typeof r> => r !== null);
+
+    return NextResponse.json({ results: mapped });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to fetch search results" },
+      { status: 502 },
+    );
+  }
 }

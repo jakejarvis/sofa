@@ -1,0 +1,110 @@
+"use client";
+
+import { IconCalendar, IconMapPin } from "@tabler/icons-react";
+import { motion } from "motion/react";
+import Image from "next/image";
+import { useState } from "react";
+import type { ResolvedPerson } from "@/lib/types/title";
+
+interface PersonHeroProps {
+  person: ResolvedPerson;
+}
+
+function calculateAge(birthday: string, deathday?: string | null): number {
+  const birth = new Date(birthday);
+  const end = deathday ? new Date(deathday) : new Date();
+  let age = end.getFullYear() - birth.getFullYear();
+  const m = end.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && end.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+export function PersonHero({ person }: PersonHeroProps) {
+  const [bioExpanded, setBioExpanded] = useState(false);
+  const age = person.birthday
+    ? calculateAge(person.birthday, person.deathday)
+    : null;
+
+  return (
+    <motion.div
+      className="flex flex-col gap-6 sm:flex-row sm:gap-8"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 28 }}
+    >
+      <div className="size-40 shrink-0 self-center overflow-hidden rounded-2xl ring-1 ring-white/10 shadow-2xl sm:size-56 sm:self-start">
+        {person.profilePath ? (
+          <Image
+            src={person.profilePath}
+            alt={person.name}
+            width={224}
+            height={224}
+            className="h-full w-full object-cover"
+            priority
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+            <span className="font-display text-5xl text-muted-foreground/40">
+              {person.name.charAt(0)}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="min-w-0 flex-1 space-y-3">
+        <h1 className="font-display text-3xl tracking-tight sm:text-5xl">
+          {person.name}
+        </h1>
+
+        {person.knownForDepartment && (
+          <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+            {person.knownForDepartment}
+          </span>
+        )}
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+          {person.birthday && (
+            <span className="flex items-center gap-1.5">
+              <IconCalendar className="size-3.5" />
+              {person.birthday}
+              {age !== null && (
+                <span className="text-muted-foreground/60">
+                  ({person.deathday ? `died at ${age}` : `age ${age}`})
+                </span>
+              )}
+            </span>
+          )}
+          {person.placeOfBirth && (
+            <span className="flex items-center gap-1.5">
+              <IconMapPin className="size-3.5" />
+              {person.placeOfBirth}
+            </span>
+          )}
+        </div>
+
+        {person.biography && (
+          <div className="max-w-3xl">
+            <p
+              className={`text-sm leading-relaxed text-muted-foreground ${
+                !bioExpanded ? "line-clamp-6" : ""
+              }`}
+            >
+              {person.biography}
+            </p>
+            {person.biography.length > 400 && (
+              <button
+                type="button"
+                onClick={() => setBioExpanded(!bioExpanded)}
+                className="mt-1 text-xs font-medium text-primary transition-colors hover:text-primary/80"
+              >
+                {bioExpanded ? "Show less" : "Read more"}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}

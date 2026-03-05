@@ -289,6 +289,62 @@ export const titleRecommendations = sqliteTable(
   ],
 );
 
+// ─── Persons & Cast ─────────────────────────────────────────────────
+
+export const persons = sqliteTable(
+  "persons",
+  {
+    id: uuidPk(),
+    tmdbId: int("tmdbId").notNull(),
+    name: text("name").notNull(),
+    biography: text("biography"),
+    birthday: text("birthday"),
+    deathday: text("deathday"),
+    placeOfBirth: text("placeOfBirth"),
+    profilePath: text("profilePath"),
+    knownForDepartment: text("knownForDepartment"),
+    popularity: real("popularity"),
+    imdbId: text("imdbId"),
+    lastFetchedAt: int("lastFetchedAt", { mode: "timestamp" }),
+  },
+  (table) => [
+    uniqueIndex("persons_tmdbId_unique").on(table.tmdbId),
+    index("persons_name").on(table.name),
+  ],
+);
+
+export const titleCast = sqliteTable(
+  "titleCast",
+  {
+    id: uuidPk(),
+    titleId: text("titleId")
+      .notNull()
+      .references(() => titles.id, { onDelete: "cascade" }),
+    personId: text("personId")
+      .notNull()
+      .references(() => persons.id, { onDelete: "cascade" }),
+    character: text("character"),
+    department: text("department").notNull().default("Acting"),
+    job: text("job"),
+    displayOrder: int("displayOrder").notNull().default(0),
+    episodeCount: int("episodeCount"),
+    lastFetchedAt: int("lastFetchedAt", { mode: "timestamp" }),
+  },
+  (table) => [
+    uniqueIndex("titleCast_unique").on(
+      table.titleId,
+      table.personId,
+      table.department,
+      table.character,
+    ),
+    index("titleCast_titleId_displayOrder").on(
+      table.titleId,
+      table.displayOrder,
+    ),
+    index("titleCast_personId").on(table.personId),
+  ],
+);
+
 // ─── Webhook Connections ─────────────────────────────────────────────
 
 export const webhookConnections = sqliteTable(

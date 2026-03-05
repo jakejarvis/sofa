@@ -5,6 +5,7 @@ const IMAGE_BASE_URL =
 
 function sizeToCategory(size: string): ImageCategory {
   if (size === "w92") return "logos";
+  if (size === "w185") return "profiles";
   if (size === "w1280") return "backdrops";
   return "posters";
 }

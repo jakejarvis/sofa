@@ -2,10 +2,15 @@ import { createLogger } from "@/lib/logger";
 import type {
   TmdbFindResult,
   TmdbGenreListResponse,
+  TmdbMovieCreditsResponse,
   TmdbMovieDetails,
+  TmdbPersonCombinedCredits,
+  TmdbPersonDetails,
+  TmdbPersonSearchResponse,
   TmdbRecommendationResponse,
   TmdbSearchResponse,
   TmdbSeasonDetails,
+  TmdbTvAggregateCreditsResponse,
   TmdbTvDetails,
   TmdbVideosResponse,
   TmdbWatchProviderResponse,
@@ -152,6 +157,35 @@ export async function findByExternalId(
 ) {
   return tmdbFetch<TmdbFindResult>(`/find/${externalId}`, {
     external_source: source,
+  });
+}
+
+// ─── Person / Credits endpoints ─────────────────────────────────────
+
+export async function getMovieCredits(tmdbId: number) {
+  return tmdbFetch<TmdbMovieCreditsResponse>(`/movie/${tmdbId}/credits`);
+}
+
+export async function getTvAggregateCredits(tmdbId: number) {
+  return tmdbFetch<TmdbTvAggregateCreditsResponse>(
+    `/tv/${tmdbId}/aggregate_credits`,
+  );
+}
+
+export async function getPersonDetails(tmdbId: number) {
+  return tmdbFetch<TmdbPersonDetails>(`/person/${tmdbId}`);
+}
+
+export async function getPersonCombinedCredits(tmdbId: number) {
+  return tmdbFetch<TmdbPersonCombinedCredits>(
+    `/person/${tmdbId}/combined_credits`,
+  );
+}
+
+export async function searchPerson(query: string, page = 1) {
+  return tmdbFetch<TmdbPersonSearchResponse>("/search/person", {
+    query,
+    page: String(page),
   });
 }
 

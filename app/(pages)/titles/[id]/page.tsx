@@ -12,6 +12,7 @@ import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { getTitleThemeStyle } from "@/lib/utils/title-theme";
 import { TitleActions } from "./_components/title-actions";
 import { TitleAvailability } from "./_components/title-availability";
+import { TitleCast } from "./_components/title-cast";
 import { TitleHero } from "./_components/title-hero";
 import { TitleKeyboardShortcuts } from "./_components/title-keyboard-shortcuts";
 import { TitleProvider } from "./_components/title-provider";
@@ -70,7 +71,7 @@ export default async function TitleDetailPage({
   ]);
   if (!result) notFound();
 
-  const { title, seasons, availability } = result;
+  const { title, seasons, availability, cast } = result;
 
   const themeStyle = getTitleThemeStyle(title.colorPalette);
 
@@ -92,6 +93,8 @@ export default async function TitleDetailPage({
         >
           <TitleAvailability availability={availability} />
         </TitleHero>
+
+        <TitleCast cast={cast} titleType={title.type} />
 
         {title.type === "tv" && seasons.length > 0 && <TitleSeasons />}
 
