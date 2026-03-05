@@ -59,28 +59,10 @@ export function useConnectionActions(provider: "plex" | "jellyfin" | "emby") {
     }
   }, [provider, label, setConnections]);
 
-  const handleToggle = useCallback(
-    async (enabled: boolean) => {
-      const previous = connections;
-      setConnections((prev) =>
-        prev.map((c) => (c.provider === provider ? { ...c, enabled } : c)),
-      );
-      try {
-        await saveWebhookConnection(provider, enabled);
-        toast.success(`${label} webhook ${enabled ? "enabled" : "disabled"}`);
-      } catch {
-        setConnections(previous);
-        toast.error(`Failed to update ${label}`);
-      }
-    },
-    [provider, label, connections, setConnections],
-  );
-
   return {
     connection,
     handleConnect,
     handleDelete,
     handleRegenerateToken,
-    handleToggle,
   };
 }

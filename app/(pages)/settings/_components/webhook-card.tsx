@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  IconBook2,
   IconCheck,
   IconChevronDown,
   IconCopy,
@@ -25,7 +26,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import {
   Tooltip,
   TooltipContent,
@@ -55,13 +55,8 @@ export function WebhookCard({
 }: {
   provider: "plex" | "jellyfin" | "emby";
 }) {
-  const {
-    connection,
-    handleConnect,
-    handleDelete,
-    handleRegenerateToken,
-    handleToggle,
-  } = useConnectionActions(provider);
+  const { connection, handleConnect, handleDelete, handleRegenerateToken } =
+    useConnectionActions(provider);
   const [connecting, setConnecting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
@@ -107,7 +102,7 @@ export function WebhookCard({
                   {connection
                     ? connection.lastEventAt
                       ? `Last event ${formatDistanceToNow(new Date(connection.lastEventAt), { addSuffix: true })}`
-                      : "Connected — no events yet"
+                      : "Ready — no events yet"
                     : "Not configured"}
                 </CardDescription>
               </div>
@@ -120,23 +115,11 @@ export function WebhookCard({
 
         <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
           <CardContent className="space-y-3 border-t border-border/30 pt-4">
-            {connection && (
-              <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
-                <span className="text-xs text-muted-foreground">
-                  Webhook {connection.enabled ? "enabled" : "disabled"}
-                </span>
-                <Switch
-                  checked={connection.enabled}
-                  onCheckedChange={(checked) => handleToggle(checked)}
-                />
-              </div>
-            )}
-
             {isPlex && (
               <div className="flex gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
                 <IconInfoCircle className="mt-0.5 size-3.5 shrink-0 text-primary" />
                 <p className="text-xs leading-relaxed text-foreground/80">
-                  Plex webhooks require an active{" "}
+                  Requires an active{" "}
                   <a
                     href="https://www.plex.tv/plex-pass/"
                     target="_blank"
@@ -155,7 +138,11 @@ export function WebhookCard({
               <div className="flex gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
                 <IconInfoCircle className="mt-0.5 size-3.5 shrink-0 text-primary" />
                 <p className="text-xs leading-relaxed text-foreground/80">
-                  Emby webhooks require an active{" "}
+                  Requires{" "}
+                  <span className="font-medium text-foreground">
+                    Emby Server 4.7.9+
+                  </span>{" "}
+                  and an active{" "}
                   <a
                     href="https://emby.media/premiere.html"
                     target="_blank"
@@ -165,7 +152,7 @@ export function WebhookCard({
                     <span>Emby Premiere</span>
                     <IconExternalLink className="inline-block size-3 translate-y-[-1px]" />
                   </a>{" "}
-                  subscription.
+                  license.
                 </p>
               </div>
             )}
@@ -174,6 +161,7 @@ export function WebhookCard({
               <Button
                 onClick={onConnect}
                 disabled={connecting}
+                size="lg"
                 className="w-full"
               >
                 {connecting ? "Connecting..." : `Connect ${label}`}
@@ -253,79 +241,108 @@ export function WebhookCard({
                 Setup instructions
               </CollapsibleTrigger>
               <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
-                <div className="mt-2 rounded-lg bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
-                  {isPlex ? (
-                    <ol className="list-inside list-decimal space-y-1.5">
-                      <li>
-                        Open Plex, go to{" "}
-                        <span className="font-medium text-foreground">
-                          Settings &gt; Webhooks
-                        </span>
-                      </li>
-                      <li>
-                        Click{" "}
-                        <span className="font-medium text-foreground">
-                          Add Webhook
-                        </span>{" "}
-                        and paste the URL above
-                      </li>
-                      <li>
-                        Sofa will automatically log movies and episodes when you
-                        finish watching them
-                      </li>
-                    </ol>
-                  ) : isEmby ? (
-                    <ol className="list-inside list-decimal space-y-1.5">
-                      <li>
-                        Open Emby, go to{" "}
-                        <span className="font-medium text-foreground">
-                          Settings &gt; Webhooks
-                        </span>
-                      </li>
-                      <li>Add a new webhook and paste the URL above</li>
-                      <li>
-                        Enable the{" "}
-                        <span className="font-medium text-foreground">
-                          Playback Stop
-                        </span>{" "}
-                        event type
-                      </li>
-                      <li>
-                        Sofa will automatically log movies and episodes when you
-                        finish watching them
-                      </li>
-                    </ol>
-                  ) : (
-                    <ol className="list-inside list-decimal space-y-1.5">
-                      <li>
-                        Install the{" "}
-                        <span className="font-medium text-foreground">
-                          Webhook plugin
-                        </span>{" "}
-                        from Jellyfin&apos;s plugin catalog
-                      </li>
-                      <li>
-                        Go to{" "}
-                        <span className="font-medium text-foreground">
-                          Dashboard &gt; Plugins &gt; Webhook
-                        </span>
-                      </li>
-                      <li>
-                        Add a{" "}
-                        <span className="font-medium text-foreground">
-                          Generic Destination
-                        </span>{" "}
-                        and paste the URL above
-                      </li>
-                      <li>
-                        Enable the{" "}
-                        <span className="font-medium text-foreground">
-                          Playback Stop
-                        </span>{" "}
-                        notification type
-                      </li>
-                    </ol>
-                  )}
+                <div className="mt-2 rounded-lg bg-muted/30 border border-border/50 p-3 text-xs leading-relaxed text-muted-foreground">
+                  <ol className="list-inside list-decimal space-y-1.5">
+                    {isPlex ? (
+                      <>
+                        <li>
+                          Open Plex, go to{" "}
+                          <a
+                            href="https://app.plex.tv/desktop/#!/settings/webhooks"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+                          >
+                            Settings &gt; Webhooks
+                            <IconExternalLink className="inline-block size-3 translate-y-[-1px]" />
+                          </a>
+                        </li>
+                        <li>
+                          Click{" "}
+                          <span className="font-medium text-foreground">
+                            Add Webhook
+                          </span>{" "}
+                          and paste the URL above
+                        </li>
+                      </>
+                    ) : isEmby ? (
+                      <>
+                        <li>
+                          Open Emby, go to{" "}
+                          <span className="font-medium text-foreground">
+                            Settings &gt; Webhooks
+                          </span>
+                        </li>
+                        <li>Add a new webhook and paste the URL above</li>
+                        <li>
+                          Enable the{" "}
+                          <span className="font-medium text-foreground">
+                            Playback
+                          </span>{" "}
+                          event category
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li>
+                          Install the{" "}
+                          <a
+                            href="https://github.com/jellyfin/jellyfin-plugin-webhook/tree/master"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+                          >
+                            Webhook plugin
+                            <IconExternalLink className="inline-block size-3 translate-y-[-1px]" />
+                          </a>{" "}
+                          from Jellyfin&apos;s plugin catalog
+                        </li>
+                        <li>
+                          Go to{" "}
+                          <span className="font-medium text-foreground">
+                            Dashboard &gt; Plugins &gt; Webhook
+                          </span>
+                        </li>
+                        <li>
+                          Add a{" "}
+                          <span className="font-medium text-foreground">
+                            Generic Destination
+                          </span>{" "}
+                          and paste the URL above
+                        </li>
+                        <li>
+                          Enable the{" "}
+                          <span className="font-medium text-foreground">
+                            Playback Stop
+                          </span>{" "}
+                          notification type
+                        </li>
+                      </>
+                    )}
+                    <li>
+                      Sofa will automatically log movies and episodes when you
+                      finish watching them
+                    </li>
+                  </ol>
+                  <p className="mt-2 -ml-0.5">
+                    <IconBook2 className="inline-block size-3 translate-y-[-1px] mr-1" />
+                    Need more help?{" "}
+                    <a
+                      href={
+                        isPlex
+                          ? "https://support.plex.tv/hc/en-us/articles/115002267687-Webhooks/"
+                          : isEmby
+                            ? "https://emby.media/support/articles/Webhooks.html"
+                            : "https://jellyfin.org/docs/general/server/notifications/"
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+                    >
+                      Open docs{" "}
+                      <IconExternalLink className="inline-block size-3 translate-y-[-1px]" />
+                    </a>
+                  </p>
                 </div>
               </CollapsibleContent>
             </Collapsible>

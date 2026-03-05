@@ -2,13 +2,16 @@
 
 import {
   IconActivity,
-  IconClock,
+  IconAlertTriangle,
+  IconCalendarCheck,
+  IconCheck,
   IconDatabase,
+  IconPlayerPlay,
   IconRefresh,
 } from "@tabler/icons-react";
-import { formatDistanceToNow } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { StatusDot } from "@/components/status-dot";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,6 +21,20 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useTimeAgo } from "@/hooks/use-time-ago";
 import type { SystemHealthData } from "@/lib/services/system-health";
 
 const JOB_LABELS: Record<string, string> = {
@@ -29,6 +46,40 @@ const JOB_LABELS: Record<string, string> = {
   scheduledBackup: "Backup",
   updateCheck: "Update check",
 };
+
+/** Convert a cron pattern to a short human-readable string */
+function cronToHuman(pattern: string): string {
+  const parts = pattern.split(" ");
+  if (parts.length !== 5) return pattern;
+  const [min, hour, _dom, _mon, dow] = parts;
+
+  // Every N hours: "0 */6 * * *"
+  if (hour.startsWith("*/")) {
+    const n = Number.parseInt(hour.slice(2), 10);
+    return `Every ${n}h`;
+  }
+
+  // Twice daily: "0 1,13 * * *"
+  if (hour.includes(",") && !hour.includes("/") && !hour.includes("-")) {
+    const hours = hour.split(",");
+    if (hours.length === 2) {
+      return `Daily at ${hours.map((h) => `${h.padStart(2, "0")}:${min.padStart(2, "0")}`).join(", ")}`;
+    }
+  }
+
+  // Daily at specific time: "0 3 * * *"
+  if (/^\d+$/.test(hour) && /^\d+$/.test(min) && dow === "*") {
+    return `Daily at ${hour.padStart(2, "0")}:${min.padStart(2, "0")}`;
+  }
+
+  // Weekly
+  if (/^\d+$/.test(dow)) {
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    return `Weekly on ${days[Number(dow)] ?? dow}`;
+  }
+
+  return pattern;
+}
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -42,25 +93,6 @@ function formatDuration(ms: number): string {
   if (ms < 1000) return `${ms}ms`;
   if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
   return `${Math.round(ms / 60000)}m`;
-}
-
-/** Small colored status dot */
-function StatusDot({
-  status,
-}: {
-  status: "ok" | "error" | "warn" | "inactive";
-}) {
-  const color = {
-    ok: "bg-green-500",
-    error: "bg-destructive",
-    warn: "bg-amber-500",
-    inactive: "bg-muted-foreground/30",
-  }[status];
-  return (
-    <span
-      className={`inline-block h-1.5 w-1.5 shrink-0 rounded-full ${color}`}
-    />
-  );
 }
 
 function SkeletonCards() {
@@ -81,6 +113,18 @@ function SkeletonCards() {
       ))}
     </div>
   );
+}
+
+/** Inline component that live-updates a relative timestamp */
+function LiveTimeAgo({
+  date,
+  fallback = "",
+}: {
+  date: string | Date | null | undefined;
+  fallback?: string;
+}) {
+  const text = useTimeAgo(date, { fallback });
+  return <>{text}</>;
 }
 
 /** Renders 3 separate cards: System status, Background jobs, Storage */
@@ -122,34 +166,34 @@ export function SystemHealthCards() {
                 <IconActivity className="size-4 text-primary" />
               </div>
               <div>
-                <CardTitle>System status</CardTitle>
+                <CardTitle>Health status</CardTitle>
                 <CardDescription suppressHydrationWarning>
-                  Checked{" "}
-                  {formatDistanceToNow(new Date(data.checkedAt), {
-                    addSuffix: true,
-                  })}
+                  Checked <LiveTimeAgo date={data.checkedAt} />
                 </CardDescription>
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => fetchHealth(true)}
-              disabled={refreshing}
-            >
-              {refreshing ? (
-                <Spinner className="size-3" />
-              ) : (
-                <IconRefresh className="size-3.5" />
-              )}
-              Refresh
-            </Button>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => fetchHealth(true)}
+                    disabled={refreshing}
+                  />
+                }
+              >
+                {refreshing ? <Spinner /> : <IconRefresh />}
+              </TooltipTrigger>
+              <TooltipContent>Refresh</TooltipContent>
+            </Tooltip>
           </div>
         </CardContent>
 
         {/* Database */}
         <CardContent className="border-t border-border/30 pt-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/40">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
               Database
             </span>
             <span className="font-mono text-[11px] text-muted-foreground">
@@ -158,24 +202,17 @@ export function SystemHealthCards() {
                 ` + ${formatBytes(data.database.walSizeBytes)} WAL`}
             </span>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {data.database.titleCount.toLocaleString()} titles
-            {" · "}
-            {data.database.episodeCount.toLocaleString()} episodes
-            {" · "}
-            {data.database.userCount.toLocaleString()} users
-          </p>
         </CardContent>
 
         {/* TMDB */}
         <CardContent className="border-t border-border/30 pt-4">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/40">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
               TMDB API
             </span>
             {!data.tmdb.tokenConfigured ? (
               <>
-                <StatusDot status="inactive" />
+                <StatusDot status="error" />
                 <span className="text-xs text-muted-foreground/50">
                   Not configured
                 </span>
@@ -184,7 +221,7 @@ export function SystemHealthCards() {
               <>
                 <StatusDot status="ok" />
                 <span className="text-xs text-muted-foreground">Connected</span>
-                <span className="font-mono text-[11px] text-muted-foreground/40">
+                <span className="font-mono text-[11px] text-muted-foreground/80">
                   {data.tmdb.responseTimeMs}ms
                 </span>
               </>
@@ -210,8 +247,13 @@ export function SystemHealthCards() {
         {/* Environment */}
         <CardContent className="border-t border-border/30 pt-4">
           <div className="space-y-2">
-            <span className="inline-block text-[11px] font-medium uppercase tracking-wider text-muted-foreground/40">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
               Environment
+              {data.environment.dataDirWritable ? (
+                <IconCheck className="size-3 text-green-500" />
+              ) : (
+                <IconAlertTriangle className="size-3 text-destructive" />
+              )}
             </span>
             <div className="space-y-1">
               {data.environment.envVars
@@ -219,9 +261,9 @@ export function SystemHealthCards() {
                 .map((env) => (
                   <div
                     key={env.name}
-                    className="flex items-baseline gap-1 font-mono text-[11px] leading-relaxed"
+                    className="flex items-baseline gap-[1px] font-mono text-[11px] leading-relaxed"
                   >
-                    <span className="text-muted-foreground/50">
+                    <span className="text-muted-foreground/60">
                       {env.name}=
                     </span>
                     <span className="text-muted-foreground break-all">
@@ -235,71 +277,10 @@ export function SystemHealthCards() {
       </Card>
 
       {/* ── Card 2: Background Jobs ── */}
-      <Card className="border-l-2 border-l-primary/30">
-        <CardContent>
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconClock className="size-4 text-primary" />
-            </div>
-            <div>
-              <CardTitle>Background jobs</CardTitle>
-              <CardDescription>
-                {data.jobs.filter((j) => j.lastStatus === "success").length} of{" "}
-                {data.jobs.length} jobs healthy
-              </CardDescription>
-            </div>
-          </div>
-        </CardContent>
-        <CardContent className="border-t border-border/30 pt-4">
-          <div className="space-y-1.5">
-            {data.jobs.map((job) => (
-              <div
-                key={job.jobName}
-                className={`grid grid-cols-[auto_1fr_auto_auto] items-center gap-x-2.5 ${
-                  job.isCurrentlyRunning ? "animate-pulse" : ""
-                }`}
-              >
-                {job.isCurrentlyRunning ? (
-                  <Spinner className="size-2.5" />
-                ) : job.lastStatus === null ? (
-                  <StatusDot status="inactive" />
-                ) : job.lastStatus === "success" ? (
-                  <StatusDot status="ok" />
-                ) : (
-                  <StatusDot status="error" />
-                )}
-
-                <span className="text-xs text-muted-foreground">
-                  {JOB_LABELS[job.jobName] ?? job.jobName}
-                </span>
-
-                {job.lastRunAt ? (
-                  <span
-                    className="text-right text-[11px] text-muted-foreground/50"
-                    suppressHydrationWarning
-                  >
-                    {formatDistanceToNow(new Date(job.lastRunAt), {
-                      addSuffix: true,
-                    })}
-                  </span>
-                ) : (
-                  <span className="text-[11px] text-muted-foreground/30">
-                    —
-                  </span>
-                )}
-
-                {job.lastDurationMs !== null ? (
-                  <span className="w-12 text-right font-mono text-[11px] text-muted-foreground/40">
-                    {formatDuration(job.lastDurationMs)}
-                  </span>
-                ) : (
-                  <span className="w-12" />
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <BackgroundJobsCard
+        jobs={data.jobs}
+        onRefresh={() => fetchHealth(true)}
+      />
 
       {/* ── Card 3: Storage ── */}
       <Card className="border-l-2 border-l-primary/30">
@@ -320,7 +301,7 @@ export function SystemHealthCards() {
         {/* Image cache */}
         <CardContent className="border-t border-border/30 pt-4">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/40">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
               Image cache
             </span>
             {data.imageCache.enabled ? (
@@ -334,7 +315,7 @@ export function SystemHealthCards() {
               <p className="mt-1 text-xs text-muted-foreground">
                 {data.imageCache.imageCount.toLocaleString()} cached images
               </p>
-              <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground/30">
+              <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground/50">
                 {Object.entries(data.imageCache.categories)
                   .map(([name, cat]) => `${name} ${cat.count}`)
                   .join(" · ")}
@@ -351,7 +332,7 @@ export function SystemHealthCards() {
         {/* Backup summary */}
         <CardContent className="border-t border-border/30 pt-4">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/40">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
               Backups
             </span>
             {data.backups.backupCount > 0 && (
@@ -366,11 +347,10 @@ export function SystemHealthCards() {
               suppressHydrationWarning
             >
               {data.backups.backupCount} backups · last{" "}
-              {data.backups.lastBackupAt
-                ? formatDistanceToNow(new Date(data.backups.lastBackupAt), {
-                    addSuffix: true,
-                  })
-                : "unknown"}
+              <LiveTimeAgo
+                date={data.backups.lastBackupAt}
+                fallback="unknown"
+              />
             </p>
           ) : (
             <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground/50">
@@ -381,5 +361,218 @@ export function SystemHealthCards() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+/** Background Jobs card with table layout and manual trigger */
+function BackgroundJobsCard({
+  jobs,
+  onRefresh,
+}: {
+  jobs: SystemHealthData["jobs"];
+  onRefresh: () => void;
+}) {
+  const [triggeringJob, setTriggeringJob] = useState<string | null>(null);
+
+  const handleTrigger = async (jobName: string) => {
+    setTriggeringJob(jobName);
+    try {
+      const res = await fetch("/api/admin/jobs/trigger", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobName }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to trigger job");
+      }
+      toast.success(`${JOB_LABELS[jobName] ?? jobName} triggered`);
+      // Refresh after a brief delay so the run shows up
+      setTimeout(onRefresh, 1500);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to trigger job");
+    } finally {
+      setTriggeringJob(null);
+    }
+  };
+
+  const healthyCount = jobs.filter((j) => j.lastStatus === "success").length;
+
+  return (
+    <Card className="border-l-2 border-l-primary/30">
+      <CardContent>
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+            <IconCalendarCheck className="size-4 text-primary" />
+          </div>
+          <div>
+            <CardTitle>Background jobs</CardTitle>
+            <CardDescription>
+              {healthyCount} of {jobs.length} jobs healthy
+            </CardDescription>
+          </div>
+        </div>
+      </CardContent>
+      <CardContent className="border-t border-border/30 px-0 pt-0 pb-0">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-b-border/30 hover:bg-transparent">
+              <TableHead className="h-8 pl-5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                Job
+              </TableHead>
+              <TableHead className="h-8 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                Schedule
+              </TableHead>
+              <TableHead className="h-8 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                Last run
+              </TableHead>
+              <TableHead className="h-8 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                Next run
+              </TableHead>
+              <TableHead className="h-8 pr-5 text-right text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                <span className="sr-only">Actions</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {jobs.map((job) => {
+              const isTriggering = triggeringJob === job.jobName;
+              const isRunning = job.isCurrentlyRunning || isTriggering;
+
+              return (
+                <TableRow
+                  key={job.jobName}
+                  className="border-b-border/20 hover:bg-muted/30"
+                >
+                  {/* Job name + status */}
+                  <TableCell className="pl-5">
+                    <div className="flex items-center gap-2">
+                      {isRunning ? (
+                        <Spinner className="size-2.5" />
+                      ) : job.lastStatus === null ? (
+                        <StatusDot status="inactive" label="Never run" />
+                      ) : job.lastStatus === "success" ? (
+                        <StatusDot status="ok" label="Last run succeeded" />
+                      ) : (
+                        <StatusDot
+                          status="error"
+                          label={job.lastError ?? "Last run failed"}
+                        />
+                      )}
+                      <span className="text-xs text-muted-foreground">
+                        {JOB_LABELS[job.jobName] ?? job.jobName}
+                      </span>
+                    </div>
+                  </TableCell>
+
+                  {/* Schedule */}
+                  <TableCell>
+                    {job.cronPattern ? (
+                      <Tooltip>
+                        <TooltipTrigger className="cursor-default">
+                          <span className="text-xs text-muted-foreground/80">
+                            {cronToHuman(job.cronPattern)}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <span className="font-mono">{job.cronPattern}</span>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <span className="text-xs text-muted-foreground/50">
+                        —
+                      </span>
+                    )}
+                  </TableCell>
+
+                  {/* Last run */}
+                  <TableCell>
+                    {job.lastRunAt ? (
+                      <Tooltip>
+                        <TooltipTrigger className="cursor-default">
+                          <div className="flex items-baseline gap-1.5">
+                            <span
+                              className="text-xs text-muted-foreground/80"
+                              suppressHydrationWarning
+                            >
+                              <LiveTimeAgo date={job.lastRunAt} />
+                            </span>
+                            {job.lastDurationMs !== null &&
+                              job.lastDurationMs > 0 && (
+                                <span className="font-mono text-[10px] text-muted-foreground/50">
+                                  {formatDuration(job.lastDurationMs)}
+                                </span>
+                              )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {new Date(job.lastRunAt).toLocaleString()}
+                          {job.lastError && (
+                            <div className="mt-1 text-destructive">
+                              {job.lastError}
+                            </div>
+                          )}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <span className="text-xs text-muted-foreground/50">
+                        Never
+                      </span>
+                    )}
+                  </TableCell>
+
+                  {/* Next run */}
+                  <TableCell>
+                    {job.nextRunAt ? (
+                      <Tooltip>
+                        <TooltipTrigger className="cursor-default">
+                          <span
+                            className="text-xs text-muted-foreground/80"
+                            suppressHydrationWarning
+                          >
+                            <LiveTimeAgo date={job.nextRunAt} />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {new Date(job.nextRunAt).toLocaleString()}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <span className="text-xs text-muted-foreground/50">
+                        —
+                      </span>
+                    )}
+                  </TableCell>
+
+                  {/* Trigger button */}
+                  <TableCell className="pr-5 text-right">
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-6"
+                            disabled={isRunning}
+                            onClick={() => handleTrigger(job.jobName)}
+                          />
+                        }
+                      >
+                        {isRunning ? (
+                          <Spinner className="size-3" />
+                        ) : (
+                          <IconPlayerPlay className="size-3 text-muted-foreground/50" />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>Run now</TooltipContent>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }

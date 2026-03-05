@@ -32,6 +32,8 @@ export interface SystemHealthData {
   };
   jobs: {
     jobName: string;
+    cronPattern: string | null;
+    nextRunAt: string | null;
     lastRunAt: string | null;
     lastDurationMs: number | null;
     lastStatus: "running" | "success" | "error" | null;
@@ -143,6 +145,12 @@ async function getTmdbHealth(): Promise<SystemHealthData["tmdb"]> {
 }
 
 function getJobsHealth(): SystemHealthData["jobs"] {
+  // Lazy-import to avoid circular dependency issues at module level
+  const { getJobSchedules } =
+    require("@/lib/cron") as typeof import("@/lib/cron");
+  const schedules = getJobSchedules();
+  const scheduleMap = new Map(schedules.map((s) => [s.jobName, s]));
+
   return JOB_NAMES.map((jobName) => {
     const latest = db
       .select()
@@ -153,14 +161,18 @@ function getJobsHealth(): SystemHealthData["jobs"] {
       .get();
 
     const isCurrentlyRunning = latest?.status === "running";
+    const schedule = scheduleMap.get(jobName);
 
-    let lastDurationMs: number | null = null;
-    if (latest?.finishedAt && latest.startedAt) {
+    // Prefer the in-memory durationMs column; fall back to timestamp diff
+    let lastDurationMs: number | null = latest?.durationMs ?? null;
+    if (lastDurationMs === null && latest?.finishedAt && latest.startedAt) {
       lastDurationMs = latest.finishedAt.getTime() - latest.startedAt.getTime();
     }
 
     return {
       jobName,
+      cronPattern: schedule?.pattern ?? null,
+      nextRunAt: schedule?.nextRunAt ?? null,
       lastRunAt: latest?.startedAt?.toISOString() ?? null,
       lastDurationMs,
       lastStatus: (latest?.status as "running" | "success" | "error") ?? null,

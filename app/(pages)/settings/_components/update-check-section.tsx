@@ -1,6 +1,6 @@
 "use client";
 
-import { IconCloudDownload } from "@tabler/icons-react";
+import { IconWorldUpload } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
@@ -37,7 +37,7 @@ export function UpdateCheckSection({
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <IconCloudDownload className="size-4 text-primary" />
+            <IconWorldUpload className="size-4 text-primary" />
           </div>
           <div>
             <CardTitle>Automatic update checks</CardTitle>

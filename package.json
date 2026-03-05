@@ -9,10 +9,10 @@
     "lint": "biome check",
     "format": "biome format --write",
     "check-types": "tsc --noEmit",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:generate": "bun --bun drizzle-kit generate",
+    "db:migrate": "bun --bun drizzle-kit migrate",
+    "db:push": "bun --bun drizzle-kit push",
+    "db:studio": "bun --bun drizzle-kit studio"
   },
   "dependencies": {
     "@base-ui/react": "1.2.0",

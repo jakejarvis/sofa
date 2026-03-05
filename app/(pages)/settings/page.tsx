@@ -1,6 +1,6 @@
 import {
   IconDatabaseExport,
-  IconServerCog,
+  IconServer2,
   IconShieldLock,
 } from "@tabler/icons-react";
 import { desc, eq } from "drizzle-orm";
@@ -154,7 +154,7 @@ export default async function SettingsPage() {
           {/* Server health */}
           <div>
             <div className="mb-3 flex items-center gap-2">
-              <IconServerCog className="size-4 text-muted-foreground" />
+              <IconServer2 className="size-4 text-muted-foreground" />
               <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Server
               </h2>

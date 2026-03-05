@@ -350,6 +350,7 @@ export const cronRuns = sqliteTable(
     }).notNull(),
     startedAt: int("startedAt", { mode: "timestamp" }).notNull(),
     finishedAt: int("finishedAt", { mode: "timestamp" }),
+    durationMs: int("durationMs"),
     errorMessage: text("errorMessage"),
   },
   (table) => [

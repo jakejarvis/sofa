@@ -1,6 +1,6 @@
 "use client";
 
-import { IconCalendarRepeat, IconChevronDown } from "@tabler/icons-react";
+import { IconCalendarWeek, IconChevronDown } from "@tabler/icons-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { createStore, Provider, useAtomValue } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
@@ -150,7 +150,7 @@ function BackupScheduleInner() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconCalendarRepeat className="size-4 text-primary" />
+              <IconCalendarWeek className="size-4 text-primary" />
             </div>
             <div>
               <CardTitle>Backup schedule</CardTitle>

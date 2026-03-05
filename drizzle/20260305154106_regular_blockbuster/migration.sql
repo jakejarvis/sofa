@@ -1,0 +1,1 @@
+ALTER TABLE `cronRuns` ADD `durationMs` integer;

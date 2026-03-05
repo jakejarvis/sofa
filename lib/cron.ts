@@ -51,6 +51,7 @@ function schedule(name: string, cron: string, handler: () => Promise<void>) {
     name,
     new Cron(cron, { name, protect: true }, async () => {
       log.info(`Running job: ${name}`);
+      const startMs = performance.now();
       const run = db
         .insert(cronRuns)
         .values({ jobName: name, status: "running", startedAt: new Date() })
@@ -58,16 +59,19 @@ function schedule(name: string, cron: string, handler: () => Promise<void>) {
         .get();
       try {
         await handler();
+        const durationMs = Math.round(performance.now() - startMs);
         db.update(cronRuns)
-          .set({ status: "success", finishedAt: new Date() })
+          .set({ status: "success", finishedAt: new Date(), durationMs })
           .where(eq(cronRuns.id, run.id))
           .run();
-        log.info(`Completed job: ${name}`);
+        log.info(`Completed job: ${name} (${durationMs}ms)`);
       } catch (err) {
+        const durationMs = Math.round(performance.now() - startMs);
         db.update(cronRuns)
           .set({
             status: "error",
             finishedAt: new Date(),
+            durationMs,
             errorMessage: err instanceof Error ? err.message : String(err),
           })
           .where(eq(cronRuns.id, run.id))
@@ -76,6 +80,27 @@ function schedule(name: string, cron: string, handler: () => Promise<void>) {
       }
     }),
   );
+}
+
+/** Get schedule metadata for all registered jobs */
+export function getJobSchedules(): {
+  jobName: string;
+  pattern: string;
+  nextRunAt: string | null;
+}[] {
+  return Array.from(jobs.entries()).map(([name, cron]) => ({
+    jobName: name,
+    pattern: cron.getPattern() ?? "",
+    nextRunAt: cron.nextRun()?.toISOString() ?? null,
+  }));
+}
+
+/** Manually trigger a job by name. Returns false if job not found. */
+export async function triggerJob(name: string): Promise<boolean> {
+  const job = jobs.get(name);
+  if (!job) return false;
+  await job.trigger();
+  return true;
 }
 
 function getLibraryTitleIds(): string[] {
