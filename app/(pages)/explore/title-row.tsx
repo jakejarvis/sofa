@@ -73,6 +73,7 @@ export function TitleRow({ heading, icon, items }: TitleRowProps) {
                     releaseDate={item.releaseDate}
                     voteAverage={item.voteAverage}
                     href={`/titles/tmdb-${item.tmdbId}-${item.type}`}
+                    showQuickAdd
                   />
                 </motion.div>
               </CarouselItem>

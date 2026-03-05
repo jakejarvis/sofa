@@ -4,16 +4,6 @@ import { useStore } from "jotai";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import {
-  episodeWatchesAtom,
-  seasonsAtom,
-  titleIdAtom,
-  titleNameAtom,
-  userRatingAtom,
-  userStatusAtom,
-  watchingEpAtom,
-} from "@/lib/atoms/title";
-import type { Season } from "@/lib/types/title";
-import {
   batchWatchEpisodes,
   markAllWatchedAction,
   unwatchEpisodeAction,
@@ -23,7 +13,17 @@ import {
   watchEpisode,
   watchMovie,
   watchSeason,
-} from "./actions";
+} from "@/lib/actions/titles";
+import {
+  episodeWatchesAtom,
+  seasonsAtom,
+  titleIdAtom,
+  titleNameAtom,
+  userRatingAtom,
+  userStatusAtom,
+  watchingEpAtom,
+} from "@/lib/atoms/title";
+import type { Season } from "@/lib/types/title";
 
 export function useTitleActions() {
   const store = useStore();

@@ -157,6 +157,7 @@ export function GenreBrowser({ movieGenres, tvGenres }: GenreBrowserProps) {
                 releaseDate={r.releaseDate}
                 voteAverage={r.voteAverage}
                 href={`/titles/tmdb-${r.tmdbId}-${r.type}`}
+                showQuickAdd
               />
             </motion.div>
           ))}

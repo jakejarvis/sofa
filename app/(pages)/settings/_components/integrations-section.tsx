@@ -7,7 +7,7 @@ import {
   deleteWebhookConnection,
   regenerateWebhookToken,
   saveWebhookConnection,
-} from "./actions";
+} from "@/lib/actions/settings";
 import { WebhookCard, type WebhookConnection } from "./webhook-card";
 
 export function IntegrationsSection({

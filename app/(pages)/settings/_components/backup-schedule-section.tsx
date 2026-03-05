@@ -15,12 +15,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
-import type { BackupFrequency } from "@/lib/cron";
 import {
   setBackupScheduleAction,
   setMaxBackupsAction,
   setScheduledBackupAction,
-} from "./actions";
+} from "@/lib/actions/settings";
+import type { BackupFrequency } from "@/lib/cron";
 
 const FREQUENCY_OPTIONS: { value: BackupFrequency; label: string }[] = [
   { value: "6h", label: "6h" },

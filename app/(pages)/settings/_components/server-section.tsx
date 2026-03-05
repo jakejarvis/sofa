@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { toggleRegistration } from "./actions";
+import { toggleRegistration } from "@/lib/actions/settings";
 
 export function ServerSection({
   initialRegistrationOpen,

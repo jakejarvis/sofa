@@ -1,9 +1,23 @@
 "use client";
 
-import { IconDeviceTv, IconMovie, IconStarFilled } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconDeviceTv,
+  IconLoader,
+  IconMovie,
+  IconPlus,
+  IconStarFilled,
+} from "@tabler/icons-react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { quickAddToWatchlist } from "@/lib/actions/watchlist";
 
 interface TitleCardProps {
   id?: string;
@@ -15,10 +29,54 @@ interface TitleCardProps {
   voteAverage?: number | null;
   href?: string;
   onImport?: () => void;
+  showQuickAdd?: boolean;
+}
+
+type QuickAddState = "idle" | "loading" | "added";
+
+function QuickAddButton({
+  tmdbId,
+  type,
+}: {
+  tmdbId: number;
+  type: "movie" | "tv";
+}) {
+  const [state, setState] = useState<QuickAddState>("idle");
+
+  async function handleClick(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (state === "loading" || state === "added") return;
+    setState("loading");
+    try {
+      await quickAddToWatchlist(tmdbId, type);
+      setState("added");
+    } catch {
+      setState("idle");
+    }
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        onClick={handleClick}
+        className="absolute top-2 right-2 z-10 flex size-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 hover:bg-black/70"
+        render={<button type="button" />}
+      >
+        {state === "idle" && <IconPlus className="size-4" />}
+        {state === "loading" && <IconLoader className="size-4 animate-spin" />}
+        {state === "added" && <IconCheck className="size-4 text-green-400" />}
+      </TooltipTrigger>
+      <TooltipContent side="bottom">
+        {state === "added" ? "Added to Watchlist" : "Add to Watchlist"}
+      </TooltipContent>
+    </Tooltip>
+  );
 }
 
 export function TitleCard({
   id,
+  tmdbId,
   type,
   title,
   posterPath,
@@ -26,13 +84,14 @@ export function TitleCard({
   voteAverage,
   href,
   onImport,
+  showQuickAdd,
 }: TitleCardProps) {
   const year = releaseDate?.slice(0, 4);
   const TypeIcon = type === "movie" ? IconMovie : IconDeviceTv;
 
-  const content = (
+  const cardInner = (
     <motion.div
-      className="group relative overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06] transition-shadow hover:ring-primary/25 hover:shadow-lg hover:shadow-primary/5"
+      className="relative overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06] transition-shadow hover:ring-primary/25 hover:shadow-lg hover:shadow-primary/5"
       whileHover={{ scale: 1.02 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
@@ -83,16 +142,23 @@ export function TitleCard({
   );
 
   if (href || id) {
-    return <Link href={href ?? `/titles/${id}`}>{content}</Link>;
+    return (
+      <div className="relative group">
+        {showQuickAdd && (
+          <QuickAddButton tmdbId={tmdbId} type={type as "movie" | "tv"} />
+        )}
+        <Link href={href ?? `/titles/${id}`}>{cardInner}</Link>
+      </div>
+    );
   }
 
   if (onImport) {
     return (
       <button type="button" onClick={onImport} className="w-full text-left">
-        {content}
+        {cardInner}
       </button>
     );
   }
 
-  return content;
+  return cardInner;
 }

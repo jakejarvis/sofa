@@ -32,8 +32,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { createBackupAction, deleteBackupAction } from "@/lib/actions/settings";
 import type { BackupInfo } from "@/lib/services/backup";
-import { createBackupAction, deleteBackupAction } from "./actions";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
