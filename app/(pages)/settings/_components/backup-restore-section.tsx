@@ -119,7 +119,7 @@ export function BackupRestoreSection() {
           disabled={restoring}
         >
           {restoring ? <Spinner /> : <IconCloudUpload aria-hidden={true} />}
-          {restoring ? "Restoring\u2026" : "Upload"}
+          {restoring ? "Restoring…" : "Upload"}
         </Button>
       </div>
     </CardContent>

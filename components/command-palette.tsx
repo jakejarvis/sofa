@@ -152,7 +152,7 @@ export function CommandPalette() {
         >
           <Command shouldFilter={false}>
             <CommandInput
-              placeholder="Search movies & TV shows\u2026"
+              placeholder="Search movies & TV shows…"
               value={query}
               onValueChange={setQuery}
             />

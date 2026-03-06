@@ -2,6 +2,8 @@
 
 import { IconCheck } from "@tabler/icons-react";
 import { useAtomValue } from "jotai";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   titleTypeAtom,
   userRatingAtom,
@@ -25,16 +27,16 @@ export function TitleActions() {
         onChange={handleStatusChange}
       />
       {titleType === "movie" && (
-        <button
-          type="button"
+        <Button
           onClick={handleWatchMovie}
-          className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all active:scale-[0.97] hover:shadow-md hover:shadow-primary/20"
+          size="lg"
+          className="h-9 rounded-lg px-4 text-sm active:scale-[0.97] hover:shadow-md hover:shadow-primary/20"
         >
           <IconCheck aria-hidden={true} className="size-3.5" />
           Mark Watched
-        </button>
+        </Button>
       )}
-      <span className="mx-0.5 h-4 w-px bg-border/50" />
+      <Separator orientation="vertical" className="mx-0.5 h-4 bg-border/50" />
       <StarRating value={userRating ?? 0} onChange={handleRating} />
     </div>
   );

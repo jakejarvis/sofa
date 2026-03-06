@@ -6,6 +6,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SofaLogo } from "@/components/sofa-logo";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { authClient, signIn, signUp } from "@/lib/auth/client";
 
 export interface AuthConfig {
@@ -14,6 +18,9 @@ export interface AuthConfig {
   passwordLoginDisabled: boolean;
   registrationOpen?: boolean;
 }
+
+const authInputClass =
+  "h-11 rounded-lg border-border/50 bg-background/50 px-4 py-0 placeholder:text-muted-foreground/50 focus-visible:border-primary/40 focus-visible:ring-ring md:text-sm";
 
 const fieldVariants = {
   hidden: { opacity: 0, y: 10 },
@@ -117,19 +124,20 @@ export function AuthForm({
               visible: { transition: { staggerChildren: 0.08 } },
             }}
           >
-            <motion.button
-              type="button"
-              onClick={handleOidcLogin}
-              disabled={oidcLoading}
-              variants={fieldVariants}
-              whileTap={{ scale: 0.98 }}
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-border/50 bg-background/50 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
-            >
-              <IconKey aria-hidden={true} className="size-4" />
-              {oidcLoading
-                ? "Redirecting\u2026"
-                : `Sign in with ${authConfig?.oidcProviderName || "SSO"}`}
-            </motion.button>
+            <motion.div variants={fieldVariants}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleOidcLogin}
+                disabled={oidcLoading}
+                className="h-11 w-full gap-2 rounded-lg border-border/50 bg-background/50 text-sm hover:bg-accent hover:text-foreground"
+              >
+                <IconKey aria-hidden={true} className="size-4" />
+                {oidcLoading
+                  ? "Redirecting…"
+                  : `Sign in with ${authConfig?.oidcProviderName || "SSO"}`}
+              </Button>
+            </motion.div>
           </motion.div>
         )}
 
@@ -154,33 +162,33 @@ export function AuthForm({
           >
             {isRegister && (
               <motion.div variants={fieldVariants} className="space-y-1.5">
-                <label
+                <Label
                   htmlFor="name"
-                  className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+                  className="uppercase tracking-wider text-muted-foreground"
                 >
                   Name
-                </label>
-                <input
+                </Label>
+                <Input
                   id="name"
                   type="text"
                   required
                   autoComplete="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  placeholder="Your name\u2026"
+                  className={authInputClass}
+                  placeholder="Your name…"
                 />
               </motion.div>
             )}
 
             <motion.div variants={fieldVariants} className="space-y-1.5">
-              <label
+              <Label
                 htmlFor="email"
-                className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+                className="uppercase tracking-wider text-muted-foreground"
               >
                 Email
-              </label>
-              <input
+              </Label>
+              <Input
                 id="email"
                 type="email"
                 required
@@ -188,19 +196,19 @@ export function AuthForm({
                 spellCheck={false}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className={authInputClass}
                 placeholder="wwhite@graymatter.biz"
               />
             </motion.div>
 
             <motion.div variants={fieldVariants} className="space-y-1.5">
-              <label
+              <Label
                 htmlFor="password"
-                className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+                className="uppercase tracking-wider text-muted-foreground"
               >
                 Password
-              </label>
-              <input
+              </Label>
+              <Input
                 id="password"
                 type="password"
                 required
@@ -210,37 +218,40 @@ export function AuthForm({
                 }
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="flex h-11 w-full rounded-lg border border-border/50 bg-background/50 px-4 text-sm transition-colors placeholder:text-muted-foreground/50 focus-visible:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                placeholder="Min 8 characters\u2026"
+                className={authInputClass}
+                placeholder="Min 8 characters…"
               />
             </motion.div>
 
-            <motion.button
-              type="submit"
-              disabled={loading}
-              variants={fieldVariants}
-              whileTap={{ scale: 0.98 }}
-              className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-primary font-medium text-primary-foreground transition-shadow hover:shadow-lg hover:shadow-primary/20 disabled:pointer-events-none disabled:opacity-50"
-            >
-              {loading
-                ? "Loading\u2026"
-                : isRegister
-                  ? "Create account"
-                  : "Sign in"}
-            </motion.button>
+            <motion.div variants={fieldVariants}>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="h-11 w-full rounded-lg text-sm hover:shadow-lg hover:shadow-primary/20"
+              >
+                {loading
+                  ? "Loading…"
+                  : isRegister
+                    ? "Create account"
+                    : "Sign in"}
+              </Button>
+            </motion.div>
           </motion.form>
         )}
 
         <AnimatePresence>
           {error && (
             <motion.div
-              role="alert"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive"
+              className="overflow-hidden"
             >
-              {error}
+              <Alert variant="destructive" className="bg-destructive/10">
+                <AlertDescription className="text-destructive text-sm">
+                  {error}
+                </AlertDescription>
+              </Alert>
             </motion.div>
           )}
         </AnimatePresence>

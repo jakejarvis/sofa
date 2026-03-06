@@ -2,6 +2,7 @@
 
 import { IconLogout, IconUser } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -41,9 +42,9 @@ export function AccountSection({
             <CardTitle>
               {user.name}
               {user.role === "admin" && (
-                <span className="ml-2 inline-flex items-center rounded-md bg-primary/10 px-1.5 py-0.5 align-middle text-[10px] font-medium text-primary">
+                <Badge className="ml-2 rounded-md border-0 bg-primary/10 align-middle text-primary">
                   Admin
-                </span>
+                </Badge>
               )}
             </CardTitle>
             <CardDescription>{user.email}</CardDescription>

@@ -119,7 +119,7 @@ export function BackupSection({
             ) : (
               <IconPlus aria-hidden={true} />
             )}
-            {creating ? "Creating\u2026" : "New backup"}
+            {creating ? "Creating…" : "New backup"}
           </Button>
         </div>
       </CardContent>

@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
   episodeWatchesAtom,
@@ -64,19 +65,20 @@ export function TitleSeasons({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <IconDeviceTvOld aria-hidden={true} className="size-5 text-primary" />
-          <h2 className="font-display text-2xl tracking-tight">Seasons</h2>
+          <h2 className="font-display text-2xl tracking-tight">Episodes</h2>
         </div>
         {userStatus && userStatus !== "completed" && (
           <AlertDialog open={markAllOpen} onOpenChange={setMarkAllOpen}>
             <AlertDialogTrigger
               render={
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  className="uppercase tracking-wider text-muted-foreground"
                 >
                   <IconChecks aria-hidden={true} className="size-3.5" />
                   Mark All Watched
-                </button>
+                </Button>
               }
             />
             <AlertDialogContent>
@@ -151,28 +153,30 @@ export function TitleSeasons({
                     </>
                   )}
                   {totalCount > 0 && watchedCount < totalCount && (
-                    <button
-                      type="button"
+                    <Button
+                      variant="ghost"
+                      size="xs"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleMarkSeason(season);
                       }}
-                      className="w-24 rounded-md px-2 py-1 text-center text-[10px] font-medium uppercase tracking-wider text-primary transition-colors hover:bg-primary/10 sm:hidden sm:group-hover/season:block"
+                      className="w-24 uppercase tracking-wider text-primary hover:bg-primary/10 hover:text-primary sm:hidden sm:group-hover/season:block"
                     >
                       Watch all
-                    </button>
+                    </Button>
                   )}
                   {totalCount > 0 && watchedCount === totalCount && (
-                    <button
-                      type="button"
+                    <Button
+                      variant="ghost"
+                      size="xs"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleUnmarkSeason(season);
                       }}
-                      className="w-24 rounded-md px-2 py-1 text-center text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive sm:hidden sm:group-hover/season:block"
+                      className="w-24 uppercase tracking-wider text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:hidden sm:group-hover/season:block"
                     >
                       Unwatch all
-                    </button>
+                    </Button>
                   )}
                   {totalCount > 0 && (
                     <span className="hidden font-mono text-xs tabular-nums text-muted-foreground sm:inline">

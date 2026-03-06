@@ -2,19 +2,18 @@
 
 import {
   IconCheck,
-  IconChevronDown,
   IconLibrary,
   IconMovie,
   IconPlayerPlay,
 } from "@tabler/icons-react";
 import { useAtom, useAtomValue } from "jotai";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   episodePeriodAtom,
   episodeStatsAtom,
@@ -83,6 +82,9 @@ function StatCard({
   );
 }
 
+const inlineTriggerClass =
+  "h-auto w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 [font-size:inherit] [line-height:inherit] shadow-none underline decoration-dotted decoration-muted-foreground/50 underline-offset-4 hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:ring-0 focus-visible:decoration-solid focus-visible:decoration-foreground dark:bg-transparent dark:hover:bg-transparent";
+
 function PeriodSelector({
   noun,
   period,
@@ -95,24 +97,29 @@ function PeriodSelector({
   return (
     <span className="inline-flex items-baseline gap-1">
       {noun}{" "}
-      <DropdownMenu>
-        <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-0.5 border-b border-dotted border-muted-foreground/50 uppercase text-foreground/80 transition-colors hover:text-foreground">
-          {periodLabels[period]}
-          <IconChevronDown aria-hidden={true} className="size-2.5" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuRadioGroup
-            value={period}
-            onValueChange={(v) => onPeriodChange(v as TimePeriod)}
-          >
-            {periods.map((p) => (
-              <DropdownMenuRadioItem key={p} value={p}>
-                {periodLabels[p]}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Select
+        value={period}
+        onValueChange={(v) => v && onPeriodChange(v as TimePeriod)}
+      >
+        <SelectTrigger
+          className={`${inlineTriggerClass} uppercase text-foreground/80`}
+        >
+          <SelectValue>
+            {(value: TimePeriod | null) => (value ? periodLabels[value] : null)}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent
+          align="start"
+          alignItemWithTrigger={false}
+          className="p-1"
+        >
+          {periods.map((p) => (
+            <SelectItem key={p} value={p}>
+              {periodLabels[p]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </span>
   );
 }

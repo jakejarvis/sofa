@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { TmdbLogo } from "@/components/tmdb-logo";
+import { Badge } from "@/components/ui/badge";
 import type { ColorPalette, ResolvedTitle } from "@/lib/types/title";
 import { TrailerDialog } from "./trailer-dialog";
 
@@ -100,9 +101,9 @@ export function TitleHero({
               {title.title}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-              <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-primary">
+              <Badge className="rounded border-0 bg-primary/10 font-semibold uppercase tracking-wider text-primary">
                 {title.type}
-              </span>
+              </Badge>
               {year && <span>{year}</span>}
               {title.voteAverage != null && title.voteAverage > 0 && (
                 <span className="flex items-center gap-1 text-primary">
@@ -115,9 +116,12 @@ export function TitleHero({
                 </span>
               )}
               {title.status && (
-                <span className="inline-flex h-5 items-center rounded border border-border/50 px-2 text-xs">
+                <Badge
+                  variant="outline"
+                  className="rounded border-border/50 font-normal"
+                >
                   {title.status}
-                </span>
+                </Badge>
               )}
               <a
                 href={`https://www.themoviedb.org/${title.type === "movie" ? "movie" : "tv"}/${title.tmdbId}`}

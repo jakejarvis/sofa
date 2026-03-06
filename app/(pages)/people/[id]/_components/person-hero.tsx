@@ -3,6 +3,7 @@
 import { IconCalendar, IconMapPin } from "@tabler/icons-react";
 import Image from "next/image";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import type { ResolvedPerson } from "@/lib/types/title";
 
 interface PersonHeroProps {
@@ -53,9 +54,9 @@ export function PersonHero({ person }: PersonHeroProps) {
         </h1>
 
         {person.knownForDepartment && (
-          <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+          <Badge className="border-0 bg-primary/10 px-2.5 font-semibold uppercase tracking-wider text-primary">
             {person.knownForDepartment}
-          </span>
+          </Badge>
         )}
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">

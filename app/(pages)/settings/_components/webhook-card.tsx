@@ -13,6 +13,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,7 +26,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import { Label } from "@/components/ui/label";
 import {
   Tooltip,
   TooltipContent,
@@ -117,12 +124,9 @@ export function WebhookCard({
         <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
           <CardContent className="space-y-3 border-t border-border/30 pt-4">
             {isPlex && (
-              <div className="flex gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
-                <IconInfoCircle
-                  aria-hidden={true}
-                  className="mt-0.5 size-3.5 shrink-0 text-primary"
-                />
-                <p className="text-xs leading-relaxed text-foreground/80">
+              <Alert className="border-primary/20 bg-primary/5 [&>svg]:text-primary">
+                <IconInfoCircle aria-hidden={true} />
+                <AlertDescription className="text-foreground/80">
                   Requires an active{" "}
                   <a
                     href="https://www.plex.tv/plex-pass/"
@@ -137,17 +141,14 @@ export function WebhookCard({
                     />
                   </a>{" "}
                   subscription.
-                </p>
-              </div>
+                </AlertDescription>
+              </Alert>
             )}
 
             {isEmby && (
-              <div className="flex gap-2.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
-                <IconInfoCircle
-                  aria-hidden={true}
-                  className="mt-0.5 size-3.5 shrink-0 text-primary"
-                />
-                <p className="text-xs leading-relaxed text-foreground/80">
+              <Alert className="border-primary/20 bg-primary/5 [&>svg]:text-primary">
+                <IconInfoCircle aria-hidden={true} />
+                <AlertDescription className="text-foreground/80">
                   Requires{" "}
                   <span className="font-medium text-foreground">
                     Emby Server 4.7.9+
@@ -166,8 +167,8 @@ export function WebhookCard({
                     />
                   </a>{" "}
                   license.
-                </p>
-              </div>
+                </AlertDescription>
+              </Alert>
             )}
 
             {!connection ? (
@@ -177,7 +178,7 @@ export function WebhookCard({
                 size="lg"
                 className="w-full"
               >
-                {connecting ? "Connecting\u2026" : `Connect ${label}`}
+                {connecting ? "Connecting…" : `Connect ${label}`}
               </Button>
             ) : (
               <AnimatePresence>
@@ -189,38 +190,39 @@ export function WebhookCard({
                     className="space-y-3 overflow-hidden"
                   >
                     <div>
-                      <label
+                      <Label
                         htmlFor={`${provider}-webhook-url`}
-                        className="mb-1 block text-xs text-muted-foreground"
+                        className="mb-1 text-muted-foreground"
                       >
                         Webhook URL
-                      </label>
-                      <div className="flex gap-2">
-                        <Input
+                      </Label>
+                      <InputGroup>
+                        <InputGroupInput
                           id={`${provider}-webhook-url`}
                           readOnly
                           value={webhookUrl}
                           className="font-mono text-[10px] text-muted-foreground"
                         />
-                        <Tooltip>
-                          <TooltipTrigger
-                            render={
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={handleCopy}
-                              />
-                            }
-                          >
-                            {copied ? (
-                              <IconCheck className="text-green-400" />
-                            ) : (
-                              <IconCopy />
-                            )}
-                          </TooltipTrigger>
-                          <TooltipContent>Copy URL</TooltipContent>
-                        </Tooltip>
-                      </div>
+                        <InputGroupAddon align="inline-end">
+                          <Tooltip>
+                            <TooltipTrigger
+                              render={
+                                <InputGroupButton
+                                  size="icon-xs"
+                                  onClick={handleCopy}
+                                />
+                              }
+                            >
+                              {copied ? (
+                                <IconCheck className="text-green-400" />
+                              ) : (
+                                <IconCopy />
+                              )}
+                            </TooltipTrigger>
+                            <TooltipContent>Copy URL</TooltipContent>
+                          </Tooltip>
+                        </InputGroupAddon>
+                      </InputGroup>
                     </div>
 
                     <div className="flex items-center gap-2">

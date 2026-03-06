@@ -5,6 +5,7 @@ import {
 } from "@tabler/icons-react";
 import { desc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { TmdbLogo } from "@/components/tmdb-logo";
 import { Card } from "@/components/ui/card";
 import { getSession } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
@@ -145,6 +146,20 @@ export default async function SettingsPage() {
               </span>
             )}
           </p>
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <a
+              href="https://www.themoviedb.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-70 transition-opacity"
+            >
+              <TmdbLogo className="h-3" />
+            </a>
+            <p className="text-[10px] leading-relaxed text-muted-foreground">
+              This product uses the TMDB API but is not endorsed or certified by
+              TMDB.
+            </p>
+          </div>
         </footer>
       }
     >

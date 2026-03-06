@@ -4,6 +4,14 @@ import { IconMovie } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { PersonCredit } from "@/lib/types/title";
 
 type Filter = "all" | "movie" | "tv";
@@ -62,31 +70,44 @@ export function FilmographyGrid({ credits }: FilmographyGridProps) {
           </span>
         </div>
 
-        <select
+        <Select
           value={sort}
-          onChange={(e) => setSort(e.target.value as Sort)}
+          onValueChange={(v) => v && setSort(v as Sort)}
           aria-label="Sort filmography"
-          className="rounded-lg border border-border/50 bg-card px-2 py-1 text-xs text-foreground"
         >
-          <option value="newest">Newest</option>
-          <option value="rating">Rating</option>
-        </select>
+          <SelectTrigger size="sm">
+            <SelectValue>
+              {(value: string | null) =>
+                value === "newest"
+                  ? "Newest"
+                  : value === "rating"
+                    ? "Rating"
+                    : null
+              }
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent
+            align="end"
+            alignItemWithTrigger={false}
+            className="p-1"
+          >
+            <SelectItem value="newest">Newest</SelectItem>
+            <SelectItem value="rating">Rating</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="flex gap-2">
         {filters.map((f) => (
-          <button
+          <Button
             key={f.value}
-            type="button"
+            variant={filter === f.value ? "default" : "secondary"}
+            size="xs"
             onClick={() => setFilter(f.value)}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-              filter === f.value
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:text-foreground"
-            }`}
+            className="rounded-full"
           >
             {f.label}
-          </button>
+          </Button>
         ))}
       </div>
 

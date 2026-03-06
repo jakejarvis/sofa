@@ -1,19 +1,20 @@
 "use client";
 
-import { IconCalendarWeek, IconChevronDown } from "@tabler/icons-react";
+import { IconCalendarWeek } from "@tabler/icons-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { useAtomValue } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import {
   backupScheduleAtom,
@@ -161,29 +162,33 @@ function BackupScheduleInner() {
                       {formatNextBackup(frequency, time, dow)}.
                     </span>{" "}
                     Keeping{" "}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-0.5 border-b border-dotted border-muted-foreground/50 transition-colors hover:text-foreground">
-                        {maxRetention === 0
-                          ? "unlimited"
-                          : `last ${maxRetention}`}
-                        <IconChevronDown
-                          aria-hidden={true}
-                          className="size-2.5"
-                        />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start">
-                        <DropdownMenuRadioGroup
-                          value={String(maxRetention)}
-                          onValueChange={(v) => changeMaxRetention(Number(v))}
-                        >
-                          {[3, 5, 7, 14, 30, 0].map((n) => (
-                            <DropdownMenuRadioItem key={n} value={String(n)}>
-                              {n === 0 ? "unlimited" : n}
-                            </DropdownMenuRadioItem>
-                          ))}
-                        </DropdownMenuRadioGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>{" "}
+                    <Select
+                      value={String(maxRetention)}
+                      onValueChange={(v) => v && changeMaxRetention(Number(v))}
+                    >
+                      <SelectTrigger className="h-auto w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 shadow-none underline decoration-dotted decoration-muted-foreground/50 underline-offset-4 hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:ring-0 focus-visible:decoration-solid focus-visible:decoration-foreground dark:bg-transparent dark:hover:bg-transparent">
+                        <SelectValue>
+                          {(value: string | null) =>
+                            value === "0"
+                              ? "unlimited"
+                              : value
+                                ? `last ${value}`
+                                : null
+                          }
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent
+                        align="start"
+                        alignItemWithTrigger={false}
+                        className="p-1"
+                      >
+                        {[3, 5, 7, 14, 30, 0].map((n) => (
+                          <SelectItem key={n} value={String(n)}>
+                            {n === 0 ? "unlimited" : `last ${n}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>{" "}
                     backups.
                   </span>
                 ) : (
@@ -217,7 +222,7 @@ function BackupScheduleInner() {
                   <span className="inline-block text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
                     Frequency
                   </span>
-                  <div className="flex gap-1">
+                  <ButtonGroup>
                     {FREQUENCY_OPTIONS.map((opt) => (
                       <Button
                         key={opt.value}
@@ -234,7 +239,7 @@ function BackupScheduleInner() {
                         {opt.label}
                       </Button>
                     ))}
-                  </div>
+                  </ButtonGroup>
                 </div>
 
                 {/* Day of week — shown for 7d only */}
@@ -250,32 +255,33 @@ function BackupScheduleInner() {
                       <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
                         Day:{" "}
                       </span>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border/50 bg-muted/30 px-2.5 py-1 text-xs text-foreground transition-colors hover:bg-muted/50 disabled:opacity-50">
-                          {DAYS_OF_WEEK[dow]}
-                          <IconChevronDown
-                            aria-hidden={true}
-                            className="size-3 text-muted-foreground"
-                          />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start">
-                          <DropdownMenuRadioGroup
-                            value={String(dow)}
-                            onValueChange={(v) =>
-                              changeSchedule(frequency, time, Number(v))
+                      <Select
+                        value={String(dow)}
+                        onValueChange={(v) =>
+                          v && changeSchedule(frequency, time, Number(v))
+                        }
+                      >
+                        <SelectTrigger className="h-auto gap-1 border-border/50 bg-muted/30 px-2.5 py-1 text-xs text-foreground hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50">
+                          <SelectValue>
+                            {(value: string | null) =>
+                              value !== null
+                                ? DAYS_OF_WEEK[Number(value)]
+                                : null
                             }
-                          >
-                            {DAYS_OF_WEEK.map((day, i) => (
-                              <DropdownMenuRadioItem
-                                key={day}
-                                value={String(i)}
-                              >
-                                {day}
-                              </DropdownMenuRadioItem>
-                            ))}
-                          </DropdownMenuRadioGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent
+                          align="start"
+                          alignItemWithTrigger={false}
+                          className="p-1"
+                        >
+                          {DAYS_OF_WEEK.map((day, i) => (
+                            <SelectItem key={day} value={String(i)}>
+                              {day}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -293,41 +299,43 @@ function BackupScheduleInner() {
                       <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
                         {frequency === "12h" ? "Starting at" : "Time:"}{" "}
                       </span>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-border/50 bg-muted/30 px-2.5 py-1 text-xs text-foreground transition-colors hover:bg-muted/50 disabled:opacity-50">
-                          {format(
-                            new Date(
-                              2000,
-                              0,
-                              1,
-                              ...(time.split(":").map(Number) as [
-                                number,
-                                number,
-                              ]),
-                            ),
-                            "h:mm a",
-                          )}
-                          <IconChevronDown
-                            aria-hidden={true}
-                            className="size-3 text-muted-foreground"
-                          />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start">
-                          <DropdownMenuRadioGroup
-                            value={time}
-                            onValueChange={(v) => changeSchedule(frequency, v)}
-                          >
-                            {HOURS.map((h) => {
-                              const val = `${String(h).padStart(2, "0")}:00`;
-                              return (
-                                <DropdownMenuRadioItem key={h} value={val}>
-                                  {format(new Date(2000, 0, 1, h, 0), "h:mm a")}
-                                </DropdownMenuRadioItem>
-                              );
-                            })}
-                          </DropdownMenuRadioGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <Select
+                        value={time}
+                        onValueChange={(v) => v && changeSchedule(frequency, v)}
+                      >
+                        <SelectTrigger className="h-auto gap-1 border-border/50 bg-muted/30 px-2.5 py-1 text-xs text-foreground hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50">
+                          <SelectValue>
+                            {(value: string | null) =>
+                              value
+                                ? format(
+                                    new Date(
+                                      2000,
+                                      0,
+                                      1,
+                                      Number(value.split(":")[0]),
+                                      0,
+                                    ),
+                                    "h:mm a",
+                                  )
+                                : null
+                            }
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent
+                          align="start"
+                          alignItemWithTrigger={false}
+                          className="p-1"
+                        >
+                          {HOURS.map((h) => {
+                            const val = `${String(h).padStart(2, "0")}:00`;
+                            return (
+                              <SelectItem key={h} value={val}>
+                                {format(new Date(2000, 0, 1, h, 0), "h:mm a")}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
                     </motion.div>
                   )}
                 </AnimatePresence>

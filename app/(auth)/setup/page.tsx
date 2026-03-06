@@ -9,6 +9,8 @@ import {
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 
 const steps = [
   {
@@ -181,10 +183,11 @@ export default function SetupPage() {
                         <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                           {snippet.label}
                         </span>
-                        <button
-                          type="button"
+                        <Button
+                          variant="ghost"
+                          size="xs"
                           onClick={() => copySnippet(idx, snippet.code)}
-                          className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                          className="text-[11px] text-muted-foreground"
                         >
                           {copiedIdx === idx ? (
                             <>
@@ -200,7 +203,7 @@ export default function SetupPage() {
                               Copy
                             </>
                           )}
-                        </button>
+                        </Button>
                       </div>
                       <pre className="overflow-x-auto p-3 font-mono text-sm text-foreground/80">
                         {snippet.code}
@@ -244,21 +247,21 @@ export default function SetupPage() {
                   Click the button to verify your configuration
                 </p>
               </div>
-              <button
-                type="button"
+              <Button
                 onClick={checkStatus}
                 disabled={checking}
-                className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-all hover:shadow-md hover:shadow-primary/20 disabled:opacity-50"
+                size="lg"
+                className="h-9 rounded-lg px-4 text-sm hover:shadow-md hover:shadow-primary/20"
               >
                 {checking ? (
                   <>
-                    <span className="h-3 w-3 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+                    <Spinner className="size-3" />
                     Checking…
                   </>
                 ) : (
                   "Check configuration"
                 )}
-              </button>
+              </Button>
             </div>
           )}
         </div>

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { SofaLogo } from "@/components/sofa-logo";
 import { Kbd } from "@/components/ui/kbd";
+import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
@@ -86,7 +87,10 @@ export function NavBar() {
             <span>Search…</span>
             <Kbd className="ml-1">⌘K</Kbd>
           </button>
-          <div className="mx-1.5 hidden h-4 w-px bg-border/50 sm:block" />
+          <Separator
+            orientation="vertical"
+            className="mx-1.5 hidden h-4 bg-border/50 sm:block"
+          />
           <Tooltip>
             <TooltipTrigger
               render={<Link href="/settings" />}

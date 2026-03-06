@@ -6,9 +6,9 @@ import {
 } from "@/lib/services/tracking";
 import { getGenres, getPopular, getTrending } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import { FilterableTitleRow } from "./filterable-title-row";
-import { HeroBanner } from "./hero-banner";
-import { TitleRow } from "./title-row";
+import { FilterableTitleRow } from "./_components/filterable-title-row";
+import { HeroBanner } from "./_components/hero-banner";
+import { TitleRow } from "./_components/title-row";
 
 function mapResults(
   results: {

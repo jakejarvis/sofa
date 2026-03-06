@@ -5,6 +5,7 @@ import { createStore, Provider, useAtom, useAtomValue } from "jotai";
 import { useState } from "react";
 import { TitleCardSkeleton } from "@/components/skeletons";
 import { ExploreTitleCard } from "@/components/title-card";
+import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -114,18 +115,19 @@ function FilterableTitleRowInner({
       {/* Genre chips */}
       <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-0 sm:flex-wrap sm:px-0">
         {genres.map((genre) => (
-          <button
+          <Button
             key={genre.id}
-            type="button"
+            variant={selectedGenre === genre.id ? "default" : "outline"}
+            size="xs"
             onClick={() => toggleGenre(genre.id)}
-            className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+            className={`shrink-0 rounded-full ${
               selectedGenre === genre.id
-                ? "border-primary bg-primary/10 text-primary"
+                ? "border-primary bg-primary/10 text-primary hover:bg-primary/20"
                 : "border-border/50 bg-card/50 text-muted-foreground hover:border-primary/20 hover:text-foreground"
             }`}
           >
             {genre.name}
-          </button>
+          </Button>
         ))}
       </div>
 
