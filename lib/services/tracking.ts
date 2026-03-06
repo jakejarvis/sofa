@@ -100,7 +100,7 @@ export function logEpisodeWatch(
     )
     .get();
 
-  if (!existing) {
+  if (!existing || existing.status === "watchlist") {
     setTitleStatus(userId, titleId, "in_progress", source);
   }
 
@@ -155,7 +155,7 @@ export function logEpisodeWatchBatch(
       )
       .get();
 
-    if (!existing) {
+    if (!existing || existing.status === "watchlist") {
       const statusNow = new Date();
       tx.insert(userTitleStatus)
         .values({
