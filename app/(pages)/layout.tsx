@@ -24,7 +24,7 @@ export default async function PagesLayout({
           <div className="pointer-events-none fixed left-1/2 top-1/4 -translate-x-1/2 -translate-y-1/2 hidden h-[600px] w-[800px] rounded-full bg-primary/3 blur-[200px] sm:block" />
           <main
             id="main-content"
-            className="relative mx-auto max-w-6xl px-[max(1rem,env(safe-area-inset-left))] py-6 sm:px-[max(1.5rem,env(safe-area-inset-right))]"
+            className="relative mx-auto max-w-6xl pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] py-6 sm:pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(1.5rem,env(safe-area-inset-right))]"
           >
             {children}
           </main>

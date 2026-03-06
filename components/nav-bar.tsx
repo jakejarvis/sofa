@@ -29,7 +29,7 @@ export function NavBar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
-      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-5 px-[max(1rem,env(safe-area-inset-left))] sm:gap-0 sm:px-[max(1.5rem,env(safe-area-inset-right))]">
+      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-5 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:gap-0 sm:pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(1.5rem,env(safe-area-inset-right))]">
         <div className="flex items-center gap-3 sm:gap-6">
           <Link
             href="/dashboard"
