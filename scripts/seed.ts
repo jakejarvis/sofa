@@ -22,12 +22,11 @@
  */
 
 import { parseArgs } from "node:util";
-import { hashPassword } from "better-auth/crypto";
 import { eq } from "drizzle-orm";
+import { auth } from "@/lib/auth/server";
 import { db } from "@/lib/db/client";
 import { runMigrations } from "@/lib/db/migrate";
 import {
-  account,
   appSettings,
   cronRuns,
   episodes,
@@ -42,6 +41,7 @@ import {
 } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
 import { importTitle } from "@/lib/services/metadata";
+import { setSetting } from "@/lib/services/settings";
 
 const log = createLogger("seed");
 
@@ -120,11 +120,8 @@ async function seed() {
   // 1. Run migrations to ensure schema is ready
   runMigrations();
 
-  // 2. Create demo user
+  // 2. Create demo user via Better Auth API
   log.info(`Creating demo user: ${DEMO_EMAIL}`);
-  const userId = Bun.randomUUIDv7();
-  const now = new Date();
-  const hashedPassword = await hashPassword(DEMO_PASSWORD);
 
   const existingUser = db
     .select()
@@ -140,31 +137,23 @@ async function seed() {
     return;
   }
 
-  db.insert(user)
-    .values({
-      id: userId,
+  // Ensure registration is open so signUpEmail succeeds
+  await setSetting("registrationOpen", "true");
+
+  const result = await auth.api.signUpEmail({
+    body: {
       name: DEMO_NAME,
       email: DEMO_EMAIL,
-      emailVerified: true,
-      role: "admin",
-      createdAt: daysAgo(180),
-      updatedAt: now,
-    })
-    .run();
+      password: DEMO_PASSWORD,
+    },
+  });
 
-  db.insert(account)
-    .values({
-      id: Bun.randomUUIDv7(),
-      userId,
-      accountId: userId,
-      providerId: "credential",
-      password: hashedPassword,
-      createdAt: daysAgo(180),
-      updatedAt: now,
-    })
-    .run();
+  if (!result?.user) {
+    throw new Error("Failed to create user via Better Auth signUpEmail");
+  }
 
-  log.info(`User created: ${userId}`);
+  const userId = result.user.id;
+  log.info(`User created: ${userId} (role: ${result.user.role})`);
   await seedForUser(userId);
 }
 
