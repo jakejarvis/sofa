@@ -25,6 +25,18 @@ IMPORTANT: Default to using Bun instead of Node.js:
 - Use `bunx <package> <command>` instead of `npx <package> <command>`
 - Bun automatically loads .env, so don't use dotenv.
 
+For more information, read the Bun API docs in node_modules/bun-types/docs/**.mdx.
+
+## Pre-commit checks
+
+Before committing, all three of these must pass with zero warnings or errors:
+
+```bash
+bun run lint
+bun run check-types
+bun run test
+```
+
 ## Architecture
 
 **Sofa** is a self-hosted movie & TV tracking app (like Trakt/TVTime) built as a single Next.js 16 application with SQLite.
