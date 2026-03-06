@@ -102,7 +102,6 @@ const inflightImports = new Map<number, ImportResult>();
 export function importTitle(
   tmdbId: number,
   type: "movie" | "tv",
-  options?: { awaitEnrichment?: boolean },
 ): ImportResult {
   const inflight = inflightImports.get(tmdbId);
   if (inflight) {
@@ -110,21 +109,16 @@ export function importTitle(
     return inflight;
   }
 
-  const promise = _importTitle(tmdbId, type, options).finally(() => {
+  const promise = _importTitle(tmdbId, type).finally(() => {
     inflightImports.delete(tmdbId);
   }) as ImportResult;
   inflightImports.set(tmdbId, promise);
   return promise;
 }
 
-async function _importTitle(
-  tmdbId: number,
-  type: "movie" | "tv",
-  options?: { awaitEnrichment?: boolean },
-) {
+async function _importTitle(tmdbId: number, type: "movie" | "tv") {
   log.debug(`Importing ${type} TMDB ${tmdbId}`);
 
-  const awaitEnrichment = options?.awaitEnrichment ?? false;
   const existing = db
     .select()
     .from(titles)
@@ -157,32 +151,21 @@ async function _importTitle(
         }
         upsertGenres(existing.id, show.genres);
         await refreshTvChildren(existing.id, tmdbId, show.number_of_seasons);
-        if (awaitEnrichment) {
-          await Promise.all([
-            refreshAvailability(existing.id).catch((err) =>
-              log.debug("Availability enrichment failed:", err),
-            ),
-            refreshRecommendations(existing.id).catch((err) =>
-              log.debug("Recommendations enrichment failed:", err),
-            ),
-            extractAndStoreColors(existing.id, show.poster_path).catch((err) =>
-              log.debug("Color extraction failed:", err),
-            ),
-            refreshCredits(existing.id).catch((err) =>
-              log.debug("Credits enrichment failed:", err),
-            ),
-          ]);
-        } else {
-          refreshAvailability(existing.id).catch((err) =>
-            log.debug("Availability enrichment failed:", err),
-          );
-          refreshRecommendations(existing.id).catch((err) =>
-            log.debug("Recommendations enrichment failed:", err),
-          );
-          refreshCredits(existing.id).catch((err) =>
-            log.debug("Credits enrichment failed:", err),
-          );
-        }
+        refreshAvailability(existing.id).catch((err) =>
+          log.debug("Availability enrichment failed:", err),
+        );
+        refreshRecommendations(existing.id).catch((err) =>
+          log.debug("Recommendations enrichment failed:", err),
+        );
+        extractAndStoreColors(existing.id, show.poster_path).catch((err) =>
+          log.debug("Color extraction failed:", err),
+        );
+        refreshCredits(existing.id).catch((err) =>
+          log.debug("Credits enrichment failed:", err),
+        );
+        refreshTrailer(existing.id).catch((err) =>
+          log.debug("Trailer enrichment failed:", err),
+        );
         if (imageCacheEnabled()) {
           cacheImagesForTitle(existing.id).catch((err) =>
             log.debug("Image caching failed:", err),
@@ -222,35 +205,18 @@ async function _importTitle(
     );
     if (!row) return undefined;
     upsertGenres(row.id, movie.genres);
-    if (awaitEnrichment) {
-      await Promise.all([
-        refreshAvailability(row.id).catch((err) =>
-          log.debug("Availability enrichment failed:", err),
-        ),
-        refreshRecommendations(row.id).catch((err) =>
-          log.debug("Recommendations enrichment failed:", err),
-        ),
-        extractAndStoreColors(row.id, movie.poster_path).catch((err) =>
-          log.debug("Color extraction failed:", err),
-        ),
-        refreshCredits(row.id).catch((err) =>
-          log.debug("Credits enrichment failed:", err),
-        ),
-      ]);
-    } else {
-      refreshAvailability(row.id).catch((err) =>
-        log.debug("Availability enrichment failed:", err),
-      );
-      refreshRecommendations(row.id).catch((err) =>
-        log.debug("Recommendations enrichment failed:", err),
-      );
-      extractAndStoreColors(row.id, movie.poster_path).catch((err) =>
-        log.debug("Color extraction failed:", err),
-      );
-      refreshCredits(row.id).catch((err) =>
-        log.debug("Credits enrichment failed:", err),
-      );
-    }
+    refreshAvailability(row.id).catch((err) =>
+      log.debug("Availability enrichment failed:", err),
+    );
+    refreshRecommendations(row.id).catch((err) =>
+      log.debug("Recommendations enrichment failed:", err),
+    );
+    extractAndStoreColors(row.id, movie.poster_path).catch((err) =>
+      log.debug("Color extraction failed:", err),
+    );
+    refreshCredits(row.id).catch((err) =>
+      log.debug("Credits enrichment failed:", err),
+    );
     refreshTrailer(row.id).catch((err) =>
       log.debug("Trailer enrichment failed:", err),
     );
@@ -287,35 +253,18 @@ async function _importTitle(
   upsertGenres(row.id, show.genres);
 
   await refreshTvChildren(row.id, tmdbId, show.number_of_seasons);
-  if (awaitEnrichment) {
-    await Promise.all([
-      refreshAvailability(row.id).catch((err) =>
-        log.debug("Availability enrichment failed:", err),
-      ),
-      refreshRecommendations(row.id).catch((err) =>
-        log.debug("Recommendations enrichment failed:", err),
-      ),
-      extractAndStoreColors(row.id, show.poster_path).catch((err) =>
-        log.debug("Color extraction failed:", err),
-      ),
-      refreshCredits(row.id).catch((err) =>
-        log.debug("Credits enrichment failed:", err),
-      ),
-    ]);
-  } else {
-    refreshAvailability(row.id).catch((err) =>
-      log.debug("Availability enrichment failed:", err),
-    );
-    refreshRecommendations(row.id).catch((err) =>
-      log.debug("Recommendations enrichment failed:", err),
-    );
-    extractAndStoreColors(row.id, show.poster_path).catch((err) =>
-      log.debug("Color extraction failed:", err),
-    );
-    refreshCredits(row.id).catch((err) =>
-      log.debug("Credits enrichment failed:", err),
-    );
-  }
+  refreshAvailability(row.id).catch((err) =>
+    log.debug("Availability enrichment failed:", err),
+  );
+  refreshRecommendations(row.id).catch((err) =>
+    log.debug("Recommendations enrichment failed:", err),
+  );
+  extractAndStoreColors(row.id, show.poster_path).catch((err) =>
+    log.debug("Color extraction failed:", err),
+  );
+  refreshCredits(row.id).catch((err) =>
+    log.debug("Credits enrichment failed:", err),
+  );
   refreshTrailer(row.id).catch((err) =>
     log.debug("Trailer enrichment failed:", err),
   );
@@ -695,6 +644,91 @@ export async function ensureTvHydrated(
   return result;
 }
 
+/**
+ * Ensure a title has all enrichment data. Accepts already-read data to avoid
+ * redundant queries — only does lightweight existence checks for data not
+ * already loaded (recommendations). Returns true if any work was performed.
+ */
+async function ensureEnriched(
+  titleId: string,
+  title: typeof titles.$inferSelect,
+  existing: { hasCast: boolean; hasAvailability: boolean },
+): Promise<boolean> {
+  const tasks: Promise<void>[] = [];
+
+  if (!existing.hasCast) {
+    tasks.push(
+      refreshCredits(titleId).catch((err) =>
+        log.debug("Credits enrichment failed:", err),
+      ),
+    );
+  }
+
+  if (!existing.hasAvailability) {
+    tasks.push(
+      refreshAvailability(titleId).catch((err) =>
+        log.debug("Availability enrichment failed:", err),
+      ),
+    );
+  }
+
+  // Recommendations are loaded separately (Suspense), so check here
+  const hasRecommendations =
+    db
+      .select({ titleId: titleRecommendations.titleId })
+      .from(titleRecommendations)
+      .where(eq(titleRecommendations.titleId, titleId))
+      .limit(1)
+      .get() != null;
+  if (!hasRecommendations) {
+    tasks.push(
+      refreshRecommendations(titleId).catch((err) =>
+        log.debug("Recommendations enrichment failed:", err),
+      ),
+    );
+  }
+
+  if (!title.colorPalette && title.posterPath) {
+    tasks.push(
+      extractAndStoreColors(titleId, title.posterPath).then(
+        () => {},
+        (err) => log.debug("Color enrichment failed:", err),
+      ),
+    );
+  }
+
+  if (!title.trailerVideoKey) {
+    tasks.push(
+      refreshTrailer(titleId).catch((err) =>
+        log.debug("Trailer enrichment failed:", err),
+      ),
+    );
+  }
+
+  if (tasks.length > 0) {
+    log.debug(
+      `Backfilling ${tasks.length} enrichment task(s) for "${title.title}"`,
+    );
+    await Promise.all(tasks);
+    return true;
+  }
+  return false;
+}
+
+function readAvailability(titleId: string): AvailabilityOffer[] {
+  return db
+    .select()
+    .from(availabilityOffers)
+    .where(eq(availabilityOffers.titleId, titleId))
+    .all()
+    .map((a) => ({
+      providerId: a.providerId,
+      providerName: a.providerName,
+      logoPath: tmdbImageUrl(a.logoPath, "w92"),
+      offerType: a.offerType,
+    }));
+}
+
 export async function getTitleWithChildren(id: string): Promise<{
   title: ResolvedTitle;
   seasons: Season[];
@@ -705,10 +739,12 @@ export async function getTitleWithChildren(id: string): Promise<{
   let title = db.select().from(titles).where(eq(titles.id, id)).get();
   if (!title) return null;
 
-  // For shell TV titles, skip blocking hydration — let Suspense stream it
+  // For TV titles, check if seasons need hydration (reuse result below)
+  const existingSeasons =
+    title.type === "tv" && title.lastFetchedAt ? fetchSeasonsFromDb(id) : null;
   const needsTvHydration =
     title.type === "tv" &&
-    (!title.lastFetchedAt || fetchSeasonsFromDb(id).length === 0);
+    (!title.lastFetchedAt || existingSeasons?.length === 0);
 
   // If this is a shell movie title, fetch full details now (movies are fast)
   if (title.type === "movie" && !title.lastFetchedAt) {
@@ -738,28 +774,26 @@ export async function getTitleWithChildren(id: string): Promise<{
     }
   }
 
-  // For already-hydrated TV titles, fetch seasons from DB directly
-  const titleSeasons = needsTvHydration ? [] : fetchSeasonsFromDb(id);
+  const titleSeasons = needsTvHydration ? [] : (existingSeasons ?? []);
 
-  const availability = db
-    .select()
-    .from(availabilityOffers)
-    .where(eq(availabilityOffers.titleId, title.id))
-    .all()
-    .map(
-      (a): AvailabilityOffer => ({
-        providerId: a.providerId,
-        providerName: a.providerName,
-        logoPath: tmdbImageUrl(a.logoPath, "w92"),
-        offerType: a.offerType,
-      }),
-    );
+  // Read enrichment data, then backfill anything missing
+  let availability = readAvailability(title.id);
+  let cast = getCastForTitle(id);
 
-  // Color extraction — use cached palette if available, otherwise fire-and-forget
-  const palette = parseColorPalette(title.colorPalette);
-  if (!palette && title.posterPath) {
-    extractAndStoreColors(title.id, title.posterPath).catch(() => {});
+  if (title.lastFetchedAt) {
+    const enriched = await ensureEnriched(id, title, {
+      hasCast: cast.length > 0,
+      hasAvailability: availability.length > 0,
+    });
+    if (enriched) {
+      // Re-read only what was missing
+      if (cast.length === 0) cast = getCastForTitle(id);
+      if (availability.length === 0) availability = readAvailability(title.id);
+      title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
+    }
   }
+
+  const palette = parseColorPalette(title.colorPalette);
 
   const titleGenreRows = db
     .select({ name: genres.name })
@@ -788,8 +822,6 @@ export async function getTitleWithChildren(id: string): Promise<{
     trailerVideoKey: title.trailerVideoKey,
     genres: titleGenreRows.map((r) => r.name),
   };
-
-  const cast = getCastForTitle(id);
 
   return {
     title: resolvedTitle,

@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const title = await importTitle(tmdbId, type, { awaitEnrichment: true });
+    const title = await importTitle(tmdbId, type);
     return NextResponse.json({ id: title?.id });
   } catch {
     return NextResponse.json(
