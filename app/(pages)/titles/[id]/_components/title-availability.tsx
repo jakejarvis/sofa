@@ -19,13 +19,25 @@ const offerLabels: Record<string, string> = {
 function ProviderBadge({
   name,
   logoPath,
+  watchUrl,
 }: {
   name: string;
   logoPath: string | null;
+  watchUrl: string | null;
 }) {
   return (
     <Tooltip>
-      <TooltipTrigger className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card motion-safe:transition-transform motion-safe:hover:scale-105">
+      <TooltipTrigger
+        {...(watchUrl
+          ? {
+              render: (
+                // biome-ignore lint/a11y/useAnchorContent: content is provided conditionally below
+                <a href={watchUrl} target="_blank" rel="noopener noreferrer" />
+              ),
+            }
+          : {})}
+        className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card motion-safe:transition-transform motion-safe:hover:scale-105${watchUrl ? "" : " cursor-default"}`}
+      >
         {logoPath ? (
           <Image
             src={logoPath}
@@ -41,7 +53,7 @@ function ProviderBadge({
         )}
       </TooltipTrigger>
       <TooltipContent className="bg-popover px-2 py-1 text-[10px] font-medium text-popover-foreground shadow-md [&>:last-child]:bg-popover [&>:last-child]:fill-popover">
-        {name}
+        {watchUrl ? `Watch on ${name}` : name}
       </TooltipContent>
     </Tooltip>
   );
@@ -77,6 +89,7 @@ export function TitleAvailability({
                   key={offer.providerId}
                   name={offer.providerName}
                   logoPath={offer.logoPath}
+                  watchUrl={offer.watchUrl}
                 />
               ))}
             </div>

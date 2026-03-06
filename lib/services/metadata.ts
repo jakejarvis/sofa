@@ -10,6 +10,7 @@ import {
   titles,
 } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
+import { generateProviderUrl } from "@/lib/providers";
 import {
   getMovieDetails,
   getRecommendations,
@@ -715,7 +716,10 @@ async function ensureEnriched(
   return false;
 }
 
-function readAvailability(titleId: string): AvailabilityOffer[] {
+function readAvailability(
+  titleId: string,
+  titleName: string,
+): AvailabilityOffer[] {
   return db
     .select()
     .from(availabilityOffers)
@@ -726,6 +730,7 @@ function readAvailability(titleId: string): AvailabilityOffer[] {
       providerName: a.providerName,
       logoPath: tmdbImageUrl(a.logoPath, "w92"),
       offerType: a.offerType,
+      watchUrl: generateProviderUrl(a.providerId, titleName),
     }));
 }
 
@@ -777,7 +782,7 @@ export async function getTitleWithChildren(id: string): Promise<{
   const titleSeasons = needsTvHydration ? [] : (existingSeasons ?? []);
 
   // Read enrichment data, then backfill anything missing
-  let availability = readAvailability(title.id);
+  let availability = readAvailability(title.id, title.title);
   let cast = getCastForTitle(id);
 
   if (title.lastFetchedAt) {
@@ -788,7 +793,8 @@ export async function getTitleWithChildren(id: string): Promise<{
     if (enriched) {
       // Re-read only what was missing
       if (cast.length === 0) cast = getCastForTitle(id);
-      if (availability.length === 0) availability = readAvailability(title.id);
+      if (availability.length === 0)
+        availability = readAvailability(title.id, title.title);
       title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
     }
   }

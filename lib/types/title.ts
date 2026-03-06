@@ -20,6 +20,7 @@ export interface AvailabilityOffer {
   providerName: string;
   logoPath: string | null;
   offerType: string;
+  watchUrl: string | null;
 }
 
 export interface RecommendedTitle {
