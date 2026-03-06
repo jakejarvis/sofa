@@ -3,7 +3,7 @@
  *
  * Usage:
  *   bun run db:seed                     # uses defaults
- *   bun run db:seed --email demo@sofa.tv --password demo1234 --name "Demo User"
+ *   bun run db:seed --email demo@sofa.watch --password demo1234 --name "Demo User"
  *
  * Requires:
  *   - TMDB_API_READ_ACCESS_TOKEN in .env (titles are fetched live from TMDB)
