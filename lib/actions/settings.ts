@@ -3,7 +3,7 @@
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { requireAdmin, requireSession } from "@/lib/auth/session";
-import { type BackupFrequency, rescheduleBackup } from "@/lib/cron";
+import { type BackupFrequency, rescheduleBackup, triggerJob } from "@/lib/cron";
 import { db } from "@/lib/db/client";
 import { integrations } from "@/lib/db/schema";
 import {
@@ -11,8 +11,17 @@ import {
   createBackup,
   deleteBackup,
   listBackups,
+  restoreFromBackup,
 } from "@/lib/services/backup";
 import { getSetting, setSetting } from "@/lib/services/settings";
+import {
+  getSystemHealth,
+  type SystemHealthData,
+} from "@/lib/services/system-health";
+import {
+  getCachedUpdateCheck,
+  type UpdateCheckResult,
+} from "@/lib/services/update-check";
 
 const providerSchema = z.enum(["plex", "jellyfin", "emby", "sonarr", "radarr"]);
 
@@ -206,4 +215,49 @@ export async function setBackupScheduleAction(
   setSetting("backupScheduleTime", parsed.time);
   setSetting("backupScheduleDow", String(parsed.dayOfWeek));
   rescheduleBackup();
+}
+
+// --- System health actions ---
+
+export async function getSystemHealthAction(): Promise<SystemHealthData> {
+  await requireAdmin();
+  return getSystemHealth();
+}
+
+// --- Job trigger action ---
+
+export async function triggerJobAction(
+  jobName: string,
+): Promise<{ ok: boolean }> {
+  await requireAdmin();
+  if (!jobName || typeof jobName !== "string") {
+    throw new Error("Missing job name");
+  }
+  const triggered = await triggerJob(jobName);
+  if (!triggered) throw new Error("Job not found");
+  return { ok: true };
+}
+
+// --- Backup restore action ---
+
+const MAX_RESTORE_SIZE = 500 * 1024 * 1024; // 500MB
+
+export async function restoreBackupAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const file = formData.get("file") as File | null;
+  if (!file) throw new Error("No file provided");
+  if (file.size > MAX_RESTORE_SIZE) throw new Error("File too large");
+  const buffer = Buffer.from(await file.arrayBuffer());
+  await restoreFromBackup(buffer);
+}
+
+// --- Update check action ---
+
+export async function getUpdateCheckAction(): Promise<UpdateCheckResult | null> {
+  try {
+    await requireAdmin();
+    return getCachedUpdateCheck();
+  } catch {
+    return null;
+  }
 }

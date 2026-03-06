@@ -25,7 +25,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Sofa",
   description: "Track your movies and TV shows",
-  themeColor: "#090706",
 };
 
 export const viewport: Viewport = {
@@ -34,6 +33,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
+  themeColor: "#090706",
 };
 
 export default function RootLayout({

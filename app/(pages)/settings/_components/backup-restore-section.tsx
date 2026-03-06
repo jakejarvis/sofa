@@ -1,7 +1,7 @@
 "use client";
 
 import { IconCloudUpload } from "@tabler/icons-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -16,35 +16,29 @@ import {
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { restoreBackupAction } from "@/lib/actions/settings";
 
 export function BackupRestoreSection() {
-  const [restoring, setRestoring] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function handleRestore(file: File) {
-    setRestoring(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/backup/restore", {
-        method: "POST",
-        body: formData,
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Restore failed");
+  function handleRestore(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+    startTransition(async () => {
+      try {
+        await restoreBackupAction(formData);
+        toast.success("Database restored. Reloading...");
+        setTimeout(() => window.location.reload(), 1500);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Restore failed";
+        toast.error(message);
+      } finally {
+        if (fileInputRef.current) fileInputRef.current.value = "";
       }
-      toast.success("Database restored. Reloading...");
-      setTimeout(() => window.location.reload(), 1500);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Restore failed";
-      toast.error(message);
-    } finally {
-      setRestoring(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
+    });
   }
 
   return (
@@ -116,10 +110,10 @@ export function BackupRestoreSection() {
         <Button
           variant="outline"
           onClick={() => fileInputRef.current?.click()}
-          disabled={restoring}
+          disabled={isPending}
         >
-          {restoring ? <Spinner /> : <IconCloudUpload aria-hidden={true} />}
-          {restoring ? "Restoring…" : "Upload"}
+          {isPending ? <Spinner /> : <IconCloudUpload aria-hidden={true} />}
+          {isPending ? "Restoring…" : "Upload"}
         </Button>
       </div>
     </CardContent>

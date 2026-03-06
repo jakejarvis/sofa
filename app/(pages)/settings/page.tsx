@@ -5,6 +5,7 @@ import {
 } from "@tabler/icons-react";
 import { desc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { Card } from "@/components/ui/card";
 import { getSession } from "@/lib/auth/session";
@@ -12,6 +13,7 @@ import { db } from "@/lib/db/client";
 import { integrationEvents, integrations } from "@/lib/db/schema";
 import { listBackups } from "@/lib/services/backup";
 import { getSetting } from "@/lib/services/settings";
+import { getSystemHealth } from "@/lib/services/system-health";
 import {
   getCachedUpdateCheck,
   isUpdateCheckEnabled,
@@ -23,7 +25,10 @@ import { BackupSection } from "./_components/backup-section";
 import { IntegrationsSection } from "./_components/integrations-section";
 import { RegistrationSection } from "./_components/registration-section";
 import { SettingsShell } from "./_components/settings-shell";
-import { SystemHealthCards } from "./_components/system-health-section";
+import {
+  SkeletonCards,
+  SystemHealthCards,
+} from "./_components/system-health-section";
 import { UpdateCheckSection } from "./_components/update-check-section";
 
 export default async function SettingsPage() {
@@ -193,7 +198,9 @@ export default async function SettingsPage() {
                 Admin only
               </span>
             </div>
-            <SystemHealthCards />
+            <Suspense fallback={<SkeletonCards />}>
+              <SystemHealthLoader />
+            </Suspense>
           </div>
 
           {/* Security */}
@@ -260,4 +267,9 @@ export default async function SettingsPage() {
       )}
     </SettingsShell>
   );
+}
+
+async function SystemHealthLoader() {
+  const data = await getSystemHealth();
+  return <SystemHealthCards initialData={data} />;
 }
