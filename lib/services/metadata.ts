@@ -81,7 +81,10 @@ function upsertGenres(titleId: string, tmdbGenres: TmdbGenre[]) {
   }
 }
 
-function extractMovieContentRating(movie: TmdbMovieDetails): string | null {
+/** @internal */
+export function extractMovieContentRating(
+  movie: TmdbMovieDetails,
+): string | null {
   const us = movie.release_dates?.results?.find((r) => r.iso_3166_1 === "US");
   if (!us) return null;
   for (const rd of us.release_dates) {
@@ -90,7 +93,8 @@ function extractMovieContentRating(movie: TmdbMovieDetails): string | null {
   return null;
 }
 
-function extractTvContentRating(show: TmdbTvDetails): string | null {
+/** @internal */
+export function extractTvContentRating(show: TmdbTvDetails): string | null {
   const us = show.content_ratings?.results?.find((r) => r.iso_3166_1 === "US");
   return us?.rating || null;
 }

@@ -53,13 +53,15 @@ const REQUIRED_TABLES = [
 
 let backupOpQueue: Promise<void> = Promise.resolve();
 
-function getBackupSource(filename: string): BackupSource {
+/** @internal */
+export function getBackupSource(filename: string): BackupSource {
   if (SCHEDULED_PATTERN.test(filename)) return "scheduled";
   if (PRE_RESTORE_PATTERN.test(filename)) return "pre-restore";
   return "manual";
 }
 
-function isKnownBackup(filename: string): boolean {
+/** @internal */
+export function isKnownBackup(filename: string): boolean {
   return (
     MANUAL_PATTERN.test(filename) ||
     SCHEDULED_PATTERN.test(filename) ||
@@ -129,7 +131,8 @@ function validateBackupDatabase(filePath: string): void {
   }
 }
 
-function isValidBackupFilename(filename: string): boolean {
+/** @internal */
+export function isValidBackupFilename(filename: string): boolean {
   const base = path.basename(filename);
   return (
     base === filename && !filename.includes("..") && isKnownBackup(filename)

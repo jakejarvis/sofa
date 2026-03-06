@@ -29,7 +29,8 @@ export interface WebhookEvent {
   showTitle?: string;
 }
 
-function toOptionalInt(value: unknown): number | undefined {
+/** @internal */
+export function toOptionalInt(value: unknown): number | undefined {
   if (typeof value === "number" && Number.isInteger(value)) {
     return value;
   }

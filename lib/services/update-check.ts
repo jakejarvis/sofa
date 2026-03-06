@@ -23,8 +23,8 @@ export function isUpdateCheckEnabled(): boolean {
   return setting !== "false";
 }
 
-/** Returns true if `latest` is strictly newer than `current` using semver comparison. */
-function isNewerVersion(latest: string, current: string): boolean {
+/** @internal Returns true if `latest` is strictly newer than `current` using semver comparison. */
+export function isNewerVersion(latest: string, current: string): boolean {
   const parse = (v: string) => v.replace(/^v/, "").split(".").map(Number);
   const [lMajor = 0, lMinor = 0, lPatch = 0] = parse(latest);
   const [cMajor = 0, cMinor = 0, cPatch = 0] = parse(current);

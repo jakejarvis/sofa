@@ -9,6 +9,8 @@
     "lint": "biome check",
     "format": "biome format --write",
     "check-types": "tsc --noEmit",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
     "db:generate": "bun --bun drizzle-kit generate",
     "db:migrate": "bun --bun drizzle-kit migrate",
     "db:push": "bun --bun drizzle-kit push",
