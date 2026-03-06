@@ -1,10 +1,6 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { persons, titleCast } from "@/lib/db/schema";
 import { clearAllTables, insertTitle, testDb } from "@/lib/test-utils";
-
-mock.module("@/lib/tmdb/image", () => ({
-  tmdbImageUrl: (path: string | null) => path,
-}));
 
 import { getLocalFilmography } from "./person";
 

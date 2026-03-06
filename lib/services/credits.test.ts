@@ -2,10 +2,6 @@ import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { persons, titleCast } from "@/lib/db/schema";
 import { clearAllTables, insertTitle, testDb } from "@/lib/test-utils";
 
-mock.module("@/lib/tmdb/image", () => ({
-  tmdbImageUrl: (path: string | null) => path,
-}));
-
 mock.module("./image-cache", () => ({
   imageCacheEnabled: () => false,
   cacheProfilePhotos: async () => {},
@@ -65,7 +61,7 @@ describe("getCastForTitle", () => {
     expect(cast).toHaveLength(2);
     expect(cast[0].name).toBe("Actor One");
     expect(cast[0].character).toBe("Hero");
-    expect(cast[0].profilePath).toBe("/path1.jpg");
+    expect(cast[0].profilePath).toBe("/api/images/profiles/path1.jpg");
     expect(cast[1].name).toBe("Actor Two");
   });
 

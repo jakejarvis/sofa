@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import {
   clearAllTables,
   insertAvailabilityOffer,
@@ -11,10 +11,6 @@ import {
   insertTvShow,
   insertUser,
 } from "@/lib/test-utils";
-
-mock.module("@/lib/tmdb/image", () => ({
-  tmdbImageUrl: (path: string | null) => path,
-}));
 
 import {
   getContinueWatchingFeed,
