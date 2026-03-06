@@ -187,7 +187,10 @@ function getJobsHealth(): SystemHealthData["jobs"] {
       jobName,
       cronPattern: disabled ? null : (schedule?.pattern ?? null),
       nextRunAt: disabled ? null : (schedule?.nextRunAt ?? null),
-      lastRunAt: latest?.startedAt?.toISOString() ?? null,
+      lastRunAt:
+        latest?.finishedAt?.toISOString() ??
+        latest?.startedAt?.toISOString() ??
+        null,
       lastDurationMs,
       lastStatus: (latest?.status as "running" | "success" | "error") ?? null,
       lastError: latest?.errorMessage ?? null,
