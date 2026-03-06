@@ -143,7 +143,7 @@ export function TitleAvailability({
   if (Object.keys(availByType).length === 0) return null;
 
   return (
-    <div className="space-y-3">
+    <div className="pt-1 space-y-2">
       <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         Where to Watch
       </h2>

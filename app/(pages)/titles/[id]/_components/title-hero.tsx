@@ -1,9 +1,18 @@
+import {
+  IconCalendarEvent,
+  IconCircleCheck,
+  IconCircleX,
+  IconLoader,
+  IconRefresh,
+  IconStarFilled,
+} from "@tabler/icons-react";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { TmdbLogo } from "@/components/tmdb-logo";
-import { Badge } from "@/components/ui/badge";
 import type { ColorPalette, ResolvedTitle } from "@/lib/types/title";
+import { GenreCollapse } from "./genre-collapse";
 import { TrailerDialog } from "./trailer-dialog";
+import { TypeBadge } from "./type-badge";
 
 export function TitleHero({
   title,
@@ -100,49 +109,37 @@ export function TitleHero({
             <h1 className="font-display text-2xl tracking-tight text-balance sm:text-5xl">
               {title.title}
             </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-              <Badge className="rounded border-0 bg-primary/10 font-semibold uppercase tracking-wider text-primary">
-                {title.type}
-              </Badge>
-              {title.contentRating && (
-                <Badge
-                  variant="outline"
-                  className="rounded border-border/50 font-semibold uppercase tracking-wider"
-                >
-                  {title.contentRating}
-                </Badge>
-              )}
-              {year && <span>{year}</span>}
-              {title.genres.length > 0 && (
-                <span>{title.genres.join(" · ")}</span>
-              )}
-              {title.voteAverage != null && title.voteAverage > 0 && (
-                <span className="flex items-center gap-1 text-primary">
-                  ★ {title.voteAverage.toFixed(1)}
-                  {title.voteCount != null && (
-                    <span className="text-muted-foreground">
-                      ({title.voteCount.toLocaleString()})
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+              <TypeBadge type={title.type} />
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 [&>*+*]:before:mr-2 [&>*+*]:before:text-border [&>*+*]:before:content-['·']">
+                {title.contentRating && <span>{title.contentRating}</span>}
+                {year && <span>{year}</span>}
+                {title.genres.length > 0 && (
+                  <GenreCollapse genres={title.genres} />
+                )}
+                {title.voteAverage != null && title.voteAverage > 0 && (
+                  <span className="inline-flex items-center gap-1 text-primary">
+                    <IconStarFilled className="size-3.5" />
+                    {title.voteAverage.toFixed(1)}
+                  </span>
+                )}
+                {title.status &&
+                  !(title.type === "movie" && title.status === "Released") && (
+                    <span className="inline-flex items-center gap-1">
+                      <StatusIcon status={title.status} />
+                      {title.status}
                     </span>
                   )}
-                </span>
-              )}
-              {title.status && (
-                <Badge
-                  variant="outline"
-                  className="rounded border-border/50 font-normal"
+                <a
+                  href={`https://www.themoviedb.org/${title.type === "movie" ? "movie" : "tv"}/${title.tmdbId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="View on TMDB"
+                  className="inline-flex items-center opacity-70 transition-opacity hover:opacity-40"
                 >
-                  {title.status}
-                </Badge>
-              )}
-              <a
-                href={`https://www.themoviedb.org/${title.type === "movie" ? "movie" : "tv"}/${title.tmdbId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="View on TMDB"
-                className="inline-flex h-5 items-center rounded border border-border/50 px-2 text-xs text-muted-foreground transition-colors hover:border-border hover:text-foreground"
-              >
-                <TmdbLogo className="h-2.5 w-auto" />
-              </a>
+                  <TmdbLogo className="h-2.5 w-auto" />
+                </a>
+              </div>
             </div>
           </div>
 
@@ -159,6 +156,21 @@ export function TitleHero({
       </div>
     </>
   );
+}
+
+const statusIcons: Record<string, React.ReactNode> = {
+  Ended: <IconCircleCheck className="size-3.5" />,
+  Canceled: <IconCircleX className="size-3.5" />,
+  "Returning Series": <IconRefresh className="size-3.5" />,
+  "In Production": <IconLoader className="size-3.5" />,
+  "Post Production": <IconLoader className="size-3.5" />,
+  Planned: <IconCalendarEvent className="size-3.5" />,
+  Pilot: <IconCalendarEvent className="size-3.5" />,
+  Rumored: <IconCalendarEvent className="size-3.5" />,
+};
+
+function StatusIcon({ status }: { status: string }) {
+  return statusIcons[status] ?? null;
 }
 
 function AmbientGlow({ palette }: { palette: ColorPalette | null }) {
