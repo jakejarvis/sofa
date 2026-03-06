@@ -1,7 +1,9 @@
 "use client";
 
 import { IconWebhook } from "@tabler/icons-react";
+import { useSetAtom } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
+import { useEffect } from "react";
 import { connectionsAtom } from "@/lib/atoms/integrations";
 import {
   IntegrationCard,
@@ -15,6 +17,10 @@ export function IntegrationsSection({
   initialConnections: IntegrationConnection[];
 }) {
   useHydrateAtoms([[connectionsAtom, initialConnections]]);
+  const setConnections = useSetAtom(connectionsAtom);
+  useEffect(() => {
+    setConnections(initialConnections);
+  }, [initialConnections, setConnections]);
 
   return (
     <div>

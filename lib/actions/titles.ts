@@ -1,9 +1,8 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
 import { z } from "zod";
-import { auth } from "@/lib/auth/server";
+import { requireSession } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import { episodes } from "@/lib/db/schema";
 import {
@@ -19,8 +18,7 @@ import {
 } from "@/lib/services/tracking";
 
 async function getSessionUserId() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) throw new Error("Unauthorized");
+  const session = await requireSession();
   return session.user.id;
 }
 

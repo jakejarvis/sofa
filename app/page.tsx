@@ -1,5 +1,8 @@
+import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { LandingPage } from "@/components/landing-page";
+import { getSession } from "@/lib/auth/session";
+import { isTmdbConfigured } from "@/lib/config";
 import { getUserCount, isRegistrationOpen } from "@/lib/services/settings";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 
@@ -25,6 +28,11 @@ const posterUrls = posterPaths
 
 export default async function Home() {
   await connection();
+
+  const session = await getSession();
+  if (session?.user) redirect("/dashboard");
+  if (!isTmdbConfigured()) redirect("/setup");
+
   const userCount = getUserCount();
   return (
     <LandingPage

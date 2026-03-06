@@ -1,6 +1,7 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { APIError, createAuthMiddleware } from "better-auth/api";
-import { betterAuth } from "better-auth/minimal";
+import { type BetterAuthOptions, betterAuth } from "better-auth/minimal";
+import { nextCookies } from "better-auth/next-js";
 import { admin, genericOAuth } from "better-auth/plugins";
 import {
   isOidcAutoRegisterEnabled,
@@ -14,27 +15,6 @@ import {
   isRegistrationOpen,
   setSetting,
 } from "@/lib/services/settings";
-
-const oidcPlugin = isOidcConfigured()
-  ? [
-      genericOAuth({
-        config: [
-          {
-            providerId: "oidc",
-            clientId: process.env.OIDC_CLIENT_ID ?? "",
-            clientSecret: process.env.OIDC_CLIENT_SECRET ?? "",
-            discoveryUrl: `${process.env.OIDC_ISSUER_URL}/.well-known/openid-configuration`,
-            scopes: ["openid", "email", "profile"],
-            pkce: true,
-            disableImplicitSignUp: !isOidcAutoRegisterEnabled(),
-            mapProfileToUser: (profile) => ({
-              name: profile.name || profile.preferred_username || profile.email,
-            }),
-          },
-        ],
-      }),
-    ]
-  : [];
 
 const authLog = createLogger("auth");
 
@@ -60,7 +40,37 @@ export const auth = betterAuth({
       trustedProviders: ["oidc"],
     },
   },
-  plugins: [admin(), ...oidcPlugin],
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
+  },
+  plugins: [
+    admin(),
+    ...(isOidcConfigured()
+      ? [
+          genericOAuth({
+            config: [
+              {
+                providerId: "oidc",
+                clientId: process.env.OIDC_CLIENT_ID ?? "",
+                clientSecret: process.env.OIDC_CLIENT_SECRET ?? "",
+                discoveryUrl: `${process.env.OIDC_ISSUER_URL}/.well-known/openid-configuration`,
+                scopes: ["openid", "email", "profile"],
+                pkce: true,
+                disableImplicitSignUp: !isOidcAutoRegisterEnabled(),
+                mapProfileToUser: (profile) => ({
+                  name:
+                    profile.name || profile.preferred_username || profile.email,
+                }),
+              },
+            ],
+          }),
+        ]
+      : []),
+    nextCookies(), // must be last
+  ],
   advanced: {
     database: {
       generateId: () => Bun.randomUUIDv7(),
@@ -72,7 +82,7 @@ export const auth = betterAuth({
       // This is endpoint-level so it doesn't affect OIDC user creation
       // (which is gated by the genericOAuth plugin's disableImplicitSignUp).
       if (ctx.path === "/sign-up/email") {
-        const open = await isRegistrationOpen();
+        const open = isRegistrationOpen();
         if (!open) {
           throw new APIError("FORBIDDEN", {
             message: "Registration is currently closed",
@@ -84,27 +94,29 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (userData) => {
+        before: async (user) => {
           // First user becomes admin regardless of auth method
-          const userCount = await getUserCount();
+          const userCount = getUserCount();
           if (userCount === 0) {
             return {
               data: {
-                ...userData,
+                ...user,
                 role: "admin",
               },
             };
           }
-          return { data: userData };
+          return { data: user };
         },
         after: async () => {
           // Auto-close registration after first user
-          const userCount = await getUserCount();
+          const userCount = getUserCount();
           if (userCount === 1) {
-            await setSetting("registrationOpen", "false");
+            setSetting("registrationOpen", "false");
           }
         },
       },
     },
   },
-});
+} satisfies BetterAuthOptions);
+
+export type Session = typeof auth.$Infer.Session;

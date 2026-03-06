@@ -19,7 +19,7 @@ export default async function PagesLayout({
     <StoreProvider>
       <ProgressProvider>
         <div className="relative z-0 min-h-screen pb-[calc(3.5rem+env(safe-area-inset-bottom))] sm:pb-0">
-          <NavBar />
+          <NavBar userName={session.user.name} />
           {/* Ambient glow — hidden on mobile where it overwhelms the viewport */}
           <div className="pointer-events-none fixed left-1/2 top-1/4 -translate-x-1/2 -translate-y-1/2 hidden h-[600px] w-[800px] rounded-full bg-primary/3 blur-[200px] sm:block" />
           <main
@@ -31,7 +31,7 @@ export default async function PagesLayout({
         </div>
         <MobileTabBar />
         <CommandPalette />
-        <UpdateToast />
+        {session.user.role === "admin" && <UpdateToast />}
       </ProgressProvider>
     </StoreProvider>
   );

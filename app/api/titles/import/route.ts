@@ -1,8 +1,7 @@
-import { headers } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { importTitle } from "@/lib/services/metadata";
 
 const bodySchema = z.object({
@@ -11,9 +10,7 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

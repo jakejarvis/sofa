@@ -14,8 +14,9 @@ import {
 } from "./lists";
 
 // Mock getTvExternalIds for lazy resolution tests
-const mockGetTvExternalIds = mock(() =>
-  Promise.resolve({ tvdb_id: 55555, imdb_id: "tt9999999" }),
+const mockGetTvExternalIds = mock(
+  (): Promise<{ tvdb_id: number | null; imdb_id: string | null }> =>
+    Promise.resolve({ tvdb_id: 55555, imdb_id: "tt9999999" }),
 );
 mock.module("@/lib/tmdb/client", () => ({
   getTvExternalIds: mockGetTvExternalIds,

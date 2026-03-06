@@ -4,7 +4,6 @@ import { IconCompass, IconHome, IconSettings } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession } from "@/lib/auth/client";
 
 const tabs = [
   { href: "/dashboard", label: "Home", icon: IconHome },
@@ -13,10 +12,7 @@ const tabs = [
 ] as const;
 
 export function MobileTabBar() {
-  const { data: session } = useSession();
   const pathname = usePathname();
-
-  if (!session?.user) return null;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/90 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] backdrop-blur-xl sm:hidden">

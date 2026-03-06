@@ -1,7 +1,6 @@
-import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { isTmdbConfigured } from "@/lib/config";
 import { discover } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
@@ -20,9 +19,7 @@ const querySchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

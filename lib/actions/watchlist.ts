@@ -1,8 +1,7 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth/server";
+import { getSession, requireSession } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import { userTitleStatus } from "@/lib/db/schema";
 import { importTitle } from "@/lib/services/metadata";
@@ -15,7 +14,7 @@ import {
 export async function fetchUserStatuses(
   tmdbIds: { tmdbId: number; type: string }[],
 ): Promise<Record<string, "watchlist" | "in_progress" | "completed">> {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) return {};
   return getUserStatusesByTmdbIds(session.user.id, tmdbIds);
 }
@@ -23,7 +22,7 @@ export async function fetchUserStatuses(
 export async function fetchEpisodeProgress(
   tmdbIds: { tmdbId: number; type: string }[],
 ): Promise<Record<string, { watched: number; total: number }>> {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) return {};
   return getEpisodeProgressByTmdbIds(session.user.id, tmdbIds);
 }
@@ -32,8 +31,7 @@ export async function quickAddToWatchlist(
   tmdbId: number,
   type: "movie" | "tv",
 ) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) throw new Error("Unauthorized");
+  const session = await requireSession();
   const userId = session.user.id;
 
   const title = await importTitle(tmdbId, type);

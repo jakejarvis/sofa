@@ -1,9 +1,8 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
-import { headers } from "next/headers";
 import { z } from "zod";
-import { auth } from "@/lib/auth/server";
+import { requireAdmin, requireSession } from "@/lib/auth/session";
 import { type BackupFrequency, rescheduleBackup } from "@/lib/cron";
 import { db } from "@/lib/db/client";
 import { integrations } from "@/lib/db/schema";
@@ -23,18 +22,6 @@ function integrationTypeFor(provider: string): "webhook" | "list" {
   return LIST_PROVIDERS.has(provider) ? "list" : "webhook";
 }
 
-async function getSession() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) throw new Error("Unauthorized");
-  return session;
-}
-
-async function getAdminSession() {
-  const session = await getSession();
-  if (session.user.role !== "admin") throw new Error("Forbidden");
-  return session;
-}
-
 function generateToken() {
   return Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString(
     "hex",
@@ -44,7 +31,7 @@ function generateToken() {
 // --- Integration actions ---
 
 export async function saveIntegration(provider: string, enabled?: boolean) {
-  const session = await getSession();
+  const session = await requireSession();
   const parsed = providerSchema.parse(provider);
 
   const existing = db
@@ -95,7 +82,7 @@ export async function saveIntegration(provider: string, enabled?: boolean) {
 }
 
 export async function deleteIntegration(provider: string) {
-  const session = await getSession();
+  const session = await requireSession();
   const parsed = providerSchema.parse(provider);
 
   db.delete(integrations)
@@ -109,7 +96,7 @@ export async function deleteIntegration(provider: string) {
 }
 
 export async function regenerateIntegrationToken(provider: string) {
-  const session = await getSession();
+  const session = await requireSession();
   const parsed = providerSchema.parse(provider);
 
   const row = db
@@ -136,36 +123,36 @@ export async function regenerateIntegrationToken(provider: string) {
 // --- Admin actions ---
 
 export async function toggleRegistration(open: boolean) {
-  await getAdminSession();
+  await requireAdmin();
   setSetting("registrationOpen", String(open));
 }
 
 export async function toggleUpdateCheck(enabled: boolean) {
-  await getAdminSession();
+  await requireAdmin();
   setSetting("updateCheckEnabled", String(enabled));
 }
 
 // --- Backup actions ---
 
 export async function createBackupAction(): Promise<BackupInfo> {
-  await getAdminSession();
+  await requireAdmin();
   return await createBackup();
 }
 
 export async function listBackupsAction(): Promise<BackupInfo[]> {
-  await getAdminSession();
+  await requireAdmin();
   return await listBackups();
 }
 
 export async function deleteBackupAction(filename: string): Promise<void> {
-  await getAdminSession();
+  await requireAdmin();
   await deleteBackup(filename);
 }
 
 export async function setScheduledBackupAction(
   enabled: boolean,
 ): Promise<void> {
-  await getAdminSession();
+  await requireAdmin();
   setSetting("scheduledBackups", String(enabled));
 }
 
@@ -173,7 +160,7 @@ export async function getScheduledBackupSettings(): Promise<{
   enabled: boolean;
   maxRetention: number;
 }> {
-  await getAdminSession();
+  await requireAdmin();
   return {
     enabled: getSetting("scheduledBackups") === "true",
     maxRetention: Number.parseInt(getSetting("maxBackupRetention") ?? "7", 10),
@@ -188,7 +175,7 @@ const maxBackupsSchema = z
   });
 
 export async function setMaxBackupsAction(max: number): Promise<void> {
-  await getAdminSession();
+  await requireAdmin();
   maxBackupsSchema.parse(max);
   setSetting("maxBackupRetention", String(max));
 }
@@ -213,7 +200,7 @@ export async function setBackupScheduleAction(
   time: string,
   dayOfWeek = 0,
 ): Promise<void> {
-  await getAdminSession();
+  await requireAdmin();
   const parsed = backupScheduleSchema.parse({ frequency, time, dayOfWeek });
   setSetting("backupScheduleFrequency", parsed.frequency);
   setSetting("backupScheduleTime", parsed.time);

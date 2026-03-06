@@ -1,12 +1,11 @@
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { restoreFromBackup } from "@/lib/services/backup";
 
 const MAX_SIZE = 500 * 1024 * 1024; // 500MB
 
 export async function POST(req: Request) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

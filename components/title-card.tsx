@@ -14,7 +14,7 @@ import {
 import { type MotionStyle, type MotionValue, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -83,8 +83,15 @@ function QuickAddButton({
     userStatus ?? null,
   );
 
-  const effectiveStatus = addedStatus;
-  const config = effectiveStatus ? statusConfig[effectiveStatus] : null;
+  // Sync local state when prop changes (e.g. after navigation or SWR revalidation)
+  useEffect(() => {
+    if (userStatus) {
+      setState("added");
+      setAddedStatus(userStatus);
+    }
+  }, [userStatus]);
+
+  const config = addedStatus ? statusConfig[addedStatus] : null;
 
   async function handleClick(e: React.MouseEvent) {
     e.preventDefault();
@@ -92,13 +99,9 @@ function QuickAddButton({
     if (state === "loading" || state === "added") return;
     setState("loading");
     try {
-      const result = await quickAddToWatchlist(tmdbId, type);
+      await quickAddToWatchlist(tmdbId, type);
       setState("added");
-      setAddedStatus(result.alreadyAdded ? null : "watchlist");
-      if (result.alreadyAdded) {
-        // Already existed — keep as added but we don't know exact status
-        setAddedStatus("watchlist");
-      }
+      setAddedStatus("watchlist");
     } catch {
       setState("idle");
     }

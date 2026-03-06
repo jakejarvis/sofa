@@ -14,15 +14,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { commandPaletteOpenAtom } from "@/lib/atoms/command-palette";
-import { signOut, useSession } from "@/lib/auth/client";
+import { signOut } from "@/lib/auth/client";
 
 const navLinks = [
   { href: "/dashboard", label: "Home" },
   { href: "/explore", label: "Explore" },
 ] as const;
 
-export function NavBar() {
-  const { data: session } = useSession();
+export function NavBar({ userName }: { userName: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const setCommandPaletteOpen = useSetAtom(commandPaletteOpenAtom);
@@ -96,7 +95,7 @@ export function NavBar() {
               render={<Link href="/settings" />}
               className="hidden items-center gap-1.5 rounded-md px-2 py-1.5 text-sm leading-none text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
             >
-              {session?.user?.name}
+              {userName}
               <IconSettings aria-hidden={true} className="size-3.5" />
             </TooltipTrigger>
             <TooltipContent>Settings</TooltipContent>

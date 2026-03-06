@@ -151,7 +151,7 @@ export function useTitleActions() {
           await watchEpisode(episodeId);
 
           const seasons = store.get(seasonsAtom);
-          const episodeWatches = store.get(episodeWatchesAtom);
+          const watchedSet = new Set(store.get(episodeWatchesAtom));
           const previousUnwatched: string[] = [];
           for (const s of seasons) {
             for (const ep of s.episodes) {
@@ -159,7 +159,7 @@ export function useTitleActions() {
                 s.seasonNumber < seasonNum ||
                 (s.seasonNumber === seasonNum && ep.episodeNumber < epNum)
               ) {
-                if (!episodeWatches.includes(ep.id) && ep.id !== episodeId) {
+                if (!watchedSet.has(ep.id) && ep.id !== episodeId) {
                   previousUnwatched.push(ep.id);
                 }
               }
@@ -198,13 +198,11 @@ export function useTitleActions() {
     async (season: Season) => {
       const prevWatches = store.get(episodeWatchesAtom);
       const prevStatus = store.get(userStatusAtom);
-      const episodeWatches = store.get(episodeWatchesAtom);
-      const unwatched = season.episodes.filter(
-        (ep) => !episodeWatches.includes(ep.id),
-      );
+      const watchedSet = new Set(prevWatches);
+      const unwatched = season.episodes.filter((ep) => !watchedSet.has(ep.id));
       if (unwatched.length === 0) return;
 
-      const newWatchSet = new Set(episodeWatches);
+      const newWatchSet = new Set(watchedSet);
       for (const ep of unwatched) newWatchSet.add(ep.id);
       store.set(episodeWatchesAtom, [...newWatchSet]);
 

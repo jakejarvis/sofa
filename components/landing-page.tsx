@@ -3,22 +3,7 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { SofaLogo } from "@/components/sofa-logo";
-import { useSession } from "@/lib/auth/client";
-
-/** Check whether the server has TMDB configured. */
-async function fetchSetupStatus(): Promise<boolean> {
-  try {
-    const res = await fetch("/api/setup/status");
-    if (!res.ok) return true; // assume configured on error
-    const data = await res.json();
-    return !!data.tmdbConfigured;
-  } catch {
-    return true;
-  }
-}
 
 // Poster positions arranged in angled columns behind the hero
 const posterLayout = [
@@ -49,23 +34,6 @@ export function LandingPage({
   freshInstall: boolean;
   registrationOpen: boolean;
 }) {
-  const { data: session, isPending } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (isPending) return;
-    if (session?.user) {
-      router.replace("/dashboard");
-      return;
-    }
-    // If not logged in, check whether TMDB is configured
-    fetchSetupStatus().then((configured) => {
-      if (!configured) router.replace("/setup");
-    });
-  }, [session, isPending, router]);
-
-  if (isPending) return null;
-
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
       {/* Background grain texture */}

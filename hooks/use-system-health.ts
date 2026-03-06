@@ -5,7 +5,7 @@ import { fetcher } from "@/lib/swr/fetcher";
 export function useSystemHealth() {
   const { data, error, isLoading, isValidating, mutate } =
     useSWR<SystemHealthData>("/api/admin/system-health", fetcher, {
-      revalidateOnFocus: true,
+      revalidateOnFocus: false,
       dedupingInterval: 10_000,
     });
 

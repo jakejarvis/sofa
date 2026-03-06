@@ -2,9 +2,10 @@
 
 import { IconCalendarWeek } from "@tabler/icons-react";
 import { format, formatDistanceToNow } from "date-fns";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
 import { AnimatePresence, motion } from "motion/react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
@@ -128,6 +129,23 @@ export function BackupScheduleSection({
         dow: initialDow,
       },
     ],
+  ]);
+  const setSchedule = useSetAtom(backupScheduleAtom);
+  useEffect(() => {
+    setSchedule({
+      enabled: initialScheduledEnabled,
+      maxRetention: initialMaxRetention,
+      frequency: initialFrequency,
+      time: initialTime,
+      dow: initialDow,
+    });
+  }, [
+    setSchedule,
+    initialScheduledEnabled,
+    initialMaxRetention,
+    initialFrequency,
+    initialTime,
+    initialDow,
   ]);
 
   return <BackupScheduleInner />;
