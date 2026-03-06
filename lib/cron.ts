@@ -1,5 +1,5 @@
 import { Cron } from "croner";
-import { and, eq, isNotNull, lt, or } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, lt, or } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   availabilityOffers,
@@ -123,18 +123,20 @@ async function nightlyRefreshLibrary() {
   const nonLibraryStale = new Date(Date.now() - 30 * DAY);
 
   // Library titles: 7 days
-  for (const titleId of libraryIds) {
-    const t = db
-      .select()
-      .from(titles)
-      .where(
-        and(eq(titles.id, titleId), lt(titles.lastFetchedAt, libraryStale)),
-      )
-      .get();
-    if (t) {
-      await refreshTitle(titleId);
-      await Bun.sleep(RATE_LIMIT_MS);
-    }
+  const staleLibrary = db
+    .select({ id: titles.id })
+    .from(titles)
+    .where(
+      and(
+        inArray(titles.id, libraryIds),
+        lt(titles.lastFetchedAt, libraryStale),
+      ),
+    )
+    .all();
+
+  for (const { id } of staleLibrary) {
+    await refreshTitle(id);
+    await Bun.sleep(RATE_LIMIT_MS);
   }
 
   // Non-library titles: 30 days
@@ -164,27 +166,34 @@ async function refreshAvailabilityJob() {
   log.debug(`Checking availability for ${libraryIds.length} library titles`);
   const stale = new Date(Date.now() - DAY);
 
-  for (const titleId of libraryIds) {
-    // Check if any offer is stale
-    const offer = db
-      .select()
+  // Batch: find titles with any offers, and titles with stale offers
+  const titlesWithOffers = new Set(
+    db
+      .select({ titleId: availabilityOffers.titleId })
+      .from(availabilityOffers)
+      .where(inArray(availabilityOffers.titleId, libraryIds))
+      .groupBy(availabilityOffers.titleId)
+      .all()
+      .map((r) => r.titleId),
+  );
+
+  const titlesWithStaleOffers = new Set(
+    db
+      .select({ titleId: availabilityOffers.titleId })
       .from(availabilityOffers)
       .where(
         and(
-          eq(availabilityOffers.titleId, titleId),
+          inArray(availabilityOffers.titleId, libraryIds),
           lt(availabilityOffers.lastFetchedAt, stale),
         ),
       )
-      .get();
+      .groupBy(availabilityOffers.titleId)
+      .all()
+      .map((r) => r.titleId),
+  );
 
-    // Also handle titles with no offers yet
-    const anyOffer = db
-      .select()
-      .from(availabilityOffers)
-      .where(eq(availabilityOffers.titleId, titleId))
-      .get();
-
-    if (offer || !anyOffer) {
+  for (const titleId of libraryIds) {
+    if (titlesWithStaleOffers.has(titleId) || !titlesWithOffers.has(titleId)) {
       await refreshAvailability(titleId);
       await Bun.sleep(RATE_LIMIT_MS);
     }
@@ -223,17 +232,27 @@ async function refreshTvChildrenJob() {
 
   log.debug(`Checking ${tvShows.length} returning TV shows for stale episodes`);
 
-  for (const show of tvShows) {
-    // Check if seasons are stale
-    const staleSeason = db
-      .select()
-      .from(seasons)
-      .where(
-        and(eq(seasons.titleId, show.id), lt(seasons.lastFetchedAt, stale)),
-      )
-      .get();
+  // Batch: find shows with at least one stale season
+  const tvIds = tvShows.map((s) => s.id);
+  const titlesWithStaleSeasons = new Set(
+    tvIds.length > 0
+      ? db
+          .select({ titleId: seasons.titleId })
+          .from(seasons)
+          .where(
+            and(
+              inArray(seasons.titleId, tvIds),
+              lt(seasons.lastFetchedAt, stale),
+            ),
+          )
+          .groupBy(seasons.titleId)
+          .all()
+          .map((r) => r.titleId)
+      : [],
+  );
 
-    if (staleSeason) {
+  for (const show of tvShows) {
+    if (titlesWithStaleSeasons.has(show.id)) {
       const details = await getTvDetails(show.tmdbId);
       await refreshTvChildren(show.id, show.tmdbId, details.number_of_seasons);
       await Bun.sleep(RATE_LIMIT_MS);

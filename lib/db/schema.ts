@@ -124,6 +124,12 @@ export const titles = sqliteTable(
     uniqueIndex("titles_tmdbId_unique").on(table.tmdbId),
     index("titles_type_releaseDate").on(table.type, table.releaseDate),
     index("titles_type_firstAirDate").on(table.type, table.firstAirDate),
+    index("titles_lastFetchedAt").on(table.lastFetchedAt),
+    index("titles_type_status_lastFetchedAt").on(
+      table.type,
+      table.status,
+      table.lastFetchedAt,
+    ),
   ],
 );
 
@@ -316,6 +322,7 @@ export const titleRecommendations = sqliteTable(
       table.recommendedTitleId,
       table.source,
     ),
+    index("titleRecommendations_titleId_rank").on(table.titleId, table.rank),
   ],
 );
 

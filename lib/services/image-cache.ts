@@ -1,6 +1,6 @@
 import { mkdir, rename } from "node:fs/promises";
 import path from "node:path";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   availabilityOffers,
@@ -191,24 +191,25 @@ export async function cacheEpisodeStills(titleId: string) {
     .where(eq(seasons.titleId, titleId))
     .all();
 
-  for (const s of allSeasons) {
-    const eps = db
-      .select()
-      .from(episodes)
-      .where(eq(episodes.seasonId, s.id))
-      .all();
+  const seasonIds = allSeasons.map((s) => s.id);
+  if (seasonIds.length === 0) return;
 
-    const tasks: Promise<unknown>[] = [];
-    for (const ep of eps) {
-      if (
-        ep.stillPath &&
-        !(await isImageCached("stills", path.basename(ep.stillPath)))
-      ) {
-        tasks.push(downloadAndCacheImage(ep.stillPath, "stills"));
-      }
+  const allEps = db
+    .select()
+    .from(episodes)
+    .where(inArray(episodes.seasonId, seasonIds))
+    .all();
+
+  const tasks: Promise<unknown>[] = [];
+  for (const ep of allEps) {
+    if (
+      ep.stillPath &&
+      !(await isImageCached("stills", path.basename(ep.stillPath)))
+    ) {
+      tasks.push(downloadAndCacheImage(ep.stillPath, "stills"));
     }
-    await Promise.allSettled(tasks);
   }
+  await Promise.allSettled(tasks);
 }
 
 export async function cacheProviderLogos(titleId: string) {

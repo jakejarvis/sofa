@@ -134,12 +134,13 @@ async function _importTitle(tmdbId: number, type: "movie" | "tv") {
     // They may be missing if a prior fetch failed or the title was created
     // as a shell by the recommendations system (lastFetchedAt: null).
     if (existing.type === "tv") {
-      const seasonCount = db
-        .select()
+      const hasSeason = db
+        .select({ id: seasons.id })
         .from(seasons)
         .where(eq(seasons.titleId, existing.id))
-        .all().length;
-      if (seasonCount === 0) {
+        .limit(1)
+        .get();
+      if (!hasSeason) {
         const show = await getTvDetails(tmdbId);
         if (!existing.lastFetchedAt) {
           db.update(titles)

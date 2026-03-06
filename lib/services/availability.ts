@@ -20,36 +20,38 @@ export async function refreshAvailability(titleId: string) {
   const now = new Date();
   const offerTypes = ["flatrate", "rent", "buy", "free", "ads"] as const;
 
-  // Delete existing offers for this title+region
-  db.delete(availabilityOffers)
-    .where(
-      and(
-        eq(availabilityOffers.titleId, titleId),
-        eq(availabilityOffers.region, "US"),
-      ),
-    )
-    .run();
+  db.transaction((tx) => {
+    // Delete existing offers for this title+region
+    tx.delete(availabilityOffers)
+      .where(
+        and(
+          eq(availabilityOffers.titleId, titleId),
+          eq(availabilityOffers.region, "US"),
+        ),
+      )
+      .run();
 
-  for (const offerType of offerTypes) {
-    const providers = us[offerType];
-    if (!providers) continue;
+    for (const offerType of offerTypes) {
+      const providers = us[offerType];
+      if (!providers) continue;
 
-    for (const p of providers) {
-      db.insert(availabilityOffers)
-        .values({
-          titleId,
-          region: "US",
-          providerId: p.provider_id,
-          providerName: p.provider_name,
-          logoPath: p.logo_path,
-          offerType,
-          link: us.link ?? null,
-          lastFetchedAt: now,
-        })
-        .onConflictDoNothing()
-        .run();
+      for (const p of providers) {
+        tx.insert(availabilityOffers)
+          .values({
+            titleId,
+            region: "US",
+            providerId: p.provider_id,
+            providerName: p.provider_name,
+            logoPath: p.logo_path,
+            offerType,
+            link: us.link ?? null,
+            lastFetchedAt: now,
+          })
+          .onConflictDoNothing()
+          .run();
+      }
     }
-  }
+  });
 
   const total = offerTypes.reduce((n, t) => n + (us[t]?.length ?? 0), 0);
   log.debug(`Refreshed availability for title ${titleId}: ${total} offers`);
