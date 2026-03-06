@@ -1,5 +1,5 @@
 import { MotionConfig } from "motion/react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, DM_Serif_Display, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -26,6 +26,14 @@ export const metadata: Metadata = {
   title: "Sofa",
   description: "Track your movies and TV shows",
   themeColor: "#090706",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
