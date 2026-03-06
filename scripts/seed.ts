@@ -49,7 +49,7 @@ const log = createLogger("seed");
 
 const { values: args } = parseArgs({
   options: {
-    email: { type: "string", default: "demo@sofa.tv" },
+    email: { type: "string", default: "demo@sofa.watch" },
     password: { type: "string", default: "password" },
     name: { type: "string", default: "Demo User" },
   },
