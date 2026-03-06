@@ -5,6 +5,8 @@ import { db } from "@/lib/db/client";
 import { cronRuns, episodes, titles, user } from "@/lib/db/schema";
 import { listBackups } from "@/lib/services/backup";
 import { imageCacheEnabled } from "@/lib/services/image-cache";
+import { getSetting } from "@/lib/services/settings";
+import { isUpdateCheckEnabled } from "@/lib/services/update-check";
 
 const DATA_DIR = process.env.DATA_DIR || "./data";
 const DATABASE_URL =
@@ -39,6 +41,7 @@ export interface SystemHealthData {
     lastStatus: "running" | "success" | "error" | null;
     lastError: string | null;
     isCurrentlyRunning: boolean;
+    disabled: boolean;
   }[];
   imageCache: {
     enabled: boolean;
@@ -175,15 +178,21 @@ function getJobsHealth(): SystemHealthData["jobs"] {
       lastDurationMs = latest.finishedAt.getTime() - latest.startedAt.getTime();
     }
 
+    const disabled =
+      (jobName === "scheduledBackup" &&
+        getSetting("scheduledBackups") !== "true") ||
+      (jobName === "updateCheck" && !isUpdateCheckEnabled());
+
     return {
       jobName,
-      cronPattern: schedule?.pattern ?? null,
-      nextRunAt: schedule?.nextRunAt ?? null,
+      cronPattern: disabled ? null : (schedule?.pattern ?? null),
+      nextRunAt: disabled ? null : (schedule?.nextRunAt ?? null),
       lastRunAt: latest?.startedAt?.toISOString() ?? null,
       lastDurationMs,
       lastStatus: (latest?.status as "running" | "success" | "error") ?? null,
       lastError: latest?.errorMessage ?? null,
       isCurrentlyRunning,
+      disabled,
     };
   });
 }

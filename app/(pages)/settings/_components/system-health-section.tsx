@@ -161,22 +161,7 @@ export function SystemHealthCards() {
                 </CardDescription>
               </div>
             </div>
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="Refresh system health"
-                    onClick={() => refresh()}
-                    disabled={isValidating}
-                  />
-                }
-              >
-                {isValidating ? <Spinner /> : <IconRefresh />}
-              </TooltipTrigger>
-              <TooltipContent>Refresh</TooltipContent>
-            </Tooltip>
+            <RefreshButton isValidating={isValidating} onRefresh={refresh} />
           </div>
         </CardContent>
 
@@ -273,24 +258,31 @@ export function SystemHealthCards() {
       </Card>
 
       {/* ── Card 2: Background Jobs ── */}
-      <BackgroundJobsCard jobs={data.jobs} onRefresh={refresh} />
+      <BackgroundJobsCard
+        jobs={data.jobs}
+        isValidating={isValidating}
+        onRefresh={refresh}
+      />
 
       {/* ── Card 3: Storage ── */}
       <Card className="border-l-2 border-l-primary/30">
         <CardContent>
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconDatabase
-                aria-hidden={true}
-                className="size-4 text-primary"
-              />
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                <IconDatabase
+                  aria-hidden={true}
+                  className="size-4 text-primary"
+                />
+              </div>
+              <div>
+                <CardTitle>Storage</CardTitle>
+                <CardDescription>
+                  Image cache and backup disk usage
+                </CardDescription>
+              </div>
             </div>
-            <div>
-              <CardTitle>Storage</CardTitle>
-              <CardDescription>
-                Image cache and backup disk usage
-              </CardDescription>
-            </div>
+            <RefreshButton isValidating={isValidating} onRefresh={refresh} />
           </div>
         </CardContent>
 
@@ -360,12 +352,41 @@ export function SystemHealthCards() {
   );
 }
 
+function RefreshButton({
+  isValidating,
+  onRefresh,
+}: {
+  isValidating: boolean;
+  onRefresh: () => void;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Refresh system health"
+            onClick={onRefresh}
+            disabled={isValidating}
+          />
+        }
+      >
+        {isValidating ? <Spinner /> : <IconRefresh />}
+      </TooltipTrigger>
+      <TooltipContent>Refresh</TooltipContent>
+    </Tooltip>
+  );
+}
+
 /** Background Jobs card with table layout and manual trigger */
 function BackgroundJobsCard({
   jobs,
+  isValidating,
   onRefresh,
 }: {
   jobs: SystemHealthData["jobs"];
+  isValidating: boolean;
   onRefresh: () => void;
 }) {
   const [triggeringJob, setTriggeringJob] = useState<string | null>(null);
@@ -392,24 +413,39 @@ function BackgroundJobsCard({
     }
   };
 
-  const healthyCount = jobs.filter((j) => j.lastStatus === "success").length;
+  const sortedJobs = [...jobs].sort((a, b) => {
+    // Disabled jobs go to the bottom
+    if (a.disabled !== b.disabled) return a.disabled ? 1 : -1;
+    // Active jobs sorted by next run time (soonest first, null last)
+    if (!a.nextRunAt && !b.nextRunAt) return 0;
+    if (!a.nextRunAt) return 1;
+    if (!b.nextRunAt) return -1;
+    return new Date(a.nextRunAt).getTime() - new Date(b.nextRunAt).getTime();
+  });
+  const activeJobs = jobs.filter((j) => !j.disabled);
+  const healthyCount = activeJobs.filter(
+    (j) => j.lastStatus === "success",
+  ).length;
 
   return (
     <Card className="border-l-2 border-l-primary/30">
       <CardContent>
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <IconCalendarCheck
-              aria-hidden={true}
-              className="size-4 text-primary"
-            />
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <IconCalendarCheck
+                aria-hidden={true}
+                className="size-4 text-primary"
+              />
+            </div>
+            <div>
+              <CardTitle>Background jobs</CardTitle>
+              <CardDescription>
+                {healthyCount} of {activeJobs.length} jobs healthy
+              </CardDescription>
+            </div>
           </div>
-          <div>
-            <CardTitle>Background jobs</CardTitle>
-            <CardDescription>
-              {healthyCount} of {jobs.length} jobs healthy
-            </CardDescription>
-          </div>
+          <RefreshButton isValidating={isValidating} onRefresh={onRefresh} />
         </div>
       </CardContent>
       <CardContent className="border-t border-border/30 px-0 pt-0 pb-0">
@@ -434,7 +470,7 @@ function BackgroundJobsCard({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {jobs.map((job) => {
+            {sortedJobs.map((job) => {
               const isTriggering = triggeringJob === job.jobName;
               const isRunning = job.isCurrentlyRunning || isTriggering;
 
@@ -446,10 +482,12 @@ function BackgroundJobsCard({
                   {/* Job name + status */}
                   <TableCell className="pl-5">
                     <div className="flex items-center gap-2">
-                      {isRunning ? (
+                      {job.disabled ? (
+                        <StatusDot status="inactive" label="Disabled" />
+                      ) : isRunning ? (
                         <Spinner className="size-2.5" />
                       ) : job.lastStatus === null ? (
-                        <StatusDot status="inactive" label="Never run" />
+                        <StatusDot status="warn" label="Never run" />
                       ) : job.lastStatus === "success" ? (
                         <StatusDot status="ok" label="Last run succeeded" />
                       ) : (
@@ -553,7 +591,7 @@ function BackgroundJobsCard({
                             size="icon"
                             aria-label="Trigger job"
                             className="size-6"
-                            disabled={isRunning}
+                            disabled={isRunning || job.disabled}
                             onClick={() => handleTrigger(job.jobName)}
                           />
                         }
