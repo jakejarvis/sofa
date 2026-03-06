@@ -16,8 +16,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+ARG APP_VERSION
 ARG GIT_COMMIT_SHA
 ENV NODE_ENV=production
+ENV APP_VERSION=${APP_VERSION}
 ENV GIT_COMMIT_SHA=${GIT_COMMIT_SHA}
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -27,17 +29,20 @@ RUN bun run build
 FROM base AS runner
 WORKDIR /app
 
+ARG APP_VERSION
+ARG GIT_COMMIT_SHA
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATA_DIR=/data
+ENV APP_VERSION=${APP_VERSION}
+ENV GIT_COMMIT_SHA=${GIT_COMMIT_SHA}
 
 RUN mkdir -p /data \
     && chown bun:bun /data
 
 COPY --from=builder --chown=bun:bun /app/public ./public
-COPY --from=builder --chown=bun:bun /app/package.json ./package.json
 COPY --from=builder --chown=bun:bun /app/.next/standalone ./
 COPY --from=builder --chown=bun:bun /app/.next/static ./.next/static
 COPY --from=builder --chown=bun:bun /app/drizzle ./drizzle

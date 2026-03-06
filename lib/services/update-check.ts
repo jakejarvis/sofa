@@ -1,6 +1,7 @@
 import { createLogger } from "@/lib/logger";
 import { getSetting, setSetting } from "@/lib/services/settings";
-import { APP_VERSION } from "@/lib/version";
+
+const APP_VERSION = process.env.APP_VERSION || "0.0.0";
 
 const log = createLogger("update-check");
 

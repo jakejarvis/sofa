@@ -16,7 +16,6 @@ import {
   getCachedUpdateCheck,
   isUpdateCheckEnabled,
 } from "@/lib/services/update-check";
-import { APP_VERSION, GIT_COMMIT } from "@/lib/version";
 import { AccountSection } from "./_components/account-section";
 import { BackupRestoreSection } from "./_components/backup-restore-section";
 import { BackupScheduleSection } from "./_components/backup-schedule-section";
@@ -98,7 +97,9 @@ export default async function SettingsPage() {
   const updateCheck =
     isAdmin && updateCheckEnabled ? getCachedUpdateCheck() : null;
 
-  const repoUrl = "https://github.com/jakejarvis/sofa";
+  const GITHUB_REPO = "jakejarvis/sofa";
+  const APP_VERSION = process.env.APP_VERSION || "0.0.0";
+  const GIT_COMMIT_SHA = process.env.GIT_COMMIT_SHA?.slice(0, 7) || "";
 
   return (
     <SettingsShell
@@ -106,7 +107,7 @@ export default async function SettingsPage() {
         <footer className="border-t border-border/50 pt-6 pb-2 text-center text-xs text-muted-foreground">
           <p>
             <a
-              href={repoUrl}
+              href={`https://github.com/${GITHUB_REPO}`}
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-primary/80 hover:text-primary transition-colors"
@@ -114,17 +115,17 @@ export default async function SettingsPage() {
               Sofa
             </a>{" "}
             v{APP_VERSION}
-            {GIT_COMMIT && (
+            {GIT_COMMIT_SHA && (
               <>
                 {" "}
                 (
                 <a
-                  href={`${repoUrl}/commit/${GIT_COMMIT}`}
+                  href={`https://github.com/${GITHUB_REPO}/commit/${GIT_COMMIT_SHA}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-mono hover:text-primary transition-colors"
                 >
-                  {GIT_COMMIT}
+                  {GIT_COMMIT_SHA}
                 </a>
                 )
               </>
@@ -136,7 +137,10 @@ export default async function SettingsPage() {
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
                 </span>
                 <a
-                  href={updateCheck.releaseUrl ?? `${repoUrl}/releases`}
+                  href={
+                    updateCheck.releaseUrl ??
+                    `https://github.com/${GITHUB_REPO}/releases`
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:underline"
