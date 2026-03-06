@@ -13,7 +13,7 @@ import { useHotkey, useHotkeySequence } from "@tanstack/react-hotkeys";
 import { useAtom } from "jotai";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useProgress } from "@/components/navigation-progress";
 import {
   Command,
@@ -86,15 +86,22 @@ export function CommandPalette() {
     }
   }, [commandPaletteOpen]);
 
-  // Save to recent searches when results arrive
+  // Save to recent searches after user stops typing for a while
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
   useEffect(() => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     const trimmed = debouncedQuery.trim();
     if (trimmed && results.length > 0) {
-      setRecentSearches((prev) => {
-        const filtered = prev.filter((q) => q !== trimmed);
-        return [trimmed, ...filtered].slice(0, MAX_RECENT);
-      });
+      saveTimerRef.current = setTimeout(() => {
+        setRecentSearches((prev) => {
+          const filtered = prev.filter((q) => q !== trimmed);
+          return [trimmed, ...filtered].slice(0, MAX_RECENT);
+        });
+      }, 2000);
     }
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
   }, [debouncedQuery, results, setRecentSearches]);
 
   const handleSelect = useCallback(
