@@ -68,7 +68,7 @@ export function TitleSeasons({
           <IconDeviceTvOld aria-hidden={true} className="size-5 text-primary" />
           <h2 className="font-display text-2xl tracking-tight">Episodes</h2>
         </div>
-        {userStatus && userStatus !== "completed" && (
+        {userStatus !== "completed" && (
           <AlertDialog open={markAllOpen} onOpenChange={setMarkAllOpen}>
             <AlertDialogTrigger
               render={
@@ -144,14 +144,9 @@ export function TitleSeasons({
                 </div>
                 <div className="flex items-center gap-3">
                   {totalCount > 0 && (
-                    <>
-                      <span className="text-xs tabular-nums text-muted-foreground sm:hidden">
-                        {Math.round(progressPercent)}%
-                      </span>
-                      <div className="hidden w-24 sm:block sm:group-hover/season:hidden">
-                        <Progress value={progressPercent} />
-                      </div>
-                    </>
+                    <div className="hidden w-24 sm:block sm:group-hover/season:hidden">
+                      <Progress value={progressPercent} />
+                    </div>
                   )}
                   {totalCount > 0 && watchedCount < totalCount && (
                     <Button
@@ -180,7 +175,7 @@ export function TitleSeasons({
                     </Button>
                   )}
                   {totalCount > 0 && (
-                    <span className="hidden font-mono text-xs tabular-nums text-muted-foreground sm:inline">
+                    <span className="font-mono text-xs tabular-nums text-muted-foreground">
                       {watchedCount}/{totalCount}
                     </span>
                   )}
