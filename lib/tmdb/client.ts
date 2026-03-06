@@ -1,5 +1,6 @@
 import { createLogger } from "@/lib/logger";
 import type {
+  TmdbExternalIds,
   TmdbFindResult,
   TmdbGenreListResponse,
   TmdbMovieCreditsResponse,
@@ -90,8 +91,12 @@ export async function getMovieDetails(tmdbId: number) {
 
 export async function getTvDetails(tmdbId: number) {
   return tmdbFetch<TmdbTvDetails>(`/tv/${tmdbId}`, {
-    append_to_response: "content_ratings",
+    append_to_response: "content_ratings,external_ids",
   });
+}
+
+export async function getTvExternalIds(tmdbId: number) {
+  return tmdbFetch<TmdbExternalIds>(`/tv/${tmdbId}/external_ids`);
 }
 
 export async function getTvSeasonDetails(tmdbId: number, seasonNumber: number) {

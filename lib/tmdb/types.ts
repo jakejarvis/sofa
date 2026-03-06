@@ -61,7 +61,13 @@ export interface TmdbTvDetails {
   content_ratings?: {
     results: { iso_3166_1: string; rating: string }[];
   };
+  external_ids?: TmdbExternalIds;
   seasons: TmdbSeasonSummary[];
+}
+
+export interface TmdbExternalIds {
+  tvdb_id: number | null;
+  imdb_id: string | null;
 }
 
 export interface TmdbSeasonSummary {

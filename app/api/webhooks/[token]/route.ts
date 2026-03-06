@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
-import { webhookConnections } from "@/lib/db/schema";
+import { integrations } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
 import type { WebhookEvent } from "@/lib/services/webhooks";
 import {
@@ -23,8 +23,8 @@ export async function POST(
   // Look up connection by token — this IS the auth
   const connection = db
     .select()
-    .from(webhookConnections)
-    .where(eq(webhookConnections.token, token))
+    .from(integrations)
+    .where(eq(integrations.token, token))
     .get();
 
   if (!connection || !connection.enabled) {
@@ -32,12 +32,19 @@ export async function POST(
     return NextResponse.json({ ok: true });
   }
 
+  // Only webhook-type integrations are handled here
+  if (connection.type !== "webhook") {
+    return NextResponse.json({ ok: true });
+  }
+
+  const provider = connection.provider as "plex" | "jellyfin" | "emby";
+
   try {
     let event: WebhookEvent | null;
-    if (connection.provider === "plex") {
+    if (provider === "plex") {
       const formData = await req.formData();
       event = parsePlexPayload(formData);
-    } else if (connection.provider === "emby") {
+    } else if (provider === "emby") {
       const body = await req.json();
       event = parseEmbyPayload(body);
     } else {
@@ -50,12 +57,7 @@ export async function POST(
       return NextResponse.json({ ok: true });
     }
 
-    await processWebhook(
-      connection.id,
-      connection.userId,
-      connection.provider,
-      event,
-    );
+    await processWebhook(connection.id, connection.userId, provider, event);
   } catch (err) {
     // Swallow errors — never return non-200 to media servers
     log.debug("Webhook processing failed:", err);

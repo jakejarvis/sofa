@@ -2,10 +2,11 @@
 
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import { z } from "zod";
 import { auth } from "@/lib/auth/server";
 import { type BackupFrequency, rescheduleBackup } from "@/lib/cron";
 import { db } from "@/lib/db/client";
-import { webhookConnections } from "@/lib/db/schema";
+import { integrations } from "@/lib/db/schema";
 import {
   type BackupInfo,
   createBackup,
@@ -13,6 +14,14 @@ import {
   listBackups,
 } from "@/lib/services/backup";
 import { getSetting, setSetting } from "@/lib/services/settings";
+
+const providerSchema = z.enum(["plex", "jellyfin", "emby", "sonarr", "radarr"]);
+
+const LIST_PROVIDERS = new Set(["sonarr", "radarr"]);
+
+function integrationTypeFor(provider: string): "webhook" | "list" {
+  return LIST_PROVIDERS.has(provider) ? "list" : "webhook";
+}
 
 async function getSession() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -26,123 +35,105 @@ async function getAdminSession() {
   return session;
 }
 
-// --- Webhook actions ---
+function generateToken() {
+  return Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString(
+    "hex",
+  );
+}
 
-export async function saveWebhookConnection(
-  provider: "plex" | "jellyfin" | "emby",
-  enabled?: boolean,
-) {
+// --- Integration actions ---
+
+export async function saveIntegration(provider: string, enabled?: boolean) {
   const session = await getSession();
-
-  if (!["plex", "jellyfin", "emby"].includes(provider)) {
-    throw new Error("Invalid provider");
-  }
+  const parsed = providerSchema.parse(provider);
 
   const existing = db
     .select()
-    .from(webhookConnections)
+    .from(integrations)
     .where(
       and(
-        eq(webhookConnections.userId, session.user.id),
-        eq(webhookConnections.provider, provider),
+        eq(integrations.userId, session.user.id),
+        eq(integrations.provider, parsed),
       ),
     )
     .get();
 
   if (existing) {
-    const connection = db
-      .update(webhookConnections)
+    const row = db
+      .update(integrations)
       .set({
         enabled: typeof enabled === "boolean" ? enabled : existing.enabled,
       })
-      .where(eq(webhookConnections.id, existing.id))
+      .where(eq(integrations.id, existing.id))
       .returning()
       .get();
     return {
-      ...connection,
-      lastEventAt: connection.lastEventAt?.toISOString() ?? null,
-      createdAt: connection.createdAt.toISOString(),
+      ...row,
+      lastEventAt: row.lastEventAt?.toISOString() ?? null,
+      createdAt: row.createdAt.toISOString(),
     };
   }
 
-  const token = Buffer.from(
-    crypto.getRandomValues(new Uint8Array(32)),
-  ).toString("hex");
-  const now = new Date();
-
-  const connection = db
-    .insert(webhookConnections)
+  const row = db
+    .insert(integrations)
     .values({
       userId: session.user.id,
-      provider,
-      token,
+      provider: parsed,
+      type: integrationTypeFor(parsed),
+      token: generateToken(),
       enabled: true,
-      createdAt: now,
+      createdAt: new Date(),
     })
     .returning()
     .get();
 
   return {
-    ...connection,
-    lastEventAt: connection.lastEventAt?.toISOString() ?? null,
-    createdAt: connection.createdAt.toISOString(),
+    ...row,
+    lastEventAt: row.lastEventAt?.toISOString() ?? null,
+    createdAt: row.createdAt.toISOString(),
   };
 }
 
-export async function deleteWebhookConnection(
-  provider: "plex" | "jellyfin" | "emby",
-) {
+export async function deleteIntegration(provider: string) {
   const session = await getSession();
+  const parsed = providerSchema.parse(provider);
 
-  if (!["plex", "jellyfin", "emby"].includes(provider)) {
-    throw new Error("Invalid provider");
-  }
-
-  db.delete(webhookConnections)
+  db.delete(integrations)
     .where(
       and(
-        eq(webhookConnections.userId, session.user.id),
-        eq(webhookConnections.provider, provider),
+        eq(integrations.userId, session.user.id),
+        eq(integrations.provider, parsed),
       ),
     )
     .run();
 }
 
-export async function regenerateWebhookToken(
-  provider: "plex" | "jellyfin" | "emby",
-) {
+export async function regenerateIntegrationToken(provider: string) {
   const session = await getSession();
+  const parsed = providerSchema.parse(provider);
 
-  if (!["plex", "jellyfin", "emby"].includes(provider)) {
-    throw new Error("Invalid provider");
-  }
-
-  const newToken = Buffer.from(
-    crypto.getRandomValues(new Uint8Array(32)),
-  ).toString("hex");
-
-  const connection = db
-    .update(webhookConnections)
-    .set({ token: newToken })
+  const row = db
+    .update(integrations)
+    .set({ token: generateToken() })
     .where(
       and(
-        eq(webhookConnections.userId, session.user.id),
-        eq(webhookConnections.provider, provider),
+        eq(integrations.userId, session.user.id),
+        eq(integrations.provider, parsed),
       ),
     )
     .returning()
     .get();
 
-  if (!connection) {
-    throw new Error("Connection not found");
-  }
+  if (!row) throw new Error("Integration not found");
 
   return {
-    ...connection,
-    lastEventAt: connection.lastEventAt?.toISOString() ?? null,
-    createdAt: connection.createdAt.toISOString(),
+    ...row,
+    lastEventAt: row.lastEventAt?.toISOString() ?? null,
+    createdAt: row.createdAt.toISOString(),
   };
 }
+
+// --- Admin actions ---
 
 export async function toggleRegistration(open: boolean) {
   await getAdminSession();
@@ -189,14 +180,33 @@ export async function getScheduledBackupSettings(): Promise<{
   };
 }
 
+const maxBackupsSchema = z
+  .number()
+  .int()
+  .refine((n) => n === 0 || (n >= 1 && n <= 30), {
+    message: "Max backups must be between 1 and 30, or 0 for unlimited",
+  });
+
 export async function setMaxBackupsAction(max: number): Promise<void> {
   await getAdminSession();
-  if (max < 0 || (max > 30 && max !== 0))
-    throw new Error("Max backups must be between 1 and 30, or 0 for unlimited");
+  maxBackupsSchema.parse(max);
   setSetting("maxBackupRetention", String(max));
 }
 
-const VALID_FREQUENCIES: BackupFrequency[] = ["6h", "12h", "1d", "7d"];
+const backupScheduleSchema = z.object({
+  frequency: z.enum(["6h", "12h", "1d", "7d"]),
+  time: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/, "Invalid time format")
+    .refine(
+      (t) => {
+        const [h, m] = t.split(":").map(Number);
+        return h >= 0 && h <= 23 && m >= 0 && m <= 59;
+      },
+      { message: "Invalid time value" },
+    ),
+  dayOfWeek: z.number().int().min(0).max(6).default(0),
+});
 
 export async function setBackupScheduleAction(
   frequency: BackupFrequency,
@@ -204,14 +214,9 @@ export async function setBackupScheduleAction(
   dayOfWeek = 0,
 ): Promise<void> {
   await getAdminSession();
-  if (!VALID_FREQUENCIES.includes(frequency))
-    throw new Error("Invalid frequency");
-  if (!/^\d{2}:\d{2}$/.test(time)) throw new Error("Invalid time format");
-  const [h, m] = time.split(":").map(Number);
-  if (h < 0 || h > 23 || m < 0 || m > 59) throw new Error("Invalid time value");
-  if (dayOfWeek < 0 || dayOfWeek > 6) throw new Error("Invalid day of week");
-  setSetting("backupScheduleFrequency", frequency);
-  setSetting("backupScheduleTime", time);
-  setSetting("backupScheduleDow", String(dayOfWeek));
+  const parsed = backupScheduleSchema.parse({ frequency, time, dayOfWeek });
+  setSetting("backupScheduleFrequency", parsed.frequency);
+  setSetting("backupScheduleTime", parsed.time);
+  setSetting("backupScheduleDow", String(parsed.dayOfWeek));
   rescheduleBackup();
 }

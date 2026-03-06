@@ -9,7 +9,7 @@ import { TmdbLogo } from "@/components/tmdb-logo";
 import { Card } from "@/components/ui/card";
 import { getSession } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
-import { webhookConnections, webhookEventLog } from "@/lib/db/schema";
+import { integrationEvents, integrations } from "@/lib/db/schema";
 import { listBackups } from "@/lib/services/backup";
 import { getSetting } from "@/lib/services/settings";
 import {
@@ -34,8 +34,8 @@ export default async function SettingsPage() {
 
   const connRows = db
     .select()
-    .from(webhookConnections)
-    .where(eq(webhookConnections.userId, session.user.id))
+    .from(integrations)
+    .where(eq(integrations.userId, session.user.id))
     .all();
 
   const connIds = connRows.map((c) => c.id);
@@ -43,14 +43,14 @@ export default async function SettingsPage() {
   // Fetch only the 10 most recent events per connection (index-optimized)
   const eventsByConn = new Map<
     string,
-    (typeof webhookEventLog.$inferSelect)[]
+    (typeof integrationEvents.$inferSelect)[]
   >();
   for (const connId of connIds) {
     const events = db
       .select()
-      .from(webhookEventLog)
-      .where(eq(webhookEventLog.connectionId, connId))
-      .orderBy(desc(webhookEventLog.receivedAt))
+      .from(integrationEvents)
+      .where(eq(integrationEvents.integrationId, connId))
+      .orderBy(desc(integrationEvents.receivedAt))
       .limit(10)
       .all();
     eventsByConn.set(connId, events);
@@ -59,6 +59,7 @@ export default async function SettingsPage() {
   const connections = connRows.map((conn) => ({
     id: conn.id,
     provider: conn.provider,
+    type: conn.type,
     token: conn.token,
     enabled: conn.enabled,
     lastEventAt: conn.lastEventAt?.toISOString() ?? null,

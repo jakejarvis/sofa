@@ -1,12 +1,23 @@
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth/server";
 import { isTmdbConfigured } from "@/lib/config";
 import { discover } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 
-const SORT_BY_PATTERN = /^[a-z_]+\.(asc|desc)$/;
-const MAX_PAGE = 500;
+const querySchema = z.object({
+  type: z.enum(["movie", "tv"]).default("movie"),
+  sort_by: z
+    .string()
+    .regex(/^[a-z_]+\.(asc|desc)$/)
+    .default("popularity.desc"),
+  genre: z
+    .string()
+    .regex(/^\d+(,\d+)*$/)
+    .optional(),
+  page: z.coerce.number().int().min(1).max(500).default(1),
+});
 
 export async function GET(req: NextRequest) {
   const session = await auth.api.getSession({
@@ -26,40 +37,19 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const { searchParams } = req.nextUrl;
-  const rawType = searchParams.get("type");
-  if (rawType && rawType !== "movie" && rawType !== "tv") {
+  const raw = Object.fromEntries(req.nextUrl.searchParams);
+  const result = querySchema.safeParse(raw);
+  if (!result.success) {
     return NextResponse.json(
-      { error: "type must be movie or tv" },
-      { status: 400 },
-    );
-  }
-  const type = rawType === "tv" ? "tv" : "movie";
-  const genre = searchParams.get("genre");
-  const sortBy = searchParams.get("sort_by") || "popularity.desc";
-  const pageRaw = searchParams.get("page") || "1";
-  const page = Number.parseInt(pageRaw, 10);
-
-  if (!Number.isInteger(page) || page < 1 || page > MAX_PAGE) {
-    return NextResponse.json(
-      { error: `page must be an integer between 1 and ${MAX_PAGE}` },
+      { error: result.error.issues[0].message },
       { status: 400 },
     );
   }
 
-  if (!SORT_BY_PATTERN.test(sortBy)) {
-    return NextResponse.json(
-      { error: "Invalid sort_by value" },
-      { status: 400 },
-    );
-  }
-
-  if (genre && !/^\d+(,\d+)*$/.test(genre)) {
-    return NextResponse.json({ error: "Invalid genre value" }, { status: 400 });
-  }
+  const { type, sort_by, genre, page } = result.data;
 
   const params: Record<string, string> = {
-    sort_by: sortBy,
+    sort_by,
     "vote_count.gte": "50",
   };
   if (genre) {

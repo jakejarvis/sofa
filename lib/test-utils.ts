@@ -14,6 +14,7 @@ const {
   userRatings,
   availabilityOffers,
   titleRecommendations,
+  integrations,
 } = schema;
 
 export const testClient = new Database(":memory:");
@@ -58,6 +59,7 @@ export function insertTitle(
   overrides: {
     id?: string;
     tmdbId?: number;
+    tvdbId?: number;
     type?: "movie" | "tv";
     title?: string;
   } = {},
@@ -68,6 +70,7 @@ export function insertTitle(
     .values({
       id,
       tmdbId: overrides.tmdbId ?? 12345,
+      tvdbId: overrides.tvdbId,
       type: overrides.type ?? "movie",
       title: overrides.title ?? "Test Movie",
     })
@@ -178,6 +181,27 @@ export function insertAvailabilityOffer(
       offerType: overrides.offerType ?? "flatrate",
     })
     .run();
+}
+
+export function insertIntegration(
+  userId: string,
+  provider: string,
+  token = "test-token",
+) {
+  const type =
+    provider === "sonarr" || provider === "radarr" ? "list" : "webhook";
+  return testDb
+    .insert(integrations)
+    .values({
+      userId,
+      provider,
+      type,
+      token,
+      enabled: true,
+      createdAt: new Date(),
+    })
+    .returning()
+    .get();
 }
 
 export function insertRecommendation(

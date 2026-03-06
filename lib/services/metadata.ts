@@ -149,6 +149,7 @@ async function _importTitle(tmdbId: number, type: "movie" | "tv") {
               backdropPath: show.backdrop_path,
               status: show.status,
               contentRating: extractTvContentRating(show),
+              tvdbId: show.external_ids?.tvdb_id ?? null,
               lastFetchedAt: new Date(),
             })
             .where(eq(titles.id, existing.id))
@@ -238,6 +239,7 @@ async function _importTitle(tmdbId: number, type: "movie" | "tv") {
   const row = insertTitleOrGet(
     {
       tmdbId: show.id,
+      tvdbId: show.external_ids?.tvdb_id ?? null,
       type: "tv",
       title: show.name,
       originalTitle: show.original_name,
@@ -326,6 +328,7 @@ export async function refreshTitle(titleId: string) {
         voteCount: show.vote_count,
         status: show.status,
         contentRating: extractTvContentRating(show),
+        tvdbId: show.external_ids?.tvdb_id ?? null,
         lastFetchedAt: now,
       })
       .where(eq(titles.id, titleId))

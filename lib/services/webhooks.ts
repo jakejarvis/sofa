@@ -2,11 +2,11 @@ import { and, eq, gte } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   episodes,
+  integrationEvents,
+  integrations,
   seasons,
   userEpisodeWatches,
   userMovieWatches,
-  webhookConnections,
-  webhookEventLog,
 } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
 import { findByExternalId, searchTv } from "@/lib/tmdb/client";
@@ -283,9 +283,9 @@ function logEvent(
   status: "success" | "ignored" | "error",
   errorMessage?: string,
 ) {
-  db.insert(webhookEventLog)
+  db.insert(integrationEvents)
     .values({
-      connectionId,
+      integrationId: connectionId,
       eventType:
         event?.provider === "plex"
           ? "media.scrobble"
@@ -300,9 +300,9 @@ function logEvent(
     })
     .run();
 
-  db.update(webhookConnections)
+  db.update(integrations)
     .set({ lastEventAt: new Date() })
-    .where(eq(webhookConnections.id, connectionId))
+    .where(eq(integrations.id, connectionId))
     .run();
 }
 

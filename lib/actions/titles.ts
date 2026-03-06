@@ -2,6 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import { z } from "zod";
 import { auth } from "@/lib/auth/server";
 import { db } from "@/lib/db/client";
 import { episodes } from "@/lib/db/schema";
@@ -40,10 +41,11 @@ export async function markAllWatchedAction(titleId: string) {
   markAllEpisodesWatched(userId, titleId);
 }
 
+const ratingSchema = z.number().int().min(0).max(5);
+
 export async function updateTitleRating(titleId: string, ratingStars: number) {
   const userId = await getSessionUserId();
-  if (ratingStars < 0 || ratingStars > 5) throw new Error("Invalid rating");
-  rateTitleStars(userId, titleId, ratingStars);
+  rateTitleStars(userId, titleId, ratingSchema.parse(ratingStars));
 }
 
 export async function watchMovie(titleId: string) {

@@ -3,12 +3,16 @@
 import { IconWebhook } from "@tabler/icons-react";
 import { useHydrateAtoms } from "jotai/utils";
 import { connectionsAtom } from "@/lib/atoms/integrations";
-import { WebhookCard, type WebhookConnection } from "./webhook-card";
+import {
+  IntegrationCard,
+  type IntegrationConnection,
+} from "./integration-card";
+import { INTEGRATION_CONFIGS } from "./integration-configs";
 
 export function IntegrationsSection({
   initialConnections,
 }: {
-  initialConnections: WebhookConnection[];
+  initialConnections: IntegrationConnection[];
 }) {
   useHydrateAtoms([[connectionsAtom, initialConnections]]);
 
@@ -24,9 +28,9 @@ export function IntegrationsSection({
         </h2>
       </div>
       <div className="space-y-3">
-        <WebhookCard provider="plex" />
-        <WebhookCard provider="jellyfin" />
-        <WebhookCard provider="emby" />
+        {INTEGRATION_CONFIGS.map((config) => (
+          <IntegrationCard key={config.provider} config={config} />
+        ))}
       </div>
     </div>
   );

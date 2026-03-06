@@ -102,6 +102,7 @@ export const titles = sqliteTable(
   {
     id: uuidPk(),
     tmdbId: int("tmdbId").notNull(),
+    tvdbId: int("tvdbId"),
     type: text("type", { enum: ["movie", "tv"] }).notNull(),
     title: text("title").notNull(),
     originalTitle: text("originalTitle"),
@@ -374,39 +375,38 @@ export const titleCast = sqliteTable(
   ],
 );
 
-// ─── Webhook Connections ─────────────────────────────────────────────
+// ─── Integrations ───────────────────────────────────────────────────
 
-export const webhookConnections = sqliteTable(
-  "webhookConnections",
+export const integrations = sqliteTable(
+  "integrations",
   {
     id: uuidPk(),
     userId: text("userId")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    provider: text("provider", {
-      enum: ["plex", "jellyfin", "emby"],
-    }).notNull(),
+    provider: text("provider").notNull(),
+    type: text("type", { enum: ["webhook", "list"] }).notNull(),
     token: text("token").notNull().unique(),
     enabled: int("enabled", { mode: "boolean" }).notNull().default(true),
     createdAt: int("createdAt", { mode: "timestamp" }).notNull(),
     lastEventAt: int("lastEventAt", { mode: "timestamp" }),
   },
   (table) => [
-    uniqueIndex("webhookConnections_userId_provider").on(
+    uniqueIndex("integrations_userId_provider").on(
       table.userId,
       table.provider,
     ),
-    uniqueIndex("webhookConnections_token").on(table.token),
+    uniqueIndex("integrations_token").on(table.token),
   ],
 );
 
-export const webhookEventLog = sqliteTable(
-  "webhookEventLog",
+export const integrationEvents = sqliteTable(
+  "integrationEvents",
   {
     id: uuidPk(),
-    connectionId: text("connectionId")
+    integrationId: text("integrationId")
       .notNull()
-      .references(() => webhookConnections.id, { onDelete: "cascade" }),
+      .references(() => integrations.id, { onDelete: "cascade" }),
     eventType: text("eventType"),
     mediaType: text("mediaType"),
     mediaTitle: text("mediaTitle"),
@@ -417,8 +417,8 @@ export const webhookEventLog = sqliteTable(
     receivedAt: int("receivedAt", { mode: "timestamp" }).notNull(),
   },
   (table) => [
-    index("webhookEventLog_connectionId_receivedAt").on(
-      table.connectionId,
+    index("integrationEvents_integrationId_receivedAt").on(
+      table.integrationId,
       table.receivedAt,
     ),
   ],

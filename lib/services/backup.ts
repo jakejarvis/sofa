@@ -47,8 +47,8 @@ const REQUIRED_TABLES = [
   "userRatings",
   "userTitleStatus",
   "verification",
-  "webhookConnections",
-  "webhookEventLog",
+  "integrations",
+  "integrationEvents",
 ] as const;
 
 let backupOpQueue: Promise<void> = Promise.resolve();

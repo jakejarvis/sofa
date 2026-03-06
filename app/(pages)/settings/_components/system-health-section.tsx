@@ -369,6 +369,7 @@ function RefreshButton({
             aria-label="Refresh system health"
             onClick={onRefresh}
             disabled={isValidating}
+            className="text-muted-foreground"
           />
         }
       >
@@ -601,7 +602,7 @@ function BackgroundJobsCard({
                         ) : (
                           <IconPlayerPlay
                             aria-hidden={true}
-                            className="size-3 text-muted-foreground/50"
+                            className="size-3 text-muted-foreground/70"
                           />
                         )}
                       </TooltipTrigger>

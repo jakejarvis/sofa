@@ -1,12 +1,12 @@
 import path from "node:path";
 import { type NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import {
   fetchAndMaybeCache,
-  type ImageCategory,
   imageCacheEnabled,
 } from "@/lib/services/image-cache";
 
-const VALID_CATEGORIES = new Set<ImageCategory>([
+const categorySchema = z.enum([
   "posters",
   "backdrops",
   "stills",
@@ -33,11 +33,13 @@ export async function GET(
     return NextResponse.json({ error: "Invalid path" }, { status: 400 });
   }
 
-  const [category, rawFilename] = segments.path;
+  const [rawCategory, rawFilename] = segments.path;
 
-  if (!VALID_CATEGORIES.has(category as ImageCategory)) {
+  const catResult = categorySchema.safeParse(rawCategory);
+  if (!catResult.success) {
     return NextResponse.json({ error: "Invalid category" }, { status: 400 });
   }
+  const category = catResult.data;
 
   // Sanitize filename — only allow basename to prevent path traversal
   const filename = path.basename(rawFilename);
@@ -46,7 +48,7 @@ export async function GET(
   }
 
   const tmdbPath = `/${filename}`;
-  const result = await fetchAndMaybeCache(tmdbPath, category as ImageCategory);
+  const result = await fetchAndMaybeCache(tmdbPath, category);
 
   if (!result) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
