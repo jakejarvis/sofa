@@ -19,7 +19,7 @@ export function MobileTabBar() {
   if (!session?.user) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/90 backdrop-blur-xl sm:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/90 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] backdrop-blur-xl sm:hidden">
       <div className="flex h-14 items-stretch">
         {tabs.map((tab) => {
           const Icon = tab.icon;
