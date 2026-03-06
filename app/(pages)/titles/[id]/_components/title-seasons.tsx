@@ -7,6 +7,7 @@ import {
   IconChevronUp,
   IconDeviceTvOld,
 } from "@tabler/icons-react";
+import { format, parseISO } from "date-fns";
 import { useAtomValue, useSetAtom } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
@@ -271,7 +272,9 @@ export function TitleSeasons({
                               </span>
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {ep.airDate ?? ""}
+                              {ep.airDate
+                                ? format(parseISO(ep.airDate), "MMM d, yyyy")
+                                : ""}
                               {ep.airDate && ep.runtimeMinutes ? " · " : ""}
                               {ep.runtimeMinutes ? `${ep.runtimeMinutes}m` : ""}
                             </p>

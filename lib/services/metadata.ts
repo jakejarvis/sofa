@@ -3,7 +3,9 @@ import { db } from "@/lib/db/client";
 import {
   availabilityOffers,
   episodes,
+  genres,
   seasons,
+  titleGenres,
   titleRecommendations,
   titles,
 } from "@/lib/db/schema";
@@ -17,7 +19,12 @@ import {
   getVideos,
 } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import type { TmdbVideo } from "@/lib/tmdb/types";
+import type {
+  TmdbGenre,
+  TmdbMovieDetails,
+  TmdbTvDetails,
+  TmdbVideo,
+} from "@/lib/tmdb/types";
 import type {
   AvailabilityOffer,
   CastMember,
@@ -54,6 +61,37 @@ function insertTitleOrGet(values: typeof titles.$inferInsert, tmdbId: number) {
     }
     throw err;
   }
+}
+
+function upsertGenres(titleId: string, tmdbGenres: TmdbGenre[]) {
+  if (tmdbGenres.length === 0) return;
+  for (const g of tmdbGenres) {
+    db.insert(genres)
+      .values({ id: g.id, name: g.name })
+      .onConflictDoUpdate({ target: genres.id, set: { name: g.name } })
+      .run();
+  }
+  db.delete(titleGenres).where(eq(titleGenres.titleId, titleId)).run();
+  for (const g of tmdbGenres) {
+    db.insert(titleGenres)
+      .values({ titleId, genreId: g.id })
+      .onConflictDoNothing()
+      .run();
+  }
+}
+
+function extractMovieContentRating(movie: TmdbMovieDetails): string | null {
+  const us = movie.release_dates?.results?.find((r) => r.iso_3166_1 === "US");
+  if (!us) return null;
+  for (const rd of us.release_dates) {
+    if (rd.certification) return rd.certification;
+  }
+  return null;
+}
+
+function extractTvContentRating(show: TmdbTvDetails): string | null {
+  const us = show.content_ratings?.results?.find((r) => r.iso_3166_1 === "US");
+  return us?.rating || null;
 }
 
 type ImportResult = ReturnType<typeof _importTitle>;
@@ -111,11 +149,13 @@ async function _importTitle(
               posterPath: show.poster_path,
               backdropPath: show.backdrop_path,
               status: show.status,
+              contentRating: extractTvContentRating(show),
               lastFetchedAt: new Date(),
             })
             .where(eq(titles.id, existing.id))
             .run();
         }
+        upsertGenres(existing.id, show.genres);
         await refreshTvChildren(existing.id, tmdbId, show.number_of_seasons);
         if (awaitEnrichment) {
           await Promise.all([
@@ -175,11 +215,13 @@ async function _importTitle(
         voteAverage: movie.vote_average,
         voteCount: movie.vote_count,
         status: movie.status,
+        contentRating: extractMovieContentRating(movie),
         lastFetchedAt: now,
       },
       tmdbId,
     );
     if (!row) return undefined;
+    upsertGenres(row.id, movie.genres);
     if (awaitEnrichment) {
       await Promise.all([
         refreshAvailability(row.id).catch((err) =>
@@ -236,11 +278,13 @@ async function _importTitle(
       voteAverage: show.vote_average,
       voteCount: show.vote_count,
       status: show.status,
+      contentRating: extractTvContentRating(show),
       lastFetchedAt: now,
     },
     tmdbId,
   );
   if (!row) return undefined;
+  upsertGenres(row.id, show.genres);
 
   await refreshTvChildren(row.id, tmdbId, show.number_of_seasons);
   if (awaitEnrichment) {
@@ -307,10 +351,12 @@ export async function refreshTitle(titleId: string) {
         voteAverage: movie.vote_average,
         voteCount: movie.vote_count,
         status: movie.status,
+        contentRating: extractMovieContentRating(movie),
         lastFetchedAt: now,
       })
       .where(eq(titles.id, titleId))
       .run();
+    upsertGenres(titleId, movie.genres);
   } else {
     const show = await getTvDetails(title.tmdbId);
     db.update(titles)
@@ -325,10 +371,12 @@ export async function refreshTitle(titleId: string) {
         voteAverage: show.vote_average,
         voteCount: show.vote_count,
         status: show.status,
+        contentRating: extractTvContentRating(show),
         lastFetchedAt: now,
       })
       .where(eq(titles.id, titleId))
       .run();
+    upsertGenres(titleId, show.genres);
     await refreshTvChildren(titleId, title.tmdbId, show.number_of_seasons);
   }
 
@@ -616,10 +664,12 @@ export async function ensureTvHydrated(
           posterPath: show.poster_path,
           backdropPath: show.backdrop_path,
           status: show.status,
+          contentRating: extractTvContentRating(show),
           lastFetchedAt: new Date(),
         })
         .where(eq(titles.id, titleId))
         .run();
+      upsertGenres(titleId, show.genres);
       await refreshTvChildren(titleId, tmdbId, show.number_of_seasons);
     } catch (err) {
       log.debug(`Failed to hydrate shell TV title ${titleId}:`, err);
@@ -676,10 +726,12 @@ export async function getTitleWithChildren(id: string): Promise<{
           voteAverage: movie.vote_average,
           voteCount: movie.vote_count,
           status: movie.status,
+          contentRating: extractMovieContentRating(movie),
           lastFetchedAt: new Date(),
         })
         .where(eq(titles.id, id))
         .run();
+      upsertGenres(id, movie.genres);
       title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
     } catch (err) {
       log.debug(`Failed to hydrate shell movie title ${id}:`, err);
@@ -709,6 +761,13 @@ export async function getTitleWithChildren(id: string): Promise<{
     extractAndStoreColors(title.id, title.posterPath).catch(() => {});
   }
 
+  const titleGenreRows = db
+    .select({ name: genres.name })
+    .from(titleGenres)
+    .innerJoin(genres, eq(titleGenres.genreId, genres.id))
+    .where(eq(titleGenres.titleId, id))
+    .all();
+
   const resolvedTitle: ResolvedTitle = {
     id: title.id,
     tmdbId: title.tmdbId,
@@ -724,8 +783,10 @@ export async function getTitleWithChildren(id: string): Promise<{
     voteAverage: title.voteAverage,
     voteCount: title.voteCount,
     status: title.status,
+    contentRating: title.contentRating,
     colorPalette: palette,
     trailerVideoKey: title.trailerVideoKey,
+    genres: titleGenreRows.map((r) => r.name),
   };
 
   const cast = getCastForTitle(id);

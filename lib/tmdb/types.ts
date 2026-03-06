@@ -10,6 +10,7 @@ export interface TmdbSearchResult {
   first_air_date?: string;
   poster_path: string | null;
   backdrop_path: string | null;
+  profile_path?: string | null;
   popularity: number;
   vote_average: number;
   vote_count: number;
@@ -34,6 +35,13 @@ export interface TmdbMovieDetails {
   vote_average: number;
   vote_count: number;
   status: string;
+  genres: TmdbGenre[];
+  release_dates?: {
+    results: {
+      iso_3166_1: string;
+      release_dates: { certification: string; type: number }[];
+    }[];
+  };
 }
 
 export interface TmdbTvDetails {
@@ -49,6 +57,10 @@ export interface TmdbTvDetails {
   vote_count: number;
   status: string;
   number_of_seasons: number;
+  genres: TmdbGenre[];
+  content_ratings?: {
+    results: { iso_3166_1: string; rating: string }[];
+  };
   seasons: TmdbSeasonSummary[];
 }
 

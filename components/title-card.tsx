@@ -42,16 +42,9 @@ interface CardInnerProps {
   tiltStyles?: TiltStyles;
 }
 
-interface TitleCardProps extends CardInnerProps {
-  id: string;
+export interface TitleCardProps extends CardInnerProps {
+  id?: string;
   tmdbId: number;
-}
-
-interface ExploreTitleCardProps extends CardInnerProps {
-  tmdbId: number;
-  href: string;
-  userStatus?: TitleStatus | null;
-  episodeProgress?: { watched: number; total: number } | null;
 }
 
 type QuickAddState = "idle" | "loading" | "added";
@@ -273,10 +266,9 @@ function CardInner({
   );
 }
 
-/** Linked title card for library grids, recommendations, dashboards */
 export function TitleCard({
   id,
-  tmdbId: _tmdbId,
+  tmdbId,
   type,
   title,
   posterPath,
@@ -285,41 +277,7 @@ export function TitleCard({
   userStatus,
   episodeProgress,
 }: TitleCardProps) {
-  const tilt = useTiltEffect();
-  return (
-    <Link href={`/titles/${id}`} className="group">
-      <motion.div ref={tilt.ref} style={tilt.containerStyle} {...tilt.handlers}>
-        <CardInner
-          title={title}
-          type={type}
-          posterPath={posterPath}
-          releaseDate={releaseDate}
-          voteAverage={voteAverage}
-          userStatus={userStatus}
-          episodeProgress={episodeProgress}
-          tiltStyles={{
-            imageStyle: tilt.imageStyle,
-            glareBackground: tilt.glareBackground,
-            glareOpacity: tilt.glareOpacity,
-          }}
-        />
-      </motion.div>
-    </Link>
-  );
-}
-
-/** Explore/browse card with quick-add button and custom href */
-export function ExploreTitleCard({
-  tmdbId,
-  type,
-  title,
-  posterPath,
-  releaseDate,
-  voteAverage,
-  href,
-  userStatus,
-  episodeProgress,
-}: ExploreTitleCardProps) {
+  const href = id ? `/titles/${id}` : `/titles/tmdb-${tmdbId}-${type}`;
   const tilt = useTiltEffect();
   return (
     <div className="relative group">

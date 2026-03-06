@@ -1,9 +1,8 @@
 "use client";
 
 import { IconMovie } from "@tabler/icons-react";
-import Image from "next/image";
-import Link from "next/link";
 import { useMemo, useState } from "react";
+import { TitleCard } from "@/components/title-card";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -121,44 +120,15 @@ export function FilmographyGrid({ credits }: FilmographyGridProps) {
             className="animate-stagger-item"
             style={{ "--stagger-index": i } as React.CSSProperties}
           >
-            <Link href={`/titles/${credit.titleId}`} className="group">
-              <div className="overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06] transition-all group-hover:ring-primary/25">
-                <div className="aspect-[2/3] w-full bg-muted">
-                  {credit.posterPath ? (
-                    <Image
-                      src={credit.posterPath}
-                      alt={credit.title}
-                      width={200}
-                      height={300}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-muted-foreground/30">
-                      <IconMovie aria-hidden={true} className="size-10" />
-                    </div>
-                  )}
-                </div>
-                <div className="px-3 pb-3 pt-2.5">
-                  <p className="truncate text-xs font-medium">{credit.title}</p>
-                  <div className="mt-0.5 flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                    <span className="uppercase">{credit.type}</span>
-                    {(credit.releaseDate ?? credit.firstAirDate) && (
-                      <span>
-                        {(credit.releaseDate ?? credit.firstAirDate)?.slice(
-                          0,
-                          4,
-                        )}
-                      </span>
-                    )}
-                  </div>
-                  {credit.character && (
-                    <p className="mt-1 truncate text-[10px] text-muted-foreground/70">
-                      as {credit.character}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </Link>
+            <TitleCard
+              id={credit.titleId}
+              tmdbId={credit.tmdbId}
+              type={credit.type}
+              title={credit.title}
+              posterPath={credit.posterPath}
+              releaseDate={credit.releaseDate ?? credit.firstAirDate}
+              voteAverage={credit.voteAverage}
+            />
           </div>
         ))}
       </div>

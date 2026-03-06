@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
             type: "person" as const,
             title: r.name ?? "Unknown",
             posterPath: null,
-            profilePath: tmdbImageUrl(r.profile_path, "w185"),
+            profilePath: tmdbImageUrl(r.profile_path ?? null, "w185"),
             overview: "",
             releaseDate: null,
             popularity: r.popularity,

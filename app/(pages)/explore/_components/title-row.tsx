@@ -1,7 +1,7 @@
 "use client";
 
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
-import { ExploreTitleCard } from "@/components/title-card";
+import { TitleCard } from "@/components/title-card";
 import {
   Carousel,
   CarouselContent,
@@ -57,14 +57,13 @@ export function TitleRow({
                 className="animate-stagger-item"
                 style={{ "--stagger-index": i } as React.CSSProperties}
               >
-                <ExploreTitleCard
+                <TitleCard
                   tmdbId={item.tmdbId}
                   type={item.type}
                   title={item.title}
                   posterPath={item.posterPath}
                   releaseDate={item.releaseDate}
                   voteAverage={item.voteAverage}
-                  href={`/titles/tmdb-${item.tmdbId}-${item.type}`}
                   userStatus={userStatuses?.[`${item.tmdbId}-${item.type}`]}
                   episodeProgress={
                     episodeProgress?.[`${item.tmdbId}-${item.type}`]

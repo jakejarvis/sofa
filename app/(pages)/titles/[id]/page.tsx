@@ -82,6 +82,7 @@ export default async function TitleDetailPage({
   return (
     <div className="relative space-y-10" style={themeStyle}>
       <TitleProvider
+        key={title.id}
         titleId={title.id}
         titleType={title.type}
         titleName={title.title}

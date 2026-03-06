@@ -72,6 +72,29 @@ export const verification = sqliteTable("verification", {
   updatedAt: int("updatedAt", { mode: "timestamp" }),
 });
 
+// ─── Genres ─────────────────────────────────────────────────────────
+
+export const genres = sqliteTable("genres", {
+  id: int("id").primaryKey(),
+  name: text("name").notNull(),
+});
+
+export const titleGenres = sqliteTable(
+  "titleGenres",
+  {
+    titleId: text("titleId")
+      .notNull()
+      .references(() => titles.id, { onDelete: "cascade" }),
+    genreId: int("genreId")
+      .notNull()
+      .references(() => genres.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    uniqueIndex("titleGenres_titleId_genreId").on(table.titleId, table.genreId),
+    index("titleGenres_genreId").on(table.genreId),
+  ],
+);
+
 // ─── App tables ──────────────────────────────────────────────────────
 
 export const titles = sqliteTable(
@@ -91,6 +114,7 @@ export const titles = sqliteTable(
     voteAverage: real("voteAverage"),
     voteCount: int("voteCount"),
     status: text("status"),
+    contentRating: text("contentRating"),
     colorPalette: text("colorPalette"),
     trailerVideoKey: text("trailerVideoKey"),
     lastFetchedAt: int("lastFetchedAt", { mode: "timestamp" }),

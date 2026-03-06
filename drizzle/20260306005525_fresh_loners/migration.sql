@@ -1,0 +1,1 @@
+ALTER TABLE `titles` ADD `contentRating` text;

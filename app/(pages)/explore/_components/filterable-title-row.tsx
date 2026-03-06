@@ -4,7 +4,7 @@ import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import { createStore, Provider, useAtom, useAtomValue } from "jotai";
 import { useState } from "react";
 import { TitleCardSkeleton } from "@/components/skeletons";
-import { ExploreTitleCard } from "@/components/title-card";
+import { TitleCard } from "@/components/title-card";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -175,14 +175,13 @@ function FilterableTitleRowInner({
                     className="animate-stagger-item"
                     style={{ "--stagger-index": i } as React.CSSProperties}
                   >
-                    <ExploreTitleCard
+                    <TitleCard
                       tmdbId={item.tmdbId}
                       type={item.type}
                       title={item.title}
                       posterPath={item.posterPath}
                       releaseDate={item.releaseDate}
                       voteAverage={item.voteAverage}
-                      href={`/titles/tmdb-${item.tmdbId}-${item.type}`}
                       userStatus={userStatuses[`${item.tmdbId}-${item.type}`]}
                       episodeProgress={
                         episodeProgress[`${item.tmdbId}-${item.type}`]

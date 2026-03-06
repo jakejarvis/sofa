@@ -1,8 +1,9 @@
 "use client";
 
 import { IconCalendar, IconMapPin } from "@tabler/icons-react";
+import { format, parseISO } from "date-fns";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import type { ResolvedPerson } from "@/lib/types/title";
 
@@ -23,6 +24,19 @@ function calculateAge(birthday: string, deathday?: string | null): number {
 
 export function PersonHero({ person }: PersonHeroProps) {
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [isClamped, setIsClamped] = useState(false);
+  const bioRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const el = bioRef.current;
+    if (!el) return;
+    const check = () => setIsClamped(el.scrollHeight > el.clientHeight);
+    check();
+    const observer = new ResizeObserver(check);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   const age = person.birthday
     ? calculateAge(person.birthday, person.deathday)
     : null;
@@ -34,8 +48,8 @@ export function PersonHero({ person }: PersonHeroProps) {
           <Image
             src={person.profilePath}
             alt={person.name}
-            width={224}
-            height={224}
+            width={500}
+            height={500}
             className="h-full w-full object-cover"
             priority
           />
@@ -63,7 +77,7 @@ export function PersonHero({ person }: PersonHeroProps) {
           {person.birthday && (
             <span className="flex items-center gap-1.5">
               <IconCalendar aria-hidden={true} className="size-3.5" />
-              {person.birthday}
+              {format(parseISO(person.birthday), "MMMM d, yyyy")}
               {age !== null && (
                 <span className="text-muted-foreground/60">
                   ({person.deathday ? `died at ${age}` : `age ${age}`})
@@ -82,13 +96,14 @@ export function PersonHero({ person }: PersonHeroProps) {
         {person.biography && (
           <div className="max-w-3xl">
             <p
+              ref={bioRef}
               className={`text-sm leading-relaxed text-muted-foreground ${
-                !bioExpanded ? "line-clamp-6" : ""
+                !bioExpanded ? "line-clamp-3" : ""
               }`}
             >
               {person.biography}
             </p>
-            {person.biography.length > 400 && (
+            {(isClamped || bioExpanded) && (
               <button
                 type="button"
                 onClick={() => setBioExpanded(!bioExpanded)}

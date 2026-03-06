@@ -104,7 +104,18 @@ export function TitleHero({
               <Badge className="rounded border-0 bg-primary/10 font-semibold uppercase tracking-wider text-primary">
                 {title.type}
               </Badge>
+              {title.contentRating && (
+                <Badge
+                  variant="outline"
+                  className="rounded border-border/50 font-semibold uppercase tracking-wider"
+                >
+                  {title.contentRating}
+                </Badge>
+              )}
               {year && <span>{year}</span>}
+              {title.genres.length > 0 && (
+                <span>{title.genres.join(" · ")}</span>
+              )}
               {title.voteAverage != null && title.voteAverage > 0 && (
                 <span className="flex items-center gap-1 text-primary">
                   ★ {title.voteAverage.toFixed(1)}

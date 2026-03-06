@@ -97,6 +97,8 @@ export interface ResolvedTitle {
   voteAverage: number | null;
   voteCount: number | null;
   status: string | null;
+  contentRating: string | null;
   colorPalette: ColorPalette | null;
   trailerVideoKey: string | null;
+  genres: string[];
 }

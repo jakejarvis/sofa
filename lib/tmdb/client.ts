@@ -83,11 +83,15 @@ export async function searchTv(query: string, page = 1) {
 }
 
 export async function getMovieDetails(tmdbId: number) {
-  return tmdbFetch<TmdbMovieDetails>(`/movie/${tmdbId}`);
+  return tmdbFetch<TmdbMovieDetails>(`/movie/${tmdbId}`, {
+    append_to_response: "release_dates",
+  });
 }
 
 export async function getTvDetails(tmdbId: number) {
-  return tmdbFetch<TmdbTvDetails>(`/tv/${tmdbId}`);
+  return tmdbFetch<TmdbTvDetails>(`/tv/${tmdbId}`, {
+    append_to_response: "content_ratings",
+  });
 }
 
 export async function getTvSeasonDetails(tmdbId: number, seasonNumber: number) {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useHydrateAtoms } from "jotai/utils";
+import { createStore, Provider } from "jotai";
+import { useState } from "react";
 import {
   episodeWatchesAtom,
   seasonsAtom,
@@ -31,15 +32,17 @@ export function TitleProvider({
   seasons: Season[];
   children: React.ReactNode;
 }) {
-  useHydrateAtoms([
-    [titleIdAtom, titleId],
-    [titleTypeAtom, titleType],
-    [titleNameAtom, titleName],
-    [seasonsAtom, seasons],
-    [userStatusAtom, initialStatus],
-    [userRatingAtom, initialRating],
-    [episodeWatchesAtom, initialEpisodeWatches],
-  ]);
+  const [store] = useState(() => {
+    const s = createStore();
+    s.set(titleIdAtom, titleId);
+    s.set(titleTypeAtom, titleType);
+    s.set(titleNameAtom, titleName);
+    s.set(seasonsAtom, seasons);
+    s.set(userStatusAtom, initialStatus);
+    s.set(userRatingAtom, initialRating);
+    s.set(episodeWatchesAtom, initialEpisodeWatches);
+    return s;
+  });
 
-  return children;
+  return <Provider store={store}>{children}</Provider>;
 }
