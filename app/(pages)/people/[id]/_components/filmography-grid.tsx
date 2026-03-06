@@ -18,9 +18,13 @@ type Sort = "newest" | "rating";
 
 interface FilmographyGridProps {
   credits: PersonCredit[];
+  userStatuses?: Record<string, "watchlist" | "in_progress" | "completed">;
 }
 
-export function FilmographyGrid({ credits }: FilmographyGridProps) {
+export function FilmographyGrid({
+  credits,
+  userStatuses,
+}: FilmographyGridProps) {
   const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<Sort>("newest");
 
@@ -128,6 +132,7 @@ export function FilmographyGrid({ credits }: FilmographyGridProps) {
               posterPath={credit.posterPath}
               releaseDate={credit.releaseDate ?? credit.firstAirDate}
               voteAverage={credit.voteAverage}
+              userStatus={userStatuses?.[credit.titleId]}
             />
           </div>
         ))}

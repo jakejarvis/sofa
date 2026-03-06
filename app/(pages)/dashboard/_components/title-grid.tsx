@@ -10,6 +10,7 @@ interface TitleGridItem {
   posterPath: string | null;
   releaseDate?: string | null;
   voteAverage?: number | null;
+  userStatus?: "watchlist" | "in_progress" | "completed" | null;
 }
 
 export function TitleGrid({ items }: { items: TitleGridItem[] }) {
@@ -29,6 +30,7 @@ export function TitleGrid({ items }: { items: TitleGridItem[] }) {
             posterPath={t.posterPath}
             releaseDate={t.releaseDate}
             voteAverage={t.voteAverage}
+            userStatus={t.userStatus}
           />
         </div>
       ))}

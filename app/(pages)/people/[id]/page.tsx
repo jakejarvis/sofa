@@ -9,6 +9,7 @@ import {
   getOrFetchPerson,
   getOrFetchPersonByTmdbId,
 } from "@/lib/services/person";
+import { getUserStatusesByTitleIds } from "@/lib/services/tracking";
 import { FilmographyGrid } from "./_components/filmography-grid";
 import { PersonHero } from "./_components/person-hero";
 
@@ -47,11 +48,18 @@ export default async function PersonDetailPage({
   if (!person) notFound();
 
   const filmography = getLocalFilmography(person.id);
+  const session = await getSession();
+  const userStatuses = session
+    ? getUserStatusesByTitleIds(
+        session.user.id,
+        filmography.map((c) => c.titleId),
+      )
+    : {};
 
   return (
     <div className="space-y-10">
       <PersonHero person={person} />
-      <FilmographyGrid credits={filmography} />
+      <FilmographyGrid credits={filmography} userStatuses={userStatuses} />
     </div>
   );
 }

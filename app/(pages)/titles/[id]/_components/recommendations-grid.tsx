@@ -6,8 +6,10 @@ import type { RecommendedTitle } from "@/lib/types/title";
 
 export function RecommendationsGrid({
   recommendations,
+  userStatuses,
 }: {
   recommendations: RecommendedTitle[];
+  userStatuses?: Record<string, "watchlist" | "in_progress" | "completed">;
 }) {
   return (
     <div className="space-y-4">
@@ -30,6 +32,7 @@ export function RecommendationsGrid({
               posterPath={rec.posterPath}
               releaseDate={rec.releaseDate ?? rec.firstAirDate}
               voteAverage={rec.voteAverage}
+              userStatus={userStatuses?.[rec.id]}
             />
           </div>
         ))}

@@ -16,6 +16,7 @@ export async function LibrarySection({ userId }: { userId: string }) {
     posterPath: tmdbImageUrl(t.posterPath, "w500"),
     releaseDate: t.releaseDate ?? t.firstAirDate,
     voteAverage: t.voteAverage,
+    userStatus: t.userStatus as "watchlist" | "in_progress" | "completed",
   }));
 
   return (

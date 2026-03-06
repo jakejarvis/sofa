@@ -451,6 +451,36 @@ export function getUserStatusesByTmdbIds(
   return result;
 }
 
+export function getUserStatusesByTitleIds(
+  userId: string,
+  titleIds: string[],
+): Record<string, "watchlist" | "in_progress" | "completed"> {
+  if (titleIds.length === 0) return {};
+
+  const rows = db
+    .select({
+      titleId: userTitleStatus.titleId,
+      status: userTitleStatus.status,
+    })
+    .from(userTitleStatus)
+    .where(
+      and(
+        eq(userTitleStatus.userId, userId),
+        inArray(userTitleStatus.titleId, titleIds),
+      ),
+    )
+    .all();
+
+  const result: Record<string, "watchlist" | "in_progress" | "completed"> = {};
+  for (const row of rows) {
+    result[row.titleId] = row.status as
+      | "watchlist"
+      | "in_progress"
+      | "completed";
+  }
+  return result;
+}
+
 export function getEpisodeProgressByTmdbIds(
   userId: string,
   tmdbIds: { tmdbId: number; type: string }[],

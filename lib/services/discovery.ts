@@ -370,6 +370,7 @@ export function getNewAvailableFeed(userId: string, days = 14) {
       firstAirDate: titles.firstAirDate,
       voteAverage: titles.voteAverage,
       popularity: titles.popularity,
+      userStatus: userTitleStatus.status,
     })
     .from(titles)
     .innerJoin(

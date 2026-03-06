@@ -1,4 +1,6 @@
+import { getSession } from "@/lib/auth/session";
 import { getRecommendationsForTitle } from "@/lib/services/discovery";
+import { getUserStatusesByTitleIds } from "@/lib/services/tracking";
 import type { RecommendedTitle } from "@/lib/types/title";
 import { RecommendationsGrid } from "./recommendations-grid";
 
@@ -17,5 +19,18 @@ export async function TitleRecommendations({ titleId }: { titleId: string }) {
     voteAverage: r.voteAverage,
   }));
 
-  return <RecommendationsGrid recommendations={recommendations} />;
+  const session = await getSession();
+  const userStatuses = session
+    ? getUserStatusesByTitleIds(
+        session.user.id,
+        recommendations.map((r) => r.id),
+      )
+    : {};
+
+  return (
+    <RecommendationsGrid
+      recommendations={recommendations}
+      userStatuses={userStatuses}
+    />
+  );
 }
