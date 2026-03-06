@@ -1,7 +1,7 @@
 "use client";
 
 import { IconDoorEnter } from "@tabler/icons-react";
-import { useState } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -15,21 +15,20 @@ export function RegistrationSection({
   const [registrationOpen, setRegistrationOpen] = useState(
     initialRegistrationOpen,
   );
-  const [toggling, setToggling] = useState(false);
+  const [optimisticOpen, setOptimisticOpen] = useOptimistic(registrationOpen);
+  const [isPending, startTransition] = useTransition();
 
-  async function handleToggle(checked: boolean) {
-    const previous = registrationOpen;
-    setRegistrationOpen(checked);
-    setToggling(true);
-    try {
-      await toggleRegistration(checked);
-      toast.success(checked ? "Registration opened" : "Registration closed");
-    } catch {
-      setRegistrationOpen(previous);
-      toast.error("Failed to update registration setting");
-    } finally {
-      setToggling(false);
-    }
+  function handleToggle(checked: boolean) {
+    startTransition(async () => {
+      setOptimisticOpen(checked);
+      try {
+        await toggleRegistration(checked);
+        setRegistrationOpen(checked);
+        toast.success(checked ? "Registration opened" : "Registration closed");
+      } catch {
+        toast.error("Failed to update registration setting");
+      }
+    });
   }
 
   return (
@@ -47,9 +46,9 @@ export function RegistrationSection({
           </div>
         </div>
         <Switch
-          checked={registrationOpen}
+          checked={optimisticOpen}
           onCheckedChange={handleToggle}
-          disabled={toggling}
+          disabled={isPending}
           aria-label="Toggle open registration"
         />
       </div>

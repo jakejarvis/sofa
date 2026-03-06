@@ -1,6 +1,5 @@
 "use client";
 
-import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import { createStore, Provider, useAtom, useAtomValue } from "jotai";
 import { useState } from "react";
 import { TitleCardSkeleton } from "@/components/skeletons";
@@ -162,7 +161,6 @@ function FilterableTitleRowInner({
               dragFree: true,
               containScroll: "trimSnaps",
             }}
-            plugins={[WheelGesturesPlugin({ forceWheelAxis: "x" })]}
             className="-mx-6 sm:-mx-2 carousel-tilt"
           >
             <CarouselContent className="px-6 sm:px-2">

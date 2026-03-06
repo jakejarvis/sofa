@@ -44,6 +44,15 @@ import {
 } from "@/lib/atoms/command-palette";
 import { SHORTCUT_DESCRIPTIONS } from "@/lib/constants/shortcuts";
 
+const groupedShortcuts: Record<
+  string,
+  { description: string; keys: readonly string[] }[]
+> = {};
+for (const entry of SHORTCUT_DESCRIPTIONS) {
+  if (!groupedShortcuts[entry.scope]) groupedShortcuts[entry.scope] = [];
+  groupedShortcuts[entry.scope].push(entry);
+}
+
 type SearchResult = ReturnType<typeof useSearch>["results"][number];
 
 export function CommandPalette() {
@@ -102,7 +111,7 @@ export function CommandPalette() {
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [debouncedQuery, results, setRecentSearches]);
+  }, [debouncedQuery, results.length, setRecentSearches]);
 
   const handleSelect = useCallback(
     (result: SearchResult) => {
@@ -133,16 +142,6 @@ export function CommandPalette() {
   }, [setRecentSearches]);
 
   const hasQuery = query.trim().length > 0;
-
-  // Group shortcuts by scope for help dialog
-  const grouped: Record<
-    string,
-    { description: string; keys: readonly string[] }[]
-  > = {};
-  for (const entry of SHORTCUT_DESCRIPTIONS) {
-    if (!grouped[entry.scope]) grouped[entry.scope] = [];
-    grouped[entry.scope].push(entry);
-  }
 
   return (
     <>
@@ -362,7 +361,7 @@ export function CommandPalette() {
             <DialogTitle>Keyboard Shortcuts</DialogTitle>
           </DialogHeader>
           <div className="space-y-5 py-2">
-            {Object.entries(grouped).map(([scope, items]) => (
+            {Object.entries(groupedShortcuts).map(([scope, items]) => (
               <div key={scope} className="space-y-2">
                 <h3 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                   {scope}

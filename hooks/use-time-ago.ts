@@ -1,5 +1,32 @@
 import { formatDistanceToNowStrict } from "date-fns";
-import { useEffect, useEffectEvent, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+// Shared ticker — one interval regardless of how many components subscribe
+const TICK_MS = 30_000;
+let tick = Date.now();
+const listeners = new Set<() => void>();
+let timerId: ReturnType<typeof setInterval> | null = null;
+
+function subscribe(cb: () => void) {
+  if (listeners.size === 0) {
+    timerId = setInterval(() => {
+      tick = Date.now();
+      for (const l of listeners) l();
+    }, TICK_MS);
+  }
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
+    if (listeners.size === 0 && timerId) {
+      clearInterval(timerId);
+      timerId = null;
+    }
+  };
+}
+
+function getSnapshot() {
+  return tick;
+}
 
 function toTimestamp(date: string | Date | null | undefined): number | null {
   if (!date) return null;
@@ -9,26 +36,10 @@ function toTimestamp(date: string | Date | null | undefined): number | null {
 
 export function useTimeAgo(
   date: string | Date | null | undefined,
-  { intervalMs = 1_000, addSuffix = true, fallback = "" } = {},
+  { addSuffix = true, fallback = "" } = {},
 ): string {
+  useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   const ts = toTimestamp(date);
-
-  const [text, setText] = useState(() =>
-    ts === null ? fallback : formatDistanceToNowStrict(ts, { addSuffix }),
-  );
-
-  const tick = useEffectEvent(() => {
-    const next =
-      ts === null ? fallback : formatDistanceToNowStrict(ts, { addSuffix });
-    if (next !== text) setText(next);
-  });
-
-  useEffect(() => {
-    tick();
-    if (ts === null) return;
-    const id = setInterval(tick, intervalMs);
-    return () => clearInterval(id);
-  }, [ts, intervalMs]); // tick is NOT listed — that's the point
-
-  return text;
+  if (ts === null) return fallback;
+  return formatDistanceToNowStrict(ts, { addSuffix });
 }

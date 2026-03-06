@@ -1,7 +1,7 @@
 "use client";
 
 import { IconWorldUpload } from "@tabler/icons-react";
-import { useState } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -13,23 +13,22 @@ export function UpdateCheckSection({
   initialEnabled: boolean;
 }) {
   const [enabled, setEnabled] = useState(initialEnabled);
-  const [toggling, setToggling] = useState(false);
+  const [optimisticEnabled, setOptimisticEnabled] = useOptimistic(enabled);
+  const [isPending, startTransition] = useTransition();
 
-  async function handleToggle(checked: boolean) {
-    const previous = enabled;
-    setEnabled(checked);
-    setToggling(true);
-    try {
-      await toggleUpdateCheck(checked);
-      toast.success(
-        checked ? "Update checks enabled" : "Update checks disabled",
-      );
-    } catch {
-      setEnabled(previous);
-      toast.error("Failed to update setting");
-    } finally {
-      setToggling(false);
-    }
+  function handleToggle(checked: boolean) {
+    startTransition(async () => {
+      setOptimisticEnabled(checked);
+      try {
+        await toggleUpdateCheck(checked);
+        setEnabled(checked);
+        toast.success(
+          checked ? "Update checks enabled" : "Update checks disabled",
+        );
+      } catch {
+        toast.error("Failed to update setting");
+      }
+    });
   }
 
   return (
@@ -50,9 +49,9 @@ export function UpdateCheckSection({
           </div>
         </div>
         <Switch
-          checked={enabled}
+          checked={optimisticEnabled}
           onCheckedChange={handleToggle}
-          disabled={toggling}
+          disabled={isPending}
           aria-label="Toggle automatic update checks"
         />
       </div>

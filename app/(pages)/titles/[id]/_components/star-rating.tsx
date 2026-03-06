@@ -4,6 +4,12 @@ import { IconStar, IconStarFilled } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 
+const springTransition = {
+  type: "spring" as const,
+  stiffness: 400,
+  damping: 15,
+};
+
 interface StarRatingProps {
   value: number;
   onChange: (value: number) => void;
@@ -36,11 +42,7 @@ export function StarRating({ value, onChange }: StarRatingProps) {
             animate={
               filled && star === value ? { scale: [1, 1.25, 1] } : { scale: 1 }
             }
-            transition={{
-              type: "spring" as const,
-              stiffness: 400,
-              damping: 15,
-            }}
+            transition={springTransition}
           >
             {filled ? (
               <IconStarFilled className="size-4.5 text-primary" />

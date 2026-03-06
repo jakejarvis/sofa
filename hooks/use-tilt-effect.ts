@@ -34,11 +34,17 @@ export function useTiltEffect(config: TiltConfig = {}) {
   const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
-    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setDisabled(mql.matches);
-    const handler = (e: MediaQueryListEvent) => setDisabled(e.matches);
-    mql.addEventListener("change", handler);
-    return () => mql.removeEventListener("change", handler);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const finePointer = window.matchMedia("(pointer: fine)");
+    const update = () =>
+      setDisabled(reducedMotion.matches || !finePointer.matches);
+    update();
+    reducedMotion.addEventListener("change", update);
+    finePointer.addEventListener("change", update);
+    return () => {
+      reducedMotion.removeEventListener("change", update);
+      finePointer.removeEventListener("change", update);
+    };
   }, []);
 
   // Normalized mouse position [0,1], center = 0.5

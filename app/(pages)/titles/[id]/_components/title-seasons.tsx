@@ -11,7 +11,7 @@ import { format, parseISO } from "date-fns";
 import { useAtomValue, useSetAtom } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,6 +50,7 @@ export function TitleSeasons({
 
   const seasons = useAtomValue(seasonsAtom);
   const episodeWatches = useAtomValue(episodeWatchesAtom);
+  const watchedSet = useMemo(() => new Set(episodeWatches), [episodeWatches]);
   const userStatus = useAtomValue(userStatusAtom);
   const watchingEp = useAtomValue(watchingEpAtom);
   const {
@@ -58,6 +59,18 @@ export function TitleSeasons({
     handleUnmarkSeason,
     handleMarkAllWatched,
   } = useTitleActions();
+  const seasonProgress = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const season of seasons) {
+      let count = 0;
+      for (const ep of season.episodes) {
+        if (watchedSet.has(ep.id)) count++;
+      }
+      map.set(season.id, count);
+    }
+    return map;
+  }, [seasons, watchedSet]);
+
   const [openSeason, setOpenSeason] = useState<number | null>(null);
   const [markAllOpen, setMarkAllOpen] = useState(false);
 
@@ -110,9 +123,7 @@ export function TitleSeasons({
       <div className="space-y-2">
         {seasons.map((season) => {
           const isOpen = openSeason === season.seasonNumber;
-          const watchedCount = season.episodes.filter((ep) =>
-            episodeWatches.includes(ep.id),
-          ).length;
+          const watchedCount = seasonProgress.get(season.id) ?? 0;
           const totalCount = season.episodes.length;
           const progressPercent =
             totalCount > 0 ? (watchedCount / totalCount) * 100 : 0;
@@ -207,7 +218,7 @@ export function TitleSeasons({
                     className="overflow-hidden border-t border-border/50"
                   >
                     {season.episodes.map((ep) => {
-                      const isWatched = episodeWatches.includes(ep.id);
+                      const isWatched = watchedSet.has(ep.id);
                       const { stillPath } = ep;
                       return (
                         <div

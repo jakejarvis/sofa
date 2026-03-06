@@ -1,6 +1,5 @@
 "use client";
 
-import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import { TitleCard } from "@/components/title-card";
 import {
   Carousel,
@@ -44,7 +43,6 @@ export function TitleRow({
       </div>
       <Carousel
         opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}
-        plugins={[WheelGesturesPlugin({ forceWheelAxis: "x" })]}
         className="-mx-6 sm:-mx-2 carousel-tilt"
       >
         <CarouselContent className="px-6 sm:px-2">

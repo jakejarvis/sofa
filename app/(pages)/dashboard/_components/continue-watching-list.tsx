@@ -1,6 +1,5 @@
 "use client";
 
-import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import {
   Carousel,
   CarouselContent,
@@ -19,7 +18,6 @@ export function ContinueWatchingList({
   return (
     <Carousel
       opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}
-      plugins={[WheelGesturesPlugin({ forceWheelAxis: "x" })]}
       className="-mx-4 sm:-mx-0"
     >
       <CarouselContent className="px-4 sm:px-0">

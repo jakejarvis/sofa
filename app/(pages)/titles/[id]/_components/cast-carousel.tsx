@@ -1,7 +1,6 @@
 "use client";
 
 import { IconUser, IconUsers } from "@tabler/icons-react";
-import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -31,7 +30,6 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
             dragFree: true,
             containScroll: "trimSnaps",
           }}
-          plugins={[WheelGesturesPlugin({ forceWheelAxis: "x" })]}
           className="-mx-4 sm:-mx-0"
         >
           <CarouselContent className="px-4 sm:px-0">

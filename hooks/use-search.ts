@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/swr/fetcher";
 
@@ -26,8 +27,13 @@ export function useSearch(debouncedQuery: string) {
     },
   );
 
+  const results = useMemo(
+    () => data?.results?.slice(0, 8) ?? [],
+    [data?.results],
+  );
+
   return {
-    results: data?.results?.slice(0, 8) ?? [],
+    results,
     isLoading,
   };
 }
