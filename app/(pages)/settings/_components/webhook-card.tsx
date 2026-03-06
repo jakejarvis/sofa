@@ -74,9 +74,10 @@ export function WebhookCard({
   const label = isPlex ? "Plex" : isEmby ? "Emby" : "Jellyfin";
   const Icon = isPlex ? PlexIcon : isEmby ? EmbyIcon : JellyfinIcon;
 
-  const webhookUrl = connection
-    ? `${window.location.origin}/api/webhooks/${connection.token}`
-    : null;
+  const webhookUrl =
+    connection && typeof window !== "undefined"
+      ? `${window.location.origin}/api/webhooks/${connection.token}`
+      : null;
 
   async function onConnect() {
     setConnecting(true);
