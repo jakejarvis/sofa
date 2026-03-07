@@ -91,7 +91,7 @@ export async function getSonarrList(
   const result: { TvdbId: number; Title: string }[] = [];
 
   for (const row of rows) {
-    let tvdbId = row.tvdbId;
+    let { tvdbId } = row;
 
     if (tvdbId == null) {
       try {

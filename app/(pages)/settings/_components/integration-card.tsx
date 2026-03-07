@@ -135,7 +135,7 @@ export function IntegrationCard({ config }: { config: IntegrationConfig }) {
         </CardContent>
 
         <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
-          <CardContent className="space-y-3 border-t border-border/30 pt-4">
+          <CardContent className="space-y-3 border-border/30 border-t pt-4">
             {config.alert}
 
             {!connection ? (
@@ -216,7 +216,7 @@ export function IntegrationCard({ config }: { config: IntegrationConfig }) {
             )}
 
             <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
-              <CollapsibleTrigger className="flex w-full items-center gap-1.5 rounded-md py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
+              <CollapsibleTrigger className="flex w-full items-center gap-1.5 rounded-md py-1 text-muted-foreground text-xs transition-colors hover:text-foreground">
                 <IconChevronDown
                   aria-hidden={true}
                   className={`size-3 transition-transform ${setupOpen ? "rotate-0" : "-rotate-90"}`}
@@ -224,7 +224,7 @@ export function IntegrationCard({ config }: { config: IntegrationConfig }) {
                 Setup instructions
               </CollapsibleTrigger>
               <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
-                <div className="mt-2 rounded-lg bg-muted/30 border border-border/50 p-3 text-xs leading-relaxed text-muted-foreground">
+                <div className="mt-2 rounded-lg border border-border/50 bg-muted/30 p-3 text-muted-foreground text-xs leading-relaxed">
                   <ol className="list-inside list-decimal space-y-1.5">
                     {config.setupSteps}
                   </ol>
@@ -232,7 +232,7 @@ export function IntegrationCard({ config }: { config: IntegrationConfig }) {
                     <p className="mt-2 -ml-0.5">
                       <IconBook2
                         aria-hidden={true}
-                        className="inline-block size-3 translate-y-[-1px] mr-1"
+                        className="mr-1 inline-block size-3 translate-y-[-1px]"
                       />
                       Need more help?{" "}
                       <a

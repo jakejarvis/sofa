@@ -36,13 +36,13 @@ export function TrailerDialog({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex h-5 items-center gap-1 rounded border border-border/50 px-2 text-xs text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+          className="inline-flex h-5 items-center gap-1 rounded border border-border/50 px-2 text-muted-foreground text-xs transition-colors hover:border-border hover:text-foreground"
         >
           <IconPlayerPlayFilled aria-hidden={true} className="h-2.5 w-2.5" />
           Trailer
         </button>
       )}
-      <DialogContent className="sm:max-w-4xl p-0 overflow-hidden bg-black border-white/10">
+      <DialogContent className="overflow-hidden border-white/10 bg-black p-0 sm:max-w-4xl">
         <DialogTitle className="sr-only">Trailer</DialogTitle>
         <div className="aspect-video w-full">
           <MediaThemeSutro

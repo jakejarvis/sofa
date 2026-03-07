@@ -88,7 +88,7 @@ export function TitleSeasons({
                 <Button
                   variant="ghost"
                   size="xs"
-                  className="uppercase tracking-wider text-muted-foreground"
+                  className="text-muted-foreground uppercase tracking-wider"
                 >
                   <IconChecks aria-hidden={true} className="size-3.5" />
                   Mark All Watched
@@ -167,9 +167,13 @@ export function TitleSeasons({
                         e.stopPropagation();
                         handleMarkSeason(season);
                       }}
-                      className="w-24 uppercase tracking-wider text-primary hover:bg-primary/10 hover:text-primary sm:hidden sm:group-hover/season:block"
+                      className="text-primary uppercase tracking-wider hover:bg-primary/10 hover:text-primary sm:hidden sm:w-24 sm:group-hover/season:block"
                     >
-                      Watch all
+                      <IconChecks
+                        aria-hidden={true}
+                        className="size-3.5 sm:hidden"
+                      />
+                      <span className="hidden sm:inline">Watch all</span>
                     </Button>
                   )}
                   {totalCount > 0 && watchedCount === totalCount && (
@@ -180,13 +184,17 @@ export function TitleSeasons({
                         e.stopPropagation();
                         handleUnmarkSeason(season);
                       }}
-                      className="w-24 uppercase tracking-wider text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:hidden sm:group-hover/season:block"
+                      className="text-muted-foreground uppercase tracking-wider hover:bg-destructive/10 hover:text-destructive sm:hidden sm:w-24 sm:group-hover/season:block"
                     >
-                      Unwatch all
+                      <IconChecks
+                        aria-hidden={true}
+                        className="size-3.5 sm:hidden"
+                      />
+                      <span className="hidden sm:inline">Unwatch all</span>
                     </Button>
                   )}
                   {totalCount > 0 && (
-                    <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                    <span className="font-mono text-muted-foreground text-xs tabular-nums">
                       {watchedCount}/{totalCount}
                     </span>
                   )}
@@ -215,7 +223,7 @@ export function TitleSeasons({
                       stiffness: 300,
                       damping: 30,
                     }}
-                    className="overflow-hidden border-t border-border/50"
+                    className="overflow-hidden border-border/50 border-t"
                   >
                     {season.episodes.map((ep) => {
                       const isWatched = watchedSet.has(ep.id);
@@ -223,72 +231,99 @@ export function TitleSeasons({
                       return (
                         <div
                           key={ep.id}
-                          className={`flex gap-3 border-b border-border/30 px-4 py-3 last:border-b-0 transition-colors ${isWatched ? "opacity-60" : ""}`}
+                          className={`border-border/30 border-b transition-colors last:border-b-0 ${isWatched ? "opacity-60" : ""}`}
                         >
-                          <button
-                            type="button"
-                            aria-label={`Mark episode ${ep.episodeNumber} as ${isWatched ? "unwatched" : "watched"}`}
-                            onClick={() =>
-                              handleWatchEpisode(
-                                ep.id,
-                                season.seasonNumber,
-                                ep.episodeNumber,
-                                isWatched,
-                              )
-                            }
-                            disabled={watchingEp === ep.id}
-                            className={`mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
-                              isWatched
-                                ? "border-primary bg-primary text-primary-foreground"
-                                : "border-muted-foreground/40 bg-muted-foreground/5 hover:border-primary/70 hover:bg-primary/10"
-                            }`}
-                          >
-                            {isWatched && (
-                              <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{
-                                  type: "spring",
-                                  stiffness: 500,
-                                  damping: 15,
-                                }}
-                              >
-                                <IconCheck className="size-3.5" />
-                              </motion.div>
-                            )}
-                          </button>
+                          {/* Mobile: still banner above episode info */}
                           {stillPath && (
-                            <div className="hidden h-14 w-24 shrink-0 overflow-hidden rounded-md bg-muted sm:block">
+                            <div className="relative aspect-video w-full overflow-hidden bg-muted sm:hidden">
                               <Image
                                 src={stillPath}
                                 alt={ep.name ?? ""}
-                                width={300}
-                                height={169}
+                                width={600}
+                                height={338}
                                 className="h-full w-full object-cover"
                               />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                              <span className="absolute bottom-2 left-3 font-mono text-[10px] text-white/70">
+                                E{String(ep.episodeNumber).padStart(2, "0")}
+                              </span>
                             </div>
                           )}
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm">
-                              <span className="font-mono text-xs text-muted-foreground">
-                                E{String(ep.episodeNumber).padStart(2, "0")}
-                              </span>{" "}
-                              <span className="font-medium">
-                                {ep.name ?? "Untitled"}
-                              </span>
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {ep.airDate
-                                ? format(parseISO(ep.airDate), "MMM d, yyyy")
-                                : ""}
-                              {ep.airDate && ep.runtimeMinutes ? " · " : ""}
-                              {ep.runtimeMinutes ? `${ep.runtimeMinutes}m` : ""}
-                            </p>
-                            {ep.overview && (
-                              <p className="mt-1 hidden line-clamp-2 text-xs leading-relaxed text-muted-foreground/70 sm:block">
-                                {ep.overview}
-                              </p>
+                          <div className="flex gap-3 px-4 py-3">
+                            <button
+                              type="button"
+                              aria-label={`Mark episode ${ep.episodeNumber} as ${isWatched ? "unwatched" : "watched"}`}
+                              onClick={() =>
+                                handleWatchEpisode(
+                                  ep.id,
+                                  season.seasonNumber,
+                                  ep.episodeNumber,
+                                  isWatched,
+                                )
+                              }
+                              disabled={watchingEp === ep.id}
+                              className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
+                                isWatched
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-muted-foreground/40 bg-muted-foreground/5 hover:border-primary/70 hover:bg-primary/10"
+                              }`}
+                            >
+                              {isWatched && (
+                                <motion.div
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{
+                                    type: "spring",
+                                    stiffness: 500,
+                                    damping: 15,
+                                  }}
+                                >
+                                  <IconCheck className="size-3.5" />
+                                </motion.div>
+                              )}
+                            </button>
+                            {/* Desktop: inline thumbnail */}
+                            {stillPath && (
+                              <div className="hidden h-14 w-24 shrink-0 overflow-hidden rounded-md bg-muted sm:block">
+                                <Image
+                                  src={stillPath}
+                                  alt={ep.name ?? ""}
+                                  width={300}
+                                  height={169}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
                             )}
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm">
+                                {/* Episode number shown inline on desktop, or mobile without still */}
+                                <span
+                                  className={`font-mono text-muted-foreground text-xs ${stillPath ? "hidden sm:inline" : ""}`}
+                                >
+                                  E{String(ep.episodeNumber).padStart(2, "0")}
+                                </span>
+                                {stillPath && (
+                                  <span className="hidden sm:inline"> </span>
+                                )}
+                                <span className="font-medium">
+                                  {ep.name ?? "Untitled"}
+                                </span>
+                              </p>
+                              <p className="text-muted-foreground text-xs">
+                                {ep.airDate
+                                  ? format(parseISO(ep.airDate), "MMM d, yyyy")
+                                  : ""}
+                                {ep.airDate && ep.runtimeMinutes ? " · " : ""}
+                                {ep.runtimeMinutes
+                                  ? `${ep.runtimeMinutes}m`
+                                  : ""}
+                              </p>
+                              {ep.overview && (
+                                <p className="mt-1 line-clamp-2 text-muted-foreground/70 text-xs leading-relaxed">
+                                  {ep.overview}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );

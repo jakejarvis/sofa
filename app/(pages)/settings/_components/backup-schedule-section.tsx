@@ -184,7 +184,7 @@ function BackupScheduleInner() {
                       value={String(maxRetention)}
                       onValueChange={(v) => v && changeMaxRetention(Number(v))}
                     >
-                      <SelectTrigger className="h-auto w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 shadow-none underline decoration-dotted decoration-muted-foreground/50 underline-offset-4 hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:ring-0 focus-visible:decoration-solid focus-visible:decoration-foreground dark:bg-transparent dark:hover:bg-transparent">
+                      <SelectTrigger className="h-auto w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 underline decoration-muted-foreground/50 decoration-dotted underline-offset-4 shadow-none hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:decoration-foreground focus-visible:decoration-solid focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent">
                         <SelectValue>
                           {(value: string | null) =>
                             value === "0"
@@ -226,7 +226,7 @@ function BackupScheduleInner() {
 
       <AnimatePresence initial={false}>
         {enabled && (
-          <CardContent className="border-t border-border/30 pt-4">
+          <CardContent className="border-border/30 border-t pt-4">
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
@@ -237,7 +237,7 @@ function BackupScheduleInner() {
               <div className="space-y-3">
                 {/* Frequency selector */}
                 <div className="space-y-1.5">
-                  <span className="inline-block text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+                  <span className="inline-block font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
                     Frequency
                   </span>
                   <ButtonGroup>
@@ -270,7 +270,7 @@ function BackupScheduleInner() {
                       transition={{ duration: 0.15 }}
                       className="overflow-hidden"
                     >
-                      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+                      <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
                         Day:{" "}
                       </span>
                       <Select
@@ -279,7 +279,7 @@ function BackupScheduleInner() {
                           v && changeSchedule(frequency, time, Number(v))
                         }
                       >
-                        <SelectTrigger className="h-auto gap-1 border-border/50 bg-muted/30 px-2.5 py-1 text-xs text-foreground hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50">
+                        <SelectTrigger className="h-auto gap-1 border-border/50 bg-muted/30 px-2.5 py-1 text-foreground text-xs hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50">
                           <SelectValue>
                             {(value: string | null) =>
                               value !== null
@@ -314,14 +314,14 @@ function BackupScheduleInner() {
                       transition={{ duration: 0.15 }}
                       className="overflow-hidden"
                     >
-                      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+                      <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
                         {frequency === "12h" ? "Starting at" : "Time:"}{" "}
                       </span>
                       <Select
                         value={time}
                         onValueChange={(v) => v && changeSchedule(frequency, v)}
                       >
-                        <SelectTrigger className="h-auto gap-1 border-border/50 bg-muted/30 px-2.5 py-1 text-xs text-foreground hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50">
+                        <SelectTrigger className="h-auto gap-1 border-border/50 bg-muted/30 px-2.5 py-1 text-foreground text-xs hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50">
                           <SelectValue>
                             {(value: string | null) =>
                               value

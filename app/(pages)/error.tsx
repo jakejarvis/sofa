@@ -26,7 +26,7 @@ export default function PagesError({
         <h1 className="font-display text-2xl tracking-tight sm:text-3xl">
           Something went wrong
         </h1>
-        <p className="mx-auto max-w-sm text-sm leading-relaxed text-muted-foreground">
+        <p className="mx-auto max-w-sm text-muted-foreground text-sm leading-relaxed">
           An unexpected error occurred while loading this page. You can try
           again or head back to the dashboard.
         </p>
@@ -42,7 +42,7 @@ export default function PagesError({
         <button
           type="button"
           onClick={reset}
-          className="group relative inline-flex h-10 items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-shadow hover:shadow-lg hover:shadow-primary/20"
+          className="group relative inline-flex h-10 items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary px-5 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-lg hover:shadow-primary/20"
         >
           <IconRefresh className="size-4" />
           <span className="relative z-10">Try again</span>
@@ -50,7 +50,7 @@ export default function PagesError({
         </button>
         <Link
           href="/dashboard"
-          className="inline-flex h-10 items-center justify-center rounded-lg border border-border px-5 text-sm font-medium transition-colors hover:border-primary/40 hover:bg-primary/5"
+          className="inline-flex h-10 items-center justify-center rounded-lg border border-border px-5 font-medium text-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
         >
           Dashboard
         </Link>

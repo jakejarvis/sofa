@@ -112,7 +112,7 @@ function QuickAddButton({
     return (
       <Tooltip>
         <TooltipTrigger
-          className="absolute top-2 right-2 z-10 flex size-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white cursor-default"
+          className="absolute top-2 right-2 z-10 flex size-8 cursor-default items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm"
           render={<div />}
         >
           <StatusIcon className="size-4" />
@@ -126,7 +126,7 @@ function QuickAddButton({
     <Tooltip>
       <TooltipTrigger
         onClick={handleClick}
-        className="absolute top-2 right-2 z-10 flex size-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 hover:bg-black/70"
+        className="absolute top-2 right-2 z-10 flex size-8 items-center justify-center rounded-full bg-black/50 text-white opacity-60 backdrop-blur-sm transition-opacity hover:bg-black/70 focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
         render={<button type="button" />}
       >
         {state === "idle" && <IconPlus className="size-4" />}
@@ -145,7 +145,7 @@ function ProgressBar({ watched, total }: { watched: number; total: number }) {
   return (
     <Tooltip>
       <TooltipTrigger
-        className="absolute bottom-0 left-0 right-0 z-10 h-1 bg-white/10 cursor-default"
+        className="absolute right-0 bottom-0 left-0 z-10 h-1 cursor-default bg-white/10"
         render={<div />}
       >
         <div
@@ -179,7 +179,7 @@ function CardInner({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-card ring-1 transition-[box-shadow,ring-color] duration-200 ease-out hover:ring-primary/25 hover:shadow-lg hover:shadow-primary/5 ${ringClass}`}
+      className={`relative overflow-hidden rounded-xl bg-card ring-1 transition-[box-shadow,ring-color] duration-200 ease-out hover:shadow-lg hover:shadow-primary/5 hover:ring-primary/25 ${ringClass}`}
     >
       <div className="aspect-[2/3] overflow-hidden bg-card">
         {posterPath ? (
@@ -202,7 +202,7 @@ function CardInner({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-primary/10 via-transparent to-transparent" />
             <div className="relative px-3 text-center">
-              <p className="font-display text-sm leading-snug tracking-tight text-foreground/70">
+              <p className="font-display text-foreground/70 text-sm leading-snug tracking-tight">
                 {title}
               </p>
             </div>
@@ -220,12 +220,12 @@ function CardInner({
         )}
       </div>
 
-      <div className="px-3 pb-3 pt-2.5">
+      <div className="px-3 pt-2.5 pb-3">
         <div className="flex items-center gap-1.5">
           {userStatus && (
             <Tooltip>
               <TooltipTrigger
-                className="cursor-default shrink-0"
+                className="shrink-0 cursor-default"
                 render={<div className="flex items-center" />}
               >
                 <span className="relative flex size-2">
@@ -240,11 +240,11 @@ function CardInner({
               <TooltipContent>{statusConfig[userStatus].label}</TooltipContent>
             </Tooltip>
           )}
-          <p className="line-clamp-1 text-sm font-medium leading-snug">
+          <p className="line-clamp-1 font-medium text-sm leading-snug">
             {title}
           </p>
         </div>
-        <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="mt-1.5 flex items-center gap-2 text-muted-foreground text-xs">
           <TypeIcon
             aria-hidden={true}
             className="size-3.5 shrink-0 text-primary/60"
@@ -283,7 +283,7 @@ export function TitleCard({
   const href = id ? `/titles/${id}` : `/titles/tmdb-${tmdbId}-${type}`;
   const tilt = useTiltEffect();
   return (
-    <div className="relative group">
+    <div className="group relative">
       <QuickAddButton
         tmdbId={tmdbId}
         type={type as "movie" | "tv"}

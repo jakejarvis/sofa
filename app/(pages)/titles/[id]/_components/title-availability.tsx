@@ -43,7 +43,7 @@ function ProviderBadge({
               ),
             }
           : {})}
-        className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card motion-safe:transition-transform motion-safe:hover:scale-105${watchUrl ? "" : " cursor-default"}`}
+        className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card motion-safe:transition-transform motion-safe:hover:scale-105${watchUrl ? "" : "cursor-default"}`}
       >
         {logoPath ? (
           <Image
@@ -54,12 +54,12 @@ function ProviderBadge({
             className="h-full w-full object-cover"
           />
         ) : (
-          <span className="text-[8px] font-medium text-muted-foreground">
+          <span className="font-medium text-[8px] text-muted-foreground">
             {name.slice(0, 2)}
           </span>
         )}
       </TooltipTrigger>
-      <TooltipContent className="bg-popover px-2 py-1 text-[10px] font-medium text-popover-foreground shadow-md [&>:last-child]:bg-popover [&>:last-child]:fill-popover">
+      <TooltipContent className="bg-popover px-2 py-1 font-medium text-[10px] text-popover-foreground shadow-md [&>:last-child]:hidden">
         {watchUrl ? `Watch on ${name}` : name}
       </TooltipContent>
     </Tooltip>
@@ -78,7 +78,7 @@ function OverflowProviderIcon({ offer }: { offer: AvailabilityOffer }) {
           className="h-7 w-7 object-cover"
         />
       ) : (
-        <span className="text-[7px] font-medium text-muted-foreground">
+        <span className="font-medium text-[7px] text-muted-foreground">
           {offer.providerName.slice(0, 2)}
         </span>
       )}
@@ -93,7 +93,7 @@ function OverflowBadge({ offers }: { offers: AvailabilityOffer[] }) {
         openOnHover
         delay={0}
         closeDelay={300}
-        className="flex h-10 w-10 cursor-default items-center justify-center rounded-lg border border-border/30 bg-card text-xs font-semibold text-muted-foreground motion-safe:transition-transform motion-safe:hover:scale-105"
+        className="flex h-10 w-10 cursor-default items-center justify-center rounded-lg border border-border/30 bg-card font-semibold text-muted-foreground text-xs motion-safe:transition-transform motion-safe:hover:scale-105"
       >
         +{offers.length}
       </PopoverTrigger>
@@ -108,7 +108,7 @@ function OverflowBadge({ offers }: { offers: AvailabilityOffer[] }) {
               className="flex items-center gap-2.5 px-2 py-1.5 hover:bg-muted/50"
             >
               <OverflowProviderIcon offer={offer} />
-              <span className="truncate text-xs text-popover-foreground">
+              <span className="truncate text-popover-foreground text-xs">
                 {offer.providerName}
               </span>
             </a>
@@ -118,7 +118,7 @@ function OverflowBadge({ offers }: { offers: AvailabilityOffer[] }) {
               className="flex items-center gap-2.5 px-2 py-1.5"
             >
               <OverflowProviderIcon offer={offer} />
-              <span className="truncate text-xs text-popover-foreground">
+              <span className="truncate text-popover-foreground text-xs">
                 {offer.providerName}
               </span>
             </div>
@@ -143,8 +143,8 @@ export function TitleAvailability({
   if (Object.keys(availByType).length === 0) return null;
 
   return (
-    <div className="pt-1 space-y-2">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+    <div className="space-y-2 pt-1">
+      <h2 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
         Where to Watch
       </h2>
       <div className="flex flex-wrap gap-4">
@@ -154,7 +154,7 @@ export function TitleAvailability({
 
           return (
             <div key={type} className="space-y-1.5">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
+              <span className="font-medium text-[10px] text-muted-foreground/60 uppercase tracking-wider">
                 {offerLabels[type] ?? type}
               </span>
               <div className="flex gap-1.5">

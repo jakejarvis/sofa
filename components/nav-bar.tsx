@@ -27,8 +27,8 @@ export function NavBar({ userName }: { userName: string }) {
   const setCommandPaletteOpen = useSetAtom(commandPaletteOpenAtom);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
-      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-5 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:gap-0 sm:pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(1.5rem,env(safe-area-inset-right))]">
+    <header className="sticky top-0 z-50 border-border/50 border-b bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-5 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))] sm:gap-0 sm:pr-[max(1.5rem,env(safe-area-inset-right))] sm:pl-[max(1.5rem,env(safe-area-inset-left))]">
         <div className="flex items-center gap-3 sm:gap-6">
           <Link
             href="/dashboard"
@@ -46,7 +46,7 @@ export function NavBar({ userName }: { userName: string }) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="relative inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="relative inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground"
                 >
                   {link.label}
                   {isActive && (
@@ -71,7 +71,7 @@ export function NavBar({ userName }: { userName: string }) {
           <button
             type="button"
             onClick={() => setCommandPaletteOpen(true)}
-            className="flex flex-1 items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/20 hover:bg-card sm:hidden"
+            className="flex flex-1 items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-muted-foreground text-sm transition-colors hover:border-primary/20 hover:bg-card sm:hidden"
           >
             <IconSearch aria-hidden={true} className="size-3.5" />
             <span>Search…</span>
@@ -80,7 +80,7 @@ export function NavBar({ userName }: { userName: string }) {
           <button
             type="button"
             onClick={() => setCommandPaletteOpen(true)}
-            className="hidden items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/20 hover:bg-card sm:inline-flex"
+            className="hidden items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-muted-foreground text-sm transition-colors hover:border-primary/20 hover:bg-card sm:inline-flex"
           >
             <IconSearch aria-hidden={true} className="size-3.5" />
             <span>Search…</span>
@@ -93,7 +93,7 @@ export function NavBar({ userName }: { userName: string }) {
           <Tooltip>
             <TooltipTrigger
               render={<Link href="/settings" />}
-              className="hidden items-center gap-1.5 rounded-md px-2 py-1.5 text-sm leading-none text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+              className="hidden items-center gap-1.5 rounded-md px-2 py-1.5 text-muted-foreground text-sm leading-none transition-colors hover:text-foreground sm:inline-flex"
             >
               {userName}
               <IconSettings aria-hidden={true} className="size-3.5" />

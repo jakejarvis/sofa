@@ -18,7 +18,7 @@ export function ContinueWatchingList({
   return (
     <Carousel
       opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}
-      className="-mx-4 sm:-mx-0"
+      className="-mx-4 sm:-mx-0 [&>[data-slot=carousel-content]]:px-px"
     >
       <CarouselContent className="px-4 sm:px-0">
         {items.map((item, i) => (

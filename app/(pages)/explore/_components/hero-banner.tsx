@@ -24,8 +24,8 @@ export function HeroBanner({
   const href = `/titles/tmdb-${tmdbId}-${type}`;
 
   return (
-    <div className="animate-stagger-item relative -mt-6 mb-4 ml-[calc(-50vw+50%)] mr-[calc(-50vw+50%)] overflow-hidden">
-      <div className="relative w-full min-h-[280px] max-h-[420px] aspect-[21/9]">
+    <div className="relative -mt-6 mr-[calc(-50vw+50%)] mb-4 ml-[calc(-50vw+50%)] animate-stagger-item overflow-hidden">
+      <div className="relative aspect-[21/9] max-h-[420px] min-h-[280px] w-full">
         {backdropPath ? (
           <Image
             src={backdropPath}
@@ -44,18 +44,18 @@ export function HeroBanner({
 
         {/* Content */}
         <div className="absolute inset-0 flex items-end">
-          <div className="w-full px-4 pb-8 sm:px-6">
-            <div className="mx-auto max-w-6xl">
+          <div className="w-full pb-8">
+            <div className="mx-auto max-w-6xl pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(1.5rem,env(safe-area-inset-right))] sm:pl-[max(1.5rem,env(safe-area-inset-left))]">
               <div
                 className="animate-stagger-item"
                 style={{ "--stagger-index": 3 } as React.CSSProperties}
               >
                 <div className="mb-3 flex items-center gap-2">
-                  <span className="rounded bg-primary/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+                  <span className="rounded bg-primary/20 px-2 py-0.5 font-semibold text-[10px] text-primary uppercase tracking-wider">
                     {type}
                   </span>
                   {voteAverage > 0 && (
-                    <span className="flex items-center gap-1 text-sm text-primary">
+                    <span className="flex items-center gap-1 text-primary text-sm">
                       <IconStar
                         aria-hidden={true}
                         className="size-3.5 fill-primary"
@@ -63,21 +63,21 @@ export function HeroBanner({
                       {voteAverage.toFixed(1)}
                     </span>
                   )}
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-muted-foreground text-xs">
                     Trending today
                   </span>
                 </div>
                 <Link href={href} className="group/title">
-                  <h2 className="font-display text-3xl tracking-tight text-balance sm:text-4xl transition-colors group-hover/title:text-primary">
+                  <h2 className="text-balance font-display text-3xl tracking-tight transition-colors group-hover/title:text-primary sm:text-4xl">
                     {title}
                   </h2>
                 </Link>
-                <p className="mt-2 line-clamp-2 max-w-2xl text-sm text-muted-foreground">
+                <p className="mt-2 line-clamp-2 max-w-2xl text-muted-foreground text-sm">
                   {overview}
                 </p>
                 <Link
                   href={href}
-                  className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-shadow hover:shadow-md hover:shadow-primary/20"
+                  className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-md hover:shadow-primary/20"
                 >
                   <IconPlus aria-hidden={true} className="size-4" />
                   Add to Library

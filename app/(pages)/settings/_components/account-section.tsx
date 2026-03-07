@@ -29,7 +29,7 @@ export function AccountSection({
     <div>
       <div className="mb-3 flex items-center gap-2">
         <IconUser aria-hidden={true} className="size-4 text-muted-foreground" />
-        <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
           Account
         </h2>
       </div>
@@ -48,7 +48,7 @@ export function AccountSection({
               )}
             </CardTitle>
             <CardDescription>{user.email}</CardDescription>
-            <p className="mt-0.5 text-xs text-muted-foreground/60">
+            <p className="mt-0.5 text-muted-foreground/60 text-xs">
               Member since {memberSince}
             </p>
           </div>

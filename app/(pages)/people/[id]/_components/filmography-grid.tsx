@@ -65,10 +65,10 @@ export function FilmographyGrid({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <IconMovie aria-hidden={true} className="size-5 text-primary" />
-          <h2 className="font-display text-xl tracking-tight text-balance">
+          <h2 className="text-balance font-display text-xl tracking-tight">
             Filmography
           </h2>
-          <span className="text-sm text-muted-foreground">
+          <span className="text-muted-foreground text-sm">
             ({filtered.length})
           </span>
         </div>
@@ -105,7 +105,7 @@ export function FilmographyGrid({
           <Button
             key={f.value}
             variant={filter === f.value ? "default" : "secondary"}
-            size="xs"
+            size="sm"
             onClick={() => setFilter(f.value)}
             className="rounded-full"
           >

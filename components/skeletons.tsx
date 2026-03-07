@@ -13,7 +13,7 @@ export function TitleCardSkeleton() {
   return (
     <div className="overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06]">
       <Skeleton className="aspect-[2/3] w-full rounded-none" />
-      <div className="px-3 pb-3 pt-2.5">
+      <div className="px-3 pt-2.5 pb-3">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="mt-1.5 h-3 w-1/2" />
       </div>
@@ -174,7 +174,7 @@ export function RecommendationsSkeleton() {
 export function TitleDetailSkeleton() {
   return (
     <div className="space-y-10">
-      <Skeleton className="-mt-6 ml-[calc(-50vw+50%)] mr-[calc(-50vw+50%)] h-80 rounded-none sm:h-[28rem]" />
+      <Skeleton className="-mt-6 mr-[calc(-50vw+50%)] ml-[calc(-50vw+50%)] h-80 rounded-none sm:h-[28rem]" />
       <div className="flex flex-row gap-4 sm:gap-8">
         <Skeleton className="h-[180px] w-[120px] shrink-0 rounded-xl sm:h-[330px] sm:w-[220px]" />
         <div className="flex-1 space-y-5">

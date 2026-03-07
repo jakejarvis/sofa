@@ -37,19 +37,19 @@ export function TitleRow({
     <section className="space-y-4">
       <div className="flex items-center gap-2">
         {icon}
-        <h2 className="font-display text-xl tracking-tight text-balance">
+        <h2 className="text-balance font-display text-xl tracking-tight">
           {heading}
         </h2>
       </div>
       <Carousel
         opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}
-        className="-mx-6 sm:-mx-2 carousel-tilt"
+        className="carousel-tilt -mx-6 sm:-mx-2"
       >
         <CarouselContent className="px-6 sm:px-2">
           {items.map((item, i) => (
             <CarouselItem
               key={`${item.type}-${item.tmdbId}`}
-              className="basis-auto pl-4 w-[140px] shrink-0 sm:w-[160px]"
+              className="w-[140px] shrink-0 basis-auto pl-4 sm:w-[160px]"
             >
               <div
                 className="animate-stagger-item"

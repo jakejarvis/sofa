@@ -106,28 +106,31 @@ function FilterableTitleRowInner({
     <section className="space-y-4">
       <div className="flex items-center gap-2">
         {icon}
-        <h2 className="font-display text-xl tracking-tight text-balance">
+        <h2 className="text-balance font-display text-xl tracking-tight">
           {heading}
         </h2>
       </div>
 
       {/* Genre chips */}
-      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-0 sm:flex-wrap sm:px-0">
-        {genres.map((genre) => (
-          <Button
-            key={genre.id}
-            variant={selectedGenre === genre.id ? "default" : "outline"}
-            size="xs"
-            onClick={() => toggleGenre(genre.id)}
-            className={`shrink-0 rounded-full ${
-              selectedGenre === genre.id
-                ? "border-primary bg-primary/10 text-primary hover:bg-primary/20"
-                : "border-border/50 bg-card/50 text-muted-foreground hover:border-primary/20 hover:text-foreground"
-            }`}
-          >
-            {genre.name}
-          </Button>
-        ))}
+      <div className="relative">
+        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+          {genres.map((genre) => (
+            <Button
+              key={genre.id}
+              variant={selectedGenre === genre.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleGenre(genre.id)}
+              className={`shrink-0 rounded-full ${
+                selectedGenre === genre.id
+                  ? "border-primary bg-primary/10 text-primary hover:bg-primary/20"
+                  : "border-border/50 bg-card/50 text-muted-foreground hover:border-primary/20 hover:text-foreground"
+              }`}
+            >
+              {genre.name}
+            </Button>
+          ))}
+        </div>
+        <div className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-background to-transparent sm:hidden" />
       </div>
 
       {/* Loading skeleton */}
@@ -147,7 +150,7 @@ function FilterableTitleRowInner({
 
       {/* Empty state */}
       {!loading && selectedGenre !== null && items.length === 0 && (
-        <p className="py-8 text-center text-sm text-muted-foreground">
+        <p className="py-8 text-center text-muted-foreground text-sm">
           No titles found for this genre.
         </p>
       )}
@@ -161,13 +164,13 @@ function FilterableTitleRowInner({
               dragFree: true,
               containScroll: "trimSnaps",
             }}
-            className="-mx-6 sm:-mx-2 carousel-tilt"
+            className="carousel-tilt -mx-6 sm:-mx-2"
           >
             <CarouselContent className="px-6 sm:px-2">
               {items.slice(0, 20).map((item, i) => (
                 <CarouselItem
                   key={`${item.type}-${item.tmdbId}`}
-                  className="basis-auto pl-4 w-[140px] shrink-0 sm:w-[160px]"
+                  className="w-[140px] shrink-0 basis-auto pl-4 sm:w-[160px]"
                 >
                   <div
                     className="animate-stagger-item"

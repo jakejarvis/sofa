@@ -227,7 +227,7 @@ export function CommandPalette() {
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-medium">
+                        <p className="truncate font-medium text-xs">
                           {r.title}
                         </p>
                         <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
@@ -275,7 +275,7 @@ export function CommandPalette() {
                           <button
                             type="button"
                             onClick={handleClearRecent}
-                            className="text-[10px] font-normal text-muted-foreground transition-colors hover:text-foreground"
+                            className="font-normal text-[10px] text-muted-foreground transition-colors hover:text-foreground"
                           >
                             Clear all
                           </button>
@@ -363,7 +363,7 @@ export function CommandPalette() {
           <div className="space-y-5 py-2">
             {Object.entries(groupedShortcuts).map(([scope, items]) => (
               <div key={scope} className="space-y-2">
-                <h3 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <h3 className="font-semibold text-[10px] text-muted-foreground uppercase tracking-wider">
                   {scope}
                 </h3>
                 <div className="space-y-1">
@@ -372,7 +372,7 @@ export function CommandPalette() {
                       key={item.description}
                       className="flex items-center justify-between rounded-md px-2 py-1.5"
                     >
-                      <span className="text-xs text-foreground">
+                      <span className="text-foreground text-xs">
                         {item.description}
                       </span>
                       <div className="flex items-center gap-1">

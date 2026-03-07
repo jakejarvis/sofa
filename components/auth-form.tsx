@@ -107,10 +107,10 @@ export function AuthForm({
           <Link href="/" className="inline-flex justify-center text-primary">
             <SofaLogo className="size-9" />
           </Link>
-          <h1 className="text-lg font-medium text-balance">
+          <h1 className="text-balance font-medium text-lg">
             {isRegister ? "Create your account" : "Welcome back"}
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {isRegister ? "Start tracking your watches" : "Sign in to continue"}
           </p>
         </div>
@@ -144,7 +144,7 @@ export function AuthForm({
         {showOidc && showPasswordForm && (
           <div className="flex items-center gap-3">
             <div className="h-px flex-1 bg-border/50" />
-            <span className="text-xs text-muted-foreground">or</span>
+            <span className="text-muted-foreground text-xs">or</span>
             <div className="h-px flex-1 bg-border/50" />
           </div>
         )}
@@ -164,7 +164,7 @@ export function AuthForm({
               <motion.div variants={fieldVariants} className="space-y-1.5">
                 <Label
                   htmlFor="name"
-                  className="uppercase tracking-wider text-muted-foreground"
+                  className="text-muted-foreground uppercase tracking-wider"
                 >
                   Name
                 </Label>
@@ -184,7 +184,7 @@ export function AuthForm({
             <motion.div variants={fieldVariants} className="space-y-1.5">
               <Label
                 htmlFor="email"
-                className="uppercase tracking-wider text-muted-foreground"
+                className="text-muted-foreground uppercase tracking-wider"
               >
                 Email
               </Label>
@@ -204,7 +204,7 @@ export function AuthForm({
             <motion.div variants={fieldVariants} className="space-y-1.5">
               <Label
                 htmlFor="password"
-                className="uppercase tracking-wider text-muted-foreground"
+                className="text-muted-foreground uppercase tracking-wider"
               >
                 Password
               </Label>
@@ -258,7 +258,7 @@ export function AuthForm({
 
         {showPasswordForm &&
           (isRegister || authConfig?.registrationOpen !== false) && (
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="text-center text-muted-foreground text-sm">
               {isRegister ? (
                 <>
                   Already have an account?{" "}

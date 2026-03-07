@@ -81,7 +81,7 @@ export function LandingPage({
 
       {/* Warm primary glow */}
       <motion.div
-        className="pointer-events-none absolute left-1/2 top-1/3 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[120px]"
+        className="pointer-events-none absolute top-1/3 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[120px]"
         animate={{ opacity: [0.4, 0.7, 0.4] }}
         transition={{
           duration: 6,
@@ -93,7 +93,7 @@ export function LandingPage({
       <main className="relative z-10 flex flex-col items-center gap-10 px-6 text-center">
         <div className="space-y-4">
           <motion.p
-            className="text-sm font-medium uppercase tracking-[0.3em] text-primary"
+            className="font-medium text-primary text-sm uppercase tracking-[0.3em]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -118,7 +118,7 @@ export function LandingPage({
             <SofaLogo className="size-24 sm:size-28 md:size-32" />
           </motion.div>
           <motion.p
-            className="mx-auto max-w-md text-lg leading-relaxed text-muted-foreground"
+            className="mx-auto max-w-md text-lg text-muted-foreground leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -176,7 +176,7 @@ export function LandingPage({
       </main>
 
       {/* Bottom fade */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-32 bg-gradient-to-t from-background to-transparent" />
     </div>
   );
 }

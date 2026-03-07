@@ -178,8 +178,7 @@ async function resolveEpisode(event: WebhookEvent): Promise<{
   seasonNumber: number;
   episodeNumber: number;
 } | null> {
-  const seasonNumber = event.seasonNumber;
-  const episodeNumber = event.episodeNumber;
+  const { seasonNumber, episodeNumber } = event;
   if (seasonNumber == null || episodeNumber == null) return null;
 
   // Strategy 1: Use IMDB ID to find the episode and get show_id

@@ -30,7 +30,7 @@ export function TitleActions() {
         <Button
           onClick={handleWatchMovie}
           size="lg"
-          className="h-9 rounded-lg px-4 text-sm active:scale-[0.97] hover:shadow-md hover:shadow-primary/20"
+          className="h-9 rounded-lg px-4 text-sm hover:shadow-md hover:shadow-primary/20 active:scale-[0.97]"
         >
           <IconCheck aria-hidden={true} className="size-3.5" />
           Mark Watched

@@ -29,7 +29,7 @@ export function IntegrationsSection({
           aria-hidden={true}
           className="size-4 text-muted-foreground"
         />
-        <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
           Integrations
         </h2>
       </div>

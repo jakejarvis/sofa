@@ -15,7 +15,7 @@ export function FeedSection({
     <section className="space-y-4">
       <div className="flex items-center gap-2">
         <span aria-hidden={true}>{icon}</span>
-        <h2 className="font-display text-xl tracking-tight text-balance">
+        <h2 className="text-balance font-display text-xl tracking-tight">
           {title}
         </h2>
       </div>

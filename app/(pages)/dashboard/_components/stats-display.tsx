@@ -53,7 +53,7 @@ function StatCard({
 }: StatCardProps) {
   return (
     <div
-      className="animate-stagger-item relative overflow-hidden rounded-xl border border-border/30 bg-card/50 p-4"
+      className="relative animate-stagger-item overflow-hidden rounded-xl border border-border/30 bg-card/50 p-4"
       style={{ "--stagger-index": index } as React.CSSProperties}
     >
       {sparklineData && <Sparkline data={sparklineData} color={color} />}
@@ -63,7 +63,7 @@ function StatCard({
         >
           <Icon aria-hidden={true} className={`size-[13px] ${color}`} />
         </div>
-        <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+        <span className="font-medium text-[10px] text-muted-foreground uppercase tracking-wider">
           {label}
         </span>
       </div>
@@ -97,7 +97,7 @@ function PeriodSelector({
         onValueChange={(v) => v && onPeriodChange(v as TimePeriod)}
       >
         <SelectTrigger
-          className={`${inlineTriggerClass} uppercase text-foreground/80`}
+          className={`${inlineTriggerClass} text-foreground/80 uppercase`}
         >
           <SelectValue>
             {(value: TimePeriod | null) => (value ? periodLabels[value] : null)}
@@ -132,11 +132,11 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
   } | null>(null);
 
   useEffect(() => {
-    getStatsAction("movies", moviePeriod).then(setMovieStats);
+    void getStatsAction("movies", moviePeriod).then(setMovieStats);
   }, [moviePeriod]);
 
   useEffect(() => {
-    getStatsAction("episodes", episodePeriod).then(setEpisodeStats);
+    void getStatsAction("episodes", episodePeriod).then(setEpisodeStats);
   }, [episodePeriod]);
 
   const movieCount = movieStats?.count ?? stats.moviesThisMonth;

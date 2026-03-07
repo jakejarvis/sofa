@@ -12,7 +12,7 @@ export function UpdateToast() {
   useEffect(() => {
     if (shown) return;
 
-    getUpdateCheckAction().then((data) => {
+    void getUpdateCheckAction().then((data) => {
       if (!data?.updateAvailable) return;
 
       setShown(true);

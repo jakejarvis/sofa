@@ -110,13 +110,13 @@ export default async function SettingsPage() {
   return (
     <SettingsShell
       footer={
-        <footer className="border-t border-border/50 pt-6 pb-2 text-center text-xs text-muted-foreground">
+        <footer className="border-border/50 border-t pt-6 pb-2 text-center text-muted-foreground text-xs">
           <p>
             <a
               href={`https://github.com/${GITHUB_REPO}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-primary/80 hover:text-primary transition-colors"
+              className="font-medium text-primary/80 transition-colors hover:text-primary"
             >
               Sofa
             </a>{" "}
@@ -129,7 +129,7 @@ export default async function SettingsPage() {
                   href={`https://github.com/${GITHUB_REPO}/commit/${GIT_COMMIT_SHA}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono hover:text-primary transition-colors"
+                  className="font-mono transition-colors hover:text-primary"
                 >
                   {GIT_COMMIT_SHA}
                 </a>
@@ -137,7 +137,7 @@ export default async function SettingsPage() {
               </>
             )}
             {updateCheck?.updateAvailable && (
-              <span className="ml-1.5 inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary">
+              <span className="ml-1.5 inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 font-medium text-[10px] text-primary">
                 <span className="relative flex h-1.5 w-1.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
@@ -161,11 +161,11 @@ export default async function SettingsPage() {
               href="https://www.themoviedb.org/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:opacity-70 transition-opacity"
+              className="transition-opacity hover:opacity-70"
             >
               <TmdbLogo className="h-3" />
             </a>
-            <p className="text-[10px] leading-relaxed text-muted-foreground">
+            <p className="text-[10px] text-muted-foreground leading-relaxed">
               This product uses the TMDB API but is not endorsed or certified by
               TMDB.
             </p>
@@ -191,10 +191,10 @@ export default async function SettingsPage() {
                 aria-hidden={true}
                 className="size-4 text-muted-foreground"
               />
-              <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
                 Server
               </h2>
-              <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+              <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
                 Admin only
               </span>
             </div>
@@ -210,10 +210,10 @@ export default async function SettingsPage() {
                 aria-hidden={true}
                 className="size-4 text-muted-foreground"
               />
-              <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
                 Security
               </h2>
-              <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+              <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
                 Admin only
               </span>
             </div>
@@ -236,10 +236,10 @@ export default async function SettingsPage() {
                 aria-hidden={true}
                 className="size-4 text-muted-foreground"
               />
-              <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
                 Backups
               </h2>
-              <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+              <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
                 Admin only
               </span>
             </div>

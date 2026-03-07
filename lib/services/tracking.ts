@@ -86,7 +86,7 @@ export function logEpisodeWatch(
     .where(eq(seasons.id, ep.seasonId))
     .get();
   if (!season) return;
-  const titleId = season.titleId;
+  const { titleId } = season;
 
   // Auto-set status to in_progress if not set
   const existing = db
@@ -141,7 +141,7 @@ export function logEpisodeWatchBatch(
       .all();
     if (seasonRows.length === 0) return;
 
-    const titleId = seasonRows[0].titleId;
+    const { titleId } = seasonRows[0];
 
     // Set status to in_progress if not already set
     const existing = tx

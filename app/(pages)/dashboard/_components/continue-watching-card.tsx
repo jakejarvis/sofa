@@ -35,16 +35,16 @@ export function ContinueWatchingCard({
   return (
     <Link
       href={`/titles/${item.title.id}`}
-      className="group relative w-[calc(100vw-3rem)] shrink-0 overflow-hidden rounded-xl bg-card/50 ring-1 ring-white/[0.06] transition-shadow hover:shadow-lg hover:shadow-black/25 sm:w-72"
+      className="group relative inline-block w-64 shrink-0 overflow-hidden rounded-xl bg-card/50 ring-1 ring-white/[0.06] transition-shadow hover:shadow-black/25 hover:shadow-lg sm:w-72"
     >
       <div className="relative aspect-video overflow-hidden rounded-t-xl bg-muted">
         {stillUrl ? (
           <Image
             src={stillUrl}
             alt={item.nextEpisode?.name ?? item.title.title}
-            width={500}
-            height={281}
-            className="h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-105"
+            fill
+            sizes="(min-width: 640px) 288px, 256px"
+            className="object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-gradient-to-br from-card via-secondary to-muted">
@@ -56,13 +56,13 @@ export function ContinueWatchingCard({
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         {item.nextEpisode && (
-          <div className="absolute bottom-2.5 left-3 right-3">
-            <p className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-primary">
-              <span className="inline-block h-1.5 w-1.5 motion-safe:animate-pulse rounded-full bg-primary" />
+          <div className="absolute right-3 bottom-2.5 left-3">
+            <p className="flex items-center gap-1.5 font-medium text-[10px] text-primary uppercase tracking-wider">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary motion-safe:animate-pulse" />
               Up next
             </p>
-            <p className="mt-0.5 truncate text-sm font-medium text-white">
-              <span className="font-mono text-xs text-white/60 [word-spacing:-0.25em] mr-0.5">
+            <p className="mt-0.5 truncate font-medium text-sm text-white">
+              <span className="mr-0.5 font-mono text-white/60 text-xs [word-spacing:-0.25em]">
                 S{item.nextEpisode.seasonNumber} E
                 {item.nextEpisode.episodeNumber}
               </span>{" "}
@@ -73,8 +73,8 @@ export function ContinueWatchingCard({
       </div>
       <div className="flex items-center gap-3 p-3">
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">{item.title.title}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="truncate font-medium text-sm">{item.title.title}</p>
+          <p className="text-muted-foreground text-xs">
             {item.watchedEpisodes}/{item.totalEpisodes} episodes
           </p>
         </div>
@@ -83,7 +83,7 @@ export function ContinueWatchingCard({
         </div>
       </div>
       {progress > 0 && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-muted">
+        <div className="absolute right-0 bottom-0 left-0 h-0.5 bg-muted">
           <div
             className="h-full bg-primary transition-[width]"
             style={{ width: `${progress}%` }}

@@ -127,7 +127,7 @@ export function BackupSection({
       {/* Backup list */}
       <AnimatePresence initial={false}>
         {backups.length > 0 && (
-          <CardContent className="border-t border-border/30 pt-4">
+          <CardContent className="border-border/30 border-t pt-4">
             <div className="space-y-1.5">
               {backups.map((backup) => (
                 <motion.div
@@ -169,7 +169,7 @@ export function BackupSection({
                     </Tooltip>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-xs font-medium text-foreground">
+                        <span className="font-medium text-foreground text-xs">
                           {formatBackupDate(backup.createdAt)}
                         </span>
                         <span className="text-[11px] text-muted-foreground">
@@ -185,7 +185,7 @@ export function BackupSection({
                         </span>
                       </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                    <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
                       <Tooltip>
                         <TooltipTrigger
                           render={

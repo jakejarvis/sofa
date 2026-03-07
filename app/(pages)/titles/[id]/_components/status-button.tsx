@@ -48,7 +48,7 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.15 }}
-          className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary/10 px-4 text-sm font-medium text-primary ring-1 ring-primary/20 transition-all hover:bg-primary/15 hover:ring-primary/30 active:scale-[0.97]"
+          className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary/10 px-4 font-medium text-primary text-sm ring-1 ring-primary/20 transition-all hover:bg-primary/15 hover:ring-primary/30 active:scale-[0.97]"
         >
           <IconPlus aria-hidden={true} className="size-3.5" strokeWidth={2.5} />
           Watchlist
@@ -63,7 +63,7 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
           exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.15 }}
           title="Remove from library"
-          className={`group inline-flex h-9 items-center gap-2 rounded-lg px-4 text-sm font-medium ring-1 transition-all active:scale-[0.97] ${config.class} ${config.bgClass} ${config.borderClass} hover:ring-destructive/30 hover:bg-destructive/10 hover:text-destructive`}
+          className={`group inline-flex h-9 items-center gap-2 rounded-lg px-4 font-medium text-sm ring-1 transition-all active:scale-[0.97] ${config.class} ${config.bgClass} ${config.borderClass} hover:bg-destructive/10 hover:text-destructive hover:ring-destructive/30`}
         >
           <span className="grid [&>svg]:col-start-1 [&>svg]:row-start-1">
             <config.icon
@@ -72,7 +72,7 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
             />
             <IconX
               aria-hidden={true}
-              className="size-3.5 opacity-0 text-destructive transition-opacity group-hover:opacity-100"
+              className="size-3.5 text-destructive opacity-0 transition-opacity group-hover:opacity-100"
             />
           </span>
           <span className="grid [&>span]:col-start-1 [&>span]:row-start-1">

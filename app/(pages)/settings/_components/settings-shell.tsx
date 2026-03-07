@@ -33,11 +33,11 @@ export function SettingsShell({
       <motion.div variants={sectionVariants}>
         <div className="flex items-center gap-2">
           <IconSettings aria-hidden={true} className="size-5 text-primary" />
-          <h1 className="font-display text-3xl tracking-tight text-balance">
+          <h1 className="text-balance font-display text-3xl tracking-tight">
             Settings
           </h1>
         </div>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-muted-foreground text-sm">
           Manage your account and preferences
         </p>
       </motion.div>

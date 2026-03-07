@@ -15,7 +15,7 @@ export function MobileTabBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/90 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] backdrop-blur-xl sm:hidden">
+    <nav className="fixed right-0 bottom-0 left-0 z-50 border-border/50 border-t bg-background/90 pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] backdrop-blur-xl sm:hidden">
       <div className="flex h-14 items-stretch">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -33,7 +33,7 @@ export function MobileTabBar() {
                 className={`size-5 ${isActive ? "text-primary" : "text-muted-foreground"}`}
               />
               <span
-                className={`text-[10px] font-medium ${isActive ? "text-primary" : "text-muted-foreground"}`}
+                className={`font-medium text-[10px] ${isActive ? "text-primary" : "text-muted-foreground"}`}
               >
                 {tab.label}
               </span>

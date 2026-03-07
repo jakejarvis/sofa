@@ -25,17 +25,17 @@ export default async function RegisterPage() {
               <IconLock aria-hidden={true} className="size-6 text-primary" />
             </div>
             <div className="space-y-2">
-              <h1 className="font-display text-xl tracking-tight text-balance">
+              <h1 className="text-balance font-display text-xl tracking-tight">
                 Registration Closed
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 New accounts are not being accepted right now. Contact the admin
                 if you need access.
               </p>
             </div>
             <Link
               href="/login"
-              className="inline-flex h-10 items-center rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground transition-all hover:shadow-md hover:shadow-primary/20"
+              className="inline-flex h-10 items-center rounded-lg bg-primary px-6 font-medium text-primary-foreground text-sm transition-all hover:shadow-md hover:shadow-primary/20"
             >
               Sign in instead
             </Link>

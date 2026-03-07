@@ -65,7 +65,7 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
                       )}
                     </div>
                     <div className="w-full text-center">
-                      <p className="truncate text-xs font-medium">
+                      <p className="line-clamp-2 font-medium text-xs leading-tight">
                         {member.name}
                       </p>
                       {member.character && (

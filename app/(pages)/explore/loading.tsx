@@ -35,8 +35,8 @@ export default function ExploreLoading() {
   return (
     <div className="space-y-10">
       {/* Hero skeleton — full viewport width like the actual HeroBanner */}
-      <div className="-mt-6 mb-4 ml-[calc(-50vw+50%)] mr-[calc(-50vw+50%)]">
-        <Skeleton className="aspect-[21/9] min-h-[280px] max-h-[420px] w-full rounded-none" />
+      <div className="-mt-6 mr-[calc(-50vw+50%)] mb-4 ml-[calc(-50vw+50%)]">
+        <Skeleton className="aspect-[21/9] max-h-[420px] min-h-[280px] w-full rounded-none" />
       </div>
 
       <TitleRowSkeleton />

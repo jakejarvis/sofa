@@ -17,7 +17,7 @@ function origin() {
 /** Reusable alert banner for integrations that require a subscription. */
 function RequirementAlert({ children }: { children: React.ReactNode }) {
   return (
-    <Alert className="border-primary/20 bg-primary/5 [&>svg]:text-primary gap-0">
+    <Alert className="gap-0 border-primary/20 bg-primary/5 [&>svg]:text-primary">
       <IconInfoCircle aria-hidden={true} className="inline-block size-3.5" />
       <AlertDescription className="text-foreground/80">
         {children}
