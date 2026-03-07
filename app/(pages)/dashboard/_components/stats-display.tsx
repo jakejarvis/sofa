@@ -6,7 +6,7 @@ import {
   IconMovie,
   IconPlayerPlay,
 } from "@tabler/icons-react";
-import { useAtom, useAtomValue } from "jotai";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -14,12 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  episodePeriodAtom,
-  episodeStatsAtom,
-  moviePeriodAtom,
-  movieStatsAtom,
-} from "@/lib/atoms/stats";
+import { getStatsAction } from "@/lib/actions/watchlist";
 import type {
   DashboardStats,
   HistoryBucket,
@@ -83,7 +78,7 @@ function StatCard({
 }
 
 const inlineTriggerClass =
-  "h-auto w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 [font-size:inherit] [line-height:inherit] shadow-none underline decoration-dotted decoration-muted-foreground/50 underline-offset-4 hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:ring-0 focus-visible:decoration-solid focus-visible:decoration-foreground dark:bg-transparent dark:hover:bg-transparent";
+  "h-auto w-auto gap-0.5 rounded-none border-0 bg-transparent py-1 px-0.5 -my-1 -mx-0.5 sm:p-0 sm:m-0 [font-size:inherit] [line-height:inherit] shadow-none underline decoration-dotted decoration-muted-foreground/50 underline-offset-4 hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:ring-0 focus-visible:decoration-solid focus-visible:decoration-foreground dark:bg-transparent dark:hover:bg-transparent";
 
 function PeriodSelector({
   noun,
@@ -125,10 +120,24 @@ function PeriodSelector({
 }
 
 export function StatsDisplay({ stats }: { stats: DashboardStats }) {
-  const [moviePeriod, setMoviePeriod] = useAtom(moviePeriodAtom);
-  const [episodePeriod, setEpisodePeriod] = useAtom(episodePeriodAtom);
-  const movieStats = useAtomValue(movieStatsAtom);
-  const episodeStats = useAtomValue(episodeStatsAtom);
+  const [moviePeriod, setMoviePeriod] = useState<TimePeriod>("this_month");
+  const [episodePeriod, setEpisodePeriod] = useState<TimePeriod>("this_week");
+  const [movieStats, setMovieStats] = useState<{
+    count: number;
+    history: HistoryBucket[];
+  } | null>(null);
+  const [episodeStats, setEpisodeStats] = useState<{
+    count: number;
+    history: HistoryBucket[];
+  } | null>(null);
+
+  useEffect(() => {
+    getStatsAction("movies", moviePeriod).then(setMovieStats);
+  }, [moviePeriod]);
+
+  useEffect(() => {
+    getStatsAction("episodes", episodePeriod).then(setEpisodeStats);
+  }, [episodePeriod]);
 
   const movieCount = movieStats?.count ?? stats.moviesThisMonth;
   const movieHistory = movieStats?.history;
