@@ -161,4 +161,4 @@ Core workflow:
 3. `agent-browser click @e1` / `fill @e2 "text"` - Interact using refs
 4. Re-snapshot after page changes
 
-When encountering auth, use `jake@jarv.is` for the username/email and `password` for the password.
+When encountering auth, use `demo@sofa.watch` for the username/email and `password` for the password.
