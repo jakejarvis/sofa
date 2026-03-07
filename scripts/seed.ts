@@ -36,8 +36,8 @@ import {
   userMovieWatches,
   userRatings,
   userTitleStatus,
-  webhookConnections,
-  webhookEventLog,
+  integrations,
+  integrationEvents,
 } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
 import { importTitle } from "@/lib/services/metadata";
@@ -499,17 +499,18 @@ async function seedForUser(userId: string) {
     );
   }
 
-  // 6. Webhook connections
-  log.info("Creating webhook connections...");
+  // 6. Integrations (webhook connections)
+  log.info("Creating integrations...");
   const plexWebhookId = Bun.randomUUIDv7();
   const jellyfinWebhookId = Bun.randomUUIDv7();
 
-  db.insert(webhookConnections)
+  db.insert(integrations)
     .values([
       {
         id: plexWebhookId,
         userId,
         provider: "plex",
+        type: "webhook",
         token: `plex_${Bun.randomUUIDv7().replace(/-/g, "").slice(0, 32)}`,
         enabled: true,
         createdAt: daysAgo(90),
@@ -519,6 +520,7 @@ async function seedForUser(userId: string) {
         id: jellyfinWebhookId,
         userId,
         provider: "jellyfin",
+        type: "webhook",
         token: `jf_${Bun.randomUUIDv7().replace(/-/g, "").slice(0, 32)}`,
         enabled: true,
         createdAt: daysAgo(45),
@@ -528,10 +530,10 @@ async function seedForUser(userId: string) {
     .onConflictDoNothing()
     .run();
 
-  // Sample webhook event log
-  const webhookEvents = [
+  // Sample integration event log
+  const integrationEventEntries = [
     {
-      connectionId: plexWebhookId,
+      integrationId: plexWebhookId,
       eventType: "media.scrobble",
       mediaType: "movie",
       mediaTitle: "The Shawshank Redemption",
@@ -539,7 +541,7 @@ async function seedForUser(userId: string) {
       receivedAt: daysAgo(5),
     },
     {
-      connectionId: plexWebhookId,
+      integrationId: plexWebhookId,
       eventType: "media.scrobble",
       mediaType: "movie",
       mediaTitle: "Fight Club",
@@ -547,7 +549,7 @@ async function seedForUser(userId: string) {
       receivedAt: daysAgo(10),
     },
     {
-      connectionId: plexWebhookId,
+      integrationId: plexWebhookId,
       eventType: "media.play",
       mediaType: "movie",
       mediaTitle: "Unknown Movie",
@@ -555,7 +557,7 @@ async function seedForUser(userId: string) {
       receivedAt: daysAgo(12),
     },
     {
-      connectionId: jellyfinWebhookId,
+      integrationId: jellyfinWebhookId,
       eventType: "PlaybackStop",
       mediaType: "episode",
       mediaTitle: "House of the Dragon S01E05",
@@ -563,7 +565,7 @@ async function seedForUser(userId: string) {
       receivedAt: daysAgo(30),
     },
     {
-      connectionId: jellyfinWebhookId,
+      integrationId: jellyfinWebhookId,
       eventType: "PlaybackStop",
       mediaType: "episode",
       mediaTitle: "House of the Dragon S01E06",
@@ -573,10 +575,10 @@ async function seedForUser(userId: string) {
     },
   ];
 
-  for (const event of webhookEvents) {
-    db.insert(webhookEventLog).values(event).run();
+  for (const event of integrationEventEntries) {
+    db.insert(integrationEvents).values(event).run();
   }
-  log.info(`  Created 2 webhook connections + ${webhookEvents.length} events`);
+  log.info(`  Created 2 integrations + ${integrationEventEntries.length} events`);
 
   // 7. Cron run history
   log.info("Creating cron run history...");
