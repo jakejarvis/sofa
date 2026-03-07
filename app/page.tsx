@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { connection } from "next/server";
+import { Suspense } from "react";
 import { LandingPage } from "@/components/landing-page";
 import { getSession } from "@/lib/auth/session";
 import { isTmdbConfigured } from "@/lib/config";
@@ -26,9 +26,15 @@ const posterUrls = posterPaths
   .map((p) => tmdbImageUrl(p, "w300"))
   .filter(Boolean) as string[];
 
-export default async function Home() {
-  await connection();
+export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
+  );
+}
 
+async function HomeContent() {
   const session = await getSession();
   if (session?.user) redirect("/dashboard");
   if (!isTmdbConfigured()) redirect("/setup");

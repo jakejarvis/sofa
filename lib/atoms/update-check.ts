@@ -1,7 +1,7 @@
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 
-export const updateToastShownAtom = atomWithStorage<boolean>(
-  "sofa:update-toast-shown",
-  false,
+export const updateToastDismissedVersionAtom = atomWithStorage<string | null>(
+  "sofa:update-toast-dismissed-version",
+  null,
   createJSONStorage(() => sessionStorage),
 );

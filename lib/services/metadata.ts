@@ -1,4 +1,5 @@
 import { eq, inArray, sql } from "drizzle-orm";
+import { updateTag } from "next/cache";
 import { db } from "@/lib/db/client";
 import {
   availabilityOffers,
@@ -573,6 +574,8 @@ export async function refreshRecommendations(titleId: string) {
         .run();
     }
   });
+
+  updateTag(`recs-${titleId}`);
 }
 
 /** Fetch seasons from the DB, building the Season[] structure. */

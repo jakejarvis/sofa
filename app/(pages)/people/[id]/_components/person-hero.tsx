@@ -1,5 +1,3 @@
-"use client";
-
 import { IconCalendar, IconMapPin } from "@tabler/icons-react";
 import { format, parseISO } from "date-fns";
 import Image from "next/image";

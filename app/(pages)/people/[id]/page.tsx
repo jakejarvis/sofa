@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
+import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
@@ -24,6 +25,17 @@ export async function generateMetadata({
   };
 }
 
+async function getCachedPersonData(id: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(`person-${id}`);
+
+  const person = await getOrFetchPerson(id);
+  if (!person) return null;
+  const filmography = getLocalFilmography(person.id);
+  return { person, filmography };
+}
+
 export default async function PersonDetailPage({
   params,
 }: {
@@ -31,10 +43,10 @@ export default async function PersonDetailPage({
 }) {
   const { id } = await params;
 
-  const person = await getOrFetchPerson(id);
-  if (!person) notFound();
+  const data = await getCachedPersonData(id);
+  if (!data) notFound();
 
-  const filmography = getLocalFilmography(person.id);
+  const { person, filmography } = data;
   const session = await getSession();
   const userStatuses = session
     ? getUserStatusesByTitleIds(

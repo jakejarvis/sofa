@@ -9,8 +9,6 @@ import {
   IconPlayerPlay,
   IconRefresh,
 } from "@tabler/icons-react";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useHydrateAtoms } from "jotai/utils";
 import { useState } from "react";
 import { toast } from "sonner";
 import { StatusDot } from "@/components/status-dot";
@@ -41,10 +39,6 @@ import {
   getSystemHealthAction,
   triggerJobAction,
 } from "@/lib/actions/settings";
-import {
-  systemHealthDataAtom,
-  systemHealthRefreshingAtom,
-} from "@/lib/atoms/system-health";
 import type { SystemHealthData } from "@/lib/services/system-health";
 
 const JOB_LABELS: Record<string, string> = {
@@ -137,9 +131,14 @@ function LiveTimeAgo({
   return <>{text}</>;
 }
 
-function useSystemHealthRefresh() {
-  const [isRefreshing, setRefreshing] = useAtom(systemHealthRefreshingAtom);
-  const setData = useSetAtom(systemHealthDataAtom);
+/** Hydrates system health state and renders the 3 cards */
+export function SystemHealthCards({
+  initialData,
+}: {
+  initialData: SystemHealthData;
+}) {
+  const [data, setData] = useState(initialData);
+  const [isRefreshing, setRefreshing] = useState(false);
 
   async function refresh() {
     setRefreshing(true);
@@ -153,31 +152,38 @@ function useSystemHealthRefresh() {
     }
   }
 
-  return { isRefreshing, refresh };
-}
-
-/** Hydrates the system health atom and renders the 3 cards */
-export function SystemHealthCards({
-  initialData,
-}: {
-  initialData: SystemHealthData;
-}) {
-  useHydrateAtoms([
-    [systemHealthDataAtom, initialData],
-    [systemHealthRefreshingAtom, false],
-  ]);
-
   return (
     <div className="space-y-3">
-      <SystemStatusCard />
-      <BackgroundJobsCard />
-      <StorageCard />
+      <SystemStatusCard
+        checkedAt={data.checkedAt}
+        database={data.database}
+        tmdb={data.tmdb}
+        environment={data.environment}
+        isRefreshing={isRefreshing}
+        onRefresh={refresh}
+      />
+      <BackgroundJobsCard
+        jobs={data.jobs}
+        isRefreshing={isRefreshing}
+        onRefresh={refresh}
+      />
+      <StorageCard
+        imageCache={data.imageCache}
+        backups={data.backups}
+        isRefreshing={isRefreshing}
+        onRefresh={refresh}
+      />
     </div>
   );
 }
 
-function RefreshButton() {
-  const { isRefreshing, refresh } = useSystemHealthRefresh();
+function RefreshButton({
+  isRefreshing,
+  onRefresh,
+}: {
+  isRefreshing: boolean;
+  onRefresh: () => void;
+}) {
   return (
     <Tooltip>
       <TooltipTrigger
@@ -186,7 +192,7 @@ function RefreshButton() {
             variant="ghost"
             size="icon"
             aria-label="Refresh system health"
-            onClick={refresh}
+            onClick={onRefresh}
             disabled={isRefreshing}
             className="text-muted-foreground"
           />
@@ -199,9 +205,17 @@ function RefreshButton() {
   );
 }
 
-function SystemStatusCard() {
-  const data = useAtomValue(systemHealthDataAtom);
-
+function SystemStatusCard({
+  checkedAt,
+  database,
+  tmdb,
+  environment,
+  isRefreshing,
+  onRefresh,
+}: Pick<SystemHealthData, "checkedAt" | "database" | "tmdb" | "environment"> & {
+  isRefreshing: boolean;
+  onRefresh: () => void;
+}) {
   return (
     <Card className="border-l-2 border-l-primary/30">
       <CardContent>
@@ -216,11 +230,11 @@ function SystemStatusCard() {
             <div>
               <CardTitle>Health status</CardTitle>
               <CardDescription suppressHydrationWarning>
-                Checked <LiveTimeAgo date={data.checkedAt} />
+                Checked <LiveTimeAgo date={checkedAt} />
               </CardDescription>
             </div>
           </div>
-          <RefreshButton />
+          <RefreshButton isRefreshing={isRefreshing} onRefresh={onRefresh} />
         </div>
       </CardContent>
 
@@ -231,9 +245,9 @@ function SystemStatusCard() {
             Database
           </span>
           <span className="font-mono text-[11px] text-muted-foreground">
-            {formatBytes(data.database.dbSizeBytes)}
-            {data.database.walSizeBytes > 0 &&
-              ` + ${formatBytes(data.database.walSizeBytes)} WAL`}
+            {formatBytes(database.dbSizeBytes)}
+            {database.walSizeBytes > 0 &&
+              ` + ${formatBytes(database.walSizeBytes)} WAL`}
           </span>
         </div>
       </CardContent>
@@ -244,22 +258,22 @@ function SystemStatusCard() {
           <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
             TMDB API
           </span>
-          {!data.tmdb.tokenConfigured ? (
+          {!tmdb.tokenConfigured ? (
             <>
               <StatusDot status="error" />
               <span className="text-muted-foreground/50 text-xs">
                 Not configured
               </span>
             </>
-          ) : data.tmdb.connected && data.tmdb.tokenValid ? (
+          ) : tmdb.connected && tmdb.tokenValid ? (
             <>
               <StatusDot status="ok" />
               <span className="text-muted-foreground text-xs">Connected</span>
               <span className="font-mono text-[11px] text-muted-foreground/80">
-                {data.tmdb.responseTimeMs}ms
+                {tmdb.responseTimeMs}ms
               </span>
             </>
-          ) : data.tmdb.connected && !data.tmdb.tokenValid ? (
+          ) : tmdb.connected && !tmdb.tokenValid ? (
             <>
               <StatusDot status="error" />
               <span className="text-destructive text-xs">Invalid token</span>
@@ -268,9 +282,9 @@ function SystemStatusCard() {
             <>
               <StatusDot status="error" />
               <span className="text-destructive text-xs">Unreachable</span>
-              {data.tmdb.error && (
+              {tmdb.error && (
                 <span className="text-[11px] text-muted-foreground/50">
-                  {data.tmdb.error}
+                  {tmdb.error}
                 </span>
               )}
             </>
@@ -283,7 +297,7 @@ function SystemStatusCard() {
         <div className="space-y-2">
           <span className="inline-flex items-center gap-1.5 font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
             Environment
-            {data.environment.dataDirWritable ? (
+            {environment.dataDirWritable ? (
               <IconCheck aria-hidden={true} className="size-3 text-green-500" />
             ) : (
               <IconAlertTriangle
@@ -293,7 +307,7 @@ function SystemStatusCard() {
             )}
           </span>
           <div className="space-y-1">
-            {data.environment.envVars
+            {environment.envVars
               .filter((env) => env.value !== null)
               .map((env) => (
                 <div
@@ -313,9 +327,14 @@ function SystemStatusCard() {
   );
 }
 
-function BackgroundJobsCard() {
-  const data = useAtomValue(systemHealthDataAtom);
-  const { refresh } = useSystemHealthRefresh();
+function BackgroundJobsCard({
+  jobs,
+  isRefreshing,
+  onRefresh,
+}: Pick<SystemHealthData, "jobs"> & {
+  isRefreshing: boolean;
+  onRefresh: () => void;
+}) {
   const [triggeringJob, setTriggeringJob] = useState<string | null>(null);
 
   const handleTrigger = async (jobName: string) => {
@@ -324,7 +343,7 @@ function BackgroundJobsCard() {
       await triggerJobAction(jobName);
       toast.success(`${JOB_LABELS[jobName] ?? jobName} triggered`);
       // Refresh after a brief delay so the run shows up
-      setTimeout(refresh, 1500);
+      setTimeout(onRefresh, 1500);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to trigger job");
     } finally {
@@ -332,14 +351,14 @@ function BackgroundJobsCard() {
     }
   };
 
-  const sortedJobs = [...data.jobs].sort((a, b) => {
+  const sortedJobs = [...jobs].sort((a, b) => {
     if (a.disabled !== b.disabled) return a.disabled ? 1 : -1;
     if (!a.nextRunAt && !b.nextRunAt) return 0;
     if (!a.nextRunAt) return 1;
     if (!b.nextRunAt) return -1;
     return new Date(a.nextRunAt).getTime() - new Date(b.nextRunAt).getTime();
   });
-  const activeJobs = data.jobs.filter((j) => !j.disabled);
+  const activeJobs = jobs.filter((j) => !j.disabled);
   const healthyCount = activeJobs.filter(
     (j) => j.lastStatus === "success",
   ).length;
@@ -362,7 +381,7 @@ function BackgroundJobsCard() {
               </CardDescription>
             </div>
           </div>
-          <RefreshButton />
+          <RefreshButton isRefreshing={isRefreshing} onRefresh={onRefresh} />
         </div>
       </CardContent>
       <CardContent className="border-border/30 border-t px-0 pt-0 pb-0">
@@ -535,9 +554,15 @@ function BackgroundJobsCard() {
   );
 }
 
-function StorageCard() {
-  const data = useAtomValue(systemHealthDataAtom);
-
+function StorageCard({
+  imageCache,
+  backups,
+  isRefreshing,
+  onRefresh,
+}: Pick<SystemHealthData, "imageCache" | "backups"> & {
+  isRefreshing: boolean;
+  onRefresh: () => void;
+}) {
   return (
     <Card className="border-l-2 border-l-primary/30">
       <CardContent>
@@ -556,7 +581,7 @@ function StorageCard() {
               </CardDescription>
             </div>
           </div>
-          <RefreshButton />
+          <RefreshButton isRefreshing={isRefreshing} onRefresh={onRefresh} />
         </div>
       </CardContent>
 
@@ -566,19 +591,19 @@ function StorageCard() {
           <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
             Image cache
           </span>
-          {data.imageCache.enabled ? (
+          {imageCache.enabled ? (
             <span className="font-mono text-[11px] text-muted-foreground/50">
-              {formatBytes(data.imageCache.totalSizeBytes)}
+              {formatBytes(imageCache.totalSizeBytes)}
             </span>
           ) : null}
         </div>
-        {data.imageCache.enabled ? (
+        {imageCache.enabled ? (
           <>
             <p className="mt-1 text-muted-foreground text-xs">
-              {data.imageCache.imageCount.toLocaleString()} cached images
+              {imageCache.imageCount.toLocaleString()} cached images
             </p>
             <p className="mt-0.5 text-[10px] text-muted-foreground/50 leading-relaxed">
-              {Object.entries(data.imageCache.categories)
+              {Object.entries(imageCache.categories)
                 .map(([name, cat]) => `${name} ${cat.count}`)
                 .join(" · ")}
             </p>
@@ -597,19 +622,19 @@ function StorageCard() {
           <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
             Backups
           </span>
-          {data.backups.backupCount > 0 && (
+          {backups.backupCount > 0 && (
             <span className="font-mono text-[11px] text-muted-foreground/50">
-              {formatBytes(data.backups.totalSizeBytes)}
+              {formatBytes(backups.totalSizeBytes)}
             </span>
           )}
         </div>
-        {data.backups.backupCount > 0 ? (
+        {backups.backupCount > 0 ? (
           <p
             className="mt-1 text-muted-foreground text-xs"
             suppressHydrationWarning
           >
-            {data.backups.backupCount} backups · last{" "}
-            <LiveTimeAgo date={data.backups.lastBackupAt} fallback="unknown" />
+            {backups.backupCount} backups · last{" "}
+            <LiveTimeAgo date={backups.lastBackupAt} fallback="unknown" />
           </p>
         ) : (
           <p className="mt-1 flex items-center gap-1.5 text-muted-foreground/50 text-xs">

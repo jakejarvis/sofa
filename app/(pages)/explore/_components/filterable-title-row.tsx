@@ -1,7 +1,6 @@
 "use client";
 
-import { createStore, Provider, useAtom, useAtomValue } from "jotai";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { TitleCardSkeleton } from "@/components/skeletons";
 import { TitleCard } from "@/components/title-card";
 import { Button } from "@/components/ui/button";
@@ -10,15 +9,11 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { discoverByGenre } from "@/lib/actions/explore";
 import {
-  defaultItemsAtom,
-  genreEnrichmentsAtom,
-  genreResultsAtom,
-  initialEpisodeProgressAtom,
-  initialUserStatusesAtom,
-  mediaTypeAtom,
-  selectedGenreAtom,
-} from "@/lib/atoms/filterable-row";
+  fetchEpisodeProgress,
+  fetchUserStatuses,
+} from "@/lib/actions/watchlist";
 
 interface Genre {
   id: number;
@@ -34,13 +29,15 @@ interface TitleRowItem {
   voteAverage: number;
 }
 
+type TitleStatus = "watchlist" | "in_progress" | "completed";
+
 interface FilterableTitleRowProps {
   heading: string;
   icon: React.ReactNode;
   mediaType: "movie" | "tv";
   defaultItems: TitleRowItem[];
   genres: Genre[];
-  userStatuses?: Record<string, "watchlist" | "in_progress" | "completed">;
+  userStatuses?: Record<string, TitleStatus>;
   episodeProgress?: Record<string, { watched: number; total: number }>;
 }
 
@@ -50,56 +47,52 @@ export function FilterableTitleRow({
   mediaType,
   defaultItems,
   genres,
-  userStatuses,
-  episodeProgress,
+  userStatuses: initialStatuses = {},
+  episodeProgress: initialProgress = {},
 }: FilterableTitleRowProps) {
-  const [store] = useState(() => {
-    const s = createStore();
-    s.set(mediaTypeAtom, mediaType);
-    s.set(defaultItemsAtom, defaultItems);
-    s.set(initialUserStatusesAtom, userStatuses ?? {});
-    s.set(initialEpisodeProgressAtom, episodeProgress ?? {});
-    return s;
-  });
+  const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
+  const [genreResults, setGenreResults] = useState<TitleRowItem[] | null>(null);
+  const [genreStatuses, setGenreStatuses] = useState<
+    Record<string, TitleStatus>
+  >({});
+  const [genreProgress, setGenreProgress] = useState<
+    Record<string, { watched: number; total: number }>
+  >({});
+  const [isPending, startTransition] = useTransition();
 
-  return (
-    <Provider store={store}>
-      <FilterableTitleRowInner heading={heading} icon={icon} genres={genres} />
-    </Provider>
-  );
-}
-
-function FilterableTitleRowInner({
-  heading,
-  icon,
-  genres,
-}: {
-  heading: string;
-  icon: React.ReactNode;
-  genres: Genre[];
-}) {
-  const [selectedGenre, setSelectedGenre] = useAtom(selectedGenreAtom);
-  const defaults = useAtomValue(defaultItemsAtom);
-  const genreResults = useAtomValue(genreResultsAtom);
-  const initialStatuses = useAtomValue(initialUserStatusesAtom);
-  const initialProgress = useAtomValue(initialEpisodeProgressAtom);
-  const genreEnrichments = useAtomValue(genreEnrichmentsAtom);
-
-  const loading = selectedGenre !== null && genreResults === undefined;
-  const items = selectedGenre === null ? defaults : (genreResults ?? []);
-
-  const userStatuses =
-    selectedGenre === null
-      ? initialStatuses
-      : (genreEnrichments?.statuses ?? initialStatuses);
-
+  const items = selectedGenre === null ? defaultItems : (genreResults ?? []);
+  const userStatuses = selectedGenre === null ? initialStatuses : genreStatuses;
   const episodeProgress =
-    selectedGenre === null
-      ? initialProgress
-      : (genreEnrichments?.progress ?? initialProgress);
+    selectedGenre === null ? initialProgress : genreProgress;
 
   function toggleGenre(genreId: number) {
-    setSelectedGenre(selectedGenre === genreId ? null : genreId);
+    if (selectedGenre === genreId) {
+      setSelectedGenre(null);
+      setGenreResults(null);
+      return;
+    }
+
+    setSelectedGenre(genreId);
+    startTransition(async () => {
+      const results = await discoverByGenre(mediaType, genreId);
+      setGenreResults(results);
+
+      if (results.length > 0) {
+        const lookups = results.map((r) => ({
+          tmdbId: r.tmdbId,
+          type: r.type,
+        }));
+        const [statuses, progress] = await Promise.all([
+          fetchUserStatuses(lookups),
+          fetchEpisodeProgress(lookups),
+        ]);
+        setGenreStatuses(statuses);
+        setGenreProgress(progress);
+      } else {
+        setGenreStatuses({});
+        setGenreProgress({});
+      }
+    });
   }
 
   return (
@@ -134,7 +127,7 @@ function FilterableTitleRowInner({
       </div>
 
       {/* Loading skeleton */}
-      {loading && (
+      {isPending && (
         <div className="-mx-4 flex gap-4 overflow-hidden px-4 sm:-mx-0 sm:px-0">
           {Array.from({ length: 8 }).map((_, i) => (
             <div
@@ -149,14 +142,14 @@ function FilterableTitleRowInner({
       )}
 
       {/* Empty state */}
-      {!loading && selectedGenre !== null && items.length === 0 && (
+      {!isPending && selectedGenre !== null && items.length === 0 && (
         <p className="py-8 text-center text-muted-foreground text-sm">
           No titles found for this genre.
         </p>
       )}
 
       {/* Carousel */}
-      {!loading && items.length > 0 && (
+      {!isPending && items.length > 0 && (
         <div key={selectedGenre ?? "default"}>
           <Carousel
             opts={{

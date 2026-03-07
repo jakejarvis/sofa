@@ -23,7 +23,7 @@ export function TitleCardSkeleton() {
 
 export function ContinueWatchingSkeleton() {
   return (
-    <div className="w-[calc(100vw-3rem)] shrink-0 overflow-hidden rounded-xl bg-card/50 ring-1 ring-white/[0.06] sm:w-72">
+    <div className="w-64 shrink-0 overflow-hidden rounded-xl bg-card/50 ring-1 ring-white/[0.06] sm:w-72">
       <Skeleton className="aspect-video w-full rounded-none" />
       <div className="flex items-center gap-3 p-3">
         <div className="min-w-0 flex-1 space-y-2">
@@ -38,7 +38,13 @@ export function ContinueWatchingSkeleton() {
 
 export function StatCardSkeleton() {
   return (
-    <Skeleton className="h-[88px] w-full rounded-xl border border-border/30" />
+    <div className="overflow-hidden rounded-xl border border-border/30 bg-card/50 p-4">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-6 w-6 rounded-md" />
+        <Skeleton className="h-3 w-16" />
+      </div>
+      <Skeleton className="mt-2 h-7 w-12" />
+    </div>
   );
 }
 
@@ -82,35 +88,14 @@ export function TitleGridSectionSkeleton() {
   );
 }
 
-export function CastSkeleton() {
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Skeleton className="size-5 rounded" />
-        <Skeleton className="h-6 w-20" />
-      </div>
-      <div className="flex gap-4 overflow-hidden">
-        {Array.from({ length: 8 }).map((_, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
-          <div key={i} className="flex shrink-0 flex-col items-center gap-2">
-            <Skeleton className="size-20 rounded-full sm:size-24" />
-            <Skeleton className="h-3 w-16" />
-            <Skeleton className="h-2.5 w-12" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function PersonDetailSkeleton() {
   return (
     <div className="space-y-10">
       <div className="flex flex-col gap-6 sm:flex-row sm:gap-8">
-        <Skeleton className="size-40 shrink-0 rounded-2xl sm:size-56" />
-        <div className="flex-1 space-y-4">
-          <Skeleton className="h-10 w-2/3 sm:h-14" />
-          <Skeleton className="h-5 w-24 rounded-full" />
+        <Skeleton className="size-40 shrink-0 self-center rounded-2xl sm:size-56 sm:self-start" />
+        <div className="flex-1 space-y-3">
+          <Skeleton className="h-9 w-2/3 sm:h-12" />
+          <Skeleton className="h-5 w-24 rounded-md" />
           <div className="flex gap-4">
             <Skeleton className="h-4 w-28" />
             <Skeleton className="h-4 w-36" />
@@ -128,25 +113,24 @@ export function PersonDetailSkeleton() {
 
 export function SeasonsSkeleton() {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
         <Skeleton className="size-5 rounded" />
-        <Skeleton className="h-6 w-24" />
+        <Skeleton className="h-7 w-28" />
       </div>
-      <div className="flex gap-2">
-        <Skeleton className="h-8 w-20 rounded-full" />
-        <Skeleton className="h-8 w-20 rounded-full" />
-        <Skeleton className="h-8 w-20 rounded-full" />
-      </div>
-      <div className="space-y-3">
-        {Array.from({ length: 4 }).map((_, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
-          <div key={i} className="flex gap-3 rounded-lg bg-card/50 p-3">
-            <Skeleton className="aspect-video w-32 shrink-0 rounded" />
-            <div className="flex-1 space-y-2 py-1">
-              <Skeleton className="h-4 w-2/3" />
-              <Skeleton className="h-3 w-full" />
-              <Skeleton className="h-3 w-1/2" />
+      <div className="space-y-2">
+        {["s1", "s2", "s3"].map((id) => (
+          <div
+            key={id}
+            className="overflow-hidden rounded-xl border border-border/50 bg-card/50"
+          >
+            <div className="flex items-center justify-between p-4">
+              <Skeleton className="h-4 w-24" />
+              <div className="flex items-center gap-3">
+                <Skeleton className="hidden h-2 w-24 rounded-full sm:block" />
+                <Skeleton className="h-3 w-10" />
+                <Skeleton className="size-4" />
+              </div>
             </div>
           </div>
         ))}
@@ -158,7 +142,7 @@ export function SeasonsSkeleton() {
 export function RecommendationsSkeleton() {
   return (
     <div className="space-y-4">
-      <Skeleton className="h-8 w-48" />
+      <SectionHeading width="w-36" />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         <TitleCardSkeleton />
         <TitleCardSkeleton />
@@ -174,15 +158,16 @@ export function RecommendationsSkeleton() {
 export function TitleDetailSkeleton() {
   return (
     <div className="space-y-10">
-      <Skeleton className="-mt-6 mr-[calc(-50vw+50%)] ml-[calc(-50vw+50%)] h-80 rounded-none sm:h-[28rem]" />
-      <div className="flex flex-row gap-4 sm:gap-8">
-        <Skeleton className="h-[180px] w-[120px] shrink-0 rounded-xl sm:h-[330px] sm:w-[220px]" />
+      <Skeleton className="-mt-6 mr-[calc(-50vw+50%)] ml-[calc(-50vw+50%)] h-80 rounded-none md:h-[28rem]" />
+      <div className="flex flex-col gap-4 md:flex-row md:gap-8">
+        <Skeleton className="aspect-[2/3] w-[140px] shrink-0 self-center rounded-xl md:w-[220px] md:self-start" />
         <div className="flex-1 space-y-5">
           <div>
-            <Skeleton className="h-8 w-2/3 sm:h-12" />
-            <div className="mt-2 flex items-center gap-3">
-              <Skeleton className="h-5 w-14 rounded" />
+            <Skeleton className="h-7 w-2/3 md:h-12" />
+            <div className="mt-2 flex items-center gap-2">
+              <Skeleton className="h-5 w-6 rounded" />
               <Skeleton className="h-4 w-10" />
+              <Skeleton className="h-4 w-8" />
               <Skeleton className="h-4 w-16" />
             </div>
           </div>
@@ -191,10 +176,10 @@ export function TitleDetailSkeleton() {
             <Skeleton className="h-4 w-5/6" />
             <Skeleton className="h-4 w-4/6" />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Skeleton className="h-9 w-28 rounded-lg" />
-            <Skeleton className="h-6 w-px" />
-            <div className="flex gap-1">
+            <Skeleton className="h-4 w-px" />
+            <div className="flex gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton
                 <Skeleton key={i} className="size-5 rounded" />
@@ -203,20 +188,6 @@ export function TitleDetailSkeleton() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-export function DashboardSkeleton() {
-  return (
-    <div className="space-y-10">
-      <div>
-        <Skeleton className="h-9 w-64" />
-        <Skeleton className="mt-1 h-4 w-48" />
-      </div>
-      <StatsSectionSkeleton />
-      <ContinueWatchingSectionSkeleton />
-      <TitleGridSectionSkeleton />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
+import { cache, Suspense } from "react";
 import {
   RecommendationsSkeleton,
   SeasonsSkeleton,
@@ -22,6 +22,8 @@ import { TitleKeyboardShortcuts } from "./_components/title-keyboard-shortcuts";
 import { TitleProvider } from "./_components/title-provider";
 import { TitleRecommendations } from "./_components/title-recommendations";
 import { TitleSeasons } from "./_components/title-seasons";
+
+const getCachedOrFetchTitle = cache((id: string) => getOrFetchTitle(id));
 
 export async function generateMetadata({
   params,
@@ -55,7 +57,7 @@ export default async function TitleDetailPage({
   // Fetch title + user info in parallel
   const session = await getSession();
   const [result, userInfo] = await Promise.all([
-    getOrFetchTitle(id),
+    getCachedOrFetchTitle(id),
     session ? getUserTitleInfo(session.user.id, id) : null,
   ]);
   if (!result) notFound();

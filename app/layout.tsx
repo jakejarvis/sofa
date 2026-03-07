@@ -1,10 +1,11 @@
+import { Provider as StoreProvider } from "jotai";
 import { MotionConfig } from "motion/react";
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, DM_Serif_Display, Geist_Mono } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -53,10 +54,12 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <MotionConfig reducedMotion="user">
-          <TooltipProvider>{children}</TooltipProvider>
-        </MotionConfig>
-        <Toaster position="bottom-right" />
+        <StoreProvider>
+          <MotionConfig reducedMotion="user">
+            <TooltipProvider>{children}</TooltipProvider>
+            <Toaster position="bottom-right" />
+          </MotionConfig>
+        </StoreProvider>
       </body>
     </html>
   );

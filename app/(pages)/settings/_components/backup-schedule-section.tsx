@@ -2,10 +2,9 @@
 
 import { IconCalendarWeek } from "@tabler/icons-react";
 import { format, formatDistanceToNow } from "date-fns";
-import { useAtomValue, useSetAtom } from "jotai";
-import { useHydrateAtoms } from "jotai/utils";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect } from "react";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
@@ -18,11 +17,10 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import {
-  backupScheduleAtom,
-  savingScheduleAtom,
-  togglingScheduleAtom,
-  useBackupScheduleActions,
-} from "@/lib/atoms/backup-schedule";
+  setBackupScheduleAction,
+  setMaxBackupsAction,
+  setScheduledBackupAction,
+} from "@/lib/actions/settings";
 import type { BackupFrequency } from "@/lib/cron";
 
 const FREQUENCY_OPTIONS: { value: BackupFrequency; label: string }[] = [
@@ -43,6 +41,14 @@ const DAYS_OF_WEEK = [
   "Friday",
   "Saturday",
 ] as const;
+
+interface BackupScheduleState {
+  enabled: boolean;
+  maxRetention: number;
+  frequency: BackupFrequency;
+  time: string;
+  dow: number;
+}
 
 function getNextBackupDate(
   frequency: BackupFrequency,
@@ -118,47 +124,82 @@ export function BackupScheduleSection({
   initialTime: string;
   initialDow: number;
 }) {
-  useHydrateAtoms([
-    [
-      backupScheduleAtom,
-      {
-        enabled: initialScheduledEnabled,
-        maxRetention: initialMaxRetention,
-        frequency: initialFrequency,
-        time: initialTime,
-        dow: initialDow,
-      },
-    ],
-  ]);
-  const setSchedule = useSetAtom(backupScheduleAtom);
-  useEffect(() => {
-    setSchedule({
-      enabled: initialScheduledEnabled,
-      maxRetention: initialMaxRetention,
-      frequency: initialFrequency,
-      time: initialTime,
-      dow: initialDow,
-    });
-  }, [
-    setSchedule,
-    initialScheduledEnabled,
-    initialMaxRetention,
-    initialFrequency,
-    initialTime,
-    initialDow,
-  ]);
-
-  return <BackupScheduleInner />;
-}
-
-function BackupScheduleInner() {
-  const schedule = useAtomValue(backupScheduleAtom);
-  const savingSchedule = useAtomValue(savingScheduleAtom);
-  const togglingSchedule = useAtomValue(togglingScheduleAtom);
-  const { toggleScheduled, changeMaxRetention, changeSchedule } =
-    useBackupScheduleActions();
+  const [schedule, setSchedule] = useState<BackupScheduleState>({
+    enabled: initialScheduledEnabled,
+    maxRetention: initialMaxRetention,
+    frequency: initialFrequency,
+    time: initialTime,
+    dow: initialDow,
+  });
+  const [savingSchedule, setSavingSchedule] = useState(false);
+  const [togglingSchedule, setTogglingSchedule] = useState(false);
 
   const { enabled, maxRetention, frequency, time, dow } = schedule;
+
+  const toggleScheduled = useCallback(
+    async (checked: boolean) => {
+      const previous = schedule.enabled;
+      setSchedule((prev) => ({ ...prev, enabled: checked }));
+      setTogglingSchedule(true);
+      try {
+        await setScheduledBackupAction(checked);
+        toast.success(
+          checked ? "Scheduled backups enabled" : "Scheduled backups disabled",
+        );
+      } catch {
+        setSchedule((prev) => ({ ...prev, enabled: previous }));
+        toast.error("Failed to update scheduled backup setting");
+      } finally {
+        setTogglingSchedule(false);
+      }
+    },
+    [schedule.enabled],
+  );
+
+  const changeMaxRetention = useCallback(
+    async (value: number) => {
+      const previous = schedule.maxRetention;
+      setSchedule((prev) => ({ ...prev, maxRetention: value }));
+      try {
+        await setMaxBackupsAction(value);
+      } catch {
+        setSchedule((prev) => ({ ...prev, maxRetention: previous }));
+        toast.error("Failed to update retention setting");
+      }
+    },
+    [schedule.maxRetention],
+  );
+
+  const changeSchedule = useCallback(
+    async (
+      newFrequency: BackupFrequency,
+      newTime: string,
+      newDow = schedule.dow,
+    ) => {
+      const prev = {
+        frequency: schedule.frequency,
+        time: schedule.time,
+        dow: schedule.dow,
+      };
+      setSchedule((s) => ({
+        ...s,
+        frequency: newFrequency,
+        time: newTime,
+        dow: newDow,
+      }));
+      setSavingSchedule(true);
+      try {
+        await setBackupScheduleAction(newFrequency, newTime, newDow);
+        toast.success("Schedule updated");
+      } catch {
+        setSchedule((s) => ({ ...s, ...prev }));
+        toast.error("Failed to update schedule");
+      } finally {
+        setSavingSchedule(false);
+      }
+    },
+    [schedule.frequency, schedule.time, schedule.dow],
+  );
 
   return (
     <>

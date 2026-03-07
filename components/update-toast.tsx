@@ -4,18 +4,19 @@ import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { getUpdateCheckAction } from "@/lib/actions/settings";
-import { updateToastShownAtom } from "@/lib/atoms/update-check";
+import { updateToastDismissedVersionAtom } from "@/lib/atoms/update-check";
 
 export function UpdateToast() {
-  const [shown, setShown] = useAtom(updateToastShownAtom);
+  const [dismissedVersion, setDismissedVersion] = useAtom(
+    updateToastDismissedVersionAtom,
+  );
 
   useEffect(() => {
-    if (shown) return;
-
     void getUpdateCheckAction().then((data) => {
       if (!data?.updateAvailable) return;
+      if (dismissedVersion === data.latestVersion) return;
 
-      setShown(true);
+      setDismissedVersion(data.latestVersion);
       toast.info(`Sofa v${data.latestVersion} is available`, {
         description: `You're running v${data.currentVersion}.`,
         duration: 15_000,
@@ -27,7 +28,7 @@ export function UpdateToast() {
           : undefined,
       });
     });
-  }, [shown, setShown]);
+  }, [dismissedVersion, setDismissedVersion]);
 
   return null;
 }

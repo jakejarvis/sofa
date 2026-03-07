@@ -1,11 +1,13 @@
 import { sql } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { connection, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("health");
 
 export async function GET() {
+  await connection();
+
   try {
     db.run(sql`SELECT 1`);
 

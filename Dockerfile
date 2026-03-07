@@ -7,7 +7,8 @@ WORKDIR /app
 
 COPY package.json bun.lock ./
 
-RUN bun install --frozen-lockfile
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    bun install --no-save --frozen-lockfile
 
 # --- Builder ---
 FROM base AS builder
@@ -32,20 +33,25 @@ WORKDIR /app
 ARG APP_VERSION
 ARG GIT_COMMIT_SHA
 ENV NODE_ENV=production
-ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
-ENV NEXT_TELEMETRY_DISABLED=1
+ENV HOSTNAME=0.0.0.0
 ENV DATA_DIR=/data
 ENV APP_VERSION=${APP_VERSION}
 ENV GIT_COMMIT_SHA=${GIT_COMMIT_SHA}
+ENV NEXT_TELEMETRY_DISABLED=1
+
+COPY --from=builder --chown=bun:bun /app/public ./public
+
+RUN mkdir .next \
+    && chown bun:bun .next
+
+COPY --from=builder --chown=bun:bun /app/.next/standalone ./
+COPY --from=builder --chown=bun:bun /app/.next/static ./.next/static
+COPY --from=builder --chown=bun:bun /app/.next/cache ./.next/cache
+COPY --from=builder --chown=bun:bun /app/drizzle ./drizzle
 
 RUN mkdir -p /data \
     && chown bun:bun /data
-
-COPY --from=builder --chown=bun:bun /app/public ./public
-COPY --from=builder --chown=bun:bun /app/.next/standalone ./
-COPY --from=builder --chown=bun:bun /app/.next/static ./.next/static
-COPY --from=builder --chown=bun:bun /app/drizzle ./drizzle
 
 USER bun
 EXPOSE 3000

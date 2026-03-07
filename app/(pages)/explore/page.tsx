@@ -37,21 +37,39 @@ function mapResults(
     }));
 }
 
-export default async function ExplorePage() {
-  // Fetch session in parallel with TMDB calls
-  const [trending, popularMovies, popularTv, movieGenres, tvGenres, session] =
+async function getExploreTmdbData() {
+  const [trending, popularMovies, popularTv, movieGenres, tvGenres] =
     await Promise.all([
       getTrending("all", "day"),
       getPopular("movie"),
       getPopular("tv"),
       getGenres("movie"),
       getGenres("tv"),
-      getSession(),
     ]);
 
-  const trendingItems = mapResults(trending.results, "movie");
-  const popularMovieItems = mapResults(popularMovies.results, "movie");
-  const popularTvItems = mapResults(popularTv.results, "tv");
+  return {
+    trending,
+    trendingItems: mapResults(trending.results, "movie"),
+    popularMovieItems: mapResults(popularMovies.results, "movie"),
+    popularTvItems: mapResults(popularTv.results, "tv"),
+    movieGenres: movieGenres.genres,
+    tvGenres: tvGenres.genres,
+  };
+}
+
+export default async function ExplorePage() {
+  // Await session first — its headers() call triggers the dynamic bailout during
+  // PPR static generation, preventing TMDB fetches from firing at build time.
+  const session = await getSession();
+
+  const {
+    trending,
+    trendingItems,
+    popularMovieItems,
+    popularTvItems,
+    movieGenres,
+    tvGenres,
+  } = await getExploreTmdbData();
 
   // Fetch user statuses and episode progress for all visible TMDB IDs
   let userStatuses: Record<string, "watchlist" | "in_progress" | "completed"> =
@@ -102,7 +120,7 @@ export default async function ExplorePage() {
         icon={<IconMovie aria-hidden={true} className="size-5 text-primary" />}
         mediaType="movie"
         defaultItems={popularMovieItems.slice(0, 20)}
-        genres={movieGenres.genres}
+        genres={movieGenres}
         userStatuses={userStatuses}
         episodeProgress={episodeProgress}
       />
@@ -114,7 +132,7 @@ export default async function ExplorePage() {
         }
         mediaType="tv"
         defaultItems={popularTvItems.slice(0, 20)}
-        genres={tvGenres.genres}
+        genres={tvGenres}
         userStatuses={userStatuses}
         episodeProgress={episodeProgress}
       />

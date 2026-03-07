@@ -1,4 +1,5 @@
 import { eq, inArray, sql } from "drizzle-orm";
+import { updateTag } from "next/cache";
 import { db } from "@/lib/db/client";
 import { persons, titleCast, titles } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
@@ -87,6 +88,8 @@ export async function refreshCredits(titleId: string) {
   log.debug(`Refreshing credits for "${title.title}" (${title.type})`);
 
   try {
+    let personIds: Map<number, string>;
+
     if (title.type === "movie") {
       const credits = await getMovieCredits(title.tmdbId);
       const castSlice = credits.cast.slice(0, 20);
@@ -117,7 +120,7 @@ export async function refreshCredits(titleId: string) {
           popularity: c.popularity,
         })),
       ];
-      const personIds = batchUpsertPersons(allPeople);
+      personIds = batchUpsertPersons(allPeople);
 
       // Collect all titleCast rows (cast + crew) and batch insert
       const now = new Date();
@@ -212,7 +215,7 @@ export async function refreshCredits(titleId: string) {
           popularity: c.person.popularity,
         })),
       ];
-      const personIds = batchUpsertPersons(allPeople);
+      personIds = batchUpsertPersons(allPeople);
 
       // Collect all titleCast rows (cast + crew) and batch insert
       const now = new Date();
@@ -268,6 +271,10 @@ export async function refreshCredits(titleId: string) {
           })
           .run();
       }
+    }
+
+    for (const personId of personIds.values()) {
+      updateTag(`person-${personId}`);
     }
 
     log.debug(`Credits refreshed for "${title.title}"`);

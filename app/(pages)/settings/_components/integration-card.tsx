@@ -13,6 +13,7 @@ import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import type { ComponentType, ReactNode } from "react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -37,7 +38,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useConnectionActions } from "@/lib/atoms/integrations";
+import {
+  deleteIntegration,
+  regenerateIntegrationToken,
+  saveIntegration,
+} from "@/lib/actions/settings";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -78,9 +83,56 @@ export interface IntegrationConfig {
 
 // ─── Component ──────────────────────────────────────────────────────
 
-export function IntegrationCard({ config }: { config: IntegrationConfig }) {
-  const { connection, handleConnect, handleDelete, handleRegenerateToken } =
-    useConnectionActions(config.provider, config.label);
+export function IntegrationCard({
+  config,
+  connection,
+  setConnections,
+}: {
+  config: IntegrationConfig;
+  connection: IntegrationConnection | null;
+  setConnections: React.Dispatch<React.SetStateAction<IntegrationConnection[]>>;
+}) {
+  const { provider, label } = config;
+
+  async function handleConnect() {
+    try {
+      const result = await saveIntegration(provider);
+      setConnections((prev) => [...prev, { ...result, recentEvents: [] }]);
+      toast.success(`${label} connected`);
+    } catch {
+      toast.error(`Failed to connect ${label}`);
+    }
+  }
+
+  async function handleDelete() {
+    let previous: IntegrationConnection[] = [];
+    setConnections((prev) => {
+      previous = prev;
+      return prev.filter((c) => c.provider !== provider);
+    });
+    try {
+      await deleteIntegration(provider);
+      toast.success(`${label} disconnected`);
+    } catch {
+      setConnections(previous);
+      toast.error(`Failed to disconnect ${label}`);
+    }
+  }
+
+  async function handleRegenerateToken() {
+    try {
+      const result = await regenerateIntegrationToken(provider);
+      setConnections((prev) =>
+        prev.map((c) =>
+          c.provider === provider ? { ...c, token: result.token } : c,
+        ),
+      );
+      toast.success(`${label} URL regenerated`);
+    } catch {
+      toast.error(`Failed to regenerate ${label} URL`);
+    }
+  }
+
   const [connecting, setConnecting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
