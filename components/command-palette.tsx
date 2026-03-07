@@ -36,6 +36,8 @@ import { Kbd } from "@/components/ui/kbd";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useSearch } from "@/hooks/use-search";
+import { resolvePerson } from "@/lib/actions/people";
+import { resolveTitle } from "@/lib/actions/titles";
 import {
   commandPaletteOpenAtom,
   helpOpenAtom,
@@ -118,9 +120,13 @@ export function CommandPalette() {
       setCommandPaletteOpen(false);
       progress.start();
       if (result.type === "person") {
-        router.push(`/people/tmdb-${result.tmdbId}`);
+        void resolvePerson(result.tmdbId).then((id) => {
+          if (id) router.push(`/people/${id}`);
+        });
       } else {
-        router.push(`/titles/tmdb-${result.tmdbId}-${result.type}`);
+        void resolveTitle(result.tmdbId, result.type).then((id) => {
+          if (id) router.push(`/titles/${id}`);
+        });
       }
     },
     [router, setCommandPaletteOpen, progress],

@@ -40,7 +40,7 @@ import {
   userTitleStatus,
 } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
-import { importTitle } from "@/lib/services/metadata";
+import { getOrFetchTitleByTmdbId } from "@/lib/services/metadata";
 import { setSetting } from "@/lib/services/settings";
 
 const log = createLogger("seed");
@@ -164,7 +164,7 @@ async function seedForUser(userId: string) {
   for (const movie of MOVIES) {
     try {
       log.info(`  Importing movie: ${movie.name} (TMDB ${movie.tmdbId})`);
-      const title = await importTitle(movie.tmdbId, "movie");
+      const title = await getOrFetchTitleByTmdbId(movie.tmdbId, "movie");
       if (title) {
         movieTitles.push({
           id: title.id,
@@ -184,7 +184,7 @@ async function seedForUser(userId: string) {
   for (const show of TV_SHOWS) {
     try {
       log.info(`  Importing TV show: ${show.name} (TMDB ${show.tmdbId})`);
-      const title = await importTitle(show.tmdbId, "tv");
+      const title = await getOrFetchTitleByTmdbId(show.tmdbId, "tv");
       if (title) {
         tvTitles.push({ id: title.id, tmdbId: show.tmdbId, name: show.name });
       }

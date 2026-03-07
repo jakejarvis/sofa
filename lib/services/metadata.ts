@@ -1,4 +1,4 @@
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
   availabilityOffers,
@@ -48,7 +48,7 @@ const log = createLogger("metadata");
  * Insert a title row, or return the existing one if a concurrent insert won the race.
  * Catches SQLITE_CONSTRAINT_UNIQUE and falls back to a SELECT.
  */
-function insertTitleOrGet(values: typeof titles.$inferInsert, tmdbId: number) {
+function upsertTitle(values: typeof titles.$inferInsert, tmdbId: number) {
   try {
     return db.insert(titles).values(values).returning().get();
   } catch (err: unknown) {
@@ -66,19 +66,21 @@ function insertTitleOrGet(values: typeof titles.$inferInsert, tmdbId: number) {
 
 function upsertGenres(titleId: string, tmdbGenres: TmdbGenre[]) {
   if (tmdbGenres.length === 0) return;
-  for (const g of tmdbGenres) {
-    db.insert(genres)
-      .values({ id: g.id, name: g.name })
-      .onConflictDoUpdate({ target: genres.id, set: { name: g.name } })
-      .run();
-  }
-  db.delete(titleGenres).where(eq(titleGenres.titleId, titleId)).run();
-  for (const g of tmdbGenres) {
-    db.insert(titleGenres)
-      .values({ titleId, genreId: g.id })
-      .onConflictDoNothing()
-      .run();
-  }
+  db.transaction((tx) => {
+    for (const g of tmdbGenres) {
+      tx.insert(genres)
+        .values({ id: g.id, name: g.name })
+        .onConflictDoUpdate({ target: genres.id, set: { name: g.name } })
+        .run();
+    }
+    tx.delete(titleGenres).where(eq(titleGenres.titleId, titleId)).run();
+    for (const g of tmdbGenres) {
+      tx.insert(titleGenres)
+        .values({ titleId, genreId: g.id })
+        .onConflictDoNothing()
+        .run();
+    }
+  });
 }
 
 /** @internal */
@@ -99,12 +101,12 @@ export function extractTvContentRating(show: TmdbTvDetails): string | null {
   return us?.rating || null;
 }
 
-type ImportResult = ReturnType<typeof _importTitle>;
+type ImportResult = ReturnType<typeof _getOrFetchTitleByTmdbId>;
 
 /** In-flight import promises keyed by tmdbId — coalesces concurrent calls */
 const inflightImports = new Map<number, ImportResult>();
 
-export function importTitle(
+export function getOrFetchTitleByTmdbId(
   tmdbId: number,
   type: "movie" | "tv",
 ): ImportResult {
@@ -114,14 +116,14 @@ export function importTitle(
     return inflight;
   }
 
-  const promise = _importTitle(tmdbId, type).finally(() => {
+  const promise = _getOrFetchTitleByTmdbId(tmdbId, type).finally(() => {
     inflightImports.delete(tmdbId);
   }) as ImportResult;
   inflightImports.set(tmdbId, promise);
   return promise;
 }
 
-async function _importTitle(tmdbId: number, type: "movie" | "tv") {
+async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
   log.debug(`Importing ${type} TMDB ${tmdbId}`);
 
   const existing = db
@@ -191,7 +193,7 @@ async function _importTitle(tmdbId: number, type: "movie" | "tv") {
 
   if (type === "movie") {
     const movie = await getMovieDetails(tmdbId);
-    const row = insertTitleOrGet(
+    const row = upsertTitle(
       {
         tmdbId: movie.id,
         type: "movie",
@@ -237,7 +239,7 @@ async function _importTitle(tmdbId: number, type: "movie" | "tv") {
   }
 
   const show = await getTvDetails(tmdbId);
-  const row = insertTitleOrGet(
+  const row = upsertTitle(
     {
       tmdbId: show.id,
       tvdbId: show.external_ids?.tvdb_id ?? null,
@@ -401,28 +403,33 @@ export async function refreshTvChildren(
         .returning()
         .get();
 
-      for (const ep of seasonData.episodes) {
-        db.insert(episodes)
-          .values({
-            seasonId: seasonRow.id,
-            episodeNumber: ep.episode_number,
-            name: ep.name,
-            overview: ep.overview,
-            stillPath: ep.still_path,
-            airDate: ep.air_date,
-            runtimeMinutes: ep.runtime,
-          })
-          .onConflictDoUpdate({
-            target: [episodes.seasonId, episodes.episodeNumber],
-            set: {
-              name: ep.name,
-              overview: ep.overview,
-              stillPath: ep.still_path,
-              airDate: ep.air_date,
-              runtimeMinutes: ep.runtime,
-            },
-          })
-          .run();
+      // Batch all episode upserts in a single transaction per season
+      if (seasonData.episodes.length > 0) {
+        db.transaction((tx) => {
+          for (const ep of seasonData.episodes) {
+            tx.insert(episodes)
+              .values({
+                seasonId: seasonRow.id,
+                episodeNumber: ep.episode_number,
+                name: ep.name,
+                overview: ep.overview,
+                stillPath: ep.still_path,
+                airDate: ep.air_date,
+                runtimeMinutes: ep.runtime,
+              })
+              .onConflictDoUpdate({
+                target: [episodes.seasonId, episodes.episodeNumber],
+                set: {
+                  name: ep.name,
+                  overview: ep.overview,
+                  stillPath: ep.still_path,
+                  airDate: ep.air_date,
+                  runtimeMinutes: ep.runtime,
+                },
+              })
+              .run();
+          }
+        });
       }
     } catch (err) {
       // Skip this season and continue with the rest — partial data is
@@ -534,25 +541,34 @@ export async function refreshRecommendations(titleId: string) {
       for (const f of fallbacks) titleIdMap.set(f.tmdbId, f.id);
     }
 
-    // Upsert all recommendation rows
-    for (const item of allItems) {
-      const recTitleId = titleIdMap.get(item.result.id);
-      if (!recTitleId) continue;
-      tx.insert(titleRecommendations)
-        .values({
+    // Batch upsert all recommendation rows (N inserts → 1)
+    const recRows = allItems
+      .map((item) => {
+        const recTitleId = titleIdMap.get(item.result.id);
+        if (!recTitleId) return null;
+        return {
           titleId,
           recommendedTitleId: recTitleId,
           source: item.source,
           rank: item.rank,
           lastFetchedAt: now,
-        })
+        };
+      })
+      .filter((r): r is NonNullable<typeof r> => r !== null);
+
+    if (recRows.length > 0) {
+      tx.insert(titleRecommendations)
+        .values(recRows)
         .onConflictDoUpdate({
           target: [
             titleRecommendations.titleId,
             titleRecommendations.recommendedTitleId,
             titleRecommendations.source,
           ],
-          set: { rank: item.rank, lastFetchedAt: now },
+          set: {
+            rank: sql`excluded.rank`,
+            lastFetchedAt: sql`excluded.lastFetchedAt`,
+          },
         })
         .run();
     }
@@ -742,7 +758,7 @@ function readAvailability(
     }));
 }
 
-export async function getTitleWithChildren(id: string): Promise<{
+export async function getOrFetchTitle(id: string): Promise<{
   title: ResolvedTitle;
   seasons: Season[];
   needsHydration: boolean;

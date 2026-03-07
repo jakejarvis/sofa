@@ -1,4 +1,4 @@
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { persons, titleCast, titles } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
@@ -119,73 +119,59 @@ export async function refreshCredits(titleId: string) {
       ];
       const personIds = batchUpsertPersons(allPeople);
 
-      // Batch insert titleCast rows
-      db.transaction((tx) => {
-        const now = new Date();
-        for (let i = 0; i < castSlice.length; i++) {
-          const c = castSlice[i];
-          const personId = personIds.get(c.id);
-          if (!personId) continue;
-          tx.insert(titleCast)
-            .values({
-              titleId,
-              personId,
-              character: c.character,
-              department: "Acting",
-              job: null,
-              displayOrder: i,
-              episodeCount: null,
-              lastFetchedAt: now,
-            })
-            .onConflictDoUpdate({
-              target: [
-                titleCast.titleId,
-                titleCast.personId,
-                titleCast.department,
-                titleCast.character,
-              ],
-              set: {
-                job: null,
-                displayOrder: i,
-                episodeCount: null,
-                lastFetchedAt: now,
-              },
-            })
-            .run();
-        }
-        let crewOrder = 100;
-        for (const c of notableCrew) {
-          const personId = personIds.get(c.id);
-          if (!personId) continue;
-          tx.insert(titleCast)
-            .values({
-              titleId,
-              personId,
-              character: null,
-              department: c.department,
-              job: c.job,
-              displayOrder: crewOrder,
-              episodeCount: null,
-              lastFetchedAt: now,
-            })
-            .onConflictDoUpdate({
-              target: [
-                titleCast.titleId,
-                titleCast.personId,
-                titleCast.department,
-                titleCast.character,
-              ],
-              set: {
-                job: c.job,
-                displayOrder: crewOrder,
-                episodeCount: null,
-                lastFetchedAt: now,
-              },
-            })
-            .run();
-          crewOrder++;
-        }
-      });
+      // Collect all titleCast rows (cast + crew) and batch insert
+      const now = new Date();
+      const allCastRows: (typeof titleCast.$inferInsert)[] = [];
+      for (let i = 0; i < castSlice.length; i++) {
+        const c = castSlice[i];
+        const personId = personIds.get(c.id);
+        if (!personId) continue;
+        allCastRows.push({
+          titleId,
+          personId,
+          character: c.character,
+          department: "Acting",
+          job: null,
+          displayOrder: i,
+          episodeCount: null,
+          lastFetchedAt: now,
+        });
+      }
+      let crewOrder = 100;
+      for (const c of notableCrew) {
+        const personId = personIds.get(c.id);
+        if (!personId) continue;
+        allCastRows.push({
+          titleId,
+          personId,
+          character: null,
+          department: c.department,
+          job: c.job,
+          displayOrder: crewOrder,
+          episodeCount: null,
+          lastFetchedAt: now,
+        });
+        crewOrder++;
+      }
+      if (allCastRows.length > 0) {
+        db.insert(titleCast)
+          .values(allCastRows)
+          .onConflictDoUpdate({
+            target: [
+              titleCast.titleId,
+              titleCast.personId,
+              titleCast.department,
+              titleCast.character,
+            ],
+            set: {
+              job: sql`excluded.job`,
+              displayOrder: sql`excluded.displayOrder`,
+              episodeCount: sql`excluded.episodeCount`,
+              lastFetchedAt: sql`excluded.lastFetchedAt`,
+            },
+          })
+          .run();
+      }
     } else {
       const credits = await getTvAggregateCredits(title.tmdbId);
       const castSlice = credits.cast.slice(0, 20);
@@ -228,74 +214,60 @@ export async function refreshCredits(titleId: string) {
       ];
       const personIds = batchUpsertPersons(allPeople);
 
-      // Batch insert titleCast rows
-      db.transaction((tx) => {
-        const now = new Date();
-        for (let i = 0; i < castSlice.length; i++) {
-          const c = castSlice[i];
-          const personId = personIds.get(c.id);
-          if (!personId) continue;
-          const character = c.roles?.[0]?.character ?? null;
-          tx.insert(titleCast)
-            .values({
-              titleId,
-              personId,
-              character,
-              department: "Acting",
-              job: null,
-              displayOrder: i,
-              episodeCount: c.total_episode_count,
-              lastFetchedAt: now,
-            })
-            .onConflictDoUpdate({
-              target: [
-                titleCast.titleId,
-                titleCast.personId,
-                titleCast.department,
-                titleCast.character,
-              ],
-              set: {
-                job: null,
-                displayOrder: i,
-                episodeCount: c.total_episode_count,
-                lastFetchedAt: now,
-              },
-            })
-            .run();
-        }
-        let crewOrder = 100;
-        for (const c of notableCrew) {
-          const personId = personIds.get(c.person.id);
-          if (!personId) continue;
-          tx.insert(titleCast)
-            .values({
-              titleId,
-              personId,
-              character: null,
-              department: c.person.department,
-              job: c.job,
-              displayOrder: crewOrder,
-              episodeCount: c.episodeCount,
-              lastFetchedAt: now,
-            })
-            .onConflictDoUpdate({
-              target: [
-                titleCast.titleId,
-                titleCast.personId,
-                titleCast.department,
-                titleCast.character,
-              ],
-              set: {
-                job: c.job,
-                displayOrder: crewOrder,
-                episodeCount: c.episodeCount,
-                lastFetchedAt: now,
-              },
-            })
-            .run();
-          crewOrder++;
-        }
-      });
+      // Collect all titleCast rows (cast + crew) and batch insert
+      const now = new Date();
+      const allCastRows: (typeof titleCast.$inferInsert)[] = [];
+      for (let i = 0; i < castSlice.length; i++) {
+        const c = castSlice[i];
+        const personId = personIds.get(c.id);
+        if (!personId) continue;
+        const character = c.roles?.[0]?.character ?? null;
+        allCastRows.push({
+          titleId,
+          personId,
+          character,
+          department: "Acting",
+          job: null,
+          displayOrder: i,
+          episodeCount: c.total_episode_count,
+          lastFetchedAt: now,
+        });
+      }
+      let crewOrder = 100;
+      for (const c of notableCrew) {
+        const personId = personIds.get(c.person.id);
+        if (!personId) continue;
+        allCastRows.push({
+          titleId,
+          personId,
+          character: null,
+          department: c.person.department,
+          job: c.job,
+          displayOrder: crewOrder,
+          episodeCount: c.episodeCount,
+          lastFetchedAt: now,
+        });
+        crewOrder++;
+      }
+      if (allCastRows.length > 0) {
+        db.insert(titleCast)
+          .values(allCastRows)
+          .onConflictDoUpdate({
+            target: [
+              titleCast.titleId,
+              titleCast.personId,
+              titleCast.department,
+              titleCast.character,
+            ],
+            set: {
+              job: sql`excluded.job`,
+              displayOrder: sql`excluded.displayOrder`,
+              episodeCount: sql`excluded.episodeCount`,
+              lastFetchedAt: sql`excluded.lastFetchedAt`,
+            },
+          })
+          .run();
+      }
     }
 
     log.debug(`Credits refreshed for "${title.title}"`);

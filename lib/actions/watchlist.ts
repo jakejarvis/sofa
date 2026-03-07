@@ -11,7 +11,7 @@ import {
   type HistoryBucket,
   type TimePeriod,
 } from "@/lib/services/discovery";
-import { importTitle } from "@/lib/services/metadata";
+import { getOrFetchTitleByTmdbId } from "@/lib/services/metadata";
 import {
   getEpisodeProgressByTmdbIds,
   getUserStatusesByTmdbIds,
@@ -41,7 +41,7 @@ export async function quickAddToWatchlist(
   const session = await requireSession();
   const userId = session.user.id;
 
-  const title = await importTitle(tmdbId, type);
+  const title = await getOrFetchTitleByTmdbId(tmdbId, type);
   if (!title) throw new Error("Failed to import title");
 
   const existing = db

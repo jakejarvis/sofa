@@ -145,22 +145,13 @@ export async function cacheImagesForTitle(titleId: string) {
   const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title) return;
 
-  const tasks: Promise<unknown>[] = [];
+  // Collect all candidate images, then check cache in parallel
+  const candidates: { imgPath: string; category: ImageCategory }[] = [];
+  if (title.posterPath)
+    candidates.push({ imgPath: title.posterPath, category: "posters" });
+  if (title.backdropPath)
+    candidates.push({ imgPath: title.backdropPath, category: "backdrops" });
 
-  if (
-    title.posterPath &&
-    !(await isImageCached("posters", path.basename(title.posterPath)))
-  ) {
-    tasks.push(downloadAndCacheImage(title.posterPath, "posters"));
-  }
-  if (
-    title.backdropPath &&
-    !(await isImageCached("backdrops", path.basename(title.backdropPath)))
-  ) {
-    tasks.push(downloadAndCacheImage(title.backdropPath, "backdrops"));
-  }
-
-  // Season posters
   if (title.type === "tv") {
     const allSeasons = db
       .select()
@@ -168,14 +159,21 @@ export async function cacheImagesForTitle(titleId: string) {
       .where(eq(seasons.titleId, titleId))
       .all();
     for (const s of allSeasons) {
-      if (
-        s.posterPath &&
-        !(await isImageCached("posters", path.basename(s.posterPath)))
-      ) {
-        tasks.push(downloadAndCacheImage(s.posterPath, "posters"));
-      }
+      if (s.posterPath)
+        candidates.push({ imgPath: s.posterPath, category: "posters" });
     }
   }
+
+  // Parallel cache checks instead of sequential awaits
+  const checks = await Promise.all(
+    candidates.map(async (c) => ({
+      ...c,
+      cached: await isImageCached(c.category, path.basename(c.imgPath)),
+    })),
+  );
+  const tasks = checks
+    .filter((c) => !c.cached)
+    .map((c) => downloadAndCacheImage(c.imgPath, c.category));
 
   if (tasks.length > 0) {
     log.debug(`Caching ${tasks.length} images for title ${titleId}`);
@@ -200,15 +198,20 @@ export async function cacheEpisodeStills(titleId: string) {
     .where(inArray(episodes.seasonId, seasonIds))
     .all();
 
-  const tasks: Promise<unknown>[] = [];
-  for (const ep of allEps) {
-    if (
-      ep.stillPath &&
-      !(await isImageCached("stills", path.basename(ep.stillPath)))
-    ) {
-      tasks.push(downloadAndCacheImage(ep.stillPath, "stills"));
-    }
-  }
+  const epsWithStills = allEps.filter(
+    (ep): ep is typeof ep & { stillPath: string } => ep.stillPath != null,
+  );
+  // Parallel cache checks instead of sequential awaits
+  const checks = await Promise.all(
+    epsWithStills.map(async (ep) => ({
+      stillPath: ep.stillPath,
+      cached: await isImageCached("stills", path.basename(ep.stillPath)),
+    })),
+  );
+  const tasks = checks
+    .filter((c) => !c.cached)
+    .map((c) => downloadAndCacheImage(c.stillPath, "stills"));
+
   await Promise.allSettled(tasks);
 }
 
@@ -219,17 +222,24 @@ export async function cacheProviderLogos(titleId: string) {
     .where(eq(availabilityOffers.titleId, titleId))
     .all();
 
-  const tasks: Promise<unknown>[] = [];
-  const seen = new Set<string>();
+  // Deduplicate and parallel cache checks
+  const uniqueLogos = new Map<string, string>();
   for (const offer of offers) {
     if (offer.logoPath) {
       const basename = path.basename(offer.logoPath);
-      if (!seen.has(basename) && !(await isImageCached("logos", basename))) {
-        seen.add(basename);
-        tasks.push(downloadAndCacheImage(offer.logoPath, "logos"));
-      }
+      if (!uniqueLogos.has(basename)) uniqueLogos.set(basename, offer.logoPath);
     }
   }
+  const checks = await Promise.all(
+    [...uniqueLogos.entries()].map(async ([basename, logoPath]) => ({
+      logoPath,
+      cached: await isImageCached("logos", basename),
+    })),
+  );
+  const tasks = checks
+    .filter((c) => !c.cached)
+    .map((c) => downloadAndCacheImage(c.logoPath, "logos"));
+
   await Promise.allSettled(tasks);
 }
 
@@ -241,17 +251,25 @@ export async function cacheProfilePhotos(titleId: string) {
     .where(eq(titleCast.titleId, titleId))
     .all();
 
-  const tasks: Promise<unknown>[] = [];
-  const seen = new Set<string>();
+  // Deduplicate and parallel cache checks
+  const uniqueProfiles = new Map<string, string>();
   for (const row of castRows) {
     if (row.profilePath) {
       const basename = path.basename(row.profilePath);
-      if (!seen.has(basename) && !(await isImageCached("profiles", basename))) {
-        seen.add(basename);
-        tasks.push(downloadAndCacheImage(row.profilePath, "profiles"));
-      }
+      if (!uniqueProfiles.has(basename))
+        uniqueProfiles.set(basename, row.profilePath);
     }
   }
+  const checks = await Promise.all(
+    [...uniqueProfiles.entries()].map(async ([basename, profilePath]) => ({
+      profilePath,
+      cached: await isImageCached("profiles", basename),
+    })),
+  );
+  const tasks = checks
+    .filter((c) => !c.cached)
+    .map((c) => downloadAndCacheImage(c.profilePath, "profiles"));
+
   if (tasks.length > 0) {
     log.debug(`Caching ${tasks.length} profile photos for title ${titleId}`);
   }

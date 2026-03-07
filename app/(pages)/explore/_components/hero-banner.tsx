@@ -2,7 +2,10 @@
 
 import { IconPlus, IconStar } from "@tabler/icons-react";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { useProgress } from "@/components/navigation-progress";
+import { resolveTitle } from "@/lib/actions/titles";
 
 interface HeroBannerProps {
   tmdbId: number;
@@ -21,7 +24,18 @@ export function HeroBanner({
   backdropPath,
   voteAverage,
 }: HeroBannerProps) {
-  const href = `/titles/tmdb-${tmdbId}-${type}`;
+  const router = useRouter();
+  const progress = useProgress();
+  const [isPending, startTransition] = useTransition();
+
+  function handleNavigate() {
+    if (isPending) return;
+    progress.start();
+    startTransition(async () => {
+      const id = await resolveTitle(tmdbId, type);
+      if (id) router.push(`/titles/${id}`);
+    });
+  }
 
   return (
     <div className="relative -mt-6 mr-[calc(-50vw+50%)] mb-4 ml-[calc(-50vw+50%)] animate-stagger-item overflow-hidden">
@@ -67,21 +81,28 @@ export function HeroBanner({
                     Trending today
                   </span>
                 </div>
-                <Link href={href} className="group/title">
+                <button
+                  type="button"
+                  className="group/title cursor-pointer text-left"
+                  onClick={handleNavigate}
+                  disabled={isPending}
+                >
                   <h2 className="text-balance font-display text-3xl tracking-tight transition-colors group-hover/title:text-primary sm:text-4xl">
                     {title}
                   </h2>
-                </Link>
+                </button>
                 <p className="mt-2 line-clamp-2 max-w-2xl text-muted-foreground text-sm">
                   {overview}
                 </p>
-                <Link
-                  href={href}
-                  className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-md hover:shadow-primary/20"
+                <button
+                  type="button"
+                  onClick={handleNavigate}
+                  disabled={isPending}
+                  className="mt-4 inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-md hover:shadow-primary/20 disabled:opacity-70"
                 >
                   <IconPlus aria-hidden={true} className="size-4" />
                   Add to Library
-                </Link>
+                </button>
               </div>
             </div>
           </div>

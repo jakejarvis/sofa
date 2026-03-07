@@ -77,16 +77,15 @@ export function logEpisodeWatch(
     .values({ userId, episodeId, watchedAt: now, source })
     .run();
 
-  // Find the title for this episode
-  const ep = db.select().from(episodes).where(eq(episodes.id, episodeId)).get();
-  if (!ep) return;
-  const season = db
-    .select()
-    .from(seasons)
-    .where(eq(seasons.id, ep.seasonId))
+  // Find the title for this episode (single JOIN instead of 2 queries)
+  const row = db
+    .select({ titleId: seasons.titleId })
+    .from(episodes)
+    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
+    .where(eq(episodes.id, episodeId))
     .get();
-  if (!season) return;
-  const { titleId } = season;
+  if (!row) return;
+  const { titleId } = row;
 
   // Auto-set status to in_progress if not set
   const existing = db
@@ -231,21 +230,13 @@ export function markAllEpisodesWatched(
   if (!title || title.type !== "tv") return;
 
   const now = new Date();
-  const allSeasons = db
-    .select()
-    .from(seasons)
+  // Single JOIN instead of seasons → episodes chain (2 queries → 1)
+  const allEps = db
+    .select({ id: episodes.id })
+    .from(episodes)
+    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
     .where(eq(seasons.titleId, titleId))
     .all();
-
-  const seasonIds = allSeasons.map((s) => s.id);
-  const allEps =
-    seasonIds.length > 0
-      ? db
-          .select()
-          .from(episodes)
-          .where(inArray(episodes.seasonId, seasonIds))
-          .all()
-      : [];
 
   const epIds = allEps.map((ep) => ep.id);
   const existingWatches =
@@ -279,19 +270,12 @@ export function markAllEpisodesWatched(
 }
 
 function checkAllEpisodesWatched(userId: string, titleId: string) {
-  const allSeasons = db
-    .select()
-    .from(seasons)
-    .where(eq(seasons.titleId, titleId))
-    .all();
-
-  if (allSeasons.length === 0) return;
-
-  const seasonIds = allSeasons.map((s) => s.id);
+  // Single JOIN instead of seasons → episodes chain (2 queries → 1)
   const allEps = db
-    .select()
+    .select({ id: episodes.id })
     .from(episodes)
-    .where(inArray(episodes.seasonId, seasonIds))
+    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
+    .where(eq(seasons.titleId, titleId))
     .all();
 
   const totalEpisodes = allEps.length;
@@ -327,14 +311,13 @@ export function unwatchEpisode(userId: string, episodeId: string) {
     .run();
 
   // Find parent title and downgrade from completed to in_progress
-  const ep = db.select().from(episodes).where(eq(episodes.id, episodeId)).get();
-  if (!ep) return;
-  const season = db
-    .select()
-    .from(seasons)
-    .where(eq(seasons.id, ep.seasonId))
+  const row = db
+    .select({ titleId: seasons.titleId })
+    .from(episodes)
+    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
+    .where(eq(episodes.id, episodeId))
     .get();
-  if (!season) return;
+  if (!row) return;
 
   const existing = db
     .select()
@@ -342,13 +325,13 @@ export function unwatchEpisode(userId: string, episodeId: string) {
     .where(
       and(
         eq(userTitleStatus.userId, userId),
-        eq(userTitleStatus.titleId, season.titleId),
+        eq(userTitleStatus.titleId, row.titleId),
       ),
     )
     .get();
 
   if (existing?.status === "completed") {
-    setTitleStatus(userId, season.titleId, "in_progress");
+    setTitleStatus(userId, row.titleId, "in_progress");
   }
 }
 
@@ -545,22 +528,13 @@ export function getUserTitleInfo(userId: string, titleId: string) {
     )
     .get();
 
-  // Batch fetch all episode IDs for this title
-  const titleSeasons = db
-    .select()
-    .from(seasons)
+  // Single JOIN instead of seasons → episodes chain (2 queries → 1)
+  const allEps = db
+    .select({ id: episodes.id })
+    .from(episodes)
+    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
     .where(eq(seasons.titleId, titleId))
     .all();
-
-  const seasonIds = titleSeasons.map((s) => s.id);
-  const allEps =
-    seasonIds.length > 0
-      ? db
-          .select()
-          .from(episodes)
-          .where(inArray(episodes.seasonId, seasonIds))
-          .all()
-      : [];
 
   const epIds = allEps.map((ep) => ep.id);
 

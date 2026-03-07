@@ -88,27 +88,32 @@ export async function getSonarrList(
     )
     .all();
 
-  const result: { TvdbId: number; Title: string }[] = [];
-
-  for (const row of rows) {
-    let { tvdbId } = row;
-
-    if (tvdbId == null) {
-      try {
-        const externalIds = await getTvExternalIds(row.tmdbId);
-        tvdbId = externalIds.tvdb_id;
-        if (tvdbId != null) {
-          db.update(titles).set({ tvdbId }).where(eq(titles.id, row.id)).run();
+  // Resolve missing TVDB IDs in parallel instead of sequentially
+  const needsResolution = rows.filter((r) => r.tvdbId == null);
+  if (needsResolution.length > 0) {
+    const resolved = await Promise.all(
+      needsResolution.map(async (row) => {
+        try {
+          const externalIds = await getTvExternalIds(row.tmdbId);
+          return { row, tvdbId: externalIds.tvdb_id };
+        } catch (err) {
+          log.warn(`Failed to resolve TVDB ID for TMDB ${row.tmdbId}:`, err);
+          return { row, tvdbId: null };
         }
-      } catch (err) {
-        log.warn(`Failed to resolve TVDB ID for TMDB ${row.tmdbId}:`, err);
+      }),
+    );
+    // Batch update resolved IDs in a single transaction
+    db.transaction((tx) => {
+      for (const { row, tvdbId } of resolved) {
+        if (tvdbId != null) {
+          row.tvdbId = tvdbId;
+          tx.update(titles).set({ tvdbId }).where(eq(titles.id, row.id)).run();
+        }
       }
-    }
-
-    if (tvdbId != null) {
-      result.push({ TvdbId: tvdbId, Title: row.title });
-    }
+    });
   }
 
-  return result;
+  return rows
+    .filter((r): r is typeof r & { tvdbId: number } => r.tvdbId != null)
+    .map((r) => ({ TvdbId: r.tvdbId, Title: r.title }));
 }

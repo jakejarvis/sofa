@@ -14,13 +14,16 @@ import {
 import { type MotionStyle, type MotionValue, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import { useProgress } from "@/components/navigation-progress";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTiltEffect } from "@/hooks/use-tilt-effect";
+import { resolveTitle } from "@/lib/actions/titles";
 import { quickAddToWatchlist } from "@/lib/actions/watchlist";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
@@ -280,8 +283,30 @@ export function TitleCard({
   userStatus,
   episodeProgress,
 }: TitleCardProps) {
-  const href = id ? `/titles/${id}` : `/titles/tmdb-${tmdbId}-${type}`;
   const tilt = useTiltEffect();
+  const router = useRouter();
+  const progress = useProgress();
+  const [isPending, startTransition] = useTransition();
+
+  const cardContent = (
+    <motion.div ref={tilt.ref} style={tilt.containerStyle} {...tilt.handlers}>
+      <CardInner
+        title={title}
+        type={type}
+        posterPath={posterPath}
+        releaseDate={releaseDate}
+        voteAverage={voteAverage}
+        userStatus={userStatus}
+        episodeProgress={episodeProgress}
+        tiltStyles={{
+          imageStyle: tilt.imageStyle,
+          glareBackground: tilt.glareBackground,
+          glareOpacity: tilt.glareOpacity,
+        }}
+      />
+    </motion.div>
+  );
+
   return (
     <div className="group relative">
       <QuickAddButton
@@ -289,28 +314,27 @@ export function TitleCard({
         type={type as "movie" | "tv"}
         userStatus={userStatus}
       />
-      <Link href={href}>
-        <motion.div
-          ref={tilt.ref}
-          style={tilt.containerStyle}
-          {...tilt.handlers}
+      {id ? (
+        <Link href={`/titles/${id}`}>{cardContent}</Link>
+      ) : (
+        <button
+          type="button"
+          disabled={isPending}
+          className={`w-full text-left ${isPending ? "pointer-events-none opacity-70" : "cursor-pointer"}`}
+          onClick={() => {
+            progress.start();
+            startTransition(async () => {
+              const resolvedId = await resolveTitle(
+                tmdbId,
+                type as "movie" | "tv",
+              );
+              if (resolvedId) router.push(`/titles/${resolvedId}`);
+            });
+          }}
         >
-          <CardInner
-            title={title}
-            type={type}
-            posterPath={posterPath}
-            releaseDate={releaseDate}
-            voteAverage={voteAverage}
-            userStatus={userStatus}
-            episodeProgress={episodeProgress}
-            tiltStyles={{
-              imageStyle: tilt.imageStyle,
-              glareBackground: tilt.glareBackground,
-              glareOpacity: tilt.glareOpacity,
-            }}
-          />
-        </motion.div>
-      </Link>
+          {cardContent}
+        </button>
+      )}
     </div>
   );
 }

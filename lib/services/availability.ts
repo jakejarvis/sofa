@@ -20,8 +20,26 @@ export async function refreshAvailability(titleId: string) {
   const now = new Date();
   const offerTypes = ["flatrate", "rent", "buy", "free", "ads"] as const;
 
+  // Collect all offer rows, then batch insert in a single transaction
+  const allOfferRows: (typeof availabilityOffers.$inferInsert)[] = [];
+  for (const offerType of offerTypes) {
+    const providers = us[offerType];
+    if (!providers) continue;
+    for (const p of providers) {
+      allOfferRows.push({
+        titleId,
+        region: "US",
+        providerId: p.provider_id,
+        providerName: p.provider_name,
+        logoPath: p.logo_path,
+        offerType,
+        link: us.link ?? null,
+        lastFetchedAt: now,
+      });
+    }
+  }
+
   db.transaction((tx) => {
-    // Delete existing offers for this title+region
     tx.delete(availabilityOffers)
       .where(
         and(
@@ -31,25 +49,11 @@ export async function refreshAvailability(titleId: string) {
       )
       .run();
 
-    for (const offerType of offerTypes) {
-      const providers = us[offerType];
-      if (!providers) continue;
-
-      for (const p of providers) {
-        tx.insert(availabilityOffers)
-          .values({
-            titleId,
-            region: "US",
-            providerId: p.provider_id,
-            providerName: p.provider_name,
-            logoPath: p.logo_path,
-            offerType,
-            link: us.link ?? null,
-            lastFetchedAt: now,
-          })
-          .onConflictDoNothing()
-          .run();
-      }
+    if (allOfferRows.length > 0) {
+      tx.insert(availabilityOffers)
+        .values(allOfferRows)
+        .onConflictDoNothing()
+        .run();
     }
   });
 

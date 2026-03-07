@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import {
   RecommendationsSkeleton,
@@ -9,7 +9,7 @@ import {
 import { getSession } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import { titles } from "@/lib/db/schema";
-import { getTitleWithChildren, importTitle } from "@/lib/services/metadata";
+import { getOrFetchTitle } from "@/lib/services/metadata";
 import { getUserTitleInfo } from "@/lib/services/tracking";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { getTitleThemeStyle } from "@/lib/utils/title-theme";
@@ -23,16 +23,12 @@ import { TitleProvider } from "./_components/title-provider";
 import { TitleRecommendations } from "./_components/title-recommendations";
 import { TitleSeasons } from "./_components/title-seasons";
 
-const TMDB_ID_PATTERN = /^tmdb-(\d+)-(movie|tv)$/;
-
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  if (TMDB_ID_PATTERN.test(id)) return { title: "Sofa" };
-
   const title = db.select().from(titles).where(eq(titles.id, id)).get();
   if (!title) return { title: "Not Found — Sofa" };
 
@@ -56,21 +52,10 @@ export default async function TitleDetailPage({
 }) {
   const { id } = await params;
 
-  // TMDB ID resolution: tmdb-{id}-{type} → import + redirect
-  const tmdbMatch = TMDB_ID_PATTERN.exec(id);
-  if (tmdbMatch) {
-    const title = await importTitle(
-      Number(tmdbMatch[1]),
-      tmdbMatch[2] as "movie" | "tv",
-    );
-    if (!title) notFound();
-    redirect(`/titles/${title.id}`);
-  }
-
   // Fetch title + user info in parallel
   const session = await getSession();
   const [result, userInfo] = await Promise.all([
-    getTitleWithChildren(id),
+    getOrFetchTitle(id),
     session ? getUserTitleInfo(session.user.id, id) : null,
   ]);
   if (!result) notFound();

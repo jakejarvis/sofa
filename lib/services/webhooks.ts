@@ -10,7 +10,7 @@ import {
 } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
 import { findByExternalId, searchTv } from "@/lib/tmdb/client";
-import { importTitle } from "./metadata";
+import { getOrFetchTitleByTmdbId } from "./metadata";
 import { logEpisodeWatch, logMovieWatch } from "./tracking";
 
 const log = createLogger("webhooks");
@@ -330,7 +330,7 @@ export async function processWebhook(
         return { status: "error", message: "Could not resolve TMDB ID" };
       }
 
-      const title = await importTitle(tmdbId, "movie");
+      const title = await getOrFetchTitleByTmdbId(tmdbId, "movie");
       if (!title) {
         logEvent(connectionId, event, "error", "Failed to import movie");
         return { status: "error", message: "Failed to import movie" };
@@ -361,7 +361,7 @@ export async function processWebhook(
         return { status: "error", message: "Could not resolve episode" };
       }
 
-      const title = await importTitle(resolved.showTmdbId, "tv");
+      const title = await getOrFetchTitleByTmdbId(resolved.showTmdbId, "tv");
       if (!title) {
         logEvent(connectionId, event, "error", "Failed to import TV show");
         return { status: "error", message: "Failed to import TV show" };

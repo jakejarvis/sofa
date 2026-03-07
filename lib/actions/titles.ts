@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireSession } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import { episodes } from "@/lib/db/schema";
+import { getOrFetchTitleByTmdbId } from "@/lib/services/metadata";
 import {
   logEpisodeWatch,
   logEpisodeWatchBatch,
@@ -20,6 +21,15 @@ import {
 async function getSessionUserId() {
   const session = await requireSession();
   return session.user.id;
+}
+
+export async function resolveTitle(
+  tmdbId: number,
+  type: "movie" | "tv",
+): Promise<string | null> {
+  await requireSession();
+  const title = await getOrFetchTitleByTmdbId(tmdbId, type);
+  return title?.id ?? null;
 }
 
 export async function updateTitleStatus(
