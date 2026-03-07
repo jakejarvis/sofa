@@ -30,14 +30,14 @@ import {
   appSettings,
   cronRuns,
   episodes,
+  integrationEvents,
+  integrations,
   seasons,
   user,
   userEpisodeWatches,
   userMovieWatches,
   userRatings,
   userTitleStatus,
-  integrations,
-  integrationEvents,
 } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
 import { importTitle } from "@/lib/services/metadata";
@@ -578,7 +578,9 @@ async function seedForUser(userId: string) {
   for (const event of integrationEventEntries) {
     db.insert(integrationEvents).values(event).run();
   }
-  log.info(`  Created 2 integrations + ${integrationEventEntries.length} events`);
+  log.info(
+    `  Created 2 integrations + ${integrationEventEntries.length} events`,
+  );
 
   // 7. Cron run history
   log.info("Creating cron run history...");

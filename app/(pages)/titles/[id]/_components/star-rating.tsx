@@ -42,7 +42,11 @@ export function StarRating({ value, onChange }: StarRatingProps) {
             animate={
               filled && star === value ? { scale: [1, 1.25, 1] } : { scale: 1 }
             }
-            transition={springTransition}
+            transition={
+              filled && star === value
+                ? { type: "tween", duration: 0.3, ease: "easeInOut" }
+                : springTransition
+            }
           >
             {filled ? (
               <IconStarFilled className="size-4.5 text-primary" />
