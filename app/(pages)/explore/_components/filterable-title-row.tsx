@@ -1,15 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { TitleCardSkeleton } from "@/components/skeletons";
 import { TitleCard } from "@/components/title-card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { discoverByGenre } from "@/lib/actions/explore";
-import {
-  fetchEpisodeProgress,
-  fetchUserStatuses,
-} from "@/lib/actions/watchlist";
+import { useDiscover } from "@/hooks/use-discover";
 
 interface Genre {
   id: number;
@@ -47,48 +43,24 @@ export function FilterableTitleRow({
   episodeProgress: initialProgress = {},
 }: FilterableTitleRowProps) {
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
-  const [genreResults, setGenreResults] = useState<TitleRowItem[] | null>(null);
-  const [genreStatuses, setGenreStatuses] = useState<
-    Record<string, TitleStatus>
-  >({});
-  const [genreProgress, setGenreProgress] = useState<
-    Record<string, { watched: number; total: number }>
-  >({});
-  const [isPending, startTransition] = useTransition();
+  const { data: discoverData, isLoading: isPending } = useDiscover(
+    mediaType,
+    selectedGenre,
+  );
 
-  const items = selectedGenre === null ? defaultItems : (genreResults ?? []);
-  const userStatuses = selectedGenre === null ? initialStatuses : genreStatuses;
+  const items =
+    selectedGenre === null ? defaultItems : (discoverData?.items ?? []);
+  const userStatuses =
+    selectedGenre === null
+      ? initialStatuses
+      : (discoverData?.userStatuses ?? {});
   const episodeProgress =
-    selectedGenre === null ? initialProgress : genreProgress;
+    selectedGenre === null
+      ? initialProgress
+      : (discoverData?.episodeProgress ?? {});
 
   function toggleGenre(genreId: number) {
-    if (selectedGenre === genreId) {
-      setSelectedGenre(null);
-      setGenreResults(null);
-      return;
-    }
-
-    setSelectedGenre(genreId);
-    startTransition(async () => {
-      const results = await discoverByGenre(mediaType, genreId);
-      setGenreResults(results);
-
-      if (results.length > 0) {
-        const lookups = results.map((r) => ({
-          tmdbId: r.tmdbId,
-          type: r.type,
-        }));
-        const [statuses, progress] = await Promise.all([
-          fetchUserStatuses(lookups),
-          fetchEpisodeProgress(lookups),
-        ]);
-        setGenreStatuses(statuses);
-        setGenreProgress(progress);
-      } else {
-        setGenreStatuses({});
-        setGenreProgress({});
-      }
-    });
+    setSelectedGenre(genreId === selectedGenre ? null : genreId);
   }
 
   return (

@@ -14,6 +14,7 @@ import { useAtom } from "jotai";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { useProgress } from "@/components/navigation-progress";
 import {
   Command,
@@ -136,13 +137,25 @@ export function CommandPalette() {
       setCommandPaletteOpen(false);
       progress.start();
       if (result.type === "person") {
-        void resolvePerson(result.tmdbId).then((id) => {
-          if (id) router.push(`/people/${id}`);
-        });
+        void resolvePerson(result.tmdbId)
+          .then((id) => {
+            if (id) router.push(`/people/${id}`);
+            else progress.done();
+          })
+          .catch(() => {
+            progress.done();
+            toast.error("Failed to load person");
+          });
       } else {
-        void resolveTitle(result.tmdbId, result.type).then((id) => {
-          if (id) router.push(`/titles/${id}`);
-        });
+        void resolveTitle(result.tmdbId, result.type)
+          .then((id) => {
+            if (id) router.push(`/titles/${id}`);
+            else progress.done();
+          })
+          .catch(() => {
+            progress.done();
+            toast.error("Failed to load title");
+          });
       }
     },
     [router, setCommandPaletteOpen, progress],

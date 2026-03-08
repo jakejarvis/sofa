@@ -9,6 +9,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { toast } from "sonner";
 import { useProgress } from "@/components/navigation-progress";
 import { resolveTitle } from "@/lib/actions/titles";
 
@@ -37,8 +38,14 @@ export function HeroBanner({
     if (isPending) return;
     progress.start();
     startTransition(async () => {
-      const id = await resolveTitle(tmdbId, type);
-      if (id) router.push(`/titles/${id}`);
+      try {
+        const id = await resolveTitle(tmdbId, type);
+        if (id) router.push(`/titles/${id}`);
+        else progress.done();
+      } catch {
+        progress.done();
+        toast.error("Failed to load title");
+      }
     });
   }
 

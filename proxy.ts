@@ -1,7 +1,7 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
-const authRoutes = new Set(["/login", "/register", "/setup"]);
+const authRoutes = new Set(["/login", "/register"]);
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

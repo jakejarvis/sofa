@@ -7,7 +7,9 @@ export default function AuthLayout({
 }) {
   return (
     <main className="min-h-screen">
-      <Suspense>{children}</Suspense>
+      <div className="flex min-h-[80vh] items-center justify-center px-4">
+        <Suspense>{children}</Suspense>
+      </div>
     </main>
   );
 }

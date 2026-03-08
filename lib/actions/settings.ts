@@ -19,14 +19,6 @@ import {
   restoreFromBackup,
 } from "@/lib/services/backup";
 import { getSetting, setSetting } from "@/lib/services/settings";
-import {
-  getSystemHealth,
-  type SystemHealthData,
-} from "@/lib/services/system-health";
-import {
-  getCachedUpdateCheck,
-  type UpdateCheckResult,
-} from "@/lib/services/update-check";
 
 const providerSchema = z.enum(["plex", "jellyfin", "emby", "sonarr", "radarr"]);
 
@@ -222,13 +214,6 @@ export async function setBackupScheduleAction(
   rescheduleBackup();
 }
 
-// --- System health actions ---
-
-export async function getSystemHealthAction(): Promise<SystemHealthData> {
-  await requireAdmin();
-  return getSystemHealth();
-}
-
 // --- Job trigger action ---
 
 export async function triggerJobAction(
@@ -254,17 +239,6 @@ export async function restoreBackupAction(formData: FormData): Promise<void> {
   if (file.size > MAX_RESTORE_SIZE) throw new Error("File too large");
   const buffer = Buffer.from(await file.arrayBuffer());
   await restoreFromBackup(buffer);
-}
-
-// --- Update check action ---
-
-export async function getUpdateCheckAction(): Promise<UpdateCheckResult | null> {
-  try {
-    await requireAdmin();
-    return getCachedUpdateCheck();
-  } catch {
-    return null;
-  }
 }
 
 // --- Avatar actions ---

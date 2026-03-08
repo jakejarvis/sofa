@@ -1,5 +1,6 @@
 import path from "node:path";
 import { type NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth/session";
 import { AVATAR_DIR } from "@/lib/constants";
 
 const IMMUTABLE_CACHE = "public, max-age=31536000, immutable";
@@ -8,6 +9,11 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ userId: string }> },
 ) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { userId } = await params;
 
   // Sanitize userId to prevent path traversal

@@ -6,7 +6,7 @@ import {
   IconMovie,
   IconPlayerPlay,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getStatsAction } from "@/lib/actions/watchlist";
+import { useStats } from "@/hooks/use-stats";
 import type {
   DashboardStats,
   HistoryBucket,
@@ -123,22 +123,9 @@ function PeriodSelector({
 export function StatsDisplay({ stats }: { stats: DashboardStats }) {
   const [moviePeriod, setMoviePeriod] = useState<TimePeriod>("this_month");
   const [episodePeriod, setEpisodePeriod] = useState<TimePeriod>("this_week");
-  const [movieStats, setMovieStats] = useState<{
-    count: number;
-    history: HistoryBucket[];
-  } | null>(null);
-  const [episodeStats, setEpisodeStats] = useState<{
-    count: number;
-    history: HistoryBucket[];
-  } | null>(null);
 
-  useEffect(() => {
-    void getStatsAction("movies", moviePeriod).then(setMovieStats);
-  }, [moviePeriod]);
-
-  useEffect(() => {
-    void getStatsAction("episodes", episodePeriod).then(setEpisodeStats);
-  }, [episodePeriod]);
+  const movieStats = useStats("movies", moviePeriod);
+  const episodeStats = useStats("episodes", episodePeriod);
 
   const movieCount = movieStats?.count ?? stats.moviesThisMonth;
   const movieHistory = movieStats?.history;

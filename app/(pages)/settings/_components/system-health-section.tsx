@@ -34,11 +34,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useSystemHealth } from "@/hooks/use-system-health";
 import { useTimeAgo } from "@/hooks/use-time-ago";
-import {
-  getSystemHealthAction,
-  triggerJobAction,
-} from "@/lib/actions/settings";
+import { triggerJobAction } from "@/lib/actions/settings";
 import type { SystemHealthData } from "@/lib/services/system-health";
 
 const JOB_LABELS: Record<string, string> = {
@@ -137,20 +135,7 @@ export function SystemHealthCards({
 }: {
   initialData: SystemHealthData;
 }) {
-  const [data, setData] = useState(initialData);
-  const [isRefreshing, setRefreshing] = useState(false);
-
-  async function refresh() {
-    setRefreshing(true);
-    try {
-      const newData = await getSystemHealthAction();
-      setData(newData);
-    } catch {
-      toast.error("Failed to refresh system health");
-    } finally {
-      setRefreshing(false);
-    }
-  }
+  const { data, isRefreshing, refresh } = useSystemHealth(initialData);
 
   return (
     <div className="space-y-3">

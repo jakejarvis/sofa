@@ -16,6 +16,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
 import { useProgress } from "@/components/navigation-progress";
 import {
   Tooltip,
@@ -324,11 +325,17 @@ export function TitleCard({
           onClick={() => {
             progress.start();
             startTransition(async () => {
-              const resolvedId = await resolveTitle(
-                tmdbId,
-                type as "movie" | "tv",
-              );
-              if (resolvedId) router.push(`/titles/${resolvedId}`);
+              try {
+                const resolvedId = await resolveTitle(
+                  tmdbId,
+                  type as "movie" | "tv",
+                );
+                if (resolvedId) router.push(`/titles/${resolvedId}`);
+                else progress.done();
+              } catch {
+                progress.done();
+                toast.error("Failed to load title");
+              }
             });
           }}
         >

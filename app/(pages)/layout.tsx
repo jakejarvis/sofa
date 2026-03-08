@@ -5,6 +5,7 @@ import { MobileTabBar, NavBar } from "@/components/nav-bar";
 import { ProgressProvider } from "@/components/navigation-progress";
 import { UpdateToast } from "@/components/update-toast";
 import { getSession } from "@/lib/auth/session";
+import { getCachedUpdateCheck } from "@/lib/services/update-check";
 
 export default function PagesLayout({
   children,
@@ -44,7 +45,9 @@ async function AuthenticatedShell({ children }: { children: React.ReactNode }) {
       </div>
       <MobileTabBar />
       <CommandPalette />
-      {session.user.role === "admin" && <UpdateToast />}
+      {session.user.role === "admin" && (
+        <UpdateToast data={getCachedUpdateCheck()} />
+      )}
     </>
   );
 }
