@@ -219,16 +219,41 @@ export function useTitleActions() {
 
       try {
         await watchSeason(season.id);
-        toast.success(
-          `Watched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
-        );
+
+        const seasons = store.get(seasonsAtom);
+        const currentWatchSet = new Set(store.get(episodeWatchesAtom));
+        const previousUnwatched: string[] = [];
+        for (const s of seasons) {
+          if (s.seasonNumber < season.seasonNumber) {
+            for (const ep of s.episodes) {
+              if (!currentWatchSet.has(ep.id)) {
+                previousUnwatched.push(ep.id);
+              }
+            }
+          }
+        }
+
+        const seasonLabel = season.name ?? `Season ${season.seasonNumber}`;
+        if (previousUnwatched.length > 0) {
+          const count = previousUnwatched.length;
+          toast.success(`Watched all of ${seasonLabel}`, {
+            description: `${count} earlier episode${count > 1 ? "s" : ""} unwatched`,
+            action: {
+              label: "Catch up",
+              onClick: () => catchUp(previousUnwatched),
+            },
+            duration: 8000,
+          });
+        } else {
+          toast.success(`Watched all of ${seasonLabel}`);
+        }
       } catch {
         store.set(episodeWatchesAtom, prevWatches);
         store.set(userStatusAtom, prevStatus);
         toast.error("Failed to mark some episodes");
       }
     },
-    [store],
+    [store, catchUp],
   );
 
   const handleUnmarkSeason = useCallback(
