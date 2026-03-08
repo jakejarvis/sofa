@@ -1,8 +1,6 @@
 import path from "node:path";
 import { type NextRequest, NextResponse } from "next/server";
-
-const DATA_DIR = process.env.DATA_DIR || "./data";
-const AVATAR_DIR = path.join(DATA_DIR, "avatars");
+import { AVATAR_DIR } from "@/lib/constants";
 
 const IMMUTABLE_CACHE = "public, max-age=31536000, immutable";
 

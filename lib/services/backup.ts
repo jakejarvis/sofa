@@ -4,16 +4,12 @@ import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 import { format } from "date-fns";
 import { sql } from "drizzle-orm";
+import { BACKUP_DIR, DATABASE_URL } from "@/lib/constants";
 import { closeDatabase, db } from "@/lib/db/client";
 import { runMigrations } from "@/lib/db/migrate";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger("backup");
-
-const DATA_DIR = process.env.DATA_DIR || "./data";
-const DATABASE_URL =
-  process.env.DATABASE_URL || path.join(DATA_DIR, "sqlite.db");
-const BACKUP_DIR = path.join(DATA_DIR, "backups");
 
 const MANUAL_PATTERN = /^sofa-manual-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
 const SCHEDULED_PATTERN =

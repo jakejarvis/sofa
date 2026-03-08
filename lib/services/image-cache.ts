@@ -1,6 +1,7 @@
 import { mkdir, rename } from "node:fs/promises";
 import path from "node:path";
 import { eq, inArray } from "drizzle-orm";
+import { CACHE_DIR, TMDB_IMAGE_BASE_URL } from "@/lib/constants";
 import { db } from "@/lib/db/client";
 import {
   availabilityOffers,
@@ -28,14 +29,6 @@ const CATEGORY_SIZES: Record<ImageCategory, string> = {
   logos: "w92",
   profiles: "w185",
 };
-
-const IMAGE_BASE_URL =
-  process.env.TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p";
-
-const DATA_DIR = process.env.DATA_DIR || "./data";
-const CACHE_DIR = process.env.CACHE_DIR
-  ? path.join(process.env.CACHE_DIR, "images")
-  : path.join(DATA_DIR, "images");
 
 export function imageCacheEnabled(): boolean {
   return process.env.IMAGE_CACHE_ENABLED !== "false";
@@ -76,7 +69,7 @@ export async function downloadAndCacheImage(
   category: ImageCategory,
 ): Promise<Buffer | null> {
   const size = CATEGORY_SIZES[category];
-  const url = `${IMAGE_BASE_URL}/${size}${tmdbPath}`;
+  const url = `${TMDB_IMAGE_BASE_URL}/${size}${tmdbPath}`;
 
   const res = await fetch(url);
   if (!res.ok) {
@@ -121,7 +114,7 @@ export async function fetchAndMaybeCache(
 
   // Fetch from TMDB
   const size = CATEGORY_SIZES[category];
-  const url = `${IMAGE_BASE_URL}/${size}${tmdbPath}`;
+  const url = `${TMDB_IMAGE_BASE_URL}/${size}${tmdbPath}`;
   const res = await fetch(url);
   if (!res.ok) {
     log.warn(`Fetch failed: ${url} -> ${res.status}`);

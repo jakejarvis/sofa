@@ -1,21 +1,18 @@
 import { access, constants, readdir } from "node:fs/promises";
 import path from "node:path";
 import { count, desc, eq } from "drizzle-orm";
+import {
+  CACHE_DIR,
+  DATA_DIR,
+  DATABASE_URL,
+  TMDB_API_BASE_URL,
+} from "@/lib/constants";
 import { db } from "@/lib/db/client";
 import { cronRuns, episodes, titles, user } from "@/lib/db/schema";
 import { listBackups } from "@/lib/services/backup";
 import { imageCacheEnabled } from "@/lib/services/image-cache";
 import { getSetting } from "@/lib/services/settings";
 import { isUpdateCheckEnabled } from "@/lib/services/update-check";
-
-const DATA_DIR = process.env.DATA_DIR || "./data";
-const DATABASE_URL =
-  process.env.DATABASE_URL || path.join(DATA_DIR, "sqlite.db");
-const CACHE_DIR = process.env.CACHE_DIR
-  ? path.join(process.env.CACHE_DIR, "images")
-  : path.join(DATA_DIR, "images");
-const TMDB_API_BASE_URL =
-  process.env.TMDB_API_BASE_URL || "https://api.themoviedb.org/3";
 
 export interface SystemHealthData {
   database: {

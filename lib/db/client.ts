@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite";
-import path from "node:path";
 import type { Logger } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
+import { DATABASE_URL } from "@/lib/constants";
 import { createLogger } from "@/lib/logger";
 import * as schema from "./schema";
 
@@ -28,10 +28,6 @@ const globalForDb = globalThis as unknown as {
   _db: ReturnType<typeof drizzle> | undefined;
   _client: Database | undefined;
 };
-
-const DATABASE_URL =
-  process.env.DATABASE_URL ||
-  path.join(process.env.DATA_DIR || "./data", "sqlite.db");
 
 function getClient() {
   if (!globalForDb._client) {

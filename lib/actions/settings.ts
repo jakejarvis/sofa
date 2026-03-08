@@ -7,6 +7,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth/server";
 import { requireAdmin, requireSession } from "@/lib/auth/session";
+import { AVATAR_DIR } from "@/lib/constants";
 import { type BackupFrequency, rescheduleBackup, triggerJob } from "@/lib/cron";
 import { db } from "@/lib/db/client";
 import { integrations } from "@/lib/db/schema";
@@ -268,8 +269,6 @@ export async function getUpdateCheckAction(): Promise<UpdateCheckResult | null> 
 
 // --- Avatar actions ---
 
-const DATA_DIR = process.env.DATA_DIR || "./data";
-const AVATAR_DIR = path.join(DATA_DIR, "avatars");
 const MAX_AVATAR_SIZE = 2 * 1024 * 1024; // 2MB
 const ALLOWED_AVATAR_TYPES = new Set([
   "image/jpeg",

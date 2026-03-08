@@ -1,3 +1,4 @@
+import { TMDB_API_BASE_URL } from "@/lib/constants";
 import { createLogger } from "@/lib/logger";
 import type {
   TmdbExternalIds,
@@ -18,9 +19,6 @@ import type {
 } from "./types";
 
 const log = createLogger("tmdb");
-
-const BASE_URL =
-  process.env.TMDB_API_BASE_URL || "https://api.themoviedb.org/3";
 function getApiKey() {
   const key = process.env.TMDB_API_READ_ACCESS_TOKEN;
   if (!key) throw new Error("TMDB_API_READ_ACCESS_TOKEN is not set");
@@ -32,7 +30,7 @@ async function tmdbFetch<T>(
   params?: Record<string, string>,
   fetchOptions?: RequestInit,
 ): Promise<T> {
-  const url = new URL(`${BASE_URL}${path}`);
+  const url = new URL(`${TMDB_API_BASE_URL}${path}`);
   if (params) {
     for (const [k, v] of Object.entries(params)) {
       url.searchParams.set(k, v);
