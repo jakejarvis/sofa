@@ -1,8 +1,4 @@
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   ContinueWatchingCard,
   type ContinueWatchingItemProps,
@@ -14,22 +10,22 @@ export function ContinueWatchingList({
   items: ContinueWatchingItemProps[];
 }) {
   return (
-    <Carousel
-      opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}
-      className="-mx-4 sm:-mx-0 [&>[data-slot=carousel-content]]:px-px"
+    <ScrollArea
+      scrollFade
+      className="-mx-4 sm:-mx-0 [&_[data-slot=scroll-area-content]]:px-px"
     >
-      <CarouselContent className="px-4 sm:px-0">
+      <div className="flex gap-4 px-4 py-2 sm:px-0">
         {items.map((item, i) => (
-          <CarouselItem key={item.title.id} className="basis-auto pl-4">
+          <div key={item.title.id} className="shrink-0">
             <div
               className="animate-stagger-item"
               style={{ "--stagger-index": i } as React.CSSProperties}
             >
               <ContinueWatchingCard item={item} />
             </div>
-          </CarouselItem>
+          </div>
         ))}
-      </CarouselContent>
-    </Carousel>
+      </div>
+    </ScrollArea>
   );
 }

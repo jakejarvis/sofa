@@ -179,12 +179,7 @@ export function TitleDetailSkeleton() {
           <div className="flex flex-wrap items-center gap-3">
             <Skeleton className="h-9 w-28 rounded-lg" />
             <Skeleton className="h-4 w-px" />
-            <div className="flex gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton
-                <Skeleton key={i} className="size-5 rounded" />
-              ))}
-            </div>
+            <Skeleton className="h-5 w-24 rounded" />
           </div>
         </div>
       </div>

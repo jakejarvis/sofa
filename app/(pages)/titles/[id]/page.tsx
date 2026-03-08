@@ -22,6 +22,7 @@ import { TitleKeyboardShortcuts } from "./_components/title-keyboard-shortcuts";
 import { TitleProvider } from "./_components/title-provider";
 import { TitleRecommendations } from "./_components/title-recommendations";
 import { TitleSeasons } from "./_components/title-seasons";
+import { TitleTheme } from "./_components/title-theme";
 
 const getCachedOrFetchTitle = cache((id: string) => getOrFetchTitle(id));
 
@@ -68,6 +69,7 @@ export default async function TitleDetailPage({
 
   return (
     <div className="relative space-y-10" style={themeStyle}>
+      <TitleTheme style={themeStyle as Record<string, string>} />
       <TitleProvider
         key={title.id}
         titleId={title.id}

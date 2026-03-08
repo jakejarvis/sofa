@@ -36,7 +36,10 @@ export function TitleActions() {
           Mark Watched
         </Button>
       )}
-      <Separator orientation="vertical" className="mx-0.5 h-4 bg-border/50" />
+      <Separator
+        orientation="vertical"
+        className="mx-0.5 my-auto h-6 bg-border/50"
+      />
       <StarRating value={userRating ?? 0} onChange={handleRating} />
     </div>
   );

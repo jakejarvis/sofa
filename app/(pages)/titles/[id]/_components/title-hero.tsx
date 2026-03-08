@@ -2,7 +2,9 @@ import {
   IconCalendarEvent,
   IconCircleCheck,
   IconCircleX,
+  IconDeviceTv,
   IconLoader,
+  IconMovie,
   IconRefresh,
   IconStarFilled,
 } from "@tabler/icons-react";
@@ -13,7 +15,6 @@ import { TmdbLogo } from "@/components/tmdb-logo";
 import type { ColorPalette, ResolvedTitle } from "@/lib/types/title";
 import { GenreCollapse } from "./genre-collapse";
 import { TrailerDialog } from "./trailer-dialog";
-import { TypeBadge } from "./type-badge";
 
 export function TitleHero({
   title,
@@ -69,7 +70,7 @@ export function TitleHero({
             }}
           />
           {trailerVideoKey && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center">
+            <div className="absolute inset-0 z-10 mb-12 flex items-center justify-center">
               <TrailerDialog videoKey={trailerVideoKey} variant="backdrop" />
             </div>
           )}
@@ -106,106 +107,65 @@ export function TitleHero({
         )}
 
         <div className="flex-1 space-y-5">
-          <div>
+          <div className="space-y-1.5">
             <h1 className="text-balance font-display text-2xl tracking-tight md:text-5xl">
               {title.title}
             </h1>
-            <div className="mt-2 space-y-1.5 text-muted-foreground text-sm md:space-y-0">
-              {/* Desktop: single row with dot separators */}
-              <div className="hidden md:flex md:items-center md:gap-x-2 md:gap-y-1">
-                <TypeBadge type={title.type} />
-                <div className="flex items-center gap-x-2 [&>*+*]:before:mr-2 [&>*+*]:before:text-border [&>*+*]:before:content-['·']">
-                  {title.contentRating && <span>{title.contentRating}</span>}
-                  {year && <span>{year}</span>}
-                  {title.genres.length > 0 && (
-                    <GenreCollapse genres={title.genres} />
-                  )}
-                  {title.voteAverage != null && title.voteAverage > 0 && (
-                    <span className="inline-flex items-center gap-1 text-primary">
-                      <IconStarFilled className="size-3.5" />
-                      {title.voteAverage.toFixed(1)}
-                    </span>
-                  )}
-                  {title.status &&
-                    !(
-                      title.type === "movie" && title.status === "Released"
-                    ) && (
-                      <span className="inline-flex items-center gap-1">
-                        <StatusIcon status={title.status} />
-                        {title.status}
-                      </span>
-                    )}
+            {/* Desktop: single row with dot separators */}
+            <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2 text-muted-foreground text-sm md:gap-x-5">
+              <div className="inline-flex cursor-default items-center justify-center gap-1.5 rounded bg-primary/10 px-1 py-1 font-medium text-primary text-xs md:px-1.5">
+                {title.type === "movie" ? (
+                  <>
+                    <IconMovie
+                      aria-hidden
+                      className="size-3.5 translate-y-[-0.5px]"
+                    />
+                    <span className="hidden md:inline">Movie</span>
+                  </>
+                ) : (
+                  <>
+                    <IconDeviceTv
+                      aria-hidden
+                      className="size-3.5 translate-y-[-0.5px]"
+                    />
+                    <span className="hidden md:inline">TV</span>
+                  </>
+                )}
+              </div>
+              {title.contentRating && (
+                <div className="inline-flex border border-muted-foreground/50 px-1.5 font-medium text-[13px]">
+                  {title.contentRating}
                 </div>
-                <a
-                  href={`https://www.themoviedb.org/${title.type === "movie" ? "movie" : "tv"}/${title.tmdbId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="View on TMDB"
-                  className="inline-flex items-center opacity-70 transition-opacity hover:opacity-40"
-                >
-                  <TmdbLogo className="h-2.5 w-auto" />
-                </a>
-              </div>
-
-              {/* Mobile: two clean rows */}
-              <div className="flex items-center gap-2 md:hidden">
-                <TypeBadge type={title.type} />
-                {title.contentRating && <span>{title.contentRating}</span>}
-                {year && (
-                  <>
-                    {title.contentRating && (
-                      <span className="text-border">·</span>
-                    )}
-                    <span>{year}</span>
-                  </>
-                )}
-                {title.genres.length > 0 && (
-                  <>
-                    <span className="text-border">·</span>
-                    <GenreCollapse genres={title.genres} />
-                  </>
-                )}
-                {title.voteAverage != null && title.voteAverage > 0 && (
-                  <>
-                    <span className="text-border">·</span>
-                    <span className="inline-flex items-center gap-1 text-primary">
-                      <IconStarFilled className="size-3.5" />
-                      {title.voteAverage.toFixed(1)}
-                    </span>
-                  </>
-                )}
-              </div>
-              {title.status &&
-                !(title.type === "movie" && title.status === "Released") && (
-                  <div className="flex items-center gap-2 md:hidden">
-                    <span className="inline-flex items-center gap-1 text-muted-foreground/70">
-                      <StatusIcon status={title.status} />
-                      {title.status}
-                    </span>
-                    <a
-                      href={`https://www.themoviedb.org/${title.type === "movie" ? "movie" : "tv"}/${title.tmdbId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="View on TMDB"
-                      className="inline-flex items-center opacity-70 transition-opacity hover:opacity-40"
-                    >
-                      <TmdbLogo className="h-2.5 w-auto" />
-                    </a>
-                  </div>
-                )}
-              {/* TMDB link for mobile when no status is shown */}
-              {(!title.status ||
-                (title.type === "movie" && title.status === "Released")) && (
-                <a
-                  href={`https://www.themoviedb.org/${title.type === "movie" ? "movie" : "tv"}/${title.tmdbId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="View on TMDB"
-                  className="inline-flex items-center opacity-70 transition-opacity hover:opacity-40 md:hidden"
-                >
-                  <TmdbLogo className="h-2.5 w-auto" />
-                </a>
               )}
+              {year && <span>{year}</span>}
+              {title.genres.length > 0 && (
+                <GenreCollapse genres={title.genres} />
+              )}
+              {title.voteAverage != null && title.voteAverage > 0 && (
+                <span className="inline-flex items-center gap-1 text-primary">
+                  <IconStarFilled className="size-3.5 translate-y-[-0.5px]" />
+                  {title.voteAverage.toFixed(1)}
+                </span>
+              )}
+              {title.status &&
+                !(title.type === "movie" && title.status === "Released") &&
+                !(
+                  title.type === "tv" && title.status === "Returning Series"
+                ) && (
+                  <span className="inline-flex items-center gap-1">
+                    <StatusIcon status={title.status} />
+                    {title.status}
+                  </span>
+                )}
+              <a
+                href={`https://www.themoviedb.org/${title.type === "movie" ? "movie" : "tv"}/${title.tmdbId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="View on TMDB"
+                className="inline-flex items-center opacity-70 transition-opacity hover:opacity-40"
+              >
+                <TmdbLogo className="h-2.5 w-auto" />
+              </a>
             </div>
           </div>
 
@@ -245,7 +205,7 @@ function AmbientGlow({ palette }: { palette: ColorPalette | null }) {
       {/* Mobile: single full-bleed color wash that flows from the backdrop edge-to-edge */}
       {glowColor && (
         <div
-          className="pointer-events-none absolute top-0 right-[calc(-50vw+50%)] left-[calc(-50vw+50%)] -z-10 h-[600px] md:hidden"
+          className="pointer-events-none absolute top-0 right-[calc(-50dvw+50%)] left-[calc(-50dvw+50%)] -z-10 h-[600px] md:hidden"
           style={{
             background: `radial-gradient(ellipse 100% 60% at 50% 0%, ${glowColor}18 0%, transparent 70%)`,
           }}
@@ -253,7 +213,7 @@ function AmbientGlow({ palette }: { palette: ColorPalette | null }) {
       )}
 
       {/* Desktop: multi-orb ambient glow with room to breathe */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[800px] overflow-hidden md:block">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[800px] md:block">
         {palette.vibrant && (
           <div
             className="absolute top-16 -left-32 h-[500px] w-[500px] rounded-full opacity-[0.07] blur-[120px]"

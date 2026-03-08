@@ -1,13 +1,7 @@
-"use client";
-
 import { IconUser, IconUsers } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type { CastMember } from "@/lib/types/title";
 
 interface CastCarouselProps {
@@ -24,20 +18,10 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
       </div>
 
       {actors.length > 0 && (
-        <Carousel
-          opts={{
-            align: "start",
-            dragFree: true,
-            containScroll: "trimSnaps",
-          }}
-          className="-mx-4 sm:-mx-0"
-        >
-          <CarouselContent className="px-4 sm:px-0">
+        <ScrollArea scrollFade className="-mx-4 sm:-mx-0">
+          <div className="flex gap-4 px-4 py-2 sm:px-0">
             {actors.map((member, i) => (
-              <CarouselItem
-                key={member.id}
-                className="w-[100px] shrink-0 basis-auto pl-4 sm:w-[120px]"
-              >
+              <div key={member.id} className="w-[100px] shrink-0 sm:w-[120px]">
                 <div
                   className="animate-stagger-item"
                   style={{ "--stagger-index": i } as React.CSSProperties}
@@ -82,10 +66,10 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
                     </div>
                   </Link>
                 </div>
-              </CarouselItem>
+              </div>
             ))}
-          </CarouselContent>
-        </Carousel>
+          </div>
+        </ScrollArea>
       )}
     </section>
   );

@@ -1,4 +1,4 @@
-import { IconSparkles } from "@tabler/icons-react";
+import { IconThumbUp } from "@tabler/icons-react";
 import { getRecommendationsFeed } from "@/lib/services/discovery";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { FeedSection } from "./feed-section";
@@ -24,7 +24,7 @@ export async function RecommendationsSection({ userId }: { userId: string }) {
   return (
     <FeedSection
       title="Recommended for You"
-      icon={<IconSparkles className="size-5 text-primary" />}
+      icon={<IconThumbUp className="size-5 text-primary" />}
     >
       <TitleGrid items={items} />
     </FeedSection>

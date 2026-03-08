@@ -143,12 +143,6 @@
     display: none;
   }
 
-  /* Allow tilt/scale effects to overflow carousel viewport vertically */
-  .carousel-tilt > [data-slot="carousel-content"] {
-    overflow-x: clip;
-    overflow-y: visible;
-  }
-
   /* CSS stagger animation — plays immediately from SSR without waiting for JS hydration */
   .animate-stagger-item {
     animation: stagger-fade-in 0.35s ease-out both;

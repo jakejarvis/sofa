@@ -29,7 +29,7 @@ export function GenreCollapse({ genres }: { genres: string[] }) {
           {remaining.map((genre) => (
             <span
               key={genre}
-              className="px-2 py-1 text-popover-foreground text-xs"
+              className="px-2 py-1 text-[13px] text-popover-foreground"
             >
               {genre}
             </span>

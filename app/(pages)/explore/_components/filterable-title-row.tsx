@@ -4,11 +4,7 @@ import { useState, useTransition } from "react";
 import { TitleCardSkeleton } from "@/components/skeletons";
 import { TitleCard } from "@/components/title-card";
 import { Button } from "@/components/ui/button";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { discoverByGenre } from "@/lib/actions/explore";
 import {
   fetchEpisodeProgress,
@@ -105,8 +101,8 @@ export function FilterableTitleRow({
       </div>
 
       {/* Genre chips */}
-      <div className="relative">
-        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+      <ScrollArea scrollFade>
+        <div className="flex gap-2">
           {genres.map((genre) => (
             <Button
               key={genre.id}
@@ -123,8 +119,7 @@ export function FilterableTitleRow({
             </Button>
           ))}
         </div>
-        <div className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-background to-transparent sm:hidden" />
-      </div>
+      </ScrollArea>
 
       {/* Loading skeleton */}
       {isPending && (
@@ -148,45 +143,40 @@ export function FilterableTitleRow({
         </p>
       )}
 
-      {/* Carousel */}
+      {/* Title cards */}
       {!isPending && items.length > 0 && (
-        <div key={selectedGenre ?? "default"}>
-          <Carousel
-            opts={{
-              align: "start",
-              dragFree: true,
-              containScroll: "trimSnaps",
-            }}
-            className="carousel-tilt -mx-6 sm:-mx-2"
-          >
-            <CarouselContent className="px-6 sm:px-2">
-              {items.slice(0, 20).map((item, i) => (
-                <CarouselItem
-                  key={`${item.type}-${item.tmdbId}`}
-                  className="w-[140px] shrink-0 basis-auto pl-4 sm:w-[160px]"
+        <ScrollArea
+          key={selectedGenre ?? "default"}
+          scrollFade
+          className="-mx-6 sm:-mx-2"
+        >
+          <div className="flex gap-4 px-6 py-2 sm:px-2">
+            {items.slice(0, 20).map((item, i) => (
+              <div
+                key={`${item.type}-${item.tmdbId}`}
+                className="w-[140px] shrink-0 sm:w-[160px]"
+              >
+                <div
+                  className="animate-stagger-item"
+                  style={{ "--stagger-index": i } as React.CSSProperties}
                 >
-                  <div
-                    className="animate-stagger-item"
-                    style={{ "--stagger-index": i } as React.CSSProperties}
-                  >
-                    <TitleCard
-                      tmdbId={item.tmdbId}
-                      type={item.type}
-                      title={item.title}
-                      posterPath={item.posterPath}
-                      releaseDate={item.releaseDate}
-                      voteAverage={item.voteAverage}
-                      userStatus={userStatuses[`${item.tmdbId}-${item.type}`]}
-                      episodeProgress={
-                        episodeProgress[`${item.tmdbId}-${item.type}`]
-                      }
-                    />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-          </Carousel>
-        </div>
+                  <TitleCard
+                    tmdbId={item.tmdbId}
+                    type={item.type}
+                    title={item.title}
+                    posterPath={item.posterPath}
+                    releaseDate={item.releaseDate}
+                    voteAverage={item.voteAverage}
+                    userStatus={userStatuses[`${item.tmdbId}-${item.type}`]}
+                    episodeProgress={
+                      episodeProgress[`${item.tmdbId}-${item.type}`]
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
       )}
     </section>
   );

@@ -1,11 +1,5 @@
-"use client";
-
 import { TitleCard } from "@/components/title-card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TitleRowItem {
   tmdbId: number;
@@ -41,15 +35,12 @@ export function TitleRow({
           {heading}
         </h2>
       </div>
-      <Carousel
-        opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}
-        className="carousel-tilt -mx-6 sm:-mx-2"
-      >
-        <CarouselContent className="px-6 sm:px-2">
+      <ScrollArea scrollFade className="-mx-6 sm:-mx-2">
+        <div className="flex gap-4 px-6 py-2 sm:px-2">
           {items.map((item, i) => (
-            <CarouselItem
+            <div
               key={`${item.type}-${item.tmdbId}`}
-              className="w-[140px] shrink-0 basis-auto pl-4 sm:w-[160px]"
+              className="w-[140px] shrink-0 sm:w-[160px]"
             >
               <div
                 className="animate-stagger-item"
@@ -68,10 +59,10 @@ export function TitleRow({
                   }
                 />
               </div>
-            </CarouselItem>
+            </div>
           ))}
-        </CarouselContent>
-      </Carousel>
+        </div>
+      </ScrollArea>
     </section>
   );
 }
