@@ -101,7 +101,7 @@ export function FilterableTitleRow({
       </div>
 
       {/* Genre chips */}
-      <ScrollArea scrollFade>
+      <ScrollArea scrollFade hideScrollbar>
         <div className="flex gap-2">
           {genres.map((genre) => (
             <Button
@@ -148,6 +148,7 @@ export function FilterableTitleRow({
         <ScrollArea
           key={selectedGenre ?? "default"}
           scrollFade
+          hideScrollbar
           className="-mx-6 sm:-mx-2"
         >
           <div className="flex gap-4 px-6 py-2 sm:px-2">

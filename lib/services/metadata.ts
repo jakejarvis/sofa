@@ -440,7 +440,10 @@ export async function refreshTvChildren(
   }
 }
 
-export async function refreshRecommendations(titleId: string) {
+export async function refreshRecommendations(
+  titleId: string,
+  { revalidate = true }: { revalidate?: boolean } = {},
+) {
   const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title) return;
 
@@ -575,7 +578,9 @@ export async function refreshRecommendations(titleId: string) {
     }
   });
 
-  updateTag(`recs-${titleId}`);
+  if (revalidate) {
+    updateTag(`recs-${titleId}`);
+  }
 }
 
 /** Fetch seasons from the DB, building the Season[] structure. */
@@ -684,9 +689,12 @@ async function ensureEnriched(
 ): Promise<boolean> {
   const tasks: Promise<void>[] = [];
 
+  // Called during render — skip updateTag calls (not allowed outside Server Actions/Route Handlers)
+  const noRevalidate = { revalidate: false } as const;
+
   if (!existing.hasCast) {
     tasks.push(
-      refreshCredits(titleId).catch((err) =>
+      refreshCredits(titleId, noRevalidate).catch((err) =>
         log.debug("Credits enrichment failed:", err),
       ),
     );
@@ -710,7 +718,7 @@ async function ensureEnriched(
       .get() != null;
   if (!hasRecommendations) {
     tasks.push(
-      refreshRecommendations(titleId).catch((err) =>
+      refreshRecommendations(titleId, noRevalidate).catch((err) =>
         log.debug("Recommendations enrichment failed:", err),
       ),
     );

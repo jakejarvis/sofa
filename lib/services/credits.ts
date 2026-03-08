@@ -81,7 +81,10 @@ function batchUpsertPersons(people: PersonData[]): Map<number, string> {
   return idMap;
 }
 
-export async function refreshCredits(titleId: string) {
+export async function refreshCredits(
+  titleId: string,
+  { revalidate = true }: { revalidate?: boolean } = {},
+) {
   const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title) return;
 
@@ -273,8 +276,10 @@ export async function refreshCredits(titleId: string) {
       }
     }
 
-    for (const personId of personIds.values()) {
-      updateTag(`person-${personId}`);
+    if (revalidate) {
+      for (const personId of personIds.values()) {
+        updateTag(`person-${personId}`);
+      }
     }
 
     log.debug(`Credits refreshed for "${title.title}"`);

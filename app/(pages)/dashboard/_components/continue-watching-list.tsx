@@ -12,6 +12,7 @@ export function ContinueWatchingList({
   return (
     <ScrollArea
       scrollFade
+      hideScrollbar
       className="-mx-4 sm:-mx-0 [&_[data-slot=scroll-area-content]]:px-px"
     >
       <div className="flex gap-4 px-4 py-2 sm:px-0">

@@ -35,7 +35,7 @@ export function TitleRow({
           {heading}
         </h2>
       </div>
-      <ScrollArea scrollFade className="-mx-6 sm:-mx-2">
+      <ScrollArea scrollFade hideScrollbar className="-mx-6 sm:-mx-2">
         <div className="flex gap-4 px-6 py-2 sm:px-2">
           {items.map((item, i) => (
             <div

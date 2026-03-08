@@ -1,6 +1,11 @@
 "use client";
 
-import { IconPlus, IconStar } from "@tabler/icons-react";
+import {
+  IconDeviceTv,
+  IconMovie,
+  IconPlus,
+  IconStar,
+} from "@tabler/icons-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -65,8 +70,18 @@ export function HeroBanner({
                 style={{ "--stagger-index": 3 } as React.CSSProperties}
               >
                 <div className="mb-3 flex items-center gap-2">
-                  <span className="rounded bg-primary/20 px-2 py-0.5 font-semibold text-[10px] text-primary uppercase tracking-wider">
-                    {type}
+                  <span className="inline-flex cursor-default items-center justify-center gap-1 rounded bg-primary/10 px-1.5 py-1 font-medium text-primary text-xs">
+                    {type === "movie" ? (
+                      <>
+                        <IconMovie aria-hidden className="size-3.5" />
+                        Movie
+                      </>
+                    ) : (
+                      <>
+                        <IconDeviceTv aria-hidden className="size-3.5" />
+                        TV
+                      </>
+                    )}
                   </span>
                   {voteAverage > 0 && (
                     <span className="flex items-center gap-1 text-primary text-sm">
