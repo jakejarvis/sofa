@@ -19,7 +19,7 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
 
       {actors.length > 0 && (
         <ScrollArea scrollFade hideScrollbar className="-mx-4 sm:-mx-0">
-          <div className="flex gap-4 px-4 py-2 sm:px-0">
+          <div className="flex gap-1 px-4 py-2 sm:px-0">
             {actors.map((member, i) => (
               <div key={member.id} className="w-[100px] shrink-0 sm:w-[120px]">
                 <div
@@ -49,7 +49,7 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
                       )}
                     </div>
                     <div className="w-full text-center">
-                      <p className="line-clamp-2 font-medium text-xs leading-tight">
+                      <p className="truncate font-medium text-xs">
                         {member.name}
                       </p>
                       {member.character && (

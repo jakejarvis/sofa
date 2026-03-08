@@ -76,6 +76,7 @@ export function FilmographyGrid({
         <Select
           value={sort}
           onValueChange={(v) => v && setSort(v as Sort)}
+          modal={false}
           aria-label="Sort filmography"
         >
           <SelectTrigger size="sm">

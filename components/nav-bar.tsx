@@ -212,7 +212,7 @@ export function NavBar({
             className="mx-1.5 my-auto hidden h-6 bg-border/50 sm:block"
           />
           {/* User avatar dropdown */}
-          <DropdownMenu>
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger
               className="hidden cursor-pointer rounded-full outline-none ring-2 ring-transparent transition-all hover:ring-primary/40 focus-visible:ring-primary/60 sm:block"
               aria-label="Account menu"

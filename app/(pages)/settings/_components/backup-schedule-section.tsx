@@ -216,16 +216,17 @@ export function BackupScheduleSection({
               <CardTitle>Backup schedule</CardTitle>
               <CardDescription>
                 {enabled ? (
-                  <span className="inline-flex flex-wrap items-baseline gap-1">
-                    <span suppressHydrationWarning>
-                      {formatNextBackup(frequency, time, dow)}.
-                    </span>{" "}
-                    Keeping{" "}
+                  <span
+                    className="inline-flex flex-wrap items-baseline"
+                    suppressHydrationWarning
+                  >
+                    {formatNextBackup(frequency, time, dow)}. Keeping{" "}
                     <Select
                       value={String(maxRetention)}
                       onValueChange={(v) => v && changeMaxRetention(Number(v))}
+                      modal={false}
                     >
-                      <SelectTrigger className="h-auto w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 underline decoration-muted-foreground/50 decoration-dotted underline-offset-4 shadow-none hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:decoration-foreground focus-visible:decoration-solid focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent">
+                      <SelectTrigger className="!h-auto mr-0.5 ml-1.5 w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 underline decoration-muted-foreground/50 decoration-dotted underline-offset-4 shadow-none hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:decoration-foreground focus-visible:decoration-solid focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent">
                         <SelectValue>
                           {(value: string | null) =>
                             value === "0"
@@ -319,6 +320,7 @@ export function BackupScheduleSection({
                         onValueChange={(v) =>
                           v && changeSchedule(frequency, time, Number(v))
                         }
+                        modal={false}
                       >
                         <SelectTrigger className="h-auto gap-1 border-border/50 bg-muted/30 px-2.5 py-1 text-foreground text-xs hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50">
                           <SelectValue>
@@ -361,6 +363,7 @@ export function BackupScheduleSection({
                       <Select
                         value={time}
                         onValueChange={(v) => v && changeSchedule(frequency, v)}
+                        modal={false}
                       >
                         <SelectTrigger className="h-auto gap-1 border-border/50 bg-muted/30 px-2.5 py-1 text-foreground text-xs hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50">
                           <SelectValue>

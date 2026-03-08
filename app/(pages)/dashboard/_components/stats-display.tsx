@@ -95,6 +95,7 @@ function PeriodSelector({
       <Select
         value={period}
         onValueChange={(v) => v && onPeriodChange(v as TimePeriod)}
+        modal={false}
       >
         <SelectTrigger
           className={`${inlineTriggerClass} text-foreground/80 uppercase`}
