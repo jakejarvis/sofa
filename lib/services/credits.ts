@@ -280,7 +280,12 @@ export async function refreshCredits(
 
     if (revalidate) {
       for (const personId of personIds.values()) {
-        updateTag(`person-${personId}`);
+        try {
+          updateTag(`person-${personId}`);
+        } catch {
+          // updateTag only works inside Route Handlers / Server Actions;
+          // swallow the error when called from cron jobs or detached promises.
+        }
       }
     }
 

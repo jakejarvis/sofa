@@ -173,7 +173,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
         extractAndStoreColors(existing.id, show.poster_path ?? null).catch(
           (err) => log.debug("Color extraction failed:", err),
         );
-        refreshCredits(existing.id).catch((err) =>
+        refreshCredits(existing.id, { revalidate: false }).catch((err) =>
           log.debug("Credits enrichment failed:", err),
         );
         refreshTrailer(existing.id).catch((err) =>
@@ -227,7 +227,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
     extractAndStoreColors(row.id, movie.poster_path ?? null).catch((err) =>
       log.debug("Color extraction failed:", err),
     );
-    refreshCredits(row.id).catch((err) =>
+    refreshCredits(row.id, { revalidate: false }).catch((err) =>
       log.debug("Credits enrichment failed:", err),
     );
     refreshTrailer(row.id).catch((err) =>
@@ -276,7 +276,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
   extractAndStoreColors(row.id, show.poster_path ?? null).catch((err) =>
     log.debug("Color extraction failed:", err),
   );
-  refreshCredits(row.id).catch((err) =>
+  refreshCredits(row.id, { revalidate: false }).catch((err) =>
     log.debug("Credits enrichment failed:", err),
   );
   refreshTrailer(row.id).catch((err) =>
@@ -352,7 +352,7 @@ export async function refreshTitle(titleId: string) {
     refreshTrailer(updated.id).catch((err) =>
       log.debug("Trailer enrichment failed:", err),
     );
-    refreshCredits(updated.id).catch((err) =>
+    refreshCredits(updated.id, { revalidate: false }).catch((err) =>
       log.debug("Credits enrichment failed:", err),
     );
     if (imageCacheEnabled()) {
@@ -586,7 +586,12 @@ export async function refreshRecommendations(
   });
 
   if (revalidate) {
-    updateTag(`recs-${titleId}`);
+    try {
+      updateTag(`recs-${titleId}`);
+    } catch {
+      // updateTag only works inside Route Handlers / Server Actions;
+      // swallow when called from cron jobs or detached promises.
+    }
   }
 }
 
