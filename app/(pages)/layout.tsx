@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { CommandPalette } from "@/components/command-palette";
-import { MobileTabBar } from "@/components/mobile-tab-bar";
-import { NavBar } from "@/components/nav-bar";
+import { MobileTabBar, NavBar } from "@/components/nav-bar";
 import { ProgressProvider } from "@/components/navigation-progress";
 import { UpdateToast } from "@/components/update-toast";
 import { getSession } from "@/lib/auth/session";
