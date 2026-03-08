@@ -11,7 +11,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { AvailabilityOffer } from "@/lib/types/title";
+import type { AvailabilityOffer } from "@/lib/types";
 
 const MAX_VISIBLE = 4;
 

@@ -12,7 +12,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { ExpandableText } from "@/components/expandable-text";
 import { TmdbLogo } from "@/components/tmdb-logo";
-import type { ColorPalette, ResolvedTitle } from "@/lib/types/title";
+import type { ColorPalette, ResolvedTitle } from "@/lib/types";
 import { GenreCollapse } from "./genre-collapse";
 import { TrailerDialog } from "./trailer-dialog";
 

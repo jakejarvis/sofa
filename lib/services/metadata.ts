@@ -33,7 +33,7 @@ import type {
   Episode,
   ResolvedTitle,
   Season,
-} from "@/lib/types/title";
+} from "@/lib/types";
 import { refreshAvailability } from "./availability";
 import { extractAndStoreColors, parseColorPalette } from "./colors";
 import { getCastForTitle, refreshCredits } from "./credits";

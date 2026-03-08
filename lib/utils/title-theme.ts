@@ -1,4 +1,4 @@
-import type { ColorPalette } from "@/lib/types/title";
+import type { ColorPalette } from "@/lib/types";
 
 /** @internal */
 export function hexToRelativeLuminance(hex: string): number {

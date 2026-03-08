@@ -1,4 +1,4 @@
-import type { CastMember } from "@/lib/types/title";
+import type { CastMember } from "@/lib/types";
 import { CastCarousel } from "./cast-carousel";
 
 interface TitleCastProps {

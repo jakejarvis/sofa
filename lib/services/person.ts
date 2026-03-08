@@ -4,7 +4,7 @@ import { persons, titleCast, titles } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
 import { getPersonCombinedCredits, getPersonDetails } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import type { PersonCredit, ResolvedPerson } from "@/lib/types/title";
+import type { PersonCredit, ResolvedPerson } from "@/lib/types";
 
 const log = createLogger("person");
 

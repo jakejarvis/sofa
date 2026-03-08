@@ -2,7 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { getSession } from "@/lib/auth/session";
 import { getRecommendationsForTitle } from "@/lib/services/discovery";
 import { getUserStatusesByTitleIds } from "@/lib/services/tracking";
-import type { RecommendedTitle } from "@/lib/types/title";
+import type { RecommendedTitle } from "@/lib/types";
 import { RecommendationsGrid } from "./recommendations-grid";
 
 async function getCachedRecommendations(titleId: string) {

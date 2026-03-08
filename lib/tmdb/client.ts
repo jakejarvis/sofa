@@ -19,6 +19,7 @@ import type {
 } from "./types";
 
 const log = createLogger("tmdb");
+
 function getApiKey() {
   const key = process.env.TMDB_API_READ_ACCESS_TOKEN;
   if (!key) throw new Error("TMDB_API_READ_ACCESS_TOKEN is not set");

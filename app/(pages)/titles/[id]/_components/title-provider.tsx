@@ -11,7 +11,7 @@ import {
   userRatingAtom,
   userStatusAtom,
 } from "@/lib/atoms/title";
-import type { Season } from "@/lib/types/title";
+import type { Season } from "@/lib/types";
 
 export function TitleProvider({
   titleId,

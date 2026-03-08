@@ -2,7 +2,7 @@
 
 import { IconThumbUp } from "@tabler/icons-react";
 import { TitleCard } from "@/components/title-card";
-import type { RecommendedTitle } from "@/lib/types/title";
+import type { RecommendedTitle } from "@/lib/types";
 
 export function RecommendationsGrid({
   recommendations,

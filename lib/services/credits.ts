@@ -5,7 +5,7 @@ import { persons, titleCast, titles } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
 import { getMovieCredits, getTvAggregateCredits } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import type { CastMember } from "@/lib/types/title";
+import type { CastMember } from "@/lib/types";
 import { cacheProfilePhotos, imageCacheEnabled } from "./image-cache";
 
 const log = createLogger("credits");

@@ -3,7 +3,7 @@ import { format, parseISO } from "date-fns";
 import Image from "next/image";
 import { ExpandableText } from "@/components/expandable-text";
 import { Badge } from "@/components/ui/badge";
-import type { ResolvedPerson } from "@/lib/types/title";
+import type { ResolvedPerson } from "@/lib/types";
 
 interface PersonHeroProps {
   person: ResolvedPerson;

@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import type { Season } from "@/lib/types/title";
+import type { Season } from "@/lib/types";
 
 export const titleIdAtom = atom("");
 export const titleTypeAtom = atom<"movie" | "tv">("movie");
