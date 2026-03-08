@@ -1,4 +1,4 @@
-import { access, constants, readdir, stat } from "node:fs/promises";
+import { access, constants, readdir } from "node:fs/promises";
 import path from "node:path";
 import { count, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
@@ -217,14 +217,7 @@ async function getImageCacheHealth(): Promise<SystemHealthData["imageCache"]> {
       try {
         const files = await readdir(dir);
         const sizes = await Promise.all(
-          files.map(async (file) => {
-            try {
-              const s = await stat(path.join(dir, file));
-              return s.isFile() ? s.size : 0;
-            } catch {
-              return 0;
-            }
-          }),
+          files.map((file) => Bun.file(path.join(dir, file)).size),
         );
         const sizeBytes = sizes.reduce((sum, s) => sum + s, 0);
         categories[category] = { count: files.length, sizeBytes };

@@ -6,13 +6,16 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { SofaLogo } from "@/components/sofa-logo";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Kbd } from "@/components/ui/kbd";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { commandPaletteOpenAtom } from "@/lib/atoms/command-palette";
 import { signOut } from "@/lib/auth/client";
 
@@ -21,10 +24,20 @@ const navLinks = [
   { href: "/explore", label: "Explore" },
 ] as const;
 
-export function NavBar({ userName }: { userName: string }) {
+export function NavBar({
+  userName,
+  userEmail,
+  userImage,
+}: {
+  userName: string;
+  userEmail: string;
+  userImage?: string;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const setCommandPaletteOpen = useSetAtom(commandPaletteOpenAtom);
+
+  const initial = userName?.charAt(0).toUpperCase() ?? "?";
 
   return (
     <header className="sticky top-0 z-50 border-border/50 border-b bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
@@ -84,36 +97,78 @@ export function NavBar({ userName }: { userName: string }) {
           >
             <IconSearch aria-hidden={true} className="size-3.5" />
             <span>Search…</span>
-            <Kbd className="ml-1">⌘K</Kbd>
+            <Kbd className="ml-2.5">⌘ K</Kbd>
           </button>
           <Separator
             orientation="vertical"
-            className="mx-1.5 hidden h-4 bg-border/50 sm:block"
+            className="mx-1.5 my-auto hidden h-6 bg-border/50 sm:block"
           />
-          <Tooltip>
-            <TooltipTrigger
-              render={<Link href="/settings" />}
-              className="hidden items-center gap-1.5 rounded-md px-2 py-1.5 text-muted-foreground text-sm leading-none transition-colors hover:text-foreground sm:inline-flex"
+          {/* User avatar dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="hidden cursor-pointer rounded-full outline-none ring-2 ring-transparent transition-all hover:ring-primary/40 focus-visible:ring-primary/60 sm:block"
+              aria-label="Account menu"
             >
-              {userName}
-              <IconSettings aria-hidden={true} className="size-3.5" />
-            </TooltipTrigger>
-            <TooltipContent>Settings</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger
-              onClick={async () => {
-                await signOut();
-                router.push("/");
-                router.refresh();
-              }}
-              aria-label="Sign out"
-              className="hidden h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:inline-flex"
-            >
-              <IconLogout className="size-[15px]" />
-            </TooltipTrigger>
-            <TooltipContent>Log out</TooltipContent>
-          </Tooltip>
+              <Avatar>
+                {userImage && <AvatarImage src={userImage} alt={userName} />}
+                <AvatarFallback className="bg-primary/10 font-display text-primary text-xs">
+                  {initial}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={8} className="w-56">
+              <div className="flex items-center gap-3 px-2 py-2.5">
+                <Avatar className="size-9">
+                  {userImage && <AvatarImage src={userImage} alt={userName} />}
+                  <AvatarFallback className="bg-primary/10 font-display text-primary text-sm">
+                    {initial}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium text-foreground text-sm leading-tight">
+                    {userName}
+                  </p>
+                  <p className="truncate text-muted-foreground text-xs">
+                    {userEmail}
+                  </p>
+                </div>
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                render={<Link href="/settings" />}
+                className="cursor-pointer text-[13px]"
+              >
+                <IconSettings className="size-3.5" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                variant="destructive"
+                onSelect={async () => {
+                  await signOut();
+                  router.push("/");
+                  router.refresh();
+                }}
+                className="cursor-pointer text-[13px]"
+              >
+                <IconLogout className="size-3.5" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {/* Mobile: simple avatar link to settings */}
+          <Link
+            href="/settings"
+            className="rounded-full ring-2 ring-transparent transition-all hover:ring-primary/40 sm:hidden"
+            aria-label="Settings"
+          >
+            <Avatar size="sm">
+              {userImage && <AvatarImage src={userImage} alt={userName} />}
+              <AvatarFallback className="bg-primary/10 font-display text-[10px] text-primary">
+                {initial}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
         </div>
       </nav>
     </header>

@@ -28,7 +28,11 @@ async function AuthenticatedShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <div className="relative z-0 min-h-screen pb-[calc(3.5rem+env(safe-area-inset-bottom))] sm:pb-0">
-        <NavBar userName={session.user.name} />
+        <NavBar
+          userName={session.user.name}
+          userEmail={session.user.email}
+          userImage={session.user.image || undefined}
+        />
         {/* Ambient glow — smaller on mobile to add warmth without overwhelming */}
         <div className="pointer-events-none fixed top-1/4 left-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/3 blur-[200px]" />
         <main

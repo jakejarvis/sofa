@@ -177,6 +177,7 @@ export default async function SettingsPage() {
         user={{
           name: session.user.name,
           email: session.user.email,
+          image: session.user.image || undefined,
           createdAt: session.user.createdAt.toISOString(),
           role: session.user.role ?? undefined,
         }}

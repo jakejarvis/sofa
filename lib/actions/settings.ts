@@ -1,7 +1,11 @@
 "use server";
 
+import { mkdir, rename } from "node:fs/promises";
+import path from "node:path";
 import { and, eq } from "drizzle-orm";
+import { headers } from "next/headers";
 import { z } from "zod";
+import { auth } from "@/lib/auth/server";
 import { requireAdmin, requireSession } from "@/lib/auth/session";
 import { type BackupFrequency, rescheduleBackup, triggerJob } from "@/lib/cron";
 import { db } from "@/lib/db/client";
@@ -260,4 +264,76 @@ export async function getUpdateCheckAction(): Promise<UpdateCheckResult | null> 
   } catch {
     return null;
   }
+}
+
+// --- Avatar actions ---
+
+const DATA_DIR = process.env.DATA_DIR || "./data";
+const AVATAR_DIR = path.join(DATA_DIR, "avatars");
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024; // 2MB
+const ALLOWED_AVATAR_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+const MIME_TO_EXT: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+};
+
+export async function uploadAvatarAction(
+  formData: FormData,
+): Promise<{ imageUrl: string }> {
+  const session = await requireSession();
+  const file = formData.get("file") as File | null;
+  if (!file) throw new Error("No file provided");
+  if (file.size > MAX_AVATAR_SIZE) throw new Error("File too large (max 2MB)");
+  if (!ALLOWED_AVATAR_TYPES.has(file.type))
+    throw new Error("Invalid file type. Use JPEG, PNG, WebP, or GIF.");
+
+  await mkdir(AVATAR_DIR, { recursive: true });
+
+  // Remove any existing avatar for this user
+  const glob = new Bun.Glob(`${session.user.id}.*`);
+  const existing = await Array.fromAsync(glob.scan(AVATAR_DIR));
+  for (const match of existing) {
+    await Bun.file(path.join(AVATAR_DIR, match)).delete();
+  }
+
+  // Write new avatar (atomic: temp file + rename)
+  const ext = MIME_TO_EXT[file.type] || "jpg";
+  const filename = `${session.user.id}.${ext}`;
+  const filePath = path.join(AVATAR_DIR, filename);
+  const tmpPath = `${filePath}.tmp.${Date.now()}`;
+  await Bun.write(tmpPath, file);
+  await rename(tmpPath, filePath);
+
+  // Update user via Better Auth (updates DB + refreshes session cookie)
+  const imageUrl = `/api/avatars/${session.user.id}?v=${Date.now()}`;
+  await auth.api.updateUser({
+    body: { image: imageUrl },
+    headers: await headers(),
+  });
+
+  return { imageUrl };
+}
+
+export async function removeAvatarAction(): Promise<void> {
+  const session = await requireSession();
+
+  // Remove file from disk
+  const glob = new Bun.Glob(`${session.user.id}.*`);
+  const matches = await Array.fromAsync(glob.scan(AVATAR_DIR));
+  for (const match of matches) {
+    await Bun.file(path.join(AVATAR_DIR, match)).delete();
+  }
+
+  // Clear user via Better Auth (updates DB + refreshes session cookie)
+  await auth.api.updateUser({
+    body: { image: "" },
+    headers: await headers(),
+  });
 }
