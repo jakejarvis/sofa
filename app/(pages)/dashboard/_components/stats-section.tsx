@@ -1,22 +1,14 @@
 import { IconDeviceTv } from "@tabler/icons-react";
 import Link from "next/link";
-import { getUserStats, type TimePeriod } from "@/lib/services/discovery";
+import { getUserStats } from "@/lib/services/discovery";
 import { StatsDisplay } from "./stats-display";
 
-export async function StatsSection({
-  userId,
-  moviePeriod,
-  episodePeriod,
-}: {
-  userId: string;
-  moviePeriod: TimePeriod;
-  episodePeriod: TimePeriod;
-}) {
-  const stats = getUserStats(userId, moviePeriod, episodePeriod);
+export async function StatsSection({ userId }: { userId: string }) {
+  const stats = await getUserStats(userId);
 
   const isEmpty =
-    stats.movieCount === 0 &&
-    stats.episodeCount === 0 &&
+    stats.moviesThisMonth === 0 &&
+    stats.episodesThisWeek === 0 &&
     stats.librarySize === 0 &&
     stats.completed === 0;
 

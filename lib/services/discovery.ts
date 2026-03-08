@@ -144,19 +144,15 @@ export function getWatchHistory(
 }
 
 export interface DashboardStats {
-  movieCount: number;
-  episodeCount: number;
+  moviesThisMonth: number;
+  episodesThisWeek: number;
   librarySize: number;
   completed: number;
 }
 
-export function getUserStats(
-  userId: string,
-  moviePeriod: TimePeriod = "this_month",
-  episodePeriod: TimePeriod = "this_week",
-): DashboardStats {
-  const movieCount = getWatchCount(userId, "movies", moviePeriod);
-  const episodeCount = getWatchCount(userId, "episodes", episodePeriod);
+export function getUserStats(userId: string): DashboardStats {
+  const moviesThisMonth = getWatchCount(userId, "movies", "this_month");
+  const episodesThisWeek = getWatchCount(userId, "episodes", "this_week");
 
   const [statusCounts] = db
     .select({
@@ -168,8 +164,8 @@ export function getUserStats(
     .all();
 
   return {
-    movieCount,
-    episodeCount,
+    moviesThisMonth,
+    episodesThisWeek,
     librarySize: statusCounts?.librarySize ?? 0,
     completed: statusCounts?.completed ?? 0,
   };

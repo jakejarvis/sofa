@@ -122,8 +122,8 @@ describe("getUserStats", () => {
     insertStatus("user-1", titleId, "in_progress");
 
     const stats = getUserStats("user-1");
-    expect(stats.movieCount).toBe(2);
-    expect(stats.episodeCount).toBe(1);
+    expect(stats.moviesThisMonth).toBe(2);
+    expect(stats.episodesThisWeek).toBe(1);
     expect(stats.librarySize).toBe(3);
     expect(stats.completed).toBe(2);
   });
@@ -131,8 +131,8 @@ describe("getUserStats", () => {
   test("returns zeros when no data", () => {
     insertUser();
     const stats = getUserStats("user-1");
-    expect(stats.movieCount).toBe(0);
-    expect(stats.episodeCount).toBe(0);
+    expect(stats.moviesThisMonth).toBe(0);
+    expect(stats.episodesThisWeek).toBe(0);
     expect(stats.librarySize).toBe(0);
     expect(stats.completed).toBe(0);
   });

@@ -6,7 +6,6 @@ import {
   IconMovie,
   IconPlayerPlay,
 } from "@tabler/icons-react";
-import { useQueryStates } from "nuqs";
 import { useEffect, useState } from "react";
 import {
   Select,
@@ -21,7 +20,6 @@ import type {
   HistoryBucket,
   TimePeriod,
 } from "@/lib/services/discovery";
-import { dashboardSearchParams, periods } from "../search-params";
 import { Sparkline } from "./sparkline";
 
 const periodLabels: Record<TimePeriod, string> = {
@@ -30,6 +28,8 @@ const periodLabels: Record<TimePeriod, string> = {
   this_month: "This Month",
   this_year: "This Year",
 };
+
+const periods: TimePeriod[] = ["today", "this_week", "this_month", "this_year"];
 
 interface StatCardProps {
   icon: React.ComponentType<{ className?: string }>;
@@ -120,9 +120,8 @@ function PeriodSelector({
 }
 
 export function StatsDisplay({ stats }: { stats: DashboardStats }) {
-  const [{ moviePeriod, episodePeriod }, setPeriods] = useQueryStates(
-    dashboardSearchParams,
-  );
+  const [moviePeriod, setMoviePeriod] = useState<TimePeriod>("this_month");
+  const [episodePeriod, setEpisodePeriod] = useState<TimePeriod>("this_week");
   const [movieStats, setMovieStats] = useState<{
     count: number;
     history: HistoryBucket[];
@@ -140,10 +139,10 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
     void getStatsAction("episodes", episodePeriod).then(setEpisodeStats);
   }, [episodePeriod]);
 
-  const movieCount = movieStats?.count ?? stats.movieCount;
+  const movieCount = movieStats?.count ?? stats.moviesThisMonth;
   const movieHistory = movieStats?.history;
 
-  const episodeCount = episodeStats?.count ?? stats.episodeCount;
+  const episodeCount = episodeStats?.count ?? stats.episodesThisWeek;
   const episodeHistory = episodeStats?.history;
 
   return (
@@ -159,7 +158,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
           <PeriodSelector
             noun="Movies"
             period={moviePeriod}
-            onPeriodChange={(p) => setPeriods({ moviePeriod: p })}
+            onPeriodChange={setMoviePeriod}
           />
         }
       />
@@ -174,7 +173,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
           <PeriodSelector
             noun="Episodes"
             period={episodePeriod}
-            onPeriodChange={(p) => setPeriods({ episodePeriod: p })}
+            onPeriodChange={setEpisodePeriod}
           />
         }
       />
