@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
           tmdbId: r.id,
           type: "person" as const,
           title: r.name,
-          profilePath: tmdbImageUrl(r.profile_path, "w185"),
+          profilePath: tmdbImageUrl(r.profile_path, "profiles"),
           knownForDepartment: r.known_for_department,
           knownFor: r.known_for
             ?.slice(0, 3)
@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
             type: "person" as const,
             title: r.name ?? "Unknown",
             posterPath: null,
-            profilePath: tmdbImageUrl(r.profile_path ?? null, "w185"),
+            profilePath: tmdbImageUrl(r.profile_path ?? null, "profiles"),
             overview: "",
             releaseDate: null,
             popularity: r.popularity,
@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
           title: r.title ?? r.name,
           overview: r.overview,
           releaseDate: r.release_date ?? r.first_air_date,
-          posterPath: tmdbImageUrl(r.poster_path, "w500"),
+          posterPath: tmdbImageUrl(r.poster_path, "posters"),
           popularity: r.popularity,
           voteAverage: r.vote_average,
         };

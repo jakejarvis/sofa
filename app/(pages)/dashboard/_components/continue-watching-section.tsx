@@ -13,18 +13,14 @@ export async function ContinueWatchingSection({ userId }: { userId: string }) {
     title: {
       id: item.title.id,
       title: item.title.title,
-      backdropPath: tmdbImageUrl(item.title.backdropPath, "w1280"),
+      backdropPath: tmdbImageUrl(item.title.backdropPath, "backdrops"),
     },
     nextEpisode: item.nextEpisode
       ? {
           seasonNumber: item.nextEpisode.seasonNumber,
           episodeNumber: item.nextEpisode.episodeNumber,
           name: item.nextEpisode.name,
-          stillPath: tmdbImageUrl(
-            item.nextEpisode.stillPath,
-            "w1280",
-            "stills",
-          ),
+          stillPath: tmdbImageUrl(item.nextEpisode.stillPath, "stills"),
         }
       : null,
     totalEpisodes: item.totalEpisodes,

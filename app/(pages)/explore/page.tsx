@@ -31,7 +31,7 @@ function mapResults(
         ? r.media_type
         : fallbackType) as "movie" | "tv",
       title: r.title ?? r.name ?? "",
-      posterPath: tmdbImageUrl(r.poster_path, "w500"),
+      posterPath: tmdbImageUrl(r.poster_path, "posters"),
       releaseDate: r.release_date ?? r.first_air_date ?? null,
       voteAverage: r.vote_average,
     }));
@@ -102,7 +102,7 @@ export default async function ExplorePage() {
           type={heroTitle.media_type as "movie" | "tv"}
           title={heroTitle.title ?? heroTitle.name ?? ""}
           overview={heroTitle.overview}
-          backdropPath={tmdbImageUrl(heroTitle.backdrop_path, "w1280")}
+          backdropPath={tmdbImageUrl(heroTitle.backdrop_path, "backdrops")}
           voteAverage={heroTitle.vote_average}
         />
       )}

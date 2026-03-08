@@ -23,7 +23,7 @@ const posterPaths = [
 ];
 
 const posterUrls = posterPaths
-  .map((p) => tmdbImageUrl(p, "w300"))
+  .map((p) => tmdbImageUrl(p, "posters", "w300"))
   .filter(Boolean) as string[];
 
 export default function Home() {

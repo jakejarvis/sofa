@@ -16,7 +16,7 @@ export async function RecommendationsSection({ userId }: { userId: string }) {
       tmdbId: t.tmdbId,
       type: t.type,
       title: t.title,
-      posterPath: tmdbImageUrl(t.posterPath, "w500"),
+      posterPath: tmdbImageUrl(t.posterPath, "posters"),
       releaseDate: t.releaseDate ?? t.firstAirDate,
       voteAverage: t.voteAverage,
     }));

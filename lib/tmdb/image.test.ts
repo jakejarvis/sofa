@@ -24,54 +24,56 @@ describe("tmdbImageUrl", () => {
   });
 
   test("returns null for null path", () => {
-    expect(tmdbImageUrl(null)).toBeNull();
+    expect(tmdbImageUrl(null, "posters")).toBeNull();
   });
 
   test("returns null for undefined path", () => {
-    expect(tmdbImageUrl(undefined as unknown as string | null)).toBeNull();
+    expect(
+      tmdbImageUrl(undefined as unknown as string | null, "posters"),
+    ).toBeNull();
   });
 
   describe("cache enabled (default)", () => {
-    test("w500 maps to posters", () => {
-      expect(tmdbImageUrl("/abc.jpg", "w500")).toBe(
+    test("posters category", () => {
+      expect(tmdbImageUrl("/abc.jpg", "posters")).toBe(
         "/api/images/posters/abc.jpg",
       );
     });
 
-    test("w1280 maps to backdrops", () => {
-      expect(tmdbImageUrl("/backdrop.jpg", "w1280")).toBe(
+    test("backdrops category", () => {
+      expect(tmdbImageUrl("/backdrop.jpg", "backdrops")).toBe(
         "/api/images/backdrops/backdrop.jpg",
       );
     });
 
-    test("w92 maps to logos", () => {
-      expect(tmdbImageUrl("/logo.png", "w92")).toBe(
+    test("logos category", () => {
+      expect(tmdbImageUrl("/logo.png", "logos")).toBe(
         "/api/images/logos/logo.png",
       );
     });
 
-    test("w185 maps to profiles", () => {
-      expect(tmdbImageUrl("/profile.jpg", "w185")).toBe(
+    test("profiles category", () => {
+      expect(tmdbImageUrl("/profile.jpg", "profiles")).toBe(
         "/api/images/profiles/profile.jpg",
       );
     });
 
-    test("strips leading slash from path", () => {
-      expect(tmdbImageUrl("/test.jpg")).toBe("/api/images/posters/test.jpg");
-    });
-
-    test("handles path without leading slash", () => {
-      expect(tmdbImageUrl("test.jpg")).toBe("/api/images/posters/test.jpg");
-    });
-
-    test("explicit category override", () => {
-      expect(tmdbImageUrl("/still.jpg", "w1280", "stills")).toBe(
+    test("stills category", () => {
+      expect(tmdbImageUrl("/still.jpg", "stills")).toBe(
         "/api/images/stills/still.jpg",
       );
     });
 
-    test("default size is w500 (posters)", () => {
-      expect(tmdbImageUrl("/img.jpg")).toBe("/api/images/posters/img.jpg");
+    test("strips leading slash from path", () => {
+      expect(tmdbImageUrl("/test.jpg", "posters")).toBe(
+        "/api/images/posters/test.jpg",
+      );
+    });
+
+    test("handles path without leading slash", () => {
+      expect(tmdbImageUrl("test.jpg", "posters")).toBe(
+        "/api/images/posters/test.jpg",
+      );
     });
   });
 
@@ -80,24 +82,33 @@ describe("tmdbImageUrl", () => {
       process.env.IMAGE_CACHE_ENABLED = "false";
     });
 
-    test("returns TMDB CDN URL with default base", () => {
-      expect(tmdbImageUrl("/abc.jpg", "w500")).toBe(
+    test("returns TMDB CDN URL with default size for category", () => {
+      expect(tmdbImageUrl("/abc.jpg", "posters")).toBe(
         "https://image.tmdb.org/t/p/w500/abc.jpg",
       );
     });
 
-    test("uses custom TMDB_IMAGE_BASE_URL", () => {
-      process.env.TMDB_IMAGE_BASE_URL = "https://custom-cdn.example.com";
-      // Need to re-import to pick up the new base URL — but since IMAGE_BASE_URL
-      // is evaluated at module load time, we test with the default
-      expect(tmdbImageUrl("/abc.jpg", "w1280")).toBe(
+    test("uses category-specific size", () => {
+      expect(tmdbImageUrl("/abc.jpg", "backdrops")).toBe(
         "https://image.tmdb.org/t/p/w1280/abc.jpg",
       );
     });
 
-    test("preserves size in URL", () => {
-      expect(tmdbImageUrl("/img.jpg", "w185")).toBe(
+    test("allows size override", () => {
+      expect(tmdbImageUrl("/abc.jpg", "posters", "w300")).toBe(
+        "https://image.tmdb.org/t/p/w300/abc.jpg",
+      );
+    });
+
+    test("preserves size for profiles", () => {
+      expect(tmdbImageUrl("/img.jpg", "profiles")).toBe(
         "https://image.tmdb.org/t/p/w185/img.jpg",
+      );
+    });
+
+    test("preserves size for logos", () => {
+      expect(tmdbImageUrl("/img.jpg", "logos")).toBe(
+        "https://image.tmdb.org/t/p/w92/img.jpg",
       );
     });
   });

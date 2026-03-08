@@ -42,7 +42,7 @@ export async function generateMetadata({
     openGraph: {
       title: title.title,
       images: title.posterPath
-        ? [{ url: tmdbImageUrl(title.posterPath, "w500") ?? "" }]
+        ? [{ url: tmdbImageUrl(title.posterPath, "posters") ?? "" }]
         : [],
     },
   };

@@ -505,7 +505,7 @@ export function getRecommendationsForTitle(titleId: string) {
         tmdbId: r.tmdbId,
         type: r.type as "movie" | "tv",
         title: r.title,
-        posterPath: tmdbImageUrl(r.posterPath, "w500"),
+        posterPath: tmdbImageUrl(r.posterPath, "posters"),
         releaseDate: r.releaseDate,
         firstAirDate: r.firstAirDate,
         voteAverage: r.voteAverage,

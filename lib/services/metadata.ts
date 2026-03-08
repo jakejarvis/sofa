@@ -610,7 +610,7 @@ function fetchSeasonsFromDb(titleId: string): Season[] {
       episodeNumber: ep.episodeNumber,
       name: ep.name,
       overview: ep.overview,
-      stillPath: tmdbImageUrl(ep.stillPath, "w1280", "stills"),
+      stillPath: tmdbImageUrl(ep.stillPath, "stills"),
       airDate: ep.airDate,
       runtimeMinutes: ep.runtimeMinutes,
     });
@@ -763,7 +763,7 @@ function readAvailability(
     .map((a) => ({
       providerId: a.providerId,
       providerName: a.providerName,
-      logoPath: tmdbImageUrl(a.logoPath, "w92"),
+      logoPath: tmdbImageUrl(a.logoPath, "logos"),
       offerType: a.offerType,
       watchUrl: generateProviderUrl(a.providerId, titleName),
     }));
@@ -852,8 +852,8 @@ export async function getOrFetchTitle(id: string): Promise<{
     overview: title.overview,
     releaseDate: title.releaseDate,
     firstAirDate: title.firstAirDate,
-    posterPath: tmdbImageUrl(title.posterPath, "w500"),
-    backdropPath: tmdbImageUrl(title.backdropPath, "w1280"),
+    posterPath: tmdbImageUrl(title.posterPath, "posters"),
+    backdropPath: tmdbImageUrl(title.backdropPath, "backdrops"),
     popularity: title.popularity,
     voteAverage: title.voteAverage,
     voteCount: title.voteCount,

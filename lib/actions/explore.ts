@@ -20,7 +20,7 @@ export async function discoverByGenre(
       tmdbId: r.id,
       type: mediaType,
       title: (r.title ?? r.name) as string,
-      posterPath: tmdbImageUrl(r.poster_path, "w500"),
+      posterPath: tmdbImageUrl(r.poster_path, "posters"),
       releaseDate: (r.release_date ?? r.first_air_date ?? null) as
         | string
         | null,

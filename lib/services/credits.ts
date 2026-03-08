@@ -316,6 +316,6 @@ export function getCastForTitle(titleId: string): CastMember[] {
 
   return rows.map((r) => ({
     ...r,
-    profilePath: tmdbImageUrl(r.profilePath, "w185"),
+    profilePath: tmdbImageUrl(r.profilePath, "profiles"),
   }));
 }
