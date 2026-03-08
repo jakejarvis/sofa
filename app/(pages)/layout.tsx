@@ -32,6 +32,7 @@ async function AuthenticatedShell({ children }: { children: React.ReactNode }) {
           userName={session.user.name}
           userEmail={session.user.email}
           userImage={session.user.image || undefined}
+          userRole={session.user.role || undefined}
         />
         {/* Ambient glow — smaller on mobile to add warmth without overwhelming */}
         <div className="pointer-events-none fixed top-1/4 left-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/3 blur-[200px]" />

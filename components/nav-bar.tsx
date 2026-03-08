@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { SofaLogo } from "@/components/sofa-logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,10 +29,12 @@ export function NavBar({
   userName,
   userEmail,
   userImage,
+  userRole,
 }: {
   userName: string;
   userEmail: string;
   userImage?: string;
+  userRole?: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -84,7 +87,7 @@ export function NavBar({
           <button
             type="button"
             onClick={() => setCommandPaletteOpen(true)}
-            className="flex flex-1 items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-muted-foreground text-sm transition-colors hover:border-primary/20 hover:bg-card sm:hidden"
+            className="flex flex-1 items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-[13px] text-muted-foreground transition-colors hover:border-primary/20 hover:bg-card sm:hidden"
           >
             <IconSearch aria-hidden={true} className="size-3.5" />
             <span>Search…</span>
@@ -93,7 +96,7 @@ export function NavBar({
           <button
             type="button"
             onClick={() => setCommandPaletteOpen(true)}
-            className="hidden items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-muted-foreground text-sm transition-colors hover:border-primary/20 hover:bg-card sm:inline-flex"
+            className="hidden items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-[13px] text-muted-foreground transition-colors hover:border-primary/20 hover:bg-card sm:inline-flex"
           >
             <IconSearch aria-hidden={true} className="size-3.5" />
             <span>Search…</span>
@@ -127,6 +130,11 @@ export function NavBar({
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-foreground text-sm leading-tight">
                     {userName}
+                    {userRole === "admin" && (
+                      <Badge className="mb-0.5 ml-1.5 rounded-md border-0 bg-primary/10 align-middle text-primary">
+                        Admin
+                      </Badge>
+                    )}
                   </p>
                   <p className="truncate text-muted-foreground text-xs">
                     {userEmail}
