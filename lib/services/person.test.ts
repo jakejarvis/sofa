@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { persons, titleCast } from "@/lib/db/schema";
-import { clearAllTables, insertTitle, testDb } from "@/lib/test-utils";
+import { clearAllTables, insertTitle, testDb } from "@/test/sqlite";
 
 import { getLocalFilmography } from "./person";
 

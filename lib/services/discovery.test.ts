@@ -10,8 +10,7 @@ import {
   insertTitle,
   insertTvShow,
   insertUser,
-} from "@/lib/test-utils";
-
+} from "@/test/sqlite";
 import {
   getContinueWatchingFeed,
   getNewAvailableFeed,

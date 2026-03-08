@@ -12,7 +12,7 @@ import {
   insertTvShow,
   insertUser,
   testDb,
-} from "@/lib/test-utils";
+} from "@/test/sqlite";
 import {
   getUserTitleInfo,
   logEpisodeWatch,

@@ -5,7 +5,7 @@ import {
   insertStatus,
   insertTitle,
   insertUser,
-} from "@/lib/test-utils";
+} from "@/test/sqlite";
 import {
   getRadarrList,
   getSonarrList,

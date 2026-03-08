@@ -1,5 +1,5 @@
 import { mock } from "bun:test";
-import { applyMigrations, testDb } from "@/lib/test-utils";
+import { applyMigrations, testDb } from "./sqlite";
 
 mock.module("@/lib/db/client", () => ({
   db: testDb,

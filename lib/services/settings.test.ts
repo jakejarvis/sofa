@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { clearAllTables, insertUser } from "@/lib/test-utils";
+import { clearAllTables, insertUser } from "@/test/sqlite";
 import {
   getSetting,
   getUserCount,
