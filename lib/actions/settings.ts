@@ -336,3 +336,17 @@ export async function removeAvatarAction(): Promise<void> {
     headers: await headers(),
   });
 }
+
+// --- Name update action ---
+
+export async function updateNameAction(name: string): Promise<void> {
+  await requireSession();
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error("Name cannot be empty");
+  if (trimmed.length > 100) throw new Error("Name is too long");
+
+  await auth.api.updateUser({
+    body: { name: trimmed },
+    headers: await headers(),
+  });
+}
