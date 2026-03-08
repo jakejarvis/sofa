@@ -1,8 +1,6 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
-const authRoutes = new Set(["/login", "/register"]);
-
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -14,16 +12,6 @@ export function proxy(request: NextRequest) {
     return sessionCookie
       ? NextResponse.rewrite(new URL("/dashboard", request.url))
       : NextResponse.next();
-  }
-
-  // Logged-in users on auth pages → dashboard
-  if (authRoutes.has(pathname) && sessionCookie) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  // Unauthenticated users on protected pages → login
-  if (!authRoutes.has(pathname) && !sessionCookie) {
-    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
