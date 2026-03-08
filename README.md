@@ -2,6 +2,10 @@
 
 Sofa is a self-hosted movie and TV tracker for nerds. Track what you've watched, discover what's next, and plug your data into your existing home media stack.
 
+<p align="center">
+<img width="1335" height="848" alt="Screenshot 2026-03-08 at 7 26 43 PM" src="https://github.com/user-attachments/assets/ece86930-cb92-4faf-984b-74f3d1e7ce07" />
+</p>
+
 ## What it does
 
 - Track episode-level progress for TV series and pick shows back up from a dedicated "Continue Watching" view
