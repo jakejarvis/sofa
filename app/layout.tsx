@@ -2,6 +2,7 @@ import { Provider as StoreProvider } from "jotai";
 import { MotionConfig } from "motion/react";
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, DM_Serif_Display, Geist_Mono } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -54,12 +55,14 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <StoreProvider>
-          <MotionConfig reducedMotion="user">
-            <TooltipProvider>{children}</TooltipProvider>
-            <Toaster position="bottom-right" />
-          </MotionConfig>
-        </StoreProvider>
+        <NuqsAdapter>
+          <StoreProvider>
+            <MotionConfig reducedMotion="user">
+              <TooltipProvider>{children}</TooltipProvider>
+              <Toaster position="bottom-right" />
+            </MotionConfig>
+          </StoreProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );

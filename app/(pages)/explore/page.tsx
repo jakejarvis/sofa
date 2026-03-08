@@ -1,14 +1,21 @@
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react";
+import type { SearchParams } from "nuqs/server";
 import { getSession } from "@/lib/auth/session";
 import {
   getEpisodeProgressByTmdbIds,
   getUserStatusesByTmdbIds,
 } from "@/lib/services/tracking";
-import { getGenres, getPopular, getTrending } from "@/lib/tmdb/client";
+import {
+  discover,
+  getGenres,
+  getPopular,
+  getTrending,
+} from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { FilterableTitleRow } from "./_components/filterable-title-row";
 import { HeroBanner } from "./_components/hero-banner";
 import { TitleRow } from "./_components/title-row";
+import { loadExploreSearchParams } from "./search-params";
 
 function mapResults(
   results: {
@@ -30,6 +37,33 @@ function mapResults(
       type: (r.media_type === "movie" || r.media_type === "tv"
         ? r.media_type
         : fallbackType) as "movie" | "tv",
+      title: r.title ?? r.name ?? "",
+      posterPath: tmdbImageUrl(r.poster_path ?? null, "posters"),
+      releaseDate: r.release_date ?? r.first_air_date ?? null,
+      voteAverage: r.vote_average,
+    }));
+}
+
+async function discoverByGenreServer(
+  mediaType: "movie" | "tv",
+  genreId: number,
+) {
+  const results = await discover(mediaType, {
+    sort_by: "popularity.desc",
+    "vote_count.gte": "50",
+    with_genres: String(genreId),
+  });
+  type DiscoverResult = NonNullable<typeof results.results>[number] & {
+    title?: string;
+    name?: string;
+    release_date?: string;
+    first_air_date?: string;
+  };
+  return ((results.results ?? []) as DiscoverResult[])
+    .filter((r) => r.poster_path)
+    .map((r) => ({
+      tmdbId: r.id,
+      type: mediaType,
       title: r.title ?? r.name ?? "",
       posterPath: tmdbImageUrl(r.poster_path ?? null, "posters"),
       releaseDate: r.release_date ?? r.first_air_date ?? null,
@@ -63,19 +97,35 @@ async function getExploreTmdbData() {
   };
 }
 
-export default async function ExplorePage() {
+export default async function ExplorePage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   // Await session first — its headers() call triggers the dynamic bailout during
   // PPR static generation, preventing TMDB fetches from firing at build time.
   const session = await getSession();
 
-  const {
-    trending,
-    trendingItems,
-    popularMovieItems,
-    popularTvItems,
-    movieGenres,
-    tvGenres,
-  } = await getExploreTmdbData();
+  const [
+    { movieGenre, tvGenre },
+    {
+      trending,
+      trendingItems,
+      popularMovieItems,
+      popularTvItems,
+      movieGenres,
+      tvGenres,
+    },
+  ] = await Promise.all([
+    loadExploreSearchParams(searchParams),
+    getExploreTmdbData(),
+  ]);
+
+  // Pre-fetch genre-filtered results server-side when URL has genre params
+  const [movieGenreItems, tvGenreItems] = await Promise.all([
+    movieGenre ? discoverByGenreServer("movie", movieGenre) : null,
+    tvGenre ? discoverByGenreServer("tv", tvGenre) : null,
+  ]);
 
   // Fetch user statuses and episode progress for all visible TMDB IDs
   let userStatuses: Record<string, "watchlist" | "in_progress" | "completed"> =
@@ -84,8 +134,8 @@ export default async function ExplorePage() {
   if (session) {
     const allItems = [
       ...trendingItems,
-      ...popularMovieItems,
-      ...popularTvItems,
+      ...(movieGenreItems ?? popularMovieItems),
+      ...(tvGenreItems ?? popularTvItems),
     ];
     const tmdbLookups = allItems.map((i) => ({
       tmdbId: i.tmdbId,
@@ -133,6 +183,7 @@ export default async function ExplorePage() {
         icon={<IconMovie aria-hidden={true} className="size-5 text-primary" />}
         mediaType="movie"
         defaultItems={popularMovieItems.slice(0, 20)}
+        initialGenreItems={movieGenreItems?.slice(0, 20) ?? null}
         genres={movieGenres}
         userStatuses={userStatuses}
         episodeProgress={episodeProgress}
@@ -145,6 +196,7 @@ export default async function ExplorePage() {
         }
         mediaType="tv"
         defaultItems={popularTvItems.slice(0, 20)}
+        initialGenreItems={tvGenreItems?.slice(0, 20) ?? null}
         genres={tvGenres}
         userStatuses={userStatuses}
         episodeProgress={episodeProgress}

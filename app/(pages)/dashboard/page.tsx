@@ -1,3 +1,4 @@
+import type { SearchParams } from "nuqs/server";
 import { Suspense } from "react";
 import {
   ContinueWatchingSectionSkeleton,
@@ -10,17 +11,29 @@ import { LibrarySection } from "./_components/library-section";
 import { RecommendationsSection } from "./_components/recommendations-section";
 import { StatsSection } from "./_components/stats-section";
 import { WelcomeHeader } from "./_components/welcome-header";
+import { loadDashboardSearchParams } from "./search-params";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   const session = await getSession();
   if (!session) return null;
+
+  const { moviePeriod, episodePeriod } =
+    await loadDashboardSearchParams(searchParams);
 
   return (
     <div className="space-y-10">
       <WelcomeHeader name={session.user.name} />
 
       <Suspense fallback={<StatsSectionSkeleton />}>
-        <StatsSection userId={session.user.id} />
+        <StatsSection
+          userId={session.user.id}
+          moviePeriod={moviePeriod}
+          episodePeriod={episodePeriod}
+        />
       </Suspense>
 
       <Suspense fallback={<ContinueWatchingSectionSkeleton />}>
