@@ -95,13 +95,13 @@ export async function refreshCredits(
 
     if (title.type === "movie") {
       const credits = await getMovieCredits(title.tmdbId);
-      const castSlice = credits.cast.slice(0, 20);
+      const castSlice = (credits.cast ?? []).slice(0, 20);
 
       // Collect notable crew
       const seenCrew = new Set<string>();
       const notableCrew: typeof credits.crew = [];
-      for (const c of credits.crew) {
-        if (!NOTABLE_DEPARTMENTS.has(c.job)) continue;
+      for (const c of credits.crew ?? []) {
+        if (!NOTABLE_DEPARTMENTS.has(c.job ?? "")) continue;
         const key = `${c.id}-${c.job}`;
         if (seenCrew.has(key)) continue;
         seenCrew.add(key);
@@ -112,14 +112,14 @@ export async function refreshCredits(
       const allPeople: PersonData[] = [
         ...castSlice.map((c) => ({
           tmdbId: c.id,
-          name: c.name,
-          profilePath: c.profile_path,
+          name: c.name ?? "",
+          profilePath: c.profile_path ?? null,
           popularity: c.popularity,
         })),
         ...notableCrew.map((c) => ({
           tmdbId: c.id,
-          name: c.name,
-          profilePath: c.profile_path,
+          name: c.name ?? "",
+          profilePath: c.profile_path ?? null,
           popularity: c.popularity,
         })),
       ];
@@ -180,24 +180,26 @@ export async function refreshCredits(
       }
     } else {
       const credits = await getTvAggregateCredits(title.tmdbId);
-      const castSlice = credits.cast.slice(0, 20);
+      const tvCast = credits.cast ?? [];
+      const tvCrew = credits.crew ?? [];
+      const castSlice = tvCast.slice(0, 20);
 
       // Collect notable crew
       const seenCrew = new Set<string>();
       const notableCrew: Array<{
-        person: (typeof credits.crew)[0];
+        person: (typeof tvCrew)[number];
         job: string;
         episodeCount: number;
       }> = [];
-      for (const c of credits.crew) {
-        for (const j of c.jobs) {
-          if (!NOTABLE_DEPARTMENTS.has(j.job)) continue;
+      for (const c of tvCrew) {
+        for (const j of c.jobs ?? []) {
+          if (!NOTABLE_DEPARTMENTS.has(j.job ?? "")) continue;
           const key = `${c.id}-${j.job}`;
           if (seenCrew.has(key)) continue;
           seenCrew.add(key);
           notableCrew.push({
             person: c,
-            job: j.job,
+            job: j.job ?? "",
             episodeCount: j.episode_count,
           });
         }
@@ -207,14 +209,14 @@ export async function refreshCredits(
       const allPeople: PersonData[] = [
         ...castSlice.map((c) => ({
           tmdbId: c.id,
-          name: c.name,
-          profilePath: c.profile_path,
+          name: c.name ?? "",
+          profilePath: c.profile_path ?? null,
           popularity: c.popularity,
         })),
         ...notableCrew.map((c) => ({
           tmdbId: c.person.id,
-          name: c.person.name,
-          profilePath: c.person.profile_path,
+          name: c.person.name ?? "",
+          profilePath: c.person.profile_path ?? null,
           popularity: c.person.popularity,
         })),
       ];
@@ -247,7 +249,7 @@ export async function refreshCredits(
           titleId,
           personId,
           character: null,
-          department: c.person.department,
+          department: c.person.department ?? "",
           job: c.job,
           displayOrder: crewOrder,
           episodeCount: c.episodeCount,

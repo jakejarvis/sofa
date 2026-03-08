@@ -12,6 +12,12 @@ import {
 } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
 import { generateProviderUrl } from "@/lib/providers";
+import type {
+  TmdbGenre,
+  TmdbMovieDetails,
+  TmdbTvDetails,
+  TmdbVideo,
+} from "@/lib/tmdb/client";
 import {
   getMovieDetails,
   getRecommendations,
@@ -21,12 +27,6 @@ import {
   getVideos,
 } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import type {
-  TmdbGenre,
-  TmdbMovieDetails,
-  TmdbTvDetails,
-  TmdbVideo,
-} from "@/lib/tmdb/types";
 import type {
   AvailabilityOffer,
   CastMember,
@@ -66,16 +66,19 @@ function upsertTitle(values: typeof titles.$inferInsert, tmdbId: number) {
 }
 
 function upsertGenres(titleId: string, tmdbGenres: TmdbGenre[]) {
-  if (tmdbGenres.length === 0) return;
+  const validGenres = tmdbGenres.filter(
+    (g): g is TmdbGenre & { name: string } => !!g.name,
+  );
+  if (validGenres.length === 0) return;
   db.transaction((tx) => {
-    for (const g of tmdbGenres) {
+    for (const g of validGenres) {
       tx.insert(genres)
         .values({ id: g.id, name: g.name })
         .onConflictDoUpdate({ target: genres.id, set: { name: g.name } })
         .run();
     }
     tx.delete(titleGenres).where(eq(titleGenres.titleId, titleId)).run();
-    for (const g of tmdbGenres) {
+    for (const g of validGenres) {
       tx.insert(titleGenres)
         .values({ titleId, genreId: g.id })
         .onConflictDoNothing()
@@ -90,7 +93,7 @@ export function extractMovieContentRating(
 ): string | null {
   const us = movie.release_dates?.results?.find((r) => r.iso_3166_1 === "US");
   if (!us) return null;
-  for (const rd of us.release_dates) {
+  for (const rd of us.release_dates ?? []) {
     if (rd.certification) return rd.certification;
   }
   return null;
@@ -159,7 +162,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
             .where(eq(titles.id, existing.id))
             .run();
         }
-        upsertGenres(existing.id, show.genres);
+        upsertGenres(existing.id, show.genres ?? []);
         await refreshTvChildren(existing.id, tmdbId, show.number_of_seasons);
         refreshAvailability(existing.id).catch((err) =>
           log.debug("Availability enrichment failed:", err),
@@ -167,8 +170,8 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
         refreshRecommendations(existing.id).catch((err) =>
           log.debug("Recommendations enrichment failed:", err),
         );
-        extractAndStoreColors(existing.id, show.poster_path).catch((err) =>
-          log.debug("Color extraction failed:", err),
+        extractAndStoreColors(existing.id, show.poster_path ?? null).catch(
+          (err) => log.debug("Color extraction failed:", err),
         );
         refreshCredits(existing.id).catch((err) =>
           log.debug("Credits enrichment failed:", err),
@@ -198,7 +201,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
       {
         tmdbId: movie.id,
         type: "movie",
-        title: movie.title,
+        title: movie.title ?? "",
         originalTitle: movie.original_title,
         overview: movie.overview,
         releaseDate: movie.release_date || null,
@@ -214,14 +217,14 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
       tmdbId,
     );
     if (!row) return undefined;
-    upsertGenres(row.id, movie.genres);
+    upsertGenres(row.id, movie.genres ?? []);
     refreshAvailability(row.id).catch((err) =>
       log.debug("Availability enrichment failed:", err),
     );
     refreshRecommendations(row.id).catch((err) =>
       log.debug("Recommendations enrichment failed:", err),
     );
-    extractAndStoreColors(row.id, movie.poster_path).catch((err) =>
+    extractAndStoreColors(row.id, movie.poster_path ?? null).catch((err) =>
       log.debug("Color extraction failed:", err),
     );
     refreshCredits(row.id).catch((err) =>
@@ -245,7 +248,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
       tmdbId: show.id,
       tvdbId: show.external_ids?.tvdb_id ?? null,
       type: "tv",
-      title: show.name,
+      title: show.name ?? "",
       originalTitle: show.original_name,
       overview: show.overview,
       firstAirDate: show.first_air_date || null,
@@ -261,7 +264,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
     tmdbId,
   );
   if (!row) return undefined;
-  upsertGenres(row.id, show.genres);
+  upsertGenres(row.id, show.genres ?? []);
 
   await refreshTvChildren(row.id, tmdbId, show.number_of_seasons);
   refreshAvailability(row.id).catch((err) =>
@@ -270,7 +273,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
   refreshRecommendations(row.id).catch((err) =>
     log.debug("Recommendations enrichment failed:", err),
   );
-  extractAndStoreColors(row.id, show.poster_path).catch((err) =>
+  extractAndStoreColors(row.id, show.poster_path ?? null).catch((err) =>
     log.debug("Color extraction failed:", err),
   );
   refreshCredits(row.id).catch((err) =>
@@ -316,7 +319,7 @@ export async function refreshTitle(titleId: string) {
       })
       .where(eq(titles.id, titleId))
       .run();
-    upsertGenres(titleId, movie.genres);
+    upsertGenres(titleId, movie.genres ?? []);
   } else {
     const show = await getTvDetails(title.tmdbId);
     db.update(titles)
@@ -337,7 +340,7 @@ export async function refreshTitle(titleId: string) {
       })
       .where(eq(titles.id, titleId))
       .run();
-    upsertGenres(titleId, show.genres);
+    upsertGenres(titleId, show.genres ?? []);
     await refreshTvChildren(titleId, title.tmdbId, show.number_of_seasons);
   }
 
@@ -405,9 +408,10 @@ export async function refreshTvChildren(
         .get();
 
       // Batch all episode upserts in a single transaction per season
-      if (seasonData.episodes.length > 0) {
+      const eps = seasonData.episodes ?? [];
+      if (eps.length > 0) {
         db.transaction((tx) => {
-          for (const ep of seasonData.episodes) {
+          for (const ep of eps) {
             tx.insert(episodes)
               .values({
                 seasonId: seasonRow.id,
@@ -455,20 +459,23 @@ export async function refreshRecommendations(
     getSimilar(title.tmdbId, title.type),
   ]);
 
+  const recsResults = recs.results ?? [];
+  const similarResults = similar.results ?? [];
+
   log.debug(
-    `Fetched ${recs.results.length} recommendations and ${similar.results.length} similar for title ${titleId}`,
+    `Fetched ${recsResults.length} recommendations and ${similarResults.length} similar for title ${titleId}`,
   );
 
   // Collect all valid results with their source/rank
   interface RecItem {
-    result: (typeof recs.results)[0];
+    result: (typeof recsResults)[number];
     type: "movie" | "tv";
     source: "tmdb_recommendations" | "tmdb_similar";
     rank: number;
   }
   const allItems: RecItem[] = [];
-  for (let i = 0; i < recs.results.length && i < 20; i++) {
-    const r = recs.results[i];
+  for (let i = 0; i < recsResults.length && i < 20; i++) {
+    const r = recsResults[i];
     const type = r.media_type ?? title.type;
     if (type === "movie" || type === "tv") {
       allItems.push({
@@ -479,8 +486,8 @@ export async function refreshRecommendations(
       });
     }
   }
-  for (let i = 0; i < similar.results.length && i < 20; i++) {
-    const r = similar.results[i];
+  for (let i = 0; i < similarResults.length && i < 20; i++) {
+    const r = similarResults[i];
     const type = r.media_type ?? title.type;
     if (type === "movie" || type === "tv") {
       allItems.push({ result: r, type, source: "tmdb_similar", rank: i + 1 });
@@ -651,7 +658,7 @@ export async function ensureTvHydrated(
         })
         .where(eq(titles.id, titleId))
         .run();
-      upsertGenres(titleId, show.genres);
+      upsertGenres(titleId, show.genres ?? []);
       await refreshTvChildren(titleId, tmdbId, show.number_of_seasons);
     } catch (err) {
       log.debug(`Failed to hydrate shell TV title ${titleId}:`, err);
@@ -807,7 +814,7 @@ export async function getOrFetchTitle(id: string): Promise<{
         })
         .where(eq(titles.id, id))
         .run();
-      upsertGenres(id, movie.genres);
+      upsertGenres(id, movie.genres ?? []);
       title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
     } catch (err) {
       log.debug(`Failed to hydrate shell movie title ${id}:`, err);
@@ -888,15 +895,15 @@ export function pickBestTrailer(videos: TmdbVideo[]): string | null {
   const officialTrailers = candidates
     .filter((v) => v.official && v.type === "Trailer")
     .sort(byDate);
-  if (officialTrailers.length > 0) return officialTrailers[0].key;
+  if (officialTrailers.length > 0) return officialTrailers[0].key ?? null;
 
   // Tier 2: any trailer
   const trailers = candidates.filter((v) => v.type === "Trailer").sort(byDate);
-  if (trailers.length > 0) return trailers[0].key;
+  if (trailers.length > 0) return trailers[0].key ?? null;
 
   // Tier 3: teasers
   const teasers = candidates.filter((v) => v.type === "Teaser").sort(byDate);
-  if (teasers.length > 0) return teasers[0].key;
+  if (teasers.length > 0) return teasers[0].key ?? null;
 
   return null;
 }
@@ -907,7 +914,7 @@ export async function refreshTrailer(titleId: string) {
 
   try {
     const response = await getVideos(title.tmdbId, title.type);
-    const key = pickBestTrailer(response.results);
+    const key = pickBestTrailer(response.results ?? []);
     db.update(titles)
       .set({ trailerVideoKey: key })
       .where(eq(titles.id, titleId))

@@ -8,7 +8,6 @@ import {
   searchTv,
 } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import type { TmdbSearchResponse } from "@/lib/tmdb/types";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -51,30 +50,43 @@ export async function GET(req: NextRequest) {
     if (type === "person") {
       const personResults = await searchPerson(query);
       return NextResponse.json({
-        results: personResults.results.map((r) => ({
+        results: (personResults.results ?? []).map((r) => ({
           tmdbId: r.id,
           type: "person" as const,
           title: r.name,
-          profilePath: tmdbImageUrl(r.profile_path, "profiles"),
+          profilePath: tmdbImageUrl(r.profile_path ?? null, "profiles"),
           knownForDepartment: r.known_for_department,
           knownFor: r.known_for
             ?.slice(0, 3)
-            .map((k) => k.title ?? k.name)
+            .map((k) => k.title ?? (k as { name?: string }).name)
             .filter(Boolean),
         })),
       });
     }
 
-    let results: TmdbSearchResponse;
-    if (type === "movie") {
-      results = await searchMovies(query);
-    } else if (type === "tv") {
-      results = await searchTv(query);
-    } else {
-      results = await searchMulti(query);
-    }
+    const raw =
+      type === "movie"
+        ? await searchMovies(query)
+        : type === "tv"
+          ? await searchTv(query)
+          : await searchMulti(query);
 
-    const mapped = results.results
+    // Search endpoints return movie, TV, or multi results with slightly
+    // different fields. Widen to the union we actually access.
+    type SearchResult = {
+      id: number;
+      media_type?: string;
+      title?: string;
+      name?: string;
+      overview?: string;
+      poster_path?: string | null;
+      profile_path?: string | null;
+      release_date?: string;
+      first_air_date?: string;
+      popularity?: number;
+      vote_average?: number;
+    };
+    const mapped = ((raw.results ?? []) as SearchResult[])
       .map((r) => {
         // Include person results from multi search
         if (r.media_type === "person") {
@@ -103,7 +115,7 @@ export async function GET(req: NextRequest) {
           title: r.title ?? r.name,
           overview: r.overview,
           releaseDate: r.release_date ?? r.first_air_date,
-          posterPath: tmdbImageUrl(r.poster_path, "posters"),
+          posterPath: tmdbImageUrl(r.poster_path ?? null, "posters"),
           popularity: r.popularity,
           voteAverage: r.vote_average,
         };

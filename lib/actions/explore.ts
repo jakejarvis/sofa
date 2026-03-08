@@ -14,16 +14,22 @@ export async function discoverByGenre(
     "vote_count.gte": "50",
     with_genres: String(genreId),
   });
-  return results.results
+  // Discover may return movie (title, release_date) or TV (name, first_air_date)
+  // fields depending on mediaType. The schema types them separately, so widen.
+  type DiscoverResult = NonNullable<typeof results.results>[number] & {
+    title?: string;
+    name?: string;
+    release_date?: string;
+    first_air_date?: string;
+  };
+  return ((results.results ?? []) as DiscoverResult[])
     .filter((r) => r.poster_path)
     .map((r) => ({
       tmdbId: r.id,
       type: mediaType,
-      title: (r.title ?? r.name) as string,
-      posterPath: tmdbImageUrl(r.poster_path, "posters"),
-      releaseDate: (r.release_date ?? r.first_air_date ?? null) as
-        | string
-        | null,
+      title: r.title ?? r.name ?? "",
+      posterPath: tmdbImageUrl(r.poster_path ?? null, "posters"),
+      releaseDate: r.release_date ?? r.first_air_date ?? null,
       voteAverage: r.vote_average,
     }));
 }

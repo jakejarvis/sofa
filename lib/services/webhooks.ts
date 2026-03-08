@@ -162,12 +162,14 @@ async function resolveMovieTmdbId(event: WebhookEvent): Promise<number | null> {
 
   if (event.imdbId) {
     const result = await findByExternalId(event.imdbId, "imdb_id");
-    if (result.movie_results.length > 0) return result.movie_results[0].id;
+    const movie = result.movie_results?.[0];
+    if (movie) return movie.id;
   }
 
   if (event.tvdbId) {
     const result = await findByExternalId(event.tvdbId, "tvdb_id");
-    if (result.movie_results.length > 0) return result.movie_results[0].id;
+    const movie = result.movie_results?.[0];
+    if (movie) return movie.id;
   }
 
   return null;
@@ -184,39 +186,27 @@ async function resolveEpisode(event: WebhookEvent): Promise<{
   // Strategy 1: Use IMDB ID to find the episode and get show_id
   if (event.imdbId) {
     const result = await findByExternalId(event.imdbId, "imdb_id");
-    if (result.tv_episode_results.length > 0) {
-      return {
-        showTmdbId: result.tv_episode_results[0].show_id,
-        seasonNumber,
-        episodeNumber,
-      };
+    const ep = result.tv_episode_results?.[0];
+    if (ep) {
+      return { showTmdbId: ep.show_id, seasonNumber, episodeNumber };
     }
     // IMDB ID might reference the show itself
-    if (result.tv_results.length > 0) {
-      return {
-        showTmdbId: result.tv_results[0].id,
-        seasonNumber,
-        episodeNumber,
-      };
+    const show = result.tv_results?.[0];
+    if (show) {
+      return { showTmdbId: show.id, seasonNumber, episodeNumber };
     }
   }
 
   // Strategy 2: Use TVDB ID
   if (event.tvdbId) {
     const result = await findByExternalId(event.tvdbId, "tvdb_id");
-    if (result.tv_episode_results.length > 0) {
-      return {
-        showTmdbId: result.tv_episode_results[0].show_id,
-        seasonNumber,
-        episodeNumber,
-      };
+    const ep = result.tv_episode_results?.[0];
+    if (ep) {
+      return { showTmdbId: ep.show_id, seasonNumber, episodeNumber };
     }
-    if (result.tv_results.length > 0) {
-      return {
-        showTmdbId: result.tv_results[0].id,
-        seasonNumber,
-        episodeNumber,
-      };
+    const show = result.tv_results?.[0];
+    if (show) {
+      return { showTmdbId: show.id, seasonNumber, episodeNumber };
     }
   }
 
@@ -228,12 +218,9 @@ async function resolveEpisode(event: WebhookEvent): Promise<{
   // Strategy 4: Search by show title
   if (event.showTitle) {
     const searchResult = await searchTv(event.showTitle);
-    if (searchResult.results.length > 0) {
-      return {
-        showTmdbId: searchResult.results[0].id,
-        seasonNumber,
-        episodeNumber,
-      };
+    const tvMatch = searchResult.results?.[0];
+    if (tvMatch) {
+      return { showTmdbId: tvMatch.id, seasonNumber, episodeNumber };
     }
   }
 

@@ -16,7 +16,7 @@ function mapResults(
     media_type?: string;
     title?: string;
     name?: string;
-    poster_path: string | null;
+    poster_path?: string | null;
     release_date?: string;
     first_air_date?: string;
     vote_average: number;
@@ -31,7 +31,7 @@ function mapResults(
         ? r.media_type
         : fallbackType) as "movie" | "tv",
       title: r.title ?? r.name ?? "",
-      posterPath: tmdbImageUrl(r.poster_path, "posters"),
+      posterPath: tmdbImageUrl(r.poster_path ?? null, "posters"),
       releaseDate: r.release_date ?? r.first_air_date ?? null,
       voteAverage: r.vote_average,
     }));
@@ -49,11 +49,17 @@ async function getExploreTmdbData() {
 
   return {
     trending,
-    trendingItems: mapResults(trending.results, "movie"),
-    popularMovieItems: mapResults(popularMovies.results, "movie"),
-    popularTvItems: mapResults(popularTv.results, "tv"),
-    movieGenres: movieGenres.genres,
-    tvGenres: tvGenres.genres,
+    trendingItems: mapResults(trending.results ?? [], "movie"),
+    popularMovieItems: mapResults(popularMovies.results ?? [], "movie"),
+    popularTvItems: mapResults(popularTv.results ?? [], "tv"),
+    movieGenres: (movieGenres.genres ?? []).map((g) => ({
+      id: g.id,
+      name: g.name ?? "",
+    })),
+    tvGenres: (tvGenres.genres ?? []).map((g) => ({
+      id: g.id,
+      name: g.name ?? "",
+    })),
   };
 }
 
@@ -89,7 +95,7 @@ export default async function ExplorePage() {
     episodeProgress = getEpisodeProgressByTmdbIds(session.user.id, tmdbLookups);
   }
 
-  const heroTitle = trending.results.find(
+  const heroTitle = (trending.results ?? []).find(
     (r) =>
       r.backdrop_path && (r.media_type === "movie" || r.media_type === "tv"),
   );
@@ -100,9 +106,16 @@ export default async function ExplorePage() {
         <HeroBanner
           tmdbId={heroTitle.id}
           type={heroTitle.media_type as "movie" | "tv"}
-          title={heroTitle.title ?? heroTitle.name ?? ""}
-          overview={heroTitle.overview}
-          backdropPath={tmdbImageUrl(heroTitle.backdrop_path, "backdrops")}
+          title={
+            ("title" in heroTitle ? heroTitle.title : undefined) ??
+            ("name" in heroTitle ? heroTitle.name : undefined) ??
+            ""
+          }
+          overview={heroTitle.overview ?? ""}
+          backdropPath={tmdbImageUrl(
+            heroTitle.backdrop_path ?? null,
+            "backdrops",
+          )}
           voteAverage={heroTitle.vote_average}
         />
       )}

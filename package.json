@@ -15,7 +15,8 @@
     "db:migrate": "bun --bun drizzle-kit migrate",
     "db:push": "bun --bun drizzle-kit push",
     "db:studio": "bun --bun drizzle-kit studio",
-    "db:seed": "bun run scripts/seed.ts"
+    "db:seed": "bun run scripts/seed.ts",
+    "generate-tmdb-schema": "bunx openapi-typescript https://developer.themoviedb.org/openapi/tmdb-api.json -o ./lib/tmdb/schema.d.ts"
   },
   "dependencies": {
     "@base-ui/react": "1.2.0",
@@ -35,6 +36,7 @@
     "motion": "12.35.1",
     "next": "16.1.6",
     "node-vibrant": "4.0.4",
+    "openapi-fetch": "0.17.0",
     "react": "19.2.4",
     "react-day-picker": "9.14.0",
     "react-dom": "19.2.4",

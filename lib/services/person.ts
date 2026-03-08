@@ -24,7 +24,7 @@ export async function getOrFetchPerson(
       const details = await getPersonDetails(person.tmdbId);
       db.update(persons)
         .set({
-          name: details.name,
+          name: details.name || person.name,
           biography: details.biography || null,
           birthday: details.birthday,
           deathday: details.deathday,
@@ -41,14 +41,14 @@ export async function getOrFetchPerson(
       return {
         id: person.id,
         tmdbId: person.tmdbId,
-        name: details.name,
+        name: details.name || person.name,
         biography: details.biography || null,
-        birthday: details.birthday,
-        deathday: details.deathday,
-        placeOfBirth: details.place_of_birth,
-        profilePath: tmdbImageUrl(details.profile_path, "profiles"),
-        knownForDepartment: details.known_for_department,
-        imdbId: details.imdb_id,
+        birthday: details.birthday ?? null,
+        deathday: details.deathday ?? null,
+        placeOfBirth: details.place_of_birth ?? null,
+        profilePath: tmdbImageUrl(details.profile_path ?? null, "profiles"),
+        knownForDepartment: details.known_for_department ?? null,
+        imdbId: details.imdb_id ?? null,
       };
     } catch (err) {
       log.error(`Failed to hydrate person ${personId}:`, err);
@@ -89,15 +89,15 @@ export async function getOrFetchPersonByTmdbId(
       .insert(persons)
       .values({
         tmdbId,
-        name: details.name,
+        name: details.name ?? "",
         biography: details.biography || null,
-        birthday: details.birthday,
-        deathday: details.deathday,
-        placeOfBirth: details.place_of_birth,
-        profilePath: details.profile_path,
-        knownForDepartment: details.known_for_department,
+        birthday: details.birthday ?? null,
+        deathday: details.deathday ?? null,
+        placeOfBirth: details.place_of_birth ?? null,
+        profilePath: details.profile_path ?? null,
+        knownForDepartment: details.known_for_department ?? null,
         popularity: details.popularity,
-        imdbId: details.imdb_id,
+        imdbId: details.imdb_id ?? null,
         lastFetchedAt: new Date(),
       })
       .onConflictDoNothing()
@@ -174,7 +174,12 @@ export async function fetchFullFilmography(
   const credits = await getPersonCombinedCredits(person.tmdbId);
 
   // Filter to valid cast entries
-  const validCast = credits.cast.filter(
+  // Schema types combined credits cast as movie-only; TV entries also carry
+  // `name` and `first_air_date` at runtime, so widen the type minimally.
+  type CastEntry = (typeof credits)["cast"] extends (infer E)[] | undefined
+    ? E & { name?: string; first_air_date?: string }
+    : never;
+  const validCast = ((credits.cast ?? []) as CastEntry[]).filter(
     (c) => c.media_type === "movie" || c.media_type === "tv",
   );
   if (validCast.length === 0) return [];
@@ -245,7 +250,7 @@ export async function fetchFullFilmography(
       tmdbId: c.id,
       type: c.media_type as "movie" | "tv",
       title: c.title ?? c.name ?? "Unknown",
-      posterPath: tmdbImageUrl(c.poster_path, "posters"),
+      posterPath: tmdbImageUrl(c.poster_path ?? null, "posters"),
       releaseDate: c.release_date ?? null,
       firstAirDate: c.first_air_date ?? null,
       voteAverage: c.vote_average,

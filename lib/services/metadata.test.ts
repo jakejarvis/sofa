@@ -3,7 +3,7 @@ import type {
   TmdbMovieDetails,
   TmdbTvDetails,
   TmdbVideo,
-} from "@/lib/tmdb/types";
+} from "@/lib/tmdb/client";
 import {
   extractMovieContentRating,
   extractTvContentRating,
