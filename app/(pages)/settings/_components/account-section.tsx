@@ -175,9 +175,10 @@ export function AccountSection({
               }
             >
               <Avatar className="size-12 overflow-hidden">
-                {avatarUrl && !isPending && (
-                  <AvatarImage src={avatarUrl} alt={displayName} />
-                )}
+                <AvatarImage
+                  src={isPending ? undefined : avatarUrl}
+                  alt={displayName}
+                />
                 <AvatarFallback className="bg-primary/10 font-display text-lg text-primary">
                   {initial}
                 </AvatarFallback>
@@ -191,7 +192,9 @@ export function AccountSection({
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.15 }}
                     className={`absolute inset-0 flex items-center justify-center rounded-full text-foreground/70 backdrop-blur-sm ${
-                      avatarUrl ? "bg-destructive/40" : "bg-black/50"
+                      avatarUrl && !isPending
+                        ? "bg-destructive/40"
+                        : "bg-black/50"
                     }`}
                   >
                     {isPending ? (

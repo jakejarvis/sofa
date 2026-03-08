@@ -110,7 +110,7 @@ export function NavBar({
               aria-label="Account menu"
             >
               <Avatar>
-                {userImage && <AvatarImage src={userImage} alt={userName} />}
+                <AvatarImage src={userImage} alt={userName} />
                 <AvatarFallback className="bg-primary/10 font-display text-primary text-xs">
                   {initial}
                 </AvatarFallback>
@@ -119,7 +119,7 @@ export function NavBar({
             <DropdownMenuContent align="end" sideOffset={8} className="w-56">
               <div className="flex items-center gap-3 px-2 py-2.5">
                 <Avatar className="size-9">
-                  {userImage && <AvatarImage src={userImage} alt={userName} />}
+                  <AvatarImage src={userImage} alt={userName} />
                   <AvatarFallback className="bg-primary/10 font-display text-primary text-sm">
                     {initial}
                   </AvatarFallback>
@@ -163,7 +163,7 @@ export function NavBar({
             aria-label="Settings"
           >
             <Avatar size="sm">
-              {userImage && <AvatarImage src={userImage} alt={userName} />}
+              <AvatarImage src={userImage} alt={userName} />
               <AvatarFallback className="bg-primary/10 font-display text-[10px] text-primary">
                 {initial}
               </AvatarFallback>
