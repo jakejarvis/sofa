@@ -9,6 +9,7 @@ import {
   IconUser,
   IconX,
 } from "@tabler/icons-react";
+import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
@@ -29,7 +30,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { signOut } from "@/lib/auth/client";
-import { client } from "@/lib/orpc/client";
+import { orpc } from "@/lib/orpc/tanstack";
 
 export function AccountSection({
   user,
@@ -52,8 +53,23 @@ export function AccountSection({
   const [isEditingName, setIsEditingName] = useState(false);
   const [displayName, setDisplayName] = useState(user.name);
   const [editValue, setEditValue] = useState(user.name);
-  const [isNamePending, startNameTransition] = useTransition();
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const updateNameMutation = useMutation(
+    orpc.account.updateName.mutationOptions({
+      onSuccess: () => {
+        const trimmed = editValue.trim();
+        setDisplayName(trimmed);
+        setIsEditingName(false);
+        toast.success("Name updated");
+        router.refresh();
+      },
+      onError: (err) => {
+        const message = err instanceof Error ? err.message : "Update failed";
+        toast.error(message);
+      },
+    }),
+  );
+  const isNamePending = updateNameMutation.isPending;
 
   useEffect(() => {
     if (isEditingName) {
@@ -120,18 +136,7 @@ export function AccountSection({
       return;
     }
 
-    startNameTransition(async () => {
-      try {
-        await client.account.updateName({ name: trimmed });
-        setDisplayName(trimmed);
-        setIsEditingName(false);
-        toast.success("Name updated");
-        router.refresh();
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Update failed";
-        toast.error(message);
-      }
-    });
+    updateNameMutation.mutate({ name: trimmed });
   }
 
   function handleNameCancel() {

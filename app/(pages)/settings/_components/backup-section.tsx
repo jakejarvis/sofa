@@ -9,7 +9,7 @@ import {
   IconShieldCheck,
   IconTrash,
 } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
@@ -33,7 +33,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { client } from "@/lib/orpc/client";
 import { orpc } from "@/lib/orpc/tanstack";
 import type { BackupInfo } from "@/lib/services/backup";
 
@@ -53,48 +52,51 @@ export function BackupSection() {
 
   // Use local state if user has modified, else use query data
   const displayBackups = backups ?? data?.backups ?? [];
-  const [creating, setCreating] = useState(false);
-  const [deleting, setDeleting] = useState<string | null>(null);
 
-  async function handleCreateBackup() {
-    setCreating(true);
-    try {
-      const backup = (await client.admin.backups.create()) as BackupInfo;
-      setBackups((prev) => [backup, ...(prev ?? data?.backups ?? [])]);
-      toast.success("Backup created", {
-        action: {
-          label: "Download",
-          onClick: () => {
-            const a = document.createElement("a");
-            a.href = `/api/backup/${backup.filename}`;
-            a.download = backup.filename;
-            a.click();
+  const createMutation = useMutation(
+    orpc.admin.backups.create.mutationOptions({
+      onSuccess: (backup) => {
+        setBackups((prev) => [
+          backup as BackupInfo,
+          ...(prev ?? data?.backups ?? []),
+        ]);
+        toast.success("Backup created", {
+          action: {
+            label: "Download",
+            onClick: () => {
+              const a = document.createElement("a");
+              a.href = `/api/backup/${backup.filename}`;
+              a.download = backup.filename;
+              a.click();
+            },
           },
-        },
-      });
-    } catch {
-      toast.error("Failed to create backup");
-    } finally {
-      setCreating(false);
-    }
-  }
+        });
+      },
+      onError: () => toast.error("Failed to create backup"),
+    }),
+  );
 
-  async function handleDelete(filename: string) {
-    const previous = displayBackups;
-    setDeleting(filename);
-    setBackups(
-      displayBackups.filter((b: BackupInfo) => b.filename !== filename),
-    );
-    try {
-      await client.admin.backups.delete({ filename });
-      toast.success("Backup deleted");
-    } catch {
-      setBackups(previous);
-      toast.error("Failed to delete backup");
-    } finally {
-      setDeleting(null);
-    }
-  }
+  const deleteMutation = useMutation(
+    orpc.admin.backups.delete.mutationOptions({
+      onMutate: ({ filename }) => {
+        const previous = displayBackups;
+        setBackups(
+          displayBackups.filter((b: BackupInfo) => b.filename !== filename),
+        );
+        return { previous };
+      },
+      onSuccess: () => toast.success("Backup deleted"),
+      onError: (_, __, ctx) => {
+        if (ctx?.previous) setBackups(ctx.previous);
+        toast.error("Failed to delete backup");
+      },
+    }),
+  );
+
+  const creating = createMutation.isPending;
+  const deleting = deleteMutation.isPending
+    ? (deleteMutation.variables?.filename ?? null)
+    : null;
 
   return (
     <>
@@ -117,7 +119,7 @@ export function BackupSection() {
               </CardDescription>
             </div>
           </div>
-          <Button onClick={handleCreateBackup} disabled={creating}>
+          <Button onClick={() => createMutation.mutate({})} disabled={creating}>
             {creating ? (
               <Spinner className="size-3" />
             ) : (
@@ -252,7 +254,11 @@ export function BackupSection() {
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
                               variant="destructive"
-                              onClick={() => handleDelete(backup.filename)}
+                              onClick={() =>
+                                deleteMutation.mutate({
+                                  filename: backup.filename,
+                                })
+                              }
                             >
                               Delete
                             </AlertDialogAction>

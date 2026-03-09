@@ -9,8 +9,7 @@ import {
   IconPlayerPlay,
   IconRefresh,
 } from "@tabler/icons-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { StatusDot } from "@/components/status-dot";
 import { Button } from "@/components/ui/button";
@@ -36,7 +35,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTimeAgo } from "@/hooks/use-time-ago";
-import { client } from "@/lib/orpc/client";
 import { orpc } from "@/lib/orpc/tanstack";
 import type { SystemHealthData } from "@/lib/services/system-health";
 
@@ -328,21 +326,22 @@ function BackgroundJobsCard({
   isRefreshing: boolean;
   onRefresh: () => void;
 }) {
-  const [triggeringJob, setTriggeringJob] = useState<string | null>(null);
-
-  const handleTrigger = async (jobName: string) => {
-    setTriggeringJob(jobName);
-    try {
-      await client.admin.triggerJob({ name: jobName });
-      toast.success(`${JOB_LABELS[jobName] ?? jobName} triggered`);
-      // Refresh after a brief delay so the run shows up
-      setTimeout(onRefresh, 1500);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to trigger job");
-    } finally {
-      setTriggeringJob(null);
-    }
-  };
+  const triggerJobMutation = useMutation(
+    orpc.admin.triggerJob.mutationOptions({
+      onSuccess: (_, { name }) => {
+        toast.success(`${JOB_LABELS[name] ?? name} triggered`);
+        setTimeout(onRefresh, 1500);
+      },
+      onError: (err) => {
+        toast.error(
+          err instanceof Error ? err.message : "Failed to trigger job",
+        );
+      },
+    }),
+  );
+  const triggeringJob = triggerJobMutation.isPending
+    ? (triggerJobMutation.variables?.name ?? null)
+    : null;
 
   const sortedJobs = [...jobs].sort((a, b) => {
     if (a.disabled !== b.disabled) return a.disabled ? 1 : -1;
@@ -521,7 +520,9 @@ function BackgroundJobsCard({
                             aria-label="Trigger job"
                             className="size-6"
                             disabled={isRunning || job.disabled}
-                            onClick={() => handleTrigger(job.jobName)}
+                            onClick={() =>
+                              triggerJobMutation.mutate({ name: job.jobName })
+                            }
                           />
                         }
                       >

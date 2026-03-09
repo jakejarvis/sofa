@@ -10,7 +10,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useHotkey, useHotkeySequence } from "@tanstack/react-hotkeys";
-import { skipToken, useQuery } from "@tanstack/react-query";
+import { skipToken, useMutation, useQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -43,7 +43,6 @@ import {
   MAX_RECENT,
   recentSearchesAtom,
 } from "@/lib/atoms/command-palette";
-import { client } from "@/lib/orpc/client";
 import { orpc } from "@/lib/orpc/tanstack";
 
 // Static shortcut descriptions for the help dialog.
@@ -148,35 +147,51 @@ export function CommandPalette() {
     };
   }, [debouncedQuery, results.length, setRecentSearches]);
 
+  const resolvePersonMutation = useMutation(
+    orpc.people.resolve.mutationOptions({
+      onSuccess: ({ id }) => {
+        if (id) router.push(`/people/${id}`);
+        else progress.done();
+      },
+      onError: () => {
+        progress.done();
+        toast.error("Failed to load person");
+      },
+    }),
+  );
+
+  const resolveTitleMutation = useMutation(
+    orpc.titles.resolve.mutationOptions({
+      onSuccess: ({ id }) => {
+        if (id) router.push(`/titles/${id}`);
+        else progress.done();
+      },
+      onError: () => {
+        progress.done();
+        toast.error("Failed to load title");
+      },
+    }),
+  );
+
   const handleSelect = useCallback(
     (result: SearchResult) => {
       setCommandPaletteOpen(false);
       progress.start();
       if (result.type === "person") {
-        void client.people
-          .resolve({ tmdbId: result.tmdbId })
-          .then(({ id }) => {
-            if (id) router.push(`/people/${id}`);
-            else progress.done();
-          })
-          .catch(() => {
-            progress.done();
-            toast.error("Failed to load person");
-          });
+        resolvePersonMutation.mutate({ tmdbId: result.tmdbId });
       } else {
-        void client.titles
-          .resolve({ tmdbId: result.tmdbId, type: result.type })
-          .then(({ id }) => {
-            if (id) router.push(`/titles/${id}`);
-            else progress.done();
-          })
-          .catch(() => {
-            progress.done();
-            toast.error("Failed to load title");
-          });
+        resolveTitleMutation.mutate({
+          tmdbId: result.tmdbId,
+          type: result.type,
+        });
       }
     },
-    [router, setCommandPaletteOpen, progress],
+    [
+      setCommandPaletteOpen,
+      progress,
+      resolvePersonMutation,
+      resolveTitleMutation,
+    ],
   );
 
   const handleRecentSearch = useCallback((q: string) => {

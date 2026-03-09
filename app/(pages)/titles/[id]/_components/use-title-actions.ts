@@ -1,5 +1,6 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { useStore } from "jotai";
 import { useCallback } from "react";
 import { toast } from "sonner";
@@ -12,11 +13,33 @@ import {
   userStatusAtom,
   watchingEpAtom,
 } from "@/lib/atoms/title";
-import { client } from "@/lib/orpc/client";
 import type { Season } from "@/lib/orpc/schemas";
+import { orpc } from "@/lib/orpc/tanstack";
 
 export function useTitleActions() {
   const store = useStore();
+
+  const batchWatchMutation = useMutation(
+    orpc.episodes.batchWatch.mutationOptions(),
+  );
+  const updateStatusMutation = useMutation(
+    orpc.titles.updateStatus.mutationOptions(),
+  );
+  const updateRatingMutation = useMutation(
+    orpc.titles.updateRating.mutationOptions(),
+  );
+  const watchMovieMutation = useMutation(
+    orpc.titles.watchMovie.mutationOptions(),
+  );
+  const unwatchEpMutation = useMutation(
+    orpc.episodes.unwatch.mutationOptions(),
+  );
+  const watchEpMutation = useMutation(orpc.episodes.watch.mutationOptions());
+  const watchSeasonMutation = useMutation(orpc.seasons.watch.mutationOptions());
+  const unwatchSeasonMutation = useMutation(
+    orpc.seasons.unwatch.mutationOptions(),
+  );
+  const watchAllMutation = useMutation(orpc.titles.watchAll.mutationOptions());
 
   const catchUp = useCallback(
     async (episodeIds: string[]) => {
@@ -33,7 +56,7 @@ export function useTitleActions() {
       }
 
       try {
-        await client.episodes.batchWatch({ episodeIds });
+        await batchWatchMutation.mutateAsync({ episodeIds });
         toast.success(
           `Caught up — marked ${episodeIds.length} episode${episodeIds.length > 1 ? "s" : ""} as watched`,
         );
@@ -43,7 +66,7 @@ export function useTitleActions() {
         toast.error("Failed to catch up");
       }
     },
-    [store],
+    [store, batchWatchMutation],
   );
 
   const handleStatusChange = useCallback(
@@ -55,7 +78,7 @@ export function useTitleActions() {
         status === "watchlist" ? "in_progress" : status,
       );
       try {
-        await client.titles.updateStatus({
+        await updateStatusMutation.mutateAsync({
           id: titleId,
           status: status ? "in_progress" : null,
         });
@@ -65,7 +88,7 @@ export function useTitleActions() {
         toast.error("Failed to update status");
       }
     },
-    [store],
+    [store, updateStatusMutation],
   );
 
   const handleRating = useCallback(
@@ -74,7 +97,10 @@ export function useTitleActions() {
       const titleId = store.get(titleIdAtom);
       store.set(userRatingAtom, ratingStars);
       try {
-        await client.titles.updateRating({ id: titleId, stars: ratingStars });
+        await updateRatingMutation.mutateAsync({
+          id: titleId,
+          stars: ratingStars,
+        });
         toast.success(
           ratingStars > 0
             ? `Rated ${ratingStars} star${ratingStars > 1 ? "s" : ""}`
@@ -85,7 +111,7 @@ export function useTitleActions() {
         toast.error("Failed to update rating");
       }
     },
-    [store],
+    [store, updateRatingMutation],
   );
 
   const handleWatchMovie = useCallback(async () => {
@@ -94,13 +120,13 @@ export function useTitleActions() {
     const titleName = store.get(titleNameAtom);
     store.set(userStatusAtom, "completed");
     try {
-      await client.titles.watchMovie({ id: titleId });
+      await watchMovieMutation.mutateAsync({ id: titleId });
       toast.success(`Marked "${titleName}" as watched`);
     } catch {
       store.set(userStatusAtom, prev);
       toast.error("Failed to mark as watched");
     }
-  }, [store]);
+  }, [store, watchMovieMutation]);
 
   const handleWatchEpisode = useCallback(
     async (
@@ -121,7 +147,7 @@ export function useTitleActions() {
           store.set(userStatusAtom, "in_progress");
 
         try {
-          await client.episodes.unwatch({ id: episodeId });
+          await unwatchEpMutation.mutateAsync({ id: episodeId });
           toast.success(`Unwatched S${seasonNum} E${epNum}`);
         } catch {
           const w = store.get(episodeWatchesAtom);
@@ -141,7 +167,7 @@ export function useTitleActions() {
         }
 
         try {
-          await client.episodes.watch({ id: episodeId });
+          await watchEpMutation.mutateAsync({ id: episodeId });
 
           const seasons = store.get(seasonsAtom);
           const watchedSet = new Set(store.get(episodeWatchesAtom));
@@ -184,7 +210,7 @@ export function useTitleActions() {
 
       store.set(watchingEpAtom, null);
     },
-    [store, catchUp],
+    [store, catchUp, unwatchEpMutation, watchEpMutation],
   );
 
   const handleMarkSeason = useCallback(
@@ -211,7 +237,7 @@ export function useTitleActions() {
       }
 
       try {
-        await client.seasons.watch({ id: season.id });
+        await watchSeasonMutation.mutateAsync({ id: season.id });
 
         const seasons = store.get(seasonsAtom);
         const currentWatchSet = new Set(store.get(episodeWatchesAtom));
@@ -246,7 +272,7 @@ export function useTitleActions() {
         toast.error("Failed to mark some episodes");
       }
     },
-    [store, catchUp],
+    [store, catchUp, watchSeasonMutation],
   );
 
   const handleUnmarkSeason = useCallback(
@@ -262,7 +288,7 @@ export function useTitleActions() {
       if (status === "completed") store.set(userStatusAtom, "in_progress");
 
       try {
-        await client.seasons.unwatch({ id: season.id });
+        await unwatchSeasonMutation.mutateAsync({ id: season.id });
         toast.success(
           `Unwatched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
         );
@@ -272,7 +298,7 @@ export function useTitleActions() {
         toast.error("Failed to unmark some episodes");
       }
     },
-    [store],
+    [store, unwatchSeasonMutation],
   );
 
   const handleMarkAllWatched = useCallback(async () => {
@@ -284,14 +310,14 @@ export function useTitleActions() {
     store.set(episodeWatchesAtom, allEpIds);
     store.set(userStatusAtom, "completed");
     try {
-      await client.titles.watchAll({ id: titleId });
+      await watchAllMutation.mutateAsync({ id: titleId });
       toast.success("Marked all episodes as watched");
     } catch {
       store.set(userStatusAtom, prevStatus);
       store.set(episodeWatchesAtom, prevWatches);
       toast.error("Failed to mark all episodes as watched");
     }
-  }, [store]);
+  }, [store, watchAllMutation]);
 
   return {
     handleStatusChange,
