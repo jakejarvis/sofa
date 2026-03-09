@@ -48,7 +48,7 @@ bun run test
 - **Auth**: Better Auth with Drizzle adapter — email/password + optional OIDC/SSO via `genericOAuth` plugin
 - **Styling**: Tailwind CSS v4, shadcn components, dark cinema theme with warm primary accents
 - **Fonts**: DM Serif Display (display), DM Sans (body), Geist Mono (mono)
-- **State**: Jotai (client), SWR (data fetching)
+- **State**: Jotai (client), TanStack Query (data fetching & mutations)
 - **Linting**: Biome (2-space indent, organized imports, React/Next.js recommended rules)
 - **External API**: TMDB (The Movie Database) with Bearer token auth
 
@@ -67,10 +67,21 @@ bun run test
 - `lib/logger.ts` — Structured logger with `LOG_LEVEL` support
 - `lib/types/` — Shared TypeScript types (e.g. `title.ts`)
 - `lib/cron.ts` — Background job scheduler (croner, `globalThis` singleton)
-- `app/api/` — Next.js route handlers
+- `lib/api-client.ts` — Thin fetch wrapper (`api<T>(path, options)`) used by all client-side query/mutation functions
+- `lib/query-client.ts` — Singleton `QueryClient` with default options (30s stale time)
+- `lib/queries/` — TanStack Query hooks organized by domain:
+  - `titles.ts` — Title detail, user info, recommendations, status/rating/watch mutations
+  - `people.ts` — Person detail, resolve person mutation
+  - `dashboard.ts` — Dashboard stats, continue watching, library, recommendations
+  - `explore.ts` — Trending, popular, genres
+  - `integrations.ts` — User integrations CRUD
+  - `admin.ts` — Backups, backup schedule, registration, update check
+  - `account.ts` — Avatar upload/remove, name update
+- `app/api/` — REST API routes (all auth-gated, JSON responses, Zod validation)
 - `app/(pages)/` — Authenticated pages (dashboard, explore, titles/[id], people/[id], settings)
 - `app/(auth)/` — Auth pages (login, register, setup)
 - `components/` — App components + `components/ui/` for shadcn primitives
+- `components/query-provider.tsx` — `QueryClientProvider` wrapper used in root layout
 
 ### Auth pattern
 
@@ -91,6 +102,66 @@ if (!session)
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 // use session.user.id
 ```
+
+### Client data fetching
+
+All client-side data fetching uses TanStack Query via hooks in `lib/queries/`. The `api()` helper in `lib/api-client.ts` wraps `fetch()` with JSON handling and error extraction.
+
+**Pattern — query hook:**
+```typescript
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
+
+export function useDashboardStats() {
+  return useQuery({
+    queryKey: ["dashboard-stats"],
+    queryFn: () => api<DashboardStats>("/dashboard/stats"),
+  });
+}
+```
+
+**Pattern — mutation hook with optimistic update:**
+```typescript
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+export function useUpdateStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (vars) => api(`/titles/${vars.titleId}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status: vars.status }),
+    }),
+    onSettled: (_d, _e, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["title-user-info", vars.titleId] });
+    },
+  });
+}
+```
+
+**Page patterns:**
+- **Thin server shell** (titles, people): Server component fetches initial data via service layer, passes as `initialData` prop to client component that uses TanStack Query for refetching/mutations. Fast first paint + client interactivity.
+- **Full client-side** (dashboard, explore, settings): Server component handles auth only; client components fetch all data via TanStack Query hooks with skeleton loading states.
+
+### API routes
+
+All API routes live under `app/api/` and follow consistent patterns:
+- Auth via `getSession()` from `@/lib/auth/session`
+- Admin routes check `session.user.role === "admin"`
+- Request validation with Zod (`schema.safeParse(await req.json())`)
+- Error responses: `{ error: "Human-readable message" }` with appropriate HTTP status
+- Image URLs resolved server-side via `tmdbImageUrl()` before returning to clients
+
+Key route groups:
+- `/api/titles/[id]/` — Title detail, user info, status, rating, watch, recommendations
+- `/api/episodes/[id]/watch` — Episode watch/unwatch
+- `/api/seasons/[id]/watch` — Season watch/unwatch
+- `/api/people/[id]` — Person detail
+- `/api/dashboard/` — Stats, continue watching, library, recommendations
+- `/api/explore/` — Trending, popular, genres
+- `/api/integrations/` — Webhook integration CRUD
+- `/api/admin/` — Backups, registration, update check, job triggers
+- `/api/account/` — Avatar, name
+- `/api/discover`, `/api/search`, `/api/stats`, `/api/status` — Discovery, search, stats, health
 
 ### Database schema
 

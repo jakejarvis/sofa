@@ -4,17 +4,26 @@ import { IconWorldUpload } from "@tabler/icons-react";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/lib/api-client";
+import { useUpdateCheck } from "@/lib/queries/admin";
 
-export function UpdateCheckSection({
-  initialEnabled,
-}: {
-  initialEnabled: boolean;
-}) {
-  const [enabled, setEnabled] = useState(initialEnabled);
-  const [optimisticEnabled, setOptimisticEnabled] = useOptimistic(enabled);
+export function UpdateCheckSection() {
+  const { data, isPending: isLoading } = useUpdateCheck();
+  const [localEnabled, setLocalEnabled] = useState<boolean | null>(null);
+  const currentEnabled = localEnabled ?? data?.enabled ?? true;
+  const [optimisticEnabled, setOptimisticEnabled] =
+    useOptimistic(currentEnabled);
   const [isPending, startTransition] = useTransition();
+
+  if (isLoading) {
+    return (
+      <CardContent>
+        <Skeleton className="h-12 w-full" />
+      </CardContent>
+    );
+  }
 
   function handleToggle(checked: boolean) {
     startTransition(async () => {
@@ -24,7 +33,7 @@ export function UpdateCheckSection({
           method: "PUT",
           body: JSON.stringify({ enabled: checked }),
         });
-        setEnabled(checked);
+        setLocalEnabled(checked);
         toast.success(
           checked ? "Update checks enabled" : "Update checks disabled",
         );

@@ -37,11 +37,19 @@ export async function GET() {
       .limit(10)
       .all();
     return {
-      ...integration,
+      id: integration.id,
+      provider: integration.provider,
+      type: integration.type,
+      token: integration.token,
+      enabled: integration.enabled,
       lastEventAt: integration.lastEventAt?.toISOString() ?? null,
       createdAt: integration.createdAt.toISOString(),
-      events: events.map((e) => ({
-        ...e,
+      recentEvents: events.map((e) => ({
+        id: e.id,
+        eventType: e.eventType,
+        mediaType: e.mediaType,
+        mediaTitle: e.mediaTitle,
+        status: e.status,
         receivedAt: e.receivedAt.toISOString(),
       })),
     };

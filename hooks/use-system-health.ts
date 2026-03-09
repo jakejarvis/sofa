@@ -7,16 +7,19 @@ interface StatusResponse {
   health: SystemHealthData;
 }
 
-export function useSystemHealth(initialData: SystemHealthData) {
+export function useSystemHealth(initialData?: SystemHealthData) {
   const queryClient = useQueryClient();
-  const { data, isFetching } = useQuery<StatusResponse>({
+  const { data, isFetching, isPending } = useQuery<StatusResponse>({
     queryKey: ["system-health"],
     queryFn: () => api<StatusResponse>("/status"),
-    initialData: { tmdbConfigured: true, health: initialData },
+    ...(initialData
+      ? { initialData: { tmdbConfigured: true, health: initialData } }
+      : {}),
   });
 
   return {
-    data: data?.health ?? initialData,
+    data: data?.health ?? initialData ?? null,
+    isPending: isPending && !initialData,
     isRefreshing: isFetching,
     refresh: () =>
       queryClient.invalidateQueries({ queryKey: ["system-health"] }),

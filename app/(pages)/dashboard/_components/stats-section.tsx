@@ -1,10 +1,16 @@
+"use client";
+
 import { IconDeviceTv } from "@tabler/icons-react";
 import Link from "next/link";
-import { getUserStats } from "@/lib/services/discovery";
+import { StatsSectionSkeleton } from "@/components/skeletons";
+import { useDashboardStats } from "@/lib/queries/dashboard";
 import { StatsDisplay } from "./stats-display";
 
-export async function StatsSection({ userId }: { userId: string }) {
-  const stats = await getUserStats(userId);
+export function StatsSection() {
+  const { data: stats, isPending } = useDashboardStats();
+
+  if (isPending) return <StatsSectionSkeleton />;
+  if (!stats) return null;
 
   const isEmpty =
     stats.moviesThisMonth === 0 &&

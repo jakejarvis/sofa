@@ -33,6 +33,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { api } from "@/lib/api-client";
+import { useBackups } from "@/lib/queries/admin";
 import type { BackupInfo } from "@/lib/services/backup";
 
 function formatBytes(bytes: number): string {
@@ -45,12 +46,12 @@ function formatBackupDate(dateStr: string): string {
   return format(new Date(dateStr), "MMM d, h:mm a");
 }
 
-export function BackupSection({
-  initialBackups,
-}: {
-  initialBackups: BackupInfo[];
-}) {
-  const [backups, setBackups] = useState<BackupInfo[]>(initialBackups);
+export function BackupSection() {
+  const { data } = useBackups();
+  const [backups, setBackups] = useState<BackupInfo[] | null>(null);
+
+  // Use local state if user has modified, else use query data
+  const displayBackups = backups ?? data?.backups ?? [];
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
@@ -60,7 +61,7 @@ export function BackupSection({
       const backup = await api<BackupInfo>("/admin/backups", {
         method: "POST",
       });
-      setBackups((prev) => [backup, ...prev]);
+      setBackups((prev) => [backup, ...(prev ?? data?.backups ?? [])]);
       toast.success("Backup created", {
         action: {
           label: "Download",
@@ -80,9 +81,9 @@ export function BackupSection({
   }
 
   async function handleDelete(filename: string) {
-    const previous = backups;
+    const previous = displayBackups;
     setDeleting(filename);
-    setBackups((prev) => prev.filter((b) => b.filename !== filename));
+    setBackups(displayBackups.filter((b) => b.filename !== filename));
     try {
       await api(`/admin/backups/${filename}`, { method: "DELETE" });
       toast.success("Backup deleted");
@@ -109,8 +110,8 @@ export function BackupSection({
             <div>
               <CardTitle>Database backups</CardTitle>
               <CardDescription>
-                {backups.length > 0
-                  ? `${backups.length} backup${backups.length !== 1 ? "s" : ""} stored`
+                {displayBackups.length > 0
+                  ? `${displayBackups.length} backup${displayBackups.length !== 1 ? "s" : ""} stored`
                   : "No backups yet"}
               </CardDescription>
             </div>
@@ -128,10 +129,10 @@ export function BackupSection({
 
       {/* Backup list */}
       <AnimatePresence initial={false}>
-        {backups.length > 0 && (
+        {displayBackups.length > 0 && (
           <CardContent className="border-border/30 border-t pt-4">
             <div className="space-y-1.5">
-              {backups.map((backup) => (
+              {displayBackups.map((backup) => (
                 <motion.div
                   key={backup.filename}
                   initial={{ opacity: 0, height: 0 }}

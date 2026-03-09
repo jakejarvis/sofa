@@ -1,31 +1,18 @@
+"use client";
+
 import { IconPlayerPlay } from "@tabler/icons-react";
-import { getContinueWatchingFeed } from "@/lib/services/discovery";
-import { tmdbImageUrl } from "@/lib/tmdb/image";
-import type { ContinueWatchingItemProps } from "./continue-watching-card";
+import { ContinueWatchingSectionSkeleton } from "@/components/skeletons";
+import { useContinueWatching } from "@/lib/queries/dashboard";
 import { ContinueWatchingList } from "./continue-watching-list";
 import { FeedSection } from "./feed-section";
 
-export async function ContinueWatchingSection({ userId }: { userId: string }) {
-  const feed = await getContinueWatchingFeed(userId);
-  if (feed.length === 0) return null;
+export function ContinueWatchingSection() {
+  const { data, isPending } = useContinueWatching();
 
-  const items: ContinueWatchingItemProps[] = feed.map((item) => ({
-    title: {
-      id: item.title.id,
-      title: item.title.title,
-      backdropPath: tmdbImageUrl(item.title.backdropPath, "backdrops"),
-    },
-    nextEpisode: item.nextEpisode
-      ? {
-          seasonNumber: item.nextEpisode.seasonNumber,
-          episodeNumber: item.nextEpisode.episodeNumber,
-          name: item.nextEpisode.name,
-          stillPath: tmdbImageUrl(item.nextEpisode.stillPath, "stills"),
-        }
-      : null,
-    totalEpisodes: item.totalEpisodes,
-    watchedEpisodes: item.watchedEpisodes,
-  }));
+  if (isPending) return <ContinueWatchingSectionSkeleton />;
+
+  const items = data?.items ?? [];
+  if (items.length === 0) return null;
 
   return (
     <FeedSection

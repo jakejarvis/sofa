@@ -4,19 +4,27 @@ import { IconDoorEnter } from "@tabler/icons-react";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/lib/api-client";
+import { useRegistration } from "@/lib/queries/admin";
 
-export function RegistrationSection({
-  initialRegistrationOpen,
-}: {
-  initialRegistrationOpen: boolean;
-}) {
-  const [registrationOpen, setRegistrationOpen] = useState(
-    initialRegistrationOpen,
+export function RegistrationSection() {
+  const { data, isPending: isLoading } = useRegistration();
+  const [registrationOpen, setRegistrationOpen] = useState<boolean | null>(
+    null,
   );
-  const [optimisticOpen, setOptimisticOpen] = useOptimistic(registrationOpen);
+  const currentOpen = registrationOpen ?? data?.open ?? false;
+  const [optimisticOpen, setOptimisticOpen] = useOptimistic(currentOpen);
   const [isPending, startTransition] = useTransition();
+
+  if (isLoading) {
+    return (
+      <CardContent>
+        <Skeleton className="h-12 w-full" />
+      </CardContent>
+    );
+  }
 
   function handleToggle(checked: boolean) {
     startTransition(async () => {

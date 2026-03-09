@@ -15,9 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/lib/api-client";
 import type { BackupFrequency } from "@/lib/cron";
+import { useBackupSchedule } from "@/lib/queries/admin";
 
 const FREQUENCY_OPTIONS: { value: BackupFrequency; label: string }[] = [
   { value: "6h", label: "6h" },
@@ -107,35 +109,29 @@ function formatNextBackup(
   return `Next backup ${formatDistanceToNow(next, { addSuffix: true })}`;
 }
 
-export function BackupScheduleSection({
-  initialScheduledEnabled,
-  initialMaxRetention,
-  initialFrequency,
-  initialTime,
-  initialDow,
-}: {
-  initialScheduledEnabled: boolean;
-  initialMaxRetention: number;
-  initialFrequency: BackupFrequency;
-  initialTime: string;
-  initialDow: number;
-}) {
-  const [schedule, setSchedule] = useState<BackupScheduleState>({
-    enabled: initialScheduledEnabled,
-    maxRetention: initialMaxRetention,
-    frequency: initialFrequency,
-    time: initialTime,
-    dow: initialDow,
-  });
+export function BackupScheduleSection() {
+  const { data: scheduleData, isPending } = useBackupSchedule();
+
+  const [schedule, setSchedule] = useState<BackupScheduleState | null>(null);
+
   const [savingSchedule, setSavingSchedule] = useState(false);
   const [togglingSchedule, setTogglingSchedule] = useState(false);
 
-  const { enabled, maxRetention, frequency, time, dow } = schedule;
+  // Use local state if user has modified, else use query data
+  const current: BackupScheduleState = schedule ?? {
+    enabled: scheduleData?.enabled ?? false,
+    maxRetention: scheduleData?.maxRetention ?? 7,
+    frequency: (scheduleData?.frequency as BackupFrequency) ?? "1d",
+    time: scheduleData?.time ?? "02:00",
+    dow: scheduleData?.dayOfWeek ?? 0,
+  };
+
+  const { enabled, maxRetention, frequency, time, dow } = current;
 
   const toggleScheduled = useCallback(
     async (checked: boolean) => {
-      const previous = schedule.enabled;
-      setSchedule((prev) => ({ ...prev, enabled: checked }));
+      const previous = current.enabled;
+      setSchedule({ ...current, enabled: checked });
       setTogglingSchedule(true);
       try {
         await api("/admin/backups/schedule", {
@@ -146,49 +142,49 @@ export function BackupScheduleSection({
           checked ? "Scheduled backups enabled" : "Scheduled backups disabled",
         );
       } catch {
-        setSchedule((prev) => ({ ...prev, enabled: previous }));
+        setSchedule({ ...current, enabled: previous });
         toast.error("Failed to update scheduled backup setting");
       } finally {
         setTogglingSchedule(false);
       }
     },
-    [schedule.enabled],
+    [current],
   );
 
   const changeMaxRetention = useCallback(
     async (value: number) => {
-      const previous = schedule.maxRetention;
-      setSchedule((prev) => ({ ...prev, maxRetention: value }));
+      const previous = current.maxRetention;
+      setSchedule({ ...current, maxRetention: value });
       try {
         await api("/admin/backups/schedule", {
           method: "PUT",
           body: JSON.stringify({ maxRetention: value }),
         });
       } catch {
-        setSchedule((prev) => ({ ...prev, maxRetention: previous }));
+        setSchedule({ ...current, maxRetention: previous });
         toast.error("Failed to update retention setting");
       }
     },
-    [schedule.maxRetention],
+    [current],
   );
 
   const changeSchedule = useCallback(
     async (
       newFrequency: BackupFrequency,
       newTime: string,
-      newDow = schedule.dow,
+      newDow = current.dow,
     ) => {
       const prev = {
-        frequency: schedule.frequency,
-        time: schedule.time,
-        dow: schedule.dow,
+        frequency: current.frequency,
+        time: current.time,
+        dow: current.dow,
       };
-      setSchedule((s) => ({
-        ...s,
+      setSchedule({
+        ...current,
         frequency: newFrequency,
         time: newTime,
         dow: newDow,
-      }));
+      });
       setSavingSchedule(true);
       try {
         await api("/admin/backups/schedule", {
@@ -201,14 +197,18 @@ export function BackupScheduleSection({
         });
         toast.success("Schedule updated");
       } catch {
-        setSchedule((s) => ({ ...s, ...prev }));
+        setSchedule({ ...current, ...prev });
         toast.error("Failed to update schedule");
       } finally {
         setSavingSchedule(false);
       }
     },
-    [schedule.frequency, schedule.time, schedule.dow],
+    [current],
   );
+
+  if (isPending) {
+    return <Skeleton className="h-20 w-full rounded-xl" />;
+  }
 
   return (
     <>

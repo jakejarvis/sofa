@@ -130,12 +130,10 @@ function LiveTimeAgo({
 }
 
 /** Hydrates system health state and renders the 3 cards */
-export function SystemHealthCards({
-  initialData,
-}: {
-  initialData: SystemHealthData;
-}) {
-  const { data, isRefreshing, refresh } = useSystemHealth(initialData);
+export function SystemHealthCards() {
+  const { data, isPending, isRefreshing, refresh } = useSystemHealth();
+
+  if (isPending || !data) return <SkeletonCards />;
 
   return (
     <div className="space-y-3">

@@ -25,7 +25,9 @@ export async function GET(req: NextRequest) {
     (req.nextUrl.searchParams.get("window") as "day" | "week") ?? "day";
 
   const data = await getTrending(type, window);
-  const items = ((data.results ?? []) as Record<string, unknown>[])
+  const results = (data.results ?? []) as Record<string, unknown>[];
+
+  const items = results
     .filter((r) => r.poster_path)
     .map((r) => {
       const mediaType =
@@ -42,6 +44,26 @@ export async function GET(req: NextRequest) {
       };
     });
 
+  // Find a hero title with a backdrop
+  const heroResult = results.find(
+    (r) =>
+      r.backdrop_path && (r.media_type === "movie" || r.media_type === "tv"),
+  );
+  const hero = heroResult
+    ? {
+        tmdbId: heroResult.id as number,
+        type: heroResult.media_type as "movie" | "tv",
+        title:
+          ((heroResult.title ?? heroResult.name) as string | undefined) ?? "",
+        overview: (heroResult.overview as string | undefined) ?? "",
+        backdropPath: tmdbImageUrl(
+          (heroResult.backdrop_path as string) ?? null,
+          "backdrops",
+        ),
+        voteAverage: heroResult.vote_average as number,
+      }
+    : null;
+
   const lookups = items.map((r) => ({ tmdbId: r.tmdbId, type: r.type }));
   const [userStatuses, episodeProgress] =
     lookups.length > 0
@@ -51,5 +73,5 @@ export async function GET(req: NextRequest) {
         ]
       : [{}, {}];
 
-  return NextResponse.json({ items, userStatuses, episodeProgress });
+  return NextResponse.json({ items, hero, userStatuses, episodeProgress });
 }
