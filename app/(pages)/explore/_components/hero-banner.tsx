@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { useProgress } from "@/components/navigation-progress";
-import { api } from "@/lib/api-client";
+import { client } from "@/lib/orpc/client";
 
 interface HeroBannerProps {
   tmdbId: number;
@@ -39,10 +39,7 @@ export function HeroBanner({
     progress.start();
     startTransition(async () => {
       try {
-        const { id } = await api<{ id: string }>("/titles/resolve", {
-          method: "POST",
-          body: JSON.stringify({ tmdbId, type }),
-        });
+        const { id } = await client.titles.resolve({ tmdbId, type });
         if (id) router.push(`/titles/${id}`);
         else progress.done();
       } catch {

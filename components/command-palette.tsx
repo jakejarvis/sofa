@@ -10,6 +10,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useHotkey, useHotkeySequence } from "@tanstack/react-hotkeys";
+import { skipToken, useQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -36,14 +37,14 @@ import {
 import { Kbd } from "@/components/ui/kbd";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/use-debounce";
-import { useSearch } from "@/hooks/use-search";
-import { api } from "@/lib/api-client";
 import {
   commandPaletteOpenAtom,
   helpOpenAtom,
   MAX_RECENT,
   recentSearchesAtom,
 } from "@/lib/atoms/command-palette";
+import { client } from "@/lib/orpc/client";
+import { orpc } from "@/lib/orpc/tanstack";
 
 // Static shortcut descriptions for the help dialog.
 // TanStack's HotkeyManager/SequenceManager handle all actual key listening.
@@ -71,7 +72,17 @@ for (const entry of SHORTCUT_DESCRIPTIONS) {
   groupedShortcuts[entry.scope].push(entry);
 }
 
-type SearchResult = ReturnType<typeof useSearch>["results"][number];
+interface SearchResult {
+  tmdbId: number;
+  type: "movie" | "tv" | "person";
+  title: string;
+  posterPath: string | null;
+  profilePath?: string | null;
+  releaseDate: string | null;
+  voteAverage: number;
+  knownFor?: string[];
+  knownForDepartment?: string;
+}
 
 export function CommandPalette() {
   const router = useRouter();
@@ -83,7 +94,13 @@ export function CommandPalette() {
   const [recentSearches, setRecentSearches] = useAtom(recentSearchesAtom);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 300);
-  const { results, isLoading: loading } = useSearch(debouncedQuery);
+  const trimmedQuery = debouncedQuery.trim();
+  const { data: searchData, isLoading: loading } = useQuery(
+    orpc.search.queryOptions({
+      input: trimmedQuery ? { query: trimmedQuery } : skipToken,
+    }),
+  );
+  const results: SearchResult[] = searchData?.results?.slice(0, 8) ?? [];
   const enabled = !commandPaletteOpen;
 
   useHotkey("Mod+K", () => setCommandPaletteOpen((prev) => !prev));
@@ -136,10 +153,8 @@ export function CommandPalette() {
       setCommandPaletteOpen(false);
       progress.start();
       if (result.type === "person") {
-        void api<{ id: string }>("/people/resolve", {
-          method: "POST",
-          body: JSON.stringify({ tmdbId: result.tmdbId }),
-        })
+        void client.people
+          .resolve({ tmdbId: result.tmdbId })
           .then(({ id }) => {
             if (id) router.push(`/people/${id}`);
             else progress.done();
@@ -149,10 +164,8 @@ export function CommandPalette() {
             toast.error("Failed to load person");
           });
       } else {
-        void api<{ id: string }>("/titles/resolve", {
-          method: "POST",
-          body: JSON.stringify({ tmdbId: result.tmdbId, type: result.type }),
-        })
+        void client.titles
+          .resolve({ tmdbId: result.tmdbId, type: result.type })
           .then(({ id }) => {
             if (id) router.push(`/titles/${id}`);
             else progress.done();

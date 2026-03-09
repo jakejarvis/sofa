@@ -1,6 +1,7 @@
 "use client";
 
 import { IconCalendarWeek } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
@@ -17,9 +18,9 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { api } from "@/lib/api-client";
 import type { BackupFrequency } from "@/lib/cron";
-import { useBackupSchedule } from "@/lib/queries/admin";
+import { client } from "@/lib/orpc/client";
+import { orpc } from "@/lib/orpc/tanstack";
 
 const FREQUENCY_OPTIONS: { value: BackupFrequency; label: string }[] = [
   { value: "6h", label: "6h" },
@@ -110,7 +111,9 @@ function formatNextBackup(
 }
 
 export function BackupScheduleSection() {
-  const { data: scheduleData, isPending } = useBackupSchedule();
+  const { data: scheduleData, isPending } = useQuery(
+    orpc.admin.backups.schedule.queryOptions(),
+  );
 
   const [schedule, setSchedule] = useState<BackupScheduleState | null>(null);
 
@@ -134,10 +137,7 @@ export function BackupScheduleSection() {
       setSchedule({ ...current, enabled: checked });
       setTogglingSchedule(true);
       try {
-        await api("/admin/backups/schedule", {
-          method: "PUT",
-          body: JSON.stringify({ enabled: checked }),
-        });
+        await client.admin.backups.updateSchedule({ enabled: checked });
         toast.success(
           checked ? "Scheduled backups enabled" : "Scheduled backups disabled",
         );
@@ -156,10 +156,7 @@ export function BackupScheduleSection() {
       const previous = current.maxRetention;
       setSchedule({ ...current, maxRetention: value });
       try {
-        await api("/admin/backups/schedule", {
-          method: "PUT",
-          body: JSON.stringify({ maxRetention: value }),
-        });
+        await client.admin.backups.updateSchedule({ maxRetention: value });
       } catch {
         setSchedule({ ...current, maxRetention: previous });
         toast.error("Failed to update retention setting");
@@ -187,13 +184,10 @@ export function BackupScheduleSection() {
       });
       setSavingSchedule(true);
       try {
-        await api("/admin/backups/schedule", {
-          method: "PUT",
-          body: JSON.stringify({
-            frequency: newFrequency,
-            time: newTime,
-            dayOfWeek: newDow,
-          }),
+        await client.admin.backups.updateSchedule({
+          frequency: newFrequency,
+          time: newTime,
+          dayOfWeek: newDow,
         });
         toast.success("Schedule updated");
       } catch {

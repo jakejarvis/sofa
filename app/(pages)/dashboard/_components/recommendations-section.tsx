@@ -1,13 +1,16 @@
 "use client";
 
 import { IconThumbUp } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { TitleGridSectionSkeleton } from "@/components/skeletons";
-import { useDashboardRecommendations } from "@/lib/queries/dashboard";
+import { orpc } from "@/lib/orpc/tanstack";
 import { FeedSection } from "./feed-section";
 import { TitleGrid } from "./title-grid";
 
 export function RecommendationsSection() {
-  const { data, isPending } = useDashboardRecommendations();
+  const { data, isPending } = useQuery(
+    orpc.dashboard.recommendations.queryOptions(),
+  );
 
   if (isPending) return <TitleGridSectionSkeleton />;
 

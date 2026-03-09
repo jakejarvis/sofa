@@ -1,21 +1,26 @@
 "use client";
 
 import { IconWorldUpload } from "@tabler/icons-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { api } from "@/lib/api-client";
-import { useUpdateCheck } from "@/lib/queries/admin";
+import { orpc } from "@/lib/orpc/tanstack";
 
 export function UpdateCheckSection() {
-  const { data, isPending: isLoading } = useUpdateCheck();
+  const { data, isPending: isLoading } = useQuery(
+    orpc.admin.updateCheck.queryOptions(),
+  );
   const [localEnabled, setLocalEnabled] = useState<boolean | null>(null);
   const currentEnabled = localEnabled ?? data?.enabled ?? true;
   const [optimisticEnabled, setOptimisticEnabled] =
     useOptimistic(currentEnabled);
   const [isPending, startTransition] = useTransition();
+  const toggleMutation = useMutation(
+    orpc.admin.toggleUpdateCheck.mutationOptions(),
+  );
 
   if (isLoading) {
     return (
@@ -29,10 +34,7 @@ export function UpdateCheckSection() {
     startTransition(async () => {
       setOptimisticEnabled(checked);
       try {
-        await api("/admin/update-check", {
-          method: "PUT",
-          body: JSON.stringify({ enabled: checked }),
-        });
+        await toggleMutation.mutateAsync({ enabled: checked });
         setLocalEnabled(checked);
         toast.success(
           checked ? "Update checks enabled" : "Update checks disabled",

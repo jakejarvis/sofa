@@ -28,8 +28,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { api } from "@/lib/api-client";
 import { signOut } from "@/lib/auth/client";
+import { client } from "@/lib/orpc/client";
 
 export function AccountSection({
   user,
@@ -102,7 +102,7 @@ export function AccountSection({
   function handleRemoveAvatar() {
     startTransition(async () => {
       try {
-        await api("/account/avatar", { method: "DELETE" });
+        await fetch("/api/account/avatar", { method: "DELETE" });
         setAvatarUrl(undefined);
         toast.success("Profile picture removed");
         router.refresh();
@@ -122,10 +122,7 @@ export function AccountSection({
 
     startNameTransition(async () => {
       try {
-        await api("/account/name", {
-          method: "PUT",
-          body: JSON.stringify({ name: trimmed }),
-        });
+        await client.account.updateName({ name: trimmed });
         setDisplayName(trimmed);
         setIsEditingName(false);
         toast.success("Name updated");

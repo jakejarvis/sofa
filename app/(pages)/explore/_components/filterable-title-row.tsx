@@ -1,11 +1,12 @@
 "use client";
 
+import { skipToken, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { TitleCardSkeleton } from "@/components/skeletons";
 import { TitleCard } from "@/components/title-card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useDiscover } from "@/hooks/use-discover";
+import { orpc } from "@/lib/orpc/tanstack";
 
 interface Genre {
   id: number;
@@ -43,9 +44,13 @@ export function FilterableTitleRow({
   episodeProgress: initialProgress = {},
 }: FilterableTitleRowProps) {
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
-  const { data: discoverData, isLoading: isPending } = useDiscover(
-    mediaType,
-    selectedGenre,
+  const { data: discoverData, isLoading: isPending } = useQuery(
+    orpc.discover.queryOptions({
+      input:
+        selectedGenre != null
+          ? { mediaType, genreId: selectedGenre }
+          : skipToken,
+    }),
   );
 
   const items =
@@ -124,7 +129,7 @@ export function FilterableTitleRow({
           className="-mx-6 sm:-mx-2"
         >
           <div className="flex gap-4 px-6 py-2 sm:px-2">
-            {items.slice(0, 20).map((item, i) => (
+            {items.slice(0, 20).map((item: TitleRowItem, i: number) => (
               <div
                 key={`${item.type}-${item.tmdbId}`}
                 className="w-[140px] shrink-0 sm:w-[160px]"

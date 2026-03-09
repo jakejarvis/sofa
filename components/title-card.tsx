@@ -24,7 +24,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTiltEffect } from "@/hooks/use-tilt-effect";
-import { api } from "@/lib/api-client";
+import { client } from "@/lib/orpc/client";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
@@ -102,10 +102,7 @@ function QuickAddButton({
     if (state === "loading" || state === "added") return;
     setState("loading");
     try {
-      await api("/watchlist/quick-add", {
-        method: "POST",
-        body: JSON.stringify({ tmdbId, type }),
-      });
+      await client.watchlist.quickAdd({ tmdbId, type });
       setState("added");
       setAddedStatus("watchlist");
     } catch {
@@ -328,16 +325,10 @@ export function TitleCard({
             progress.start();
             startTransition(async () => {
               try {
-                const { id: resolvedId } = await api<{ id: string }>(
-                  "/titles/resolve",
-                  {
-                    method: "POST",
-                    body: JSON.stringify({
-                      tmdbId,
-                      type: type as "movie" | "tv",
-                    }),
-                  },
-                );
+                const { id: resolvedId } = await client.titles.resolve({
+                  tmdbId,
+                  type: type as "movie" | "tv",
+                });
                 if (resolvedId) router.push(`/titles/${resolvedId}`);
                 else progress.done();
               } catch {

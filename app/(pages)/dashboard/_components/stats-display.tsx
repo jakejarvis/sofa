@@ -6,6 +6,7 @@ import {
   IconMovie,
   IconPlayerPlay,
 } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   Select,
@@ -14,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useStats } from "@/hooks/use-stats";
+import { orpc } from "@/lib/orpc/tanstack";
 import type {
   DashboardStats,
   HistoryBucket,
@@ -124,8 +125,14 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
   const [moviePeriod, setMoviePeriod] = useState<TimePeriod>("this_month");
   const [episodePeriod, setEpisodePeriod] = useState<TimePeriod>("this_week");
 
-  const movieStats = useStats("movies", moviePeriod);
-  const episodeStats = useStats("episodes", episodePeriod);
+  const { data: movieStats } = useQuery(
+    orpc.stats.queryOptions({ input: { type: "movies", period: moviePeriod } }),
+  );
+  const { data: episodeStats } = useQuery(
+    orpc.stats.queryOptions({
+      input: { type: "episodes", period: episodePeriod },
+    }),
+  );
 
   const movieCount = movieStats?.count ?? stats.moviesThisMonth;
   const movieHistory = movieStats?.history;

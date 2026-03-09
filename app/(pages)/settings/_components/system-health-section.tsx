@@ -9,6 +9,7 @@ import {
   IconPlayerPlay,
   IconRefresh,
 } from "@tabler/icons-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { StatusDot } from "@/components/status-dot";
@@ -34,9 +35,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useSystemHealth } from "@/hooks/use-system-health";
 import { useTimeAgo } from "@/hooks/use-time-ago";
-import { api } from "@/lib/api-client";
+import { client } from "@/lib/orpc/client";
+import { orpc } from "@/lib/orpc/tanstack";
 import type { SystemHealthData } from "@/lib/services/system-health";
 
 const JOB_LABELS: Record<string, string> = {
@@ -131,7 +132,16 @@ function LiveTimeAgo({
 
 /** Hydrates system health state and renders the 3 cards */
 export function SystemHealthCards() {
-  const { data, isPending, isRefreshing, refresh } = useSystemHealth();
+  const queryClient = useQueryClient();
+  const {
+    data: statusData,
+    isPending,
+    isFetching,
+  } = useQuery(orpc.systemStatus.queryOptions());
+  const data = statusData?.health ?? null;
+  const isRefreshing = isFetching;
+  const refresh = () =>
+    queryClient.invalidateQueries({ queryKey: orpc.systemStatus.key() });
 
   if (isPending || !data) return <SkeletonCards />;
 
@@ -323,7 +333,7 @@ function BackgroundJobsCard({
   const handleTrigger = async (jobName: string) => {
     setTriggeringJob(jobName);
     try {
-      await api(`/admin/jobs/${jobName}/trigger`, { method: "POST" });
+      await client.admin.triggerJob({ name: jobName });
       toast.success(`${JOB_LABELS[jobName] ?? jobName} triggered`);
       // Refresh after a brief delay so the run shows up
       setTimeout(onRefresh, 1500);

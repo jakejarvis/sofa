@@ -1,9 +1,10 @@
 "use client";
 
 import { IconWebhook } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useIntegrations } from "@/lib/queries/integrations";
+import { orpc } from "@/lib/orpc/tanstack";
 import {
   IntegrationCard,
   type IntegrationConnection,
@@ -11,7 +12,7 @@ import {
 import { INTEGRATION_CONFIGS } from "./integration-configs";
 
 export function IntegrationsSection() {
-  const { data, isPending } = useIntegrations();
+  const { data, isPending } = useQuery(orpc.integrations.list.queryOptions());
   const [localConnections, setLocalConnections] = useState<
     IntegrationConnection[] | null
   >(null);
@@ -54,7 +55,9 @@ export function IntegrationsSection() {
               key={config.provider}
               config={config}
               connection={
-                connections.find((c) => c.provider === config.provider) ?? null
+                connections.find(
+                  (c: IntegrationConnection) => c.provider === config.provider,
+                ) ?? null
               }
               setConnections={handleSetConnections}
             />

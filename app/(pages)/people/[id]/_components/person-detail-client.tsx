@@ -1,12 +1,17 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { PersonDetailSkeleton } from "@/components/skeletons";
-import {
-  type PersonDetailResponse,
-  usePersonDetail,
-} from "@/lib/queries/people";
+import { orpc } from "@/lib/orpc/tanstack";
+import type { PersonCredit, ResolvedPerson } from "@/lib/types";
 import { FilmographyGrid } from "./filmography-grid";
 import { PersonHero } from "./person-hero";
+
+export interface PersonDetailResponse {
+  person: ResolvedPerson;
+  filmography: PersonCredit[];
+  userStatuses: Record<string, "watchlist" | "in_progress" | "completed">;
+}
 
 export function PersonDetailClient({
   id,
@@ -15,7 +20,10 @@ export function PersonDetailClient({
   id: string;
   initialData?: PersonDetailResponse;
 }) {
-  const { data, isPending } = usePersonDetail(id, initialData);
+  const { data, isPending } = useQuery({
+    ...orpc.people.detail.queryOptions({ input: { id } }),
+    initialData,
+  });
 
   if (isPending) return <PersonDetailSkeleton />;
   if (!data) return null;

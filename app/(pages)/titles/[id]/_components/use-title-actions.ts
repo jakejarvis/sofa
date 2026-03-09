@@ -3,7 +3,6 @@
 import { useStore } from "jotai";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { api } from "@/lib/api-client";
 import {
   episodeWatchesAtom,
   seasonsAtom,
@@ -13,6 +12,7 @@ import {
   userStatusAtom,
   watchingEpAtom,
 } from "@/lib/atoms/title";
+import { client } from "@/lib/orpc/client";
 import type { Season } from "@/lib/types";
 
 export function useTitleActions() {
@@ -33,10 +33,7 @@ export function useTitleActions() {
       }
 
       try {
-        await api("/episodes/batch-watch", {
-          method: "POST",
-          body: JSON.stringify({ episodeIds }),
-        });
+        await client.episodes.batchWatch({ episodeIds });
         toast.success(
           `Caught up — marked ${episodeIds.length} episode${episodeIds.length > 1 ? "s" : ""} as watched`,
         );
@@ -58,9 +55,9 @@ export function useTitleActions() {
         status === "watchlist" ? "in_progress" : status,
       );
       try {
-        await api(`/titles/${titleId}/status`, {
-          method: "PUT",
-          body: JSON.stringify({ status: status ? "in_progress" : null }),
+        await client.titles.updateStatus({
+          id: titleId,
+          status: status ? "in_progress" : null,
         });
         toast.success(status ? "Added to watchlist" : "Removed from library");
       } catch {
@@ -77,10 +74,7 @@ export function useTitleActions() {
       const titleId = store.get(titleIdAtom);
       store.set(userRatingAtom, ratingStars);
       try {
-        await api(`/titles/${titleId}/rating`, {
-          method: "PUT",
-          body: JSON.stringify({ stars: ratingStars }),
-        });
+        await client.titles.updateRating({ id: titleId, stars: ratingStars });
         toast.success(
           ratingStars > 0
             ? `Rated ${ratingStars} star${ratingStars > 1 ? "s" : ""}`
@@ -100,7 +94,7 @@ export function useTitleActions() {
     const titleName = store.get(titleNameAtom);
     store.set(userStatusAtom, "completed");
     try {
-      await api(`/titles/${titleId}/watch`, { method: "POST" });
+      await client.titles.watchMovie({ id: titleId });
       toast.success(`Marked "${titleName}" as watched`);
     } catch {
       store.set(userStatusAtom, prev);
@@ -127,7 +121,7 @@ export function useTitleActions() {
           store.set(userStatusAtom, "in_progress");
 
         try {
-          await api(`/episodes/${episodeId}/watch`, { method: "DELETE" });
+          await client.episodes.unwatch({ id: episodeId });
           toast.success(`Unwatched S${seasonNum} E${epNum}`);
         } catch {
           const w = store.get(episodeWatchesAtom);
@@ -147,7 +141,7 @@ export function useTitleActions() {
         }
 
         try {
-          await api(`/episodes/${episodeId}/watch`, { method: "POST" });
+          await client.episodes.watch({ id: episodeId });
 
           const seasons = store.get(seasonsAtom);
           const watchedSet = new Set(store.get(episodeWatchesAtom));
@@ -217,7 +211,7 @@ export function useTitleActions() {
       }
 
       try {
-        await api(`/seasons/${season.id}/watch`, { method: "POST" });
+        await client.seasons.watch({ id: season.id });
 
         const seasons = store.get(seasonsAtom);
         const currentWatchSet = new Set(store.get(episodeWatchesAtom));
@@ -268,7 +262,7 @@ export function useTitleActions() {
       if (status === "completed") store.set(userStatusAtom, "in_progress");
 
       try {
-        await api(`/seasons/${season.id}/watch`, { method: "DELETE" });
+        await client.seasons.unwatch({ id: season.id });
         toast.success(
           `Unwatched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
         );
@@ -290,7 +284,7 @@ export function useTitleActions() {
     store.set(episodeWatchesAtom, allEpIds);
     store.set(userStatusAtom, "completed");
     try {
-      await api(`/titles/${titleId}/watch-all`, { method: "POST" });
+      await client.titles.watchAll({ id: titleId });
       toast.success("Marked all episodes as watched");
     } catch {
       store.set(userStatusAtom, prevStatus);

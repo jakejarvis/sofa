@@ -1,8 +1,9 @@
 "use client";
 
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGenres, usePopular, useTrending } from "@/lib/queries/explore";
+import { orpc } from "@/lib/orpc/tanstack";
 import { FilterableTitleRow } from "./filterable-title-row";
 import { HeroBanner } from "./hero-banner";
 import { TitleRow } from "./title-row";
@@ -35,11 +36,21 @@ function ExploreSkeletons() {
 }
 
 export function ExploreClient() {
-  const { data: trending, isPending: trendingPending } = useTrending();
-  const { data: popularMovies, isPending: moviesPending } = usePopular("movie");
-  const { data: popularTv, isPending: tvPending } = usePopular("tv");
-  const { data: movieGenreData } = useGenres("movie");
-  const { data: tvGenreData } = useGenres("tv");
+  const { data: trending, isPending: trendingPending } = useQuery(
+    orpc.explore.trending.queryOptions({ input: { type: "movie" } }),
+  );
+  const { data: popularMovies, isPending: moviesPending } = useQuery(
+    orpc.explore.popular.queryOptions({ input: { type: "movie" } }),
+  );
+  const { data: popularTv, isPending: tvPending } = useQuery(
+    orpc.explore.popular.queryOptions({ input: { type: "tv" } }),
+  );
+  const { data: movieGenreData } = useQuery(
+    orpc.explore.genres.queryOptions({ input: { type: "movie" } }),
+  );
+  const { data: tvGenreData } = useQuery(
+    orpc.explore.genres.queryOptions({ input: { type: "tv" } }),
+  );
 
   const isPending = trendingPending || moviesPending || tvPending;
 

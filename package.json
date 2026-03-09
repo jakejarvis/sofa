@@ -21,6 +21,11 @@
   "dependencies": {
     "@base-ui/react": "1.2.0",
     "@better-auth/drizzle-adapter": "1.5.4",
+    "@orpc/client": "^1.13.6",
+    "@orpc/contract": "^1.13.6",
+    "@orpc/server": "^1.13.6",
+    "@orpc/tanstack-query": "^1.13.6",
+    "@orpc/zod": "^1.13.6",
     "@player.style/sutro": "0.2.1",
     "@tabler/icons-react": "3.40.0",
     "@tanstack/react-hotkeys": "0.4.0",

@@ -9,6 +9,7 @@ import {
   IconShieldCheck,
   IconTrash,
 } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
@@ -32,8 +33,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { api } from "@/lib/api-client";
-import { useBackups } from "@/lib/queries/admin";
+import { client } from "@/lib/orpc/client";
+import { orpc } from "@/lib/orpc/tanstack";
 import type { BackupInfo } from "@/lib/services/backup";
 
 function formatBytes(bytes: number): string {
@@ -47,7 +48,7 @@ function formatBackupDate(dateStr: string): string {
 }
 
 export function BackupSection() {
-  const { data } = useBackups();
+  const { data } = useQuery(orpc.admin.backups.list.queryOptions());
   const [backups, setBackups] = useState<BackupInfo[] | null>(null);
 
   // Use local state if user has modified, else use query data
@@ -58,9 +59,7 @@ export function BackupSection() {
   async function handleCreateBackup() {
     setCreating(true);
     try {
-      const backup = await api<BackupInfo>("/admin/backups", {
-        method: "POST",
-      });
+      const backup = (await client.admin.backups.create()) as BackupInfo;
       setBackups((prev) => [backup, ...(prev ?? data?.backups ?? [])]);
       toast.success("Backup created", {
         action: {
@@ -83,9 +82,11 @@ export function BackupSection() {
   async function handleDelete(filename: string) {
     const previous = displayBackups;
     setDeleting(filename);
-    setBackups(displayBackups.filter((b) => b.filename !== filename));
+    setBackups(
+      displayBackups.filter((b: BackupInfo) => b.filename !== filename),
+    );
     try {
-      await api(`/admin/backups/${filename}`, { method: "DELETE" });
+      await client.admin.backups.delete({ filename });
       toast.success("Backup deleted");
     } catch {
       setBackups(previous);
@@ -132,7 +133,7 @@ export function BackupSection() {
         {displayBackups.length > 0 && (
           <CardContent className="border-border/30 border-t pt-4">
             <div className="space-y-1.5">
-              {displayBackups.map((backup) => (
+              {displayBackups.map((backup: BackupInfo) => (
                 <motion.div
                   key={backup.filename}
                   initial={{ opacity: 0, height: 0 }}

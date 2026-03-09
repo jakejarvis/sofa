@@ -1,13 +1,16 @@
 "use client";
 
 import { IconDeviceTv } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { StatsSectionSkeleton } from "@/components/skeletons";
-import { useDashboardStats } from "@/lib/queries/dashboard";
+import { orpc } from "@/lib/orpc/tanstack";
 import { StatsDisplay } from "./stats-display";
 
 export function StatsSection() {
-  const { data: stats, isPending } = useDashboardStats();
+  const { data: stats, isPending } = useQuery(
+    orpc.dashboard.stats.queryOptions(),
+  );
 
   if (isPending) return <StatsSectionSkeleton />;
   if (!stats) return null;
