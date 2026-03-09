@@ -3,9 +3,8 @@
 import { IconDeviceTv } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { StatsSectionSkeleton } from "@/components/skeletons";
 import { orpc } from "@/lib/orpc/tanstack";
-import { StatsDisplay } from "./stats-display";
+import { StatsDisplay, StatsSectionSkeleton } from "./stats-display";
 
 export function StatsSection() {
   const { data: stats, isPending } = useQuery(

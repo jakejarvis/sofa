@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useProgress } from "@/components/navigation-progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
@@ -25,6 +26,18 @@ import {
 } from "@/components/ui/tooltip";
 import { useTiltEffect } from "@/hooks/use-tilt-effect";
 import { orpc } from "@/lib/orpc/tanstack";
+
+export function TitleCardSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06]">
+      <Skeleton className="aspect-[2/3] w-full rounded-none" />
+      <div className="px-3 pt-2.5 pb-3">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="mt-1.5 h-3 w-1/2" />
+      </div>
+    </div>
+  );
+}
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 

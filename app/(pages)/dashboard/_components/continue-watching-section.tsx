@@ -2,9 +2,11 @@
 
 import { IconPlayerPlay } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
-import { ContinueWatchingSectionSkeleton } from "@/components/skeletons";
 import { orpc } from "@/lib/orpc/tanstack";
-import { ContinueWatchingList } from "./continue-watching-list";
+import {
+  ContinueWatchingList,
+  ContinueWatchingSectionSkeleton,
+} from "./continue-watching-list";
 import { FeedSection } from "./feed-section";
 
 export function ContinueWatchingSection() {

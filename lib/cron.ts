@@ -301,7 +301,7 @@ async function refreshCreditsJob() {
       (castEntry.lastFetchedAt && castEntry.lastFetchedAt < stale);
 
     if (needsRefresh) {
-      await refreshCredits(titleId, { revalidate: false });
+      await refreshCredits(titleId);
       await Bun.sleep(RATE_LIMIT_MS);
     }
   }

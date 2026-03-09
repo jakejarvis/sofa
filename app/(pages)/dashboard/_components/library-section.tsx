@@ -2,10 +2,9 @@
 
 import { IconBooks } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
-import { TitleGridSectionSkeleton } from "@/components/skeletons";
 import { orpc } from "@/lib/orpc/tanstack";
 import { FeedSection } from "./feed-section";
-import { TitleGrid } from "./title-grid";
+import { TitleGrid, TitleGridSectionSkeleton } from "./title-grid";
 
 export function LibrarySection() {
   const { data, isPending } = useQuery(orpc.dashboard.library.queryOptions());

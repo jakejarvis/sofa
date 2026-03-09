@@ -254,6 +254,7 @@ export const TitleRecommendationsOutput = z.object({
       voteAverage: z.number().nullable(),
     }),
   ),
+  userStatuses: userStatusMap,
 });
 
 // ─── People outputs ────────────────────────────────────────────
@@ -533,6 +534,3 @@ export type ColorPalette = z.infer<typeof ColorPaletteSchema>;
 export type ResolvedTitle = z.infer<typeof ResolvedTitleSchema>;
 export type ResolvedPerson = z.infer<typeof PersonSchema>;
 export type PersonCredit = z.infer<typeof PersonCreditSchema>;
-export type RecommendedTitle = z.infer<
-  typeof TitleRecommendationsOutput
->["recommendations"][number];

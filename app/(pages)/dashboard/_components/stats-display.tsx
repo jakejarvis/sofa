@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/tanstack";
 import type {
   DashboardStats,
@@ -22,6 +23,29 @@ import type {
   TimePeriod,
 } from "@/lib/services/discovery";
 import { Sparkline } from "./sparkline";
+
+function StatCardSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-xl border border-border/30 bg-card/50 p-4">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-6 w-6 rounded-md" />
+        <Skeleton className="h-3 w-16" />
+      </div>
+      <Skeleton className="mt-2 h-7 w-12" />
+    </div>
+  );
+}
+
+export function StatsSectionSkeleton() {
+  return (
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <StatCardSkeleton />
+      <StatCardSkeleton />
+      <StatCardSkeleton />
+      <StatCardSkeleton />
+    </div>
+  );
+}
 
 const periodLabels: Record<TimePeriod, string> = {
   today: "Today",

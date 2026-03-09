@@ -2,10 +2,6 @@ import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache, Suspense } from "react";
-import {
-  RecommendationsSkeleton,
-  SeasonsSkeleton,
-} from "@/components/skeletons";
 import { getSession } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import { titles } from "@/lib/db/schema";
@@ -21,7 +17,7 @@ import { TitleHero } from "./_components/title-hero";
 import { TitleKeyboardShortcuts } from "./_components/title-keyboard-shortcuts";
 import { TitleProvider } from "./_components/title-provider";
 import { TitleRecommendations } from "./_components/title-recommendations";
-import { TitleSeasons } from "./_components/title-seasons";
+import { SeasonsSkeleton, TitleSeasons } from "./_components/title-seasons";
 import { TitleTheme } from "./_components/title-theme";
 
 const getCachedOrFetchTitle = cache((id: string) => getOrFetchTitle(id));
@@ -102,9 +98,7 @@ export default async function TitleDetailPage({
         <TitleKeyboardShortcuts />
       </TitleProvider>
 
-      <Suspense fallback={<RecommendationsSkeleton />}>
-        <TitleRecommendations titleId={title.id} />
-      </Suspense>
+      <TitleRecommendations titleId={title.id} />
     </div>
   );
 }

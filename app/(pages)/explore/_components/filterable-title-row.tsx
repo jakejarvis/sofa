@@ -2,8 +2,7 @@
 
 import { skipToken, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { TitleCardSkeleton } from "@/components/skeletons";
-import { TitleCard } from "@/components/title-card";
+import { TitleCard, TitleCardSkeleton } from "@/components/title-card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { orpc } from "@/lib/orpc/tanstack";

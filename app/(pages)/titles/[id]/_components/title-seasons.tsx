@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   episodeWatchesAtom,
   seasonsAtom,
@@ -33,6 +34,34 @@ import {
 } from "@/lib/atoms/title";
 import type { Season } from "@/lib/orpc/schemas";
 import { useTitleActions } from "./use-title-actions";
+
+export function SeasonsSkeleton() {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <Skeleton className="size-5 rounded" />
+        <Skeleton className="h-7 w-28" />
+      </div>
+      <div className="space-y-2">
+        {["s1", "s2", "s3"].map((id) => (
+          <div
+            key={id}
+            className="overflow-hidden rounded-xl border border-border/50 bg-card/50"
+          >
+            <div className="flex items-center justify-between p-4">
+              <Skeleton className="h-4 w-24" />
+              <div className="flex items-center gap-3">
+                <Skeleton className="hidden h-2 w-24 rounded-full sm:block" />
+                <Skeleton className="h-3 w-10" />
+                <Skeleton className="size-4" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function TitleSeasons({
   seasons: streamedSeasons,

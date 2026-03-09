@@ -5,6 +5,7 @@ import {
   getOrFetchTitleByTmdbId,
 } from "@/lib/services/metadata";
 import {
+  getUserStatusesByTitleIds,
   getUserTitleInfo,
   logMovieWatch,
   markAllEpisodesWatched,
@@ -69,6 +70,11 @@ export const userInfo = os.titles.userInfo
 
 export const recommendations = os.titles.recommendations
   .use(authed)
-  .handler(({ input }) => {
-    return { recommendations: getRecommendationsForTitle(input.id) };
+  .handler(({ input, context }) => {
+    const recs = getRecommendationsForTitle(input.id);
+    const userStatuses = getUserStatusesByTitleIds(
+      context.user.id,
+      recs.map((r) => r.id),
+    );
+    return { recommendations: recs, userStatuses };
   });

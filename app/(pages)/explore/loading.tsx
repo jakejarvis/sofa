@@ -1,4 +1,4 @@
-import { TitleCardSkeleton } from "@/components/skeletons";
+import { TitleCardSkeleton } from "@/components/title-card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function TitleRowSkeleton({ withGenreChips }: { withGenreChips?: boolean }) {
