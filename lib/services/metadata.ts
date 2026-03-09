@@ -11,6 +11,13 @@ import {
   titles,
 } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
+import type {
+  AvailabilityOffer,
+  CastMember,
+  Episode,
+  ResolvedTitle,
+  Season,
+} from "@/lib/orpc/schemas";
 import { generateProviderUrl } from "@/lib/providers";
 import type {
   TmdbGenre,
@@ -27,13 +34,6 @@ import {
   getVideos,
 } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import type {
-  AvailabilityOffer,
-  CastMember,
-  Episode,
-  ResolvedTitle,
-  Season,
-} from "@/lib/types";
 import { refreshAvailability } from "./availability";
 import { extractAndStoreColors, parseColorPalette } from "./colors";
 import { getCastForTitle, refreshCredits } from "./credits";

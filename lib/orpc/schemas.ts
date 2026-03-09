@@ -517,3 +517,19 @@ export const QuickAddOutput = z.object({
   id: z.string(),
   alreadyAdded: z.boolean(),
 });
+
+// ═══════════════════════════════════════════════════════════════
+// Inferred types — use these instead of hand-written interfaces
+// ═══════════════════════════════════════════════════════════════
+
+export type Episode = z.infer<typeof EpisodeSchema>;
+export type Season = z.infer<typeof SeasonSchema>;
+export type AvailabilityOffer = z.infer<typeof AvailabilityOfferSchema>;
+export type CastMember = z.infer<typeof CastMemberSchema>;
+export type ColorPalette = z.infer<typeof ColorPaletteSchema>;
+export type ResolvedTitle = z.infer<typeof ResolvedTitleSchema>;
+export type ResolvedPerson = z.infer<typeof PersonSchema>;
+export type PersonCredit = z.infer<typeof PersonCreditSchema>;
+export type RecommendedTitle = z.infer<
+  typeof TitleRecommendationsOutput
+>["recommendations"][number];

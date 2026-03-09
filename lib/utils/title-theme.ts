@@ -1,4 +1,4 @@
-import type { ColorPalette } from "@/lib/types";
+import type { ColorPalette } from "@/lib/orpc/schemas";
 
 /** @internal */
 export function hexToRelativeLuminance(hex: string): number {

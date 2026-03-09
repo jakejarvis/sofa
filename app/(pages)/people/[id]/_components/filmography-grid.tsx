@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { PersonCredit } from "@/lib/types";
+import type { PersonCredit } from "@/lib/orpc/schemas";
 
 type Filter = "all" | "movie" | "tv";
 type Sort = "newest" | "rating";

@@ -13,7 +13,7 @@ import {
   watchingEpAtom,
 } from "@/lib/atoms/title";
 import { client } from "@/lib/orpc/client";
-import type { Season } from "@/lib/types";
+import type { Season } from "@/lib/orpc/schemas";
 
 export function useTitleActions() {
   const store = useStore();

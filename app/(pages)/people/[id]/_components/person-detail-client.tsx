@@ -2,8 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { PersonDetailSkeleton } from "@/components/skeletons";
+import type { PersonCredit, ResolvedPerson } from "@/lib/orpc/schemas";
 import { orpc } from "@/lib/orpc/tanstack";
-import type { PersonCredit, ResolvedPerson } from "@/lib/types";
 import { FilmographyGrid } from "./filmography-grid";
 import { PersonHero } from "./person-hero";
 

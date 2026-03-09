@@ -3,9 +3,9 @@ import { updateTag } from "next/cache";
 import { db } from "@/lib/db/client";
 import { persons, titleCast, titles } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
+import type { CastMember } from "@/lib/orpc/schemas";
 import { getMovieCredits, getTvAggregateCredits } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import type { CastMember } from "@/lib/types";
 import { cacheProfilePhotos, imageCacheEnabled } from "./image-cache";
 
 const log = createLogger("credits");

@@ -11,7 +11,7 @@ import {
   userRatingAtom,
   userStatusAtom,
 } from "@/lib/atoms/title";
-import type { Season } from "@/lib/types";
+import type { Season } from "@/lib/orpc/schemas";
 
 export function TitleProvider({
   titleId,
