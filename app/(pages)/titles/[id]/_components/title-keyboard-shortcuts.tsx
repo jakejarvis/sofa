@@ -6,14 +6,14 @@ import { useAtomValue } from "jotai";
 import { useRouter } from "next/navigation";
 import { useProgress } from "@/components/navigation-progress";
 import { commandPaletteOpenAtom } from "@/lib/atoms/command-palette";
-import { titleTypeAtom, userStatusAtom } from "@/lib/atoms/title";
+import { useTitleContext, useTitleUserInfo } from "./title-context";
 import { useTitleActions } from "./use-title-actions";
 
 export function TitleKeyboardShortcuts() {
   const router = useRouter();
   const progress = useProgress();
-  const titleType = useAtomValue(titleTypeAtom);
-  const userStatus = useAtomValue(userStatusAtom);
+  const { titleType } = useTitleContext();
+  const { userStatus } = useTitleUserInfo();
   const { handleStatusChange, handleRating, handleWatchMovie } =
     useTitleActions();
 

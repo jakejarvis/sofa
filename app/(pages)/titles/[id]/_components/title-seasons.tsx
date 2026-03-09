@@ -8,7 +8,6 @@ import {
   IconDeviceTvOld,
 } from "@tabler/icons-react";
 import { format, parseISO } from "date-fns";
-import { useAtomValue, useSetAtom } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
@@ -26,13 +25,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  episodeWatchesAtom,
-  seasonsAtom,
-  userStatusAtom,
-  watchingEpAtom,
-} from "@/lib/atoms/title";
 import type { Season } from "@/lib/orpc/schemas";
+import { useTitleContext, useTitleUserInfo } from "./title-context";
 import { useTitleActions } from "./use-title-actions";
 
 export function SeasonsSkeleton() {
@@ -68,20 +62,17 @@ export function TitleSeasons({
 }: {
   seasons?: Season[];
 } = {}) {
-  const setSeasons = useSetAtom(seasonsAtom);
+  const { seasons, setSeasons, watchingEp } = useTitleContext();
+  const { episodeWatches, userStatus } = useTitleUserInfo();
 
-  // When seasons are streamed via Suspense, sync them into the Jotai store
+  // When seasons are streamed via Suspense, sync them into context
   useEffect(() => {
     if (streamedSeasons && streamedSeasons.length > 0) {
       setSeasons(streamedSeasons);
     }
   }, [streamedSeasons, setSeasons]);
 
-  const seasons = useAtomValue(seasonsAtom);
-  const episodeWatches = useAtomValue(episodeWatchesAtom);
   const watchedSet = useMemo(() => new Set(episodeWatches), [episodeWatches]);
-  const userStatus = useAtomValue(userStatusAtom);
-  const watchingEp = useAtomValue(watchingEpAtom);
   const {
     handleWatchEpisode,
     handleMarkSeason,

@@ -1,17 +1,10 @@
 "use client";
 
-import { createStore, Provider } from "jotai";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  episodeWatchesAtom,
-  seasonsAtom,
-  titleIdAtom,
-  titleNameAtom,
-  titleTypeAtom,
-  userRatingAtom,
-  userStatusAtom,
-} from "@/lib/atoms/title";
 import type { Season } from "@/lib/orpc/schemas";
+import { orpc } from "@/lib/orpc/tanstack";
+import { TitleContext } from "./title-context";
 
 export function TitleProvider({
   titleId,
@@ -20,7 +13,7 @@ export function TitleProvider({
   initialStatus,
   initialRating,
   initialEpisodeWatches,
-  seasons,
+  seasons: initialSeasons,
   children,
 }: {
   titleId: string;
@@ -32,17 +25,42 @@ export function TitleProvider({
   seasons: Season[];
   children: React.ReactNode;
 }) {
-  const [store] = useState(() => {
-    const s = createStore();
-    s.set(titleIdAtom, titleId);
-    s.set(titleTypeAtom, titleType);
-    s.set(titleNameAtom, titleName);
-    s.set(seasonsAtom, seasons);
-    s.set(userStatusAtom, initialStatus);
-    s.set(userRatingAtom, initialRating);
-    s.set(episodeWatchesAtom, initialEpisodeWatches);
-    return s;
+  const queryClient = useQueryClient();
+  const [seasons, setSeasons] = useState(initialSeasons);
+  const [watchingEp, setWatchingEp] = useState<string | null>(null);
+
+  // Always overwrite the cache with fresh server-fetched data on mount.
+  // Unlike initialData (which is a no-op when the cache already has an entry),
+  // this ensures revisiting a title or signing into a different account never
+  // renders stale or another user's data.
+  useState(() => {
+    queryClient.setQueryData(
+      orpc.titles.userInfo.queryKey({ input: { id: titleId } }),
+      {
+        status: initialStatus as
+          | "watchlist"
+          | "in_progress"
+          | "completed"
+          | null,
+        rating: initialRating,
+        episodeWatches: initialEpisodeWatches,
+      },
+    );
   });
 
-  return <Provider store={store}>{children}</Provider>;
+  return (
+    <TitleContext
+      value={{
+        titleId,
+        titleType,
+        titleName,
+        seasons,
+        setSeasons,
+        watchingEp,
+        setWatchingEp,
+      }}
+    >
+      {children}
+    </TitleContext>
+  );
 }
