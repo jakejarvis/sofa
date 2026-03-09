@@ -37,6 +37,7 @@ import {
   ToggleRegistrationInput,
   ToggleUpdateCheckInput,
   TrendingOutput,
+  TrendingTypeParam,
   TriggerJobInput,
   TriggerJobOutput,
   UpdateCheckOutput,
@@ -80,7 +81,7 @@ export const contract = {
     recommendations: oc.output(DashboardRecommendationsOutput),
   },
   explore: {
-    trending: oc.input(MediaTypeParam).output(TrendingOutput),
+    trending: oc.input(TrendingTypeParam).output(TrendingOutput),
     popular: oc.input(MediaTypeParam).output(PopularOutput),
     genres: oc.input(MediaTypeParam).output(GenresOutput),
   },

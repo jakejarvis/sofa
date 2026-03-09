@@ -18,6 +18,9 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
   }
 
   const query = input.query.trim();
+  if (!query) {
+    return { results: [] };
+  }
   const type = input.type ?? null;
 
   if (type === "person") {

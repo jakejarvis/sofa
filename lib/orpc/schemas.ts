@@ -10,6 +10,9 @@ export const FilenameParam = z.object({ filename: z.string() });
 export const MediaTypeParam = z.object({
   type: z.enum(["movie", "tv"]),
 });
+export const TrendingTypeParam = z.object({
+  type: z.enum(["all", "movie", "tv"]),
+});
 export const TmdbIdTypeParam = z.object({
   tmdbId: z.number().int(),
   type: z.enum(["movie", "tv"]),

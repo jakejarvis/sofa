@@ -58,7 +58,9 @@ export function BackupSection() {
       onSuccess: (backup) => {
         setBackups((prev) => [
           backup as BackupInfo,
-          ...(prev ?? data?.backups ?? []),
+          ...(prev ?? data?.backups ?? []).filter(
+            (b: BackupInfo) => b.filename !== backup.filename,
+          ),
         ]);
         toast.success("Backup created", {
           action: {

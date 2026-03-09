@@ -40,7 +40,7 @@ export const backupsSchedule = os.admin.backups.schedule
         10,
       ),
       frequency: getSetting("backupScheduleFrequency") ?? "1d",
-      time: getSetting("backupScheduleTime") ?? "03:00",
+      time: getSetting("backupScheduleTime") ?? "02:00",
       dayOfWeek: Number.parseInt(getSetting("backupScheduleDow") ?? "0", 10),
     };
   });

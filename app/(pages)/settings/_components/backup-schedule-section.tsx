@@ -110,9 +110,11 @@ function formatNextBackup(
 }
 
 export function BackupScheduleSection() {
-  const { data: scheduleData, isPending } = useQuery(
-    orpc.admin.backups.schedule.queryOptions(),
-  );
+  const {
+    data: scheduleData,
+    isPending,
+    isError,
+  } = useQuery(orpc.admin.backups.schedule.queryOptions());
 
   const [schedule, setSchedule] = useState<BackupScheduleState | null>(null);
 
@@ -202,6 +204,16 @@ export function BackupScheduleSection() {
 
   if (isPending) {
     return <Skeleton className="h-20 w-full rounded-xl" />;
+  }
+
+  if (isError) {
+    return (
+      <CardContent>
+        <p className="text-muted-foreground text-sm">
+          Failed to load backup schedule settings.
+        </p>
+      </CardContent>
+    );
   }
 
   return (

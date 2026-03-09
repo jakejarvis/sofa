@@ -37,7 +37,7 @@ function ExploreSkeletons() {
 
 export function ExploreClient() {
   const { data: trending, isPending: trendingPending } = useQuery(
-    orpc.explore.trending.queryOptions({ input: { type: "movie" } }),
+    orpc.explore.trending.queryOptions({ input: { type: "all" } }),
   );
   const { data: popularMovies, isPending: moviesPending } = useQuery(
     orpc.explore.popular.queryOptions({ input: { type: "movie" } }),

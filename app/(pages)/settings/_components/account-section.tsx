@@ -118,7 +118,8 @@ export function AccountSection({
   function handleRemoveAvatar() {
     startTransition(async () => {
       try {
-        await fetch("/api/account/avatar", { method: "DELETE" });
+        const res = await fetch("/api/account/avatar", { method: "DELETE" });
+        if (!res.ok) throw new Error("Delete failed");
         setAvatarUrl(undefined);
         toast.success("Profile picture removed");
         router.refresh();

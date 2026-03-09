@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const formData = await req.formData();
-  const file = formData.get("file") as File | null;
-  if (!file)
+  const file = formData.get("file");
+  if (!(file instanceof File))
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   if (file.size > MAX_RESTORE_SIZE)
     return NextResponse.json({ error: "File too large" }, { status: 413 });
