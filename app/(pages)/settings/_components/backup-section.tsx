@@ -121,7 +121,7 @@ export function BackupSection() {
               </CardDescription>
             </div>
           </div>
-          <Button onClick={() => createMutation.mutate({})} disabled={creating}>
+          <Button onClick={() => createMutation.mutate()} disabled={creating}>
             {creating ? (
               <Spinner className="size-3" />
             ) : (

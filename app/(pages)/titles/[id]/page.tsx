@@ -7,8 +7,8 @@ import { db } from "@/lib/db/client";
 import { titles } from "@/lib/db/schema";
 import { getOrFetchTitle } from "@/lib/services/metadata";
 import { getUserTitleInfo } from "@/lib/services/tracking";
+import { getThemeCssProperties } from "@/lib/theme";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import { getTitleThemeStyle } from "@/lib/utils/title-theme";
 import { AsyncTitleSeasons } from "./_components/async-title-seasons";
 import { TitleActions } from "./_components/title-actions";
 import { TitleAvailability } from "./_components/title-availability";
@@ -61,7 +61,7 @@ export default async function TitleDetailPage({
 
   const { title, seasons, needsHydration, availability, cast } = result;
 
-  const themeStyle = getTitleThemeStyle(title.colorPalette);
+  const themeStyle = getThemeCssProperties(title.colorPalette);
 
   return (
     <div className="relative space-y-10" style={themeStyle}>

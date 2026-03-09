@@ -10,7 +10,7 @@ export function hexToRelativeLuminance(hex: string): number {
   return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
 }
 
-export function getTitleThemeStyle(
+export function getThemeCssProperties(
   palette: ColorPalette | null,
 ): React.CSSProperties {
   const color = palette?.vibrant;

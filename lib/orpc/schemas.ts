@@ -94,6 +94,19 @@ export const UpdateScheduleInput = z.object({
 
 export const UpdateNameInput = z.object({ name: z.string().min(1) });
 
+export const UploadAvatarInput = z
+  .file()
+  .mime(["image/jpeg", "image/png", "image/webp", "image/gif"])
+  .max(2 * 1024 * 1024, "File too large (max 2MB)");
+
+export const UploadAvatarOutput = z.object({ imageUrl: z.string() });
+
+// ─── Backup inputs ─────────────────────────────────────────────
+
+export const RestoreBackupInput = z
+  .file()
+  .max(500 * 1024 * 1024, "File too large");
+
 // ═══════════════════════════════════════════════════════════════
 // Output schemas
 // ═══════════════════════════════════════════════════════════════

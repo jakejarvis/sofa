@@ -1,6 +1,11 @@
 import { ORPCError } from "@orpc/server";
 import { rescheduleBackup, triggerJob } from "@/lib/cron";
-import { createBackup, deleteBackup, listBackups } from "@/lib/services/backup";
+import {
+  createBackup,
+  deleteBackup,
+  listBackups,
+  restoreFromBackup,
+} from "@/lib/services/backup";
 import { getSetting, setSetting } from "@/lib/services/settings";
 import {
   getCachedUpdateCheck,
@@ -28,6 +33,13 @@ export const backupsDelete = os.admin.backups.delete
   .use(admin)
   .handler(async ({ input }) => {
     await deleteBackup(input.filename);
+  });
+
+export const backupsRestore = os.admin.backups.restore
+  .use(admin)
+  .handler(async ({ input: file }) => {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await restoreFromBackup(buffer);
   });
 
 export const backupsSchedule = os.admin.backups.schedule

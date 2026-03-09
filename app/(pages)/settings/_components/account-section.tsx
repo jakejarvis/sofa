@@ -12,7 +12,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +44,6 @@ export function AccountSection({
   };
 }) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
   const [avatarUrl, setAvatarUrl] = useState(user.image);
   const [isHovered, setIsHovered] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -84,49 +83,46 @@ export function AccountSection({
   });
   const initial = displayName?.charAt(0).toUpperCase() ?? "?";
 
+  const uploadAvatarMutation = useMutation(
+    orpc.account.uploadAvatar.mutationOptions({
+      onSuccess: (data) => {
+        setAvatarUrl(data.imageUrl);
+        toast.success("Profile picture updated");
+        router.refresh();
+      },
+      onError: (err) => {
+        const message = err instanceof Error ? err.message : "Upload failed";
+        toast.error(message);
+      },
+      onSettled: () => {
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      },
+    }),
+  );
+
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    startTransition(async () => {
-      try {
-        const result = await fetch("/api/account/avatar", {
-          method: "PUT",
-          body: formData,
-        }).then(async (res) => {
-          if (!res.ok) {
-            const body = await res.json().catch(() => ({}));
-            throw new Error(body.error || "Upload failed");
-          }
-          return res.json() as Promise<{ imageUrl: string }>;
-        });
-        setAvatarUrl(result.imageUrl);
-        toast.success("Profile picture updated");
-        router.refresh();
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Upload failed";
-        toast.error(message);
-      } finally {
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      }
-    });
+    uploadAvatarMutation.mutate(file);
   }
 
-  function handleRemoveAvatar() {
-    startTransition(async () => {
-      try {
-        const res = await fetch("/api/account/avatar", { method: "DELETE" });
-        if (!res.ok) throw new Error("Delete failed");
+  const removeAvatarMutation = useMutation(
+    orpc.account.removeAvatar.mutationOptions({
+      onSuccess: () => {
         setAvatarUrl(undefined);
         toast.success("Profile picture removed");
         router.refresh();
-      } catch {
+      },
+      onError: () => {
         toast.error("Failed to remove profile picture");
-      }
-    });
+      },
+    }),
+  );
+  const isAvatarPending =
+    uploadAvatarMutation.isPending || removeAvatarMutation.isPending;
+
+  function handleRemoveAvatar() {
+    removeAvatarMutation.mutate();
   }
 
   function handleNameSave() {
@@ -177,7 +173,7 @@ export function AccountSection({
                   }
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
-                  disabled={isPending}
+                  disabled={isAvatarPending}
                 />
               }
               className="relative shrink-0 cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
@@ -187,7 +183,7 @@ export function AccountSection({
             >
               <Avatar className="size-12 overflow-hidden">
                 <AvatarImage
-                  src={isPending ? undefined : avatarUrl}
+                  src={isAvatarPending ? undefined : avatarUrl}
                   alt={displayName}
                 />
                 <AvatarFallback className="bg-primary/10 font-display text-lg text-primary">
@@ -196,19 +192,19 @@ export function AccountSection({
               </Avatar>
 
               <AnimatePresence>
-                {(isHovered || isPending) && (
+                {(isHovered || isAvatarPending) && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.15 }}
                     className={`absolute inset-0 flex items-center justify-center rounded-full text-foreground/70 backdrop-blur-sm ${
-                      avatarUrl && !isPending
+                      avatarUrl && !isAvatarPending
                         ? "bg-destructive/40"
                         : "bg-black/50"
                     }`}
                   >
-                    {isPending ? (
+                    {isAvatarPending ? (
                       <Spinner className="size-4.5" />
                     ) : avatarUrl ? (
                       <IconTrash className="size-4.5" />

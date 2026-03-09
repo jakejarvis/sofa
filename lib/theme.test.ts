@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { getTitleThemeStyle, hexToRelativeLuminance } from "./title-theme";
+import { getThemeCssProperties, hexToRelativeLuminance } from "./theme";
 
 describe("hexToRelativeLuminance", () => {
   test("black has luminance ~0", () => {
@@ -34,12 +34,12 @@ describe("hexToRelativeLuminance", () => {
 
 describe("getTitleThemeStyle", () => {
   test("returns empty object for null palette", () => {
-    expect(getTitleThemeStyle(null)).toEqual({});
+    expect(getThemeCssProperties(null)).toEqual({});
   });
 
   test("returns empty object when vibrant is null", () => {
     expect(
-      getTitleThemeStyle({
+      getThemeCssProperties({
         vibrant: null,
         darkVibrant: "#123456",
         lightVibrant: null,
@@ -51,7 +51,7 @@ describe("getTitleThemeStyle", () => {
   });
 
   test("dark color produces light foreground", () => {
-    const style = getTitleThemeStyle({
+    const style = getThemeCssProperties({
       vibrant: "#1a1a2e",
       darkVibrant: null,
       lightVibrant: null,
@@ -66,7 +66,7 @@ describe("getTitleThemeStyle", () => {
   });
 
   test("bright color produces dark foreground", () => {
-    const style = getTitleThemeStyle({
+    const style = getThemeCssProperties({
       vibrant: "#ffff00",
       darkVibrant: null,
       lightVibrant: null,
@@ -81,7 +81,7 @@ describe("getTitleThemeStyle", () => {
   });
 
   test("sets all expected CSS custom properties", () => {
-    const style = getTitleThemeStyle({
+    const style = getThemeCssProperties({
       vibrant: "#e63946",
       darkVibrant: null,
       lightVibrant: null,

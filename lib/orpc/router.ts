@@ -64,6 +64,7 @@ export const router = os.router({
       list: admin.backupsList,
       create: admin.backupsCreate,
       delete: admin.backupsDelete,
+      restore: admin.backupsRestore,
       schedule: admin.backupsSchedule,
       updateSchedule: admin.backupsUpdateSchedule,
     },
@@ -75,6 +76,8 @@ export const router = os.router({
   },
   account: {
     updateName: account.updateName,
+    uploadAvatar: account.uploadAvatar,
+    removeAvatar: account.removeAvatar,
   },
   watchlist: {
     quickAdd: watchlist.quickAdd,
