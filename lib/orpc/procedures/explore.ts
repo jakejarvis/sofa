@@ -110,5 +110,10 @@ export const genres = os.explore.genres
   .handler(async ({ input }) => {
     requireTmdb();
     const data = await getGenres(input.type);
-    return { genres: data.genres ?? [] };
+    return {
+      genres: (data.genres ?? []).map((g) => ({
+        id: g.id,
+        name: g.name ?? "",
+      })),
+    };
   });

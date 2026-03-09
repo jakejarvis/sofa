@@ -26,7 +26,7 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
       results: (personResults.results ?? []).map((r) => ({
         tmdbId: r.id,
         type: "person" as const,
-        title: r.name,
+        title: r.name ?? "",
         posterPath: null,
         profilePath: tmdbImageUrl(r.profile_path ?? null, "profiles"),
         overview: "",

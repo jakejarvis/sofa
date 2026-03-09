@@ -20,7 +20,7 @@ function generateToken() {
 function serializeIntegration(row: {
   id: string;
   provider: string;
-  type: string;
+  type: "webhook" | "list";
   token: string;
   enabled: boolean;
   lastEventAt: Date | null;

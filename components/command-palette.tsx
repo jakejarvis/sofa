@@ -76,10 +76,10 @@ interface SearchResult {
   tmdbId: number;
   type: "movie" | "tv" | "person";
   title: string;
-  posterPath: string | null;
+  posterPath?: string | null;
   profilePath?: string | null;
-  releaseDate: string | null;
-  voteAverage: number;
+  releaseDate?: string | null;
+  voteAverage?: number;
   knownFor?: string[];
   knownForDepartment?: string;
 }
