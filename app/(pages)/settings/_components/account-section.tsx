@@ -28,11 +28,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  removeAvatarAction,
-  updateNameAction,
-  uploadAvatarAction,
-} from "@/lib/actions/settings";
+import { api } from "@/lib/api-client";
 import { signOut } from "@/lib/auth/client";
 
 export function AccountSection({
@@ -81,7 +77,16 @@ export function AccountSection({
 
     startTransition(async () => {
       try {
-        const result = await uploadAvatarAction(formData);
+        const result = await fetch("/api/account/avatar", {
+          method: "PUT",
+          body: formData,
+        }).then(async (res) => {
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            throw new Error(body.error || "Upload failed");
+          }
+          return res.json() as Promise<{ imageUrl: string }>;
+        });
         setAvatarUrl(result.imageUrl);
         toast.success("Profile picture updated");
         router.refresh();
@@ -97,7 +102,7 @@ export function AccountSection({
   function handleRemoveAvatar() {
     startTransition(async () => {
       try {
-        await removeAvatarAction();
+        await api("/account/avatar", { method: "DELETE" });
         setAvatarUrl(undefined);
         toast.success("Profile picture removed");
         router.refresh();
@@ -117,7 +122,10 @@ export function AccountSection({
 
     startNameTransition(async () => {
       try {
-        await updateNameAction(trimmed);
+        await api("/account/name", {
+          method: "PUT",
+          body: JSON.stringify({ name: trimmed }),
+        });
         setDisplayName(trimmed);
         setIsEditingName(false);
         toast.success("Name updated");

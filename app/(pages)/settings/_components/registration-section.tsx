@@ -5,7 +5,7 @@ import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { toggleRegistration } from "@/lib/actions/settings";
+import { api } from "@/lib/api-client";
 
 export function RegistrationSection({
   initialRegistrationOpen,
@@ -22,7 +22,10 @@ export function RegistrationSection({
     startTransition(async () => {
       setOptimisticOpen(checked);
       try {
-        await toggleRegistration(checked);
+        await api("/admin/registration", {
+          method: "PUT",
+          body: JSON.stringify({ open: checked }),
+        });
         setRegistrationOpen(checked);
         toast.success(checked ? "Registration opened" : "Registration closed");
       } catch {

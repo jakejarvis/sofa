@@ -32,7 +32,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { createBackupAction, deleteBackupAction } from "@/lib/actions/settings";
+import { api } from "@/lib/api-client";
 import type { BackupInfo } from "@/lib/services/backup";
 
 function formatBytes(bytes: number): string {
@@ -57,7 +57,9 @@ export function BackupSection({
   async function handleCreateBackup() {
     setCreating(true);
     try {
-      const backup = await createBackupAction();
+      const backup = await api<BackupInfo>("/admin/backups", {
+        method: "POST",
+      });
       setBackups((prev) => [backup, ...prev]);
       toast.success("Backup created", {
         action: {
@@ -82,7 +84,7 @@ export function BackupSection({
     setDeleting(filename);
     setBackups((prev) => prev.filter((b) => b.filename !== filename));
     try {
-      await deleteBackupAction(filename);
+      await api(`/admin/backups/${filename}`, { method: "DELETE" });
       toast.success("Backup deleted");
     } catch {
       setBackups(previous);

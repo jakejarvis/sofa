@@ -3,17 +3,7 @@
 import { useStore } from "jotai";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import {
-  batchWatchEpisodes,
-  markAllWatchedAction,
-  unwatchEpisodeAction,
-  unwatchSeasonAction,
-  updateTitleRating,
-  updateTitleStatus,
-  watchEpisode,
-  watchMovie,
-  watchSeason,
-} from "@/lib/actions/titles";
+import { api } from "@/lib/api-client";
 import {
   episodeWatchesAtom,
   seasonsAtom,
@@ -43,7 +33,10 @@ export function useTitleActions() {
       }
 
       try {
-        await batchWatchEpisodes(episodeIds);
+        await api("/episodes/batch-watch", {
+          method: "POST",
+          body: JSON.stringify({ episodeIds }),
+        });
         toast.success(
           `Caught up — marked ${episodeIds.length} episode${episodeIds.length > 1 ? "s" : ""} as watched`,
         );
@@ -65,7 +58,10 @@ export function useTitleActions() {
         status === "watchlist" ? "in_progress" : status,
       );
       try {
-        await updateTitleStatus(titleId, status ? "in_progress" : null);
+        await api(`/titles/${titleId}/status`, {
+          method: "PUT",
+          body: JSON.stringify({ status: status ? "in_progress" : null }),
+        });
         toast.success(status ? "Added to watchlist" : "Removed from library");
       } catch {
         store.set(userStatusAtom, prev);
@@ -81,7 +77,10 @@ export function useTitleActions() {
       const titleId = store.get(titleIdAtom);
       store.set(userRatingAtom, ratingStars);
       try {
-        await updateTitleRating(titleId, ratingStars);
+        await api(`/titles/${titleId}/rating`, {
+          method: "PUT",
+          body: JSON.stringify({ stars: ratingStars }),
+        });
         toast.success(
           ratingStars > 0
             ? `Rated ${ratingStars} star${ratingStars > 1 ? "s" : ""}`
@@ -101,7 +100,7 @@ export function useTitleActions() {
     const titleName = store.get(titleNameAtom);
     store.set(userStatusAtom, "completed");
     try {
-      await watchMovie(titleId);
+      await api(`/titles/${titleId}/watch`, { method: "POST" });
       toast.success(`Marked "${titleName}" as watched`);
     } catch {
       store.set(userStatusAtom, prev);
@@ -128,7 +127,7 @@ export function useTitleActions() {
           store.set(userStatusAtom, "in_progress");
 
         try {
-          await unwatchEpisodeAction(episodeId);
+          await api(`/episodes/${episodeId}/watch`, { method: "DELETE" });
           toast.success(`Unwatched S${seasonNum} E${epNum}`);
         } catch {
           const w = store.get(episodeWatchesAtom);
@@ -148,7 +147,7 @@ export function useTitleActions() {
         }
 
         try {
-          await watchEpisode(episodeId);
+          await api(`/episodes/${episodeId}/watch`, { method: "POST" });
 
           const seasons = store.get(seasonsAtom);
           const watchedSet = new Set(store.get(episodeWatchesAtom));
@@ -218,7 +217,7 @@ export function useTitleActions() {
       }
 
       try {
-        await watchSeason(season.id);
+        await api(`/seasons/${season.id}/watch`, { method: "POST" });
 
         const seasons = store.get(seasonsAtom);
         const currentWatchSet = new Set(store.get(episodeWatchesAtom));
@@ -269,7 +268,7 @@ export function useTitleActions() {
       if (status === "completed") store.set(userStatusAtom, "in_progress");
 
       try {
-        await unwatchSeasonAction(season.id);
+        await api(`/seasons/${season.id}/watch`, { method: "DELETE" });
         toast.success(
           `Unwatched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
         );
@@ -291,7 +290,7 @@ export function useTitleActions() {
     store.set(episodeWatchesAtom, allEpIds);
     store.set(userStatusAtom, "completed");
     try {
-      await markAllWatchedAction(titleId);
+      await api(`/titles/${titleId}/watch-all`, { method: "POST" });
       toast.success("Marked all episodes as watched");
     } catch {
       store.set(userStatusAtom, prevStatus);

@@ -38,11 +38,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  deleteIntegration,
-  regenerateIntegrationToken,
-  saveIntegration,
-} from "@/lib/actions/settings";
+import { api } from "@/lib/api-client";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -96,7 +92,10 @@ export function IntegrationCard({
 
   async function handleConnect() {
     try {
-      const result = await saveIntegration(provider);
+      const result = await api<IntegrationConnection>("/integrations", {
+        method: "POST",
+        body: JSON.stringify({ provider }),
+      });
       setConnections((prev) => [...prev, { ...result, recentEvents: [] }]);
       toast.success(`${label} connected`);
     } catch {
@@ -111,7 +110,7 @@ export function IntegrationCard({
       return prev.filter((c) => c.provider !== provider);
     });
     try {
-      await deleteIntegration(provider);
+      await api(`/integrations/${provider}`, { method: "DELETE" });
       toast.success(`${label} disconnected`);
     } catch {
       setConnections(previous);
@@ -121,7 +120,10 @@ export function IntegrationCard({
 
   async function handleRegenerateToken() {
     try {
-      const result = await regenerateIntegrationToken(provider);
+      const result = await api<IntegrationConnection>(
+        `/integrations/${provider}/regenerate-token`,
+        { method: "POST" },
+      );
       setConnections((prev) =>
         prev.map((c) =>
           c.provider === provider ? { ...c, token: result.token } : c,

@@ -37,8 +37,7 @@ import { Kbd } from "@/components/ui/kbd";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useSearch } from "@/hooks/use-search";
-import { resolvePerson } from "@/lib/actions/people";
-import { resolveTitle } from "@/lib/actions/titles";
+import { api } from "@/lib/api-client";
 import {
   commandPaletteOpenAtom,
   helpOpenAtom,
@@ -137,8 +136,11 @@ export function CommandPalette() {
       setCommandPaletteOpen(false);
       progress.start();
       if (result.type === "person") {
-        void resolvePerson(result.tmdbId)
-          .then((id) => {
+        void api<{ id: string }>("/people/resolve", {
+          method: "POST",
+          body: JSON.stringify({ tmdbId: result.tmdbId }),
+        })
+          .then(({ id }) => {
             if (id) router.push(`/people/${id}`);
             else progress.done();
           })
@@ -147,8 +149,11 @@ export function CommandPalette() {
             toast.error("Failed to load person");
           });
       } else {
-        void resolveTitle(result.tmdbId, result.type)
-          .then((id) => {
+        void api<{ id: string }>("/titles/resolve", {
+          method: "POST",
+          body: JSON.stringify({ tmdbId: result.tmdbId, type: result.type }),
+        })
+          .then(({ id }) => {
             if (id) router.push(`/titles/${id}`);
             else progress.done();
           })

@@ -1,5 +1,5 @@
-import useSWR from "swr";
-import { fetcher } from "@/lib/swr/fetcher";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
@@ -19,13 +19,14 @@ interface DiscoverResponse {
 }
 
 export function useDiscover(mediaType: "movie" | "tv", genreId: number | null) {
-  const { data, isLoading } = useSWR<DiscoverResponse>(
-    genreId != null
-      ? `/api/discover?mediaType=${mediaType}&genreId=${genreId}`
-      : null,
-    fetcher,
-    { revalidateOnFocus: false, dedupingInterval: 2_000 },
-  );
+  const { data, isLoading } = useQuery<DiscoverResponse>({
+    queryKey: ["discover", mediaType, genreId],
+    queryFn: () =>
+      api<DiscoverResponse>(
+        `/discover?mediaType=${mediaType}&genreId=${genreId}`,
+      ),
+    enabled: genreId != null,
+  });
 
   return { data, isLoading };
 }

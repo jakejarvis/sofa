@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useSystemHealth } from "@/hooks/use-system-health";
 import { useTimeAgo } from "@/hooks/use-time-ago";
-import { triggerJobAction } from "@/lib/actions/settings";
+import { api } from "@/lib/api-client";
 import type { SystemHealthData } from "@/lib/services/system-health";
 
 const JOB_LABELS: Record<string, string> = {
@@ -325,7 +325,7 @@ function BackgroundJobsCard({
   const handleTrigger = async (jobName: string) => {
     setTriggeringJob(jobName);
     try {
-      await triggerJobAction(jobName);
+      await api(`/admin/jobs/${jobName}/trigger`, { method: "POST" });
       toast.success(`${JOB_LABELS[jobName] ?? jobName} triggered`);
       // Refresh after a brief delay so the run shows up
       setTimeout(onRefresh, 1500);

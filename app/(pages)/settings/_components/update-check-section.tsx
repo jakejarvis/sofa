@@ -5,7 +5,7 @@ import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { toggleUpdateCheck } from "@/lib/actions/settings";
+import { api } from "@/lib/api-client";
 
 export function UpdateCheckSection({
   initialEnabled,
@@ -20,7 +20,10 @@ export function UpdateCheckSection({
     startTransition(async () => {
       setOptimisticEnabled(checked);
       try {
-        await toggleUpdateCheck(checked);
+        await api("/admin/update-check", {
+          method: "PUT",
+          body: JSON.stringify({ enabled: checked }),
+        });
         setEnabled(checked);
         toast.success(
           checked ? "Update checks enabled" : "Update checks disabled",

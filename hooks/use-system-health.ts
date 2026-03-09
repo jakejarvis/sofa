@@ -1,6 +1,6 @@
-import useSWR from "swr";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
 import type { SystemHealthData } from "@/lib/services/system-health";
-import { fetcher } from "@/lib/swr/fetcher";
 
 interface StatusResponse {
   tmdbConfigured: boolean;
@@ -8,18 +8,17 @@ interface StatusResponse {
 }
 
 export function useSystemHealth(initialData: SystemHealthData) {
-  const { data, isValidating, mutate } = useSWR<StatusResponse>(
-    "/api/status",
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      fallbackData: { tmdbConfigured: true, health: initialData },
-    },
-  );
+  const queryClient = useQueryClient();
+  const { data, isFetching } = useQuery<StatusResponse>({
+    queryKey: ["system-health"],
+    queryFn: () => api<StatusResponse>("/status"),
+    initialData: { tmdbConfigured: true, health: initialData },
+  });
 
   return {
     data: data?.health ?? initialData,
-    isRefreshing: isValidating,
-    refresh: () => mutate(),
+    isRefreshing: isFetching,
+    refresh: () =>
+      queryClient.invalidateQueries({ queryKey: ["system-health"] }),
   };
 }

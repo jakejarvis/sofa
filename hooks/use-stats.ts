@@ -1,6 +1,6 @@
-import useSWR from "swr";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
 import type { HistoryBucket, TimePeriod } from "@/lib/services/discovery";
-import { fetcher } from "@/lib/swr/fetcher";
 
 interface StatsResponse {
   count: number;
@@ -8,11 +8,10 @@ interface StatsResponse {
 }
 
 export function useStats(type: "movies" | "episodes", period: TimePeriod) {
-  const { data } = useSWR<StatsResponse>(
-    `/api/stats?type=${type}&period=${period}`,
-    fetcher,
-    { revalidateOnFocus: false },
-  );
+  const { data } = useQuery<StatsResponse>({
+    queryKey: ["stats", type, period],
+    queryFn: () => api<StatsResponse>(`/stats?type=${type}&period=${period}`),
+  });
 
   return data;
 }

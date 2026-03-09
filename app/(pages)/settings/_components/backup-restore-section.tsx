@@ -16,7 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import { restoreBackupAction } from "@/lib/actions/settings";
 
 export function BackupRestoreSection() {
   const [isPending, startTransition] = useTransition();
@@ -29,7 +28,12 @@ export function BackupRestoreSection() {
     formData.append("file", file);
     startTransition(async () => {
       try {
-        await restoreBackupAction(formData);
+        await fetch("/api/admin/backups/restore", {
+          method: "POST",
+          body: formData,
+        }).then((res) => {
+          if (!res.ok) throw new Error("Restore failed");
+        });
         toast.success("Database restored. Reloading...");
         setTimeout(() => window.location.reload(), 1500);
       } catch (err) {

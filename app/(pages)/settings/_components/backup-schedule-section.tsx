@@ -16,11 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-  setBackupScheduleAction,
-  setMaxBackupsAction,
-  setScheduledBackupAction,
-} from "@/lib/actions/settings";
+import { api } from "@/lib/api-client";
 import type { BackupFrequency } from "@/lib/cron";
 
 const FREQUENCY_OPTIONS: { value: BackupFrequency; label: string }[] = [
@@ -142,7 +138,10 @@ export function BackupScheduleSection({
       setSchedule((prev) => ({ ...prev, enabled: checked }));
       setTogglingSchedule(true);
       try {
-        await setScheduledBackupAction(checked);
+        await api("/admin/backups/schedule", {
+          method: "PUT",
+          body: JSON.stringify({ enabled: checked }),
+        });
         toast.success(
           checked ? "Scheduled backups enabled" : "Scheduled backups disabled",
         );
@@ -161,7 +160,10 @@ export function BackupScheduleSection({
       const previous = schedule.maxRetention;
       setSchedule((prev) => ({ ...prev, maxRetention: value }));
       try {
-        await setMaxBackupsAction(value);
+        await api("/admin/backups/schedule", {
+          method: "PUT",
+          body: JSON.stringify({ maxRetention: value }),
+        });
       } catch {
         setSchedule((prev) => ({ ...prev, maxRetention: previous }));
         toast.error("Failed to update retention setting");
@@ -189,7 +191,14 @@ export function BackupScheduleSection({
       }));
       setSavingSchedule(true);
       try {
-        await setBackupScheduleAction(newFrequency, newTime, newDow);
+        await api("/admin/backups/schedule", {
+          method: "PUT",
+          body: JSON.stringify({
+            frequency: newFrequency,
+            time: newTime,
+            dayOfWeek: newDow,
+          }),
+        });
         toast.success("Schedule updated");
       } catch {
         setSchedule((s) => ({ ...s, ...prev }));
