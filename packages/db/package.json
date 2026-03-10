@@ -20,11 +20,11 @@
     "db:studio": "bun --bun drizzle-kit studio"
   },
   "dependencies": {
-    "drizzle-orm": "1.0.0-beta.16-ea816b6"
+    "drizzle-orm": "catalog:"
   },
   "devDependencies": {
-    "@types/bun": "1.3.10",
-    "drizzle-kit": "1.0.0-beta.16-ea816b6",
-    "typescript": "5.9.3"
+    "@types/bun": "catalog:",
+    "drizzle-kit": "catalog:",
+    "typescript": "catalog:"
   }
 }

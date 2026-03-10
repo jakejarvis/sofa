@@ -13,13 +13,13 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@better-auth/drizzle-adapter": "1.5.4",
+    "@better-auth/drizzle-adapter": "catalog:",
     "@sofa/db": "workspace:*",
     "@sofa/core": "workspace:*",
-    "better-auth": "1.5.4"
+    "better-auth": "catalog:"
   },
   "devDependencies": {
-    "@types/bun": "1.3.10",
-    "typescript": "5.9.3"
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
   }
 }

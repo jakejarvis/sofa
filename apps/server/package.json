@@ -11,24 +11,24 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@orpc/client": "1.13.6",
-    "@orpc/contract": "1.13.6",
-    "@orpc/json-schema": "1.13.6",
-    "@orpc/openapi": "1.13.6",
-    "@orpc/server": "1.13.6",
-    "@orpc/zod": "1.13.6",
+    "@orpc/client": "catalog:",
+    "@orpc/contract": "catalog:",
+    "@orpc/json-schema": "catalog:",
+    "@orpc/openapi": "catalog:",
+    "@orpc/server": "catalog:",
+    "@orpc/zod": "catalog:",
     "@sofa/api": "workspace:*",
     "@sofa/auth": "workspace:*",
     "@sofa/db": "workspace:*",
     "@sofa/core": "workspace:*",
     "@sofa/tmdb": "workspace:*",
     "croner": "10.0.2-dev.2",
-    "drizzle-orm": "1.0.0-beta.16-ea816b6",
-    "hono": "4.12.7",
-    "zod": "4.3.6"
+    "drizzle-orm": "catalog:",
+    "hono": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/bun": "1.3.10",
-    "typescript": "5.9.3"
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
   }
 }

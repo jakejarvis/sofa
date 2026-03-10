@@ -76,6 +76,21 @@ app.all("/api/v1/*", async (c) => {
   return response ?? c.text("Not found", 404);
 });
 
+// ─── SPA static serving (production) ─────────────────────────
+
+if (process.env.NODE_ENV === "production") {
+  const { serveStatic } = await import("hono/bun");
+  const path = await import("node:path");
+  const spaDir = path.resolve(import.meta.dir, "../../../apps/web/dist");
+
+  // Hashed assets — immutable cache
+  app.use("/assets/*", serveStatic({ root: spaDir }));
+  // Other static files (icons, manifest, etc.)
+  app.use("*", serveStatic({ root: spaDir }));
+  // SPA fallback — serve index.html for all unmatched routes
+  app.get("*", serveStatic({ root: spaDir, path: "/index.html" }));
+}
+
 // ─── Graceful shutdown ────────────────────────────────────────
 
 const shutdown = () => {
@@ -90,9 +105,10 @@ const shutdown = () => {
 process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
 
-log.info(`API server listening on port ${process.env.API_PORT || 3001}`);
+const port = Number(process.env.PORT || process.env.API_PORT || 3001);
+log.info(`API server listening on port ${port}`);
 
 export default {
-  port: Number(process.env.API_PORT || 3001),
+  port,
   fetch: app.fetch,
 };

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Root commands (via Turborepo)
-bun run dev              # Start API server + Next.js dev server
+bun run dev              # Start API server + Vite dev server
 bun run build            # Production build (both apps)
 bun run lint             # Biome lint check
 bun run format           # Biome format (auto-fix)
@@ -44,7 +44,7 @@ bun run test
 
 ## Architecture
 
-**Sofa** is a self-hosted movie & TV tracking app (like Trakt/TVTime) built as a Turborepo monorepo with a standalone Hono API server, a Next.js 16 frontend, and shared packages.
+**Sofa** is a self-hosted movie & TV tracking app (like Trakt/TVTime) built as a Turborepo monorepo with a standalone Hono API server, a Vite + TanStack Router SPA frontend, and shared packages.
 
 ### Monorepo structure
 
@@ -52,7 +52,7 @@ bun run test
 couch-potato/
 ├── apps/
 │   ├── server/        # @sofa/server — Hono API server (oRPC, auth, cron, webhooks)
-│   └── web/           # @sofa/web — Next.js 16 frontend (pages, components, TanStack Query)
+│   └── web/           # @sofa/web — Vite SPA (TanStack Router, TanStack Query)
 ├── packages/
 │   ├── api/           # @sofa/api — oRPC contract + Zod schemas (shared)
 │   ├── auth/          # @sofa/auth — Better Auth server config
@@ -61,13 +61,12 @@ couch-potato/
 │   └── tmdb/          # @sofa/tmdb — TMDB API client + image URL helper
 ├── turbo.json         # Turborepo task configuration
 ├── biome.json         # Shared Biome config
-├── Dockerfile         # Multi-stage Docker build (turbo prune)
-├── entrypoint.sh      # Docker entrypoint (starts API server then Next.js)
+├── Dockerfile         # Multi-stage Docker build (turbo prune, single process)
 └── package.json       # Root workspace config
 ```
 
-- **`@sofa/server`** (`apps/server/`) — Hono API server running on port 3001. Hosts oRPC procedures, Better Auth, webhook/image/backup routes, and cron jobs. Runs DB migrations on startup.
-- **`@sofa/web`** (`apps/web/`) — Frontend-only Next.js app. No DB access, no services. All data fetched via oRPC client calls to the API server. Next.js rewrites proxy `/api/*` and `/rpc/*` to the API server.
+- **`@sofa/server`** (`apps/server/`) — Hono API server. Hosts oRPC procedures, Better Auth, webhook/image/backup routes, and cron jobs. Runs DB migrations on startup. In production, also serves the SPA static files on port 3000. In dev, runs on port 3001.
+- **`@sofa/web`** (`apps/web/`) — Vite SPA with TanStack Router (file-based routing). No SSR, no DB access, no services. All data fetched via oRPC client calls. Vite dev server proxies `/api/*` and `/rpc/*` to the API server.
 - **`@sofa/api`** (`packages/api/`) — JIT package with the oRPC contract and Zod schemas. No build step.
 - **`@sofa/db`** (`packages/db/`) — Database layer: Drizzle schema, client, migrations, constants, logger.
 - **`@sofa/tmdb`** (`packages/tmdb/`) — TMDB API client (openapi-fetch) and image URL construction.
@@ -78,21 +77,21 @@ All shared packages are JIT (raw TypeScript exports, no build step). Consumers t
 
 ### Stack
 
-- **Framework**: Next.js 16 (App Router), React 19, TypeScript
+- **Frontend**: Vite 7 SPA, React 19, TypeScript, TanStack Router (file-based routing)
 - **API Server**: Hono (standalone Bun server)
 - **Monorepo**: Turborepo with Bun workspaces
 - **Database**: SQLite via bun:sqlite + Drizzle ORM (WAL mode, singleton via `globalThis`, sync queries, auto-migrations on startup)
 - **Auth**: Better Auth with Drizzle adapter — email/password + optional OIDC/SSO via `genericOAuth` plugin
-- **Styling**: Tailwind CSS v4, shadcn components, dark cinema theme with warm primary accents
-- **Fonts**: DM Serif Display (display), DM Sans (body), Geist Mono (mono)
+- **Styling**: Tailwind CSS v4 (via `@tailwindcss/vite`), shadcn components, dark cinema theme with warm primary accents
+- **Fonts**: DM Serif Display (display), DM Sans (body), Geist Mono (mono) — self-hosted via `@fontsource`
 - **API**: oRPC (contract-first, type-safe RPC) with `@orpc/tanstack-query` for TanStack Query integration
 - **State**: Jotai (client), TanStack Query (data fetching & mutations via oRPC)
-- **Linting**: Biome (2-space indent, organized imports, React/Next.js recommended rules)
+- **Linting**: Biome (2-space indent, organized imports, React recommended rules)
 - **External API**: TMDB (The Movie Database) with Bearer token auth
 
 ### Package imports
 
-Within `apps/web/`, `@/*` maps to `apps/web/` root, e.g. `@/components/nav-bar` → `apps/web/components/nav-bar`.
+Within `apps/web/`, `@/*` maps to `apps/web/src/`, e.g. `@/components/nav-bar` → `apps/web/src/components/nav-bar`.
 
 Cross-package imports use the package name:
 - `@sofa/api/contract`, `@sofa/api/schemas` — Contract and types
@@ -109,16 +108,21 @@ Cross-package imports use the package name:
 - `orpc/` — oRPC server layer (context, middleware, router, handler, procedures/)
 - `routes/` — Non-RPC Hono routes (auth, images, avatars, backups, webhooks, lists, health)
 
-**Web app** (`apps/web/`):
-- `app/(pages)/` — Authenticated pages (dashboard, explore, titles/[id], people/[id], settings)
-- `app/(auth)/` — Auth pages (login, register, setup)
+**Web app** (`apps/web/src/`):
+- `main.tsx` — React root: creates router + renders `<RouterProvider />`
+- `routes/` — TanStack Router file-based routes (auto-generates `routeTree.gen.ts`)
+  - `__root.tsx` — Root layout (providers, head meta, global error/not-found)
+  - `_app.tsx` — Authenticated layout (auth guard via `beforeLoad`, navbar, shell)
+  - `_app/dashboard.tsx`, `_app/explore.tsx`, `_app/settings.tsx`, `_app/titles.$id.tsx`, `_app/people.$id.tsx`
+  - `_auth.tsx` — Auth layout (centering wrapper)
+  - `_auth/login.tsx`, `_auth/register.tsx`
+  - `index.tsx`, `setup.tsx`
 - `components/` — App components + `components/ui/` for shadcn primitives
-- `lib/orpc/client.ts` — Client-side oRPC client (browser, via Next.js rewrites)
-- `lib/orpc/client.server.ts` — Server-side oRPC client (SSR, forwards cookies to API server)
+- `lib/orpc/client.ts` — oRPC client (always same-origin via Vite proxy or Hono static serving)
 - `lib/orpc/tanstack.ts` — `orpc` utils for TanStack Query
-- `lib/auth/session.ts` — Cached session getter (calls API server's get-session endpoint)
 - `lib/auth/client.ts` — Better Auth client hooks
 - `lib/theme.ts` — Color theme CSS properties from title palettes
+- `styles/globals.css` — Tailwind + font imports
 
 **Shared packages**:
 - `packages/api/src/contract.ts` — Full oRPC API contract definition (~30 procedures)
@@ -130,12 +134,18 @@ Cross-package imports use the package name:
 
 ### Auth pattern
 
-**Web app** — Server components use the cached session helper which calls the API server:
+**Web app** — Route `beforeLoad` guards check session via Better Auth client SDK:
 
 ```typescript
-import { getSession } from "@/lib/auth/session";
-const session = await getSession();
+// In route file (e.g. _app.tsx)
+beforeLoad: async () => {
+  const { data: session } = await authClient.getSession();
+  if (!session) throw redirect({ to: "/login" });
+  return { session };
+},
 ```
+
+Session is available to child routes via `Route.useRouteContext()`.
 
 **API server** — oRPC procedures use auth middleware that calls Better Auth:
 
@@ -161,7 +171,7 @@ import { contract } from "@sofa/api/contract";
 **Pattern — query in component:**
 ```typescript
 import { useQuery } from "@tanstack/react-query";
-import { orpc } from "@/lib/orpc/tanstack";
+import { orpc } from "@/lib/orpc/client";
 
 const { data } = useQuery(orpc.dashboard.stats.queryOptions());
 ```
@@ -173,16 +183,22 @@ import { client } from "@/lib/orpc/client";
 await client.titles.updateStatus({ id: titleId, status: "in_progress" });
 ```
 
-**Pattern — server component with SSR data:**
+**Pattern — route loader with TanStack Query prefetch:**
 ```typescript
-import { serverClient } from "@/lib/orpc/client.server";
-
-const data = await serverClient.titles.detail({ id });
+export const Route = createFileRoute("/_app/titles/$id")({
+  loader: async ({ params, context }) => {
+    await context.queryClient.ensureQueryData(
+      orpc.titles.detail.queryOptions({ input: { id: params.id } }),
+    );
+  },
+  component: TitlePage,
+});
 ```
 
 **Page patterns:**
-- **Thin server shell** (titles, people): Server component fetches initial data via `serverClient`, passes as `initialData` prop to client component that uses TanStack Query via `orpc` for refetching/mutations.
-- **Full client-side** (dashboard, explore, settings): Server component handles auth only; client components fetch all data via `orpc.*.queryOptions()` with skeleton loading states.
+- **Route loaders** (titles, people): `beforeLoad`/`loader` prefetch data into TanStack Query cache via `queryClient.ensureQueryData()`. Components read via `useQuery()`/`useSuspenseQuery()`.
+- **Full client-side** (dashboard, explore, settings): Components fetch all data via `orpc.*.queryOptions()` with skeleton loading states.
+- **Error/loading states**: Routes use `pendingComponent`, `errorComponent`, `notFoundComponent`.
 
 ### Non-RPC routes (API server)
 
@@ -195,7 +211,7 @@ Hono route handlers in `apps/server/src/routes/`:
 - `/api/lists/:token` — External list feeds (Sonarr/Radarr)
 - `/api/health` — Simple health check (no auth)
 
-All routes are proxied through Next.js rewrites, so the browser only sees port 3000.
+In dev, Vite proxies these to the API server. In production, Hono serves both API and SPA — the browser only sees port 3000.
 
 ### Database schema
 
@@ -250,13 +266,11 @@ Defined in `apps/server/src/cron.ts` using croner, started when the API server b
 
 `DATA_DIR` (root for DB + cache, default `./data`), `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`. `DATABASE_URL` and `CACHE_DIR` are derived from `DATA_DIR` but can be overridden individually.
 
-`INTERNAL_API_URL` (default `http://localhost:3001`) — Used by the web app to reach the API server during SSR.
-
 Optional: `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_ISSUER_URL`, `OIDC_PROVIDER_NAME`, `OIDC_AUTO_REGISTER`, `DISABLE_PASSWORD_LOGIN` (OIDC/SSO support). `LOG_LEVEL` (error/warn/info/debug, default: info). `IMAGE_CACHE_ENABLED` (default: true).
 
 ### Docker deployment
 
-Single container, two processes. The API server starts first (port 3001, handles migrations + cron), then Next.js starts (port 3000, proxies API calls). Users only expose port 3000.
+Single container, single process. Hono serves both the API and the Vite-built SPA static files on port 3000. API routes (`/rpc/*`, `/api/*`) are mounted first; unmatched routes fall back to `index.html` for SPA routing.
 
 ## Browser Automation
 
