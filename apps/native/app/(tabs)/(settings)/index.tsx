@@ -1,10 +1,13 @@
 import {
+  IconCamera,
   IconChevronRight,
   IconCloud,
   IconDatabase,
+  IconDatabaseExport,
   IconLink,
   IconLogout,
   IconPhoto,
+  IconPlus,
   IconPuzzle,
   IconServer,
   type IconSettings,
@@ -13,7 +16,9 @@ import {
   IconUserPlus,
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -137,6 +142,169 @@ function SettingsSection({
   );
 }
 
+const PROVIDERS = ["plex", "jellyfin", "emby", "sonarr", "radarr"] as const;
+type Provider = (typeof PROVIDERS)[number];
+
+function IntegrationRow({
+  integration,
+}: {
+  integration: {
+    provider: string;
+    type: string;
+    token: string;
+    enabled: boolean;
+    lastEventAt: string | null;
+  };
+}) {
+  const deleteIntegration = useMutation(
+    orpc.integrations.delete.mutationOptions({
+      onSuccess: () => queryClient.invalidateQueries(),
+    }),
+  );
+
+  const regenerateToken = useMutation(
+    orpc.integrations.regenerateToken.mutationOptions({
+      onSuccess: () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        queryClient.invalidateQueries();
+      },
+    }),
+  );
+
+  const handlePress = () => {
+    Alert.alert(
+      integration.provider.charAt(0).toUpperCase() +
+        integration.provider.slice(1),
+      `Type: ${integration.type}\nToken: ${integration.token.slice(0, 8)}...`,
+      [
+        {
+          text: "Regenerate Token",
+          onPress: () =>
+            regenerateToken.mutate({
+              provider: integration.provider as Provider,
+            }),
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () =>
+            deleteIntegration.mutate({
+              provider: integration.provider as Provider,
+            }),
+        },
+        { text: "Cancel", style: "cancel" },
+      ],
+    );
+  };
+
+  return (
+    <SettingsRow
+      label={
+        integration.provider.charAt(0).toUpperCase() +
+        integration.provider.slice(1)
+      }
+      value={integration.enabled ? "Connected" : "Disabled"}
+      onPress={handlePress}
+    />
+  );
+}
+
+function AddIntegrationRow({ existing }: { existing: string[] }) {
+  const available = PROVIDERS.filter((p) => !existing.includes(p));
+
+  const createIntegration = useMutation(
+    orpc.integrations.create.mutationOptions({
+      onSuccess: () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        queryClient.invalidateQueries();
+      },
+    }),
+  );
+
+  if (available.length === 0) return null;
+
+  const handleAdd = () => {
+    Alert.alert("Add Integration", "Select a provider", [
+      ...available.map((provider) => ({
+        text: provider.charAt(0).toUpperCase() + provider.slice(1),
+        onPress: () => createIntegration.mutate({ provider }),
+      })),
+      { text: "Cancel", style: "cancel" as const },
+    ]);
+  };
+
+  return (
+    <SettingsRow
+      label="Add Integration"
+      icon={IconPuzzle}
+      onPress={handleAdd}
+    />
+  );
+}
+
+function BackupsSection() {
+  const backups = useQuery(orpc.admin.backups.list.queryOptions());
+
+  const createBackup = useMutation(
+    orpc.admin.backups.create.mutationOptions({
+      onSuccess: () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        queryClient.invalidateQueries();
+      },
+      onError: () => Alert.alert("Error", "Failed to create backup"),
+    }),
+  );
+
+  const deleteBackup = useMutation(
+    orpc.admin.backups.delete.mutationOptions({
+      onSuccess: () => queryClient.invalidateQueries(),
+    }),
+  );
+
+  const handleBackupPress = (filename: string) => {
+    Alert.alert("Backup", filename, [
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => deleteBackup.mutate({ filename }),
+      },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  };
+
+  const formatSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  return (
+    <SettingsSection title="Backups" icon={IconDatabaseExport} badge="Admin">
+      {backups.isPending ? (
+        <View className="items-center py-4">
+          <ActivityIndicator color={colors.primary} />
+        </View>
+      ) : (
+        <>
+          {backups.data?.backups.map((backup) => (
+            <SettingsRow
+              key={backup.filename}
+              label={backup.filename}
+              value={formatSize(backup.sizeBytes)}
+              onPress={() => handleBackupPress(backup.filename)}
+            />
+          ))}
+          <SettingsRow
+            label={createBackup.isPending ? "Creating..." : "Create Backup"}
+            icon={IconPlus}
+            onPress={() => createBackup.mutate()}
+          />
+        </>
+      )}
+    </SettingsSection>
+  );
+}
+
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -163,6 +331,66 @@ export default function SettingsScreen() {
     }),
   );
 
+  const uploadAvatar = useMutation(
+    orpc.account.uploadAvatar.mutationOptions({
+      onSuccess: () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        queryClient.invalidateQueries();
+      },
+      onError: () => {
+        Alert.alert("Error", "Failed to upload avatar");
+      },
+    }),
+  );
+
+  const removeAvatar = useMutation(
+    orpc.account.removeAvatar.mutationOptions({
+      onSuccess: () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        queryClient.invalidateQueries();
+      },
+    }),
+  );
+
+  const pickAvatar = useCallback(async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (result.canceled || !result.assets[0]) return;
+
+    const asset = result.assets[0];
+    const response = await fetch(asset.uri);
+    const blob = await response.blob();
+    const file = new File([blob], asset.fileName ?? "avatar.jpg", {
+      type: asset.mimeType ?? "image/jpeg",
+    });
+    uploadAvatar.mutate(file);
+  }, [uploadAvatar]);
+
+  const handleAvatarPress = useCallback(async () => {
+    const hasImage = !!session?.user?.image;
+    if (hasImage) {
+      Alert.alert("Profile Picture", "Choose an option", [
+        {
+          text: "Change Photo",
+          onPress: () => pickAvatar(),
+        },
+        {
+          text: "Remove Photo",
+          style: "destructive",
+          onPress: () => removeAvatar.mutate(),
+        },
+        { text: "Cancel", style: "cancel" },
+      ]);
+    } else {
+      pickAvatar();
+    }
+  }, [session?.user?.image, removeAvatar, pickAvatar]);
+
   const registration = useQuery({
     ...orpc.admin.registration.queryOptions(),
     enabled: isAdmin,
@@ -170,6 +398,17 @@ export default function SettingsScreen() {
 
   const toggleRegistration = useMutation(
     orpc.admin.toggleRegistration.mutationOptions({
+      onSuccess: () => queryClient.invalidateQueries(),
+    }),
+  );
+
+  const updateCheck = useQuery({
+    ...orpc.admin.updateCheck.queryOptions(),
+    enabled: isAdmin,
+  });
+
+  const toggleUpdateCheck = useMutation(
+    orpc.admin.toggleUpdateCheck.mutationOptions({
       onSuccess: () => queryClient.invalidateQueries(),
     }),
   );
@@ -229,38 +468,54 @@ export default function SettingsScreen() {
             borderBottomColor: colors.border,
           }}
         >
-          <View
-            className="mr-3 overflow-hidden"
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 22,
-              backgroundColor: colors.secondary,
-            }}
-          >
-            {session?.user?.image ? (
-              <Image
-                source={{ uri: session.user.image }}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="cover"
-              />
-            ) : (
-              <View
-                className="flex-1 items-center justify-center"
-                style={{ backgroundColor: `${colors.primary}15` }}
-              >
-                <Text
-                  style={{
-                    fontFamily: fonts.sansMedium,
-                    fontSize: 18,
-                    color: colors.primary,
-                  }}
+          <Pressable onPress={handleAvatarPress} className="mr-3">
+            <View
+              className="overflow-hidden"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: colors.secondary,
+              }}
+            >
+              {uploadAvatar.isPending ? (
+                <View className="flex-1 items-center justify-center">
+                  <ActivityIndicator size="small" color={colors.primary} />
+                </View>
+              ) : session?.user?.image ? (
+                <Image
+                  source={{ uri: session.user.image }}
+                  style={{ width: "100%", height: "100%" }}
+                  contentFit="cover"
+                />
+              ) : (
+                <View
+                  className="flex-1 items-center justify-center"
+                  style={{ backgroundColor: `${colors.primary}15` }}
                 >
-                  {session?.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
-                </Text>
-              </View>
-            )}
-          </View>
+                  <Text
+                    style={{
+                      fontFamily: fonts.sansMedium,
+                      fontSize: 18,
+                      color: colors.primary,
+                    }}
+                  >
+                    {session?.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
+                  </Text>
+                </View>
+              )}
+            </View>
+            <View
+              className="absolute right-0 bottom-0 items-center justify-center rounded-full"
+              style={{
+                width: 18,
+                height: 18,
+                backgroundColor: colors.primary,
+              }}
+            >
+              <IconCamera size={10} color={colors.primaryForeground} />
+            </View>
+          </Pressable>
           <View className="flex-1">
             {isEditingName ? (
               <View className="flex-row items-center gap-2">
@@ -355,21 +610,22 @@ export default function SettingsScreen() {
           <View className="items-center py-4">
             <ActivityIndicator color={colors.primary} />
           </View>
-        ) : integrations.data?.integrations &&
-          integrations.data.integrations.length > 0 ? (
-          integrations.data.integrations.map((integration) => (
-            <SettingsRow
-              key={integration.provider}
-              label={integration.provider}
-              value={integration.enabled ? "Connected" : "Disabled"}
-            />
-          ))
         ) : (
-          <View className="items-center py-4">
-            <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
-              No integrations configured
-            </Text>
-          </View>
+          <>
+            {integrations.data?.integrations &&
+              integrations.data.integrations.length > 0 &&
+              integrations.data.integrations.map((integration) => (
+                <IntegrationRow
+                  key={integration.provider}
+                  integration={integration}
+                />
+              ))}
+            <AddIntegrationRow
+              existing={
+                integrations.data?.integrations?.map((i) => i.provider) ?? []
+              }
+            />
+          </>
         )}
       </SettingsSection>
 
@@ -442,13 +698,59 @@ export default function SettingsScreen() {
               }
             />
           </View>
+          <View
+            className="flex-row items-center justify-between py-3.5"
+            style={{
+              borderBottomWidth: 0.5,
+              borderBottomColor: colors.border,
+            }}
+          >
+            <View className="flex-row items-center gap-3">
+              <IconCloud size={20} color={colors.mutedForeground} />
+              <Text style={{ fontSize: 15, color: colors.foreground }}>
+                Update Checks
+              </Text>
+            </View>
+            <Switch
+              value={updateCheck.data?.enabled ?? false}
+              onValueChange={(enabled) => toggleUpdateCheck.mutate({ enabled })}
+              trackColor={{
+                false: colors.secondary,
+                true: `${colors.primary}80`,
+              }}
+              thumbColor={
+                updateCheck.data?.enabled
+                  ? colors.primary
+                  : colors.mutedForeground
+              }
+            />
+          </View>
+          {updateCheck.data?.updateCheck?.updateAvailable && (
+            <View className="py-3.5">
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: colors.statusCompleted,
+                  fontFamily: fonts.sansMedium,
+                }}
+              >
+                Update available: {updateCheck.data.updateCheck.latestVersion}
+              </Text>
+            </View>
+          )}
         </SettingsSection>
       )}
+
+      {/* Admin: Backups */}
+      {isAdmin && <BackupsSection />}
 
       {/* Version */}
       <View className="mt-4 items-center">
         <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
-          Sofa Mobile v0.1.0
+          Sofa Mobile
+          {updateCheck.data?.updateCheck?.currentVersion
+            ? ` · Server ${updateCheck.data.updateCheck.currentVersion}`
+            : ""}
         </Text>
       </View>
     </ScrollView>

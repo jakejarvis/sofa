@@ -2,20 +2,67 @@ import { IconArrowLeft, IconMovie, IconUser } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
-  ActivityIndicator,
+  type NativeSyntheticEvent,
   Pressable,
   ScrollView,
   Text,
+  type TextLayoutEventData,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PosterCard } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
+import { Skeleton } from "@/components/ui/skeleton";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { orpc } from "@/utils/orpc";
+
+function ExpandableBio({ text }: { text: string }) {
+  const maxLines = 4;
+  const [expanded, setExpanded] = useState(false);
+  const [needsTruncation, setNeedsTruncation] = useState(false);
+
+  const onTextLayout = useCallback(
+    (e: NativeSyntheticEvent<TextLayoutEventData>) => {
+      if (!needsTruncation && e.nativeEvent.lines.length > maxLines) {
+        setNeedsTruncation(true);
+      }
+    },
+    [needsTruncation],
+  );
+
+  return (
+    <View className="mb-6 px-4">
+      <Text
+        numberOfLines={expanded ? undefined : maxLines}
+        onTextLayout={onTextLayout}
+        style={{
+          fontSize: 14,
+          lineHeight: 22,
+          color: colors.foreground,
+        }}
+      >
+        {text}
+      </Text>
+      {needsTruncation && (
+        <Pressable onPress={() => setExpanded(!expanded)} className="mt-1">
+          <Text
+            style={{
+              fontSize: 13,
+              color: colors.primary,
+              fontFamily: fonts.sansMedium,
+            }}
+          >
+            {expanded ? "Show less" : "Show more"}
+          </Text>
+        </Pressable>
+      )}
+    </View>
+  );
+}
 
 export default function PersonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -29,10 +76,42 @@ export default function PersonDetailScreen() {
   if (isPending) {
     return (
       <View
-        className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.background }}
+        style={{
+          backgroundColor: colors.background,
+          flex: 1,
+          paddingTop: insets.top + 56,
+        }}
+        className="items-center"
       >
-        <ActivityIndicator size="large" color={colors.primary} />
+        {/* Profile photo skeleton */}
+        <Skeleton width={120} height={120} borderRadius={60} />
+        {/* Name skeleton */}
+        <Skeleton
+          width={180}
+          height={28}
+          borderRadius={6}
+          style={{ marginTop: 16 }}
+        />
+        {/* Department badge skeleton */}
+        <Skeleton
+          width={80}
+          height={24}
+          borderRadius={12}
+          style={{ marginTop: 8 }}
+        />
+        {/* Bio skeleton */}
+        <View
+          style={{
+            alignSelf: "stretch",
+            paddingHorizontal: 16,
+            marginTop: 24,
+            gap: 8,
+          }}
+        >
+          <Skeleton width="100%" height={14} />
+          <Skeleton width="100%" height={14} />
+          <Skeleton width="60%" height={14} />
+        </View>
       </View>
     );
   }
@@ -148,19 +227,7 @@ export default function PersonDetailScreen() {
       </View>
 
       {/* Biography */}
-      {person.biography && (
-        <View className="mb-6 px-4">
-          <Text
-            style={{
-              fontSize: 14,
-              lineHeight: 22,
-              color: colors.foreground,
-            }}
-          >
-            {person.biography}
-          </Text>
-        </View>
-      )}
+      {person.biography && <ExpandableBio text={person.biography} />}
 
       {/* Filmography */}
       {filmography.length > 0 && (

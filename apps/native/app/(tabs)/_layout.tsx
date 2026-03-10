@@ -9,11 +9,15 @@ import { Redirect, Tabs } from "expo-router";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { authClient } from "@/lib/auth-client";
+import { hasStoredServerUrl } from "@/lib/server-url";
 
 export default function TabLayout() {
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) return null;
+  if (!process.env.EXPO_PUBLIC_SERVER_URL && !hasStoredServerUrl()) {
+    return <Redirect href="/(auth)/server-url" />;
+  }
   if (!session) return <Redirect href="/(auth)/login" />;
 
   return (

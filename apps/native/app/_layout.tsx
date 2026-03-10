@@ -17,6 +17,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { Uniwind } from "uniwind";
 
+import { OfflineBanner } from "@/components/ui/offline-banner";
+import { TitleActionSheetProvider } from "@/components/ui/title-action-sheet";
 import { colors } from "@/constants/colors";
 import { queryClient } from "@/utils/orpc";
 
@@ -53,8 +55,9 @@ function AppContent() {
   }
 
   return (
-    <>
+    <TitleActionSheetProvider>
       <StatusBar style="light" />
+      <OfflineBanner />
       <Stack
         screenOptions={{
           headerShown: false,
@@ -73,7 +76,7 @@ function AppContent() {
           options={{ animation: "slide_from_right" }}
         />
       </Stack>
-    </>
+    </TitleActionSheetProvider>
   );
 }
 

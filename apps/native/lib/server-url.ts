@@ -19,6 +19,10 @@ export async function setServerUrl(url: string): Promise<void> {
   cachedUrl = normalized;
 }
 
+export function hasStoredServerUrl(): boolean {
+  return SecureStore.getItem(SERVER_URL_KEY) !== null;
+}
+
 export async function getStoredServerUrl(): Promise<string | null> {
   return SecureStore.getItemAsync(SERVER_URL_KEY);
 }

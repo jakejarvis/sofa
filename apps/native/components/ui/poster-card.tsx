@@ -20,6 +20,8 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 
+import { Skeleton } from "@/components/ui/skeleton";
+import { useTitleActions } from "@/components/ui/title-action-sheet";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { orpc, queryClient } from "@/utils/orpc";
@@ -60,6 +62,7 @@ export function PosterCard({
   width = 140,
 }: PosterCardProps) {
   const router = useRouter();
+  const { showActions } = useTitleActions();
   const scale = useSharedValue(1);
   const [localStatus, setLocalStatus] = useState<TitleStatus | null>(
     userStatus ?? null,
@@ -109,6 +112,16 @@ export function PosterCard({
     scale.value = withSpring(1, { damping: 15, stiffness: 300 });
   }, [scale]);
 
+  const handleLongPress = useCallback(() => {
+    showActions({
+      id,
+      tmdbId,
+      title,
+      type,
+      userStatus: localStatus,
+    });
+  }, [id, tmdbId, title, type, localStatus, showActions]);
+
   const handleQuickAdd = useCallback(() => {
     if (localStatus || quickAddMutation.isPending) return;
     quickAddMutation.mutate({ tmdbId, type });
@@ -120,6 +133,7 @@ export function PosterCard({
   return (
     <AnimatedPressable
       onPress={handlePress}
+      onLongPress={handleLongPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={[animatedStyle, { width }]}
@@ -282,31 +296,10 @@ export function PosterCardSkeleton({ width = 140 }: { width?: number }) {
         borderColor: "rgba(255,255,255,0.06)",
       }}
     >
-      <View
-        style={{
-          width,
-          height: imageHeight,
-          backgroundColor: colors.secondary,
-        }}
-      />
+      <Skeleton width={width} height={imageHeight} borderRadius={0} />
       <View className="px-2.5 pt-2 pb-2.5">
-        <View
-          style={{
-            height: 14,
-            width: "75%",
-            borderRadius: 4,
-            backgroundColor: colors.secondary,
-          }}
-        />
-        <View
-          style={{
-            height: 10,
-            width: "50%",
-            borderRadius: 4,
-            backgroundColor: colors.secondary,
-            marginTop: 6,
-          }}
-        />
+        <Skeleton width="75%" height={14} />
+        <Skeleton width="50%" height={10} style={{ marginTop: 6 }} />
       </View>
     </View>
   );

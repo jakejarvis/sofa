@@ -3,7 +3,6 @@ import {
   IconBookmark,
   IconCheck,
   IconChevronDown,
-  IconChevronUp,
   IconCircleCheck,
   IconCircleCheckFilled,
   IconCircleDashed,
@@ -18,7 +17,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { NativeSyntheticEvent, TextLayoutEventData } from "react-native";
 import {
   ActivityIndicator,
   FlatList,
@@ -28,10 +28,18 @@ import {
   Text,
   View,
 } from "react-native";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PosterCard } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
+import { Skeleton } from "@/components/ui/skeleton";
 import { StarRating } from "@/components/ui/star-rating";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
@@ -169,10 +177,19 @@ function SeasonAccordion({
   watchedEpisodeIds: Set<string>;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const chevronRotation = useSharedValue(0);
   const watchedCount = episodes.filter((e) =>
     watchedEpisodeIds.has(e.id),
   ).length;
   const progress = episodes.length > 0 ? watchedCount / episodes.length : 0;
+
+  useEffect(() => {
+    chevronRotation.value = withTiming(expanded ? 180 : 0, { duration: 200 });
+  }, [expanded, chevronRotation]);
+
+  const chevronStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${chevronRotation.value}deg` }],
+  }));
 
   const watchEpisode = useMutation(
     orpc.episodes.watch.mutationOptions({
@@ -250,15 +267,16 @@ function SeasonAccordion({
           />
         </View>
 
-        {expanded ? (
-          <IconChevronUp size={18} color={colors.mutedForeground} />
-        ) : (
+        <Animated.View style={chevronStyle}>
           <IconChevronDown size={18} color={colors.mutedForeground} />
-        )}
+        </Animated.View>
       </Pressable>
 
       {expanded && (
-        <View>
+        <Animated.View
+          entering={FadeIn.duration(200)}
+          exiting={FadeOut.duration(150)}
+        >
           {watchedCount < episodes.length && (
             <Pressable
               onPress={() => watchSeason.mutate({ id: season.id })}
@@ -291,7 +309,7 @@ function SeasonAccordion({
               }}
             />
           ))}
-        </View>
+        </Animated.View>
       )}
     </View>
   );
@@ -359,6 +377,55 @@ function CastCard({
   );
 }
 
+function ExpandableText({
+  text,
+  maxLines = 3,
+}: {
+  text: string;
+  maxLines?: number;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [needsTruncation, setNeedsTruncation] = useState(false);
+
+  const onTextLayout = useCallback(
+    (e: NativeSyntheticEvent<TextLayoutEventData>) => {
+      if (!needsTruncation && e.nativeEvent.lines.length > maxLines) {
+        setNeedsTruncation(true);
+      }
+    },
+    [needsTruncation, maxLines],
+  );
+
+  return (
+    <View className="mt-5 px-4">
+      <Text
+        numberOfLines={expanded ? undefined : maxLines}
+        onTextLayout={onTextLayout}
+        style={{
+          fontSize: 14,
+          lineHeight: 22,
+          color: colors.foreground,
+        }}
+      >
+        {text}
+      </Text>
+      {needsTruncation && (
+        <Pressable onPress={() => setExpanded(!expanded)} className="mt-1">
+          <Text
+            style={{
+              fontSize: 13,
+              color: colors.primary,
+              fontFamily: fonts.sansMedium,
+            }}
+          >
+            {expanded ? "Show less" : "Show more"}
+          </Text>
+        </Pressable>
+      )}
+    </View>
+  );
+}
+
 export default function TitleDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
@@ -411,11 +478,33 @@ export default function TitleDetailScreen() {
 
   if (detail.isPending) {
     return (
-      <View
-        className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.background }}
-      >
-        <ActivityIndicator size="large" color={colors.primary} />
+      <View style={{ backgroundColor: colors.background, flex: 1 }}>
+        {/* Hero skeleton */}
+        <Skeleton width="100%" height={300} borderRadius={0} />
+        {/* Genre chips skeleton */}
+        <View
+          className="mt-3 flex-row"
+          style={{ paddingHorizontal: 16, gap: 8 }}
+        >
+          <Skeleton width={60} height={24} borderRadius={12} />
+          <Skeleton width={80} height={24} borderRadius={12} />
+          <Skeleton width={50} height={24} borderRadius={12} />
+        </View>
+        {/* Actions skeleton */}
+        <View
+          className="mt-4 flex-row"
+          style={{ paddingHorizontal: 16, gap: 8 }}
+        >
+          <Skeleton width={100} height={36} borderRadius={18} />
+          <Skeleton width={90} height={36} borderRadius={18} />
+          <Skeleton width={105} height={36} borderRadius={18} />
+        </View>
+        {/* Overview skeleton */}
+        <View style={{ paddingHorizontal: 16, marginTop: 20, gap: 8 }}>
+          <Skeleton width="100%" height={14} />
+          <Skeleton width="100%" height={14} />
+          <Skeleton width="70%" height={14} />
+        </View>
       </View>
     );
   }
@@ -644,19 +733,7 @@ export default function TitleDetailScreen() {
       </View>
 
       {/* Overview */}
-      {title.overview && (
-        <View className="mt-5 px-4">
-          <Text
-            style={{
-              fontSize: 14,
-              lineHeight: 22,
-              color: colors.foreground,
-            }}
-          >
-            {title.overview}
-          </Text>
-        </View>
-      )}
+      {title.overview && <ExpandableText text={title.overview} />}
 
       {/* Availability */}
       {availability.length > 0 && (
