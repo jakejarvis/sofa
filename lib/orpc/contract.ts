@@ -63,20 +63,24 @@ export const contract = {
       .output(TitleResolveOutput),
     updateStatus: oc
       .route({ method: "PUT", path: "/titles/{id}/status", tags: ["Titles"] })
-      .input(UpdateStatusInput),
+      .input(UpdateStatusInput)
+      .output(z.void()),
     updateRating: oc
       .route({ method: "PUT", path: "/titles/{id}/rating", tags: ["Titles"] })
-      .input(UpdateRatingInput),
+      .input(UpdateRatingInput)
+      .output(z.void()),
     watchMovie: oc
       .route({ method: "POST", path: "/titles/{id}/watch", tags: ["Titles"] })
-      .input(IdParam),
+      .input(IdParam)
+      .output(z.void()),
     watchAll: oc
       .route({
         method: "POST",
         path: "/titles/{id}/watch-all",
         tags: ["Titles"],
       })
-      .input(IdParam),
+      .input(IdParam)
+      .output(z.void()),
     userInfo: oc
       .route({
         method: "GET",
@@ -101,21 +105,24 @@ export const contract = {
         path: "/episodes/{id}/watch",
         tags: ["Episodes"],
       })
-      .input(IdParam),
+      .input(IdParam)
+      .output(z.void()),
     unwatch: oc
       .route({
         method: "POST",
         path: "/episodes/{id}/unwatch",
         tags: ["Episodes"],
       })
-      .input(IdParam),
+      .input(IdParam)
+      .output(z.void()),
     batchWatch: oc
       .route({
         method: "POST",
         path: "/episodes/batch-watch",
         tags: ["Episodes"],
       })
-      .input(BatchWatchInput),
+      .input(BatchWatchInput)
+      .output(z.void()),
   },
   seasons: {
     watch: oc
@@ -124,14 +131,16 @@ export const contract = {
         path: "/seasons/{id}/watch",
         tags: ["Seasons"],
       })
-      .input(IdParam),
+      .input(IdParam)
+      .output(z.void()),
     unwatch: oc
       .route({
         method: "POST",
         path: "/seasons/{id}/unwatch",
         tags: ["Seasons"],
       })
-      .input(IdParam),
+      .input(IdParam)
+      .output(z.void()),
   },
   people: {
     detail: oc
@@ -212,7 +221,8 @@ export const contract = {
         path: "/integrations/{provider}",
         tags: ["Integrations"],
       })
-      .input(ProviderParam),
+      .input(ProviderParam)
+      .output(z.void()),
     regenerateToken: oc
       .route({
         method: "POST",
@@ -237,14 +247,16 @@ export const contract = {
           path: "/admin/backups/{filename}",
           tags: ["Admin"],
         })
-        .input(FilenameParam),
+        .input(FilenameParam)
+        .output(z.void()),
       restore: oc
         .route({
           method: "POST",
           path: "/admin/backups/restore",
           tags: ["Admin"],
         })
-        .input(RestoreBackupInput),
+        .input(RestoreBackupInput)
+        .output(z.void()),
       schedule: oc
         .route({
           method: "GET",
@@ -258,20 +270,23 @@ export const contract = {
           path: "/admin/backups/schedule",
           tags: ["Admin"],
         })
-        .input(UpdateScheduleInput),
+        .input(UpdateScheduleInput)
+        .output(z.void()),
     },
     registration: oc
       .route({ method: "GET", path: "/admin/registration", tags: ["Admin"] })
       .output(RegistrationOutput),
     toggleRegistration: oc
       .route({ method: "PUT", path: "/admin/registration", tags: ["Admin"] })
-      .input(ToggleRegistrationInput),
+      .input(ToggleRegistrationInput)
+      .output(z.void()),
     updateCheck: oc
       .route({ method: "GET", path: "/admin/update-check", tags: ["Admin"] })
       .output(UpdateCheckOutput),
     toggleUpdateCheck: oc
       .route({ method: "PUT", path: "/admin/update-check", tags: ["Admin"] })
-      .input(ToggleUpdateCheckInput),
+      .input(ToggleUpdateCheckInput)
+      .output(z.void()),
     triggerJob: oc
       .route({
         method: "POST",
@@ -284,14 +299,16 @@ export const contract = {
   account: {
     updateName: oc
       .route({ method: "PUT", path: "/account/name", tags: ["Account"] })
-      .input(UpdateNameInput),
+      .input(UpdateNameInput)
+      .output(z.void()),
     uploadAvatar: oc
       .route({ method: "POST", path: "/account/avatar", tags: ["Account"] })
       .input(UploadAvatarInput)
       .output(UploadAvatarOutput),
     removeAvatar: oc
       .route({ method: "DELETE", path: "/account/avatar", tags: ["Account"] })
-      .input(z.void()),
+      .input(z.void())
+      .output(z.void()),
   },
   watchlist: {
     quickAdd: oc
