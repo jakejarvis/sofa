@@ -8,6 +8,11 @@ import { router } from "./router";
 
 const log = createLogger("openapi");
 
+const isSecure = (process.env.BETTER_AUTH_URL ?? "").startsWith("https://");
+const sessionCookieName = isSecure
+  ? "__Secure-better-auth.session_token"
+  : "better-auth.session_token";
+
 // https://orpc.dev/docs/openapi/plugins/smart-coercion
 const schemaConverters = [new ZodToJsonSchemaConverter()];
 
@@ -26,7 +31,7 @@ export const openApiHandler = new OpenAPIHandler(router, {
           securitySchemes: {
             session: {
               type: "apiKey",
-              name: "better-auth.session_token",
+              name: sessionCookieName,
               in: "cookie",
               description: "Better Auth session cookie",
             },

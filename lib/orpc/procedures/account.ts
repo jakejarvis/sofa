@@ -26,20 +26,22 @@ export const uploadAvatar = os.account.uploadAvatar
   .handler(async ({ input: file, context }) => {
     await mkdir(AVATAR_DIR, { recursive: true });
 
-    // Remove any existing avatar for this user
-    const glob = new Bun.Glob(`${context.user.id}.*`);
-    const existing = await Array.fromAsync(glob.scan(AVATAR_DIR));
-    for (const match of existing) {
-      await Bun.file(path.join(AVATAR_DIR, match)).delete();
-    }
-
-    // Write new avatar (atomic: temp file + rename)
+    // Write new avatar first (atomic: temp file + rename)
     const ext = MIME_TO_EXT[file.type] || "jpg";
     const filename = `${context.user.id}.${ext}`;
     const filePath = path.join(AVATAR_DIR, filename);
     const tmpPath = `${filePath}.tmp.${Date.now()}`;
     await Bun.write(tmpPath, file);
     await rename(tmpPath, filePath);
+
+    // Remove any previous avatar with a different extension
+    const glob = new Bun.Glob(`${context.user.id}.*`);
+    const existing = await Array.fromAsync(glob.scan(AVATAR_DIR));
+    for (const match of existing) {
+      if (match !== filename) {
+        await Bun.file(path.join(AVATAR_DIR, match)).delete();
+      }
+    }
 
     // Update user via Better Auth
     const imageUrl = `/api/avatars/${context.user.id}?v=${Date.now()}`;

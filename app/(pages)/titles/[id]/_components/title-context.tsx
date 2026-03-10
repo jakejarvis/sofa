@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { createContext, use } from "react";
+import { useSession } from "@/lib/auth/client";
 import type { Season } from "@/lib/orpc/schemas";
 import { orpc } from "@/lib/orpc/tanstack";
 
@@ -26,9 +27,11 @@ export function useTitleContext() {
 
 export function useTitleUserInfo() {
   const { titleId } = useTitleContext();
-  const { data } = useQuery(
-    orpc.titles.userInfo.queryOptions({ input: { id: titleId } }),
-  );
+  const { data: session } = useSession();
+  const { data } = useQuery({
+    ...orpc.titles.userInfo.queryOptions({ input: { id: titleId } }),
+    enabled: !!session,
+  });
   return {
     userStatus: data?.status ?? null,
     userRating: data?.rating ?? 0,

@@ -105,7 +105,7 @@ export const UploadAvatarOutput = z.object({ imageUrl: z.string() });
 
 export const RestoreBackupInput = z
   .file()
-  .max(500 * 1024 * 1024, "File too large");
+  .max(100 * 1024 * 1024, "File too large (max 100 MB)");
 
 // ═══════════════════════════════════════════════════════════════
 // Output schemas

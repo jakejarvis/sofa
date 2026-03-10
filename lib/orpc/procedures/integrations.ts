@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { integrationEvents, integrations } from "@/lib/db/schema";
 import { os } from "../context";
@@ -40,28 +40,19 @@ export const list = os.integrations.list.use(authed).handler(({ context }) => {
     .where(eq(integrations.userId, context.user.id))
     .all();
 
-  const integrationIds = userIntegrations.map((i) => i.id);
-
-  const allEvents =
-    integrationIds.length > 0
-      ? db
-          .select()
-          .from(integrationEvents)
-          .where(inArray(integrationEvents.integrationId, integrationIds))
-          .orderBy(desc(integrationEvents.receivedAt))
-          .all()
-      : [];
-
-  const eventsByIntegration = new Map<string, typeof allEvents>();
-  for (const event of allEvents) {
-    let group = eventsByIntegration.get(event.integrationId);
-    if (!group) {
-      group = [];
-      eventsByIntegration.set(event.integrationId, group);
-    }
-    if (group.length < 10) {
-      group.push(event);
-    }
+  const eventsByIntegration = new Map<
+    string,
+    (typeof integrationEvents.$inferSelect)[]
+  >();
+  for (const integration of userIntegrations) {
+    const events = db
+      .select()
+      .from(integrationEvents)
+      .where(eq(integrationEvents.integrationId, integration.id))
+      .orderBy(desc(integrationEvents.receivedAt))
+      .limit(10)
+      .all();
+    eventsByIntegration.set(integration.id, events);
   }
 
   const result = userIntegrations.map((integration) => {

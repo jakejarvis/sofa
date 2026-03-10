@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Season } from "@/lib/orpc/schemas";
 import { orpc } from "@/lib/orpc/tanstack";
 import { TitleContext } from "./title-context";
@@ -29,11 +29,13 @@ export function TitleProvider({
   const [seasons, setSeasons] = useState(initialSeasons);
   const [watchingEp, setWatchingEp] = useState<string | null>(null);
 
-  // Always overwrite the cache with fresh server-fetched data on mount.
+  // Seed the query cache with server-fetched data on mount.
   // Unlike initialData (which is a no-op when the cache already has an entry),
   // this ensures revisiting a title or signing into a different account never
   // renders stale or another user's data.
-  useState(() => {
+  // The parent passes key={title.id}, so React remounts on navigation and the
+  // cache for the new title ID starts empty.
+  useEffect(() => {
     queryClient.setQueryData(
       orpc.titles.userInfo.queryKey({ input: { id: titleId } }),
       {
@@ -46,7 +48,13 @@ export function TitleProvider({
         episodeWatches: initialEpisodeWatches,
       },
     );
-  });
+  }, [
+    queryClient,
+    titleId,
+    initialStatus,
+    initialRating,
+    initialEpisodeWatches,
+  ]);
 
   return (
     <TitleContext

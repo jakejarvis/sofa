@@ -81,7 +81,11 @@ export function useTitleActions() {
           `Caught up — marked ${episodeIds.length} episode${episodeIds.length > 1 ? "s" : ""} as watched`,
         );
       } catch {
-        setUserInfo(() => prev);
+        setUserInfo((old) => ({
+          ...old,
+          episodeWatches: prev.episodeWatches,
+          status: prev.status,
+        }));
         toast.error("Failed to catch up");
       }
     },
@@ -90,7 +94,7 @@ export function useTitleActions() {
 
   const handleStatusChange = useCallback(
     async (status: string | null) => {
-      const prev = getUserInfo();
+      const prevStatus = getUserInfo().status;
       setUserInfo((old) => ({
         ...old,
         status:
@@ -105,7 +109,7 @@ export function useTitleActions() {
         });
         toast.success(status ? "Added to watchlist" : "Removed from library");
       } catch {
-        setUserInfo(() => prev);
+        setUserInfo((old) => ({ ...old, status: prevStatus }));
         toast.error("Failed to update status");
       }
     },
@@ -114,7 +118,7 @@ export function useTitleActions() {
 
   const handleRating = useCallback(
     async (ratingStars: number) => {
-      const prev = getUserInfo();
+      const prevRating = getUserInfo().rating;
       setUserInfo((old) => ({ ...old, rating: ratingStars }));
       try {
         await updateRatingMutation.mutateAsync({
@@ -127,7 +131,7 @@ export function useTitleActions() {
             : "Rating removed",
         );
       } catch {
-        setUserInfo(() => prev);
+        setUserInfo((old) => ({ ...old, rating: prevRating }));
         toast.error("Failed to update rating");
       }
     },
@@ -135,13 +139,13 @@ export function useTitleActions() {
   );
 
   const handleWatchMovie = useCallback(async () => {
-    const prev = getUserInfo();
+    const prevStatus = getUserInfo().status;
     setUserInfo((old) => ({ ...old, status: "completed" }));
     try {
       await watchMovieMutation.mutateAsync({ id: titleId });
       toast.success(`Marked "${titleName}" as watched`);
     } catch {
-      setUserInfo(() => prev);
+      setUserInfo((old) => ({ ...old, status: prevStatus }));
       toast.error("Failed to mark as watched");
     }
   }, [getUserInfo, setUserInfo, titleId, titleName, watchMovieMutation]);
@@ -156,7 +160,8 @@ export function useTitleActions() {
       setWatchingEp(episodeId);
 
       if (isWatched) {
-        const prev = getUserInfo();
+        const prevWatches = getUserInfo().episodeWatches;
+        const prevStatus = getUserInfo().status;
         setUserInfo((old) => ({
           ...old,
           episodeWatches: old.episodeWatches.filter((id) => id !== episodeId),
@@ -167,12 +172,17 @@ export function useTitleActions() {
           await unwatchEpMutation.mutateAsync({ id: episodeId });
           toast.success(`Unwatched S${seasonNum} E${epNum}`);
         } catch {
-          setUserInfo(() => prev);
+          setUserInfo((old) => ({
+            ...old,
+            episodeWatches: prevWatches,
+            status: prevStatus,
+          }));
           toast.error("Failed to unmark episode");
         }
       } else {
-        const prev = getUserInfo();
-        const currentWatches = prev.episodeWatches;
+        const prevWatches = getUserInfo().episodeWatches;
+        const prevStatus = getUserInfo().status;
+        const currentWatches = prevWatches;
         const newWatches = currentWatches.includes(episodeId)
           ? currentWatches
           : [...currentWatches, episodeId];
@@ -218,7 +228,11 @@ export function useTitleActions() {
             toast.success(`Watched S${seasonNum} E${epNum}`);
           }
         } catch {
-          setUserInfo(() => prev);
+          setUserInfo((old) => ({
+            ...old,
+            episodeWatches: prevWatches,
+            status: prevStatus,
+          }));
           toast.error("Failed to mark episode");
         }
       }
@@ -238,8 +252,9 @@ export function useTitleActions() {
 
   const handleMarkSeason = useCallback(
     async (season: Season) => {
-      const prev = getUserInfo();
-      const watchedSet = new Set(prev.episodeWatches);
+      const prevWatches = getUserInfo().episodeWatches;
+      const prevStatus = getUserInfo().status;
+      const watchedSet = new Set(prevWatches);
       const unwatched = season.episodes.filter((ep) => !watchedSet.has(ep.id));
       if (unwatched.length === 0) return;
 
@@ -290,7 +305,11 @@ export function useTitleActions() {
           toast.success(`Watched all of ${seasonLabel}`);
         }
       } catch {
-        setUserInfo(() => prev);
+        setUserInfo((old) => ({
+          ...old,
+          episodeWatches: prevWatches,
+          status: prevStatus,
+        }));
         toast.error("Failed to mark some episodes");
       }
     },
@@ -299,7 +318,8 @@ export function useTitleActions() {
 
   const handleUnmarkSeason = useCallback(
     async (season: Season) => {
-      const prev = getUserInfo();
+      const prevWatches = getUserInfo().episodeWatches;
+      const prevStatus = getUserInfo().status;
       const seasonEpIds = new Set(season.episodes.map((ep) => ep.id));
       setUserInfo((old) => ({
         ...old,
@@ -313,7 +333,11 @@ export function useTitleActions() {
           `Unwatched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
         );
       } catch {
-        setUserInfo(() => prev);
+        setUserInfo((old) => ({
+          ...old,
+          episodeWatches: prevWatches,
+          status: prevStatus,
+        }));
         toast.error("Failed to unmark some episodes");
       }
     },
@@ -321,7 +345,8 @@ export function useTitleActions() {
   );
 
   const handleMarkAllWatched = useCallback(async () => {
-    const prev = getUserInfo();
+    const prevWatches = getUserInfo().episodeWatches;
+    const prevStatus = getUserInfo().status;
     const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));
     setUserInfo((old) => ({
       ...old,
@@ -332,7 +357,11 @@ export function useTitleActions() {
       await watchAllMutation.mutateAsync({ id: titleId });
       toast.success("Marked all episodes as watched");
     } catch {
-      setUserInfo(() => prev);
+      setUserInfo((old) => ({
+        ...old,
+        episodeWatches: prevWatches,
+        status: prevStatus,
+      }));
       toast.error("Failed to mark all episodes as watched");
     }
   }, [getUserInfo, setUserInfo, seasons, titleId, watchAllMutation]);

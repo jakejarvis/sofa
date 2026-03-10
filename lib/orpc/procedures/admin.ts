@@ -1,8 +1,11 @@
+import path from "node:path";
 import { ORPCError } from "@orpc/server";
+import { BACKUP_DIR } from "@/lib/constants";
 import { rescheduleBackup, triggerJob } from "@/lib/cron";
 import {
   createBackup,
   deleteBackup,
+  ensureBackupDir,
   listBackups,
   restoreFromBackup,
 } from "@/lib/services/backup";
@@ -38,8 +41,21 @@ export const backupsDelete = os.admin.backups.delete
 export const backupsRestore = os.admin.backups.restore
   .use(admin)
   .handler(async ({ input: file }) => {
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await restoreFromBackup(buffer);
+    // Stream upload to disk to avoid buffering the entire file in memory
+    await ensureBackupDir();
+    const tmpPath = path.join(
+      BACKUP_DIR,
+      `.upload-${Date.now()}-${crypto.randomUUID()}.db`,
+    );
+    try {
+      await Bun.write(tmpPath, file);
+      await restoreFromBackup(tmpPath);
+    } catch (err) {
+      // Clean up the upload file if restoreFromBackup didn't consume it
+      const f = Bun.file(tmpPath);
+      if (await f.exists()) await f.delete();
+      throw err;
+    }
   });
 
 export const backupsSchedule = os.admin.backups.schedule
