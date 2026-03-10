@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.6",
-    "turbo": "2.8.15"
+    "turbo": "2.8.15",
+    "typescript": "catalog:"
   }
 }

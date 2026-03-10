@@ -1,5 +1,6 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { orpc, queryClient } from "@/lib/orpc/client";
 import { routeTree } from "./routeTree.gen";
@@ -23,7 +24,9 @@ declare module "@tanstack/react-router" {
   }
 }
 
-// biome-ignore lint/style/noNonNullAssertion: tanstack router best practice
+// biome-ignore lint/style/noNonNullAssertion: this is fine
 createRoot(document.getElementById("root")!).render(
-  <RouterProvider router={router} />,
+  <StrictMode>
+    <RouterProvider router={router} />
+  </StrictMode>,
 );
