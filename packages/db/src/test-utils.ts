@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite";
-import * as schema from "@sofa/db/schema";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import * as schema from "./schema";
 
 const {
   user,
@@ -22,7 +22,8 @@ testClient.run("PRAGMA foreign_keys = ON");
 export const testDb = drizzle({ client: testClient, schema });
 
 export function applyMigrations() {
-  migrate(testDb, { migrationsFolder: "../db/drizzle" });
+  const migrationsFolder = `${import.meta.dir}/../drizzle`;
+  migrate(testDb, { migrationsFolder });
 }
 
 export function clearAllTables() {

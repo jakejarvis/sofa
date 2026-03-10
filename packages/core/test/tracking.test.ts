@@ -7,6 +7,13 @@ import {
   userTitleStatus,
 } from "@sofa/db/schema";
 import {
+  clearAllTables,
+  insertTitle,
+  insertTvShow,
+  insertUser,
+  testDb,
+} from "@sofa/db/test-utils";
+import {
   getUserTitleInfo,
   logEpisodeWatch,
   logEpisodeWatchBatch,
@@ -18,13 +25,6 @@ import {
   unwatchEpisode,
   unwatchSeason,
 } from "../src/tracking";
-import {
-  clearAllTables,
-  insertTitle,
-  insertTvShow,
-  insertUser,
-  testDb,
-} from "./sqlite";
 
 beforeEach(() => {
   clearAllTables();

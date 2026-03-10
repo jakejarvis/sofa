@@ -1,14 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import {
-  getContinueWatchingFeed,
-  getNewAvailableFeed,
-  getRecommendationsFeed,
-  getRecommendationsForTitle,
-  getUserStats,
-  getWatchCount,
-  getWatchHistory,
-} from "../src/discovery";
-import {
   clearAllTables,
   insertAvailabilityOffer,
   insertEpisodeWatch,
@@ -19,7 +10,16 @@ import {
   insertTitle,
   insertTvShow,
   insertUser,
-} from "./sqlite";
+} from "@sofa/db/test-utils";
+import {
+  getContinueWatchingFeed,
+  getNewAvailableFeed,
+  getRecommendationsFeed,
+  getRecommendationsForTitle,
+  getUserStats,
+  getWatchCount,
+  getWatchHistory,
+} from "../src/discovery";
 
 beforeEach(() => {
   clearAllTables();

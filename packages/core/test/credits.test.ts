@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { persons, titleCast } from "@sofa/db/schema";
-import { clearAllTables, insertTitle, testDb } from "./sqlite";
+import { clearAllTables, insertTitle, testDb } from "@sofa/db/test-utils";
 
 mock.module("../src/image-cache", () => ({
   imageCacheEnabled: () => false,

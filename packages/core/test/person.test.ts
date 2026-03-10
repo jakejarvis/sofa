@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { persons, titleCast } from "@sofa/db/schema";
+import { clearAllTables, insertTitle, testDb } from "@sofa/db/test-utils";
 import { getLocalFilmography } from "../src/person";
-import { clearAllTables, insertTitle, testDb } from "./sqlite";
 
 beforeEach(() => {
   clearAllTables();

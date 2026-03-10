@@ -7,7 +7,8 @@
     "./client": "./src/client.ts",
     "./schema": "./src/schema.ts",
     "./helpers": "./src/helpers.ts",
-    "./migrate": "./src/migrate.ts"
+    "./migrate": "./src/migrate.ts",
+    "./test-utils": "./src/test-utils.ts"
   },
   "scripts": {
     "lint": "biome check",

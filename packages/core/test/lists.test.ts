@@ -1,17 +1,17 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 import {
-  getRadarrList,
-  getSonarrList,
-  parseStatusParam,
-  resolveListToken,
-} from "../src/lists";
-import {
   clearAllTables,
   insertIntegration,
   insertStatus,
   insertTitle,
   insertUser,
-} from "./sqlite";
+} from "@sofa/db/test-utils";
+import {
+  getRadarrList,
+  getSonarrList,
+  parseStatusParam,
+  resolveListToken,
+} from "../src/lists";
 
 // Mock getTvExternalIds for lazy resolution tests
 const mockGetTvExternalIds = mock(
