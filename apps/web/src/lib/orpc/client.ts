@@ -13,7 +13,7 @@ export const queryClient = new QueryClient({
         description: error.message,
         action: {
           label: "Retry",
-          onClick: query.invalidate,
+          onClick: () => query.invalidate(),
         },
       });
     },

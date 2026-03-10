@@ -2,7 +2,7 @@ import path from "node:path";
 
 // ─── Paths ───────────────────────────────────────────────────
 
-export const DATA_DIR = process.env.DATA_DIR || "./data";
+export const DATA_DIR = path.resolve(process.env.DATA_DIR || "./data");
 
 export const DATABASE_URL =
   process.env.DATABASE_URL || path.join(DATA_DIR, "sqlite.db");

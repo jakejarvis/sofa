@@ -99,7 +99,17 @@ if (process.env.NODE_ENV === "production") {
   const spaDir = resolve(import.meta.dir, "../../../apps/web/dist");
 
   // Hashed assets — immutable cache
-  app.use("/assets/*", serveStatic({ root: spaDir }));
+  app.use(
+    "/assets/*",
+    serveStatic({
+      root: spaDir,
+      onFound: (_path, c) => {
+        c.header("Cache-Control", "public, max-age=31536000, immutable");
+      },
+    }),
+  );
+  // Return 404 for missing /assets/* (stale chunks after deploy) instead of SPA fallback
+  app.all("/assets/*", (c) => c.text("Not found", 404));
   // Other static files (icons, manifest, etc.)
   app.use("*", serveStatic({ root: spaDir }));
   // SPA fallback — serve index.html for all unmatched routes
