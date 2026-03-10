@@ -1,5 +1,10 @@
 "use client";
 
+import type {
+  DashboardStats,
+  HistoryBucket,
+  TimePeriod,
+} from "@sofa/api/schemas";
 import {
   IconCheck,
   IconLibrary,
@@ -17,11 +22,6 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/tanstack";
-import type {
-  DashboardStats,
-  HistoryBucket,
-  TimePeriod,
-} from "@/lib/services/discovery";
 import { Sparkline } from "./sparkline";
 
 function StatCardSkeleton() {

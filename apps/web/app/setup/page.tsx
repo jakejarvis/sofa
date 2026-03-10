@@ -1,9 +1,8 @@
 import { IconExternalLink, IconKey } from "@tabler/icons-react";
 import { redirect } from "next/navigation";
-import { connection } from "next/server";
 import { Suspense } from "react";
 import { TmdbLogo } from "@/components/tmdb-logo";
-import { isTmdbConfigured } from "@/lib/config";
+import { client } from "@/lib/orpc/client";
 import { CopyButton } from "./_components/copy-button";
 import { RefreshButton } from "./_components/refresh-button";
 
@@ -90,8 +89,8 @@ export default function SetupPage() {
 }
 
 export async function SetupContent() {
-  await connection();
-  if (isTmdbConfigured()) redirect("/");
+  const info = await client.system.publicInfo({});
+  if (info.tmdbConfigured) redirect("/");
 
   return (
     <div className="mx-auto my-10 max-w-2xl space-y-10">

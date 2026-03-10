@@ -1,6 +1,7 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
 import {
+  AuthConfigOutput,
   BackupCreateOutput,
   BackupScheduleOutput,
   BackupsListOutput,
@@ -13,6 +14,7 @@ import {
   DiscoverOutput,
   FilenameParam,
   GenresOutput,
+  HydrateSeasonsOutput,
   IdParam,
   IntegrationOutput,
   IntegrationsListOutput,
@@ -23,6 +25,7 @@ import {
   PersonResolveOutput,
   PopularOutput,
   ProviderParam,
+  PublicInfoOutput,
   QuickAddOutput,
   RegistrationOutput,
   RestoreBackupInput,
@@ -97,6 +100,14 @@ export const contract = {
       })
       .input(IdParam)
       .output(TitleRecommendationsOutput),
+    hydrateSeasons: oc
+      .route({
+        method: "POST",
+        path: "/titles/{id}/hydrate-seasons",
+        tags: ["Titles"],
+      })
+      .input(z.object({ id: z.string(), tmdbId: z.number().int() }))
+      .output(HydrateSeasonsOutput),
   },
   episodes: {
     watch: oc
@@ -207,6 +218,14 @@ export const contract = {
   systemStatus: oc
     .route({ method: "GET", path: "/system-status", tags: ["System"] })
     .output(SystemStatusOutput),
+  system: {
+    publicInfo: oc
+      .route({ method: "GET", path: "/system/public-info", tags: ["System"] })
+      .output(PublicInfoOutput),
+    authConfig: oc
+      .route({ method: "GET", path: "/system/auth-config", tags: ["System"] })
+      .output(AuthConfigOutput),
+  },
   integrations: {
     list: oc
       .route({ method: "GET", path: "/integrations", tags: ["Integrations"] })

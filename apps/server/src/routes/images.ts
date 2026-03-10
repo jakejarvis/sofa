@@ -1,0 +1,54 @@
+import path from "node:path";
+import { fetchAndMaybeCache, imageCacheEnabled } from "@sofa/core/image-cache";
+import { Hono } from "hono";
+import { z } from "zod";
+
+const categorySchema = z.enum([
+  "posters",
+  "backdrops",
+  "stills",
+  "logos",
+  "profiles",
+]);
+
+const IMMUTABLE_CACHE = "public, max-age=31536000, immutable";
+
+const app = new Hono();
+
+app.get("/:category/:filename", async (c) => {
+  if (!imageCacheEnabled()) {
+    return c.json({ error: "Image cache disabled" }, 404);
+  }
+
+  const rawCategory = c.req.param("category");
+  const rawFilename = c.req.param("filename");
+
+  const catResult = categorySchema.safeParse(rawCategory);
+  if (!catResult.success) {
+    return c.json({ error: "Invalid category" }, 400);
+  }
+  const category = catResult.data;
+
+  // Sanitize filename — only allow basename to prevent path traversal
+  const filename = path.basename(rawFilename);
+  if (!filename || filename !== rawFilename || filename.includes("..")) {
+    return c.json({ error: "Invalid filename" }, 400);
+  }
+
+  const tmdbPath = `/${filename}`;
+  const result = await fetchAndMaybeCache(tmdbPath, category);
+
+  if (!result) {
+    return c.json({ error: "Not found" }, 404);
+  }
+
+  return new Response(new Uint8Array(result.buffer), {
+    status: 200,
+    headers: {
+      "Content-Type": result.contentType,
+      "Cache-Control": IMMUTABLE_CACHE,
+    },
+  });
+});
+
+export default app;

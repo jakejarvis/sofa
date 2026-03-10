@@ -1,5 +1,6 @@
 "use client";
 
+import type { BackupFrequency } from "@sofa/api/schemas";
 import { IconCalendarWeek } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
@@ -18,7 +19,6 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import type { BackupFrequency } from "@/lib/cron";
 import { orpc } from "@/lib/orpc/tanstack";
 
 const FREQUENCY_OPTIONS: { value: BackupFrequency; label: string }[] = [

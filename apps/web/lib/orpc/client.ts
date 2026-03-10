@@ -3,18 +3,17 @@ import { RPCLink } from "@orpc/client/fetch";
 import type { ContractRouterClient } from "@orpc/contract";
 import type { contract } from "@sofa/api/contract";
 
-declare global {
-  var $orpcClient: ContractRouterClient<typeof contract> | undefined;
-}
-
 const link = new RPCLink({
   url: () => {
     if (typeof window === "undefined") {
-      throw new Error("RPCLink is not allowed on the server side.");
+      // SSR — call the API server directly
+      return `${process.env.INTERNAL_API_URL || "http://localhost:3001"}/rpc`;
     }
-    return `${window.location.origin}/rpc`;
+    // Client — proxied via Next.js rewrites
+    return "/rpc";
   },
+  fetch: (input, init) => fetch(input, { ...init, credentials: "include" }),
 });
 
 export const client: ContractRouterClient<typeof contract> =
-  globalThis.$orpcClient ?? createORPCClient(link);
+  createORPCClient(link);

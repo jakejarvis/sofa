@@ -1,5 +1,6 @@
 "use client";
 
+import type { SystemHealthData } from "@sofa/api/schemas";
 import {
   IconActivity,
   IconAlertTriangle,
@@ -36,7 +37,6 @@ import {
 } from "@/components/ui/tooltip";
 import { useTimeAgo } from "@/hooks/use-time-ago";
 import { orpc } from "@/lib/orpc/tanstack";
-import type { SystemHealthData } from "@/lib/services/system-health";
 
 const JOB_LABELS: Record<string, string> = {
   nightlyRefreshLibrary: "Library refresh",

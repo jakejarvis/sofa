@@ -535,6 +535,42 @@ export const QuickAddOutput = z.object({
   alreadyAdded: z.boolean(),
 });
 
+// ─── System outputs (new) ─────────────────────────────────────
+
+export const PublicInfoOutput = z.object({
+  tmdbConfigured: z.boolean(),
+  userCount: z.number(),
+  registrationOpen: z.boolean(),
+  posterUrls: z.array(z.string()),
+});
+
+export const AuthConfigOutput = z.object({
+  oidcEnabled: z.boolean(),
+  oidcProviderName: z.string().nullable(),
+  passwordLoginDisabled: z.boolean(),
+  registrationOpen: z.boolean(),
+  userCount: z.number(),
+});
+
+// ─── Title hydrate seasons output ─────────────────────────────
+
+export const HydrateSeasonsOutput = z.object({
+  seasons: z.array(SeasonSchema),
+});
+
+// ─── Types used by web app (moved from services) ─────────────
+
+export type BackupFrequency = "6h" | "12h" | "1d" | "7d";
+
+export type BackupInfo = {
+  filename: string;
+  sizeBytes: number;
+  createdAt: string;
+  source: "manual" | "scheduled" | "pre-restore";
+};
+
+export type SystemHealthData = z.infer<typeof SystemHealthSchema>;
+
 // ═══════════════════════════════════════════════════════════════
 // Inferred types — use these instead of hand-written interfaces
 // ═══════════════════════════════════════════════════════════════
@@ -547,3 +583,25 @@ export type ColorPalette = z.infer<typeof ColorPaletteSchema>;
 export type ResolvedTitle = z.infer<typeof ResolvedTitleSchema>;
 export type ResolvedPerson = z.infer<typeof PersonSchema>;
 export type PersonCredit = z.infer<typeof PersonCreditSchema>;
+
+export type UpdateCheckResult = {
+  updateAvailable: boolean;
+  currentVersion: string;
+  latestVersion: string | null;
+  releaseUrl: string | null;
+  lastCheckedAt: string | null;
+};
+
+export type TimePeriod = "today" | "this_week" | "this_month" | "this_year";
+
+export interface HistoryBucket {
+  bucket: string;
+  count: number;
+}
+
+export interface DashboardStats {
+  moviesThisMonth: number;
+  episodesThisWeek: number;
+  librarySize: number;
+  completed: number;
+}

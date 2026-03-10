@@ -1,5 +1,6 @@
 "use client";
 
+import type { BackupInfo } from "@sofa/api/schemas";
 import {
   IconClock,
   IconCloudDownload,
@@ -34,7 +35,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { orpc } from "@/lib/orpc/tanstack";
-import type { BackupInfo } from "@/lib/services/backup";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;

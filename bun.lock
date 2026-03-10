@@ -9,19 +9,39 @@
         "turbo": "2.8.15",
       },
     },
-    "apps/web": {
-      "name": "@sofa/web",
+    "apps/server": {
+      "name": "@sofa/server",
       "version": "0.1.0",
       "dependencies": {
-        "@base-ui/react": "1.2.0",
-        "@better-auth/drizzle-adapter": "1.5.4",
         "@orpc/client": "1.13.6",
         "@orpc/contract": "1.13.6",
         "@orpc/json-schema": "1.13.6",
         "@orpc/openapi": "1.13.6",
         "@orpc/server": "1.13.6",
-        "@orpc/tanstack-query": "1.13.6",
         "@orpc/zod": "1.13.6",
+        "@sofa/api": "workspace:*",
+        "@sofa/auth": "workspace:*",
+        "@sofa/core": "workspace:*",
+        "@sofa/db": "workspace:*",
+        "@sofa/tmdb": "workspace:*",
+        "croner": "10.0.2-dev.2",
+        "drizzle-orm": "1.0.0-beta.16-ea816b6",
+        "hono": "4.12.7",
+        "zod": "4.3.6",
+      },
+      "devDependencies": {
+        "@types/bun": "1.3.10",
+        "typescript": "5.9.3",
+      },
+    },
+    "apps/web": {
+      "name": "@sofa/web",
+      "version": "0.1.0",
+      "dependencies": {
+        "@base-ui/react": "1.2.0",
+        "@orpc/client": "1.13.6",
+        "@orpc/contract": "1.13.6",
+        "@orpc/tanstack-query": "1.13.6",
         "@player.style/sutro": "0.2.1",
         "@sofa/api": "workspace:*",
         "@tabler/icons-react": "3.40.0",
@@ -31,19 +51,16 @@
         "class-variance-authority": "0.7.1",
         "clsx": "2.1.1",
         "cmdk": "1.1.1",
-        "croner": "10.0.2-dev.2",
         "date-fns": "4.1.0",
-        "drizzle-orm": "1.0.0-beta.16-ea816b6",
         "jotai": "2.18.1",
         "media-chrome": "4.18.0",
         "motion": "12.35.2",
         "next": "16.1.6",
-        "node-vibrant": "4.0.4",
-        "openapi-fetch": "0.17.0",
         "react": "19.2.4",
         "react-day-picker": "9.14.0",
         "react-dom": "19.2.4",
         "recharts": "3.8.0",
+        "server-only": "0.0.1",
         "shadcn": "4.0.2",
         "sonner": "2.0.7",
         "tailwind-merge": "3.5.0",
@@ -59,19 +76,73 @@
         "@types/react": "19.2.14",
         "@types/react-dom": "19.2.3",
         "babel-plugin-react-compiler": "1.0.0",
-        "drizzle-kit": "1.0.0-beta.16-ea816b6",
         "tailwindcss": "4.2.1",
         "typescript": "5.9.3",
       },
     },
     "packages/api": {
       "name": "@sofa/api",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@orpc/contract": "1.13.6",
         "zod": "4.3.6",
       },
       "devDependencies": {
+        "typescript": "5.9.3",
+      },
+    },
+    "packages/auth": {
+      "name": "@sofa/auth",
+      "version": "0.1.0",
+      "dependencies": {
+        "@better-auth/drizzle-adapter": "1.5.4",
+        "@sofa/core": "workspace:*",
+        "@sofa/db": "workspace:*",
+        "better-auth": "1.5.4",
+      },
+      "devDependencies": {
+        "@types/bun": "1.3.10",
+        "typescript": "5.9.3",
+      },
+    },
+    "packages/core": {
+      "name": "@sofa/core",
+      "version": "0.1.0",
+      "dependencies": {
+        "@sofa/api": "workspace:*",
+        "@sofa/db": "workspace:*",
+        "@sofa/tmdb": "workspace:*",
+        "date-fns": "4.1.0",
+        "drizzle-orm": "1.0.0-beta.16-ea816b6",
+        "node-vibrant": "4.0.4",
+        "zod": "4.3.6",
+      },
+      "devDependencies": {
+        "@types/bun": "1.3.10",
+        "typescript": "5.9.3",
+      },
+    },
+    "packages/db": {
+      "name": "@sofa/db",
+      "version": "0.1.0",
+      "dependencies": {
+        "drizzle-orm": "1.0.0-beta.16-ea816b6",
+      },
+      "devDependencies": {
+        "@types/bun": "1.3.10",
+        "drizzle-kit": "1.0.0-beta.16-ea816b6",
+        "typescript": "5.9.3",
+      },
+    },
+    "packages/tmdb": {
+      "name": "@sofa/tmdb",
+      "version": "0.1.0",
+      "dependencies": {
+        "@sofa/db": "workspace:*",
+        "openapi-fetch": "0.17.0",
+      },
+      "devDependencies": {
+        "@types/bun": "1.3.10",
         "typescript": "5.9.3",
       },
     },
@@ -534,6 +605,16 @@
     "@sindresorhus/merge-streams": ["@sindresorhus/merge-streams@4.0.0", "", {}, "sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ=="],
 
     "@sofa/api": ["@sofa/api@workspace:packages/api"],
+
+    "@sofa/auth": ["@sofa/auth@workspace:packages/auth"],
+
+    "@sofa/core": ["@sofa/core@workspace:packages/core"],
+
+    "@sofa/db": ["@sofa/db@workspace:packages/db"],
+
+    "@sofa/server": ["@sofa/server@workspace:apps/server"],
+
+    "@sofa/tmdb": ["@sofa/tmdb@workspace:packages/tmdb"],
 
     "@sofa/web": ["@sofa/web@workspace:apps/web"],
 
@@ -1003,7 +1084,7 @@
 
     "headers-polyfill": ["headers-polyfill@4.0.3", "", {}, "sha512-IScLbePpkvO846sIwOtOTDjutRMWdXdJmXdMvk6gCBHxFO8d+QKOQedyZSxFTTFYRSmlgSTDtXqqq4pcenBXLQ=="],
 
-    "hono": ["hono@4.12.5", "", {}, "sha512-3qq+FUBtlTHhtYxbxheZgY8NIFnkkC/MR8u5TTsr7YZ3wixryQ3cCwn3iZbg8p8B88iDBBAYSfZDS75t8MN7Vg=="],
+    "hono": ["hono@4.12.7", "", {}, "sha512-jq9l1DM0zVIvsm3lv9Nw9nlJnMNPOcAtsbsgiUhWcFzPE99Gvo6yRTlszSLLYacMeQ6quHD6hMfId8crVHvexw=="],
 
     "http-errors": ["http-errors@2.0.1", "", { "dependencies": { "depd": "~2.0.0", "inherits": "~2.0.4", "setprototypeof": "~1.2.0", "statuses": "~2.0.2", "toidentifier": "~1.0.1" } }, "sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ=="],
 
@@ -1419,6 +1500,8 @@
 
     "serve-static": ["serve-static@2.2.1", "", { "dependencies": { "encodeurl": "^2.0.0", "escape-html": "^1.0.3", "parseurl": "^1.3.3", "send": "^1.2.0" } }, "sha512-xRXBn0pPqQTVQiC8wyQrKs2MOlX24zQ0POGaj0kultvoOCstBQM5yvOhAVSUwOMjQtTvsPWoNCHfPGwaaQJhTw=="],
 
+    "server-only": ["server-only@0.0.1", "", {}, "sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA=="],
+
     "set-cookie-parser": ["set-cookie-parser@3.0.1", "", {}, "sha512-n7Z7dXZhJbwuAHhNzkTti6Aw9QDDjZtm3JTpTGATIdNzdQz5GuFs22w90BcvF4INfnrL5xrX3oGsuqO5Dx3A1Q=="],
 
     "setprototypeof": ["setprototypeof@1.2.0", "", {}, "sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw=="],
@@ -1624,6 +1707,8 @@
     "@ecies/ciphers/@noble/ciphers": ["@noble/ciphers@1.3.0", "", {}, "sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw=="],
 
     "@jimp/core/buffer": ["buffer@5.7.1", "", { "dependencies": { "base64-js": "^1.3.1", "ieee754": "^1.1.13" } }, "sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ=="],
+
+    "@modelcontextprotocol/sdk/hono": ["hono@4.12.5", "", {}, "sha512-3qq+FUBtlTHhtYxbxheZgY8NIFnkkC/MR8u5TTsr7YZ3wixryQ3cCwn3iZbg8p8B88iDBBAYSfZDS75t8MN7Vg=="],
 
     "@noble/curves/@noble/hashes": ["@noble/hashes@1.8.0", "", {}, "sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A=="],
 

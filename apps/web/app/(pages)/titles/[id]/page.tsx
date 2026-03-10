@@ -1,14 +1,9 @@
-import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache, Suspense } from "react";
 import { getSession } from "@/lib/auth/session";
-import { db } from "@/lib/db/client";
-import { titles } from "@/lib/db/schema";
-import { getOrFetchTitle } from "@/lib/services/metadata";
-import { getUserTitleInfo } from "@/lib/services/tracking";
+import { serverClient } from "@/lib/orpc/client.server";
 import { getThemeCssProperties } from "@/lib/theme";
-import { tmdbImageUrl } from "@/lib/tmdb/image";
 import { AsyncTitleSeasons } from "./_components/async-title-seasons";
 import { TitleActions } from "./_components/title-actions";
 import { TitleAvailability } from "./_components/title-availability";
@@ -20,7 +15,9 @@ import { TitleRecommendations } from "./_components/title-recommendations";
 import { SeasonsSkeleton, TitleSeasons } from "./_components/title-seasons";
 import { TitleTheme } from "./_components/title-theme";
 
-const getCachedOrFetchTitle = cache((id: string) => getOrFetchTitle(id));
+const getCachedTitle = cache((id: string) =>
+  serverClient.titles.detail({ id }),
+);
 
 export async function generateMetadata({
   params,
@@ -28,20 +25,20 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const title = db.select().from(titles).where(eq(titles.id, id)).get();
-  if (!title) return { title: "Not Found — Sofa" };
-
-  const year = (title.releaseDate ?? title.firstAirDate)?.slice(0, 4);
-  return {
-    title: `${title.title}${year ? ` (${year})` : ""} — Sofa`,
-    description: title.overview?.slice(0, 160),
-    openGraph: {
-      title: title.title,
-      images: title.posterPath
-        ? [{ url: tmdbImageUrl(title.posterPath, "posters") ?? "" }]
-        : [],
-    },
-  };
+  try {
+    const { title } = await getCachedTitle(id);
+    const year = (title.releaseDate ?? title.firstAirDate)?.slice(0, 4);
+    return {
+      title: `${title.title}${year ? ` (${year})` : ""} — Sofa`,
+      description: title.overview?.slice(0, 160),
+      openGraph: {
+        title: title.title,
+        images: title.posterPath ? [{ url: title.posterPath }] : [],
+      },
+    };
+  } catch {
+    return { title: "Not Found — Sofa" };
+  }
 }
 
 export default async function TitleDetailPage({
@@ -53,11 +50,14 @@ export default async function TitleDetailPage({
 
   // Fetch title + user info in parallel
   const session = await getSession();
-  const [result, userInfo] = await Promise.all([
-    getCachedOrFetchTitle(id),
-    session ? getUserTitleInfo(session.user.id, id) : null,
-  ]);
-  if (!result) notFound();
+  let result: Awaited<ReturnType<typeof getCachedTitle>>;
+  try {
+    result = await getCachedTitle(id);
+  } catch {
+    notFound();
+  }
+
+  const userInfo = session ? await serverClient.titles.userInfo({ id }) : null;
 
   const { title, seasons, needsHydration, availability, cast } = result;
 

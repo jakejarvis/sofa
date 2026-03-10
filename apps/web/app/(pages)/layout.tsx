@@ -6,7 +6,7 @@ import { ProgressProvider } from "@/components/navigation-progress";
 import { QueryProvider } from "@/components/query-provider";
 import { UpdateToast } from "@/components/update-toast";
 import { getSession } from "@/lib/auth/session";
-import { getCachedUpdateCheck } from "@/lib/services/update-check";
+import { serverClient } from "@/lib/orpc/client.server";
 
 export default function PagesLayout({
   children,
@@ -28,6 +28,15 @@ async function AuthenticatedShell({ children }: { children: React.ReactNode }) {
   const session = await getSession();
   if (!session) redirect("/login");
 
+  let updateCheck = null;
+  if (session.user.role === "admin") {
+    try {
+      ({ updateCheck } = await serverClient.admin.updateCheck({}));
+    } catch {
+      // Silently ignore — update check is non-critical
+    }
+  }
+
   return (
     <>
       <div className="relative z-0 min-h-screen pb-[calc(3.5rem+env(safe-area-inset-bottom))] sm:pb-0">
@@ -48,9 +57,7 @@ async function AuthenticatedShell({ children }: { children: React.ReactNode }) {
       </div>
       <MobileTabBar />
       <CommandPalette />
-      {session.user.role === "admin" && (
-        <UpdateToast data={getCachedUpdateCheck()} />
-      )}
+      {session.user.role === "admin" && <UpdateToast data={updateCheck} />}
     </>
   );
 }

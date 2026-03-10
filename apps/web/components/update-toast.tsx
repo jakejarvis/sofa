@@ -1,10 +1,10 @@
 "use client";
 
+import type { UpdateCheckResult } from "@sofa/api/schemas";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { updateToastDismissedVersionAtom } from "@/lib/atoms/update-check";
-import type { UpdateCheckResult } from "@/lib/services/update-check";
 
 export function UpdateToast({ data }: { data: UpdateCheckResult | null }) {
   const [dismissedVersion, setDismissedVersion] = useAtom(

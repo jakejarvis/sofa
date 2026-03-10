@@ -1,31 +1,26 @@
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/auth-form";
 import { getSession } from "@/lib/auth/session";
-import {
-  getOidcProviderName,
-  isOidcConfigured,
-  isPasswordLoginDisabled,
-} from "@/lib/config";
-import { getUserCount, isRegistrationOpen } from "@/lib/services/settings";
+import { client } from "@/lib/orpc/client";
 
 export default async function LoginPage() {
   const session = await getSession();
   if (session) redirect("/dashboard");
 
-  if (getUserCount() === 0) {
+  const authConfig = await client.system.authConfig({});
+
+  if (authConfig.userCount === 0) {
     redirect("/register");
   }
-
-  const oidcEnabled = isOidcConfigured();
 
   return (
     <AuthForm
       mode="login"
       authConfig={{
-        oidcEnabled,
-        oidcProviderName: oidcEnabled ? getOidcProviderName() : null,
-        passwordLoginDisabled: isPasswordLoginDisabled(),
-        registrationOpen: isRegistrationOpen(),
+        oidcEnabled: authConfig.oidcEnabled,
+        oidcProviderName: authConfig.oidcProviderName,
+        passwordLoginDisabled: authConfig.passwordLoginDisabled,
+        registrationOpen: authConfig.registrationOpen,
       }}
     />
   );

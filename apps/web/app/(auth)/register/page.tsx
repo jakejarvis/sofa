@@ -3,18 +3,15 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/auth-form";
 import { getSession } from "@/lib/auth/session";
-import {
-  getOidcProviderName,
-  isOidcConfigured,
-  isPasswordLoginDisabled,
-} from "@/lib/config";
-import { isRegistrationOpen } from "@/lib/services/settings";
+import { client } from "@/lib/orpc/client";
 
 export default async function RegisterPage() {
   const session = await getSession();
   if (session) redirect("/dashboard");
 
-  if (!isRegistrationOpen()) {
+  const authConfig = await client.system.authConfig({});
+
+  if (!authConfig.registrationOpen) {
     return (
       <div className="relative mx-auto w-full max-w-sm">
         <div className="absolute -inset-4 rounded-2xl bg-primary/3 blur-2xl" />
@@ -42,15 +39,13 @@ export default async function RegisterPage() {
     );
   }
 
-  const oidcEnabled = isOidcConfigured();
-
   return (
     <AuthForm
       mode="register"
       authConfig={{
-        oidcEnabled,
-        oidcProviderName: oidcEnabled ? getOidcProviderName() : null,
-        passwordLoginDisabled: isPasswordLoginDisabled(),
+        oidcEnabled: authConfig.oidcEnabled,
+        oidcProviderName: authConfig.oidcProviderName,
+        passwordLoginDisabled: authConfig.passwordLoginDisabled,
       }}
     />
   );

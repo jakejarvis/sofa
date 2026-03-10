@@ -1,12 +1,12 @@
-import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getSession } from "@/lib/auth/session";
-import { db } from "@/lib/db/client";
-import { persons } from "@/lib/db/schema";
-import { getLocalFilmography, getOrFetchPerson } from "@/lib/services/person";
-import { getUserStatusesByTitleIds } from "@/lib/services/tracking";
+import { cache } from "react";
+import { serverClient } from "@/lib/orpc/client.server";
 import { PersonDetailClient } from "./_components/person-detail-client";
+
+const getCachedPerson = cache((id: string) =>
+  serverClient.people.detail({ id }),
+);
 
 export async function generateMetadata({
   params,
@@ -14,13 +14,15 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const person = db.select().from(persons).where(eq(persons.id, id)).get();
-  if (!person) return { title: "Not Found — Sofa" };
-
-  return {
-    title: `${person.name} — Sofa`,
-    description: person.biography?.slice(0, 160),
-  };
+  try {
+    const { person } = await getCachedPerson(id);
+    return {
+      title: `${person.name} — Sofa`,
+      description: person.biography?.slice(0, 160),
+    };
+  } catch {
+    return { title: "Not Found — Sofa" };
+  }
 }
 
 export default async function PersonDetailPage({
@@ -30,22 +32,10 @@ export default async function PersonDetailPage({
 }) {
   const { id } = await params;
 
-  const person = await getOrFetchPerson(id);
-  if (!person) notFound();
-
-  const filmography = getLocalFilmography(person.id);
-  const session = await getSession();
-  const userStatuses = session
-    ? getUserStatusesByTitleIds(
-        session.user.id,
-        filmography.map((c) => c.titleId),
-      )
-    : {};
-
-  return (
-    <PersonDetailClient
-      id={id}
-      initialData={{ person, filmography, userStatuses }}
-    />
-  );
+  try {
+    const data = await getCachedPerson(id);
+    return <PersonDetailClient id={id} initialData={data} />;
+  } catch {
+    notFound();
+  }
 }
