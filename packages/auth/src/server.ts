@@ -1,4 +1,5 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { expo } from "@better-auth/expo";
 import {
   getUserCount,
   isRegistrationOpen,
@@ -69,9 +70,7 @@ export const auth = betterAuth({
           }),
         ]
       : []),
-    // NOTE: nextCookies() removed — Better Auth works with standard
-    // Request/Response natively on Hono. The web app proxies auth
-    // requests to the API server.
+    expo(),
   ],
   advanced: {
     database: {

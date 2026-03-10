@@ -13,3 +13,4 @@ coverage
 .idea
 .turbo
 .tanstack
+apps/native

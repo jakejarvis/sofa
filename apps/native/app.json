@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "scheme": "sofa",
+    "userInterfaceStyle": "dark",
+    "orientation": "portrait",
+    "web": {
+      "bundler": "metro"
+    },
+    "name": "Sofa",
+    "slug": "sofa",
+    "plugins": ["expo-font", "expo-secure-store"],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

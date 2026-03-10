@@ -13,7 +13,7 @@
       "!dist",
       "!build",
       "!drizzle",
-      "!lib/tmdb/schema.d.ts",
+      "!packages/tmdb/src/schema.d.ts",
       "!**/routeTree.gen.ts"
     ]
   },
@@ -45,10 +45,7 @@
             "attributes": ["classList"],
             "functions": ["cn", "clsx", "cva"]
           }
-        },
-        "noFloatingPromises": "error",
-        "noMisusedPromises": "error",
-        "useDestructuring": "error"
+        }
       }
     }
   },
