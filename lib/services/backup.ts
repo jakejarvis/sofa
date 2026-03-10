@@ -214,7 +214,9 @@ export async function readBackupFile(filename: string): Promise<Buffer | null> {
   return Buffer.from(await Bun.file(filePath).arrayBuffer());
 }
 
-export async function restoreFromBackup(buffer: Buffer): Promise<void> {
+export async function restoreFromBackup(
+  source: Buffer | string,
+): Promise<void> {
   await withBackupLock(async () => {
     await ensureBackupDir();
 
@@ -228,7 +230,11 @@ export async function restoreFromBackup(buffer: Buffer): Promise<void> {
     );
 
     try {
-      await Bun.write(tempPath, buffer);
+      if (typeof source === "string") {
+        renameSync(source, tempPath);
+      } else {
+        await Bun.write(tempPath, source);
+      }
       validateBackupDatabase(tempPath);
 
       log.info("Creating pre-restore safety backup...");

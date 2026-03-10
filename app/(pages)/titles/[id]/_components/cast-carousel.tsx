@@ -2,7 +2,7 @@ import { IconUser, IconUsers } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { CastMember } from "@/lib/types";
+import type { CastMember } from "@/lib/orpc/schemas";
 
 interface CastCarouselProps {
   actors: CastMember[];

@@ -11,7 +11,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { AvailabilityOffer } from "@/lib/types";
+import type { AvailabilityOffer } from "@/lib/orpc/schemas";
 
 const MAX_VISIBLE = 4;
 

@@ -1,10 +1,18 @@
-import { IconDeviceTv } from "@tabler/icons-react";
-import Link from "next/link";
-import { getUserStats } from "@/lib/services/discovery";
-import { StatsDisplay } from "./stats-display";
+"use client";
 
-export async function StatsSection({ userId }: { userId: string }) {
-  const stats = await getUserStats(userId);
+import { IconDeviceTv } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { orpc } from "@/lib/orpc/tanstack";
+import { StatsDisplay, StatsSectionSkeleton } from "./stats-display";
+
+export function StatsSection() {
+  const { data: stats, isPending } = useQuery(
+    orpc.dashboard.stats.queryOptions(),
+  );
+
+  if (isPending) return <StatsSectionSkeleton />;
+  if (!stats) return null;
 
   const isEmpty =
     stats.moviesThisMonth === 0 &&

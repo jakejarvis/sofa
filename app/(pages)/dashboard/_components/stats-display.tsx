@@ -6,6 +6,7 @@ import {
   IconMovie,
   IconPlayerPlay,
 } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   Select,
@@ -14,13 +15,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useStats } from "@/hooks/use-stats";
+import { Skeleton } from "@/components/ui/skeleton";
+import { orpc } from "@/lib/orpc/tanstack";
 import type {
   DashboardStats,
   HistoryBucket,
   TimePeriod,
 } from "@/lib/services/discovery";
 import { Sparkline } from "./sparkline";
+
+function StatCardSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-xl border border-border/30 bg-card/50 p-4">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-6 w-6 rounded-md" />
+        <Skeleton className="h-3 w-16" />
+      </div>
+      <Skeleton className="mt-2 h-7 w-12" />
+    </div>
+  );
+}
+
+export function StatsSectionSkeleton() {
+  return (
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <StatCardSkeleton />
+      <StatCardSkeleton />
+      <StatCardSkeleton />
+      <StatCardSkeleton />
+    </div>
+  );
+}
 
 const periodLabels: Record<TimePeriod, string> = {
   today: "Today",
@@ -124,8 +149,14 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
   const [moviePeriod, setMoviePeriod] = useState<TimePeriod>("this_month");
   const [episodePeriod, setEpisodePeriod] = useState<TimePeriod>("this_week");
 
-  const movieStats = useStats("movies", moviePeriod);
-  const episodeStats = useStats("episodes", episodePeriod);
+  const { data: movieStats } = useQuery(
+    orpc.stats.queryOptions({ input: { type: "movies", period: moviePeriod } }),
+  );
+  const { data: episodeStats } = useQuery(
+    orpc.stats.queryOptions({
+      input: { type: "episodes", period: episodePeriod },
+    }),
+  );
 
   const movieCount = movieStats?.count ?? stats.moviesThisMonth;
   const movieHistory = movieStats?.history;

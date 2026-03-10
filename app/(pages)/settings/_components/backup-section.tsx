@@ -9,6 +9,7 @@ import {
   IconShieldCheck,
   IconTrash,
 } from "@tabler/icons-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
@@ -32,7 +33,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { createBackupAction, deleteBackupAction } from "@/lib/actions/settings";
+import { orpc } from "@/lib/orpc/tanstack";
 import type { BackupInfo } from "@/lib/services/backup";
 
 function formatBytes(bytes: number): string {
@@ -45,52 +46,59 @@ function formatBackupDate(dateStr: string): string {
   return format(new Date(dateStr), "MMM d, h:mm a");
 }
 
-export function BackupSection({
-  initialBackups,
-}: {
-  initialBackups: BackupInfo[];
-}) {
-  const [backups, setBackups] = useState<BackupInfo[]>(initialBackups);
-  const [creating, setCreating] = useState(false);
-  const [deleting, setDeleting] = useState<string | null>(null);
+export function BackupSection() {
+  const { data } = useQuery(orpc.admin.backups.list.queryOptions());
+  const [backups, setBackups] = useState<BackupInfo[] | null>(null);
 
-  async function handleCreateBackup() {
-    setCreating(true);
-    try {
-      const backup = await createBackupAction();
-      setBackups((prev) => [backup, ...prev]);
-      toast.success("Backup created", {
-        action: {
-          label: "Download",
-          onClick: () => {
-            const a = document.createElement("a");
-            a.href = `/api/backup/${backup.filename}`;
-            a.download = backup.filename;
-            a.click();
+  // Use local state if user has modified, else use query data
+  const displayBackups = backups ?? data?.backups ?? [];
+
+  const createMutation = useMutation(
+    orpc.admin.backups.create.mutationOptions({
+      onSuccess: (backup) => {
+        setBackups((prev) => [
+          backup as BackupInfo,
+          ...(prev ?? data?.backups ?? []).filter(
+            (b: BackupInfo) => b.filename !== backup.filename,
+          ),
+        ]);
+        toast.success("Backup created", {
+          action: {
+            label: "Download",
+            onClick: () => {
+              const a = document.createElement("a");
+              a.href = `/api/backup/${backup.filename}`;
+              a.download = backup.filename;
+              a.click();
+            },
           },
-        },
-      });
-    } catch {
-      toast.error("Failed to create backup");
-    } finally {
-      setCreating(false);
-    }
-  }
+        });
+      },
+      onError: () => toast.error("Failed to create backup"),
+    }),
+  );
 
-  async function handleDelete(filename: string) {
-    const previous = backups;
-    setDeleting(filename);
-    setBackups((prev) => prev.filter((b) => b.filename !== filename));
-    try {
-      await deleteBackupAction(filename);
-      toast.success("Backup deleted");
-    } catch {
-      setBackups(previous);
-      toast.error("Failed to delete backup");
-    } finally {
-      setDeleting(null);
-    }
-  }
+  const deleteMutation = useMutation(
+    orpc.admin.backups.delete.mutationOptions({
+      onMutate: ({ filename }) => {
+        const previous = displayBackups;
+        setBackups(
+          displayBackups.filter((b: BackupInfo) => b.filename !== filename),
+        );
+        return { previous };
+      },
+      onSuccess: () => toast.success("Backup deleted"),
+      onError: (_, __, ctx) => {
+        if (ctx?.previous) setBackups(ctx.previous);
+        toast.error("Failed to delete backup");
+      },
+    }),
+  );
+
+  const creating = createMutation.isPending;
+  const deleting = deleteMutation.isPending
+    ? (deleteMutation.variables?.filename ?? null)
+    : null;
 
   return (
     <>
@@ -107,13 +115,13 @@ export function BackupSection({
             <div>
               <CardTitle>Database backups</CardTitle>
               <CardDescription>
-                {backups.length > 0
-                  ? `${backups.length} backup${backups.length !== 1 ? "s" : ""} stored`
+                {displayBackups.length > 0
+                  ? `${displayBackups.length} backup${displayBackups.length !== 1 ? "s" : ""} stored`
                   : "No backups yet"}
               </CardDescription>
             </div>
           </div>
-          <Button onClick={handleCreateBackup} disabled={creating}>
+          <Button onClick={() => createMutation.mutate()} disabled={creating}>
             {creating ? (
               <Spinner className="size-3" />
             ) : (
@@ -126,10 +134,10 @@ export function BackupSection({
 
       {/* Backup list */}
       <AnimatePresence initial={false}>
-        {backups.length > 0 && (
+        {displayBackups.length > 0 && (
           <CardContent className="border-border/30 border-t pt-4">
             <div className="space-y-1.5">
-              {backups.map((backup) => (
+              {displayBackups.map((backup: BackupInfo) => (
                 <motion.div
                   key={backup.filename}
                   initial={{ opacity: 0, height: 0 }}
@@ -248,7 +256,11 @@ export function BackupSection({
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
                               variant="destructive"
-                              onClick={() => handleDelete(backup.filename)}
+                              onClick={() =>
+                                deleteMutation.mutate({
+                                  filename: backup.filename,
+                                })
+                              }
                             >
                               Delete
                             </AlertDialogAction>

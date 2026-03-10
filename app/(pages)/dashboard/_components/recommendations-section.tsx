@@ -1,25 +1,20 @@
+"use client";
+
 import { IconThumbUp } from "@tabler/icons-react";
-import { getRecommendationsFeed } from "@/lib/services/discovery";
-import { tmdbImageUrl } from "@/lib/tmdb/image";
+import { useQuery } from "@tanstack/react-query";
+import { orpc } from "@/lib/orpc/tanstack";
 import { FeedSection } from "./feed-section";
-import { TitleGrid } from "./title-grid";
+import { TitleGrid, TitleGridSectionSkeleton } from "./title-grid";
 
-export async function RecommendationsSection({ userId }: { userId: string }) {
-  const feed = await getRecommendationsFeed(userId);
-  if (feed.length === 0) return null;
+export function RecommendationsSection() {
+  const { data, isPending } = useQuery(
+    orpc.dashboard.recommendations.queryOptions(),
+  );
 
-  const items = feed
-    .filter((item) => !!item)
-    .slice(0, 10)
-    .map((t) => ({
-      id: t.id,
-      tmdbId: t.tmdbId,
-      type: t.type,
-      title: t.title,
-      posterPath: tmdbImageUrl(t.posterPath, "posters"),
-      releaseDate: t.releaseDate ?? t.firstAirDate,
-      voteAverage: t.voteAverage,
-    }));
+  if (isPending) return <TitleGridSectionSkeleton />;
+
+  const items = data?.items ?? [];
+  if (items.length === 0) return null;
 
   return (
     <FeedSection

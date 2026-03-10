@@ -6,12 +6,12 @@ import {
   IconPlus,
   IconStar,
 } from "@tabler/icons-react";
+import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
 import { toast } from "sonner";
 import { useProgress } from "@/components/navigation-progress";
-import { resolveTitle } from "@/lib/actions/titles";
+import { orpc } from "@/lib/orpc/tanstack";
 
 interface HeroBannerProps {
   tmdbId: number;
@@ -32,21 +32,23 @@ export function HeroBanner({
 }: HeroBannerProps) {
   const router = useRouter();
   const progress = useProgress();
-  const [isPending, startTransition] = useTransition();
-
-  function handleNavigate() {
-    if (isPending) return;
-    progress.start();
-    startTransition(async () => {
-      try {
-        const id = await resolveTitle(tmdbId, type);
+  const resolveMutation = useMutation(
+    orpc.titles.resolve.mutationOptions({
+      onSuccess: ({ id }) => {
         if (id) router.push(`/titles/${id}`);
         else progress.done();
-      } catch {
+      },
+      onError: () => {
         progress.done();
         toast.error("Failed to load title");
-      }
-    });
+      },
+    }),
+  );
+
+  function handleNavigate() {
+    if (resolveMutation.isPending) return;
+    progress.start();
+    resolveMutation.mutate({ tmdbId, type });
   }
 
   return (
@@ -107,7 +109,7 @@ export function HeroBanner({
                   type="button"
                   className="group/title cursor-pointer text-left"
                   onClick={handleNavigate}
-                  disabled={isPending}
+                  disabled={resolveMutation.isPending}
                 >
                   <h2 className="text-balance font-display text-3xl tracking-tight transition-colors group-hover/title:text-primary sm:text-4xl">
                     {title}
@@ -119,7 +121,7 @@ export function HeroBanner({
                 <button
                   type="button"
                   onClick={handleNavigate}
-                  disabled={isPending}
+                  disabled={resolveMutation.isPending}
                   className="mt-4 inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-md hover:shadow-primary/20 disabled:opacity-70"
                 >
                   <IconPlus aria-hidden={true} className="size-4" />

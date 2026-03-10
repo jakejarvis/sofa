@@ -1,113 +1,154 @@
 "use client";
 
-import { useStore } from "jotai";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import {
-  batchWatchEpisodes,
-  markAllWatchedAction,
-  unwatchEpisodeAction,
-  unwatchSeasonAction,
-  updateTitleRating,
-  updateTitleStatus,
-  watchEpisode,
-  watchMovie,
-  watchSeason,
-} from "@/lib/actions/titles";
-import {
-  episodeWatchesAtom,
-  seasonsAtom,
-  titleIdAtom,
-  titleNameAtom,
-  userRatingAtom,
-  userStatusAtom,
-  watchingEpAtom,
-} from "@/lib/atoms/title";
-import type { Season } from "@/lib/types";
+import type { Season } from "@/lib/orpc/schemas";
+import { orpc } from "@/lib/orpc/tanstack";
+import { useTitleContext } from "./title-context";
+
+type UserInfo = {
+  status: "watchlist" | "in_progress" | "completed" | null;
+  rating: number | null;
+  episodeWatches: string[];
+};
 
 export function useTitleActions() {
-  const store = useStore();
+  const { titleId, titleName, seasons, setWatchingEp } = useTitleContext();
+  const queryClient = useQueryClient();
+  const userInfoKey = orpc.titles.userInfo.queryKey({ input: { id: titleId } });
+
+  const getUserInfo = useCallback(
+    () =>
+      queryClient.getQueryData<UserInfo>(userInfoKey) ?? {
+        status: null,
+        rating: null,
+        episodeWatches: [],
+      },
+    [queryClient, userInfoKey],
+  );
+
+  const setUserInfo = useCallback(
+    (updater: (old: UserInfo) => UserInfo) => {
+      queryClient.setQueryData<UserInfo>(userInfoKey, (old) =>
+        updater(old ?? { status: null, rating: null, episodeWatches: [] }),
+      );
+    },
+    [queryClient, userInfoKey],
+  );
+
+  const batchWatchMutation = useMutation(
+    orpc.episodes.batchWatch.mutationOptions(),
+  );
+  const updateStatusMutation = useMutation(
+    orpc.titles.updateStatus.mutationOptions(),
+  );
+  const updateRatingMutation = useMutation(
+    orpc.titles.updateRating.mutationOptions(),
+  );
+  const watchMovieMutation = useMutation(
+    orpc.titles.watchMovie.mutationOptions(),
+  );
+  const unwatchEpMutation = useMutation(
+    orpc.episodes.unwatch.mutationOptions(),
+  );
+  const watchEpMutation = useMutation(orpc.episodes.watch.mutationOptions());
+  const watchSeasonMutation = useMutation(orpc.seasons.watch.mutationOptions());
+  const unwatchSeasonMutation = useMutation(
+    orpc.seasons.unwatch.mutationOptions(),
+  );
+  const watchAllMutation = useMutation(orpc.titles.watchAll.mutationOptions());
 
   const catchUp = useCallback(
     async (episodeIds: string[]) => {
-      const currentWatches = store.get(episodeWatchesAtom);
-      const prevStatus = store.get(userStatusAtom);
-      const newWatchSet = new Set(currentWatches);
+      const prev = getUserInfo();
+      const newWatchSet = new Set(prev.episodeWatches);
       for (const id of episodeIds) newWatchSet.add(id);
-      store.set(episodeWatchesAtom, [...newWatchSet]);
+      const newWatches = [...newWatchSet];
 
-      const seasons = store.get(seasonsAtom);
       const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));
-      if (allEpIds.every((id) => newWatchSet.has(id))) {
-        store.set(userStatusAtom, "completed");
-      }
+      const allWatched = allEpIds.every((id) => newWatchSet.has(id));
+
+      setUserInfo((old) => ({
+        ...old,
+        episodeWatches: newWatches,
+        status: allWatched ? "completed" : old.status,
+      }));
 
       try {
-        await batchWatchEpisodes(episodeIds);
+        await batchWatchMutation.mutateAsync({ episodeIds });
         toast.success(
           `Caught up — marked ${episodeIds.length} episode${episodeIds.length > 1 ? "s" : ""} as watched`,
         );
       } catch {
-        store.set(episodeWatchesAtom, currentWatches);
-        store.set(userStatusAtom, prevStatus);
+        setUserInfo((old) => ({
+          ...old,
+          episodeWatches: prev.episodeWatches,
+          status: prev.status,
+        }));
         toast.error("Failed to catch up");
       }
     },
-    [store],
+    [getUserInfo, setUserInfo, seasons, batchWatchMutation],
   );
 
   const handleStatusChange = useCallback(
     async (status: string | null) => {
-      const prev = store.get(userStatusAtom);
-      const titleId = store.get(titleIdAtom);
-      store.set(
-        userStatusAtom,
-        status === "watchlist" ? "in_progress" : status,
-      );
+      const prevStatus = getUserInfo().status;
+      setUserInfo((old) => ({
+        ...old,
+        status:
+          status === "watchlist"
+            ? "in_progress"
+            : (status as UserInfo["status"]),
+      }));
       try {
-        await updateTitleStatus(titleId, status ? "in_progress" : null);
+        await updateStatusMutation.mutateAsync({
+          id: titleId,
+          status: status ? "in_progress" : null,
+        });
         toast.success(status ? "Added to watchlist" : "Removed from library");
       } catch {
-        store.set(userStatusAtom, prev);
+        setUserInfo((old) => ({ ...old, status: prevStatus }));
         toast.error("Failed to update status");
       }
     },
-    [store],
+    [getUserInfo, setUserInfo, titleId, updateStatusMutation],
   );
 
   const handleRating = useCallback(
     async (ratingStars: number) => {
-      const prev = store.get(userRatingAtom);
-      const titleId = store.get(titleIdAtom);
-      store.set(userRatingAtom, ratingStars);
+      const prevRating = getUserInfo().rating;
+      setUserInfo((old) => ({ ...old, rating: ratingStars }));
       try {
-        await updateTitleRating(titleId, ratingStars);
+        await updateRatingMutation.mutateAsync({
+          id: titleId,
+          stars: ratingStars,
+        });
         toast.success(
           ratingStars > 0
             ? `Rated ${ratingStars} star${ratingStars > 1 ? "s" : ""}`
             : "Rating removed",
         );
       } catch {
-        store.set(userRatingAtom, prev);
+        setUserInfo((old) => ({ ...old, rating: prevRating }));
         toast.error("Failed to update rating");
       }
     },
-    [store],
+    [getUserInfo, setUserInfo, titleId, updateRatingMutation],
   );
 
   const handleWatchMovie = useCallback(async () => {
-    const prev = store.get(userStatusAtom);
-    const titleId = store.get(titleIdAtom);
-    const titleName = store.get(titleNameAtom);
-    store.set(userStatusAtom, "completed");
+    const prevStatus = getUserInfo().status;
+    setUserInfo((old) => ({ ...old, status: "completed" }));
     try {
-      await watchMovie(titleId);
+      await watchMovieMutation.mutateAsync({ id: titleId });
       toast.success(`Marked "${titleName}" as watched`);
     } catch {
-      store.set(userStatusAtom, prev);
+      setUserInfo((old) => ({ ...old, status: prevStatus }));
       toast.error("Failed to mark as watched");
     }
-  }, [store]);
+  }, [getUserInfo, setUserInfo, titleId, titleName, watchMovieMutation]);
 
   const handleWatchEpisode = useCallback(
     async (
@@ -116,42 +157,49 @@ export function useTitleActions() {
       epNum: number,
       isWatched: boolean,
     ) => {
-      store.set(watchingEpAtom, episodeId);
+      setWatchingEp(episodeId);
 
       if (isWatched) {
-        const prevStatus = store.get(userStatusAtom);
-        store.set(
-          episodeWatchesAtom,
-          store.get(episodeWatchesAtom).filter((id) => id !== episodeId),
-        );
-        if (prevStatus === "completed")
-          store.set(userStatusAtom, "in_progress");
+        const prevWatches = getUserInfo().episodeWatches;
+        const prevStatus = getUserInfo().status;
+        setUserInfo((old) => ({
+          ...old,
+          episodeWatches: old.episodeWatches.filter((id) => id !== episodeId),
+          status: old.status === "completed" ? "in_progress" : old.status,
+        }));
 
         try {
-          await unwatchEpisodeAction(episodeId);
+          await unwatchEpMutation.mutateAsync({ id: episodeId });
           toast.success(`Unwatched S${seasonNum} E${epNum}`);
         } catch {
-          const w = store.get(episodeWatchesAtom);
-          if (!w.includes(episodeId))
-            store.set(episodeWatchesAtom, [...w, episodeId]);
-          store.set(userStatusAtom, prevStatus);
+          setUserInfo((old) => ({
+            ...old,
+            episodeWatches: prevWatches,
+            status: prevStatus,
+          }));
           toast.error("Failed to unmark episode");
         }
       } else {
-        const currentWatches = store.get(episodeWatchesAtom);
-        const prevStatus = store.get(userStatusAtom);
-        if (!currentWatches.includes(episodeId)) {
-          store.set(episodeWatchesAtom, [...currentWatches, episodeId]);
-        }
-        if (prevStatus === null || prevStatus === "watchlist") {
-          store.set(userStatusAtom, "in_progress");
-        }
+        const prevWatches = getUserInfo().episodeWatches;
+        const prevStatus = getUserInfo().status;
+        const currentWatches = prevWatches;
+        const newWatches = currentWatches.includes(episodeId)
+          ? currentWatches
+          : [...currentWatches, episodeId];
+
+        setUserInfo((old) => ({
+          ...old,
+          episodeWatches: newWatches,
+          status:
+            old.status === null || old.status === "watchlist"
+              ? "in_progress"
+              : old.status,
+        }));
 
         try {
-          await watchEpisode(episodeId);
+          await watchEpMutation.mutateAsync({ id: episodeId });
 
-          const seasons = store.get(seasonsAtom);
-          const watchedSet = new Set(store.get(episodeWatchesAtom));
+          const watchedSet = new Set(getUserInfo().episodeWatches);
           const previousUnwatched: string[] = [];
           for (const s of seasons) {
             for (const ep of s.episodes) {
@@ -180,48 +228,57 @@ export function useTitleActions() {
             toast.success(`Watched S${seasonNum} E${epNum}`);
           }
         } catch {
-          store.set(
-            episodeWatchesAtom,
-            store.get(episodeWatchesAtom).filter((id) => id !== episodeId),
-          );
-          store.set(userStatusAtom, prevStatus);
+          setUserInfo((old) => ({
+            ...old,
+            episodeWatches: prevWatches,
+            status: prevStatus,
+          }));
           toast.error("Failed to mark episode");
         }
       }
 
-      store.set(watchingEpAtom, null);
+      setWatchingEp(null);
     },
-    [store, catchUp],
+    [
+      getUserInfo,
+      setUserInfo,
+      setWatchingEp,
+      seasons,
+      catchUp,
+      unwatchEpMutation,
+      watchEpMutation,
+    ],
   );
 
   const handleMarkSeason = useCallback(
     async (season: Season) => {
-      const prevWatches = store.get(episodeWatchesAtom);
-      const prevStatus = store.get(userStatusAtom);
+      const prevWatches = getUserInfo().episodeWatches;
+      const prevStatus = getUserInfo().status;
       const watchedSet = new Set(prevWatches);
       const unwatched = season.episodes.filter((ep) => !watchedSet.has(ep.id));
       if (unwatched.length === 0) return;
 
       const newWatchSet = new Set(watchedSet);
       for (const ep of unwatched) newWatchSet.add(ep.id);
-      store.set(episodeWatchesAtom, [...newWatchSet]);
+      const newWatches = [...newWatchSet];
 
-      const seasons = store.get(seasonsAtom);
       const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));
-      if (allEpIds.every((id) => newWatchSet.has(id))) {
-        store.set(userStatusAtom, "completed");
-      } else {
-        const status = store.get(userStatusAtom);
-        if (status === null || status === "watchlist") {
-          store.set(userStatusAtom, "in_progress");
-        }
-      }
+      const allWatched = allEpIds.every((id) => newWatchSet.has(id));
+
+      setUserInfo((old) => ({
+        ...old,
+        episodeWatches: newWatches,
+        status: allWatched
+          ? "completed"
+          : old.status === null || old.status === "watchlist"
+            ? "in_progress"
+            : old.status,
+      }));
 
       try {
-        await watchSeason(season.id);
+        await watchSeasonMutation.mutateAsync({ id: season.id });
 
-        const seasons = store.get(seasonsAtom);
-        const currentWatchSet = new Set(store.get(episodeWatchesAtom));
+        const currentWatchSet = new Set(getUserInfo().episodeWatches);
         const previousUnwatched: string[] = [];
         for (const s of seasons) {
           if (s.seasonNumber < season.seasonNumber) {
@@ -248,57 +305,66 @@ export function useTitleActions() {
           toast.success(`Watched all of ${seasonLabel}`);
         }
       } catch {
-        store.set(episodeWatchesAtom, prevWatches);
-        store.set(userStatusAtom, prevStatus);
+        setUserInfo((old) => ({
+          ...old,
+          episodeWatches: prevWatches,
+          status: prevStatus,
+        }));
         toast.error("Failed to mark some episodes");
       }
     },
-    [store, catchUp],
+    [getUserInfo, setUserInfo, seasons, catchUp, watchSeasonMutation],
   );
 
   const handleUnmarkSeason = useCallback(
     async (season: Season) => {
-      const prevWatches = store.get(episodeWatchesAtom);
-      const prevStatus = store.get(userStatusAtom);
+      const prevWatches = getUserInfo().episodeWatches;
+      const prevStatus = getUserInfo().status;
       const seasonEpIds = new Set(season.episodes.map((ep) => ep.id));
-      store.set(
-        episodeWatchesAtom,
-        store.get(episodeWatchesAtom).filter((id) => !seasonEpIds.has(id)),
-      );
-      const status = store.get(userStatusAtom);
-      if (status === "completed") store.set(userStatusAtom, "in_progress");
+      setUserInfo((old) => ({
+        ...old,
+        episodeWatches: old.episodeWatches.filter((id) => !seasonEpIds.has(id)),
+        status: old.status === "completed" ? "in_progress" : old.status,
+      }));
 
       try {
-        await unwatchSeasonAction(season.id);
+        await unwatchSeasonMutation.mutateAsync({ id: season.id });
         toast.success(
           `Unwatched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
         );
       } catch {
-        store.set(episodeWatchesAtom, prevWatches);
-        store.set(userStatusAtom, prevStatus);
+        setUserInfo((old) => ({
+          ...old,
+          episodeWatches: prevWatches,
+          status: prevStatus,
+        }));
         toast.error("Failed to unmark some episodes");
       }
     },
-    [store],
+    [getUserInfo, setUserInfo, unwatchSeasonMutation],
   );
 
   const handleMarkAllWatched = useCallback(async () => {
-    const titleId = store.get(titleIdAtom);
-    const prevStatus = store.get(userStatusAtom);
-    const prevWatches = store.get(episodeWatchesAtom);
-    const seasons = store.get(seasonsAtom);
+    const prevWatches = getUserInfo().episodeWatches;
+    const prevStatus = getUserInfo().status;
     const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));
-    store.set(episodeWatchesAtom, allEpIds);
-    store.set(userStatusAtom, "completed");
+    setUserInfo((old) => ({
+      ...old,
+      episodeWatches: allEpIds,
+      status: "completed",
+    }));
     try {
-      await markAllWatchedAction(titleId);
+      await watchAllMutation.mutateAsync({ id: titleId });
       toast.success("Marked all episodes as watched");
     } catch {
-      store.set(userStatusAtom, prevStatus);
-      store.set(episodeWatchesAtom, prevWatches);
+      setUserInfo((old) => ({
+        ...old,
+        episodeWatches: prevWatches,
+        status: prevStatus,
+      }));
       toast.error("Failed to mark all episodes as watched");
     }
-  }, [store]);
+  }, [getUserInfo, setUserInfo, seasons, titleId, watchAllMutation]);
 
   return {
     handleStatusChange,

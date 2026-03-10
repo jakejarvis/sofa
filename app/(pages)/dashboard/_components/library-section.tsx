@@ -1,23 +1,18 @@
+"use client";
+
 import { IconBooks } from "@tabler/icons-react";
-import { getNewAvailableFeed } from "@/lib/services/discovery";
-import { tmdbImageUrl } from "@/lib/tmdb/image";
+import { useQuery } from "@tanstack/react-query";
+import { orpc } from "@/lib/orpc/tanstack";
 import { FeedSection } from "./feed-section";
-import { TitleGrid } from "./title-grid";
+import { TitleGrid, TitleGridSectionSkeleton } from "./title-grid";
 
-export async function LibrarySection({ userId }: { userId: string }) {
-  const feed = await getNewAvailableFeed(userId);
-  if (feed.length === 0) return null;
+export function LibrarySection() {
+  const { data, isPending } = useQuery(orpc.dashboard.library.queryOptions());
 
-  const items = feed.slice(0, 10).map((t) => ({
-    id: t.titleId,
-    tmdbId: t.tmdbId,
-    type: t.type,
-    title: t.title,
-    posterPath: tmdbImageUrl(t.posterPath, "posters"),
-    releaseDate: t.releaseDate ?? t.firstAirDate,
-    voteAverage: t.voteAverage,
-    userStatus: t.userStatus as "watchlist" | "in_progress" | "completed",
-  }));
+  if (isPending) return <TitleGridSectionSkeleton />;
+
+  const items = data?.items ?? [];
+  if (items.length === 0) return null;
 
   return (
     <FeedSection

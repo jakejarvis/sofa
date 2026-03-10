@@ -48,7 +48,8 @@ bun run test
 - **Auth**: Better Auth with Drizzle adapter — email/password + optional OIDC/SSO via `genericOAuth` plugin
 - **Styling**: Tailwind CSS v4, shadcn components, dark cinema theme with warm primary accents
 - **Fonts**: DM Serif Display (display), DM Sans (body), Geist Mono (mono)
-- **State**: Jotai (client), SWR (data fetching)
+- **API**: oRPC (contract-first, type-safe RPC) with `@orpc/tanstack-query` for TanStack Query integration
+- **State**: Jotai (client), TanStack Query (data fetching & mutations via oRPC)
 - **Linting**: Biome (2-space indent, organized imports, React/Next.js recommended rules)
 - **External API**: TMDB (The Movie Database) with Bearer token auth
 
@@ -67,10 +68,24 @@ bun run test
 - `lib/logger.ts` — Structured logger with `LOG_LEVEL` support
 - `lib/types/` — Shared TypeScript types (e.g. `title.ts`)
 - `lib/cron.ts` — Background job scheduler (croner, `globalThis` singleton)
-- `app/api/` — Next.js route handlers
+- `lib/query-client.ts` — Singleton `QueryClient` with default options (30s stale time)
+- `lib/orpc/` — oRPC API layer (contract-first, type-safe RPC):
+  - `contract.ts` — Full API contract definition (~30 procedures)
+  - `schemas.ts` — Shared Zod input schemas used by contract
+  - `context.ts` — Context type & `os` implementer
+  - `middleware.ts` — Auth (`authed`) and admin (`admin`) middleware
+  - `router.ts` — Assembled router implementing the contract
+  - `handler.ts` — RPCHandler instance with error logging
+  - `client.ts` — Client-side oRPC client (RPCLink)
+  - `client.server.ts` — Server-side oRPC client (zero HTTP overhead for SSR)
+  - `tanstack.ts` — `orpc` utils for TanStack Query (`orpc.*.queryOptions()`)
+  - `procedures/` — Procedure implementations by domain (titles, episodes, seasons, people, dashboard, explore, search, discover, stats, status, integrations, admin, account, watchlist)
+- `app/rpc/[[...rest]]/route.ts` — Next.js catch-all route handler for oRPC
+- `app/api/` — Non-RPC routes (auth, images, avatars, backups, webhooks, lists, health)
 - `app/(pages)/` — Authenticated pages (dashboard, explore, titles/[id], people/[id], settings)
 - `app/(auth)/` — Auth pages (login, register, setup)
 - `components/` — App components + `components/ui/` for shadcn primitives
+- `components/query-provider.tsx` — `QueryClientProvider` wrapper used in root layout
 
 ### Auth pattern
 
@@ -81,16 +96,61 @@ import { getSession } from "@/lib/auth/session";
 const session = await getSession();
 ```
 
-Route handlers call Better Auth directly:
+oRPC procedures use auth middleware that calls Better Auth:
 
 ```typescript
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth/server";
-const session = await auth.api.getSession({ headers: await headers() });
-if (!session)
-  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-// use session.user.id
+// lib/orpc/middleware.ts — applied to procedures
+export const authed = base.middleware(async ({ context, next }) => {
+  const session = await auth.api.getSession({ headers: context.headers });
+  if (!session) throw new ORPCError("UNAUTHORIZED");
+  return next({ context: { user: session.user, session: session.session } });
+});
 ```
+
+### oRPC API layer
+
+All API procedures use oRPC with a contract-first approach. The contract defines the API shape in `lib/orpc/contract.ts`, procedures implement it in `lib/orpc/procedures/`, and the client consumes it with full type safety.
+
+**Pattern — query in component:**
+```typescript
+import { useQuery } from "@tanstack/react-query";
+import { orpc } from "@/lib/orpc/tanstack";
+
+const { data } = useQuery(orpc.dashboard.stats.queryOptions());
+```
+
+**Pattern — mutation:**
+```typescript
+import { client } from "@/lib/orpc/client";
+
+await client.titles.updateStatus({ id: titleId, status: "in_progress" });
+```
+
+**Pattern — procedure definition:**
+```typescript
+// lib/orpc/procedures/dashboard.ts
+export const stats = os.dashboard.stats.func(async (input, context, meta) => {
+  const { user } = context;
+  return getUserStats(user.id);
+}, authed);
+```
+
+**Page patterns:**
+- **Thin server shell** (titles, people): Server component fetches initial data via service layer, passes as `initialData` prop to client component that uses TanStack Query via `orpc` for refetching/mutations.
+- **Full client-side** (dashboard, explore, settings): Server component handles auth only; client components fetch all data via `orpc.*.queryOptions()` with skeleton loading states.
+
+### Non-RPC routes
+
+Only file-serving, auth, and webhook routes remain as traditional Next.js API routes:
+- `/api/auth/[...all]` — Better Auth catch-all
+- `/api/images/[...path]` — Image proxy/cache serving
+- `/api/avatars/[userId]` — Avatar file serving
+- `/api/account/avatar` — Avatar upload (FormData)
+- `/api/admin/backups/restore` — Backup restore (FormData upload)
+- `/api/backup/[filename]` — Backup file download
+- `/api/webhooks/[token]` — Plex/Jellyfin/Emby webhooks
+- `/api/lists/[token]` — External list feeds
+- `/api/health` — Simple health check (no auth)
 
 ### Database schema
 

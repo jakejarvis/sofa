@@ -9,6 +9,7 @@ import {
   IconRefresh,
   IconTrash,
 } from "@tabler/icons-react";
+import { useMutation } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import type { ComponentType, ReactNode } from "react";
@@ -38,11 +39,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  deleteIntegration,
-  regenerateIntegrationToken,
-  saveIntegration,
-} from "@/lib/actions/settings";
+import { orpc } from "@/lib/orpc/tanstack";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -93,66 +90,65 @@ export function IntegrationCard({
   setConnections: React.Dispatch<React.SetStateAction<IntegrationConnection[]>>;
 }) {
   const { provider, label } = config;
+  const providerInput = provider as
+    | "plex"
+    | "jellyfin"
+    | "emby"
+    | "sonarr"
+    | "radarr";
 
-  async function handleConnect() {
-    try {
-      const result = await saveIntegration(provider);
-      setConnections((prev) => [...prev, { ...result, recentEvents: [] }]);
-      toast.success(`${label} connected`);
-    } catch {
-      toast.error(`Failed to connect ${label}`);
-    }
-  }
+  const connectMutation = useMutation(
+    orpc.integrations.create.mutationOptions({
+      onSuccess: (result) => {
+        setConnections((prev) => [...prev, { ...result, recentEvents: [] }]);
+        toast.success(`${label} connected`);
+      },
+      onError: () => toast.error(`Failed to connect ${label}`),
+    }),
+  );
 
-  async function handleDelete() {
-    let previous: IntegrationConnection[] = [];
-    setConnections((prev) => {
-      previous = prev;
-      return prev.filter((c) => c.provider !== provider);
-    });
-    try {
-      await deleteIntegration(provider);
-      toast.success(`${label} disconnected`);
-    } catch {
-      setConnections(previous);
-      toast.error(`Failed to disconnect ${label}`);
-    }
-  }
+  const deleteMutation = useMutation(
+    orpc.integrations.delete.mutationOptions({
+      onMutate: () => {
+        let previous: IntegrationConnection[] = [];
+        setConnections((prev) => {
+          previous = prev;
+          return prev.filter((c) => c.provider !== provider);
+        });
+        return { previous };
+      },
+      onSuccess: () => toast.success(`${label} disconnected`),
+      onError: (_, __, ctx) => {
+        if (ctx?.previous) setConnections(ctx.previous);
+        toast.error(`Failed to disconnect ${label}`);
+      },
+    }),
+  );
 
-  async function handleRegenerateToken() {
-    try {
-      const result = await regenerateIntegrationToken(provider);
-      setConnections((prev) =>
-        prev.map((c) =>
-          c.provider === provider ? { ...c, token: result.token } : c,
-        ),
-      );
-      toast.success(`${label} URL regenerated`);
-    } catch {
-      toast.error(`Failed to regenerate ${label} URL`);
-    }
-  }
-
-  const [connecting, setConnecting] = useState(false);
+  const regenerateTokenMutation = useMutation(
+    orpc.integrations.regenerateToken.mutationOptions({
+      onSuccess: (result) => {
+        setConnections((prev) =>
+          prev.map((c) =>
+            c.provider === provider ? { ...c, token: result.token } : c,
+          ),
+        );
+        toast.success(`${label} URL regenerated`);
+      },
+      onError: () => toast.error(`Failed to regenerate ${label} URL`),
+    }),
+  );
   const [copied, setCopied] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
 
   const Icon = config.icon;
+  const connecting = connectMutation.isPending;
 
   const url =
     connection && typeof window !== "undefined"
       ? config.buildUrl(connection.token)
       : null;
-
-  async function onConnect() {
-    setConnecting(true);
-    try {
-      await handleConnect();
-    } finally {
-      setConnecting(false);
-    }
-  }
 
   async function handleCopy() {
     if (!url) return;
@@ -192,7 +188,9 @@ export function IntegrationCard({
 
             {!connection ? (
               <Button
-                onClick={onConnect}
+                onClick={() =>
+                  connectMutation.mutate({ provider: providerInput })
+                }
                 disabled={connecting}
                 size="lg"
                 className="w-full"
@@ -248,7 +246,11 @@ export function IntegrationCard({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleRegenerateToken()}
+                        onClick={() =>
+                          regenerateTokenMutation.mutate({
+                            provider: providerInput,
+                          })
+                        }
                       >
                         <IconRefresh />
                         Regenerate URL
@@ -256,7 +258,9 @@ export function IntegrationCard({
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => handleDelete()}
+                        onClick={() =>
+                          deleteMutation.mutate({ provider: providerInput })
+                        }
                       >
                         <IconTrash />
                         Disconnect

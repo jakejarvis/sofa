@@ -1,27 +1,41 @@
 "use client";
 
 import { IconWorldUpload } from "@tabler/icons-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { toggleUpdateCheck } from "@/lib/actions/settings";
+import { orpc } from "@/lib/orpc/tanstack";
 
-export function UpdateCheckSection({
-  initialEnabled,
-}: {
-  initialEnabled: boolean;
-}) {
-  const [enabled, setEnabled] = useState(initialEnabled);
-  const [optimisticEnabled, setOptimisticEnabled] = useOptimistic(enabled);
+export function UpdateCheckSection() {
+  const { data, isPending: isLoading } = useQuery(
+    orpc.admin.updateCheck.queryOptions(),
+  );
+  const [localEnabled, setLocalEnabled] = useState<boolean | null>(null);
+  const currentEnabled = localEnabled ?? data?.enabled ?? true;
+  const [optimisticEnabled, setOptimisticEnabled] =
+    useOptimistic(currentEnabled);
   const [isPending, startTransition] = useTransition();
+  const toggleMutation = useMutation(
+    orpc.admin.toggleUpdateCheck.mutationOptions(),
+  );
+
+  if (isLoading) {
+    return (
+      <CardContent>
+        <Skeleton className="h-12 w-full" />
+      </CardContent>
+    );
+  }
 
   function handleToggle(checked: boolean) {
     startTransition(async () => {
       setOptimisticEnabled(checked);
       try {
-        await toggleUpdateCheck(checked);
-        setEnabled(checked);
+        await toggleMutation.mutateAsync({ enabled: checked });
+        setLocalEnabled(checked);
         toast.success(
           checked ? "Update checks enabled" : "Update checks disabled",
         );

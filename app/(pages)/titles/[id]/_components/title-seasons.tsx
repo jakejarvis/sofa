@@ -8,7 +8,6 @@ import {
   IconDeviceTvOld,
 } from "@tabler/icons-react";
 import { format, parseISO } from "date-fns";
-import { useAtomValue, useSetAtom } from "jotai";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
@@ -25,34 +24,55 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import {
-  episodeWatchesAtom,
-  seasonsAtom,
-  userStatusAtom,
-  watchingEpAtom,
-} from "@/lib/atoms/title";
-import type { Season } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { Season } from "@/lib/orpc/schemas";
+import { useTitleContext, useTitleUserInfo } from "./title-context";
 import { useTitleActions } from "./use-title-actions";
+
+export function SeasonsSkeleton() {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <Skeleton className="size-5 rounded" />
+        <Skeleton className="h-7 w-28" />
+      </div>
+      <div className="space-y-2">
+        {["s1", "s2", "s3"].map((id) => (
+          <div
+            key={id}
+            className="overflow-hidden rounded-xl border border-border/50 bg-card/50"
+          >
+            <div className="flex items-center justify-between p-4">
+              <Skeleton className="h-4 w-24" />
+              <div className="flex items-center gap-3">
+                <Skeleton className="hidden h-2 w-24 rounded-full sm:block" />
+                <Skeleton className="h-3 w-10" />
+                <Skeleton className="size-4" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function TitleSeasons({
   seasons: streamedSeasons,
 }: {
   seasons?: Season[];
 } = {}) {
-  const setSeasons = useSetAtom(seasonsAtom);
+  const { seasons, setSeasons, watchingEp } = useTitleContext();
+  const { episodeWatches, userStatus } = useTitleUserInfo();
 
-  // When seasons are streamed via Suspense, sync them into the Jotai store
+  // When seasons are streamed via Suspense, sync them into context
   useEffect(() => {
     if (streamedSeasons && streamedSeasons.length > 0) {
       setSeasons(streamedSeasons);
     }
   }, [streamedSeasons, setSeasons]);
 
-  const seasons = useAtomValue(seasonsAtom);
-  const episodeWatches = useAtomValue(episodeWatchesAtom);
   const watchedSet = useMemo(() => new Set(episodeWatches), [episodeWatches]);
-  const userStatus = useAtomValue(userStatusAtom);
-  const watchingEp = useAtomValue(watchingEpAtom);
   const {
     handleWatchEpisode,
     handleMarkSeason,

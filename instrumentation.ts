@@ -23,6 +23,9 @@ export async function register() {
     const { runMigrations } = await import("@/lib/db/migrate");
     runMigrations();
 
+    // Initialize oRPC server-side client for SSR
+    await import("@/lib/orpc/client.server");
+
     // Initialize job scheduler
     const { startJobs, stopJobs } = await import("@/lib/cron");
     startJobs();

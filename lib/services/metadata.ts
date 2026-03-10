@@ -1,5 +1,4 @@
 import { eq, inArray, sql } from "drizzle-orm";
-import { updateTag } from "next/cache";
 import { db } from "@/lib/db/client";
 import {
   availabilityOffers,
@@ -11,6 +10,13 @@ import {
   titles,
 } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
+import type {
+  AvailabilityOffer,
+  CastMember,
+  Episode,
+  ResolvedTitle,
+  Season,
+} from "@/lib/orpc/schemas";
 import { generateProviderUrl } from "@/lib/providers";
 import type {
   TmdbGenre,
@@ -27,13 +33,6 @@ import {
   getVideos,
 } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import type {
-  AvailabilityOffer,
-  CastMember,
-  Episode,
-  ResolvedTitle,
-  Season,
-} from "@/lib/types";
 import { refreshAvailability } from "./availability";
 import { extractAndStoreColors, parseColorPalette } from "./colors";
 import { getCastForTitle, refreshCredits } from "./credits";
@@ -173,7 +172,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
         extractAndStoreColors(existing.id, show.poster_path ?? null).catch(
           (err) => log.debug("Color extraction failed:", err),
         );
-        refreshCredits(existing.id, { revalidate: false }).catch((err) =>
+        refreshCredits(existing.id).catch((err) =>
           log.debug("Credits enrichment failed:", err),
         );
         refreshTrailer(existing.id).catch((err) =>
@@ -227,7 +226,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
     extractAndStoreColors(row.id, movie.poster_path ?? null).catch((err) =>
       log.debug("Color extraction failed:", err),
     );
-    refreshCredits(row.id, { revalidate: false }).catch((err) =>
+    refreshCredits(row.id).catch((err) =>
       log.debug("Credits enrichment failed:", err),
     );
     refreshTrailer(row.id).catch((err) =>
@@ -276,7 +275,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
   extractAndStoreColors(row.id, show.poster_path ?? null).catch((err) =>
     log.debug("Color extraction failed:", err),
   );
-  refreshCredits(row.id, { revalidate: false }).catch((err) =>
+  refreshCredits(row.id).catch((err) =>
     log.debug("Credits enrichment failed:", err),
   );
   refreshTrailer(row.id).catch((err) =>
@@ -352,7 +351,7 @@ export async function refreshTitle(titleId: string) {
     refreshTrailer(updated.id).catch((err) =>
       log.debug("Trailer enrichment failed:", err),
     );
-    refreshCredits(updated.id, { revalidate: false }).catch((err) =>
+    refreshCredits(updated.id).catch((err) =>
       log.debug("Credits enrichment failed:", err),
     );
     if (imageCacheEnabled()) {
@@ -444,10 +443,7 @@ export async function refreshTvChildren(
   }
 }
 
-export async function refreshRecommendations(
-  titleId: string,
-  { revalidate = true }: { revalidate?: boolean } = {},
-) {
+export async function refreshRecommendations(titleId: string) {
   const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title) return;
 
@@ -584,15 +580,6 @@ export async function refreshRecommendations(
         .run();
     }
   });
-
-  if (revalidate) {
-    try {
-      updateTag(`recs-${titleId}`);
-    } catch {
-      // updateTag only works inside Route Handlers / Server Actions;
-      // swallow when called from cron jobs or detached promises.
-    }
-  }
 }
 
 /** Fetch seasons from the DB, building the Season[] structure. */
@@ -701,12 +688,9 @@ async function ensureEnriched(
 ): Promise<boolean> {
   const tasks: Promise<void>[] = [];
 
-  // Called during render — skip updateTag calls (not allowed outside Server Actions/Route Handlers)
-  const noRevalidate = { revalidate: false } as const;
-
   if (!existing.hasCast) {
     tasks.push(
-      refreshCredits(titleId, noRevalidate).catch((err) =>
+      refreshCredits(titleId).catch((err) =>
         log.debug("Credits enrichment failed:", err),
       ),
     );
@@ -730,7 +714,7 @@ async function ensureEnriched(
       .get() != null;
   if (!hasRecommendations) {
     tasks.push(
-      refreshRecommendations(titleId, noRevalidate).catch((err) =>
+      refreshRecommendations(titleId).catch((err) =>
         log.debug("Recommendations enrichment failed:", err),
       ),
     );

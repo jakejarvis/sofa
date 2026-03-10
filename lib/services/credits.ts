@@ -1,11 +1,10 @@
 import { eq, inArray, sql } from "drizzle-orm";
-import { updateTag } from "next/cache";
 import { db } from "@/lib/db/client";
 import { persons, titleCast, titles } from "@/lib/db/schema";
 import { createLogger } from "@/lib/logger";
+import type { CastMember } from "@/lib/orpc/schemas";
 import { getMovieCredits, getTvAggregateCredits } from "@/lib/tmdb/client";
 import { tmdbImageUrl } from "@/lib/tmdb/image";
-import type { CastMember } from "@/lib/types";
 import { cacheProfilePhotos, imageCacheEnabled } from "./image-cache";
 
 const log = createLogger("credits");
@@ -81,10 +80,7 @@ function batchUpsertPersons(people: PersonData[]): Map<number, string> {
   return idMap;
 }
 
-export async function refreshCredits(
-  titleId: string,
-  { revalidate = true }: { revalidate?: boolean } = {},
-) {
+export async function refreshCredits(titleId: string) {
   const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title) return;
 
@@ -275,17 +271,6 @@ export async function refreshCredits(
             },
           })
           .run();
-      }
-    }
-
-    if (revalidate) {
-      for (const personId of personIds.values()) {
-        try {
-          updateTag(`person-${personId}`);
-        } catch {
-          // updateTag only works inside Route Handlers / Server Actions;
-          // swallow the error when called from cron jobs or detached promises.
-        }
       }
     }
 

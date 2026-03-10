@@ -1,6 +1,7 @@
 "use client";
 
 import { IconCalendarWeek } from "@tabler/icons-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
@@ -15,13 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import {
-  setBackupScheduleAction,
-  setMaxBackupsAction,
-  setScheduledBackupAction,
-} from "@/lib/actions/settings";
 import type { BackupFrequency } from "@/lib/cron";
+import { orpc } from "@/lib/orpc/tanstack";
 
 const FREQUENCY_OPTIONS: { value: BackupFrequency; label: string }[] = [
   { value: "6h", label: "6h" },
@@ -111,95 +109,112 @@ function formatNextBackup(
   return `Next backup ${formatDistanceToNow(next, { addSuffix: true })}`;
 }
 
-export function BackupScheduleSection({
-  initialScheduledEnabled,
-  initialMaxRetention,
-  initialFrequency,
-  initialTime,
-  initialDow,
-}: {
-  initialScheduledEnabled: boolean;
-  initialMaxRetention: number;
-  initialFrequency: BackupFrequency;
-  initialTime: string;
-  initialDow: number;
-}) {
-  const [schedule, setSchedule] = useState<BackupScheduleState>({
-    enabled: initialScheduledEnabled,
-    maxRetention: initialMaxRetention,
-    frequency: initialFrequency,
-    time: initialTime,
-    dow: initialDow,
-  });
-  const [savingSchedule, setSavingSchedule] = useState(false);
-  const [togglingSchedule, setTogglingSchedule] = useState(false);
+export function BackupScheduleSection() {
+  const {
+    data: scheduleData,
+    isPending,
+    isError,
+  } = useQuery(orpc.admin.backups.schedule.queryOptions());
 
-  const { enabled, maxRetention, frequency, time, dow } = schedule;
+  const [schedule, setSchedule] = useState<BackupScheduleState | null>(null);
+
+  // Use local state if user has modified, else use query data
+  const current: BackupScheduleState = schedule ?? {
+    enabled: scheduleData?.enabled ?? false,
+    maxRetention: scheduleData?.maxRetention ?? 7,
+    frequency: (scheduleData?.frequency as BackupFrequency) ?? "1d",
+    time: scheduleData?.time ?? "02:00",
+    dow: scheduleData?.dayOfWeek ?? 0,
+  };
+
+  const { enabled, maxRetention, frequency, time, dow } = current;
+
+  const updateScheduleMutation = useMutation(
+    orpc.admin.backups.updateSchedule.mutationOptions({
+      onMutate: (input) => {
+        const previous = { ...current };
+        const patch: Partial<BackupScheduleState> = {};
+        if (input.enabled !== undefined) patch.enabled = input.enabled;
+        if (input.maxRetention !== undefined)
+          patch.maxRetention = input.maxRetention;
+        if (input.frequency !== undefined)
+          patch.frequency = input.frequency as BackupFrequency;
+        if (input.time !== undefined) patch.time = input.time;
+        if (input.dayOfWeek !== undefined) patch.dow = input.dayOfWeek;
+        setSchedule({ ...current, ...patch });
+        return { previous };
+      },
+      onError: (_, input, ctx) => {
+        if (ctx?.previous) setSchedule(ctx.previous);
+        if (input.enabled !== undefined) {
+          toast.error("Failed to update scheduled backup setting");
+        } else if (input.maxRetention !== undefined) {
+          toast.error("Failed to update retention setting");
+        } else {
+          toast.error("Failed to update schedule");
+        }
+      },
+    }),
+  );
+
+  const togglingSchedule =
+    updateScheduleMutation.isPending &&
+    updateScheduleMutation.variables?.enabled !== undefined;
+  const savingSchedule =
+    updateScheduleMutation.isPending &&
+    updateScheduleMutation.variables?.frequency !== undefined;
 
   const toggleScheduled = useCallback(
-    async (checked: boolean) => {
-      const previous = schedule.enabled;
-      setSchedule((prev) => ({ ...prev, enabled: checked }));
-      setTogglingSchedule(true);
-      try {
-        await setScheduledBackupAction(checked);
-        toast.success(
-          checked ? "Scheduled backups enabled" : "Scheduled backups disabled",
-        );
-      } catch {
-        setSchedule((prev) => ({ ...prev, enabled: previous }));
-        toast.error("Failed to update scheduled backup setting");
-      } finally {
-        setTogglingSchedule(false);
-      }
+    (checked: boolean) => {
+      updateScheduleMutation.mutate(
+        { enabled: checked },
+        {
+          onSuccess: () =>
+            toast.success(
+              checked
+                ? "Scheduled backups enabled"
+                : "Scheduled backups disabled",
+            ),
+        },
+      );
     },
-    [schedule.enabled],
+    [updateScheduleMutation],
   );
 
   const changeMaxRetention = useCallback(
-    async (value: number) => {
-      const previous = schedule.maxRetention;
-      setSchedule((prev) => ({ ...prev, maxRetention: value }));
-      try {
-        await setMaxBackupsAction(value);
-      } catch {
-        setSchedule((prev) => ({ ...prev, maxRetention: previous }));
-        toast.error("Failed to update retention setting");
-      }
+    (value: number) => {
+      updateScheduleMutation.mutate({ maxRetention: value });
     },
-    [schedule.maxRetention],
+    [updateScheduleMutation],
   );
 
   const changeSchedule = useCallback(
-    async (
-      newFrequency: BackupFrequency,
-      newTime: string,
-      newDow = schedule.dow,
-    ) => {
-      const prev = {
-        frequency: schedule.frequency,
-        time: schedule.time,
-        dow: schedule.dow,
-      };
-      setSchedule((s) => ({
-        ...s,
-        frequency: newFrequency,
-        time: newTime,
-        dow: newDow,
-      }));
-      setSavingSchedule(true);
-      try {
-        await setBackupScheduleAction(newFrequency, newTime, newDow);
-        toast.success("Schedule updated");
-      } catch {
-        setSchedule((s) => ({ ...s, ...prev }));
-        toast.error("Failed to update schedule");
-      } finally {
-        setSavingSchedule(false);
-      }
+    (newFrequency: BackupFrequency, newTime: string, newDow = current.dow) => {
+      updateScheduleMutation.mutate(
+        {
+          frequency: newFrequency,
+          time: newTime,
+          dayOfWeek: newDow,
+        },
+        { onSuccess: () => toast.success("Schedule updated") },
+      );
     },
-    [schedule.frequency, schedule.time, schedule.dow],
+    [updateScheduleMutation, current.dow],
   );
+
+  if (isPending) {
+    return <Skeleton className="h-20 w-full rounded-xl" />;
+  }
+
+  if (isError) {
+    return (
+      <CardContent>
+        <p className="text-muted-foreground text-sm">
+          Failed to load backup schedule settings.
+        </p>
+      </CardContent>
+    );
+  }
 
   return (
     <>

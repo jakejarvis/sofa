@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { CommandPalette } from "@/components/command-palette";
 import { MobileTabBar, NavBar } from "@/components/nav-bar";
 import { ProgressProvider } from "@/components/navigation-progress";
+import { QueryProvider } from "@/components/query-provider";
 import { UpdateToast } from "@/components/update-toast";
 import { getSession } from "@/lib/auth/session";
 import { getCachedUpdateCheck } from "@/lib/services/update-check";
@@ -14,9 +15,11 @@ export default function PagesLayout({
 }) {
   return (
     <Suspense>
-      <ProgressProvider>
-        <AuthenticatedShell>{children}</AuthenticatedShell>
-      </ProgressProvider>
+      <QueryProvider>
+        <ProgressProvider>
+          <AuthenticatedShell>{children}</AuthenticatedShell>
+        </ProgressProvider>
+      </QueryProvider>
     </Suspense>
   );
 }

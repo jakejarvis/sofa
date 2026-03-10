@@ -1,28 +1,41 @@
 "use client";
 
 import { IconDoorEnter } from "@tabler/icons-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { toggleRegistration } from "@/lib/actions/settings";
+import { orpc } from "@/lib/orpc/tanstack";
 
-export function RegistrationSection({
-  initialRegistrationOpen,
-}: {
-  initialRegistrationOpen: boolean;
-}) {
-  const [registrationOpen, setRegistrationOpen] = useState(
-    initialRegistrationOpen,
+export function RegistrationSection() {
+  const { data, isPending: isLoading } = useQuery(
+    orpc.admin.registration.queryOptions(),
   );
-  const [optimisticOpen, setOptimisticOpen] = useOptimistic(registrationOpen);
+  const [registrationOpen, setRegistrationOpen] = useState<boolean | null>(
+    null,
+  );
+  const currentOpen = registrationOpen ?? data?.open ?? false;
+  const [optimisticOpen, setOptimisticOpen] = useOptimistic(currentOpen);
   const [isPending, startTransition] = useTransition();
+  const toggleMutation = useMutation(
+    orpc.admin.toggleRegistration.mutationOptions(),
+  );
+
+  if (isLoading) {
+    return (
+      <CardContent>
+        <Skeleton className="h-12 w-full" />
+      </CardContent>
+    );
+  }
 
   function handleToggle(checked: boolean) {
     startTransition(async () => {
       setOptimisticOpen(checked);
       try {
-        await toggleRegistration(checked);
+        await toggleMutation.mutateAsync({ open: checked });
         setRegistrationOpen(checked);
         toast.success(checked ? "Registration opened" : "Registration closed");
       } catch {

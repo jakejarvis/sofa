@@ -3,21 +3,10 @@ import {
   IconServer2,
   IconShieldLock,
 } from "@tabler/icons-react";
-import { desc, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { Card } from "@/components/ui/card";
 import { getSession } from "@/lib/auth/session";
-import { db } from "@/lib/db/client";
-import { integrationEvents, integrations } from "@/lib/db/schema";
-import { listBackups } from "@/lib/services/backup";
-import { getSetting } from "@/lib/services/settings";
-import { getSystemHealth } from "@/lib/services/system-health";
-import {
-  getCachedUpdateCheck,
-  isUpdateCheckEnabled,
-} from "@/lib/services/update-check";
 import { AccountSection } from "./_components/account-section";
 import { BackupRestoreSection } from "./_components/backup-restore-section";
 import { BackupScheduleSection } from "./_components/backup-schedule-section";
@@ -25,10 +14,7 @@ import { BackupSection } from "./_components/backup-section";
 import { IntegrationsSection } from "./_components/integrations-section";
 import { RegistrationSection } from "./_components/registration-section";
 import { SettingsShell } from "./_components/settings-shell";
-import {
-  SkeletonCards,
-  SystemHealthCards,
-} from "./_components/system-health-section";
+import { SystemHealthCards } from "./_components/system-health-section";
 import { UpdateCheckSection } from "./_components/update-check-section";
 
 export default async function SettingsPage() {
@@ -36,72 +22,6 @@ export default async function SettingsPage() {
   if (!session?.user) redirect("/login");
 
   const isAdmin = session.user.role === "admin";
-
-  const connRows = db
-    .select()
-    .from(integrations)
-    .where(eq(integrations.userId, session.user.id))
-    .all();
-
-  const connIds = connRows.map((c) => c.id);
-
-  // Fetch only the 10 most recent events per connection (index-optimized)
-  const eventsByConn = new Map<
-    string,
-    (typeof integrationEvents.$inferSelect)[]
-  >();
-  for (const connId of connIds) {
-    const events = db
-      .select()
-      .from(integrationEvents)
-      .where(eq(integrationEvents.integrationId, connId))
-      .orderBy(desc(integrationEvents.receivedAt))
-      .limit(10)
-      .all();
-    eventsByConn.set(connId, events);
-  }
-
-  const connections = connRows.map((conn) => ({
-    id: conn.id,
-    provider: conn.provider,
-    type: conn.type,
-    token: conn.token,
-    enabled: conn.enabled,
-    lastEventAt: conn.lastEventAt?.toISOString() ?? null,
-    recentEvents: (eventsByConn.get(conn.id) ?? []).map((e) => ({
-      id: e.id,
-      eventType: e.eventType,
-      mediaType: e.mediaType,
-      mediaTitle: e.mediaTitle,
-      status: e.status,
-      receivedAt: e.receivedAt.toISOString(),
-    })),
-  }));
-
-  const registrationOpen = isAdmin
-    ? getSetting("registrationOpen") === "true"
-    : false;
-
-  const backups = isAdmin ? await listBackups() : [];
-  const scheduledBackupsEnabled = isAdmin
-    ? getSetting("scheduledBackups") === "true"
-    : false;
-  const maxBackupRetention = isAdmin
-    ? Number.parseInt(getSetting("maxBackupRetention") ?? "7", 10)
-    : 7;
-  const backupFrequency = isAdmin
-    ? (getSetting("backupScheduleFrequency") ?? "1d")
-    : "1d";
-  const backupTime = isAdmin
-    ? (getSetting("backupScheduleTime") ?? "02:00")
-    : "02:00";
-  const backupDow = isAdmin
-    ? Number.parseInt(getSetting("backupScheduleDow") ?? "0", 10)
-    : 0;
-
-  const updateCheckEnabled = isAdmin ? isUpdateCheckEnabled() : true;
-  const updateCheck =
-    isAdmin && updateCheckEnabled ? getCachedUpdateCheck() : null;
 
   const GITHUB_REPO = "jakejarvis/sofa";
   const APP_VERSION = process.env.APP_VERSION || "0.0.0";
@@ -136,25 +56,6 @@ export default async function SettingsPage() {
                 )
               </>
             )}
-            {updateCheck?.updateAvailable && (
-              <span className="ml-1.5 inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 font-medium text-[10px] text-primary">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-                </span>
-                <a
-                  href={
-                    updateCheck.releaseUrl ??
-                    `https://github.com/${GITHUB_REPO}/releases`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  v{updateCheck.latestVersion} available
-                </a>
-              </span>
-            )}
           </p>
           <div className="mt-4 flex flex-col items-center gap-2">
             <a
@@ -182,7 +83,7 @@ export default async function SettingsPage() {
           role: session.user.role ?? undefined,
         }}
       />
-      <IntegrationsSection initialConnections={connections} />
+      <IntegrationsSection />
       {isAdmin && (
         <>
           {/* Server health */}
@@ -199,9 +100,7 @@ export default async function SettingsPage() {
                 Admin only
               </span>
             </div>
-            <Suspense fallback={<SkeletonCards />}>
-              <SystemHealthLoader />
-            </Suspense>
+            <SystemHealthCards />
           </div>
 
           {/* Security */}
@@ -220,12 +119,10 @@ export default async function SettingsPage() {
             </div>
             <div className="space-y-3">
               <Card className="border-l-2 border-l-primary/30">
-                <RegistrationSection
-                  initialRegistrationOpen={registrationOpen}
-                />
+                <RegistrationSection />
               </Card>
               <Card className="border-l-2 border-l-primary/30">
-                <UpdateCheckSection initialEnabled={updateCheckEnabled} />
+                <UpdateCheckSection />
               </Card>
             </div>
           </div>
@@ -246,18 +143,10 @@ export default async function SettingsPage() {
             </div>
             <div className="space-y-3">
               <Card className="border-l-2 border-l-primary/30">
-                <BackupSection initialBackups={backups} />
+                <BackupSection />
               </Card>
               <Card className="border-l-2 border-l-primary/30">
-                <BackupScheduleSection
-                  initialScheduledEnabled={scheduledBackupsEnabled}
-                  initialMaxRetention={maxBackupRetention}
-                  initialFrequency={
-                    backupFrequency as "6h" | "12h" | "1d" | "7d"
-                  }
-                  initialTime={backupTime}
-                  initialDow={backupDow}
-                />
+                <BackupScheduleSection />
               </Card>
               <Card className="border-l-2 border-l-primary/30">
                 <BackupRestoreSection />
@@ -268,9 +157,4 @@ export default async function SettingsPage() {
       )}
     </SettingsShell>
   );
-}
-
-async function SystemHealthLoader() {
-  const data = await getSystemHealth();
-  return <SystemHealthCards initialData={data} />;
 }

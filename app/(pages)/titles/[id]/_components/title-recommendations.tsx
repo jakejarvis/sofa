@@ -1,45 +1,64 @@
-import { cacheLife, cacheTag } from "next/cache";
-import { getSession } from "@/lib/auth/session";
-import { getRecommendationsForTitle } from "@/lib/services/discovery";
-import { getUserStatusesByTitleIds } from "@/lib/services/tracking";
-import type { RecommendedTitle } from "@/lib/types";
-import { RecommendationsGrid } from "./recommendations-grid";
+"use client";
 
-async function getCachedRecommendations(titleId: string) {
-  "use cache";
-  cacheLife("hours");
-  cacheTag(`recs-${titleId}`);
+import { IconThumbUp } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import { TitleCard, TitleCardSkeleton } from "@/components/title-card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { orpc } from "@/lib/orpc/tanstack";
 
-  return getRecommendationsForTitle(titleId);
+function RecommendationsSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Skeleton className="size-5 rounded" />
+        <Skeleton className="h-6 w-36" />
+      </div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        <TitleCardSkeleton />
+        <TitleCardSkeleton />
+        <TitleCardSkeleton />
+        <TitleCardSkeleton />
+        <TitleCardSkeleton />
+        <TitleCardSkeleton />
+      </div>
+    </div>
+  );
 }
 
-export async function TitleRecommendations({ titleId }: { titleId: string }) {
-  const recs = await getCachedRecommendations(titleId);
-  if (recs.length === 0) return null;
+export function TitleRecommendations({ titleId }: { titleId: string }) {
+  const { data, isLoading } = useQuery(
+    orpc.titles.recommendations.queryOptions({ input: { id: titleId } }),
+  );
 
-  const recommendations: RecommendedTitle[] = recs.map((r) => ({
-    id: r.id,
-    tmdbId: r.tmdbId,
-    type: r.type,
-    title: r.title,
-    posterPath: r.posterPath,
-    releaseDate: r.releaseDate,
-    firstAirDate: r.firstAirDate,
-    voteAverage: r.voteAverage,
-  }));
-
-  const session = await getSession();
-  const userStatuses = session
-    ? getUserStatusesByTitleIds(
-        session.user.id,
-        recommendations.map((r) => r.id),
-      )
-    : {};
+  if (isLoading) return <RecommendationsSkeleton />;
+  if (!data || data.recommendations.length === 0) return null;
 
   return (
-    <RecommendationsGrid
-      recommendations={recommendations}
-      userStatuses={userStatuses}
-    />
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <IconThumbUp aria-hidden={true} className="size-5 text-primary" />
+        <h2 className="font-display text-xl tracking-tight">Recommended</h2>
+      </div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        {data.recommendations.slice(0, 12).map((rec, i) => (
+          <div
+            key={rec.id}
+            className="animate-stagger-item"
+            style={{ "--stagger-index": i } as React.CSSProperties}
+          >
+            <TitleCard
+              id={rec.id}
+              tmdbId={rec.tmdbId}
+              type={rec.type}
+              title={rec.title}
+              posterPath={rec.posterPath}
+              releaseDate={rec.releaseDate ?? rec.firstAirDate}
+              voteAverage={rec.voteAverage}
+              userStatus={data.userStatuses[rec.id]}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

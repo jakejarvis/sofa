@@ -1,22 +1,16 @@
 "use client";
 
 import { IconCheck } from "@tabler/icons-react";
-import { useAtomValue } from "jotai";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-  titleTypeAtom,
-  userRatingAtom,
-  userStatusAtom,
-} from "@/lib/atoms/title";
 import { StarRating } from "./star-rating";
 import { StatusButton } from "./status-button";
+import { useTitleContext, useTitleUserInfo } from "./title-context";
 import { useTitleActions } from "./use-title-actions";
 
 export function TitleActions() {
-  const titleType = useAtomValue(titleTypeAtom);
-  const userStatus = useAtomValue(userStatusAtom);
-  const userRating = useAtomValue(userRatingAtom);
+  const { titleType } = useTitleContext();
+  const { userStatus, userRating } = useTitleUserInfo();
   const { handleStatusChange, handleRating, handleWatchMovie } =
     useTitleActions();
 

@@ -1,7 +1,8 @@
 "use client";
 
 import { IconCloudUpload } from "@tabler/icons-react";
-import { useRef, useState, useTransition } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -16,29 +17,31 @@ import {
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import { restoreBackupAction } from "@/lib/actions/settings";
+import { orpc } from "@/lib/orpc/tanstack";
 
 export function BackupRestoreSection() {
-  const [isPending, startTransition] = useTransition();
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function handleRestore(file: File) {
-    const formData = new FormData();
-    formData.append("file", file);
-    startTransition(async () => {
-      try {
-        await restoreBackupAction(formData);
+  const restoreMutation = useMutation(
+    orpc.admin.backups.restore.mutationOptions({
+      onSuccess: () => {
         toast.success("Database restored. Reloading...");
         setTimeout(() => window.location.reload(), 1500);
-      } catch (err) {
+      },
+      onError: (err) => {
         const message = err instanceof Error ? err.message : "Restore failed";
         toast.error(message);
-      } finally {
+      },
+      onSettled: () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
-      }
-    });
+      },
+    }),
+  );
+
+  function handleRestore(file: File) {
+    restoreMutation.mutate(file);
   }
 
   return (
@@ -110,10 +113,14 @@ export function BackupRestoreSection() {
         <Button
           variant="outline"
           onClick={() => fileInputRef.current?.click()}
-          disabled={isPending}
+          disabled={restoreMutation.isPending}
         >
-          {isPending ? <Spinner /> : <IconCloudUpload aria-hidden={true} />}
-          {isPending ? "Restoring…" : "Upload"}
+          {restoreMutation.isPending ? (
+            <Spinner />
+          ) : (
+            <IconCloudUpload aria-hidden={true} />
+          )}
+          {restoreMutation.isPending ? "Restoring…" : "Upload"}
         </Button>
       </div>
     </CardContent>

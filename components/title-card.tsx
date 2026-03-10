@@ -2,7 +2,6 @@
 
 import {
   IconBookmarkFilled,
-  IconCheck,
   IconCircleCheckFilled,
   IconDeviceTv,
   IconLoader,
@@ -11,21 +10,34 @@ import {
   IconPlus,
   IconStarFilled,
 } from "@tabler/icons-react";
+import { useMutation } from "@tanstack/react-query";
 import { type MotionStyle, type MotionValue, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useProgress } from "@/components/navigation-progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTiltEffect } from "@/hooks/use-tilt-effect";
-import { resolveTitle } from "@/lib/actions/titles";
-import { quickAddToWatchlist } from "@/lib/actions/watchlist";
+import { orpc } from "@/lib/orpc/tanstack";
+
+export function TitleCardSkeleton() {
+  return (
+    <div className="overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06]">
+      <Skeleton className="aspect-[2/3] w-full rounded-none" />
+      <div className="px-3 pt-2.5 pb-3">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="mt-1.5 h-3 w-1/2" />
+      </div>
+    </div>
+  );
+}
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
@@ -50,8 +62,6 @@ export interface TitleCardProps extends CardInnerProps {
   id?: string;
   tmdbId: number;
 }
-
-type QuickAddState = "idle" | "loading" | "added";
 
 const statusConfig = {
   watchlist: {
@@ -80,9 +90,6 @@ function QuickAddButton({
   type: "movie" | "tv";
   userStatus?: TitleStatus | null;
 }) {
-  const [state, setState] = useState<QuickAddState>(
-    userStatus ? "added" : "idle",
-  );
   const [addedStatus, setAddedStatus] = useState<TitleStatus | null>(
     userStatus ?? null,
   );
@@ -90,28 +97,27 @@ function QuickAddButton({
   // Sync local state when prop changes (e.g. after navigation or SWR revalidation)
   useEffect(() => {
     if (userStatus) {
-      setState("added");
       setAddedStatus(userStatus);
     }
   }, [userStatus]);
 
+  const quickAddMutation = useMutation(
+    orpc.watchlist.quickAdd.mutationOptions({
+      onSuccess: () => setAddedStatus("watchlist"),
+    }),
+  );
+
+  const isAdded = addedStatus != null;
   const config = addedStatus ? statusConfig[addedStatus] : null;
 
-  async function handleClick(e: React.MouseEvent) {
+  function handleClick(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (state === "loading" || state === "added") return;
-    setState("loading");
-    try {
-      await quickAddToWatchlist(tmdbId, type);
-      setState("added");
-      setAddedStatus("watchlist");
-    } catch {
-      setState("idle");
-    }
+    if (quickAddMutation.isPending || isAdded) return;
+    quickAddMutation.mutate({ tmdbId, type });
   }
 
-  if (state === "added" && config) {
+  if (isAdded && config) {
     const StatusIcon = config.icon;
     return (
       <Tooltip>
@@ -133,13 +139,12 @@ function QuickAddButton({
         className="absolute top-2 right-2 z-10 flex size-8 items-center justify-center rounded-full bg-black/50 text-white opacity-60 backdrop-blur-sm transition-opacity hover:bg-black/70 focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
         render={<button type="button" />}
       >
-        {state === "idle" && <IconPlus className="size-4" />}
-        {state === "loading" && <IconLoader className="size-4 animate-spin" />}
-        {state === "added" && <IconCheck className="size-4 text-green-400" />}
+        {!quickAddMutation.isPending && <IconPlus className="size-4" />}
+        {quickAddMutation.isPending && (
+          <IconLoader className="size-4 animate-spin" />
+        )}
       </TooltipTrigger>
-      <TooltipContent side="bottom">
-        {state === "added" ? "Added to Watchlist" : "Add to Watchlist"}
-      </TooltipContent>
+      <TooltipContent side="bottom">Add to Watchlist</TooltipContent>
     </Tooltip>
   );
 }
@@ -287,7 +292,18 @@ export function TitleCard({
   const tilt = useTiltEffect();
   const router = useRouter();
   const progress = useProgress();
-  const [isPending, startTransition] = useTransition();
+  const resolveMutation = useMutation(
+    orpc.titles.resolve.mutationOptions({
+      onSuccess: ({ id: resolvedId }) => {
+        if (resolvedId) router.push(`/titles/${resolvedId}`);
+        else progress.done();
+      },
+      onError: () => {
+        progress.done();
+        toast.error("Failed to load title");
+      },
+    }),
+  );
 
   const cardContent = (
     <motion.div ref={tilt.ref} style={tilt.containerStyle} {...tilt.handlers}>
@@ -320,23 +336,11 @@ export function TitleCard({
       ) : (
         <button
           type="button"
-          disabled={isPending}
-          className={`w-full text-left ${isPending ? "pointer-events-none opacity-70" : "cursor-pointer"}`}
+          disabled={resolveMutation.isPending}
+          className={`w-full text-left ${resolveMutation.isPending ? "pointer-events-none opacity-70" : "cursor-pointer"}`}
           onClick={() => {
             progress.start();
-            startTransition(async () => {
-              try {
-                const resolvedId = await resolveTitle(
-                  tmdbId,
-                  type as "movie" | "tv",
-                );
-                if (resolvedId) router.push(`/titles/${resolvedId}`);
-                else progress.done();
-              } catch {
-                progress.done();
-                toast.error("Failed to load title");
-              }
-            });
+            resolveMutation.mutate({ tmdbId, type: type as "movie" | "tv" });
           }}
         >
           {cardContent}

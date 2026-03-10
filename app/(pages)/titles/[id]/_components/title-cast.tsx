@@ -1,4 +1,4 @@
-import type { CastMember } from "@/lib/types";
+import type { CastMember } from "@/lib/orpc/schemas";
 import { CastCarousel } from "./cast-carousel";
 
 interface TitleCastProps {
