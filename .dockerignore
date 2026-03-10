@@ -1,5 +1,4 @@
 node_modules
-.next
 .git
 .gitignore
 *.md
@@ -7,10 +6,10 @@ node_modules
 *.db-*
 .env
 .env.*
-!.env.example
-data
 .DS_Store
-.vercel
+data
 coverage
 .vscode
 .idea
+.turbo
+.tanstack

@@ -41,7 +41,7 @@ jobs:
 
       - name: Get app version
         id: version
-        run: echo "version=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(jq -r .version apps/web/package.json)" >> "$GITHUB_OUTPUT"
 
       - name: Docker metadata
         id: meta

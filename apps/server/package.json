@@ -1,0 +1,35 @@
+{
+  "name": "@sofa/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --env-file=../../.env --watch src/index.ts",
+    "start": "bun --env-file=../../.env src/index.ts",
+    "lint": "biome check",
+    "format": "biome format --write",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@orpc/client": "catalog:",
+    "@orpc/contract": "catalog:",
+    "@orpc/json-schema": "1.13.6",
+    "@orpc/openapi": "1.13.6",
+    "@orpc/server": "1.13.6",
+    "@orpc/zod": "1.13.6",
+    "@sofa/api": "workspace:*",
+    "@sofa/auth": "workspace:*",
+    "@sofa/config": "workspace:*",
+    "@sofa/core": "workspace:*",
+    "@sofa/db": "workspace:*",
+    "@sofa/logger": "workspace:*",
+    "@sofa/tmdb": "workspace:*",
+    "croner": "10.0.2-dev.2",
+    "hono": "4.12.7",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
+  }
+}

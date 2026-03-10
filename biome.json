@@ -10,11 +10,11 @@
     "includes": [
       "**",
       "!node_modules",
-      "!.next",
       "!dist",
       "!build",
       "!drizzle",
-      "!lib/tmdb/schema.d.ts"
+      "!lib/tmdb/schema.d.ts",
+      "!**/routeTree.gen.ts"
     ]
   },
   "css": {
@@ -31,7 +31,6 @@
   "linter": {
     "enabled": true,
     "domains": {
-      "next": "recommended",
       "react": "recommended"
     },
     "rules": {

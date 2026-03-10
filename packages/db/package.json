@@ -1,0 +1,32 @@
+{
+  "name": "@sofa/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client": "./src/client.ts",
+    "./schema": "./src/schema.ts",
+    "./helpers": "./src/helpers.ts",
+    "./migrate": "./src/migrate.ts",
+    "./test-utils": "./src/test-utils.ts"
+  },
+  "scripts": {
+    "lint": "biome check",
+    "format": "biome format --write",
+    "check-types": "tsc --noEmit",
+    "db:generate": "bun --bun drizzle-kit generate",
+    "db:migrate": "bun --bun drizzle-kit migrate",
+    "db:push": "bun --bun drizzle-kit push",
+    "db:studio": "bun --bun drizzle-kit studio"
+  },
+  "dependencies": {
+    "@sofa/config": "workspace:*",
+    "@sofa/logger": "workspace:*",
+    "drizzle-orm": "1.0.0-beta.16-ea816b6"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "drizzle-kit": "1.0.0-beta.16-ea816b6",
+    "typescript": "catalog:"
+  }
+}

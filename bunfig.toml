@@ -1,2 +1,3 @@
 [test]
-preload = ["./test/preload.ts"]
+root = "packages/core"
+preload = ["./packages/core/test/preload.ts"]

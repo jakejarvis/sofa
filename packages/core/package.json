@@ -1,0 +1,43 @@
+{
+  "name": "@sofa/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./availability": "./src/availability.ts",
+    "./backup": "./src/backup.ts",
+    "./colors": "./src/colors.ts",
+    "./credits": "./src/credits.ts",
+    "./discovery": "./src/discovery.ts",
+    "./image-cache": "./src/image-cache.ts",
+    "./lists": "./src/lists.ts",
+    "./metadata": "./src/metadata.ts",
+    "./person": "./src/person.ts",
+    "./providers": "./src/providers.ts",
+    "./settings": "./src/settings.ts",
+    "./system-health": "./src/system-health.ts",
+    "./tracking": "./src/tracking.ts",
+    "./update-check": "./src/update-check.ts",
+    "./webhooks": "./src/webhooks.ts"
+  },
+  "scripts": {
+    "lint": "biome check",
+    "format": "biome format --write",
+    "check-types": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@sofa/api": "workspace:*",
+    "@sofa/config": "workspace:*",
+    "@sofa/db": "workspace:*",
+    "@sofa/logger": "workspace:*",
+    "@sofa/tmdb": "workspace:*",
+    "date-fns": "catalog:",
+    "node-vibrant": "4.0.4",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -5,14 +5,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-bun run dev              # Start Next.js dev server
-bun run build            # Production build
+# Root commands (via Turborepo)
+bun run dev              # Start API server + Vite dev server
+bun run build            # Production build (both apps)
 bun run lint             # Biome lint check
 bun run format           # Biome format (auto-fix)
-bun run db:push          # Push schema changes to SQLite database
-bun run db:generate      # Generate Drizzle migration files
-bun run db:migrate       # Run Drizzle migrations
-bun run db:studio        # Open Drizzle Studio (visual DB browser)
+bun run check-types      # TypeScript type check
+bun run test             # Run tests
+
+# Database commands (run from packages/db/)
+cd packages/db && bun run db:push       # Push schema changes to SQLite database
+cd packages/db && bun run db:generate   # Generate Drizzle migration files
+cd packages/db && bun run db:migrate    # Run Drizzle migrations
+cd packages/db && bun run db:studio     # Open Drizzle Studio (visual DB browser)
 ```
 
 IMPORTANT: Default to using Bun instead of Node.js:
@@ -39,67 +44,113 @@ bun run test
 
 ## Architecture
 
-**Sofa** is a self-hosted movie & TV tracking app (like Trakt/TVTime) built as a single Next.js 16 application with SQLite.
+**Sofa** is a self-hosted movie & TV tracking app (like Trakt/TVTime) built as a Turborepo monorepo with a standalone Hono API server, a Vite + TanStack Router SPA frontend, and shared packages.
+
+### Monorepo structure
+
+```
+couch-potato/
+├── apps/
+│   ├── server/        # @sofa/server — Hono API server (oRPC, auth, cron, webhooks)
+│   └── web/           # @sofa/web — Vite SPA (TanStack Router, TanStack Query)
+├── packages/
+│   ├── api/           # @sofa/api — oRPC contract + Zod schemas (shared)
+│   ├── auth/          # @sofa/auth — Better Auth server config
+│   ├── core/          # @sofa/core — Business logic services
+│   ├── db/            # @sofa/db — Database client, schema, migrations, constants, logger
+│   └── tmdb/          # @sofa/tmdb — TMDB API client + image URL helper
+├── turbo.json         # Turborepo task configuration
+├── biome.json         # Shared Biome config
+├── Dockerfile         # Multi-stage Docker build (turbo prune, single process)
+└── package.json       # Root workspace config
+```
+
+- **`@sofa/server`** (`apps/server/`) — Hono API server. Hosts oRPC procedures, Better Auth, webhook/image/backup routes, and cron jobs. Runs DB migrations on startup. In production, also serves the SPA static files on port 3000. In dev, runs on port 3001.
+- **`@sofa/web`** (`apps/web/`) — Vite SPA with TanStack Router (file-based routing). No SSR, no DB access, no services. All data fetched via oRPC client calls. Vite dev server proxies `/api/*` and `/rpc/*` to the API server.
+- **`@sofa/api`** (`packages/api/`) — JIT package with the oRPC contract and Zod schemas. No build step.
+- **`@sofa/db`** (`packages/db/`) — Database layer: Drizzle schema, client, migrations, constants, logger.
+- **`@sofa/tmdb`** (`packages/tmdb/`) — TMDB API client (openapi-fetch) and image URL construction.
+- **`@sofa/core`** (`packages/core/`) — All business logic services (metadata, tracking, discovery, etc.).
+- **`@sofa/auth`** (`packages/auth/`) — Better Auth server config + environment checks.
+
+All shared packages are JIT (raw TypeScript exports, no build step). Consumers transpile via their own bundlers.
 
 ### Stack
 
-- **Framework**: Next.js 16 (App Router), React 19, TypeScript
+- **Frontend**: Vite 7 SPA, React 19, TypeScript, TanStack Router (file-based routing)
+- **API Server**: Hono (standalone Bun server)
+- **Monorepo**: Turborepo with Bun workspaces
 - **Database**: SQLite via bun:sqlite + Drizzle ORM (WAL mode, singleton via `globalThis`, sync queries, auto-migrations on startup)
 - **Auth**: Better Auth with Drizzle adapter — email/password + optional OIDC/SSO via `genericOAuth` plugin
-- **Styling**: Tailwind CSS v4, shadcn components, dark cinema theme with warm primary accents
-- **Fonts**: DM Serif Display (display), DM Sans (body), Geist Mono (mono)
+- **Styling**: Tailwind CSS v4 (via `@tailwindcss/vite`), shadcn components, dark cinema theme with warm primary accents
+- **Fonts**: DM Serif Display (display), DM Sans (body), Geist Mono (mono) — self-hosted via `@fontsource`
 - **API**: oRPC (contract-first, type-safe RPC) with `@orpc/tanstack-query` for TanStack Query integration
 - **State**: Jotai (client), TanStack Query (data fetching & mutations via oRPC)
-- **Linting**: Biome (2-space indent, organized imports, React/Next.js recommended rules)
+- **Linting**: Biome (2-space indent, organized imports, React recommended rules)
 - **External API**: TMDB (The Movie Database) with Bearer token auth
 
-### Path alias
+### Package imports
 
-`@/*` maps to project root (`./`), e.g. `@/lib/db/client` → `./lib/db/client`.
+Within `apps/web/`, `@/*` maps to `apps/web/src/`, e.g. `@/components/nav-bar` → `apps/web/src/components/nav-bar`.
+
+Cross-package imports use the package name:
+- `@sofa/api/contract`, `@sofa/api/schemas` — Contract and types
+- `@sofa/db/client`, `@sofa/db/schema`, `@sofa/db/constants`, `@sofa/db/logger` — Database layer
+- `@sofa/tmdb/client`, `@sofa/tmdb/image` — TMDB client
+- `@sofa/core/metadata`, `@sofa/core/tracking`, etc. — Business logic
+- `@sofa/auth/server`, `@sofa/auth/config` — Auth config
 
 ### Key directories
 
-- `lib/db/schema.ts` — Single file with all Drizzle table definitions (auth tables + app tables)
-- `lib/db/migrate.ts` — Auto-migration runner (executed on startup via instrumentation)
-- `lib/services/` — Business logic layer (metadata, tracking, discovery, availability, credits, person, webhooks, backup, settings, colors, update-check, system-health)
-- `lib/tmdb/` — TMDB API client and TypeScript types
-- `lib/auth/` — Better Auth server config (`server.ts`), client hooks (`client.ts`), cached session helper (`session.ts`)
-- `lib/config.ts` — Server-side environment checks (TMDB configured, OIDC configured, etc.)
-- `lib/logger.ts` — Structured logger with `LOG_LEVEL` support
-- `lib/types/` — Shared TypeScript types (e.g. `title.ts`)
-- `lib/cron.ts` — Background job scheduler (croner, `globalThis` singleton)
-- `lib/query-client.ts` — Singleton `QueryClient` with default options (30s stale time)
-- `lib/orpc/` — oRPC API layer (contract-first, type-safe RPC):
-  - `contract.ts` — Full API contract definition (~30 procedures)
-  - `schemas.ts` — Shared Zod input schemas used by contract
-  - `context.ts` — Context type & `os` implementer
-  - `middleware.ts` — Auth (`authed`) and admin (`admin`) middleware
-  - `router.ts` — Assembled router implementing the contract
-  - `handler.ts` — RPCHandler instance with error logging
-  - `client.ts` — Client-side oRPC client (RPCLink)
-  - `client.server.ts` — Server-side oRPC client (zero HTTP overhead for SSR)
-  - `tanstack.ts` — `orpc` utils for TanStack Query (`orpc.*.queryOptions()`)
-  - `procedures/` — Procedure implementations by domain (titles, episodes, seasons, people, dashboard, explore, search, discover, stats, status, integrations, admin, account, watchlist)
-- `app/rpc/[[...rest]]/route.ts` — Next.js catch-all route handler for oRPC
-- `app/api/` — Non-RPC routes (auth, images, avatars, backups, webhooks, lists, health)
-- `app/(pages)/` — Authenticated pages (dashboard, explore, titles/[id], people/[id], settings)
-- `app/(auth)/` — Auth pages (login, register, setup)
+**API server** (`apps/server/src/`):
+- `index.ts` — Hono app entry point, startup, CORS, route mounting, graceful shutdown
+- `cron.ts` — Background job scheduler (croner)
+- `orpc/` — oRPC server layer (context, middleware, router, handler, procedures/)
+- `routes/` — Non-RPC Hono routes (auth, images, avatars, backups, webhooks, lists, health)
+
+**Web app** (`apps/web/src/`):
+- `main.tsx` — React root: creates router + renders `<RouterProvider />`
+- `routes/` — TanStack Router file-based routes (auto-generates `routeTree.gen.ts`)
+  - `__root.tsx` — Root layout (providers, head meta, global error/not-found)
+  - `_app.tsx` — Authenticated layout (auth guard via `beforeLoad`, navbar, shell)
+  - `_app/dashboard.tsx`, `_app/explore.tsx`, `_app/settings.tsx`, `_app/titles.$id.tsx`, `_app/people.$id.tsx`
+  - `_auth.tsx` — Auth layout (centering wrapper)
+  - `_auth/login.tsx`, `_auth/register.tsx`
+  - `index.tsx`, `setup.tsx`
 - `components/` — App components + `components/ui/` for shadcn primitives
-- `components/query-provider.tsx` — `QueryClientProvider` wrapper used in root layout
+- `lib/orpc/client.ts` — oRPC client (always same-origin via Vite proxy or Hono static serving)
+- `lib/orpc/tanstack.ts` — `orpc` utils for TanStack Query
+- `lib/auth/client.ts` — Better Auth client hooks
+- `lib/theme.ts` — Color theme CSS properties from title palettes
+- `styles/globals.css` — Tailwind + font imports
+
+**Shared packages**:
+- `packages/api/src/contract.ts` — Full oRPC API contract definition (~30 procedures)
+- `packages/api/src/schemas.ts` — Shared Zod schemas and inferred TypeScript types
+- `packages/db/src/schema.ts` — All Drizzle table definitions
+- `packages/db/drizzle/` — Migration files
+- `packages/core/src/` — All service files (metadata, tracking, discovery, availability, credits, person, webhooks, backup, settings, colors, update-check, system-health, lists, image-cache)
+- `packages/core/test/` — Service tests with in-memory SQLite
 
 ### Auth pattern
 
-Server components and layouts use the cached session helper to avoid redundant lookups:
+**Web app** — Route `beforeLoad` guards check session via Better Auth client SDK:
 
 ```typescript
-import { getSession } from "@/lib/auth/session";
-const session = await getSession();
+// In route file (e.g. _app.tsx)
+beforeLoad: async () => {
+  const { data: session } = await authClient.getSession();
+  if (!session) throw redirect({ to: "/login" });
+  return { session };
+},
 ```
 
-oRPC procedures use auth middleware that calls Better Auth:
+Session is available to child routes via `Route.useRouteContext()`.
+
+**API server** — oRPC procedures use auth middleware that calls Better Auth:
 
 ```typescript
-// lib/orpc/middleware.ts — applied to procedures
+// apps/server/src/orpc/middleware.ts
 export const authed = base.middleware(async ({ context, next }) => {
   const session = await auth.api.getSession({ headers: context.headers });
   if (!session) throw new ORPCError("UNAUTHORIZED");
@@ -109,12 +160,18 @@ export const authed = base.middleware(async ({ context, next }) => {
 
 ### oRPC API layer
 
-All API procedures use oRPC with a contract-first approach. The contract defines the API shape in `lib/orpc/contract.ts`, procedures implement it in `lib/orpc/procedures/`, and the client consumes it with full type safety.
+All API procedures use oRPC with a contract-first approach. The contract is defined in `packages/api/src/contract.ts`, procedures implement it in `apps/server/src/orpc/procedures/`, and the client consumes it with full type safety.
+
+**Pattern — importing types from the shared package:**
+```typescript
+import type { ResolvedTitle, Season } from "@sofa/api/schemas";
+import { contract } from "@sofa/api/contract";
+```
 
 **Pattern — query in component:**
 ```typescript
 import { useQuery } from "@tanstack/react-query";
-import { orpc } from "@/lib/orpc/tanstack";
+import { orpc } from "@/lib/orpc/client";
 
 const { data } = useQuery(orpc.dashboard.stats.queryOptions());
 ```
@@ -126,31 +183,35 @@ import { client } from "@/lib/orpc/client";
 await client.titles.updateStatus({ id: titleId, status: "in_progress" });
 ```
 
-**Pattern — procedure definition:**
+**Pattern — route loader with TanStack Query prefetch:**
 ```typescript
-// lib/orpc/procedures/dashboard.ts
-export const stats = os.dashboard.stats.func(async (input, context, meta) => {
-  const { user } = context;
-  return getUserStats(user.id);
-}, authed);
+export const Route = createFileRoute("/_app/titles/$id")({
+  loader: async ({ params, context }) => {
+    await context.queryClient.ensureQueryData(
+      orpc.titles.detail.queryOptions({ input: { id: params.id } }),
+    );
+  },
+  component: TitlePage,
+});
 ```
 
 **Page patterns:**
-- **Thin server shell** (titles, people): Server component fetches initial data via service layer, passes as `initialData` prop to client component that uses TanStack Query via `orpc` for refetching/mutations.
-- **Full client-side** (dashboard, explore, settings): Server component handles auth only; client components fetch all data via `orpc.*.queryOptions()` with skeleton loading states.
+- **Route loaders** (titles, people): `beforeLoad`/`loader` prefetch data into TanStack Query cache via `queryClient.ensureQueryData()`. Components read via `useQuery()`/`useSuspenseQuery()`.
+- **Full client-side** (dashboard, explore, settings): Components fetch all data via `orpc.*.queryOptions()` with skeleton loading states.
+- **Error/loading states**: Routes use `pendingComponent`, `errorComponent`, `notFoundComponent`.
 
-### Non-RPC routes
+### Non-RPC routes (API server)
 
-Only file-serving, auth, and webhook routes remain as traditional Next.js API routes:
-- `/api/auth/[...all]` — Better Auth catch-all
-- `/api/images/[...path]` — Image proxy/cache serving
-- `/api/avatars/[userId]` — Avatar file serving
-- `/api/account/avatar` — Avatar upload (FormData)
-- `/api/admin/backups/restore` — Backup restore (FormData upload)
-- `/api/backup/[filename]` — Backup file download
-- `/api/webhooks/[token]` — Plex/Jellyfin/Emby webhooks
-- `/api/lists/[token]` — External list feeds
+Hono route handlers in `apps/server/src/routes/`:
+- `/images/:category/:filename` — Image proxy/cache serving
+- `/api/auth/*` — Better Auth catch-all
+- `/api/avatars/:userId` — Avatar file serving
+- `/api/backup/:filename` — Backup file download
+- `/api/webhooks/:token` — Plex/Jellyfin/Emby webhooks
+- `/api/lists/:token` — External list feeds (Sonarr/Radarr)
 - `/api/health` — Simple health check (no auth)
+
+In dev, Vite proxies these to the API server. In production, Hono serves both API and SPA — the browser only sees port 3000.
 
 ### Database schema
 
@@ -167,35 +228,31 @@ All app tables use UUIDv7 text primary keys generated via `Bun.randomUUIDv7()`. 
 - `cronRuns` — Background job execution history
 - `appSettings` — Key-value store for runtime app configuration
 
-### Service layer
+### Service layer (`packages/core/src/`)
 
 - **metadata.ts**: `importTitle()` fetches from TMDB, inserts into DB, fire-and-forgets availability + recommendations + credits + image caching. `refreshTvChildren()` fetches all seasons/episodes with 250ms rate limiting.
-- **image-cache.ts**: Downloads and caches TMDB images to local disk. `cacheImagesForTitle()` caches poster + backdrop, `cacheEpisodeStills()` caches episode stills, `cacheProviderLogos()` caches streaming provider logos, `cacheProfilePhotos()` caches person profile images.
+- **image-cache.ts**: Downloads and caches TMDB images to local disk.
 - **tracking.ts**: Auto-transitions — logging a movie watch sets status to `completed`; logging an episode watch sets `in_progress`; all episodes watched auto-completes the series.
-- **discovery.ts**: Feed generators — continue watching (next unwatched episode per in-progress show), library titles with availability, personalized recommendations from completed/highly-rated titles.
+- **discovery.ts**: Feed generators — continue watching, library with availability, personalized recommendations.
 - **availability.ts**: Caches US streaming providers from TMDB watch/providers endpoint.
-- **credits.ts**: Fetches and caches cast/crew data from TMDB, links persons to titles via `titleCast`.
+- **credits.ts**: Fetches and caches cast/crew data from TMDB.
 - **person.ts**: Person detail and filmography lookups.
-- **webhooks.ts**: Processes incoming Plex/Jellyfin/Emby webhook events to auto-log watches.
-- **backup.ts**: Database backup/restore with configurable scheduled backups and retention pruning.
-- **settings.ts**: Runtime app settings (registration open/closed, backup config, etc.) via `appSettings` table.
+- **webhooks.ts**: Processes incoming Plex/Jellyfin/Emby webhook events.
+- **backup.ts**: Database backup/restore with configurable scheduled backups.
+- **settings.ts**: Runtime app settings via `appSettings` table.
 - **colors.ts**: Extracts dominant color palettes from title posters via node-vibrant.
 - **update-check.ts**: Checks for new Sofa releases.
 - **system-health.ts**: System health diagnostics.
 
 ### TMDB images
 
-Only paths are stored in DB. Image URLs are resolved **server-side only** — API routes and server components call `tmdbImageUrl()` from `lib/tmdb/image.ts` before sending data to clients. Client components never import `tmdbImageUrl`; they receive ready-to-use URLs.
+Only paths are stored in DB. Image URLs are resolved by the API server — `tmdbImageUrl()` from `@sofa/tmdb/image` is called before sending data to clients. Client components receive ready-to-use URLs.
 
-When `IMAGE_CACHE_ENABLED` is set (default), images are downloaded to local disk (`CACHE_DIR`, derived from `DATA_DIR/images`) and served via `app/api/images/[...path]/route.ts`. Categories: `posters` (w500), `backdrops` (w1280), `stills` (w1280), `logos` (w92), `profiles` (w185). When disabled, `tmdbImageUrl()` returns direct TMDB CDN URLs using `TMDB_IMAGE_BASE_URL` (defaults to `https://image.tmdb.org/t/p`).
-
-Core files: `lib/services/image-cache.ts` (caching logic), `lib/tmdb/image.ts` (URL construction), `app/api/images/[...path]/route.ts` (proxy route).
+When `IMAGE_CACHE_ENABLED` is set (default), images are downloaded to local disk and served via `/images/:category/:filename`. When disabled, `tmdbImageUrl()` returns direct TMDB CDN URLs.
 
 ### Background jobs
 
-Defined in `lib/cron.ts` using croner cron expressions, started via Next.js instrumentation hook (`instrumentation.ts`) when `NEXT_RUNTIME === "nodejs"`. The instrumentation hook also runs DB migrations on startup and registers graceful shutdown handlers.
-
-Jobs (all use `protect: true` to prevent overlapping runs, 300ms delay between TMDB calls):
+Defined in `apps/server/src/cron.ts` using croner, started when the API server boots. Jobs (all use `protect: true` to prevent overlapping runs, 300ms delay between TMDB calls):
 - `nightlyRefreshLibrary` (`0 3 * * *`) — refreshes stale library titles (7d) and non-library titles (30d)
 - `refreshAvailability` (`0 */6 * * *`) — streaming provider data
 - `refreshRecommendations` (`0 */12 * * *`)
@@ -207,9 +264,13 @@ Jobs (all use `protect: true` to prevent overlapping runs, 300ms delay between T
 
 ### Environment variables
 
-See `.env.example`: `DATA_DIR` (root for DB + cache, default `./data`), `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`. `DATABASE_URL` and `CACHE_DIR` are derived from `DATA_DIR` but can be overridden individually.
+`DATA_DIR` (root for DB + cache, default `./data`), `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`. `DATABASE_URL` and `CACHE_DIR` are derived from `DATA_DIR` but can be overridden individually.
 
 Optional: `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_ISSUER_URL`, `OIDC_PROVIDER_NAME`, `OIDC_AUTO_REGISTER`, `DISABLE_PASSWORD_LOGIN` (OIDC/SSO support). `LOG_LEVEL` (error/warn/info/debug, default: info). `IMAGE_CACHE_ENABLED` (default: true).
+
+### Docker deployment
+
+Single container, single process. Hono serves both the API and the Vite-built SPA static files on port 3000. API routes (`/rpc/*`, `/api/*`) are mounted first; unmatched routes fall back to `index.html` for SPA routing.
 
 ## Browser Automation
 
