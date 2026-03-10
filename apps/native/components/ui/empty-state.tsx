@@ -1,7 +1,8 @@
 import type { Icon } from "@tabler/icons-react-native";
 import { IconMovie } from "@tabler/icons-react-native";
 import { Button } from "heroui-native";
-import { Text, View } from "react-native";
+import { Text } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
@@ -22,7 +23,10 @@ export function EmptyState({
   onAction,
 }: EmptyStateProps) {
   return (
-    <View className="items-center justify-center px-6 py-12">
+    <Animated.View
+      entering={FadeIn.duration(400)}
+      className="items-center justify-center px-6 py-12"
+    >
       <IconComponent size={48} color={colors.mutedForeground} />
       <Text
         style={{
@@ -59,6 +63,6 @@ export function EmptyState({
           </Button.Label>
         </Button>
       )}
-    </View>
+    </Animated.View>
   );
 }

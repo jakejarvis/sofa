@@ -5,6 +5,7 @@ import {
   IconStarFilled,
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -16,6 +17,7 @@ import {
   Text,
   View,
 } from "react-native";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
@@ -35,7 +37,10 @@ function GenreChip({
 }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress();
+      }}
       className="mr-2 rounded-full px-3 py-1.5"
       style={{
         backgroundColor: isSelected ? colors.primary : colors.secondary,
@@ -317,39 +322,49 @@ export default function ExploreScreen() {
       }
       renderItem={() => (
         <View className="gap-8">
-          {heroItem && <HeroBanner item={heroItem} />}
+          {heroItem && (
+            <Animated.View entering={FadeIn.duration(400)}>
+              <HeroBanner item={heroItem} />
+            </Animated.View>
+          )}
 
-          <FilterableTitleRow
-            title="Trending Today"
-            icon={IconFlame}
-            mediaType="movie"
-            defaultItems={trending.data?.items ?? []}
-            defaultUserStatuses={trending.data?.userStatuses ?? {}}
-            defaultEpisodeProgress={trending.data?.episodeProgress ?? {}}
-            isLoading={trending.isPending}
-          />
+          <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+            <FilterableTitleRow
+              title="Trending Today"
+              icon={IconFlame}
+              mediaType="movie"
+              defaultItems={trending.data?.items ?? []}
+              defaultUserStatuses={trending.data?.userStatuses ?? {}}
+              defaultEpisodeProgress={trending.data?.episodeProgress ?? {}}
+              isLoading={trending.isPending}
+            />
+          </Animated.View>
 
-          <FilterableTitleRow
-            title="Popular Movies"
-            icon={IconMovie}
-            mediaType="movie"
-            defaultItems={popularMovies.data?.items ?? []}
-            defaultUserStatuses={popularMovies.data?.userStatuses ?? {}}
-            defaultEpisodeProgress={popularMovies.data?.episodeProgress ?? {}}
-            genres={movieGenres.data?.genres}
-            isLoading={popularMovies.isPending}
-          />
+          <Animated.View entering={FadeInDown.duration(300).delay(200)}>
+            <FilterableTitleRow
+              title="Popular Movies"
+              icon={IconMovie}
+              mediaType="movie"
+              defaultItems={popularMovies.data?.items ?? []}
+              defaultUserStatuses={popularMovies.data?.userStatuses ?? {}}
+              defaultEpisodeProgress={popularMovies.data?.episodeProgress ?? {}}
+              genres={movieGenres.data?.genres}
+              isLoading={popularMovies.isPending}
+            />
+          </Animated.View>
 
-          <FilterableTitleRow
-            title="Popular TV Shows"
-            icon={IconDeviceTv}
-            mediaType="tv"
-            defaultItems={popularTv.data?.items ?? []}
-            defaultUserStatuses={popularTv.data?.userStatuses ?? {}}
-            defaultEpisodeProgress={popularTv.data?.episodeProgress ?? {}}
-            genres={tvGenres.data?.genres}
-            isLoading={popularTv.isPending}
-          />
+          <Animated.View entering={FadeInDown.duration(300).delay(300)}>
+            <FilterableTitleRow
+              title="Popular TV Shows"
+              icon={IconDeviceTv}
+              mediaType="tv"
+              defaultItems={popularTv.data?.items ?? []}
+              defaultUserStatuses={popularTv.data?.userStatuses ?? {}}
+              defaultEpisodeProgress={popularTv.data?.episodeProgress ?? {}}
+              genres={tvGenres.data?.genres}
+              isLoading={popularTv.isPending}
+            />
+          </Animated.View>
         </View>
       )}
     />

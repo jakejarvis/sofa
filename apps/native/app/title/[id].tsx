@@ -30,6 +30,7 @@ import {
 } from "react-native";
 import Animated, {
   FadeIn,
+  FadeInDown,
   FadeOut,
   useAnimatedStyle,
   useSharedValue,
@@ -674,28 +675,33 @@ export default function TitleDetailScreen() {
 
       {/* Genres */}
       {title.genres && title.genres.length > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="mt-3"
-          contentContainerStyle={{ paddingHorizontal: 16 }}
-        >
-          {title.genres.map((genre: string) => (
-            <View
-              key={genre}
-              className="mr-2 rounded-full px-2.5 py-1"
-              style={{ backgroundColor: colors.secondary }}
-            >
-              <Text style={{ fontSize: 11, color: colors.mutedForeground }}>
-                {genre}
-              </Text>
-            </View>
-          ))}
-        </ScrollView>
+        <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mt-3"
+            contentContainerStyle={{ paddingHorizontal: 16 }}
+          >
+            {title.genres.map((genre: string) => (
+              <View
+                key={genre}
+                className="mr-2 rounded-full px-2.5 py-1"
+                style={{ backgroundColor: colors.secondary }}
+              >
+                <Text style={{ fontSize: 11, color: colors.mutedForeground }}>
+                  {genre}
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+        </Animated.View>
       )}
 
       {/* Actions */}
-      <View className="mt-4 px-4">
+      <Animated.View
+        entering={FadeInDown.duration(300).delay(200)}
+        className="mt-4 px-4"
+      >
         <StatusActionButton
           currentStatus={userInfo.data?.status ?? null}
           onStatusChange={(status) => {
@@ -754,14 +760,21 @@ export default function TitleDetailScreen() {
             </Pressable>
           )}
         </View>
-      </View>
+      </Animated.View>
 
       {/* Overview */}
-      {title.overview && <ExpandableText text={title.overview} />}
+      {title.overview && (
+        <Animated.View entering={FadeIn.duration(300).delay(300)}>
+          <ExpandableText text={title.overview} />
+        </Animated.View>
+      )}
 
       {/* Availability */}
       {availability.length > 0 && (
-        <View className="mt-6">
+        <Animated.View
+          entering={FadeInDown.duration(300).delay(400)}
+          className="mt-6"
+        >
           <View className="px-4">
             <SectionHeader title="Where to Watch" icon={IconPlayerPlay} />
           </View>
@@ -794,12 +807,15 @@ export default function TitleDetailScreen() {
               </View>
             ))}
           </ScrollView>
-        </View>
+        </Animated.View>
       )}
 
       {/* Seasons & Episodes */}
       {title.type === "tv" && seasons.length > 0 && (
-        <View className="mt-6 px-4">
+        <Animated.View
+          entering={FadeInDown.duration(300).delay(400)}
+          className="mt-6 px-4"
+        >
           <SectionHeader title="Seasons" icon={IconList} />
           {seasons.map((season) => (
             <SeasonAccordion
@@ -809,7 +825,7 @@ export default function TitleDetailScreen() {
               watchedEpisodeIds={watchedEpisodeIds}
             />
           ))}
-        </View>
+        </Animated.View>
       )}
 
       {hydrateMutation.isPending && (
@@ -829,7 +845,10 @@ export default function TitleDetailScreen() {
 
       {/* Cast */}
       {cast.length > 0 && (
-        <View className="mt-6">
+        <Animated.View
+          entering={FadeInDown.duration(300).delay(500)}
+          className="mt-6"
+        >
           <View className="px-4">
             <SectionHeader title="Cast" icon={IconUsers} />
           </View>
@@ -841,13 +860,16 @@ export default function TitleDetailScreen() {
             renderItem={({ item }) => <CastCard person={item} />}
             contentContainerStyle={{ paddingHorizontal: 16 }}
           />
-        </View>
+        </Animated.View>
       )}
 
       {/* Recommendations */}
       {recommendations.data &&
         recommendations.data.recommendations?.length > 0 && (
-          <View className="mt-6">
+          <Animated.View
+            entering={FadeInDown.duration(300).delay(600)}
+            className="mt-6"
+          >
             <View className="px-4">
               <SectionHeader title="More Like This" icon={IconSparkles} />
             </View>
@@ -874,7 +896,7 @@ export default function TitleDetailScreen() {
               )}
               contentContainerStyle={{ paddingHorizontal: 16 }}
             />
-          </View>
+          </Animated.View>
         )}
     </ScrollView>
   );

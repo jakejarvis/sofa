@@ -17,6 +17,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors } from "@/constants/colors";
@@ -206,45 +207,50 @@ export default function SearchScreen() {
       }}
     >
       {/* Search bar */}
-      <View
-        className="mx-4 mb-2 flex-row items-center rounded-xl px-3"
-        style={{
-          backgroundColor: colors.card,
-          borderWidth: 1,
-          borderColor: colors.border,
-          height: 44,
-        }}
-      >
-        <IconSearch
-          size={18}
-          color={colors.mutedForeground}
-          style={{ marginRight: 8 }}
-        />
-        <TextInput
-          ref={inputRef}
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Search movies, shows, people..."
-          placeholderTextColor={colors.mutedForeground}
+      <Animated.View entering={FadeInDown.duration(300)}>
+        <View
+          className="mx-4 mb-2 flex-row items-center rounded-xl px-3"
           style={{
-            flex: 1,
-            color: colors.foreground,
-            fontFamily: fonts.sans,
-            fontSize: 15,
+            backgroundColor: colors.card,
+            borderWidth: 1,
+            borderColor: colors.border,
+            height: 44,
           }}
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="search"
-        />
-        {query.length > 0 && (
-          <Pressable onPress={() => setQuery("")} hitSlop={8}>
-            <IconX size={18} color={colors.mutedForeground} />
-          </Pressable>
-        )}
-      </View>
+        >
+          <IconSearch
+            size={18}
+            color={colors.mutedForeground}
+            style={{ marginRight: 8 }}
+          />
+          <TextInput
+            ref={inputRef}
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search movies, shows, people..."
+            placeholderTextColor={colors.mutedForeground}
+            style={{
+              flex: 1,
+              color: colors.foreground,
+              fontFamily: fonts.sans,
+              fontSize: 15,
+            }}
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="search"
+          />
+          {query.length > 0 && (
+            <Pressable onPress={() => setQuery("")} hitSlop={8}>
+              <IconX size={18} color={colors.mutedForeground} />
+            </Pressable>
+          )}
+        </View>
+      </Animated.View>
 
       {debouncedQuery.length === 0 ? (
-        <View className="flex-1 items-center justify-center">
+        <Animated.View
+          entering={FadeIn.duration(400)}
+          className="flex-1 items-center justify-center"
+        >
           <IconSearch size={64} color={colors.mutedForeground} />
           <Text
             style={{
@@ -255,17 +261,20 @@ export default function SearchScreen() {
           >
             Search for movies, shows, or people
           </Text>
-        </View>
+        </Animated.View>
       ) : searchResults.isPending ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : allResults.length === 0 ? (
-        <View className="flex-1 items-center justify-center">
+        <Animated.View
+          entering={FadeIn.duration(300)}
+          className="flex-1 items-center justify-center"
+        >
           <Text style={{ color: colors.mutedForeground, fontSize: 15 }}>
             No results for "{debouncedQuery}"
           </Text>
-        </View>
+        </Animated.View>
       ) : (
         <FlatList
           data={allResults}

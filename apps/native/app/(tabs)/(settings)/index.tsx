@@ -32,6 +32,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { SectionHeader } from "@/components/ui/section-header";
@@ -401,7 +402,10 @@ export default function SettingsScreen() {
 
   const toggleRegistration = useMutation(
     orpc.admin.toggleRegistration.mutationOptions({
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        queryClient.invalidateQueries();
+      },
     }),
   );
 
@@ -412,7 +416,10 @@ export default function SettingsScreen() {
 
   const toggleUpdateCheck = useMutation(
     orpc.admin.toggleUpdateCheck.mutationOptions({
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        queryClient.invalidateQueries();
+      },
     }),
   );
 
@@ -451,311 +458,340 @@ export default function SettingsScreen() {
         />
       }
     >
-      <Text
-        style={{
-          fontFamily: fonts.display,
-          fontSize: 28,
-          color: colors.foreground,
-          marginBottom: 24,
-        }}
-      >
-        Settings
-      </Text>
-
-      {/* Account */}
-      <SettingsSection title="Account" icon={IconUser}>
-        <View
-          className="flex-row items-center py-3.5"
+      <Animated.View entering={FadeIn.duration(400)}>
+        <Text
           style={{
-            borderBottomWidth: 0.5,
-            borderBottomColor: colors.border,
+            fontFamily: fonts.display,
+            fontSize: 28,
+            color: colors.foreground,
+            marginBottom: 24,
           }}
         >
-          <Pressable onPress={handleAvatarPress} className="mr-3">
-            <View
-              className="overflow-hidden"
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: colors.secondary,
-              }}
-            >
-              {uploadAvatar.isPending ? (
-                <View className="flex-1 items-center justify-center">
-                  <ActivityIndicator size="small" color={colors.primary} />
+          Settings
+        </Text>
+      </Animated.View>
+
+      {/* Account */}
+      <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+        <SettingsSection title="Account" icon={IconUser}>
+          <View
+            className="flex-row items-center py-3.5"
+            style={{
+              borderBottomWidth: 0.5,
+              borderBottomColor: colors.border,
+            }}
+          >
+            <Pressable onPress={handleAvatarPress} className="mr-3">
+              <View
+                className="overflow-hidden"
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 22,
+                  backgroundColor: colors.secondary,
+                }}
+              >
+                {uploadAvatar.isPending ? (
+                  <View className="flex-1 items-center justify-center">
+                    <ActivityIndicator size="small" color={colors.primary} />
+                  </View>
+                ) : session?.user?.image ? (
+                  <Image
+                    source={{ uri: session.user.image }}
+                    style={{ width: "100%", height: "100%" }}
+                    contentFit="cover"
+                  />
+                ) : (
+                  <View
+                    className="flex-1 items-center justify-center"
+                    style={{ backgroundColor: `${colors.primary}15` }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: fonts.sansMedium,
+                        fontSize: 18,
+                        color: colors.primary,
+                      }}
+                    >
+                      {session?.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <View
+                className="absolute right-0 bottom-0 items-center justify-center rounded-full"
+                style={{
+                  width: 18,
+                  height: 18,
+                  backgroundColor: colors.primary,
+                }}
+              >
+                <IconCamera size={10} color={colors.primaryForeground} />
+              </View>
+            </Pressable>
+            <View className="flex-1">
+              {isEditingName ? (
+                <View className="flex-row items-center gap-2">
+                  <TextInput
+                    value={nameInput}
+                    onChangeText={setNameInput}
+                    style={{
+                      flex: 1,
+                      color: colors.foreground,
+                      fontSize: 15,
+                      borderBottomWidth: 1,
+                      borderBottomColor: colors.primary,
+                      paddingVertical: 2,
+                    }}
+                    autoFocus
+                  />
+                  <Pressable
+                    onPress={() => updateName.mutate({ name: nameInput })}
+                  >
+                    <Text style={{ color: colors.primary, fontSize: 14 }}>
+                      Save
+                    </Text>
+                  </Pressable>
+                  <Pressable onPress={() => setIsEditingName(false)}>
+                    <Text
+                      style={{ color: colors.mutedForeground, fontSize: 14 }}
+                    >
+                      Cancel
+                    </Text>
+                  </Pressable>
                 </View>
-              ) : session?.user?.image ? (
-                <Image
-                  source={{ uri: session.user.image }}
-                  style={{ width: "100%", height: "100%" }}
-                  contentFit="cover"
-                />
               ) : (
-                <View
-                  className="flex-1 items-center justify-center"
-                  style={{ backgroundColor: `${colors.primary}15` }}
-                >
+                <Pressable onPress={() => setIsEditingName(true)}>
                   <Text
                     style={{
                       fontFamily: fonts.sansMedium,
-                      fontSize: 18,
-                      color: colors.primary,
+                      fontSize: 16,
+                      color: colors.foreground,
                     }}
                   >
-                    {session?.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
+                    {session?.user?.name}
                   </Text>
-                </View>
+                </Pressable>
               )}
-            </View>
-            <View
-              className="absolute right-0 bottom-0 items-center justify-center rounded-full"
-              style={{
-                width: 18,
-                height: 18,
-                backgroundColor: colors.primary,
-              }}
-            >
-              <IconCamera size={10} color={colors.primaryForeground} />
-            </View>
-          </Pressable>
-          <View className="flex-1">
-            {isEditingName ? (
-              <View className="flex-row items-center gap-2">
-                <TextInput
-                  value={nameInput}
-                  onChangeText={setNameInput}
-                  style={{
-                    flex: 1,
-                    color: colors.foreground,
-                    fontSize: 15,
-                    borderBottomWidth: 1,
-                    borderBottomColor: colors.primary,
-                    paddingVertical: 2,
-                  }}
-                  autoFocus
-                />
-                <Pressable
-                  onPress={() => updateName.mutate({ name: nameInput })}
-                >
-                  <Text style={{ color: colors.primary, fontSize: 14 }}>
-                    Save
-                  </Text>
-                </Pressable>
-                <Pressable onPress={() => setIsEditingName(false)}>
-                  <Text style={{ color: colors.mutedForeground, fontSize: 14 }}>
-                    Cancel
-                  </Text>
-                </Pressable>
-              </View>
-            ) : (
-              <Pressable onPress={() => setIsEditingName(true)}>
-                <Text
-                  style={{
-                    fontFamily: fonts.sansMedium,
-                    fontSize: 16,
-                    color: colors.foreground,
-                  }}
-                >
-                  {session?.user?.name}
-                </Text>
-              </Pressable>
-            )}
-            <Text
-              style={{
-                fontSize: 13,
-                color: colors.mutedForeground,
-                marginTop: 2,
-              }}
-            >
-              {session?.user?.email}
-            </Text>
-          </View>
-          {isAdmin && (
-            <View
-              className="rounded-full px-2 py-0.5"
-              style={{ backgroundColor: `${colors.primary}20` }}
-            >
               <Text
                 style={{
-                  fontSize: 10,
-                  color: colors.primary,
-                  fontFamily: fonts.sansMedium,
+                  fontSize: 13,
+                  color: colors.mutedForeground,
+                  marginTop: 2,
                 }}
               >
-                Admin
+                {session?.user?.email}
               </Text>
             </View>
-          )}
-        </View>
+            {isAdmin && (
+              <View
+                className="rounded-full px-2 py-0.5"
+                style={{ backgroundColor: `${colors.primary}20` }}
+              >
+                <Text
+                  style={{
+                    fontSize: 10,
+                    color: colors.primary,
+                    fontFamily: fonts.sansMedium,
+                  }}
+                >
+                  Admin
+                </Text>
+              </View>
+            )}
+          </View>
 
-        <SettingsRow
-          label="Sign Out"
-          icon={IconLogout}
-          onPress={handleSignOut}
-          destructive
-        />
-      </SettingsSection>
+          <SettingsRow
+            label="Sign Out"
+            icon={IconLogout}
+            onPress={handleSignOut}
+            destructive
+          />
+        </SettingsSection>
+      </Animated.View>
 
       {/* Server */}
-      <SettingsSection title="Server" icon={IconServer}>
-        <SettingsRow
-          label="Server URL"
-          value={serverUrl}
-          icon={IconLink}
-          onPress={() => router.push("/(auth)/server-url")}
-        />
-      </SettingsSection>
+      <Animated.View entering={FadeInDown.duration(300).delay(200)}>
+        <SettingsSection title="Server" icon={IconServer}>
+          <SettingsRow
+            label="Server URL"
+            value={serverUrl}
+            icon={IconLink}
+            onPress={() => router.push("/(auth)/server-url")}
+          />
+        </SettingsSection>
+      </Animated.View>
 
       {/* Integrations */}
-      <SettingsSection title="Integrations" icon={IconPuzzle}>
-        {integrations.isPending ? (
-          <View className="items-center py-4">
-            <ActivityIndicator color={colors.primary} />
-          </View>
-        ) : (
-          <>
-            {integrations.data?.integrations &&
-              integrations.data.integrations.length > 0 &&
-              integrations.data.integrations.map((integration) => (
-                <IntegrationRow
-                  key={integration.provider}
-                  integration={integration}
-                />
-              ))}
-            <AddIntegrationRow
-              existing={
-                integrations.data?.integrations?.map((i) => i.provider) ?? []
-              }
-            />
-          </>
-        )}
-      </SettingsSection>
-
-      {/* Admin: Server Health */}
-      {isAdmin && (
-        <SettingsSection title="Server Health" icon={IconServer} badge="Admin">
-          {systemStatus.isPending ? (
+      <Animated.View entering={FadeInDown.duration(300).delay(300)}>
+        <SettingsSection title="Integrations" icon={IconPuzzle}>
+          {integrations.isPending ? (
             <View className="items-center py-4">
               <ActivityIndicator color={colors.primary} />
             </View>
-          ) : systemStatus.data ? (
+          ) : (
             <>
-              <SettingsRow
-                label="Database"
-                value={
-                  systemStatus.data.health?.database
-                    ? `${systemStatus.data.health.database.titleCount} titles`
-                    : "—"
+              {integrations.data?.integrations &&
+                integrations.data.integrations.length > 0 &&
+                integrations.data.integrations.map((integration) => (
+                  <IntegrationRow
+                    key={integration.provider}
+                    integration={integration}
+                  />
+                ))}
+              <AddIntegrationRow
+                existing={
+                  integrations.data?.integrations?.map((i) => i.provider) ?? []
                 }
-                icon={IconDatabase}
-              />
-              <SettingsRow
-                label="TMDB"
-                value={
-                  systemStatus.data.health?.tmdb?.connected ? "Connected" : "—"
-                }
-                icon={IconCloud}
-              />
-              <SettingsRow
-                label="Image Cache"
-                value={
-                  systemStatus.data.health?.imageCache
-                    ? `${systemStatus.data.health.imageCache.imageCount} images`
-                    : "—"
-                }
-                icon={IconPhoto}
               />
             </>
-          ) : null}
+          )}
         </SettingsSection>
+      </Animated.View>
+
+      {/* Admin: Server Health */}
+      {isAdmin && (
+        <Animated.View entering={FadeInDown.duration(300).delay(400)}>
+          <SettingsSection
+            title="Server Health"
+            icon={IconServer}
+            badge="Admin"
+          >
+            {systemStatus.isPending ? (
+              <View className="items-center py-4">
+                <ActivityIndicator color={colors.primary} />
+              </View>
+            ) : systemStatus.data ? (
+              <>
+                <SettingsRow
+                  label="Database"
+                  value={
+                    systemStatus.data.health?.database
+                      ? `${systemStatus.data.health.database.titleCount} titles`
+                      : "—"
+                  }
+                  icon={IconDatabase}
+                />
+                <SettingsRow
+                  label="TMDB"
+                  value={
+                    systemStatus.data.health?.tmdb?.connected
+                      ? "Connected"
+                      : "—"
+                  }
+                  icon={IconCloud}
+                />
+                <SettingsRow
+                  label="Image Cache"
+                  value={
+                    systemStatus.data.health?.imageCache
+                      ? `${systemStatus.data.health.imageCache.imageCount} images`
+                      : "—"
+                  }
+                  icon={IconPhoto}
+                />
+              </>
+            ) : null}
+          </SettingsSection>
+        </Animated.View>
       )}
 
       {/* Admin: Security */}
       {isAdmin && (
-        <SettingsSection title="Security" icon={IconShield} badge="Admin">
-          <View
-            className="flex-row items-center justify-between py-3.5"
-            style={{
-              borderBottomWidth: 0.5,
-              borderBottomColor: colors.border,
-            }}
-          >
-            <View className="flex-row items-center gap-3">
-              <IconUserPlus size={20} color={colors.mutedForeground} />
-              <Text style={{ fontSize: 15, color: colors.foreground }}>
-                Registration
-              </Text>
-            </View>
-            <Switch
-              value={registration.data?.open ?? false}
-              onValueChange={(open) => toggleRegistration.mutate({ open })}
-              trackColor={{
-                false: colors.secondary,
-                true: `${colors.primary}80`,
+        <Animated.View entering={FadeInDown.duration(300).delay(500)}>
+          <SettingsSection title="Security" icon={IconShield} badge="Admin">
+            <View
+              className="flex-row items-center justify-between py-3.5"
+              style={{
+                borderBottomWidth: 0.5,
+                borderBottomColor: colors.border,
               }}
-              thumbColor={
-                registration.data?.open
-                  ? colors.primary
-                  : colors.mutedForeground
-              }
-            />
-          </View>
-          <View
-            className="flex-row items-center justify-between py-3.5"
-            style={{
-              borderBottomWidth: 0.5,
-              borderBottomColor: colors.border,
-            }}
-          >
-            <View className="flex-row items-center gap-3">
-              <IconCloud size={20} color={colors.mutedForeground} />
-              <Text style={{ fontSize: 15, color: colors.foreground }}>
-                Update Checks
-              </Text>
-            </View>
-            <Switch
-              value={updateCheck.data?.enabled ?? false}
-              onValueChange={(enabled) => toggleUpdateCheck.mutate({ enabled })}
-              trackColor={{
-                false: colors.secondary,
-                true: `${colors.primary}80`,
-              }}
-              thumbColor={
-                updateCheck.data?.enabled
-                  ? colors.primary
-                  : colors.mutedForeground
-              }
-            />
-          </View>
-          {updateCheck.data?.updateCheck?.updateAvailable && (
-            <View className="py-3.5">
-              <Text
-                style={{
-                  fontSize: 13,
-                  color: colors.statusCompleted,
-                  fontFamily: fonts.sansMedium,
+            >
+              <View className="flex-row items-center gap-3">
+                <IconUserPlus size={20} color={colors.mutedForeground} />
+                <Text style={{ fontSize: 15, color: colors.foreground }}>
+                  Registration
+                </Text>
+              </View>
+              <Switch
+                value={registration.data?.open ?? false}
+                onValueChange={(open) => toggleRegistration.mutate({ open })}
+                trackColor={{
+                  false: colors.secondary,
+                  true: `${colors.primary}80`,
                 }}
-              >
-                Update available: {updateCheck.data.updateCheck.latestVersion}
-              </Text>
+                thumbColor={
+                  registration.data?.open
+                    ? colors.primary
+                    : colors.mutedForeground
+                }
+              />
             </View>
-          )}
-        </SettingsSection>
+            <View
+              className="flex-row items-center justify-between py-3.5"
+              style={{
+                borderBottomWidth: 0.5,
+                borderBottomColor: colors.border,
+              }}
+            >
+              <View className="flex-row items-center gap-3">
+                <IconCloud size={20} color={colors.mutedForeground} />
+                <Text style={{ fontSize: 15, color: colors.foreground }}>
+                  Update Checks
+                </Text>
+              </View>
+              <Switch
+                value={updateCheck.data?.enabled ?? false}
+                onValueChange={(enabled) =>
+                  toggleUpdateCheck.mutate({ enabled })
+                }
+                trackColor={{
+                  false: colors.secondary,
+                  true: `${colors.primary}80`,
+                }}
+                thumbColor={
+                  updateCheck.data?.enabled
+                    ? colors.primary
+                    : colors.mutedForeground
+                }
+              />
+            </View>
+            {updateCheck.data?.updateCheck?.updateAvailable && (
+              <View className="py-3.5">
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: colors.statusCompleted,
+                    fontFamily: fonts.sansMedium,
+                  }}
+                >
+                  Update available: {updateCheck.data.updateCheck.latestVersion}
+                </Text>
+              </View>
+            )}
+          </SettingsSection>
+        </Animated.View>
       )}
 
       {/* Admin: Backups */}
-      {isAdmin && <BackupsSection />}
+      {isAdmin && (
+        <Animated.View entering={FadeInDown.duration(300).delay(600)}>
+          <BackupsSection />
+        </Animated.View>
+      )}
 
       {/* Version */}
-      <View className="mt-4 items-center">
+      <Animated.View
+        entering={FadeIn.duration(300).delay(400)}
+        className="mt-4 items-center"
+      >
         <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
           Sofa Mobile
           {updateCheck.data?.updateCheck?.currentVersion
             ? ` · Server ${updateCheck.data.updateCheck.currentVersion}`
             : ""}
         </Text>
-      </View>
+      </Animated.View>
     </ScrollView>
   );
 }

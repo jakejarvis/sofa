@@ -4,6 +4,7 @@ import {
   IconSearch,
   IconSettings,
 } from "@tabler/icons-react-native";
+import * as Haptics from "expo-haptics";
 import { Redirect, Tabs } from "expo-router";
 
 import { colors } from "@/constants/colors";
@@ -34,6 +35,11 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontFamily: fonts.sansMedium,
           fontSize: 11,
+        },
+      }}
+      screenListeners={{
+        tabPress: () => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         },
       }}
     >

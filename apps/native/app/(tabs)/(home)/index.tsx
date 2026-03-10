@@ -8,6 +8,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
 import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { EmptyState } from "@/components/ui/empty-state";
@@ -161,7 +162,7 @@ export default function DashboardScreen() {
       renderItem={() => (
         <View className="gap-8">
           {/* Welcome */}
-          <View className="px-4">
+          <Animated.View entering={FadeIn.duration(400)} className="px-4">
             <Text
               style={{
                 fontFamily: fonts.display,
@@ -171,10 +172,10 @@ export default function DashboardScreen() {
             >
               Welcome, {session?.user?.name?.split(" ")[0] ?? "there"}
             </Text>
-          </View>
+          </Animated.View>
 
           {/* Stats */}
-          <View>
+          <Animated.View entering={FadeInDown.duration(300).delay(100)}>
             <FlatList
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -196,11 +197,11 @@ export default function DashboardScreen() {
               )}
               contentContainerStyle={{ paddingHorizontal: 16 }}
             />
-          </View>
+          </Animated.View>
 
           {/* Continue Watching */}
           {hasContinueWatching && (
-            <View>
+            <Animated.View entering={FadeInDown.duration(300).delay(200)}>
               <View className="px-4">
                 <SectionHeader
                   title="Continue Watching"
@@ -279,11 +280,11 @@ export default function DashboardScreen() {
                 )}
                 contentContainerStyle={{ paddingHorizontal: 16 }}
               />
-            </View>
+            </Animated.View>
           )}
 
           {/* Library */}
-          <View>
+          <Animated.View entering={FadeInDown.duration(300).delay(300)}>
             <View className="px-4">
               <SectionHeader title="Your Library" icon={IconLibrary} />
             </View>
@@ -302,11 +303,11 @@ export default function DashboardScreen() {
                 />
               )
             )}
-          </View>
+          </Animated.View>
 
           {/* Recommendations */}
           {hasRecommendations && (
-            <View>
+            <Animated.View entering={FadeInDown.duration(300).delay(400)}>
               <View className="px-4">
                 <SectionHeader
                   title="Recommended for You"
@@ -317,7 +318,7 @@ export default function DashboardScreen() {
                 items={recommendations.data?.items ?? []}
                 isLoading={recommendations.isPending}
               />
-            </View>
+            </Animated.View>
           )}
         </View>
       )}

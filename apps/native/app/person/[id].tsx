@@ -11,6 +11,7 @@ import {
   type TextLayoutEventData,
   View,
 } from "react-native";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PosterCard } from "@/components/ui/poster-card";
@@ -128,20 +129,22 @@ export default function PersonDetailScreen() {
           paddingTop: insets.top,
         }}
       >
-        <IconUser size={48} color={colors.mutedForeground} />
-        <Text
-          style={{
-            fontFamily: fonts.display,
-            fontSize: 20,
-            color: colors.foreground,
-            marginTop: 12,
-          }}
-        >
-          Person not found
-        </Text>
-        <Pressable onPress={() => router.back()} className="mt-4">
-          <Text style={{ color: colors.primary }}>Go back</Text>
-        </Pressable>
+        <Animated.View entering={FadeIn.duration(400)} className="items-center">
+          <IconUser size={48} color={colors.mutedForeground} />
+          <Text
+            style={{
+              fontFamily: fonts.display,
+              fontSize: 20,
+              color: colors.foreground,
+              marginTop: 12,
+            }}
+          >
+            Person not found
+          </Text>
+          <Pressable onPress={() => router.back()} className="mt-4">
+            <Text style={{ color: colors.primary }}>Go back</Text>
+          </Pressable>
+        </Animated.View>
       </View>
     );
   }
@@ -167,7 +170,8 @@ export default function PersonDetailScreen() {
       </Pressable>
 
       {/* Profile hero */}
-      <View
+      <Animated.View
+        entering={FadeIn.duration(400)}
         className="items-center"
         style={{ paddingTop: insets.top + 56, paddingBottom: 24 }}
       >
@@ -224,14 +228,21 @@ export default function PersonDetailScreen() {
             {person.deathday ? ` — ${person.deathday.slice(0, 4)}` : ""}
           </Text>
         )}
-      </View>
+      </Animated.View>
 
       {/* Biography */}
-      {person.biography && <ExpandableBio text={person.biography} />}
+      {person.biography && (
+        <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+          <ExpandableBio text={person.biography} />
+        </Animated.View>
+      )}
 
       {/* Filmography */}
       {filmography.length > 0 && (
-        <View className="px-4">
+        <Animated.View
+          entering={FadeInDown.duration(300).delay(200)}
+          className="px-4"
+        >
           <SectionHeader title="Filmography" icon={IconMovie} />
           <View className="flex-row flex-wrap" style={{ gap: 12 }}>
             {filmography.map((credit) => (
@@ -263,7 +274,7 @@ export default function PersonDetailScreen() {
               </View>
             ))}
           </View>
-        </View>
+        </Animated.View>
       )}
     </ScrollView>
   );
