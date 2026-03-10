@@ -2,9 +2,9 @@ import {
   getOidcProviderName,
   isOidcConfigured,
   isPasswordLoginDisabled,
-  isTmdbConfigured,
 } from "@sofa/auth/config";
 import { getUserCount, isRegistrationOpen } from "@sofa/core/settings";
+import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { os } from "../context";
 

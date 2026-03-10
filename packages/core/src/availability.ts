@@ -1,8 +1,8 @@
 import { db } from "@sofa/db/client";
+import { and, eq } from "@sofa/db/helpers";
 import { availabilityOffers, titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getWatchProviders } from "@sofa/tmdb/client";
-import { and, eq } from "drizzle-orm";
 
 const log = createLogger("availability");
 

@@ -1,11 +1,11 @@
 import { ORPCError } from "@orpc/server";
-import { isTmdbConfigured } from "@sofa/auth/config";
 import {
   searchMovies,
   searchMulti,
   searchPerson,
   searchTv,
 } from "@sofa/tmdb/client";
+import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { os } from "../context";
 import { authed } from "../middleware";

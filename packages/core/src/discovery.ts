@@ -1,4 +1,5 @@
 import { db } from "@sofa/db/client";
+import { and, desc, eq, inArray, sql } from "@sofa/db/helpers";
 import {
   availabilityOffers,
   episodes,
@@ -11,7 +12,6 @@ import {
   userTitleStatus,
 } from "@sofa/db/schema";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
 
 export type TimePeriod = "today" | "this_week" | "this_month" | "this_year";
 

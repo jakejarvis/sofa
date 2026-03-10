@@ -33,7 +33,6 @@
     "@sofa/logger": "workspace:*",
     "@sofa/tmdb": "workspace:*",
     "date-fns": "catalog:",
-    "drizzle-orm": "catalog:",
     "node-vibrant": "4.0.4",
     "zod": "catalog:"
   },

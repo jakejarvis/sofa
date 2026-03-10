@@ -1,4 +1,5 @@
 import { db } from "@sofa/db/client";
+import { and, eq, inArray, sql } from "@sofa/db/helpers";
 import {
   episodes,
   seasons,
@@ -8,7 +9,6 @@ import {
   userRatings,
   userTitleStatus,
 } from "@sofa/db/schema";
-import { and, eq, inArray, sql } from "drizzle-orm";
 
 export function setTitleStatus(
   userId: string,

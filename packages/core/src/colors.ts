@@ -1,8 +1,8 @@
 import path from "node:path";
 import { db } from "@sofa/db/client";
+import { eq } from "@sofa/db/helpers";
 import { titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
-import { eq } from "drizzle-orm";
 import { Vibrant } from "node-vibrant/node";
 import {
   downloadAndCacheImage,

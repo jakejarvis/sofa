@@ -2,6 +2,7 @@ import { mkdir, rename } from "node:fs/promises";
 import path from "node:path";
 import { CACHE_DIR, TMDB_IMAGE_BASE_URL } from "@sofa/config";
 import { db } from "@sofa/db/client";
+import { eq, inArray } from "@sofa/db/helpers";
 import {
   availabilityOffers,
   episodes,
@@ -12,7 +13,6 @@ import {
 } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import type { ImageCategory } from "@sofa/tmdb/image";
-import { eq, inArray } from "drizzle-orm";
 
 const log = createLogger("image-cache");
 

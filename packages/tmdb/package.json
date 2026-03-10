@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./client": "./src/client.ts",
-    "./image": "./src/image.ts"
+    "./image": "./src/image.ts",
+    "./config": "./src/config.ts"
   },
   "scripts": {
     "lint": "biome check",

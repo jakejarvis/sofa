@@ -1,10 +1,10 @@
 import type { PersonCredit, ResolvedPerson } from "@sofa/api/schemas";
 import { db } from "@sofa/db/client";
+import { eq, inArray } from "@sofa/db/helpers";
 import { persons, titleCast, titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getPersonCombinedCredits, getPersonDetails } from "@sofa/tmdb/client";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
-import { eq, inArray } from "drizzle-orm";
 
 const log = createLogger("person");
 

@@ -1,4 +1,5 @@
 import { db } from "@sofa/db/client";
+import { and, eq, gte } from "@sofa/db/helpers";
 import {
   episodes,
   integrationEvents,
@@ -9,7 +10,6 @@ import {
 } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { findByExternalId, searchTv } from "@sofa/tmdb/client";
-import { and, eq, gte } from "drizzle-orm";
 import { getOrFetchTitleByTmdbId } from "./metadata";
 import { logEpisodeWatch, logMovieWatch } from "./tracking";
 

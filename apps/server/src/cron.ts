@@ -16,6 +16,7 @@ import {
 import { getSetting } from "@sofa/core/settings";
 import { performUpdateCheck } from "@sofa/core/update-check";
 import { db } from "@sofa/db/client";
+import { and, eq, inArray, isNotNull, lt, or } from "@sofa/db/helpers";
 import {
   availabilityOffers,
   cronRuns,
@@ -27,7 +28,6 @@ import {
 import { createLogger } from "@sofa/logger";
 import { getTvDetails } from "@sofa/tmdb/client";
 import { Cron } from "croner";
-import { and, eq, inArray, isNotNull, lt, or } from "drizzle-orm";
 
 export type BackupFrequency = "6h" | "12h" | "1d" | "7d";
 

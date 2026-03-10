@@ -7,8 +7,8 @@ import {
   TMDB_API_BASE_URL,
 } from "@sofa/config";
 import { db } from "@sofa/db/client";
+import { count, desc, eq } from "@sofa/db/helpers";
 import { cronRuns, episodes, titles, user } from "@sofa/db/schema";
-import { count, desc, eq } from "drizzle-orm";
 import { listBackups } from "./backup";
 import { imageCacheEnabled } from "./image-cache";
 import { getSetting } from "./settings";

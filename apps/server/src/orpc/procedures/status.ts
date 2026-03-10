@@ -1,5 +1,5 @@
-import { isTmdbConfigured } from "@sofa/auth/config";
 import { getSystemHealth } from "@sofa/core/system-health";
+import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { os } from "../context";
 import { authed } from "../middleware";
 

@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { and, eq } from "@sofa/db/helpers";
 import {
   userEpisodeWatches,
   userMovieWatches,
   userRatings,
   userTitleStatus,
 } from "@sofa/db/schema";
-import { and, eq } from "drizzle-orm";
 import {
   getUserTitleInfo,
   logEpisodeWatch,

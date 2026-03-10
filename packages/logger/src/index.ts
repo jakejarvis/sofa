@@ -1,27 +1,64 @@
-const LEVELS = { error: 0, warn: 1, info: 2, debug: 3 } as const;
-type Level = keyof typeof LEVELS;
+import pino from "pino";
 
-const currentLevel: Level =
-  (process.env.LOG_LEVEL as Level) in LEVELS
-    ? (process.env.LOG_LEVEL as Level)
-    : "info";
+const VALID_LEVELS = ["fatal", "error", "warn", "info", "debug", "trace"];
 
-export function createLogger(prefix: string) {
-  const fmt = (msg: string) => `[${prefix}] ${msg}`;
+const envLevel = process.env.LOG_LEVEL?.toLowerCase() ?? "info";
+const level = VALID_LEVELS.includes(envLevel) ? envLevel : "info";
+
+const isDev = process.env.NODE_ENV !== "production";
+
+export const rootLogger = pino({
+  level,
+  base: undefined,
+  timestamp: pino.stdTimeFunctions.isoTime,
+  ...(isDev && {
+    transport: {
+      target: "pino-pretty",
+      options: {
+        colorize: true,
+        translateTime: "SYS:HH:MM:ss.l",
+        ignore: "pid,hostname",
+        messageFormat: "[{module}] {msg}",
+      },
+    },
+  }),
+});
+
+export interface Logger {
+  error(msg: string, ...args: unknown[]): void;
+  warn(msg: string, ...args: unknown[]): void;
+  info(msg: string, ...args: unknown[]): void;
+  debug(msg: string, ...args: unknown[]): void;
+}
+
+function wrapLevel(
+  child: pino.Logger,
+  lvl: "error" | "warn" | "info" | "debug",
+) {
+  return (msg: string, ...args: unknown[]) => {
+    if (args.length === 0) {
+      child[lvl](msg);
+    } else if (args.length === 1 && args[0] instanceof Error) {
+      child[lvl]({ err: args[0] }, msg);
+    } else if (
+      args.length === 1 &&
+      typeof args[0] === "object" &&
+      args[0] !== null &&
+      !Array.isArray(args[0])
+    ) {
+      child[lvl](args[0] as object, msg);
+    } else {
+      child[lvl]({ extra: args }, msg);
+    }
+  };
+}
+
+export function createLogger(name: string): Logger {
+  const child = rootLogger.child({ module: name });
   return {
-    error(msg: string, ...args: unknown[]) {
-      if (LEVELS[currentLevel] >= LEVELS.error)
-        console.error(fmt(msg), ...args);
-    },
-    warn(msg: string, ...args: unknown[]) {
-      if (LEVELS[currentLevel] >= LEVELS.warn) console.warn(fmt(msg), ...args);
-    },
-    info(msg: string, ...args: unknown[]) {
-      if (LEVELS[currentLevel] >= LEVELS.info) console.log(fmt(msg), ...args);
-    },
-    debug(msg: string, ...args: unknown[]) {
-      if (LEVELS[currentLevel] >= LEVELS.debug)
-        console.debug(fmt(msg), ...args);
-    },
+    error: wrapLevel(child, "error"),
+    warn: wrapLevel(child, "warn"),
+    info: wrapLevel(child, "info"),
+    debug: wrapLevel(child, "debug"),
   };
 }

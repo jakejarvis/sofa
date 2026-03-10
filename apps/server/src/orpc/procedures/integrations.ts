@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@sofa/db/client";
+import { and, desc, eq } from "@sofa/db/helpers";
 import { integrationEvents, integrations } from "@sofa/db/schema";
-import { and, desc, eq } from "drizzle-orm";
 import { os } from "../context";
 import { authed } from "../middleware";
 

@@ -1,10 +1,10 @@
 import { ORPCError } from "@orpc/server";
-import { isTmdbConfigured } from "@sofa/auth/config";
 import {
   getEpisodeProgressByTmdbIds,
   getUserStatusesByTmdbIds,
 } from "@sofa/core/tracking";
 import { discover } from "@sofa/tmdb/client";
+import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { os } from "../context";
 import { authed } from "../middleware";

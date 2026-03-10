@@ -42,7 +42,7 @@ export const openApiHandler = new OpenAPIHandler(router, {
   ],
   interceptors: [
     onError((error) => {
-      log.error("OpenAPI error", { error });
+      log.error("OpenAPI error", error);
     }),
   ],
 });

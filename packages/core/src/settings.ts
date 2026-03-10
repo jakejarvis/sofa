@@ -1,6 +1,6 @@
 import { db } from "@sofa/db/client";
+import { count, eq } from "@sofa/db/helpers";
 import { appSettings, user } from "@sofa/db/schema";
-import { count, eq } from "drizzle-orm";
 
 export function getSetting(key: string): string | null {
   const row = db

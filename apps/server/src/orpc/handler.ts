@@ -8,7 +8,7 @@ const log = createLogger("orpc");
 export const handler = new RPCHandler(router, {
   interceptors: [
     onError((error) => {
-      log.error("oRPC error", { error });
+      log.error("oRPC error", error);
     }),
   ],
 });

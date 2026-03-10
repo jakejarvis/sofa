@@ -2,8 +2,8 @@ import { ORPCError } from "@orpc/server";
 import { getOrFetchTitleByTmdbId } from "@sofa/core/metadata";
 import { setTitleStatus } from "@sofa/core/tracking";
 import { db } from "@sofa/db/client";
+import { and, eq } from "@sofa/db/helpers";
 import { userTitleStatus } from "@sofa/db/schema";
-import { and, eq } from "drizzle-orm";
 import { os } from "../context";
 import { authed } from "../middleware";
 

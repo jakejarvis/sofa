@@ -4,10 +4,10 @@ import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 import { BACKUP_DIR, DATABASE_URL } from "@sofa/config";
 import { closeDatabase, db } from "@sofa/db/client";
+import { sql } from "@sofa/db/helpers";
 import { runMigrations } from "@sofa/db/migrate";
 import { createLogger } from "@sofa/logger";
 import { format } from "date-fns";
-import { sql } from "drizzle-orm";
 
 const log = createLogger("backup");
 

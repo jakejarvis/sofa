@@ -1,6 +1,6 @@
 import { db } from "@sofa/db/client";
+import { sql } from "@sofa/db/helpers";
 import { createLogger } from "@sofa/logger";
-import { sql } from "drizzle-orm";
 import { Hono } from "hono";
 
 const log = createLogger("health");

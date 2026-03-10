@@ -6,6 +6,7 @@ import type {
   Season,
 } from "@sofa/api/schemas";
 import { db } from "@sofa/db/client";
+import { eq, inArray, sql } from "@sofa/db/helpers";
 import {
   availabilityOffers,
   episodes,
@@ -31,7 +32,6 @@ import {
   getVideos,
 } from "@sofa/tmdb/client";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
-import { eq, inArray, sql } from "drizzle-orm";
 import { refreshAvailability } from "./availability";
 import { extractAndStoreColors, parseColorPalette } from "./colors";
 import { getCastForTitle, refreshCredits } from "./credits";
