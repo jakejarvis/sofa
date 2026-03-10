@@ -1,8 +1,4 @@
-import {
-  IconAlertCircle,
-  IconCircleCheck,
-  IconDeviceTv,
-} from "@tabler/icons-react-native";
+import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react-native";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { Button } from "heroui-native";
@@ -17,6 +13,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SofaLogo } from "@/components/ui/sofa-logo";
 
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
@@ -162,7 +159,7 @@ export default function ServerUrlScreen() {
         className="mb-8 items-center"
       >
         <Animated.View style={iconAnimatedStyle}>
-          <IconDeviceTv size={48} color={colors.primary} />
+          <SofaLogo size={48} />
         </Animated.View>
         <Text
           style={{

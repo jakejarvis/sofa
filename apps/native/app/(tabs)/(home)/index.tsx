@@ -8,7 +8,13 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
 import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { EmptyState } from "@/components/ui/empty-state";
@@ -18,6 +24,108 @@ import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { authClient } from "@/lib/auth-client";
 import { orpc, queryClient } from "@/utils/orpc";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+function ContinueWatchingCard({
+  item,
+  onPress,
+}: {
+  item: {
+    title: {
+      id: string;
+      title: string;
+      backdropPath: string | null;
+    };
+    watchedEpisodes: number;
+    totalEpisodes: number;
+    nextEpisode?: {
+      seasonNumber: number;
+      episodeNumber: number;
+      name: string | null;
+    } | null;
+  };
+  onPress: () => void;
+}) {
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <AnimatedPressable
+      onPress={onPress}
+      onPressIn={() => {
+        scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+      }}
+      style={[
+        animatedStyle,
+        {
+          width: 200,
+          marginRight: 12,
+          backgroundColor: colors.card,
+          borderWidth: 1,
+          borderColor: "rgba(255,255,255,0.06)",
+          borderRadius: 12,
+          overflow: "hidden",
+        },
+      ]}
+    >
+      <View style={{ width: 200, height: 112 }}>
+        {item.title.backdropPath && (
+          <Image
+            source={{ uri: item.title.backdropPath }}
+            style={{ width: "100%", height: "100%" }}
+            contentFit="cover"
+          />
+        )}
+        <View
+          className="absolute right-0 bottom-0 left-0"
+          style={{
+            height: 3,
+            backgroundColor: "rgba(255,255,255,0.1)",
+          }}
+        >
+          <View
+            style={{
+              height: "100%",
+              width: `${(item.watchedEpisodes / item.totalEpisodes) * 100}%`,
+              backgroundColor: colors.statusWatching,
+            }}
+          />
+        </View>
+      </View>
+      <View className="p-2.5">
+        <Text
+          numberOfLines={1}
+          style={{
+            fontFamily: fonts.sansMedium,
+            fontSize: 13,
+            color: colors.foreground,
+          }}
+        >
+          {item.title.title}
+        </Text>
+        {item.nextEpisode && (
+          <Text
+            numberOfLines={1}
+            style={{
+              fontSize: 11,
+              color: colors.mutedForeground,
+              marginTop: 2,
+            }}
+          >
+            S{item.nextEpisode.seasonNumber}E{item.nextEpisode.episodeNumber}
+            {item.nextEpisode.name ? ` · ${item.nextEpisode.name}` : ""}
+          </Text>
+        )}
+      </View>
+    </AnimatedPressable>
+  );
+}
 
 function StatsCard({
   label,
@@ -214,69 +322,10 @@ export default function DashboardScreen() {
                 data={continueWatching.data?.items ?? []}
                 keyExtractor={(item) => item.title.id}
                 renderItem={({ item }) => (
-                  <Pressable
+                  <ContinueWatchingCard
+                    item={item}
                     onPress={() => router.push(`/title/${item.title.id}`)}
-                    className="mr-3 overflow-hidden rounded-xl"
-                    style={{
-                      width: 200,
-                      backgroundColor: colors.card,
-                      borderWidth: 1,
-                      borderColor: "rgba(255,255,255,0.06)",
-                    }}
-                  >
-                    <View style={{ width: 200, height: 112 }}>
-                      {item.title.backdropPath && (
-                        <Image
-                          source={{ uri: item.title.backdropPath }}
-                          style={{ width: "100%", height: "100%" }}
-                          contentFit="cover"
-                        />
-                      )}
-                      <View
-                        className="absolute right-0 bottom-0 left-0"
-                        style={{
-                          height: 3,
-                          backgroundColor: "rgba(255,255,255,0.1)",
-                        }}
-                      >
-                        <View
-                          style={{
-                            height: "100%",
-                            width: `${(item.watchedEpisodes / item.totalEpisodes) * 100}%`,
-                            backgroundColor: colors.statusWatching,
-                          }}
-                        />
-                      </View>
-                    </View>
-                    <View className="p-2.5">
-                      <Text
-                        numberOfLines={1}
-                        style={{
-                          fontFamily: fonts.sansMedium,
-                          fontSize: 13,
-                          color: colors.foreground,
-                        }}
-                      >
-                        {item.title.title}
-                      </Text>
-                      {item.nextEpisode && (
-                        <Text
-                          numberOfLines={1}
-                          style={{
-                            fontSize: 11,
-                            color: colors.mutedForeground,
-                            marginTop: 2,
-                          }}
-                        >
-                          S{item.nextEpisode.seasonNumber}E
-                          {item.nextEpisode.episodeNumber}
-                          {item.nextEpisode.name
-                            ? ` · ${item.nextEpisode.name}`
-                            : ""}
-                        </Text>
-                      )}
-                    </View>
-                  </Pressable>
+                  />
                 )}
                 contentContainerStyle={{ paddingHorizontal: 16 }}
               />

@@ -12,12 +12,18 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { HeroUINativeProvider } from "heroui-native";
 import { useEffect } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 import { Uniwind } from "uniwind";
-
 import { OfflineBanner } from "@/components/ui/offline-banner";
+import { SofaLogo } from "@/components/ui/sofa-logo";
 import { TitleActionSheetProvider } from "@/components/ui/title-action-sheet";
 import { colors } from "@/constants/colors";
 import { queryClient } from "@/utils/orpc";
@@ -39,6 +45,16 @@ function AppContent() {
     Uniwind.setTheme("dark");
   }, []);
 
+  const iconOpacity = useSharedValue(0.4);
+
+  useEffect(() => {
+    iconOpacity.value = withRepeat(withTiming(1, { duration: 900 }), -1, true);
+  }, [iconOpacity]);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    opacity: iconOpacity.value,
+  }));
+
   if (!fontsLoaded) {
     return (
       <View
@@ -49,7 +65,9 @@ function AppContent() {
           alignItems: "center",
         }}
       >
-        <ActivityIndicator color={colors.primary} size="large" />
+        <Animated.View style={[{ alignItems: "center" }, pulseStyle]}>
+          <SofaLogo size={56} />
+        </Animated.View>
       </View>
     );
   }

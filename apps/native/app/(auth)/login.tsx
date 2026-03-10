@@ -1,4 +1,3 @@
-import { IconDeviceTv } from "@tabler/icons-react-native";
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
@@ -23,6 +22,7 @@ import {
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
+import { SofaLogo } from "@/components/ui/sofa-logo";
 
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
@@ -92,7 +92,7 @@ export default function LoginScreen() {
         entering={FadeIn.duration(400)}
         className="mb-8 items-center"
       >
-        <IconDeviceTv size={48} color={colors.primary} />
+        <SofaLogo size={48} />
         <Text
           style={{
             fontFamily: fonts.display,

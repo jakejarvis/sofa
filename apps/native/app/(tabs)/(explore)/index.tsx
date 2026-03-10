@@ -17,7 +17,13 @@ import {
   Text,
   View,
 } from "react-native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
@@ -25,6 +31,8 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { orpc, queryClient } from "@/utils/orpc";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 function GenreChip({
   label,
@@ -73,6 +81,10 @@ function HeroBanner({
   };
 }) {
   const router = useRouter();
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   const resolveMutation = useMutation(
     orpc.titles.resolve.mutationOptions({
@@ -83,15 +95,24 @@ function HeroBanner({
   );
 
   return (
-    <Pressable
+    <AnimatedPressable
       onPress={() =>
         resolveMutation.mutate({
           tmdbId: item.tmdbId,
           type: item.type as "movie" | "tv",
         })
       }
+      onPressIn={() => {
+        scale.value = withSpring(0.98, { damping: 15, stiffness: 300 });
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+      }}
       className="mx-4 overflow-hidden rounded-2xl"
-      style={{ height: 220, opacity: resolveMutation.isPending ? 0.7 : 1 }}
+      style={[
+        animatedStyle,
+        { height: 220, opacity: resolveMutation.isPending ? 0.7 : 1 },
+      ]}
     >
       {item.backdropPath && (
         <Image
@@ -141,7 +162,7 @@ function HeroBanner({
           </Text>
         </View>
       </View>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 

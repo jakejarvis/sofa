@@ -34,6 +34,7 @@ import Animated, {
   FadeOut,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -45,6 +46,8 @@ import { StarRating } from "@/components/ui/star-rating";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { orpc, queryClient } from "@/utils/orpc";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
@@ -327,12 +330,24 @@ function CastCard({
   };
 }) {
   const router = useRouter();
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   return (
-    <Pressable
+    <AnimatedPressable
       onPress={() => router.push(`/person/${person.id}`)}
-      className="mr-4 items-center"
-      style={{ width: 80 }}
+      onPressIn={() => {
+        scale.value = withSpring(0.95, { damping: 15, stiffness: 300 });
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+      }}
+      style={[
+        animatedStyle,
+        { width: 80, marginRight: 16, alignItems: "center" },
+      ]}
     >
       <View
         className="mb-2 overflow-hidden"
@@ -374,7 +389,7 @@ function CastCard({
           {person.character}
         </Text>
       )}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 

@@ -71,6 +71,7 @@ function SearchResultRow({ item }: { item: SearchResultItem }) {
   );
 
   const handlePress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (item.type === "person") {
       resolvePersonMutation.mutate({ tmdbId: item.tmdbId });
     } else {

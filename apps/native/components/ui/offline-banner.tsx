@@ -1,8 +1,9 @@
 import { IconWifiOff } from "@tabler/icons-react-native";
+import * as Haptics from "expo-haptics";
 import * as Network from "expo-network";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, { SlideInUp, SlideOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors } from "@/constants/colors";
@@ -11,6 +12,7 @@ import { fonts } from "@/constants/fonts";
 export function OfflineBanner() {
   const [isOffline, setIsOffline] = useState(false);
   const insets = useSafeAreaInsets();
+  const wasOnline = useRef(true);
 
   useEffect(() => {
     let mounted = true;
@@ -18,7 +20,12 @@ export function OfflineBanner() {
     const check = async () => {
       const state = await Network.getNetworkStateAsync();
       if (mounted) {
-        setIsOffline(!state.isConnected || !state.isInternetReachable);
+        const offline = !state.isConnected || !state.isInternetReachable;
+        setIsOffline(offline);
+        if (offline && wasOnline.current) {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        }
+        wasOnline.current = !offline;
       }
     };
 
@@ -35,8 +42,8 @@ export function OfflineBanner() {
 
   return (
     <Animated.View
-      entering={FadeIn.duration(200)}
-      exiting={FadeOut.duration(200)}
+      entering={SlideInUp.duration(300).springify().damping(18)}
+      exiting={SlideOutUp.duration(250)}
       style={{
         position: "absolute",
         top: insets.top,
