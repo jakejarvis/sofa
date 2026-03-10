@@ -28,10 +28,13 @@ import {
   Text,
   View,
 } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   FadeIn,
   FadeInDown,
   FadeOut,
+  interpolate,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -46,8 +49,6 @@ import { StarRating } from "@/components/ui/star-rating";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { orpc, queryClient } from "@/utils/orpc";
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
@@ -146,7 +147,7 @@ function EpisodeRow({
           {episode.episodeNumber}.{" "}
           {episode.name ?? `Episode ${episode.episodeNumber}`}
         </Text>
-        {episode.airDate && (
+        {episode.airDate ? (
           <Text
             style={{
               fontSize: 11,
@@ -156,7 +157,7 @@ function EpisodeRow({
           >
             {episode.airDate}
           </Text>
-        )}
+        ) : null}
       </View>
     </Pressable>
   );
@@ -330,25 +331,34 @@ function CastCard({
   };
 }) {
   const router = useRouter();
-  const scale = useSharedValue(1);
+  const pressed = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.95]) }],
   }));
 
+  const handlePress = useCallback(() => {
+    router.push(`/person/${person.id}`);
+  }, [router, person.id]);
+
+  const tapGesture = Gesture.Tap()
+    .onBegin(() => {
+      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
+    })
+    .onFinalize(() => {
+      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
+    })
+    .onEnd(() => {
+      runOnJS(handlePress)();
+    });
+
   return (
-    <AnimatedPressable
-      onPress={() => router.push(`/person/${person.id}`)}
-      onPressIn={() => {
-        scale.value = withSpring(0.95, { damping: 15, stiffness: 300 });
-      }}
-      onPressOut={() => {
-        scale.value = withSpring(1, { damping: 15, stiffness: 300 });
-      }}
-      style={[
-        animatedStyle,
-        { width: 80, marginRight: 16, alignItems: "center" },
-      ]}
-    >
+    <GestureDetector gesture={tapGesture}>
+      <Animated.View
+        style={[
+          animatedStyle,
+          { width: 80, marginRight: 16, alignItems: "center" },
+        ]}
+      >
       <View
         className="mb-2 overflow-hidden"
         style={{
@@ -377,7 +387,7 @@ function CastCard({
       >
         {person.name}
       </Text>
-      {person.character && (
+      {person.character ? (
         <Text
           numberOfLines={1}
           style={{
@@ -388,8 +398,9 @@ function CastCard({
         >
           {person.character}
         </Text>
-      )}
-    </AnimatedPressable>
+      ) : null}
+      </Animated.View>
+    </GestureDetector>
   );
 }
 
@@ -563,14 +574,16 @@ export default function TitleDetailScreen() {
 
   const year = (title.releaseDate ?? title.firstAirDate)?.slice(0, 4);
 
-  if (
-    detail.data?.needsHydration &&
-    title.type === "tv" &&
-    !hydrateMutation.isPending &&
-    !hydrateMutation.isSuccess
-  ) {
-    hydrateMutation.mutate({ id, tmdbId: title.tmdbId });
-  }
+  useEffect(() => {
+    if (
+      detail.data?.needsHydration &&
+      title.type === "tv" &&
+      !hydrateMutation.isPending &&
+      !hydrateMutation.isSuccess
+    ) {
+      hydrateMutation.mutate({ id, tmdbId: title.tmdbId });
+    }
+  }, [detail.data?.needsHydration, title.type, id, title.tmdbId, hydrateMutation]);
 
   return (
     <ScrollView
@@ -655,7 +668,7 @@ export default function TitleDetailScreen() {
                   {title.type === "movie" ? "Movie" : "TV"}
                 </Text>
               </View>
-              {year && (
+              {year ? (
                 <Text
                   style={{
                     fontSize: 13,
@@ -664,8 +677,8 @@ export default function TitleDetailScreen() {
                 >
                   {year}
                 </Text>
-              )}
-              {title.contentRating && (
+              ) : null}
+              {title.contentRating ? (
                 <Text
                   style={{
                     fontSize: 12,
@@ -674,7 +687,7 @@ export default function TitleDetailScreen() {
                 >
                   {title.contentRating}
                 </Text>
-              )}
+              ) : null}
               {title.voteAverage != null && title.voteAverage > 0 && (
                 <View className="flex-row items-center gap-0.5">
                   <IconStarFilled size={12} color={colors.primary} />
@@ -778,11 +791,11 @@ export default function TitleDetailScreen() {
       </Animated.View>
 
       {/* Overview */}
-      {title.overview && (
+      {title.overview ? (
         <Animated.View entering={FadeIn.duration(300).delay(300)}>
           <ExpandableText text={title.overview} />
         </Animated.View>
-      )}
+      ) : null}
 
       {/* Availability */}
       {availability.length > 0 && (

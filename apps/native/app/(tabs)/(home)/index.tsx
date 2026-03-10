@@ -6,11 +6,14 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useCallback } from "react";
-import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
+import { useCallback, useMemo } from "react";
+import { FlatList, RefreshControl, Text, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   FadeIn,
   FadeInDown,
+  interpolate,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -24,8 +27,6 @@ import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { authClient } from "@/lib/auth-client";
 import { orpc, queryClient } from "@/utils/orpc";
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 function ContinueWatchingCard({
   item,
@@ -47,33 +48,38 @@ function ContinueWatchingCard({
   };
   onPress: () => void;
 }) {
-  const scale = useSharedValue(1);
+  const pressed = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.97]) }],
   }));
 
+  const tapGesture = Gesture.Tap()
+    .onBegin(() => {
+      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
+    })
+    .onFinalize(() => {
+      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
+    })
+    .onEnd(() => {
+      runOnJS(onPress)();
+    });
+
   return (
-    <AnimatedPressable
-      onPress={onPress}
-      onPressIn={() => {
-        scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
-      }}
-      onPressOut={() => {
-        scale.value = withSpring(1, { damping: 15, stiffness: 300 });
-      }}
-      style={[
-        animatedStyle,
-        {
-          width: 200,
-          marginRight: 12,
-          backgroundColor: colors.card,
-          borderWidth: 1,
-          borderColor: "rgba(255,255,255,0.06)",
-          borderRadius: 12,
-          overflow: "hidden",
-        },
-      ]}
-    >
+    <GestureDetector gesture={tapGesture}>
+      <Animated.View
+        style={[
+          animatedStyle,
+          {
+            width: 200,
+            marginRight: 12,
+            backgroundColor: colors.card,
+            borderWidth: 1,
+            borderColor: "rgba(255,255,255,0.06)",
+            borderRadius: 12,
+            overflow: "hidden",
+          },
+        ]}
+      >
       <View style={{ width: 200, height: 112 }}>
         {item.title.backdropPath && (
           <Image
@@ -123,7 +129,8 @@ function ContinueWatchingCard({
           </Text>
         )}
       </View>
-    </AnimatedPressable>
+      </Animated.View>
+    </GestureDetector>
   );
 }
 
@@ -251,6 +258,23 @@ export default function DashboardScreen() {
   const hasContinueWatching = (continueWatching.data?.items?.length ?? 0) > 0;
   const hasRecommendations = (recommendations.data?.items?.length ?? 0) > 0;
 
+  const statsData = useMemo(
+    () => [
+      { label: "Movies this month", value: stats.data?.moviesThisMonth },
+      { label: "Episodes this week", value: stats.data?.episodesThisWeek },
+      { label: "In library", value: stats.data?.librarySize },
+      { label: "Completed", value: stats.data?.completed },
+    ],
+    [stats.data],
+  );
+
+  const handleContinueWatchingPress = useCallback(
+    (titleId: string) => {
+      router.push(`/title/${titleId}`);
+    },
+    [router],
+  );
+
   return (
     <FlatList
       data={[1]}
@@ -287,18 +311,7 @@ export default function DashboardScreen() {
             <FlatList
               horizontal
               showsHorizontalScrollIndicator={false}
-              data={[
-                {
-                  label: "Movies this month",
-                  value: stats.data?.moviesThisMonth,
-                },
-                {
-                  label: "Episodes this week",
-                  value: stats.data?.episodesThisWeek,
-                },
-                { label: "In library", value: stats.data?.librarySize },
-                { label: "Completed", value: stats.data?.completed },
-              ]}
+              data={statsData}
               keyExtractor={(item) => item.label}
               renderItem={({ item }) => (
                 <StatsCard label={item.label} value={item.value} />
@@ -324,7 +337,7 @@ export default function DashboardScreen() {
                 renderItem={({ item }) => (
                   <ContinueWatchingCard
                     item={item}
-                    onPress={() => router.push(`/title/${item.title.id}`)}
+                    onPress={() => handleContinueWatchingPress(item.title.id)}
                   />
                 )}
                 contentContainerStyle={{ paddingHorizontal: 16 }}

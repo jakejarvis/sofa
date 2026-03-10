@@ -14,7 +14,10 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+  interpolate,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -47,8 +50,6 @@ const statusColors: Record<TitleStatus, string> = {
   completed: colors.statusCompleted,
 };
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
 export function PosterCard({
   id,
   tmdbId,
@@ -63,7 +64,7 @@ export function PosterCard({
 }: PosterCardProps) {
   const router = useRouter();
   const { showActions } = useTitleActions();
-  const scale = useSharedValue(1);
+  const pressed = useSharedValue(0);
   const [localStatus, setLocalStatus] = useState<TitleStatus | null>(
     userStatus ?? null,
   );
@@ -93,7 +94,11 @@ export function PosterCard({
   );
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    transform: [
+      {
+        scale: interpolate(pressed.get(), [0, 1], [1, 0.97]),
+      },
+    ],
   }));
 
   const handlePress = useCallback(() => {
@@ -103,14 +108,6 @@ export function PosterCard({
       resolveMutation.mutate({ tmdbId, type });
     }
   }, [id, tmdbId, type, router, resolveMutation]);
-
-  const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.97, { damping: 15, stiffness: 300 });
-  }, [scale]);
-
-  const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, { damping: 15, stiffness: 300 });
-  }, [scale]);
 
   const handleLongPress = useCallback(() => {
     showActions({
@@ -127,17 +124,31 @@ export function PosterCard({
     quickAddMutation.mutate({ tmdbId, type });
   }, [localStatus, quickAddMutation, tmdbId, type]);
 
+  const tapGesture = Gesture.Tap()
+    .onBegin(() => {
+      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
+    })
+    .onFinalize(() => {
+      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
+    })
+    .onEnd(() => {
+      runOnJS(handlePress)();
+    });
+
+  const longPressGesture = Gesture.LongPress()
+    .minDuration(400)
+    .onStart(() => {
+      runOnJS(handleLongPress)();
+    });
+
+  const composedGesture = Gesture.Race(tapGesture, longPressGesture);
+
   const year = releaseDate?.slice(0, 4);
   const imageHeight = width * 1.5;
 
   return (
-    <AnimatedPressable
-      onPress={handlePress}
-      onLongPress={handleLongPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={[animatedStyle, { width }]}
-    >
+    <GestureDetector gesture={composedGesture}>
+      <Animated.View style={[animatedStyle, { width }]}>
       <View
         className="overflow-hidden rounded-xl"
         style={{
@@ -263,11 +274,11 @@ export function PosterCard({
             ) : (
               <IconDeviceTv size={12} color={`${colors.primary}99`} />
             )}
-            {year && (
+            {year ? (
               <Text style={{ fontSize: 11, color: colors.mutedForeground }}>
                 {year}
               </Text>
-            )}
+            ) : null}
             {voteAverage != null && voteAverage > 0 && (
               <View className="ml-auto flex-row items-center gap-0.5">
                 <IconStarFilled size={10} color={`${colors.primary}cc`} />
@@ -279,7 +290,8 @@ export function PosterCard({
           </View>
         </View>
       </View>
-    </AnimatedPressable>
+      </Animated.View>
+    </GestureDetector>
   );
 }
 

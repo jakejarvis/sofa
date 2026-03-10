@@ -8,7 +8,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -42,59 +42,30 @@ interface SearchResultItem {
   releaseDate?: string | null;
 }
 
-function SearchResultRow({ item }: { item: SearchResultItem }) {
-  const router = useRouter();
-
-  const resolveTitleMutation = useMutation(
-    orpc.titles.resolve.mutationOptions({
-      onSuccess: ({ id }) => {
-        if (id) router.push(`/title/${id}`);
-      },
-    }),
-  );
-
-  const resolvePersonMutation = useMutation(
-    orpc.people.resolve.mutationOptions({
-      onSuccess: ({ id }) => {
-        if (id) router.push(`/person/${id}`);
-      },
-    }),
-  );
-
-  const quickAddMutation = useMutation(
-    orpc.watchlist.quickAdd.mutationOptions({
-      onSuccess: () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
-      },
-    }),
-  );
-
-  const handlePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (item.type === "person") {
-      resolvePersonMutation.mutate({ tmdbId: item.tmdbId });
-    } else {
-      resolveTitleMutation.mutate({
-        tmdbId: item.tmdbId,
-        type: item.type,
-      });
-    }
-  }, [item, resolveTitleMutation, resolvePersonMutation]);
-
+const SearchResultRow = memo(function SearchResultRow({
+  item,
+  onResolve,
+  onQuickAdd,
+  isResolving,
+  isAdding,
+}: {
+  item: SearchResultItem;
+  onResolve: (item: SearchResultItem) => void;
+  onQuickAdd: (tmdbId: number, type: "movie" | "tv") => void;
+  isResolving: boolean;
+  isAdding: boolean;
+}) {
   const imageSrc = item.posterPath ?? item.profilePath;
-  const isPending =
-    resolveTitleMutation.isPending || resolvePersonMutation.isPending;
 
   return (
     <Pressable
-      onPress={handlePress}
-      disabled={isPending}
+      onPress={() => onResolve(item)}
+      disabled={isResolving}
       className="flex-row items-center px-4 py-3"
       style={{
         borderBottomWidth: 0.5,
         borderBottomColor: colors.border,
-        opacity: isPending ? 0.6 : 1,
+        opacity: isResolving ? 0.6 : 1,
       }}
     >
       <View
@@ -106,13 +77,13 @@ function SearchResultRow({ item }: { item: SearchResultItem }) {
           borderRadius: item.type === "person" ? 22 : 8,
         }}
       >
-        {imageSrc && (
+        {imageSrc ? (
           <Image
             source={{ uri: imageSrc }}
             style={{ width: "100%", height: "100%" }}
             contentFit="cover"
           />
-        )}
+        ) : null}
       </View>
 
       <View className="flex-1">
@@ -139,27 +110,22 @@ function SearchResultRow({ item }: { item: SearchResultItem }) {
                   : "Person"}
             </Text>
           </View>
-          {item.releaseDate && (
+          {item.releaseDate ? (
             <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
               {item.releaseDate.slice(0, 4)}
             </Text>
-          )}
+          ) : null}
         </View>
       </View>
 
       {item.type !== "person" && (
         <Pressable
-          onPress={() => {
-            quickAddMutation.mutate({
-              tmdbId: item.tmdbId,
-              type: item.type as "movie" | "tv",
-            });
-          }}
-          disabled={quickAddMutation.isPending}
+          onPress={() => onQuickAdd(item.tmdbId, item.type as "movie" | "tv")}
+          disabled={isAdding}
           hitSlop={8}
           className="ml-2"
         >
-          {quickAddMutation.isPending ? (
+          {isAdding ? (
             <IconLoader size={22} color={colors.primary} />
           ) : (
             <IconPlus size={22} color={colors.primary} />
@@ -167,7 +133,7 @@ function SearchResultRow({ item }: { item: SearchResultItem }) {
         </Pressable>
       )}
 
-      {isPending && (
+      {isResolving && (
         <ActivityIndicator
           size="small"
           color={colors.primary}
@@ -176,11 +142,12 @@ function SearchResultRow({ item }: { item: SearchResultItem }) {
       )}
     </Pressable>
   );
-}
+});
 
 export default function SearchScreen() {
   const insets = useSafeAreaInsets();
   const inputRef = useRef<TextInput>(null);
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query.trim(), 300);
 
@@ -189,15 +156,93 @@ export default function SearchScreen() {
     enabled: debouncedQuery.length > 0,
   });
 
-  const allResults: SearchResultItem[] =
-    searchResults.data?.results?.map((r) => ({
-      tmdbId: r.tmdbId,
-      title: r.title,
-      type: r.type,
-      posterPath: r.posterPath,
-      profilePath: r.profilePath,
-      releaseDate: r.releaseDate,
-    })) ?? [];
+  // Track which item is currently being resolved/added
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
+  const [addingId, setAddingId] = useState<number | null>(null);
+
+  const resolveTitleMutation = useMutation(
+    orpc.titles.resolve.mutationOptions({
+      onSuccess: ({ id }) => {
+        setResolvingId(null);
+        if (id) router.push(`/title/${id}`);
+      },
+      onError: () => setResolvingId(null),
+    }),
+  );
+
+  const resolvePersonMutation = useMutation(
+    orpc.people.resolve.mutationOptions({
+      onSuccess: ({ id }) => {
+        setResolvingId(null);
+        if (id) router.push(`/person/${id}`);
+      },
+      onError: () => setResolvingId(null),
+    }),
+  );
+
+  const quickAddMutation = useMutation(
+    orpc.watchlist.quickAdd.mutationOptions({
+      onSuccess: () => {
+        setAddingId(null);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        queryClient.invalidateQueries();
+      },
+      onError: () => setAddingId(null),
+    }),
+  );
+
+  const handleResolve = useCallback(
+    (item: SearchResultItem) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setResolvingId(`${item.type}-${item.tmdbId}`);
+      if (item.type === "person") {
+        resolvePersonMutation.mutate({ tmdbId: item.tmdbId });
+      } else {
+        resolveTitleMutation.mutate({ tmdbId: item.tmdbId, type: item.type });
+      }
+    },
+    [resolveTitleMutation, resolvePersonMutation],
+  );
+
+  const handleQuickAdd = useCallback(
+    (tmdbId: number, type: "movie" | "tv") => {
+      setAddingId(tmdbId);
+      quickAddMutation.mutate({ tmdbId, type });
+    },
+    [quickAddMutation],
+  );
+
+  // Memoize mapped results to maintain stable references
+  const allResults = useMemo<SearchResultItem[]>(
+    () =>
+      searchResults.data?.results?.map((r) => ({
+        tmdbId: r.tmdbId,
+        title: r.title,
+        type: r.type,
+        posterPath: r.posterPath,
+        profilePath: r.profilePath,
+        releaseDate: r.releaseDate,
+      })) ?? [],
+    [searchResults.data?.results],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: SearchResultItem }) => (
+      <SearchResultRow
+        item={item}
+        onResolve={handleResolve}
+        onQuickAdd={handleQuickAdd}
+        isResolving={resolvingId === `${item.type}-${item.tmdbId}`}
+        isAdding={addingId === item.tmdbId}
+      />
+    ),
+    [handleResolve, handleQuickAdd, resolvingId, addingId],
+  );
+
+  const keyExtractor = useCallback(
+    (item: SearchResultItem) => `${item.type}-${item.tmdbId}`,
+    [],
+  );
 
   return (
     <View
@@ -279,8 +324,8 @@ export default function SearchScreen() {
       ) : (
         <FlatList
           data={allResults}
-          keyExtractor={(item) => `${item.type}-${item.tmdbId}`}
-          renderItem={({ item }) => <SearchResultRow item={item} />}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
         />

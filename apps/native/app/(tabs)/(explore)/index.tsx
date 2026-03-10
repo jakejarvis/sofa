@@ -17,9 +17,12 @@ import {
   Text,
   View,
 } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   FadeIn,
   FadeInDown,
+  interpolate,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -31,8 +34,6 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { orpc, queryClient } from "@/utils/orpc";
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 function GenreChip({
   label,
@@ -81,9 +82,9 @@ function HeroBanner({
   };
 }) {
   const router = useRouter();
-  const scale = useSharedValue(1);
+  const pressed = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.98]) }],
   }));
 
   const resolveMutation = useMutation(
@@ -94,26 +95,33 @@ function HeroBanner({
     }),
   );
 
+  const handlePress = useCallback(() => {
+    resolveMutation.mutate({
+      tmdbId: item.tmdbId,
+      type: item.type as "movie" | "tv",
+    });
+  }, [item.tmdbId, item.type, resolveMutation]);
+
+  const tapGesture = Gesture.Tap()
+    .onBegin(() => {
+      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
+    })
+    .onFinalize(() => {
+      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
+    })
+    .onEnd(() => {
+      runOnJS(handlePress)();
+    });
+
   return (
-    <AnimatedPressable
-      onPress={() =>
-        resolveMutation.mutate({
-          tmdbId: item.tmdbId,
-          type: item.type as "movie" | "tv",
-        })
-      }
-      onPressIn={() => {
-        scale.value = withSpring(0.98, { damping: 15, stiffness: 300 });
-      }}
-      onPressOut={() => {
-        scale.value = withSpring(1, { damping: 15, stiffness: 300 });
-      }}
-      className="mx-4 overflow-hidden rounded-2xl"
-      style={[
-        animatedStyle,
-        { height: 220, opacity: resolveMutation.isPending ? 0.7 : 1 },
-      ]}
-    >
+    <GestureDetector gesture={tapGesture}>
+      <Animated.View
+        className="mx-4 overflow-hidden rounded-2xl"
+        style={[
+          animatedStyle,
+          { height: 220, opacity: resolveMutation.isPending ? 0.7 : 1 },
+        ]}
+      >
       {item.backdropPath && (
         <Image
           source={{ uri: item.backdropPath }}
@@ -136,7 +144,7 @@ function HeroBanner({
         >
           {item.title}
         </Text>
-        {item.overview && (
+        {item.overview ? (
           <Text
             style={{
               fontSize: 12,
@@ -147,7 +155,7 @@ function HeroBanner({
           >
             {item.overview}
           </Text>
-        )}
+        ) : null}
         <View className="mt-2 flex-row items-center gap-2">
           {item.voteAverage != null && item.voteAverage > 0 && (
             <View className="flex-row items-center gap-1">
@@ -162,7 +170,8 @@ function HeroBanner({
           </Text>
         </View>
       </View>
-    </AnimatedPressable>
+      </Animated.View>
+    </GestureDetector>
   );
 }
 

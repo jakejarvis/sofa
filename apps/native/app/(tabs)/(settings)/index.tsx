@@ -79,7 +79,7 @@ function SettingsRow({
       >
         {label}
       </Text>
-      {value && (
+      {value ? (
         <Text
           style={{
             fontSize: 14,
@@ -91,7 +91,7 @@ function SettingsRow({
         >
           {value}
         </Text>
-      )}
+      ) : null}
       {onPress && <IconChevronRight size={16} color={colors.mutedForeground} />}
     </Pressable>
   );
@@ -112,7 +112,7 @@ function SettingsSection({
     <View className="mb-6">
       <View className="mb-2 flex-row items-center gap-2">
         <SectionHeader title={title} icon={icon} />
-        {badge && (
+        {badge ? (
           <View
             className="rounded-full px-2 py-0.5"
             style={{ backgroundColor: `${colors.primary}20` }}
@@ -127,7 +127,7 @@ function SettingsSection({
               {badge}
             </Text>
           </View>
-        )}
+        ) : null}
       </View>
       <View
         className="rounded-xl px-4"

@@ -205,7 +205,7 @@ export default function PersonDetailScreen() {
           {person.name}
         </Text>
 
-        {person.knownForDepartment && (
+        {person.knownForDepartment ? (
           <View
             className="mt-2 rounded-full px-3 py-1"
             style={{ backgroundColor: colors.secondary }}
@@ -214,9 +214,9 @@ export default function PersonDetailScreen() {
               {person.knownForDepartment}
             </Text>
           </View>
-        )}
+        ) : null}
 
-        {(person.birthday || person.deathday) && (
+        {person.birthday || person.deathday ? (
           <Text
             style={{
               fontSize: 13,
@@ -227,15 +227,15 @@ export default function PersonDetailScreen() {
             {person.birthday?.slice(0, 4)}
             {person.deathday ? ` — ${person.deathday.slice(0, 4)}` : ""}
           </Text>
-        )}
+        ) : null}
       </Animated.View>
 
       {/* Biography */}
-      {person.biography && (
+      {person.biography ? (
         <Animated.View entering={FadeInDown.duration(300).delay(100)}>
           <ExpandableBio text={person.biography} />
         </Animated.View>
-      )}
+      ) : null}
 
       {/* Filmography */}
       {filmography.length > 0 && (
@@ -258,7 +258,7 @@ export default function PersonDetailScreen() {
                   userStatus={data?.userStatuses?.[credit.titleId] ?? null}
                   width={undefined}
                 />
-                {credit.character && (
+                {credit.character ? (
                   <Text
                     numberOfLines={1}
                     style={{
@@ -270,7 +270,7 @@ export default function PersonDetailScreen() {
                   >
                     as {credit.character}
                   </Text>
-                )}
+                ) : null}
               </View>
             ))}
           </View>
