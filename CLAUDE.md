@@ -5,14 +5,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
+# Root commands (via Turborepo)
 bun run dev              # Start Next.js dev server
 bun run build            # Production build
 bun run lint             # Biome lint check
 bun run format           # Biome format (auto-fix)
-bun run db:push          # Push schema changes to SQLite database
-bun run db:generate      # Generate Drizzle migration files
-bun run db:migrate       # Run Drizzle migrations
-bun run db:studio        # Open Drizzle Studio (visual DB browser)
+bun run check-types      # TypeScript type check
+bun run test             # Run tests
+
+# Database commands (run from apps/web/)
+cd apps/web && bun run db:push       # Push schema changes to SQLite database
+cd apps/web && bun run db:generate   # Generate Drizzle migration files
+cd apps/web && bun run db:migrate    # Run Drizzle migrations
+cd apps/web && bun run db:studio     # Open Drizzle Studio (visual DB browser)
 ```
 
 IMPORTANT: Default to using Bun instead of Node.js:
@@ -39,11 +44,27 @@ bun run test
 
 ## Architecture
 
-**Sofa** is a self-hosted movie & TV tracking app (like Trakt/TVTime) built as a single Next.js 16 application with SQLite.
+**Sofa** is a self-hosted movie & TV tracking app (like Trakt/TVTime) built as a Turborepo monorepo with a Next.js 16 web app and a shared API contract package.
+
+### Monorepo structure
+
+```
+couch-potato/
+├── apps/web/          # Next.js 16 web application
+├── packages/api/      # @sofa/api — oRPC contract + Zod schemas (shared)
+├── turbo.json         # Turborepo task configuration
+├── biome.json         # Shared Biome config
+├── Dockerfile         # Multi-stage Docker build (turbo prune)
+└── package.json       # Root workspace config
+```
+
+- **`@sofa/web`** (`apps/web/`) — The full Next.js app (pages, components, services, DB, auth, cron)
+- **`@sofa/api`** (`packages/api/`) — JIT internal package exporting the oRPC API contract and Zod schemas. No build step; consumers transpile the raw TypeScript. Used by the web app and any future clients (mobile, CLI).
 
 ### Stack
 
 - **Framework**: Next.js 16 (App Router), React 19, TypeScript
+- **Monorepo**: Turborepo with Bun workspaces
 - **Database**: SQLite via bun:sqlite + Drizzle ORM (WAL mode, singleton via `globalThis`, sync queries, auto-migrations on startup)
 - **Auth**: Better Auth with Drizzle adapter — email/password + optional OIDC/SSO via `genericOAuth` plugin
 - **Styling**: Tailwind CSS v4, shadcn components, dark cinema theme with warm primary accents
@@ -55,10 +76,16 @@ bun run test
 
 ### Path alias
 
-`@/*` maps to project root (`./`), e.g. `@/lib/db/client` → `./lib/db/client`.
+Within `apps/web/`, `@/*` maps to `apps/web/` root, e.g. `@/lib/db/client` → `apps/web/lib/db/client`.
+
+Cross-package imports use the package name: `@sofa/api/contract`, `@sofa/api/schemas`.
 
 ### Key directories
 
+All paths below are relative to `apps/web/` unless noted:
+
+- `packages/api/src/contract.ts` — Full oRPC API contract definition (~30 procedures)
+- `packages/api/src/schemas.ts` — Shared Zod input schemas and inferred TypeScript types
 - `lib/db/schema.ts` — Single file with all Drizzle table definitions (auth tables + app tables)
 - `lib/db/migrate.ts` — Auto-migration runner (executed on startup via instrumentation)
 - `lib/services/` — Business logic layer (metadata, tracking, discovery, availability, credits, person, webhooks, backup, settings, colors, update-check, system-health)
@@ -69,9 +96,7 @@ bun run test
 - `lib/types/` — Shared TypeScript types (e.g. `title.ts`)
 - `lib/cron.ts` — Background job scheduler (croner, `globalThis` singleton)
 - `lib/query-client.ts` — Singleton `QueryClient` with default options (30s stale time)
-- `lib/orpc/` — oRPC API layer (contract-first, type-safe RPC):
-  - `contract.ts` — Full API contract definition (~30 procedures)
-  - `schemas.ts` — Shared Zod input schemas used by contract
+- `lib/orpc/` — oRPC API layer (server implementation):
   - `context.ts` — Context type & `os` implementer
   - `middleware.ts` — Auth (`authed`) and admin (`admin`) middleware
   - `router.ts` — Assembled router implementing the contract
@@ -109,7 +134,13 @@ export const authed = base.middleware(async ({ context, next }) => {
 
 ### oRPC API layer
 
-All API procedures use oRPC with a contract-first approach. The contract defines the API shape in `lib/orpc/contract.ts`, procedures implement it in `lib/orpc/procedures/`, and the client consumes it with full type safety.
+All API procedures use oRPC with a contract-first approach. The contract is defined in `packages/api/src/contract.ts`, procedures implement it in `apps/web/lib/orpc/procedures/`, and the client consumes it with full type safety.
+
+**Pattern — importing types from the shared package:**
+```typescript
+import type { ResolvedTitle, Season } from "@sofa/api/schemas";
+import { contract } from "@sofa/api/contract";
+```
 
 **Pattern — query in component:**
 ```typescript
@@ -207,7 +238,7 @@ Jobs (all use `protect: true` to prevent overlapping runs, 300ms delay between T
 
 ### Environment variables
 
-See `.env.example`: `DATA_DIR` (root for DB + cache, default `./data`), `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`. `DATABASE_URL` and `CACHE_DIR` are derived from `DATA_DIR` but can be overridden individually.
+See `apps/web/.env.example`: `DATA_DIR` (root for DB + cache, default `./data`), `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`. `DATABASE_URL` and `CACHE_DIR` are derived from `DATA_DIR` but can be overridden individually.
 
 Optional: `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_ISSUER_URL`, `OIDC_PROVIDER_NAME`, `OIDC_AUTO_REGISTER`, `DISABLE_PASSWORD_LOGIN` (OIDC/SSO support). `LOG_LEVEL` (error/warn/info/debug, default: info). `IMAGE_CACHE_ENABLED` (default: true).
 

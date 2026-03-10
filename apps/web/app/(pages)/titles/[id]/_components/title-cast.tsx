@@ -1,0 +1,15 @@
+import type { CastMember } from "@sofa/api/schemas";
+import { CastCarousel } from "./cast-carousel";
+
+interface TitleCastProps {
+  cast: CastMember[];
+  titleType: "movie" | "tv";
+}
+
+export function TitleCast({ cast, titleType }: TitleCastProps) {
+  const actors = cast.filter((c) => c.department === "Acting");
+
+  if (actors.length === 0) return null;
+
+  return <CastCarousel actors={actors} titleType={titleType} />;
+}
