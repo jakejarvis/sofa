@@ -7,8 +7,8 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [
-    tsconfigPaths(),
     devtools(),
+    tsconfigPaths(),
     tanstackRouter({ target: "react", autoCodeSplitting: true }),
     react({
       babel: { plugins: [["babel-plugin-react-compiler"]] },
