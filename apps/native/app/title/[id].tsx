@@ -460,6 +460,15 @@ export default function TitleDetailScreen() {
     }),
   );
 
+  const quickAddMutation = useMutation(
+    orpc.watchlist.quickAdd.mutationOptions({
+      onSuccess: () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        queryClient.invalidateQueries();
+      },
+    }),
+  );
+
   const hydrateMutation = useMutation(
     orpc.titles.hydrateSeasons.mutationOptions({
       onSuccess: () => queryClient.invalidateQueries(),
@@ -689,10 +698,25 @@ export default function TitleDetailScreen() {
       <View className="mt-4 px-4">
         <StatusActionButton
           currentStatus={userInfo.data?.status ?? null}
-          onStatusChange={(status) =>
-            updateStatus.mutate({ id, status: status ? "in_progress" : null })
+          onStatusChange={(status) => {
+            if (status === null) {
+              updateStatus.mutate({ id, status: null });
+            } else if (status === "watchlist") {
+              quickAddMutation.mutate({
+                tmdbId: title.tmdbId,
+                type: title.type,
+              });
+            } else if (status === "completed" && title.type === "movie") {
+              watchMovie.mutate({ id });
+            } else {
+              updateStatus.mutate({ id, status: "in_progress" });
+            }
+          }}
+          isPending={
+            updateStatus.isPending ||
+            quickAddMutation.isPending ||
+            watchMovie.isPending
           }
-          isPending={updateStatus.isPending}
         />
 
         <View className="mt-4 flex-row items-center justify-between">

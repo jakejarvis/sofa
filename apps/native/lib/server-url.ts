@@ -5,6 +5,7 @@ const DEFAULT_URL =
   process.env.EXPO_PUBLIC_SERVER_URL ?? "http://localhost:3000";
 
 let cachedUrl: string = "";
+let onServerUrlChanged: (() => void) | null = null;
 
 export function getServerUrl(): string {
   if (cachedUrl) return cachedUrl;
@@ -17,6 +18,11 @@ export async function setServerUrl(url: string): Promise<void> {
   const normalized = url.replace(/\/+$/, "");
   await SecureStore.setItemAsync(SERVER_URL_KEY, normalized);
   cachedUrl = normalized;
+  onServerUrlChanged?.();
+}
+
+export function onServerUrlChange(callback: () => void) {
+  onServerUrlChanged = callback;
 }
 
 export function hasStoredServerUrl(): boolean {

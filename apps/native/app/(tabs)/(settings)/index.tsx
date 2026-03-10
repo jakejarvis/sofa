@@ -308,7 +308,7 @@ function BackupsSection() {
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { data: session } = authClient.useSession();
+  const { data: session, refetch: refetchSession } = authClient.useSession();
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(session?.user?.name ?? "");
 
@@ -327,6 +327,7 @@ export default function SettingsScreen() {
       onSuccess: () => {
         setIsEditingName(false);
         queryClient.invalidateQueries();
+        refetchSession();
       },
     }),
   );
@@ -336,6 +337,7 @@ export default function SettingsScreen() {
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         queryClient.invalidateQueries();
+        refetchSession();
       },
       onError: () => {
         Alert.alert("Error", "Failed to upload avatar");
@@ -348,6 +350,7 @@ export default function SettingsScreen() {
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         queryClient.invalidateQueries();
+        refetchSession();
       },
     }),
   );

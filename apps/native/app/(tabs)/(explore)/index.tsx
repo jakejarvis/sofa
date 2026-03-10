@@ -4,7 +4,7 @@ import {
   IconMovie,
   IconStarFilled,
 } from "@tabler/icons-react-native";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -58,7 +58,6 @@ function HeroBanner({
   item,
 }: {
   item: {
-    id?: string;
     tmdbId: number;
     title: string;
     type: string;
@@ -70,13 +69,24 @@ function HeroBanner({
 }) {
   const router = useRouter();
 
+  const resolveMutation = useMutation(
+    orpc.titles.resolve.mutationOptions({
+      onSuccess: ({ id }) => {
+        router.push(`/title/${id}`);
+      },
+    }),
+  );
+
   return (
     <Pressable
-      onPress={() => {
-        if (item.id) router.push(`/title/${item.id}`);
-      }}
+      onPress={() =>
+        resolveMutation.mutate({
+          tmdbId: item.tmdbId,
+          type: item.type as "movie" | "tv",
+        })
+      }
       className="mx-4 overflow-hidden rounded-2xl"
-      style={{ height: 220 }}
+      style={{ height: 220, opacity: resolveMutation.isPending ? 0.7 : 1 }}
     >
       {item.backdropPath && (
         <Image
@@ -130,38 +140,55 @@ function HeroBanner({
   );
 }
 
+type TitleStatus = "watchlist" | "in_progress" | "completed";
+
 function FilterableTitleRow({
   title,
   icon,
-  items,
+  mediaType,
+  defaultItems,
+  defaultUserStatuses,
+  defaultEpisodeProgress,
   genres,
   isLoading,
 }: {
   title: string;
   icon: typeof IconMovie;
-  items: Array<{
-    id?: string;
+  mediaType: "movie" | "tv";
+  defaultItems: Array<{
     tmdbId: number;
     title: string;
     type: string;
     posterPath: string | null;
     releaseDate?: string | null;
     voteAverage?: number | null;
-    userStatus?: "watchlist" | "in_progress" | "completed" | null;
-    episodeProgress?: { watched: number; total: number } | null;
   }>;
+  defaultUserStatuses: Record<string, TitleStatus>;
+  defaultEpisodeProgress: Record<string, { watched: number; total: number }>;
   genres?: Array<{ id: number; name: string }>;
   isLoading?: boolean;
 }) {
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
 
-  const filteredItems = selectedGenre
-    ? items.filter(
-        (item) =>
-          "genreIds" in item &&
-          (item as { genreIds?: number[] }).genreIds?.includes(selectedGenre),
-      )
-    : items;
+  const discover = useQuery({
+    ...orpc.discover.queryOptions({
+      input: { mediaType, genreId: selectedGenre ?? 0 },
+    }),
+    enabled: selectedGenre !== null,
+  });
+
+  const items =
+    selectedGenre === null ? defaultItems : (discover.data?.items ?? []);
+  const userStatuses =
+    selectedGenre === null
+      ? defaultUserStatuses
+      : (discover.data?.userStatuses ?? {});
+  const episodeProgress =
+    selectedGenre === null
+      ? defaultEpisodeProgress
+      : (discover.data?.episodeProgress ?? {});
+  const showLoading =
+    isLoading || (selectedGenre !== null && discover.isPending);
 
   return (
     <View>
@@ -194,7 +221,7 @@ function FilterableTitleRow({
         </ScrollView>
       )}
 
-      {isLoading ? (
+      {showLoading ? (
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -207,24 +234,31 @@ function FilterableTitleRow({
           )}
           contentContainerStyle={{ paddingHorizontal: 16 }}
         />
+      ) : items.length === 0 && selectedGenre !== null ? (
+        <View className="items-center py-6">
+          <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
+            No titles found for this genre.
+          </Text>
+        </View>
       ) : (
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
-          data={filteredItems}
-          keyExtractor={(item, index) => item.id ?? `${item.tmdbId}-${index}`}
+          data={items}
+          keyExtractor={(item, index) => `${item.tmdbId}-${index}`}
           renderItem={({ item }) => (
             <View className="mr-3">
               <PosterCard
-                id={item.id}
                 tmdbId={item.tmdbId}
                 title={item.title}
                 type={item.type as "movie" | "tv"}
                 posterPath={item.posterPath}
                 releaseDate={item.releaseDate}
                 voteAverage={item.voteAverage}
-                userStatus={item.userStatus}
-                episodeProgress={item.episodeProgress}
+                userStatus={userStatuses[`${item.tmdbId}-${item.type}`] ?? null}
+                episodeProgress={
+                  episodeProgress[`${item.tmdbId}-${item.type}`] ?? null
+                }
               />
             </View>
           )}
@@ -264,7 +298,6 @@ export default function ExploreScreen() {
   }, []);
 
   const heroItem = trending.data?.hero;
-  const trendingItems = trending.data?.items ?? [];
 
   return (
     <FlatList
@@ -289,14 +322,20 @@ export default function ExploreScreen() {
           <FilterableTitleRow
             title="Trending Today"
             icon={IconFlame}
-            items={trendingItems}
+            mediaType="movie"
+            defaultItems={trending.data?.items ?? []}
+            defaultUserStatuses={trending.data?.userStatuses ?? {}}
+            defaultEpisodeProgress={trending.data?.episodeProgress ?? {}}
             isLoading={trending.isPending}
           />
 
           <FilterableTitleRow
             title="Popular Movies"
             icon={IconMovie}
-            items={popularMovies.data?.items ?? []}
+            mediaType="movie"
+            defaultItems={popularMovies.data?.items ?? []}
+            defaultUserStatuses={popularMovies.data?.userStatuses ?? {}}
+            defaultEpisodeProgress={popularMovies.data?.episodeProgress ?? {}}
             genres={movieGenres.data?.genres}
             isLoading={popularMovies.isPending}
           />
@@ -304,7 +343,10 @@ export default function ExploreScreen() {
           <FilterableTitleRow
             title="Popular TV Shows"
             icon={IconDeviceTv}
-            items={popularTv.data?.items ?? []}
+            mediaType="tv"
+            defaultItems={popularTv.data?.items ?? []}
+            defaultUserStatuses={popularTv.data?.userStatuses ?? {}}
+            defaultEpisodeProgress={popularTv.data?.episodeProgress ?? {}}
             genres={tvGenres.data?.genres}
             isLoading={popularTv.isPending}
           />
