@@ -2,14 +2,14 @@ import { os } from "./context";
 import * as account from "./procedures/account";
 import * as admin from "./procedures/admin";
 import * as dashboard from "./procedures/dashboard";
-import { discoverProcedure } from "./procedures/discover";
+import { discover } from "./procedures/discover";
 import * as episodes from "./procedures/episodes";
 import * as explore from "./procedures/explore";
 import * as integrations from "./procedures/integrations";
 import * as people from "./procedures/people";
 import { search } from "./procedures/search";
 import * as seasons from "./procedures/seasons";
-import { statsProcedure } from "./procedures/stats";
+import { stats } from "./procedures/stats";
 import { systemStatus } from "./procedures/status";
 import * as system from "./procedures/system";
 import * as titles from "./procedures/titles";
@@ -52,8 +52,8 @@ export const router = os.router({
     genres: explore.genres,
   },
   search,
-  discover: discoverProcedure,
-  stats: statsProcedure,
+  discover,
+  stats,
   systemStatus,
   system: {
     publicInfo: system.publicInfo,

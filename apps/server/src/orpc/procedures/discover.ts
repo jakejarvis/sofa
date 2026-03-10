@@ -3,13 +3,13 @@ import {
   getEpisodeProgressByTmdbIds,
   getUserStatusesByTmdbIds,
 } from "@sofa/core/tracking";
-import { discover } from "@sofa/tmdb/client";
+import { discover as discoverTmdb } from "@sofa/tmdb/client";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { os } from "../context";
 import { authed } from "../middleware";
 
-export const discoverProcedure = os.discover
+export const discover = os.discover
   .use(authed)
   .handler(async ({ input, context }) => {
     if (!isTmdbConfigured()) {
@@ -18,7 +18,7 @@ export const discoverProcedure = os.discover
       });
     }
 
-    const results = await discover(input.mediaType, {
+    const results = await discoverTmdb(input.mediaType, {
       sort_by: "popularity.desc",
       "vote_count.gte": "50",
       with_genres: String(input.genreId),
