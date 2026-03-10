@@ -5,7 +5,7 @@ import {
   setSetting,
 } from "@sofa/core/settings";
 import { db } from "@sofa/db/client";
-import { createLogger } from "@sofa/db/logger";
+import { createLogger } from "@sofa/logger";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { type BetterAuthOptions, betterAuth } from "better-auth/minimal";
 import { admin, genericOAuth } from "better-auth/plugins";

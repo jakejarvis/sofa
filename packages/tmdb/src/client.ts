@@ -1,4 +1,4 @@
-import { createLogger } from "@sofa/db/logger";
+import { createLogger } from "@sofa/logger";
 import createClient, { type Middleware } from "openapi-fetch";
 import type { operations, paths } from "./schema";
 

@@ -21,7 +21,7 @@ export const queryClient = new QueryClient({
 });
 
 export const link = new RPCLink({
-  url: `${import.meta.env.VITE_SERVER_URL}/rpc`,
+  url: `${window.location.origin}/rpc`,
   fetch: (input, init) => fetch(input, { ...init, credentials: "include" }),
 });
 

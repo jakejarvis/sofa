@@ -2,10 +2,10 @@ import { Database } from "bun:sqlite";
 import { renameSync, unlinkSync } from "node:fs";
 import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
+import { BACKUP_DIR, DATABASE_URL } from "@sofa/config";
 import { closeDatabase, db } from "@sofa/db/client";
-import { BACKUP_DIR, DATABASE_URL } from "@sofa/db/constants";
-import { createLogger } from "@sofa/db/logger";
 import { runMigrations } from "@sofa/db/migrate";
+import { createLogger } from "@sofa/logger";
 import { format } from "date-fns";
 import { sql } from "drizzle-orm";
 

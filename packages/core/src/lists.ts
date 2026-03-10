@@ -1,6 +1,6 @@
 import { db } from "@sofa/db/client";
-import { createLogger } from "@sofa/db/logger";
 import { integrations, titles, userTitleStatus } from "@sofa/db/schema";
+import { createLogger } from "@sofa/logger";
 import { getTvExternalIds } from "@sofa/tmdb/client";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";

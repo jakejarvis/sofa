@@ -1,8 +1,8 @@
 import { Database } from "bun:sqlite";
+import { DATABASE_URL } from "@sofa/config";
+import { createLogger } from "@sofa/logger";
 import type { Logger } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
-import { DATABASE_URL } from "./constants";
-import { createLogger } from "./logger";
 import * as schema from "./schema";
 
 const log = createLogger("drizzle");

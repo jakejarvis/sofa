@@ -1,10 +1,12 @@
+import { CACHE_DIR } from "@sofa/config";
 import { ensureBackupDir } from "@sofa/core/backup";
 import { ensureImageDirs, imageCacheEnabled } from "@sofa/core/image-cache";
 import { registerJobScheduleProvider } from "@sofa/core/system-health";
 import { closeDatabase } from "@sofa/db/client";
-import { createLogger } from "@sofa/db/logger";
 import { runMigrations } from "@sofa/db/migrate";
+import { createLogger } from "@sofa/logger";
 import { Hono } from "hono";
+import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { getJobSchedules, startJobs, stopJobs } from "./cron";
 import { handler as rpcHandler } from "./orpc/handler";
@@ -52,11 +54,25 @@ app.use(
 // Non-RPC routes
 app.route("/api/health", healthRoutes);
 app.route("/api/auth", authRoutes);
-app.route("/api/images", imagesRoutes);
 app.route("/api/avatars", avatarsRoutes);
 app.route("/api/backup", backupsRoutes);
 app.route("/api/webhooks", webhooksRoutes);
 app.route("/api/lists", listsRoutes);
+
+// Cached images — serve from disk (fast path), fall back to TMDB fetch on miss
+if (imageCacheEnabled()) {
+  app.use(
+    "/images/*",
+    serveStatic({
+      root: CACHE_DIR,
+      rewriteRequestPath: (path) => path.replace("/images", ""),
+      onFound: (_path, c) => {
+        c.header("Cache-Control", "public, max-age=31536000, immutable");
+      },
+    }),
+  );
+}
+app.route("/images", imagesRoutes);
 
 // oRPC RPC handler
 app.all("/rpc/*", async (c) => {
@@ -79,9 +95,8 @@ app.all("/api/v1/*", async (c) => {
 // ─── SPA static serving (production) ─────────────────────────
 
 if (process.env.NODE_ENV === "production") {
-  const { serveStatic } = await import("hono/bun");
-  const path = await import("node:path");
-  const spaDir = path.resolve(import.meta.dir, "../../../apps/web/dist");
+  const { resolve } = await import("node:path");
+  const spaDir = resolve(import.meta.dir, "../../../apps/web/dist");
 
   // Hashed assets — immutable cache
   app.use("/assets/*", serveStatic({ root: spaDir }));

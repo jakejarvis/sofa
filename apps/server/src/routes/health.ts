@@ -1,5 +1,5 @@
 import { db } from "@sofa/db/client";
-import { createLogger } from "@sofa/db/logger";
+import { createLogger } from "@sofa/logger";
 import { sql } from "drizzle-orm";
 import { Hono } from "hono";
 

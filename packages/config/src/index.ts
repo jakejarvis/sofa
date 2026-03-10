@@ -1,5 +1,7 @@
 import path from "node:path";
 
+// ─── Paths ───────────────────────────────────────────────────
+
 export const DATA_DIR = process.env.DATA_DIR || "./data";
 
 export const DATABASE_URL =
@@ -12,6 +14,8 @@ export const CACHE_DIR = process.env.CACHE_DIR
 export const BACKUP_DIR = path.join(DATA_DIR, "backups");
 
 export const AVATAR_DIR = path.join(DATA_DIR, "avatars");
+
+// ─── TMDB ────────────────────────────────────────────────────
 
 export const TMDB_API_BASE_URL =
   process.env.TMDB_API_BASE_URL || "https://api.themoviedb.org/3";

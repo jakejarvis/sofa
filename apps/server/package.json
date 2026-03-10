@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --watch src/index.ts",
-    "start": "bun src/index.ts",
+    "dev": "bun --env-file=../../.env --watch src/index.ts",
+    "start": "bun --env-file=../../.env src/index.ts",
     "lint": "biome check",
     "format": "biome format --write",
     "check-types": "tsc --noEmit"
@@ -19,8 +19,10 @@
     "@orpc/zod": "catalog:",
     "@sofa/api": "workspace:*",
     "@sofa/auth": "workspace:*",
-    "@sofa/db": "workspace:*",
+    "@sofa/config": "workspace:*",
     "@sofa/core": "workspace:*",
+    "@sofa/db": "workspace:*",
+    "@sofa/logger": "workspace:*",
     "@sofa/tmdb": "workspace:*",
     "croner": "10.0.2-dev.2",
     "drizzle-orm": "catalog:",

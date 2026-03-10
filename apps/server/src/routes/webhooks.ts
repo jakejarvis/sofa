@@ -6,8 +6,8 @@ import {
   processWebhook,
 } from "@sofa/core/webhooks";
 import { db } from "@sofa/db/client";
-import { createLogger } from "@sofa/db/logger";
 import { integrations } from "@sofa/db/schema";
+import { createLogger } from "@sofa/logger";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 

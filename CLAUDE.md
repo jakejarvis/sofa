@@ -203,8 +203,8 @@ export const Route = createFileRoute("/_app/titles/$id")({
 ### Non-RPC routes (API server)
 
 Hono route handlers in `apps/server/src/routes/`:
+- `/images/:category/:filename` — Image proxy/cache serving
 - `/api/auth/*` — Better Auth catch-all
-- `/api/images/:category/:filename` — Image proxy/cache serving
 - `/api/avatars/:userId` — Avatar file serving
 - `/api/backup/:filename` — Backup file download
 - `/api/webhooks/:token` — Plex/Jellyfin/Emby webhooks
@@ -248,7 +248,7 @@ All app tables use UUIDv7 text primary keys generated via `Bun.randomUUIDv7()`. 
 
 Only paths are stored in DB. Image URLs are resolved by the API server — `tmdbImageUrl()` from `@sofa/tmdb/image` is called before sending data to clients. Client components receive ready-to-use URLs.
 
-When `IMAGE_CACHE_ENABLED` is set (default), images are downloaded to local disk and served via `/api/images/:category/:filename`. When disabled, `tmdbImageUrl()` returns direct TMDB CDN URLs.
+When `IMAGE_CACHE_ENABLED` is set (default), images are downloaded to local disk and served via `/images/:category/:filename`. When disabled, `tmdbImageUrl()` returns direct TMDB CDN URLs.
 
 ### Background jobs
 

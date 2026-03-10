@@ -1,12 +1,12 @@
 import { access, constants, readdir } from "node:fs/promises";
 import path from "node:path";
-import { db } from "@sofa/db/client";
 import {
   CACHE_DIR,
   DATA_DIR,
   DATABASE_URL,
   TMDB_API_BASE_URL,
-} from "@sofa/db/constants";
+} from "@sofa/config";
+import { db } from "@sofa/db/client";
 import { cronRuns, episodes, titles, user } from "@sofa/db/schema";
 import { count, desc, eq } from "drizzle-orm";
 import { listBackups } from "./backup";

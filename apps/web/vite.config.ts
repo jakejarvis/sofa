@@ -18,6 +18,7 @@ export default defineConfig({
     proxy: {
       "/rpc": "http://localhost:3001",
       "/api": "http://localhost:3001",
+      "/images": "http://localhost:3001",
     },
   },
   define: {

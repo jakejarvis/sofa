@@ -1,6 +1,6 @@
 import path from "node:path";
 import { auth } from "@sofa/auth/server";
-import { AVATAR_DIR } from "@sofa/db/constants";
+import { AVATAR_DIR } from "@sofa/config";
 import { Hono } from "hono";
 
 const app = new Hono();

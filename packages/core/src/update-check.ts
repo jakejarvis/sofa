@@ -1,4 +1,4 @@
-import { createLogger } from "@sofa/db/logger";
+import { createLogger } from "@sofa/logger";
 import { getSetting, setSetting } from "./settings";
 
 const APP_VERSION = process.env.APP_VERSION || "0.0.0";

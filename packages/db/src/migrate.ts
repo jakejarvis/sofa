@@ -1,7 +1,7 @@
 import path from "node:path";
+import { createLogger } from "@sofa/logger";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import { db } from "./client";
-import { createLogger } from "./logger";
 
 const log = createLogger("db");
 

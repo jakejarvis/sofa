@@ -1,8 +1,7 @@
 import { mkdir, rename } from "node:fs/promises";
 import path from "node:path";
+import { CACHE_DIR, TMDB_IMAGE_BASE_URL } from "@sofa/config";
 import { db } from "@sofa/db/client";
-import { CACHE_DIR, TMDB_IMAGE_BASE_URL } from "@sofa/db/constants";
-import { createLogger } from "@sofa/db/logger";
 import {
   availabilityOffers,
   episodes,
@@ -11,6 +10,7 @@ import {
   titleCast,
   titles,
 } from "@sofa/db/schema";
+import { createLogger } from "@sofa/logger";
 import type { ImageCategory } from "@sofa/tmdb/image";
 import { eq, inArray } from "drizzle-orm";
 

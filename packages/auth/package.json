@@ -14,8 +14,9 @@
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
-    "@sofa/db": "workspace:*",
     "@sofa/core": "workspace:*",
+    "@sofa/db": "workspace:*",
+    "@sofa/logger": "workspace:*",
     "better-auth": "catalog:"
   },
   "devDependencies": {

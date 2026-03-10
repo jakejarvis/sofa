@@ -1,5 +1,5 @@
-import { useId } from "react";
-import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
+import { useEffect, useId, useRef, useState } from "react";
+import { Area, AreaChart, YAxis } from "recharts";
 
 interface SparklineProps {
   data: Array<{ bucket: string; count: number }>;
@@ -9,16 +9,36 @@ interface SparklineProps {
 export function Sparkline({ data, color }: SparklineProps) {
   const uniqueId = useId();
   const gradientId = `sparkline-${uniqueId.replace(/:/g, "")}`;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (width > 0 && height > 0) {
+        setSize({ width, height });
+      }
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   if (!data.some((d) => d.count > 0)) return null;
 
   return (
     <div
+      ref={containerRef}
       className={`pointer-events-none absolute inset-0 overflow-hidden ${color}`}
     >
-      <ResponsiveContainer width="100%" height="100%">
+      {size.width > 0 && size.height > 0 && (
         <AreaChart
           data={data}
+          width={size.width}
+          height={size.height}
           margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
         >
           <defs>
@@ -38,7 +58,7 @@ export function Sparkline({ data, color }: SparklineProps) {
             isAnimationActive={false}
           />
         </AreaChart>
-      </ResponsiveContainer>
+      )}
     </div>
   );
 }

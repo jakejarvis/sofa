@@ -28,7 +28,9 @@
   },
   "dependencies": {
     "@sofa/api": "workspace:*",
+    "@sofa/config": "workspace:*",
     "@sofa/db": "workspace:*",
+    "@sofa/logger": "workspace:*",
     "@sofa/tmdb": "workspace:*",
     "date-fns": "catalog:",
     "drizzle-orm": "catalog:",

@@ -16,7 +16,6 @@ import {
 import { getSetting } from "@sofa/core/settings";
 import { performUpdateCheck } from "@sofa/core/update-check";
 import { db } from "@sofa/db/client";
-import { createLogger } from "@sofa/db/logger";
 import {
   availabilityOffers,
   cronRuns,
@@ -25,6 +24,7 @@ import {
   titles,
   userTitleStatus,
 } from "@sofa/db/schema";
+import { createLogger } from "@sofa/logger";
 import { getTvDetails } from "@sofa/tmdb/client";
 import { Cron } from "croner";
 import { and, eq, inArray, isNotNull, lt, or } from "drizzle-orm";

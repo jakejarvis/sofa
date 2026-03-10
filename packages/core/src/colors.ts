@@ -1,7 +1,7 @@
 import path from "node:path";
 import { db } from "@sofa/db/client";
-import { createLogger } from "@sofa/db/logger";
 import { titles } from "@sofa/db/schema";
+import { createLogger } from "@sofa/logger";
 import { eq } from "drizzle-orm";
 import { Vibrant } from "node-vibrant/node";
 import {

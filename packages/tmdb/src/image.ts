@@ -30,5 +30,5 @@ export function tmdbImageUrl(
   }
 
   const filename = path.startsWith("/") ? path.slice(1) : path;
-  return `/api/images/${category}/${filename}`;
+  return `/images/${category}/${filename}`;
 }

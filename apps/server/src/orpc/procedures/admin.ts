@@ -1,5 +1,6 @@
 import path from "node:path";
 import { ORPCError } from "@orpc/server";
+import { BACKUP_DIR } from "@sofa/config";
 import {
   createBackup,
   deleteBackup,
@@ -12,7 +13,6 @@ import {
   getCachedUpdateCheck,
   isUpdateCheckEnabled,
 } from "@sofa/core/update-check";
-import { BACKUP_DIR } from "@sofa/db/constants";
 import { rescheduleBackup, triggerJob } from "../../cron";
 import { os } from "../context";
 import { admin } from "../middleware";

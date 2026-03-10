@@ -6,7 +6,6 @@ import type {
   Season,
 } from "@sofa/api/schemas";
 import { db } from "@sofa/db/client";
-import { createLogger } from "@sofa/db/logger";
 import {
   availabilityOffers,
   episodes,
@@ -16,6 +15,7 @@ import {
   titleRecommendations,
   titles,
 } from "@sofa/db/schema";
+import { createLogger } from "@sofa/logger";
 import type {
   TmdbGenre,
   TmdbMovieDetails,

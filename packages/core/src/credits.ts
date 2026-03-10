@@ -1,7 +1,7 @@
 import type { CastMember } from "@sofa/api/schemas";
 import { db } from "@sofa/db/client";
-import { createLogger } from "@sofa/db/logger";
 import { persons, titleCast, titles } from "@sofa/db/schema";
+import { createLogger } from "@sofa/logger";
 import { getMovieCredits, getTvAggregateCredits } from "@sofa/tmdb/client";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { eq, inArray, sql } from "drizzle-orm";

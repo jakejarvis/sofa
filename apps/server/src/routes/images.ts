@@ -11,8 +11,6 @@ const categorySchema = z.enum([
   "profiles",
 ]);
 
-const IMMUTABLE_CACHE = "public, max-age=31536000, immutable";
-
 const app = new Hono();
 
 app.get("/:category/:filename", async (c) => {
@@ -46,7 +44,6 @@ app.get("/:category/:filename", async (c) => {
     status: 200,
     headers: {
       "Content-Type": result.contentType,
-      "Cache-Control": IMMUTABLE_CACHE,
     },
   });
 });

@@ -21,8 +21,10 @@
         "@orpc/zod": "catalog:",
         "@sofa/api": "workspace:*",
         "@sofa/auth": "workspace:*",
+        "@sofa/config": "workspace:*",
         "@sofa/core": "workspace:*",
         "@sofa/db": "workspace:*",
+        "@sofa/logger": "workspace:*",
         "@sofa/tmdb": "workspace:*",
         "croner": "10.0.2-dev.2",
         "drizzle-orm": "catalog:",
@@ -106,8 +108,17 @@
         "@better-auth/drizzle-adapter": "catalog:",
         "@sofa/core": "workspace:*",
         "@sofa/db": "workspace:*",
+        "@sofa/logger": "workspace:*",
         "better-auth": "catalog:",
       },
+      "devDependencies": {
+        "@types/bun": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/config": {
+      "name": "@sofa/config",
+      "version": "0.1.0",
       "devDependencies": {
         "@types/bun": "catalog:",
         "typescript": "catalog:",
@@ -118,7 +129,9 @@
       "version": "0.1.0",
       "dependencies": {
         "@sofa/api": "workspace:*",
+        "@sofa/config": "workspace:*",
         "@sofa/db": "workspace:*",
+        "@sofa/logger": "workspace:*",
         "@sofa/tmdb": "workspace:*",
         "date-fns": "catalog:",
         "drizzle-orm": "catalog:",
@@ -134,6 +147,8 @@
       "name": "@sofa/db",
       "version": "0.1.0",
       "dependencies": {
+        "@sofa/config": "workspace:*",
+        "@sofa/logger": "workspace:*",
         "drizzle-orm": "catalog:",
       },
       "devDependencies": {
@@ -142,11 +157,20 @@
         "typescript": "catalog:",
       },
     },
+    "packages/logger": {
+      "name": "@sofa/logger",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@types/bun": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
     "packages/tmdb": {
       "name": "@sofa/tmdb",
       "version": "0.1.0",
       "dependencies": {
         "@sofa/db": "workspace:*",
+        "@sofa/logger": "workspace:*",
         "openapi-fetch": "0.17.0",
       },
       "devDependencies": {
@@ -708,9 +732,13 @@
 
     "@sofa/auth": ["@sofa/auth@workspace:packages/auth"],
 
+    "@sofa/config": ["@sofa/config@workspace:packages/config"],
+
     "@sofa/core": ["@sofa/core@workspace:packages/core"],
 
     "@sofa/db": ["@sofa/db@workspace:packages/db"],
+
+    "@sofa/logger": ["@sofa/logger@workspace:packages/logger"],
 
     "@sofa/server": ["@sofa/server@workspace:apps/server"],
 
