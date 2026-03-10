@@ -1,29 +1,13 @@
 import "@/global.css";
-import {
-  DMSans_400Regular,
-  DMSans_500Medium,
-  DMSans_600SemiBold,
-  DMSans_700Bold,
-} from "@expo-google-fonts/dm-sans";
-import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { HeroUINativeProvider } from "heroui-native";
 import { useEffect } from "react";
-import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from "react-native-reanimated";
 import { Uniwind } from "uniwind";
 import { OfflineBanner } from "@/components/ui/offline-banner";
-import { SofaLogo } from "@/components/ui/sofa-logo";
 import { TitleActionSheetProvider } from "@/components/ui/title-action-sheet";
 import { colors } from "@/constants/colors";
 import { queryClient } from "@/utils/orpc";
@@ -33,44 +17,9 @@ export const unstable_settings = {
 };
 
 function AppContent() {
-  const [fontsLoaded] = useFonts({
-    DMSans_400Regular,
-    DMSans_500Medium,
-    DMSans_600SemiBold,
-    DMSans_700Bold,
-    DMSerifDisplay_400Regular,
-  });
-
   useEffect(() => {
     Uniwind.setTheme("dark");
   }, []);
-
-  const iconOpacity = useSharedValue(0.4);
-
-  useEffect(() => {
-    iconOpacity.value = withRepeat(withTiming(1, { duration: 900 }), -1, true);
-  }, [iconOpacity]);
-
-  const pulseStyle = useAnimatedStyle(() => ({
-    opacity: iconOpacity.value,
-  }));
-
-  if (!fontsLoaded) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Animated.View style={[{ alignItems: "center" }, pulseStyle]}>
-          <SofaLogo size={56} />
-        </Animated.View>
-      </View>
-    );
-  }
 
   return (
     <TitleActionSheetProvider>

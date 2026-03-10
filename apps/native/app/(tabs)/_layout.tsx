@@ -1,14 +1,8 @@
-import {
-  IconCompass,
-  IconHome,
-  IconSearch,
-  IconSettings,
-} from "@tabler/icons-react-native";
 import * as Haptics from "expo-haptics";
-import { Redirect, Tabs } from "expo-router";
+import { Redirect } from "expo-router";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
 
 import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
 import { authClient } from "@/lib/auth-client";
 import { hasStoredServerUrl } from "@/lib/server-url";
 
@@ -22,20 +16,14 @@ export default function TabLayout() {
   if (!session) return <Redirect href="/(auth)/login" />;
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: colors.card,
-          borderTopColor: colors.border,
-          borderTopWidth: 0.5,
-        },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.mutedForeground,
-        tabBarLabelStyle: {
-          fontFamily: fonts.sansMedium,
-          fontSize: 11,
-        },
+    <NativeTabs
+      iconColor={{
+        default: colors.mutedForeground,
+        selected: colors.primary,
+      }}
+      labelStyle={{
+        default: { color: colors.mutedForeground },
+        selected: { color: colors.primary },
       }}
       screenListeners={{
         tabPress: () => {
@@ -43,42 +31,22 @@ export default function TabLayout() {
         },
       }}
     >
-      <Tabs.Screen
-        name="(home)"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, size }) => (
-            <IconHome size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="(explore)"
-        options={{
-          title: "Explore",
-          tabBarIcon: ({ color, size }) => (
-            <IconCompass size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="(search)"
-        options={{
-          title: "Search",
-          tabBarIcon: ({ color, size }) => (
-            <IconSearch size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="(settings)"
-        options={{
-          title: "Settings",
-          tabBarIcon: ({ color, size }) => (
-            <IconSettings size={size} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+      <NativeTabs.Trigger name="(home)">
+        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="(explore)">
+        <NativeTabs.Trigger.Label>Explore</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="safari" md="explore" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="(search)">
+        <NativeTabs.Trigger.Label>Search</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="magnifyingglass" md="search" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="(settings)">
+        <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="gear" md="settings" />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

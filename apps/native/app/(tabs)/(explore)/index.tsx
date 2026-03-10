@@ -122,54 +122,54 @@ function HeroBanner({
           { height: 220, opacity: resolveMutation.isPending ? 0.7 : 1 },
         ]}
       >
-      {item.backdropPath && (
-        <Image
-          source={{ uri: item.backdropPath }}
-          style={{ width: "100%", height: "100%", position: "absolute" }}
-          contentFit="cover"
+        {item.backdropPath && (
+          <Image
+            source={{ uri: item.backdropPath }}
+            style={{ width: "100%", height: "100%", position: "absolute" }}
+            contentFit="cover"
+          />
+        )}
+        <View
+          className="absolute inset-0"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
         />
-      )}
-      <View
-        className="absolute inset-0"
-        style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-      />
-      <View className="flex-1 justify-end p-4">
-        <Text
-          style={{
-            fontFamily: fonts.display,
-            fontSize: 24,
-            color: "white",
-          }}
-          numberOfLines={2}
-        >
-          {item.title}
-        </Text>
-        {item.overview ? (
+        <View className="flex-1 justify-end p-4">
           <Text
             style={{
-              fontSize: 12,
-              color: "rgba(255,255,255,0.7)",
-              marginTop: 4,
+              fontFamily: fonts.display,
+              fontSize: 24,
+              color: "white",
             }}
             numberOfLines={2}
           >
-            {item.overview}
+            {item.title}
           </Text>
-        ) : null}
-        <View className="mt-2 flex-row items-center gap-2">
-          {item.voteAverage != null && item.voteAverage > 0 && (
-            <View className="flex-row items-center gap-1">
-              <IconStarFilled size={12} color={colors.primary} />
-              <Text style={{ fontSize: 12, color: colors.primary }}>
-                {item.voteAverage.toFixed(1)}
-              </Text>
-            </View>
-          )}
-          <Text style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
-            {item.releaseDate?.slice(0, 4)}
-          </Text>
+          {item.overview ? (
+            <Text
+              style={{
+                fontSize: 12,
+                color: "rgba(255,255,255,0.7)",
+                marginTop: 4,
+              }}
+              numberOfLines={2}
+            >
+              {item.overview}
+            </Text>
+          ) : null}
+          <View className="mt-2 flex-row items-center gap-2">
+            {item.voteAverage != null && item.voteAverage > 0 && (
+              <View className="flex-row items-center gap-1">
+                <IconStarFilled size={12} color={colors.primary} />
+                <Text style={{ fontSize: 12, color: colors.primary }}>
+                  {item.voteAverage.toFixed(1)}
+                </Text>
+              </View>
+            )}
+            <Text style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+              {item.releaseDate?.slice(0, 4)}
+            </Text>
+          </View>
         </View>
-      </View>
       </Animated.View>
     </GestureDetector>
   );

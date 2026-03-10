@@ -189,11 +189,11 @@ function SeasonAccordion({
   const progress = episodes.length > 0 ? watchedCount / episodes.length : 0;
 
   useEffect(() => {
-    chevronRotation.value = withTiming(expanded ? 180 : 0, { duration: 200 });
+    chevronRotation.set(withTiming(expanded ? 180 : 0, { duration: 200 }));
   }, [expanded, chevronRotation]);
 
   const chevronStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${chevronRotation.value}deg` }],
+    transform: [{ rotate: `${chevronRotation.get()}deg` }],
   }));
 
   const watchEpisode = useMutation(
@@ -359,46 +359,46 @@ function CastCard({
           { width: 80, marginRight: 16, alignItems: "center" },
         ]}
       >
-      <View
-        className="mb-2 overflow-hidden"
-        style={{
-          width: 64,
-          height: 64,
-          borderRadius: 32,
-          backgroundColor: colors.secondary,
-        }}
-      >
-        {person.profilePath && (
-          <Image
-            source={{ uri: person.profilePath }}
-            style={{ width: "100%", height: "100%" }}
-            contentFit="cover"
-          />
-        )}
-      </View>
-      <Text
-        numberOfLines={1}
-        style={{
-          fontFamily: fonts.sansMedium,
-          fontSize: 11,
-          color: colors.foreground,
-          textAlign: "center",
-        }}
-      >
-        {person.name}
-      </Text>
-      {person.character ? (
+        <View
+          className="mb-2 overflow-hidden"
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: 32,
+            backgroundColor: colors.secondary,
+          }}
+        >
+          {person.profilePath && (
+            <Image
+              source={{ uri: person.profilePath }}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="cover"
+            />
+          )}
+        </View>
         <Text
           numberOfLines={1}
           style={{
-            fontSize: 10,
-            color: colors.mutedForeground,
+            fontFamily: fonts.sansMedium,
+            fontSize: 11,
+            color: colors.foreground,
             textAlign: "center",
           }}
         >
-          {person.character}
+          {person.name}
         </Text>
-      ) : null}
+        {person.character ? (
+          <Text
+            numberOfLines={1}
+            style={{
+              fontSize: 10,
+              color: colors.mutedForeground,
+              textAlign: "center",
+            }}
+          >
+            {person.character}
+          </Text>
+        ) : null}
       </Animated.View>
     </GestureDetector>
   );
@@ -512,6 +512,23 @@ export default function TitleDetailScreen() {
   const availability = detail.data?.availability ?? [];
   const watchedEpisodeIds = new Set(userInfo.data?.episodeWatches ?? []);
 
+  useEffect(() => {
+    if (
+      detail.data?.needsHydration &&
+      title?.type === "tv" &&
+      !hydrateMutation.isPending &&
+      !hydrateMutation.isSuccess
+    ) {
+      hydrateMutation.mutate({ id, tmdbId: title.tmdbId });
+    }
+  }, [
+    detail.data?.needsHydration,
+    title?.type,
+    title?.tmdbId,
+    id,
+    hydrateMutation,
+  ]);
+
   if (detail.isPending) {
     return (
       <View style={{ backgroundColor: colors.background, flex: 1 }}>
@@ -573,17 +590,6 @@ export default function TitleDetailScreen() {
   }
 
   const year = (title.releaseDate ?? title.firstAirDate)?.slice(0, 4);
-
-  useEffect(() => {
-    if (
-      detail.data?.needsHydration &&
-      title.type === "tv" &&
-      !hydrateMutation.isPending &&
-      !hydrateMutation.isSuccess
-    ) {
-      hydrateMutation.mutate({ id, tmdbId: title.tmdbId });
-    }
-  }, [detail.data?.needsHydration, title.type, id, title.tmdbId, hydrateMutation]);
 
   return (
     <ScrollView

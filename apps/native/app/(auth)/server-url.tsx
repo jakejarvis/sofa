@@ -60,26 +60,22 @@ export default function ServerUrlScreen() {
   // Icon pulse animation
   const iconOpacity = useSharedValue(1);
   const iconAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: iconOpacity.value,
+    opacity: iconOpacity.get(),
   }));
 
   // Pulsing dot animation for connecting state
   const dotOpacity = useSharedValue(0.4);
   const dotAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: dotOpacity.value,
+    opacity: dotOpacity.get(),
   }));
 
   useEffect(() => {
     if (connection.phase === "connecting") {
-      iconOpacity.value = withRepeat(
-        withTiming(0.4, { duration: 600 }),
-        -1,
-        true,
-      );
-      dotOpacity.value = withRepeat(withTiming(1, { duration: 600 }), -1, true);
+      iconOpacity.set(withRepeat(withTiming(0.4, { duration: 600 }), -1, true));
+      dotOpacity.set(withRepeat(withTiming(1, { duration: 600 }), -1, true));
     } else {
-      iconOpacity.value = withTiming(1, { duration: 200 });
-      dotOpacity.value = 0.4;
+      iconOpacity.set(withTiming(1, { duration: 200 }));
+      dotOpacity.set(0.4);
     }
   }, [connection.phase, iconOpacity, dotOpacity]);
 

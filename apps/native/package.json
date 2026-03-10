@@ -19,7 +19,6 @@
     "@expo-google-fonts/dm-sans": "0.4.2",
     "@expo-google-fonts/dm-serif-display": "0.4.2",
     "@expo/metro-runtime": "55.0.6",
-    "@tabler/icons-react-native": "3.40.0",
     "@gorhom/bottom-sheet": "5.2.8",
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
@@ -27,6 +26,7 @@
     "@react-navigation/elements": "2.9.10",
     "@sofa/api": "workspace:*",
     "@sofa/tmdb": "workspace:*",
+    "@tabler/icons-react-native": "3.40.0",
     "@tanstack/react-form": "1.28.4",
     "@tanstack/react-query": "catalog:",
     "better-auth": "catalog:",
@@ -55,7 +55,6 @@
     "react-native-web": "0.21.2",
     "react-native-worklets": "0.7.4",
     "tailwind-merge": "catalog:",
-    "tailwind-variants": "3.2.2",
     "tailwindcss": "catalog:",
     "uniwind": "1.5.0",
     "zod": "catalog:"

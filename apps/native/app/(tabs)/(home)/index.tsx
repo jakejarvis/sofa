@@ -80,55 +80,55 @@ function ContinueWatchingCard({
           },
         ]}
       >
-      <View style={{ width: 200, height: 112 }}>
-        {item.title.backdropPath && (
-          <Image
-            source={{ uri: item.title.backdropPath }}
-            style={{ width: "100%", height: "100%" }}
-            contentFit="cover"
-          />
-        )}
-        <View
-          className="absolute right-0 bottom-0 left-0"
-          style={{
-            height: 3,
-            backgroundColor: "rgba(255,255,255,0.1)",
-          }}
-        >
+        <View style={{ width: 200, height: 112 }}>
+          {item.title.backdropPath && (
+            <Image
+              source={{ uri: item.title.backdropPath }}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="cover"
+            />
+          )}
           <View
+            className="absolute right-0 bottom-0 left-0"
             style={{
-              height: "100%",
-              width: `${(item.watchedEpisodes / item.totalEpisodes) * 100}%`,
-              backgroundColor: colors.statusWatching,
+              height: 3,
+              backgroundColor: "rgba(255,255,255,0.1)",
             }}
-          />
+          >
+            <View
+              style={{
+                height: "100%",
+                width: `${(item.watchedEpisodes / item.totalEpisodes) * 100}%`,
+                backgroundColor: colors.statusWatching,
+              }}
+            />
+          </View>
         </View>
-      </View>
-      <View className="p-2.5">
-        <Text
-          numberOfLines={1}
-          style={{
-            fontFamily: fonts.sansMedium,
-            fontSize: 13,
-            color: colors.foreground,
-          }}
-        >
-          {item.title.title}
-        </Text>
-        {item.nextEpisode && (
+        <View className="p-2.5">
           <Text
             numberOfLines={1}
             style={{
-              fontSize: 11,
-              color: colors.mutedForeground,
-              marginTop: 2,
+              fontFamily: fonts.sansMedium,
+              fontSize: 13,
+              color: colors.foreground,
             }}
           >
-            S{item.nextEpisode.seasonNumber}E{item.nextEpisode.episodeNumber}
-            {item.nextEpisode.name ? ` · ${item.nextEpisode.name}` : ""}
+            {item.title.title}
           </Text>
-        )}
-      </View>
+          {item.nextEpisode && (
+            <Text
+              numberOfLines={1}
+              style={{
+                fontSize: 11,
+                color: colors.mutedForeground,
+                marginTop: 2,
+              }}
+            >
+              S{item.nextEpisode.seasonNumber}E{item.nextEpisode.episodeNumber}
+              {item.nextEpisode.name ? ` · ${item.nextEpisode.name}` : ""}
+            </Text>
+          )}
+        </View>
       </Animated.View>
     </GestureDetector>
   );
