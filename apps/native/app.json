@@ -10,13 +10,27 @@
       "config": {
         "usesNonExemptEncryption": false
       },
+      "icon": "./assets/sofa.icon",
       "bundleIdentifier": "com.jakejarvis.sofa",
       "appleTeamId": "B5ZWKBCUTU"
     },
     "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
       "package": "com.jakejarvis.sofa"
     },
     "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#101010",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200
+        }
+      ],
       [
         "expo-font",
         {

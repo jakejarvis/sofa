@@ -39,6 +39,7 @@
     "expo-network": "55.0.8",
     "expo-router": "55.0.4",
     "expo-secure-store": "55.0.8",
+    "expo-splash-screen": "55.0.10",
     "expo-status-bar": "55.0.4",
     "expo-web-browser": "55.0.9",
     "heroui-native": "1.0.0-rc.4",
