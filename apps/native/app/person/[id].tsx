@@ -9,6 +9,7 @@ import {
   ScrollView,
   Text,
   type TextLayoutEventData,
+  useWindowDimensions,
   View,
 } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
@@ -65,10 +66,16 @@ function ExpandableBio({ text }: { text: string }) {
   );
 }
 
+const FILMOGRAPHY_GAP = 12;
+const FILMOGRAPHY_PADDING = 16;
+
 export default function PersonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
-  const router = useRouter();
+  const { back } = useRouter();
+  const { width: screenWidth } = useWindowDimensions();
+  const columnWidth =
+    (screenWidth - FILMOGRAPHY_PADDING * 2 - FILMOGRAPHY_GAP) / 2;
 
   const { data, isPending } = useQuery(
     orpc.people.detail.queryOptions({ input: { id } }),
@@ -141,7 +148,7 @@ export default function PersonDetailScreen() {
           >
             Person not found
           </Text>
-          <Pressable onPress={() => router.back()} className="mt-4">
+          <Pressable onPress={() => back()} className="mt-4">
             <Text style={{ color: colors.primary }}>Go back</Text>
           </Pressable>
         </Animated.View>
@@ -156,7 +163,7 @@ export default function PersonDetailScreen() {
     >
       {/* Back button */}
       <Pressable
-        onPress={() => router.back()}
+        onPress={() => back()}
         className="absolute z-10 items-center justify-center rounded-full"
         style={{
           top: insets.top + 8,
@@ -244,9 +251,9 @@ export default function PersonDetailScreen() {
           className="px-4"
         >
           <SectionHeader title="Filmography" icon={IconMovie} />
-          <View className="flex-row flex-wrap" style={{ gap: 12 }}>
+          <View className="flex-row flex-wrap" style={{ gap: FILMOGRAPHY_GAP }}>
             {filmography.map((credit) => (
-              <View key={credit.titleId} style={{ width: "47%" }}>
+              <View key={credit.titleId} style={{ width: columnWidth }}>
                 <PosterCard
                   id={credit.titleId}
                   tmdbId={credit.tmdbId}

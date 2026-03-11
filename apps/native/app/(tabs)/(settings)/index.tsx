@@ -308,7 +308,7 @@ function BackupsSection() {
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
+  const { push, replace } = useRouter();
   const { data: session, refetch: refetchSession } = authClient.useSession();
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
@@ -443,7 +443,7 @@ export default function SettingsScreen() {
         onPress: () => {
           authClient.signOut();
           queryClient.clear();
-          router.replace("/(auth)/login");
+          replace("/(auth)/login");
         },
       },
     ]);
@@ -559,10 +559,12 @@ export default function SettingsScreen() {
                       Save
                     </Text>
                   </Pressable>
-                  <Pressable onPress={() => {
+                  <Pressable
+                    onPress={() => {
                       setNameInput(session?.user?.name ?? "");
                       setIsEditingName(false);
-                    }}>
+                    }}
+                  >
                     <Text
                       style={{ color: colors.mutedForeground, fontSize: 14 }}
                     >
@@ -627,7 +629,7 @@ export default function SettingsScreen() {
             label="Server URL"
             value={serverUrl}
             icon={IconLink}
-            onPress={() => router.push("/(auth)/server-url")}
+            onPress={() => push("/(auth)/server-url")}
           />
         </SettingsSection>
       </Animated.View>

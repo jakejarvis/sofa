@@ -81,7 +81,7 @@ function HeroBanner({
     releaseDate?: string | null;
   };
 }) {
-  const router = useRouter();
+  const { push } = useRouter();
   const pressed = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.98]) }],
@@ -90,7 +90,7 @@ function HeroBanner({
   const resolveMutation = useMutation(
     orpc.titles.resolve.mutationOptions({
       onSuccess: ({ id }) => {
-        router.push(`/title/${id}`);
+        push(`/title/${id}`);
       },
     }),
   );
@@ -329,15 +329,13 @@ export default function ExploreScreen() {
     popularTv.isRefetching;
 
   const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries();
+    queryClient.invalidateQueries({ queryKey: orpc.explore.key() });
   }, []);
 
   const heroItem = trending.data?.hero;
 
   return (
-    <FlatList
-      data={[1]}
-      keyExtractor={() => "explore"}
+    <ScrollView
       style={{ backgroundColor: colors.background }}
       contentContainerStyle={{
         paddingTop: insets.top + 16,
@@ -350,53 +348,52 @@ export default function ExploreScreen() {
           tintColor={colors.primary}
         />
       }
-      renderItem={() => (
-        <View className="gap-8">
-          {heroItem && (
-            <Animated.View entering={FadeIn.duration(400)}>
-              <HeroBanner item={heroItem} />
-            </Animated.View>
-          )}
-
-          <Animated.View entering={FadeInDown.duration(300).delay(100)}>
-            <FilterableTitleRow
-              title="Trending Today"
-              icon={IconFlame}
-              mediaType="movie"
-              defaultItems={trending.data?.items ?? []}
-              defaultUserStatuses={trending.data?.userStatuses ?? {}}
-              defaultEpisodeProgress={trending.data?.episodeProgress ?? {}}
-              isLoading={trending.isPending}
-            />
+    >
+      <View className="gap-8">
+        {heroItem && (
+          <Animated.View entering={FadeIn.duration(400)}>
+            <HeroBanner item={heroItem} />
           </Animated.View>
+        )}
 
-          <Animated.View entering={FadeInDown.duration(300).delay(200)}>
-            <FilterableTitleRow
-              title="Popular Movies"
-              icon={IconMovie}
-              mediaType="movie"
-              defaultItems={popularMovies.data?.items ?? []}
-              defaultUserStatuses={popularMovies.data?.userStatuses ?? {}}
-              defaultEpisodeProgress={popularMovies.data?.episodeProgress ?? {}}
-              genres={movieGenres.data?.genres}
-              isLoading={popularMovies.isPending}
-            />
-          </Animated.View>
+        <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+          <FilterableTitleRow
+            title="Trending Today"
+            icon={IconFlame}
+            mediaType="movie"
+            defaultItems={trending.data?.items ?? []}
+            defaultUserStatuses={trending.data?.userStatuses ?? {}}
+            defaultEpisodeProgress={trending.data?.episodeProgress ?? {}}
+            isLoading={trending.isPending}
+          />
+        </Animated.View>
 
-          <Animated.View entering={FadeInDown.duration(300).delay(300)}>
-            <FilterableTitleRow
-              title="Popular TV Shows"
-              icon={IconDeviceTv}
-              mediaType="tv"
-              defaultItems={popularTv.data?.items ?? []}
-              defaultUserStatuses={popularTv.data?.userStatuses ?? {}}
-              defaultEpisodeProgress={popularTv.data?.episodeProgress ?? {}}
-              genres={tvGenres.data?.genres}
-              isLoading={popularTv.isPending}
-            />
-          </Animated.View>
-        </View>
-      )}
-    />
+        <Animated.View entering={FadeInDown.duration(300).delay(200)}>
+          <FilterableTitleRow
+            title="Popular Movies"
+            icon={IconMovie}
+            mediaType="movie"
+            defaultItems={popularMovies.data?.items ?? []}
+            defaultUserStatuses={popularMovies.data?.userStatuses ?? {}}
+            defaultEpisodeProgress={popularMovies.data?.episodeProgress ?? {}}
+            genres={movieGenres.data?.genres}
+            isLoading={popularMovies.isPending}
+          />
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.duration(300).delay(300)}>
+          <FilterableTitleRow
+            title="Popular TV Shows"
+            icon={IconDeviceTv}
+            mediaType="tv"
+            defaultItems={popularTv.data?.items ?? []}
+            defaultUserStatuses={popularTv.data?.userStatuses ?? {}}
+            defaultEpisodeProgress={popularTv.data?.episodeProgress ?? {}}
+            genres={tvGenres.data?.genres}
+            isLoading={popularTv.isPending}
+          />
+        </Animated.View>
+      </View>
+    </ScrollView>
   );
 }

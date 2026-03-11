@@ -17,24 +17,25 @@ export function OfflineBanner() {
   useEffect(() => {
     let mounted = true;
 
-    const check = async () => {
-      const state = await Network.getNetworkStateAsync();
-      if (mounted) {
-        const offline = !state.isConnected || !state.isInternetReachable;
-        setIsOffline(offline);
-        if (offline && wasOnline.current) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-        }
-        wasOnline.current = !offline;
+    const handleState = (state: Network.NetworkState) => {
+      if (!mounted) return;
+      const offline = !state.isConnected || !state.isInternetReachable;
+      setIsOffline(offline);
+      if (offline && wasOnline.current) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       }
+      wasOnline.current = !offline;
     };
 
-    check();
-    const interval = setInterval(check, 5000);
+    // Check initial state
+    Network.getNetworkStateAsync().then(handleState);
+
+    // Listen for changes
+    const subscription = Network.addNetworkStateListener(handleState);
 
     return () => {
       mounted = false;
-      clearInterval(interval);
+      subscription.remove();
     };
   }, []);
 

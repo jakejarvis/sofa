@@ -54,7 +54,7 @@ export function TitleActionSheetProvider({
 }) {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [target, setTarget] = useState<TitleActionTarget | null>(null);
-  const router = useRouter();
+  const { push } = useRouter();
 
   const quickAdd = useMutation(
     orpc.watchlist.quickAdd.mutationOptions({
@@ -123,7 +123,7 @@ export function TitleActionSheetProvider({
               target={target}
               onViewDetails={() => {
                 bottomSheetRef.current?.close();
-                if (target.id) router.push(`/title/${target.id}`);
+                if (target.id) push(`/title/${target.id}`);
               }}
               onQuickAdd={() =>
                 quickAdd.mutate({

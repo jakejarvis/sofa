@@ -39,7 +39,7 @@ const signInSchema = z.object({
 });
 
 export default function LoginScreen() {
-  const router = useRouter();
+  const { replace } = useRouter();
   const insets = useSafeAreaInsets();
   const passwordRef = useRef<TextInput>(null);
   const { toast } = useToast();
@@ -64,7 +64,7 @@ export default function LoginScreen() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             formApi.reset();
             queryClient.invalidateQueries();
-            router.replace("/(tabs)/(home)");
+            replace("/(tabs)/(home)");
           },
         },
       );

@@ -44,7 +44,7 @@ const ERROR_MESSAGES: Record<ValidationError, string> = {
 };
 
 export default function ServerUrlScreen() {
-  const router = useRouter();
+  const { replace } = useRouter();
   const insets = useSafeAreaInsets();
   const inputRef = useRef<TextInput>(null);
   const successTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -124,7 +124,7 @@ export default function ServerUrlScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       await setServerUrl(fullUrl);
       successTimeout.current = setTimeout(() => {
-        router.replace("/(auth)/login");
+        replace("/(auth)/login");
       }, 800);
     } else {
       setConnection({ phase: "error", error: result.error });
@@ -192,6 +192,7 @@ export default function ServerUrlScreen() {
             borderWidth: 1,
             borderColor: colors.border,
             borderRadius: 12,
+            borderCurve: "continuous",
             paddingHorizontal: 14,
             height: 48,
           }}

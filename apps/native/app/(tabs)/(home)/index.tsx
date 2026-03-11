@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
-import { FlatList, RefreshControl, Text, View } from "react-native";
+import { FlatList, RefreshControl, ScrollView, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   FadeIn,
@@ -76,6 +76,7 @@ function ContinueWatchingCard({
             borderWidth: 1,
             borderColor: "rgba(255,255,255,0.06)",
             borderRadius: 12,
+            borderCurve: "continuous",
             overflow: "hidden",
           },
         ]}
@@ -98,7 +99,7 @@ function ContinueWatchingCard({
             <View
               style={{
                 height: "100%",
-                width: `${(item.watchedEpisodes / item.totalEpisodes) * 100}%`,
+                width: `${item.totalEpisodes > 0 ? (item.watchedEpisodes / item.totalEpisodes) * 100 : 0}%`,
                 backgroundColor: colors.statusWatching,
               }}
             />
@@ -235,7 +236,7 @@ function HorizontalPosterRow({
 
 export default function DashboardScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
+  const { push } = useRouter();
   const { data: session } = authClient.useSession();
 
   const stats = useQuery(orpc.dashboard.stats.queryOptions());
@@ -251,7 +252,7 @@ export default function DashboardScreen() {
     stats.isRefetching || continueWatching.isRefetching || library.isRefetching;
 
   const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries();
+    queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
   }, []);
 
   const hasLibrary = (library.data?.items?.length ?? 0) > 0;
@@ -270,15 +271,13 @@ export default function DashboardScreen() {
 
   const handleContinueWatchingPress = useCallback(
     (titleId: string) => {
-      router.push(`/title/${titleId}`);
+      push(`/title/${titleId}`);
     },
-    [router],
+    [push],
   );
 
   return (
-    <FlatList
-      data={[1]}
-      keyExtractor={() => "dashboard"}
+    <ScrollView
       style={{ backgroundColor: colors.background }}
       contentContainerStyle={{
         paddingTop: insets.top + 16,
@@ -291,98 +290,92 @@ export default function DashboardScreen() {
           tintColor={colors.primary}
         />
       }
-      renderItem={() => (
-        <View className="gap-8">
-          {/* Welcome */}
-          <Animated.View entering={FadeIn.duration(400)} className="px-4">
-            <Text
-              style={{
-                fontFamily: fonts.display,
-                fontSize: 28,
-                color: colors.foreground,
-              }}
-            >
-              Welcome, {session?.user?.name?.split(" ")[0] ?? "there"}
-            </Text>
-          </Animated.View>
+    >
+      <View className="gap-8">
+        {/* Welcome */}
+        <Animated.View entering={FadeIn.duration(400)} className="px-4">
+          <Text
+            style={{
+              fontFamily: fonts.display,
+              fontSize: 28,
+              color: colors.foreground,
+            }}
+          >
+            Welcome, {session?.user?.name?.split(" ")[0] ?? "there"}
+          </Text>
+        </Animated.View>
 
-          {/* Stats */}
-          <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+        {/* Stats */}
+        <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={statsData}
+            keyExtractor={(item) => item.label}
+            renderItem={({ item }) => (
+              <StatsCard label={item.label} value={item.value} />
+            )}
+            contentContainerStyle={{ paddingHorizontal: 16 }}
+          />
+        </Animated.View>
+
+        {/* Continue Watching */}
+        {hasContinueWatching && (
+          <Animated.View entering={FadeInDown.duration(300).delay(200)}>
+            <View className="px-4">
+              <SectionHeader title="Continue Watching" icon={IconPlayerPlay} />
+            </View>
             <FlatList
               horizontal
               showsHorizontalScrollIndicator={false}
-              data={statsData}
-              keyExtractor={(item) => item.label}
+              data={continueWatching.data?.items ?? []}
+              keyExtractor={(item) => item.title.id}
               renderItem={({ item }) => (
-                <StatsCard label={item.label} value={item.value} />
+                <ContinueWatchingCard
+                  item={item}
+                  onPress={() => handleContinueWatchingPress(item.title.id)}
+                />
               )}
               contentContainerStyle={{ paddingHorizontal: 16 }}
             />
           </Animated.View>
+        )}
 
-          {/* Continue Watching */}
-          {hasContinueWatching && (
-            <Animated.View entering={FadeInDown.duration(300).delay(200)}>
-              <View className="px-4">
-                <SectionHeader
-                  title="Continue Watching"
-                  icon={IconPlayerPlay}
-                />
-              </View>
-              <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                data={continueWatching.data?.items ?? []}
-                keyExtractor={(item) => item.title.id}
-                renderItem={({ item }) => (
-                  <ContinueWatchingCard
-                    item={item}
-                    onPress={() => handleContinueWatchingPress(item.title.id)}
-                  />
-                )}
-                contentContainerStyle={{ paddingHorizontal: 16 }}
-              />
-            </Animated.View>
-          )}
-
-          {/* Library */}
-          <Animated.View entering={FadeInDown.duration(300).delay(300)}>
-            <View className="px-4">
-              <SectionHeader title="Your Library" icon={IconLibrary} />
-            </View>
-            {library.isPending ? (
-              <HorizontalPosterRow items={[]} isLoading />
-            ) : hasLibrary ? (
-              <HorizontalPosterRow
-                items={library.data?.items ?? []}
-              />
-            ) : (
+        {/* Library */}
+        <Animated.View entering={FadeInDown.duration(300).delay(300)}>
+          <View className="px-4">
+            <SectionHeader title="Your Library" icon={IconLibrary} />
+          </View>
+          {hasLibrary ? (
+            <HorizontalPosterRow
+              items={library.data?.items ?? []}
+              isLoading={library.isPending}
+            />
+          ) : (
+            !library.isPending && (
               <EmptyState
                 title="Your library is empty"
                 description="Start tracking movies and shows"
                 actionLabel="Explore"
-                onAction={() => router.push("/(tabs)/(explore)")}
+                onAction={() => push("/(tabs)/(explore)")}
               />
-            )}
-          </Animated.View>
-
-          {/* Recommendations */}
-          {hasRecommendations && (
-            <Animated.View entering={FadeInDown.duration(300).delay(400)}>
-              <View className="px-4">
-                <SectionHeader
-                  title="Recommended for You"
-                  icon={IconSparkles}
-                />
-              </View>
-              <HorizontalPosterRow
-                items={recommendations.data?.items ?? []}
-                isLoading={recommendations.isPending}
-              />
-            </Animated.View>
+            )
           )}
-        </View>
-      )}
-    />
+        </Animated.View>
+
+        {/* Recommendations */}
+        {hasRecommendations && (
+          <Animated.View entering={FadeInDown.duration(300).delay(400)}>
+            <View className="px-4">
+              <SectionHeader title="Recommended for You" icon={IconSparkles} />
+            </View>
+            <HorizontalPosterRow
+              items={recommendations.data?.items ?? []}
+              isLoading={recommendations.isPending}
+            />
+          </Animated.View>
+        )}
+      </View>
+    </ScrollView>
   );
 }

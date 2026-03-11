@@ -62,7 +62,7 @@ export function PosterCard({
   episodeProgress,
   width = 140,
 }: PosterCardProps) {
-  const router = useRouter();
+  const { push } = useRouter();
   const { showActions } = useTitleActions();
   const pressed = useSharedValue(0);
   const [localStatus, setLocalStatus] = useState<TitleStatus | null>(
@@ -77,7 +77,7 @@ export function PosterCard({
     orpc.titles.resolve.mutationOptions({
       onSuccess: ({ id: resolvedId }) => {
         if (resolvedId) {
-          router.push(`/title/${resolvedId}`);
+          push(`/title/${resolvedId}`);
         }
       },
     }),
@@ -88,7 +88,8 @@ export function PosterCard({
       onSuccess: () => {
         setLocalStatus("watchlist");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
     }),
   );
@@ -103,11 +104,11 @@ export function PosterCard({
 
   const handlePress = useCallback(() => {
     if (id) {
-      router.push(`/title/${id}`);
+      push(`/title/${id}`);
     } else {
       resolveMutation.mutate({ tmdbId, type });
     }
-  }, [id, tmdbId, type, router, resolveMutation]);
+  }, [id, tmdbId, type, push, resolveMutation]);
 
   const handleLongPress = useCallback(() => {
     showActions({
@@ -227,20 +228,25 @@ export function PosterCard({
             )}
 
             {/* Episode progress bar */}
-            {episodeProgress && episodeProgress.total > 0 && episodeProgress.watched > 0 && (
-              <View
-                className="absolute right-0 bottom-0 left-0"
-                style={{ height: 3, backgroundColor: "rgba(255,255,255,0.1)" }}
-              >
+            {episodeProgress &&
+              episodeProgress.total > 0 &&
+              episodeProgress.watched > 0 && (
                 <View
+                  className="absolute right-0 bottom-0 left-0"
                   style={{
-                    height: "100%",
-                    width: `${(episodeProgress.watched / episodeProgress.total) * 100}%`,
-                    backgroundColor: colors.statusWatching,
+                    height: 3,
+                    backgroundColor: "rgba(255,255,255,0.1)",
                   }}
-                />
-              </View>
-            )}
+                >
+                  <View
+                    style={{
+                      height: "100%",
+                      width: `${episodeProgress.total > 0 ? (episodeProgress.watched / episodeProgress.total) * 100 : 0}%`,
+                      backgroundColor: colors.statusWatching,
+                    }}
+                  />
+                </View>
+              )}
           </View>
 
           {/* Metadata */}
@@ -302,6 +308,7 @@ export function PosterCardSkeleton({ width = 140 }: { width?: number }) {
       style={{
         width,
         borderRadius: 12,
+        borderCurve: "continuous",
         overflow: "hidden",
         backgroundColor: colors.card,
         borderWidth: 1,

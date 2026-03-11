@@ -147,7 +147,7 @@ const SearchResultRow = memo(function SearchResultRow({
 export default function SearchScreen() {
   const insets = useSafeAreaInsets();
   const inputRef = useRef<TextInput>(null);
-  const router = useRouter();
+  const { push } = useRouter();
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query.trim(), 300);
 
@@ -164,7 +164,7 @@ export default function SearchScreen() {
     orpc.titles.resolve.mutationOptions({
       onSuccess: ({ id }) => {
         setResolvingId(null);
-        if (id) router.push(`/title/${id}`);
+        if (id) push(`/title/${id}`);
       },
       onError: () => setResolvingId(null),
     }),
@@ -174,7 +174,7 @@ export default function SearchScreen() {
     orpc.people.resolve.mutationOptions({
       onSuccess: ({ id }) => {
         setResolvingId(null);
-        if (id) router.push(`/person/${id}`);
+        if (id) push(`/person/${id}`);
       },
       onError: () => setResolvingId(null),
     }),
@@ -185,32 +185,35 @@ export default function SearchScreen() {
       onSuccess: () => {
         setAddingId(null);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
       onError: () => setAddingId(null),
     }),
   );
 
-  const handleResolve = useCallback(
-    (item: SearchResultItem) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setResolvingId(`${item.type}-${item.tmdbId}`);
-      if (item.type === "person") {
-        resolvePersonMutation.mutate({ tmdbId: item.tmdbId });
-      } else {
-        resolveTitleMutation.mutate({ tmdbId: item.tmdbId, type: item.type });
-      }
-    },
-    [resolveTitleMutation, resolvePersonMutation],
-  );
+  // Use refs for mutation.mutate to keep callbacks stable across renders
+  const resolveTitleMutateRef = useRef(resolveTitleMutation.mutate);
+  resolveTitleMutateRef.current = resolveTitleMutation.mutate;
+  const resolvePersonMutateRef = useRef(resolvePersonMutation.mutate);
+  resolvePersonMutateRef.current = resolvePersonMutation.mutate;
+  const quickAddMutateRef = useRef(quickAddMutation.mutate);
+  quickAddMutateRef.current = quickAddMutation.mutate;
 
-  const handleQuickAdd = useCallback(
-    (tmdbId: number, type: "movie" | "tv") => {
-      setAddingId(`${type}-${tmdbId}`);
-      quickAddMutation.mutate({ tmdbId, type });
-    },
-    [quickAddMutation],
-  );
+  const handleResolve = useCallback((item: SearchResultItem) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setResolvingId(`${item.type}-${item.tmdbId}`);
+    if (item.type === "person") {
+      resolvePersonMutateRef.current({ tmdbId: item.tmdbId });
+    } else {
+      resolveTitleMutateRef.current({ tmdbId: item.tmdbId, type: item.type });
+    }
+  }, []);
+
+  const handleQuickAdd = useCallback((tmdbId: number, type: "movie" | "tv") => {
+    setAddingId(`${type}-${tmdbId}`);
+    quickAddMutateRef.current({ tmdbId, type });
+  }, []);
 
   // Memoize mapped results to maintain stable references
   const allResults = useMemo<SearchResultItem[]>(

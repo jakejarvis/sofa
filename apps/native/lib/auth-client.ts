@@ -24,4 +24,9 @@ export let authClient = buildAuthClient();
 
 onServerUrlChange(() => {
   authClient = buildAuthClient();
+  // Clear query cache so stale data from old server is discarded.
+  // React hooks referencing the old client will re-mount via navigation
+  // flow (server URL change → auth screens → fresh mount).
+  const { queryClient } = require("@/utils/orpc");
+  queryClient.clear();
 });

@@ -48,7 +48,7 @@ const signUpSchema = z.object({
 });
 
 export default function RegisterScreen() {
-  const router = useRouter();
+  const { replace } = useRouter();
   const insets = useSafeAreaInsets();
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
@@ -79,7 +79,7 @@ export default function RegisterScreen() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             formApi.reset();
             queryClient.invalidateQueries();
-            router.replace("/(tabs)/(home)");
+            replace("/(tabs)/(home)");
           },
         },
       );

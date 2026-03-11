@@ -17,7 +17,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { NativeSyntheticEvent, TextLayoutEventData } from "react-native";
 import {
   ActivityIndicator,
@@ -200,14 +200,18 @@ function SeasonAccordion({
     orpc.episodes.watch.mutationOptions({
       onSuccess: () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
     }),
   );
 
   const unwatchEpisode = useMutation(
     orpc.episodes.unwatch.mutationOptions({
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
+      },
     }),
   );
 
@@ -215,7 +219,8 @@ function SeasonAccordion({
     orpc.seasons.watch.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
     }),
   );
@@ -330,15 +335,15 @@ function CastCard({
     profilePath: string | null;
   };
 }) {
-  const router = useRouter();
+  const { push } = useRouter();
   const pressed = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.95]) }],
   }));
 
   const handlePress = useCallback(() => {
-    router.push(`/person/${person.id}`);
-  }, [router, person.id]);
+    push(`/person/${person.id}`);
+  }, [push, person.id]);
 
   const tapGesture = Gesture.Tap()
     .onBegin(() => {
@@ -456,7 +461,7 @@ function ExpandableText({
 export default function TitleDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
-  const router = useRouter();
+  const { back } = useRouter();
 
   const detail = useQuery(orpc.titles.detail.queryOptions({ input: { id } }));
   const userInfo = useQuery(
@@ -468,13 +473,18 @@ export default function TitleDetailScreen() {
 
   const updateStatus = useMutation(
     orpc.titles.updateStatus.mutationOptions({
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
+      },
     }),
   );
 
   const updateRating = useMutation(
     orpc.titles.updateRating.mutationOptions({
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+      },
     }),
   );
 
@@ -482,7 +492,8 @@ export default function TitleDetailScreen() {
     orpc.titles.watchMovie.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
     }),
   );
@@ -491,34 +502,41 @@ export default function TitleDetailScreen() {
     orpc.watchlist.quickAdd.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
     }),
   );
 
   const hydrateMutation = useMutation(
     orpc.titles.hydrateSeasons.mutationOptions({
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+      },
     }),
   );
 
   const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries();
+    queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
   }, []);
 
   const title = detail.data?.title;
   const seasons = detail.data?.seasons ?? [];
   const cast = detail.data?.cast ?? [];
   const availability = detail.data?.availability ?? [];
-  const watchedEpisodeIds = new Set(userInfo.data?.episodeWatches ?? []);
+  const watchedEpisodeIds = useMemo(
+    () => new Set(userInfo.data?.episodeWatches ?? []),
+    [userInfo.data?.episodeWatches],
+  );
 
+  const hydratedTitleId = useRef<string | null>(null);
   useEffect(() => {
     if (
       detail.data?.needsHydration &&
       title?.type === "tv" &&
-      !hydrateMutation.isPending &&
-      !hydrateMutation.isSuccess
+      hydratedTitleId.current !== id
     ) {
+      hydratedTitleId.current = id;
       hydrateMutation.mutate({ id, tmdbId: title.tmdbId });
     }
   }, [
@@ -526,7 +544,7 @@ export default function TitleDetailScreen() {
     title?.type,
     title?.tmdbId,
     id,
-    hydrateMutation,
+    hydrateMutation.mutate,
   ]);
 
   if (detail.isPending) {
@@ -582,7 +600,7 @@ export default function TitleDetailScreen() {
         >
           Title not found
         </Text>
-        <Pressable onPress={() => router.back()} className="mt-4">
+        <Pressable onPress={() => back()} className="mt-4">
           <Text style={{ color: colors.primary }}>Go back</Text>
         </Pressable>
       </View>
@@ -622,7 +640,7 @@ export default function TitleDetailScreen() {
         />
 
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => back()}
           className="absolute items-center justify-center rounded-full"
           style={{
             top: insets.top + 8,
@@ -923,7 +941,10 @@ export default function TitleDetailScreen() {
                     releaseDate={item.releaseDate}
                     voteAverage={item.voteAverage}
                     userStatus={
-                      recommendations.data?.userStatuses?.[item.id] ?? null
+                      item.id
+                        ? (recommendations.data?.userStatuses?.[item.id] ??
+                          null)
+                        : null
                     }
                   />
                 </View>
