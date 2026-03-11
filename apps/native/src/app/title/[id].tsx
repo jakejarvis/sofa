@@ -75,6 +75,16 @@ export default function TitleDetailScreen() {
     }),
   );
 
+  const watchAll = useMutation(
+    orpc.titles.watchAll.mutationOptions({
+      onSuccess: () => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
+      },
+    }),
+  );
+
   const quickAddMutation = useMutation(
     orpc.watchlist.quickAdd.mutationOptions({
       onSuccess: () => {
@@ -369,6 +379,8 @@ export default function TitleDetailScreen() {
               });
             } else if (status === "completed" && title.type === "movie") {
               watchMovie.mutate({ id });
+            } else if (status === "completed" && title.type === "tv") {
+              watchAll.mutate({ id });
             } else {
               updateStatus.mutate({ id, status });
             }
@@ -376,7 +388,8 @@ export default function TitleDetailScreen() {
           isPending={
             updateStatus.isPending ||
             quickAddMutation.isPending ||
-            watchMovie.isPending
+            watchMovie.isPending ||
+            watchAll.isPending
           }
         />
 

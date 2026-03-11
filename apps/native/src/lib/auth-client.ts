@@ -22,7 +22,12 @@ function buildAuthClient() {
 
 export let authClient = buildAuthClient();
 
-onServerUrlChange(() => {
+onServerUrlChange(async () => {
+  // Clear Better Auth session cookies so the old server's token
+  // is never sent to the new host (prevents leaking credentials).
+  await SecureStore.deleteItemAsync("sofa_cookie");
+  await SecureStore.deleteItemAsync("sofa_session_token");
+
   authClient = buildAuthClient();
   // Clear query cache so stale data from old server is discarded.
   // React hooks referencing the old client will re-mount via navigation

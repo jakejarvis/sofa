@@ -19,6 +19,7 @@ import {
 const authLog = createLogger("auth");
 
 export const auth = betterAuth({
+  trustedOrigins: ["sofa://"],
   logger: {
     // Suppress unset secret/low entropy warnings during build
     disabled: process.env.NEXT_PHASE === "phase-production-build",
