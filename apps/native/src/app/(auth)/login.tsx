@@ -1,17 +1,9 @@
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouter } from "expo-router";
-import {
-  Button,
-  FieldError,
-  Input,
-  Label,
-  Spinner,
-  TextField,
-  useToast,
-} from "heroui-native";
 import { useRef } from "react";
 import {
+  Alert,
   Pressable,
   ScrollView,
   Text,
@@ -21,7 +13,15 @@ import {
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
+import { Button, ButtonLabel } from "@/components/ui/button";
 import { SofaLogo } from "@/components/ui/sofa-logo";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  FieldError,
+  Input,
+  Label,
+  TextField,
+} from "@/components/ui/text-field";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { authClient } from "@/lib/auth-client";
@@ -41,7 +41,6 @@ export default function LoginScreen() {
   const { replace } = useRouter();
   const insets = useSafeAreaInsets();
   const passwordRef = useRef<TextInput>(null);
-  const { toast } = useToast();
 
   const authConfig = useQuery(orpc.system.authConfig.queryOptions());
 
@@ -54,10 +53,7 @@ export default function LoginScreen() {
         {
           onError(error) {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            toast.show({
-              variant: "danger",
-              label: error.error?.message || "Failed to sign in",
-            });
+            Alert.alert("Error", error.error?.message || "Failed to sign in");
           },
           onSuccess() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -128,9 +124,9 @@ export default function LoginScreen() {
             variant="secondary"
             className="w-full"
           >
-            <Button.Label>
+            <ButtonLabel>
               Sign in with {authConfig.data?.oidcProviderName ?? "SSO"}
-            </Button.Label>
+            </ButtonLabel>
           </Button>
 
           {showPasswordLogin && (
@@ -222,21 +218,14 @@ export default function LoginScreen() {
               <Animated.View entering={FadeInDown.duration(300).delay(400)}>
                 <Button
                   onPress={form.handleSubmit}
-                  isDisabled={isSubmitting}
+                  disabled={isSubmitting}
                   style={{ backgroundColor: colors.primary }}
                   className="mt-1"
                 >
                   {isSubmitting ? (
                     <Spinner size="sm" />
                   ) : (
-                    <Button.Label
-                      style={{
-                        color: colors.primaryForeground,
-                        fontFamily: fonts.sansMedium,
-                      }}
-                    >
-                      Sign In
-                    </Button.Label>
+                    <ButtonLabel>Sign In</ButtonLabel>
                   )}
                 </Button>
               </Animated.View>

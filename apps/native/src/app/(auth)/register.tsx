@@ -2,17 +2,9 @@ import { IconLock } from "@tabler/icons-react-native";
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouter } from "expo-router";
-import {
-  Button,
-  FieldError,
-  Input,
-  Label,
-  Spinner,
-  TextField,
-  useToast,
-} from "heroui-native";
 import { useRef } from "react";
 import {
+  Alert,
   Pressable,
   ScrollView,
   Text,
@@ -22,7 +14,15 @@ import {
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
+import { Button, ButtonLabel } from "@/components/ui/button";
 import { SofaLogo } from "@/components/ui/sofa-logo";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  FieldError,
+  Input,
+  Label,
+  TextField,
+} from "@/components/ui/text-field";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 import { authClient } from "@/lib/auth-client";
@@ -51,7 +51,6 @@ export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
-  const { toast } = useToast();
 
   const publicInfo = useQuery(orpc.system.publicInfo.queryOptions());
   const registrationOpen = publicInfo.data?.registrationOpen ?? false;
@@ -69,10 +68,10 @@ export default function RegisterScreen() {
         {
           onError(error) {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            toast.show({
-              variant: "danger",
-              label: error.error?.message || "Failed to create account",
-            });
+            Alert.alert(
+              "Error",
+              error.error?.message || "Failed to create account",
+            );
           },
           onSuccess() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -124,9 +123,9 @@ export default function RegisterScreen() {
               className="mt-6"
               style={{ backgroundColor: colors.primary }}
             >
-              <Button.Label style={{ color: colors.primaryForeground }}>
+              <ButtonLabel style={{ color: colors.primaryForeground }}>
                 Back to Login
-              </Button.Label>
+              </ButtonLabel>
             </Button>
           </Link>
         </Animated.View>
@@ -250,21 +249,14 @@ export default function RegisterScreen() {
             <Animated.View entering={FadeInDown.duration(300).delay(400)}>
               <Button
                 onPress={form.handleSubmit}
-                isDisabled={isSubmitting}
+                disabled={isSubmitting}
                 style={{ backgroundColor: colors.primary }}
                 className="mt-1"
               >
                 {isSubmitting ? (
                   <Spinner size="sm" />
                 ) : (
-                  <Button.Label
-                    style={{
-                      color: colors.primaryForeground,
-                      fontFamily: fonts.sansMedium,
-                    }}
-                  >
-                    Create Account
-                  </Button.Label>
+                  <ButtonLabel>Create Account</ButtonLabel>
                 )}
               </Button>
             </Animated.View>

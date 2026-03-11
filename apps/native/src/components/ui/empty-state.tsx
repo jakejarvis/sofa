@@ -1,8 +1,8 @@
 import type { Icon } from "@tabler/icons-react-native";
 import { IconMovie } from "@tabler/icons-react-native";
-import { Button } from "heroui-native";
 import { Text } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
+import { Button, ButtonLabel } from "@/components/ui/button";
 
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
@@ -58,9 +58,9 @@ export function EmptyState({
           className="mt-4"
           style={{ backgroundColor: colors.primary }}
         >
-          <Button.Label style={{ color: colors.primaryForeground }}>
+          <ButtonLabel style={{ color: colors.primaryForeground }}>
             {actionLabel}
-          </Button.Label>
+          </ButtonLabel>
         </Button>
       )}
     </Animated.View>

@@ -1,6 +1,5 @@
 import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react-native";
 import { useRouter } from "expo-router";
-import { Button } from "heroui-native";
 import { useEffect, useRef, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import Animated, {
@@ -12,6 +11,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button, ButtonLabel } from "@/components/ui/button";
 import { SofaLogo } from "@/components/ui/sofa-logo";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
@@ -236,7 +236,7 @@ export default function ServerUrlScreen() {
       >
         <Button
           onPress={handleConnect}
-          isDisabled={isDisabled}
+          disabled={isDisabled}
           style={{
             backgroundColor: isSuccess
               ? colors.statusCompleted
@@ -244,32 +244,11 @@ export default function ServerUrlScreen() {
           }}
         >
           {isConnecting ? (
-            <Button.Label
-              style={{
-                color: colors.primaryForeground,
-                fontFamily: fonts.sansMedium,
-              }}
-            >
-              Connecting...
-            </Button.Label>
+            <ButtonLabel>Connecting...</ButtonLabel>
           ) : isSuccess ? (
-            <Button.Label
-              style={{
-                color: colors.primaryForeground,
-                fontFamily: fonts.sansMedium,
-              }}
-            >
-              Connected
-            </Button.Label>
+            <ButtonLabel>Connected</ButtonLabel>
           ) : (
-            <Button.Label
-              style={{
-                color: colors.primaryForeground,
-                fontFamily: fonts.sansMedium,
-              }}
-            >
-              Connect
-            </Button.Label>
+            <ButtonLabel>Connect</ButtonLabel>
           )}
         </Button>
       </Animated.View>

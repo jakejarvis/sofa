@@ -1,10 +1,9 @@
 import { IconAlertTriangle } from "@tabler/icons-react-native";
 import { Link, Stack } from "expo-router";
-import { Button } from "heroui-native";
 import { Text, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
-
 import { Container } from "@/components/container";
+import { Button, ButtonLabel } from "@/components/ui/button";
 import { colors } from "@/constants/colors";
 import { fonts } from "@/constants/fonts";
 
@@ -44,9 +43,9 @@ export default function NotFoundScreen() {
           <Animated.View entering={FadeInDown.duration(300).delay(200)}>
             <Link href="/" asChild>
               <Button size="sm" style={{ backgroundColor: colors.primary }}>
-                <Button.Label style={{ color: colors.primaryForeground }}>
+                <ButtonLabel style={{ color: colors.primaryForeground }}>
                   Go Home
-                </Button.Label>
+                </ButtonLabel>
               </Button>
             </Link>
           </Animated.View>
