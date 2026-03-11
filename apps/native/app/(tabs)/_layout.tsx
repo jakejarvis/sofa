@@ -9,10 +9,10 @@ import { hasStoredServerUrl } from "@/lib/server-url";
 export default function TabLayout() {
   const { data: session, isPending } = authClient.useSession();
 
-  if (isPending) return null;
   if (!process.env.EXPO_PUBLIC_SERVER_URL && !hasStoredServerUrl()) {
     return <Redirect href="/(auth)/server-url" />;
   }
+  if (isPending) return null;
   if (!session) return <Redirect href="/(auth)/login" />;
 
   return (

@@ -427,8 +427,11 @@ export default function SettingsScreen() {
     }),
   );
 
-  const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries();
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await queryClient.invalidateQueries();
+    setRefreshing(false);
   }, []);
 
   const handleSignOut = () => {
@@ -456,7 +459,7 @@ export default function SettingsScreen() {
       }}
       refreshControl={
         <RefreshControl
-          refreshing={false}
+          refreshing={refreshing}
           onRefresh={onRefresh}
           tintColor={colors.primary}
         />
@@ -556,7 +559,10 @@ export default function SettingsScreen() {
                       Save
                     </Text>
                   </Pressable>
-                  <Pressable onPress={() => setIsEditingName(false)}>
+                  <Pressable onPress={() => {
+                      setNameInput(session?.user?.name ?? "");
+                      setIsEditingName(false);
+                    }}>
                     <Text
                       style={{ color: colors.mutedForeground, fontSize: 14 }}
                     >

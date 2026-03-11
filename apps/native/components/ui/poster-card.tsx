@@ -227,7 +227,7 @@ export function PosterCard({
             )}
 
             {/* Episode progress bar */}
-            {episodeProgress && episodeProgress.watched > 0 && (
+            {episodeProgress && episodeProgress.total > 0 && episodeProgress.watched > 0 && (
               <View
                 className="absolute right-0 bottom-0 left-0"
                 style={{ height: 3, backgroundColor: "rgba(255,255,255,0.1)" }}

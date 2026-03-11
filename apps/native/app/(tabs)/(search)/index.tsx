@@ -158,7 +158,7 @@ export default function SearchScreen() {
 
   // Track which item is currently being resolved/added
   const [resolvingId, setResolvingId] = useState<string | null>(null);
-  const [addingId, setAddingId] = useState<number | null>(null);
+  const [addingId, setAddingId] = useState<string | null>(null);
 
   const resolveTitleMutation = useMutation(
     orpc.titles.resolve.mutationOptions({
@@ -206,7 +206,7 @@ export default function SearchScreen() {
 
   const handleQuickAdd = useCallback(
     (tmdbId: number, type: "movie" | "tv") => {
-      setAddingId(tmdbId);
+      setAddingId(`${type}-${tmdbId}`);
       quickAddMutation.mutate({ tmdbId, type });
     },
     [quickAddMutation],
@@ -233,7 +233,7 @@ export default function SearchScreen() {
         onResolve={handleResolve}
         onQuickAdd={handleQuickAdd}
         isResolving={resolvingId === `${item.type}-${item.tmdbId}`}
-        isAdding={addingId === item.tmdbId}
+        isAdding={addingId === `${item.type}-${item.tmdbId}`}
       />
     ),
     [handleResolve, handleQuickAdd, resolvingId, addingId],

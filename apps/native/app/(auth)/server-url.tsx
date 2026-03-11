@@ -55,7 +55,7 @@ export default function ServerUrlScreen() {
     phase: "idle",
   });
 
-  const isFirstLaunch = !hasStoredServerUrl();
+  const [isFirstLaunch] = useState(() => !hasStoredServerUrl());
 
   // Icon pulse animation
   const iconOpacity = useSharedValue(1);

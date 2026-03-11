@@ -29,10 +29,11 @@ export function Container({
   return (
     <AnimatedView
       className={cn("flex-1 bg-background", className)}
-      style={{
-        paddingBottom: insets.bottom,
-      }}
       {...props}
+      style={[
+        { paddingBottom: insets.bottom },
+        props.style,
+      ]}
     >
       {isScrollable ? (
         <ScrollView
