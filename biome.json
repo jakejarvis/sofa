@@ -14,7 +14,10 @@
       "!build",
       "!drizzle",
       "!packages/tmdb/src/schema.d.ts",
-      "!**/routeTree.gen.ts"
+      "!**/routeTree.gen.ts",
+      "!apps/native/.expo/types/**/*.ts",
+      "!apps/native/expo-env.d.ts",
+      "!apps/native/uniwind-types.d.ts"
     ]
   },
   "css": {
