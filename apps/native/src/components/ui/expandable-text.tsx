@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { NativeSyntheticEvent, TextLayoutEventData } from "react-native";
 import { Pressable, Text, View } from "react-native";
 
@@ -12,16 +12,28 @@ export function ExpandableText({
   text: string;
   maxLines?: number;
 }) {
-  const [expanded, setExpanded] = useState(false);
-  const [needsTruncation, setNeedsTruncation] = useState(false);
+  const prevTextRef = useRef(text);
+  let expanded: boolean;
+  let needsTruncation: boolean;
+  const [expandedState, setExpanded] = useState(false);
+  const [needsTruncationState, setNeedsTruncation] = useState(false);
+
+  if (prevTextRef.current !== text) {
+    prevTextRef.current = text;
+    setExpanded(false);
+    setNeedsTruncation(false);
+    expanded = false;
+    needsTruncation = false;
+  } else {
+    expanded = expandedState;
+    needsTruncation = needsTruncationState;
+  }
 
   const onTextLayout = useCallback(
     (e: NativeSyntheticEvent<TextLayoutEventData>) => {
-      if (!needsTruncation && e.nativeEvent.lines.length > maxLines) {
-        setNeedsTruncation(true);
-      }
+      setNeedsTruncation(e.nativeEvent.lines.length > maxLines);
     },
-    [needsTruncation, maxLines],
+    [maxLines],
   );
 
   return (

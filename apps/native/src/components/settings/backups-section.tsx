@@ -64,6 +64,7 @@ export function BackupsSection() {
             label={createBackup.isPending ? "Creating..." : "Create Backup"}
             icon={IconPlus}
             onPress={() => createBackup.mutate()}
+            disabled={createBackup.isPending}
           />
         </>
       )}

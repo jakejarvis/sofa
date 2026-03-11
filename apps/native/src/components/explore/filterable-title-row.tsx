@@ -114,7 +114,7 @@ export function FilterableTitleRow({
           horizontal
           showsHorizontalScrollIndicator={false}
           data={items}
-          keyExtractor={(item, index) => `${item.tmdbId}-${index}`}
+          keyExtractor={(item) => `${item.tmdbId}-${item.type}`}
           renderItem={({ item }) => (
             <View className="mr-3">
               <PosterCard

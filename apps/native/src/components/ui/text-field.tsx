@@ -17,6 +17,7 @@ export function TextField({ children }: PropsWithChildren) {
 export function Label(props: TextProps) {
   return (
     <Text
+      {...props}
       style={[
         {
           fontFamily: fonts.sansMedium,
@@ -25,7 +26,6 @@ export function Label(props: TextProps) {
         },
         props.style,
       ]}
-      {...props}
     />
   );
 }
@@ -65,8 +65,8 @@ export function FieldError({
   if (!isInvalid) return null;
   return (
     <Text
-      style={[{ fontSize: 13, color: colors.destructive }, props.style]}
       {...props}
+      style={[{ fontSize: 13, color: colors.destructive }, props.style]}
     >
       {children}
     </Text>

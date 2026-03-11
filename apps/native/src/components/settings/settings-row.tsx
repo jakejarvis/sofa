@@ -11,19 +11,24 @@ export function SettingsRow({
   onPress,
   icon: IconComponent,
   destructive,
+  disabled,
 }: {
   label: string;
   value?: string;
   onPress?: () => void;
   icon?: Icon;
   destructive?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <Pressable
       onPress={onPress}
-      disabled={!onPress}
+      disabled={disabled || !onPress}
       className="flex-row items-center py-3.5"
-      style={{ borderBottomWidth: 0.5, borderBottomColor: colors.border }}
+      style={[
+        { borderBottomWidth: 0.5, borderBottomColor: colors.border },
+        disabled ? { opacity: 0.5 } : undefined,
+      ]}
     >
       {IconComponent && (
         <IconComponent

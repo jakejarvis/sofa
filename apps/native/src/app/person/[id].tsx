@@ -1,4 +1,8 @@
-import { IconMovie, IconUser } from "@tabler/icons-react-native";
+import {
+  IconAlertTriangle,
+  IconMovie,
+  IconUser,
+} from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -31,7 +35,7 @@ export default function PersonDetailScreen() {
   const columnWidth =
     (screenWidth - FILMOGRAPHY_PADDING * 2 - FILMOGRAPHY_GAP) / 2;
 
-  const { data, isPending } = useQuery(
+  const { data, isPending, isError } = useQuery(
     orpc.people.detail.queryOptions({ input: { id } }),
   );
 
@@ -74,6 +78,45 @@ export default function PersonDetailScreen() {
           <Skeleton width="100%" height={14} />
           <Skeleton width="60%" height={14} />
         </View>
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View
+        className="flex-1 items-center justify-center"
+        style={{
+          backgroundColor: colors.background,
+          paddingTop: insets.top,
+        }}
+      >
+        <Animated.View entering={FadeIn.duration(400)} className="items-center">
+          <IconAlertTriangle size={48} color={colors.mutedForeground} />
+          <Text
+            style={{
+              fontFamily: fonts.display,
+              fontSize: 20,
+              color: colors.foreground,
+              marginTop: 12,
+            }}
+          >
+            Something went wrong
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: colors.mutedForeground,
+              textAlign: "center",
+              marginTop: 4,
+            }}
+          >
+            Could not load person details
+          </Text>
+          <Pressable onPress={() => back()} className="mt-4">
+            <Text style={{ color: colors.primary }}>Go back</Text>
+          </Pressable>
+        </Animated.View>
       </View>
     );
   }
