@@ -9,7 +9,6 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "prebuild": "expo prebuild",
-    "web": "expo start --web",
     "lint": "biome check",
     "format": "biome format --write",
     "check-types": "tsc --noEmit"

@@ -2,10 +2,10 @@
   "expo": {
     "name": "Sofa",
     "slug": "sofa",
-    "orientation": "portrait",
+    "owner": "jakejarvis",
     "scheme": "sofa",
+    "orientation": "portrait",
     "userInterfaceStyle": "dark",
-    "jsEngine": "hermes",
     "ios": {
       "config": {
         "usesNonExemptEncryption": false
@@ -85,6 +85,11 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a9f021eb-f58d-49af-b291-d72f7dc34051"
+      }
     }
   }
 }
