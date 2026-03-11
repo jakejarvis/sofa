@@ -21,7 +21,7 @@ config.resolver.nodeModulesPaths = [
 ];
 
 const uniwindConfig = withUniwindConfig(wrapWithReanimatedMetroConfig(config), {
-  cssEntryFile: "./global.css",
+  cssEntryFile: "./src/global.css",
   dtsFile: "./uniwind-types.d.ts",
 });
 

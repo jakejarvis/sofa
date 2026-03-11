@@ -1,0 +1,169 @@
+import { IconSearch } from "@tabler/icons-react-native";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Stack, useRouter } from "expo-router";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
+import {
+  type SearchResultItem,
+  SearchResultRow,
+} from "@/components/search/search-result-row";
+import { colors } from "@/constants/colors";
+import { useDebounce } from "@/hooks/use-debounce";
+import * as Haptics from "@/utils/haptics";
+import { orpc, queryClient } from "@/utils/orpc";
+
+export default function SearchScreen() {
+  const { push } = useRouter();
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query.trim(), 300);
+
+  const searchResults = useQuery({
+    ...orpc.search.queryOptions({ input: { query: debouncedQuery } }),
+    enabled: debouncedQuery.length > 0,
+  });
+
+  // Track which item is currently being resolved/added
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
+  const [addingId, setAddingId] = useState<string | null>(null);
+
+  const resolveTitleMutation = useMutation(
+    orpc.titles.resolve.mutationOptions({
+      onSuccess: ({ id }) => {
+        setResolvingId(null);
+        if (id) push(`/title/${id}`);
+      },
+      onError: () => setResolvingId(null),
+    }),
+  );
+
+  const resolvePersonMutation = useMutation(
+    orpc.people.resolve.mutationOptions({
+      onSuccess: ({ id }) => {
+        setResolvingId(null);
+        if (id) push(`/person/${id}`);
+      },
+      onError: () => setResolvingId(null),
+    }),
+  );
+
+  const quickAddMutation = useMutation(
+    orpc.watchlist.quickAdd.mutationOptions({
+      onSuccess: () => {
+        setAddingId(null);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
+      },
+      onError: () => setAddingId(null),
+    }),
+  );
+
+  // Use refs for mutation.mutate to keep callbacks stable across renders
+  const resolveTitleMutateRef = useRef(resolveTitleMutation.mutate);
+  resolveTitleMutateRef.current = resolveTitleMutation.mutate;
+  const resolvePersonMutateRef = useRef(resolvePersonMutation.mutate);
+  resolvePersonMutateRef.current = resolvePersonMutation.mutate;
+  const quickAddMutateRef = useRef(quickAddMutation.mutate);
+  quickAddMutateRef.current = quickAddMutation.mutate;
+
+  const handleResolve = useCallback((item: SearchResultItem) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setResolvingId(`${item.type}-${item.tmdbId}`);
+    if (item.type === "person") {
+      resolvePersonMutateRef.current({ tmdbId: item.tmdbId });
+    } else {
+      resolveTitleMutateRef.current({ tmdbId: item.tmdbId, type: item.type });
+    }
+  }, []);
+
+  const handleQuickAdd = useCallback((tmdbId: number, type: "movie" | "tv") => {
+    setAddingId(`${type}-${tmdbId}`);
+    quickAddMutateRef.current({ tmdbId, type });
+  }, []);
+
+  // Memoize mapped results to maintain stable references
+  const allResults = useMemo<SearchResultItem[]>(
+    () =>
+      searchResults.data?.results?.map((r) => ({
+        tmdbId: r.tmdbId,
+        title: r.title,
+        type: r.type,
+        posterPath: r.posterPath,
+        profilePath: r.profilePath,
+        releaseDate: r.releaseDate,
+      })) ?? [],
+    [searchResults.data?.results],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: SearchResultItem }) => (
+      <SearchResultRow
+        item={item}
+        onResolve={handleResolve}
+        onQuickAdd={handleQuickAdd}
+        isResolving={resolvingId === `${item.type}-${item.tmdbId}`}
+        isAdding={addingId === `${item.type}-${item.tmdbId}`}
+      />
+    ),
+    [handleResolve, handleQuickAdd, resolvingId, addingId],
+  );
+
+  const keyExtractor = useCallback(
+    (item: SearchResultItem) => `${item.type}-${item.tmdbId}`,
+    [],
+  );
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <Stack.Screen
+        options={{
+          headerSearchBarOptions: {
+            placeholder: "Search movies, shows, people...",
+            onChangeText: (e) => setQuery(e.nativeEvent.text),
+            hideWhenScrolling: false,
+          },
+        }}
+      />
+
+      {debouncedQuery.length === 0 ? (
+        <Animated.View
+          entering={FadeIn.duration(400)}
+          className="flex-1 items-center justify-center"
+        >
+          <IconSearch size={64} color={colors.mutedForeground} />
+          <Text
+            style={{
+              color: colors.mutedForeground,
+              fontSize: 15,
+              marginTop: 12,
+            }}
+          >
+            Search for movies, shows, or people
+          </Text>
+        </Animated.View>
+      ) : searchResults.isPending ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : allResults.length === 0 ? (
+        <Animated.View
+          entering={FadeIn.duration(300)}
+          className="flex-1 items-center justify-center"
+        >
+          <Text style={{ color: colors.mutedForeground, fontSize: 15 }}>
+            No results for "{debouncedQuery}"
+          </Text>
+        </Animated.View>
+      ) : (
+        <FlatList
+          data={allResults}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          keyboardShouldPersistTaps="handled"
+          contentInsetAdjustmentBehavior="automatic"
+        />
+      )}
+    </View>
+  );
+}
