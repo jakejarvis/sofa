@@ -70,7 +70,7 @@ export function PosterCard({
   );
 
   useEffect(() => {
-    if (userStatus) setLocalStatus(userStatus);
+    setLocalStatus(userStatus ?? null);
   }, [userStatus]);
 
   const resolveMutation = useMutation(

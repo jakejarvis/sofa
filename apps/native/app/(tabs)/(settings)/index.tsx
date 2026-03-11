@@ -20,7 +20,7 @@ import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -311,7 +311,11 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { data: session, refetch: refetchSession } = authClient.useSession();
   const [isEditingName, setIsEditingName] = useState(false);
-  const [nameInput, setNameInput] = useState(session?.user?.name ?? "");
+  const [nameInput, setNameInput] = useState("");
+
+  useEffect(() => {
+    if (session?.user?.name) setNameInput(session.user.name);
+  }, [session?.user?.name]);
 
   const isAdmin = session?.user?.role === "admin";
   const serverUrl = getServerUrl();

@@ -749,7 +749,7 @@ export default function TitleDetailScreen() {
             } else if (status === "completed" && title.type === "movie") {
               watchMovie.mutate({ id });
             } else {
-              updateStatus.mutate({ id, status: "in_progress" });
+              updateStatus.mutate({ id, status });
             }
           }}
           isPending={

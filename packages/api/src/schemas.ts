@@ -22,7 +22,7 @@ export const TmdbIdTypeParam = z.object({
 
 export const UpdateStatusInput = z.object({
   id: z.string(),
-  status: z.enum(["in_progress"]).nullable(),
+  status: z.enum(["in_progress", "completed"]).nullable(),
 });
 
 export const UpdateRatingInput = z.object({
