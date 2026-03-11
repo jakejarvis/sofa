@@ -27,9 +27,11 @@ onServerUrlChange(async () => {
   // is never sent to the new host and stale session state doesn't
   // persist in the UI. The expo client caches session data under
   // ${storagePrefix}_session_data in addition to cookie/token keys.
-  await SecureStore.deleteItemAsync("sofa_cookie");
-  await SecureStore.deleteItemAsync("sofa_session_token");
-  await SecureStore.deleteItemAsync("sofa_session_data");
+  await Promise.allSettled([
+    SecureStore.deleteItemAsync("sofa_cookie"),
+    SecureStore.deleteItemAsync("sofa_session_token"),
+    SecureStore.deleteItemAsync("sofa_session_data"),
+  ]);
 
   authClient = buildAuthClient();
   // Clear query cache so stale data from old server is discarded.

@@ -82,7 +82,7 @@ export default function PersonDetailScreen() {
     );
   }
 
-  if (isError) {
+  if (isError && !data) {
     return (
       <View
         className="flex-1 items-center justify-center"
