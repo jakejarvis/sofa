@@ -23,10 +23,13 @@ function buildAuthClient() {
 export let authClient = buildAuthClient();
 
 onServerUrlChange(async () => {
-  // Clear Better Auth session cookies so the old server's token
-  // is never sent to the new host (prevents leaking credentials).
+  // Clear all Better Auth stored data so the old server's token
+  // is never sent to the new host and stale session state doesn't
+  // persist in the UI. The expo client caches session data under
+  // ${storagePrefix}_session_data in addition to cookie/token keys.
   await SecureStore.deleteItemAsync("sofa_cookie");
   await SecureStore.deleteItemAsync("sofa_session_token");
+  await SecureStore.deleteItemAsync("sofa_session_data");
 
   authClient = buildAuthClient();
   // Clear query cache so stale data from old server is discarded.
