@@ -350,20 +350,19 @@ export default function DashboardScreen() {
             <View className="px-4">
               <SectionHeader title="Your Library" icon={IconLibrary} />
             </View>
-            {hasLibrary ? (
+            {library.isPending ? (
+              <HorizontalPosterRow items={[]} isLoading />
+            ) : hasLibrary ? (
               <HorizontalPosterRow
                 items={library.data?.items ?? []}
-                isLoading={library.isPending}
               />
             ) : (
-              !library.isPending && (
-                <EmptyState
-                  title="Your library is empty"
-                  description="Start tracking movies and shows"
-                  actionLabel="Explore"
-                  onAction={() => router.push("/(tabs)/(explore)")}
-                />
-              )
+              <EmptyState
+                title="Your library is empty"
+                description="Start tracking movies and shows"
+                actionLabel="Explore"
+                onAction={() => router.push("/(tabs)/(explore)")}
+              />
             )}
           </Animated.View>
 
