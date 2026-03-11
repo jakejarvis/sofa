@@ -23,7 +23,7 @@
       "package": "com.jakejarvis.sofa"
     },
     "plugins": [
-      ["expo-router", { "root": "./src" }],
+      ["expo-router", { "root": "./src/app" }],
       "expo-secure-store",
       [
         "expo-font",
