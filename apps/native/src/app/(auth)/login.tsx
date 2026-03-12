@@ -198,7 +198,7 @@ export default function LoginScreen() {
         entering={FadeIn.duration(300).delay(500)}
         className="mt-4 items-center"
       >
-        <Link href="/connect" asChild>
+        <Link href="/(auth)/server-url" asChild>
           <Pressable>
             <Text className="text-muted-foreground text-xs">Change server</Text>
           </Pressable>

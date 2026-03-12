@@ -330,7 +330,24 @@ export default function SettingsScreen() {
             label="Server URL"
             value={serverUrl}
             icon={IconLink}
-            onPress={() => push("/connect")}
+            onPress={() => {
+              Alert.alert(
+                "Change Server",
+                "You'll be signed out to change the server URL.",
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Continue",
+                    style: "destructive",
+                    onPress: async () => {
+                      await authClient.signOut();
+                      queryClient.clear();
+                      push("/(auth)/server-url");
+                    },
+                  },
+                ],
+              );
+            }}
           />
         </SettingsSection>
       </Animated.View>

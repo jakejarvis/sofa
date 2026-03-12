@@ -161,7 +161,11 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
         className="flex-row items-center justify-between p-3"
       >
         <View className="flex-row items-center gap-3">
-          <Icon width={18} height={18} color={mutedFgColor} />
+          <Icon
+            width={18}
+            height={18}
+            color={connection ? primaryColor : mutedFgColor}
+          />
           <View>
             <Text className="font-sans-medium text-[15px] text-foreground">
               {label}

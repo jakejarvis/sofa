@@ -36,7 +36,7 @@ export function SettingsSection({
       <View className="mb-2 flex-row items-center gap-2">
         <SectionHeader title={title} icon={icon} />
         {badge ? (
-          <View className="mb-3 rounded-full bg-primary/10 px-2 py-0.5">
+          <View className="mb-2.5 rounded-full bg-primary/10 px-2 py-0.5">
             <Text className="font-sans-medium text-[10px] text-primary">
               {badge}
             </Text>

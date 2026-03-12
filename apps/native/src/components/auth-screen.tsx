@@ -36,7 +36,7 @@ export function AuthScreen({
     >
       <Animated.View
         entering={FadeIn.duration(400)}
-        className="mb-3 items-center"
+        className="mb-4 items-center"
       >
         {logoStyle ? (
           <Animated.View style={logoStyle}>
@@ -49,7 +49,7 @@ export function AuthScreen({
           {title}
         </Text>
         {subtitle && (
-          <Text className="mt-4 text-muted-foreground text-sm">{subtitle}</Text>
+          <Text className="mt-2 text-muted-foreground text-sm">{subtitle}</Text>
         )}
       </Animated.View>
       {children}

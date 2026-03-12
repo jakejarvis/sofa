@@ -3,7 +3,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { Uniwind, useResolveClassNames } from "uniwind";
@@ -13,7 +13,7 @@ import { ToastProvider } from "@/components/ui/toast-provider";
 import { authClient } from "@/lib/auth-client";
 import { queryPersister } from "@/lib/mmkv";
 import { queryClient } from "@/lib/query-client";
-import { hasStoredServerUrl } from "@/lib/server-url";
+import { hasStoredServerUrl, onServerUrlChange } from "@/lib/server-url";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,6 +23,12 @@ export const unstable_settings = {
 
 function AppContent() {
   const contentStyle = useResolveClassNames("bg-background");
+
+  // Force re-render when server URL changes so useSession()
+  // re-subscribes to the rebuilt authClient's session atom.
+  const [, setUrlVersion] = useState(0);
+  useEffect(() => onServerUrlChange(() => setUrlVersion((n) => n + 1)), []);
+
   const { data: session, isPending } = authClient.useSession();
   const hasServerUrl =
     !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
@@ -49,8 +55,6 @@ function AppContent() {
           animation: "slide_from_right",
         }}
       >
-        <Stack.Screen name="connect" options={{ presentation: "modal" }} />
-
         <Stack.Protected guard={!session}>
           <Stack.Screen name="(auth)" />
         </Stack.Protected>

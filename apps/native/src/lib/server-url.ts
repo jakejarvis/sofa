@@ -55,8 +55,12 @@ export function setServerUrl(url: string): void {
   for (const listener of serverUrlListeners) listener();
 }
 
-export function onServerUrlChange(callback: () => void) {
+export function onServerUrlChange(callback: () => void): () => void {
   serverUrlListeners.push(callback);
+  return () => {
+    const idx = serverUrlListeners.indexOf(callback);
+    if (idx !== -1) serverUrlListeners.splice(idx, 1);
+  };
 }
 
 export function hasStoredServerUrl(): boolean {
