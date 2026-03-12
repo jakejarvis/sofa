@@ -1,10 +1,9 @@
-import * as SecureStore from "expo-secure-store";
+import { storage } from "@/lib/mmkv";
 
 const SERVER_URL_KEY = "sofa_server_url";
 const DEFAULT_URL =
   process.env.EXPO_PUBLIC_SERVER_URL ?? "https://sofa.example.com";
 
-let cachedUrl: string = "";
 const serverUrlListeners: Array<() => void> = [];
 
 // --- Types ---
@@ -47,16 +46,12 @@ export function resolveUrl(path: string | null): string | null {
 // --- Server URL storage ---
 
 export function getServerUrl(): string {
-  if (cachedUrl) return cachedUrl;
-  const stored = SecureStore.getItem(SERVER_URL_KEY);
-  cachedUrl = stored ?? DEFAULT_URL;
-  return cachedUrl;
+  return storage.getString(SERVER_URL_KEY) ?? DEFAULT_URL;
 }
 
-export async function setServerUrl(url: string): Promise<void> {
+export function setServerUrl(url: string): void {
   const normalized = url.replace(/\/+$/, "");
-  await SecureStore.setItemAsync(SERVER_URL_KEY, normalized);
-  cachedUrl = normalized;
+  storage.set(SERVER_URL_KEY, normalized);
   for (const listener of serverUrlListeners) listener();
 }
 
@@ -65,11 +60,7 @@ export function onServerUrlChange(callback: () => void) {
 }
 
 export function hasStoredServerUrl(): boolean {
-  return SecureStore.getItem(SERVER_URL_KEY) !== null;
-}
-
-export async function getStoredServerUrl(): Promise<string | null> {
-  return SecureStore.getItemAsync(SERVER_URL_KEY);
+  return storage.contains(SERVER_URL_KEY);
 }
 
 // --- Validation ---

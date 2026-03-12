@@ -9,7 +9,14 @@ import { authClient } from "@/lib/auth-client";
 import { getServerUrl } from "@/lib/server-url";
 import { toast } from "@/utils/toast";
 
+const ONE_DAY_MS = 1000 * 60 * 60 * 24;
+
 export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      gcTime: ONE_DAY_MS,
+    },
+  },
   queryCache: new QueryCache({
     onError: (error) => {
       toast.error("Something went wrong\u2026", {

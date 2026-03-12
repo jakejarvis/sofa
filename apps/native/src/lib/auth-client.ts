@@ -3,7 +3,9 @@ import { adminClient, genericOAuthClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import * as SecureStore from "expo-secure-store";
 
+import { storage } from "@/lib/mmkv";
 import { getServerUrl, onServerUrlChange } from "@/lib/server-url";
+import { queryClient } from "@/utils/orpc";
 
 function buildAuthClient() {
   return createAuthClient({
@@ -34,9 +36,10 @@ onServerUrlChange(async () => {
   ]);
 
   authClient = buildAuthClient();
-  // Clear query cache so stale data from old server is discarded.
-  // React hooks referencing the old client will re-mount via navigation
-  // flow (server URL change → auth screens → fresh mount).
-  const { queryClient } = require("@/utils/orpc");
+  // Clear query cache and its MMKV-persisted data so stale data from
+  // old server is discarded. React hooks referencing the old client
+  // will re-mount via navigation flow (server URL change → auth
+  // screens → fresh mount).
+  storage.clearAll();
   queryClient.clear();
 });
