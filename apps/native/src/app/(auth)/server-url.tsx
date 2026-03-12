@@ -154,7 +154,7 @@ export default function ServerUrlScreen() {
             returnKeyType="go"
             editable={!isDisabled}
             onSubmitEditing={handleConnect}
-            className="flex-1 py-0 font-sans text-[15px] text-foreground"
+            className="flex-1 py-0 font-mono text-[15px] text-foreground"
           />
         </View>
       </Animated.View>

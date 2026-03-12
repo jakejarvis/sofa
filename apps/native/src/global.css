@@ -8,6 +8,7 @@
   --font-sans-semibold: "DMSans-SemiBold";
   --font-sans-bold: "DMSans-Bold";
   --font-display: "DMSerifDisplay-Regular";
+  --font-mono: "GeistMono-Regular";
 
   /* Sofa — dark cinema theme with warm amber accents */
   --color-background: oklch(0.13 0.006 55);

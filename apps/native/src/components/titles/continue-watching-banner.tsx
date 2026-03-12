@@ -66,9 +66,9 @@ export function ContinueWatchingBanner({
             </View>
             <Text
               numberOfLines={1}
-              className="mt-0.5 font-sans-medium text-[14px] text-white"
+              className="mt-0.5 font-sans-medium text-[13px] text-white"
             >
-              <Text className="font-mono text-[12px] text-white/60">
+              <Text className="font-sans-medium text-[11px] text-white/60">
                 S{nextEpisode.seasonNumber} E{nextEpisode.episodeNumber}
               </Text>
               {"  "}

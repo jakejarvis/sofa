@@ -1,5 +1,6 @@
 import type { Icon } from "@tabler/icons-react-native";
 import { IconChevronRight } from "@tabler/icons-react-native";
+import type { ReactNode } from "react";
 import { Pressable } from "react-native";
 import { useCSSVariable } from "uniwind";
 import { Text } from "@/components/ui/text";
@@ -11,6 +12,7 @@ export function SettingsRow({
   icon: IconComponent,
   destructive,
   disabled,
+  right,
 }: {
   label: string;
   value?: string;
@@ -18,6 +20,7 @@ export function SettingsRow({
   icon?: Icon;
   destructive?: boolean;
   disabled?: boolean;
+  right?: ReactNode;
 }) {
   const destructiveColor = useCSSVariable("--color-destructive") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
@@ -26,25 +29,22 @@ export function SettingsRow({
     <Pressable
       onPress={onPress}
       disabled={disabled || !onPress}
-      className="flex-row items-center border-border border-b py-3.5"
-      style={[
-        { borderBottomWidth: 0.5 },
-        disabled ? { opacity: 0.5 } : undefined,
-      ]}
+      className="flex-row items-center py-3.5"
+      style={disabled ? { opacity: 0.5 } : undefined}
     >
       {IconComponent && (
         <IconComponent
-          size={20}
+          size={18}
           color={destructive ? destructiveColor : mutedFgColor}
-          className="mr-3"
         />
       )}
       <Text
-        className={`flex-1 text-[15px] ${destructive ? "text-destructive" : "text-foreground"}`}
+        className={`flex-1 text-[15px] ${destructive ? "text-destructive" : "text-foreground"} ${IconComponent ? "ml-2" : ""}`}
       >
         {label}
       </Text>
-      {value ? (
+      {right}
+      {!right && value ? (
         <Text
           selectable
           className="mr-1 max-w-[160px] text-[14px] text-muted-foreground"
@@ -53,7 +53,7 @@ export function SettingsRow({
           {value}
         </Text>
       ) : null}
-      {onPress && <IconChevronRight size={16} color={mutedFgColor} />}
+      {!right && onPress && <IconChevronRight size={16} color={mutedFgColor} />}
     </Pressable>
   );
 }

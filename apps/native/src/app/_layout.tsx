@@ -56,6 +56,7 @@ function AppContent() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen
             name="title/[id]"
+            dangerouslySingular
             options={{
               headerShown: true,
               headerTransparent: true,
@@ -68,6 +69,7 @@ function AppContent() {
           />
           <Stack.Screen
             name="person/[id]"
+            dangerouslySingular
             options={{
               headerShown: true,
               headerTransparent: true,

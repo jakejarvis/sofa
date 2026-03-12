@@ -494,7 +494,7 @@ export default function TitleDetailScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={cast}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item, index) => `${item.id}-${index}`}
             renderItem={({ item }) => <CastCard person={item} />}
             contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
             style={{ overflow: "visible" }}

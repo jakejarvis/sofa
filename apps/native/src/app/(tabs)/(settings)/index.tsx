@@ -3,10 +3,10 @@ import {
   IconCloud,
   IconDatabase,
   IconDeviceMobileCog,
+  IconExternalLink,
   IconLink,
   IconLogout,
   IconPhoto,
-  IconPuzzle,
   IconServer,
   IconShield,
   IconUser,
@@ -30,9 +30,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
 import * as DropdownMenu from "zeego/dropdown-menu";
-import { AddIntegrationRow } from "@/components/settings/add-integration-row";
-import { BackupsSection } from "@/components/settings/backups-section";
-import { IntegrationRow } from "@/components/settings/integration-row";
+import { IntegrationsSection } from "@/components/settings/integrations-section";
 import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
 import { TmdbLogo } from "@/components/tmdb-logo";
@@ -60,8 +58,6 @@ export default function SettingsScreen() {
     ...orpc.system.health.queryOptions(),
     enabled: isAdmin,
   });
-
-  const integrations = useQuery(orpc.integrations.list.queryOptions());
 
   const updateName = useMutation(
     orpc.account.updateName.mutationOptions({
@@ -155,7 +151,6 @@ export default function SettingsScreen() {
   );
 
   const primaryFgColor = useCSSVariable("--color-primary-foreground") as string;
-  const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(async () => {
@@ -200,10 +195,7 @@ export default function SettingsScreen() {
       {/* Account */}
       <Animated.View entering={FadeInDown.duration(300).delay(100)}>
         <SettingsSection title="Account" icon={IconUser}>
-          <View
-            className="flex-row items-center border-border border-b py-3.5"
-            style={{ borderBottomWidth: 0.5 }}
-          >
+          <View className="flex-row items-center py-3.5">
             {hasAvatarImage ? (
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
@@ -344,29 +336,7 @@ export default function SettingsScreen() {
 
       {/* Integrations */}
       <Animated.View entering={FadeInDown.duration(300).delay(300)}>
-        <SettingsSection title="Integrations" icon={IconPuzzle}>
-          {integrations.isPending ? (
-            <View className="items-center py-4">
-              <ActivityIndicator colorClassName="accent-primary" />
-            </View>
-          ) : (
-            <>
-              {integrations.data?.integrations &&
-                integrations.data.integrations.length > 0 &&
-                integrations.data.integrations.map((integration) => (
-                  <IntegrationRow
-                    key={integration.provider}
-                    integration={integration}
-                  />
-                ))}
-              <AddIntegrationRow
-                existing={
-                  integrations.data?.integrations?.map((i) => i.provider) ?? []
-                }
-              />
-            </>
-          )}
-        </SettingsSection>
+        <IntegrationsSection />
       </Animated.View>
 
       {/* Admin: Server Health */}
@@ -416,52 +386,42 @@ export default function SettingsScreen() {
       {isAdmin && (
         <Animated.View entering={FadeInDown.duration(300).delay(500)}>
           <SettingsSection title="Security" icon={IconShield} badge="Admin">
-            <View
-              className="flex-row items-center justify-between border-border border-b py-3.5"
-              style={{ borderBottomWidth: 0.5 }}
-            >
-              <View className="flex-row items-center gap-3">
-                <IconUserPlus size={20} color={mutedFgColor} />
-                <Text className="text-[15px] text-foreground">
-                  Registration
-                </Text>
-              </View>
-              <Switch
-                value={registration.data?.open ?? false}
-                onValueChange={(open) => toggleRegistration.mutate({ open })}
-                trackColorOffClassName="accent-secondary"
-                trackColorOnClassName="accent-primary/50"
-                thumbColorClassName={
-                  registration.data?.open
-                    ? "accent-primary"
-                    : "accent-muted-foreground"
-                }
-              />
-            </View>
-            <View
-              className="flex-row items-center justify-between border-border border-b py-3.5"
-              style={{ borderBottomWidth: 0.5 }}
-            >
-              <View className="flex-row items-center gap-3">
-                <IconCloud size={20} color={mutedFgColor} />
-                <Text className="text-[15px] text-foreground">
-                  Update Checks
-                </Text>
-              </View>
-              <Switch
-                value={updateCheck.data?.enabled ?? false}
-                onValueChange={(enabled) =>
-                  toggleUpdateCheck.mutate({ enabled })
-                }
-                trackColorOffClassName="accent-secondary"
-                trackColorOnClassName="accent-primary/50"
-                thumbColorClassName={
-                  updateCheck.data?.enabled
-                    ? "accent-primary"
-                    : "accent-muted-foreground"
-                }
-              />
-            </View>
+            <SettingsRow
+              label="Registration"
+              icon={IconUserPlus}
+              right={
+                <Switch
+                  value={registration.data?.open ?? false}
+                  onValueChange={(open) => toggleRegistration.mutate({ open })}
+                  trackColorOffClassName="accent-secondary"
+                  trackColorOnClassName="accent-primary/50"
+                  thumbColorClassName={
+                    registration.data?.open
+                      ? "accent-primary"
+                      : "accent-muted-foreground"
+                  }
+                />
+              }
+            />
+            <SettingsRow
+              label="Update Checks"
+              icon={IconCloud}
+              right={
+                <Switch
+                  value={updateCheck.data?.enabled ?? false}
+                  onValueChange={(enabled) =>
+                    toggleUpdateCheck.mutate({ enabled })
+                  }
+                  trackColorOffClassName="accent-secondary"
+                  trackColorOnClassName="accent-primary/50"
+                  thumbColorClassName={
+                    updateCheck.data?.enabled
+                      ? "accent-primary"
+                      : "accent-muted-foreground"
+                  }
+                />
+              }
+            />
             {updateCheck.data?.updateCheck?.updateAvailable && (
               <View className="py-3.5">
                 <Text className="font-sans-medium text-[13px] text-status-completed">
@@ -473,12 +433,14 @@ export default function SettingsScreen() {
         </Animated.View>
       )}
 
-      {/* Admin: Backups */}
-      {isAdmin && (
-        <Animated.View entering={FadeInDown.duration(300).delay(600)}>
-          <BackupsSection />
-        </Animated.View>
-      )}
+      {/* More Settings */}
+      <Animated.View entering={FadeInDown.duration(300).delay(400)}>
+        <SettingsRow
+          label="More Settings"
+          icon={IconExternalLink}
+          onPress={() => Linking.openURL(`${serverUrl}/settings`)}
+        />
+      </Animated.View>
 
       {/* Version */}
       <Animated.View
