@@ -18,7 +18,7 @@ export function useTabScreenOptions() {
   return {
     headerLargeTitleEnabled: true,
     headerTransparent: true,
-    headerBlurEffect: "none" as const,
+    headerBlurEffect: "dark" as const,
     headerLargeStyle: { backgroundColor: "transparent" },
     headerLargeTitleStyle: headerLargeTitleStyle as Record<string, unknown>,
     headerTitleStyle: headerTitleStyle as Record<string, unknown>,
