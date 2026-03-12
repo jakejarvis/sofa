@@ -3,11 +3,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import {
-  PostHogErrorBoundary,
-  PostHogProvider,
-  usePostHog,
-} from "posthog-react-native";
+import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -40,15 +36,14 @@ function AppContent() {
     !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
 
   // --- PostHog screen tracking ---
-  const ph = usePostHog();
   const pathname = usePathname();
   const params = useGlobalSearchParams();
 
   useEffect(() => {
-    if (ph && pathname) {
-      ph.screen(pathname, params);
+    if (posthog && pathname) {
+      posthog.screen(pathname, params);
     }
-  }, [ph, pathname, params]);
+  }, [pathname, params]);
 
   useEffect(() => {
     Uniwind.setTheme("dark");
@@ -111,20 +106,24 @@ function AppContent() {
 }
 
 export default function RootLayout() {
+  const inner = (
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister: queryPersister }}
+    >
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <KeyboardProvider>
+          <AppContent />
+        </KeyboardProvider>
+      </GestureHandlerRootView>
+    </PersistQueryClientProvider>
+  );
+
+  if (!posthog) return inner;
+
   return (
     <PostHogProvider client={posthog} autocapture={{ captureScreens: false }}>
-      <PostHogErrorBoundary>
-        <PersistQueryClientProvider
-          client={queryClient}
-          persistOptions={{ persister: queryPersister }}
-        >
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <KeyboardProvider>
-              <AppContent />
-            </KeyboardProvider>
-          </GestureHandlerRootView>
-        </PersistQueryClientProvider>
-      </PostHogErrorBoundary>
+      <PostHogErrorBoundary>{inner}</PostHogErrorBoundary>
     </PostHogProvider>
   );
 }

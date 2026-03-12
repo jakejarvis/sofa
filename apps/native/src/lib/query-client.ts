@@ -16,7 +16,7 @@ export const queryClient = new QueryClient({
       toast.error("Something went wrong\u2026", {
         description: error.message,
       });
-      posthog.captureException(error, { source: "react-query" });
+      posthog?.captureException(error, { source: "react-query" });
     },
   }),
 });
