@@ -34,6 +34,7 @@
     "@tanstack/react-query-persist-client": "5.90.24",
     "better-auth": "catalog:",
     "expo": "55.0.5",
+    "expo-application": "55.0.9",
     "expo-clipboard": "55.0.8",
     "expo-constants": "55.0.7",
     "expo-dev-client": "55.0.16",

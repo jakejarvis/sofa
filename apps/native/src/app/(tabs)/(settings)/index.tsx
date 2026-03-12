@@ -1,5 +1,6 @@
 import {
   IconArrowUpRight,
+  IconBrandGithub,
   IconCamera,
   IconCloud,
   IconDatabase,
@@ -15,6 +16,7 @@ import {
   IconWorld,
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import * as Application from "expo-application";
 import * as ImagePicker from "expo-image-picker";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -456,11 +458,31 @@ export default function SettingsScreen() {
         className="mt-6 items-center"
       >
         <Text className="text-muted-foreground text-xs">
-          Sofa Mobile
+          Native
+          {Application.nativeApplicationVersion
+            ? ` v${Application.nativeApplicationVersion}`
+            : ""}
+          {Application.nativeBuildVersion
+            ? ` (${Application.nativeBuildVersion})`
+            : ""}
           {updateCheck.data?.updateCheck?.currentVersion
             ? ` · Server v${updateCheck.data.updateCheck.currentVersion}`
             : ""}
         </Text>
+      </Animated.View>
+
+      {/* GitHub */}
+      <Animated.View
+        entering={FadeInDown.duration(300).delay(450)}
+        className="mt-3 items-center"
+      >
+        <Pressable
+          onPress={() => Linking.openURL("https://github.com/jakejarvis/sofa")}
+          className="flex-row items-center gap-1.5 active:opacity-70"
+        >
+          <IconBrandGithub size={14} color={mutedFgColor} />
+          <Text className="text-muted-foreground text-xs">GitHub</Text>
+        </Pressable>
       </Animated.View>
 
       {/* TMDB Attribution */}
