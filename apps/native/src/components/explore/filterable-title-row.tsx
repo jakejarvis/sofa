@@ -30,6 +30,7 @@ export function FilterableTitleRow({
     type: string;
     posterPath: string | null;
     releaseDate?: string | null;
+    firstAirDate?: string | null;
     voteAverage?: number | null;
   }>;
   defaultUserStatuses: Record<string, TitleStatus>;
@@ -41,7 +42,7 @@ export function FilterableTitleRow({
 
   const discover = useQuery({
     ...orpc.discover.queryOptions({
-      input: { mediaType, genreId: selectedGenre ?? 0 },
+      input: { type: mediaType, genreId: selectedGenre ?? 0 },
     }),
     enabled: selectedGenre !== null,
   });
@@ -122,7 +123,7 @@ export function FilterableTitleRow({
                 title={item.title}
                 type={item.type as "movie" | "tv"}
                 posterPath={item.posterPath}
-                releaseDate={item.releaseDate}
+                releaseDate={item.releaseDate ?? item.firstAirDate}
                 voteAverage={item.voteAverage}
                 userStatus={userStatuses[`${item.tmdbId}-${item.type}`] ?? null}
                 episodeProgress={

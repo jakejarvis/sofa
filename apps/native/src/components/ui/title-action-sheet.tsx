@@ -56,7 +56,7 @@ export function TitleActionSheetProvider({
   const { push } = useRouter();
 
   const quickAdd = useMutation(
-    orpc.watchlist.quickAdd.mutationOptions({
+    orpc.titles.quickAdd.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         queryClient.invalidateQueries();

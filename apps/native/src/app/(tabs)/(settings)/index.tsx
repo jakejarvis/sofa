@@ -53,8 +53,8 @@ export default function SettingsScreen() {
   const isAdmin = session?.user?.role === "admin";
   const serverUrl = getServerUrl();
 
-  const systemStatus = useQuery({
-    ...orpc.systemStatus.queryOptions(),
+  const systemHealth = useQuery({
+    ...orpc.system.health.queryOptions(),
     enabled: isAdmin,
   });
 
@@ -392,35 +392,31 @@ export default function SettingsScreen() {
             icon={IconServer}
             badge="Admin"
           >
-            {systemStatus.isPending ? (
+            {systemHealth.isPending ? (
               <View className="items-center py-4">
                 <ActivityIndicator color={colors.primary} />
               </View>
-            ) : systemStatus.data ? (
+            ) : systemHealth.data ? (
               <>
                 <SettingsRow
                   label="Database"
                   value={
-                    systemStatus.data.health?.database
-                      ? `${systemStatus.data.health.database.titleCount} titles`
+                    systemHealth.data?.database
+                      ? `${systemHealth.data.database.titleCount} titles`
                       : "—"
                   }
                   icon={IconDatabase}
                 />
                 <SettingsRow
                   label="TMDB"
-                  value={
-                    systemStatus.data.health?.tmdb?.connected
-                      ? "Connected"
-                      : "—"
-                  }
+                  value={systemHealth.data?.tmdb?.connected ? "Connected" : "—"}
                   icon={IconCloud}
                 />
                 <SettingsRow
                   label="Image Cache"
                   value={
-                    systemStatus.data.health?.imageCache
-                      ? `${systemStatus.data.health.imageCache.imageCount} images`
+                    systemHealth.data?.imageCache
+                      ? `${systemHealth.data.imageCache.imageCount} images`
                       : "—"
                   }
                   icon={IconPhoto}

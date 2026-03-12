@@ -16,7 +16,8 @@ interface TitleRowItem {
   title: string;
   posterPath: string | null;
   releaseDate: string | null;
-  voteAverage: number;
+  firstAirDate: string | null;
+  voteAverage: number | null;
 }
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
@@ -45,7 +46,7 @@ export function FilterableTitleRow({
     orpc.discover.queryOptions({
       input:
         selectedGenre != null
-          ? { mediaType, genreId: selectedGenre }
+          ? { type: mediaType, genreId: selectedGenre }
           : skipToken,
     }),
   );
@@ -140,7 +141,7 @@ export function FilterableTitleRow({
                     type={item.type}
                     title={item.title}
                     posterPath={item.posterPath}
-                    releaseDate={item.releaseDate}
+                    releaseDate={item.releaseDate ?? item.firstAirDate}
                     voteAverage={item.voteAverage}
                     userStatus={userStatuses[`${item.tmdbId}-${item.type}`]}
                     episodeProgress={

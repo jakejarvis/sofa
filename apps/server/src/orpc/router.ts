@@ -9,11 +9,9 @@ import * as integrations from "./procedures/integrations";
 import * as people from "./procedures/people";
 import { search } from "./procedures/search";
 import * as seasons from "./procedures/seasons";
-import { stats } from "./procedures/stats";
-import { systemStatus } from "./procedures/status";
+import * as status from "./procedures/status";
 import * as system from "./procedures/system";
 import * as titles from "./procedures/titles";
-import * as watchlist from "./procedures/watchlist";
 
 export const router = os.router({
   titles: {
@@ -26,6 +24,7 @@ export const router = os.router({
     userInfo: titles.userInfo,
     recommendations: titles.recommendations,
     hydrateSeasons: titles.hydrateSeasons,
+    quickAdd: titles.quickAdd,
   },
   episodes: {
     watch: episodes.watch,
@@ -45,6 +44,7 @@ export const router = os.router({
     continueWatching: dashboard.continueWatching,
     library: dashboard.library,
     recommendations: dashboard.recommendations,
+    watchHistory: dashboard.watchHistory,
   },
   explore: {
     trending: explore.trending,
@@ -53,16 +53,16 @@ export const router = os.router({
   },
   search,
   discover,
-  stats,
-  systemStatus,
   system: {
     publicInfo: system.publicInfo,
     authConfig: system.authConfig,
+    status: status.status,
+    health: status.health,
   },
   integrations: {
     list: integrations.list,
     create: integrations.create,
-    delete: integrations.deleteProcedure,
+    delete: integrations.deleteIntegration,
     regenerateToken: integrations.regenerateToken,
   },
   admin: {
@@ -78,15 +78,12 @@ export const router = os.router({
     toggleRegistration: admin.toggleRegistration,
     updateCheck: admin.updateCheck,
     toggleUpdateCheck: admin.toggleUpdateCheck,
-    triggerJob: admin.triggerJobProcedure,
+    triggerJob: admin.triggerJob,
   },
   account: {
     updateName: account.updateName,
     uploadAvatar: account.uploadAvatar,
     removeAvatar: account.removeAvatar,
-  },
-  watchlist: {
-    quickAdd: watchlist.quickAdd,
   },
 });
 

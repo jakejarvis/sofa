@@ -14,6 +14,9 @@ import {
   removeTitleStatus,
   setTitleStatus,
 } from "@sofa/core/tracking";
+import { db } from "@sofa/db/client";
+import { and, eq } from "@sofa/db/helpers";
+import { userTitleStatus } from "@sofa/db/schema";
 import { os } from "../context";
 import { authed } from "../middleware";
 
@@ -85,4 +88,32 @@ export const hydrateSeasons = os.titles.hydrateSeasons
   .handler(async ({ input }) => {
     const seasons = await ensureTvHydrated(input.id, input.tmdbId);
     return { seasons };
+  });
+
+export const quickAdd = os.titles.quickAdd
+  .use(authed)
+  .handler(async ({ input, context }) => {
+    const title = await getOrFetchTitleByTmdbId(input.tmdbId, input.type);
+    if (!title) {
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+        message: "Failed to import title",
+      });
+    }
+
+    const existing = db
+      .select()
+      .from(userTitleStatus)
+      .where(
+        and(
+          eq(userTitleStatus.userId, context.user.id),
+          eq(userTitleStatus.titleId, title.id),
+        ),
+      )
+      .get();
+
+    if (!existing) {
+      setTitleStatus(context.user.id, title.id, "watchlist");
+    }
+
+    return { id: title.id, alreadyAdded: !!existing };
   });

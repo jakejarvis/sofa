@@ -13,7 +13,7 @@ import {
   getCachedUpdateCheck,
   isUpdateCheckEnabled,
 } from "@sofa/core/update-check";
-import { rescheduleBackup, triggerJob } from "../../cron";
+import { rescheduleBackup, triggerJob as triggerCronJob } from "../../cron";
 import { os } from "../context";
 import { admin } from "../middleware";
 
@@ -67,7 +67,11 @@ export const backupsSchedule = os.admin.backups.schedule
         getSetting("maxBackupRetention") ?? "7",
         10,
       ),
-      frequency: getSetting("backupScheduleFrequency") ?? "1d",
+      frequency: (getSetting("backupScheduleFrequency") ?? "1d") as
+        | "6h"
+        | "12h"
+        | "1d"
+        | "7d",
       time: getSetting("backupScheduleTime") ?? "02:00",
       dayOfWeek: Number.parseInt(getSetting("backupScheduleDow") ?? "0", 10),
     };
@@ -119,10 +123,10 @@ export const toggleUpdateCheck = os.admin.toggleUpdateCheck
 
 // ─── Jobs ──────────────────────────────────────────────────────
 
-export const triggerJobProcedure = os.admin.triggerJob
+export const triggerJob = os.admin.triggerJob
   .use(admin)
   .handler(async ({ input }) => {
-    const triggered = await triggerJob(input.name);
+    const triggered = await triggerCronJob(input.name);
     if (!triggered) {
       throw new ORPCError("NOT_FOUND", { message: "Job not found" });
     }

@@ -48,7 +48,7 @@ export default function SearchScreen() {
   );
 
   const quickAddMutation = useMutation(
-    orpc.watchlist.quickAdd.mutationOptions({
+    orpc.titles.quickAdd.mutationOptions({
       onSuccess: () => {
         setAddingId(null);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

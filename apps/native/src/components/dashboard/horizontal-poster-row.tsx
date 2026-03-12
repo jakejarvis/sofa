@@ -9,6 +9,7 @@ export interface PosterRowItem {
   type: string;
   posterPath: string | null;
   releaseDate?: string | null;
+  firstAirDate?: string | null;
   voteAverage?: number | null;
   userStatus?: "watchlist" | "in_progress" | "completed" | null;
   episodeProgress?: { watched: number; total: number } | null;
@@ -52,7 +53,7 @@ export function HorizontalPosterRow({
             title={item.title}
             type={item.type as "movie" | "tv"}
             posterPath={item.posterPath}
-            releaseDate={item.releaseDate}
+            releaseDate={item.releaseDate ?? item.firstAirDate}
             voteAverage={item.voteAverage}
             userStatus={item.userStatus}
             episodeProgress={item.episodeProgress}

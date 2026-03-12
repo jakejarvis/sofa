@@ -82,7 +82,7 @@ export function PosterCard({
   );
 
   const quickAddMutation = useMutation(
-    orpc.watchlist.quickAdd.mutationOptions({
+    orpc.titles.quickAdd.mutationOptions({
       onSuccess: () => {
         setLocalStatus("watchlist");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

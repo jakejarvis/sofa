@@ -98,7 +98,7 @@ function QuickAddButton({
   }, [userStatus]);
 
   const quickAddMutation = useMutation(
-    orpc.watchlist.quickAdd.mutationOptions({
+    orpc.titles.quickAdd.mutationOptions({
       onSuccess: () => setAddedStatus("watchlist"),
     }),
   );

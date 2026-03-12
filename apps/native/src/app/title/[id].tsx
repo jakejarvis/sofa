@@ -86,7 +86,7 @@ export default function TitleDetailScreen() {
   );
 
   const quickAddMutation = useMutation(
-    orpc.watchlist.quickAdd.mutationOptions({
+    orpc.titles.quickAdd.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
@@ -556,7 +556,7 @@ export default function TitleDetailScreen() {
                     title={item.title}
                     type={item.type}
                     posterPath={item.posterPath}
-                    releaseDate={item.releaseDate}
+                    releaseDate={item.releaseDate ?? item.firstAirDate}
                     voteAverage={item.voteAverage}
                     userStatus={
                       item.id

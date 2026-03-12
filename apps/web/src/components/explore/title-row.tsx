@@ -7,7 +7,8 @@ interface TitleRowItem {
   title: string;
   posterPath: string | null;
   releaseDate: string | null;
-  voteAverage: number;
+  firstAirDate: string | null;
+  voteAverage: number | null;
 }
 
 interface TitleRowProps {
@@ -51,7 +52,7 @@ export function TitleRow({
                   type={item.type}
                   title={item.title}
                   posterPath={item.posterPath}
-                  releaseDate={item.releaseDate}
+                  releaseDate={item.releaseDate ?? item.firstAirDate}
                   voteAverage={item.voteAverage}
                   userStatus={userStatuses?.[`${item.tmdbId}-${item.type}`]}
                   episodeProgress={

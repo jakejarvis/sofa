@@ -8,6 +8,7 @@ interface TitleGridItem {
   title: string;
   posterPath: string | null;
   releaseDate?: string | null;
+  firstAirDate?: string | null;
   voteAverage?: number | null;
   userStatus?: "watchlist" | "in_progress" | "completed" | null;
 }
@@ -45,7 +46,7 @@ export function TitleGrid({ items }: { items: TitleGridItem[] }) {
             type={t.type}
             title={t.title}
             posterPath={t.posterPath}
-            releaseDate={t.releaseDate}
+            releaseDate={t.releaseDate ?? t.firstAirDate}
             voteAverage={t.voteAverage}
             userStatus={t.userStatus}
           />
