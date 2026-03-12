@@ -1,8 +1,8 @@
 import { IconLoader, IconPlus } from "@tabler/icons-react-native";
-import { Image } from "expo-image";
 import { memo } from "react";
 import { ActivityIndicator, Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
+import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 
 export interface SearchResultItem {

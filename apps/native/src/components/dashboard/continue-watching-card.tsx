@@ -1,4 +1,3 @@
-import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -8,6 +7,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 
 export interface ContinueWatchingItem {
@@ -22,6 +22,7 @@ export interface ContinueWatchingItem {
     seasonNumber: number;
     episodeNumber: number;
     name: string | null;
+    stillPath: string | null;
   } | null;
 }
 
@@ -44,7 +45,7 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
       <Link.Trigger>
         <GestureDetector gesture={tapGesture}>
           <Animated.View
-            className="mr-3 w-[200px] overflow-hidden rounded-[12px] border bg-card"
+            className="w-[200px] overflow-hidden rounded-[12px] border bg-card"
             style={[
               animatedStyle,
               {
@@ -54,9 +55,12 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
             ]}
           >
             <View className="h-28 w-[200px]">
-              {item.title.backdropPath && (
+              {(item.nextEpisode?.stillPath || item.title.backdropPath) && (
                 <Image
-                  source={{ uri: item.title.backdropPath }}
+                  source={{
+                    uri: (item.nextEpisode?.stillPath ??
+                      item.title.backdropPath) as string,
+                  }}
                   className="h-full w-full"
                   contentFit="cover"
                 />

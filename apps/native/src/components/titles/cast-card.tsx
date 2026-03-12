@@ -1,4 +1,3 @@
-import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -8,6 +7,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 
 export function CastCard({
@@ -37,10 +37,7 @@ export function CastCard({
     <Link href={`/person/${person.id}` as `/person/${string}`}>
       <Link.Trigger>
         <GestureDetector gesture={tapGesture}>
-          <Animated.View
-            className="mr-4 w-20 items-center"
-            style={animatedStyle}
-          >
+          <Animated.View className="w-20 items-center" style={animatedStyle}>
             <View className="mb-2 h-16 w-16 overflow-hidden rounded-full bg-secondary">
               {person.profilePath && (
                 <Image

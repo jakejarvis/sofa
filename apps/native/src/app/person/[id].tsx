@@ -4,7 +4,6 @@ import {
   IconUser,
 } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
-import { Image } from "expo-image";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { FlatList, Pressable, useWindowDimensions, View } from "react-native";
@@ -12,6 +11,7 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
 import { ExpandableText } from "@/components/ui/expandable-text";
+import { Image } from "@/components/ui/image";
 import { PosterCard } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";

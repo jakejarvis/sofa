@@ -10,7 +10,7 @@ export function StatsCard({
 }) {
   return (
     <View
-      className="mr-3 min-w-[120px] rounded-xl border border-white/[0.06] bg-card px-4 py-3"
+      className="min-w-[120px] rounded-xl border border-white/[0.06] bg-card px-4 py-3"
       style={{ borderCurve: "continuous" }}
     >
       <Text

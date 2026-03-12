@@ -96,12 +96,9 @@ export function FilterableTitleRow({
           showsHorizontalScrollIndicator={false}
           data={[1, 2, 3, 4]}
           keyExtractor={(item) => String(item)}
-          renderItem={() => (
-            <View className="mr-3">
-              <PosterCardSkeleton />
-            </View>
-          )}
-          contentContainerStyle={{ paddingHorizontal: 16 }}
+          renderItem={() => <PosterCardSkeleton />}
+          contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
+          style={{ overflow: "visible" }}
         />
       ) : items.length === 0 && selectedGenre !== null ? (
         <View className="items-center py-6">
@@ -116,22 +113,21 @@ export function FilterableTitleRow({
           data={items}
           keyExtractor={(item) => `${item.tmdbId}-${item.type}`}
           renderItem={({ item }) => (
-            <View className="mr-3">
-              <PosterCard
-                tmdbId={item.tmdbId}
-                title={item.title}
-                type={item.type as "movie" | "tv"}
-                posterPath={item.posterPath}
-                releaseDate={item.releaseDate ?? item.firstAirDate}
-                voteAverage={item.voteAverage}
-                userStatus={userStatuses[`${item.tmdbId}-${item.type}`] ?? null}
-                episodeProgress={
-                  episodeProgress[`${item.tmdbId}-${item.type}`] ?? null
-                }
-              />
-            </View>
+            <PosterCard
+              tmdbId={item.tmdbId}
+              title={item.title}
+              type={item.type as "movie" | "tv"}
+              posterPath={item.posterPath}
+              releaseDate={item.releaseDate ?? item.firstAirDate}
+              voteAverage={item.voteAverage}
+              userStatus={userStatuses[`${item.tmdbId}-${item.type}`] ?? null}
+              episodeProgress={
+                episodeProgress[`${item.tmdbId}-${item.type}`] ?? null
+              }
+            />
           )}
-          contentContainerStyle={{ paddingHorizontal: 16 }}
+          contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
+          style={{ overflow: "visible" }}
         />
       )}
     </View>

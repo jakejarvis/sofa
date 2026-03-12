@@ -25,7 +25,7 @@ export type ValidationError =
 export function normalizeUrl(input: string): string {
   let url = input.trim().replace(/\/+$/, "");
   if (url && !url.includes("://")) {
-    url = `https://${url}`;
+    url = `http://${url}`;
   }
   return url;
 }
@@ -35,7 +35,13 @@ export function splitUrl(input: string): { protocol: string; host: string } {
   if (match) {
     return { protocol: match[1], host: match[2] };
   }
-  return { protocol: "https://", host: input };
+  return { protocol: "http://", host: input };
+}
+
+export function resolveUrl(path: string | null): string | null {
+  if (!path) return null;
+  if (path.startsWith("http")) return path;
+  return `${getServerUrl()}${path}`;
 }
 
 // --- Server URL storage ---
@@ -84,10 +90,15 @@ export async function validateServerUrl(
   }
 
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+
     const response = await fetch(`${normalized}/api/health`, {
       method: "GET",
-      signal: AbortSignal.timeout(5000),
+      signal: controller.signal,
     });
+
+    clearTimeout(timer);
 
     if (!response.ok) {
       return { status: "error", error: "server_unhealthy" };
@@ -105,7 +116,7 @@ export async function validateServerUrl(
     return { status: "success" };
   } catch (err) {
     if (
-      err instanceof DOMException &&
+      err instanceof Error &&
       (err.name === "TimeoutError" || err.name === "AbortError")
     ) {
       return { status: "error", error: "timeout" };

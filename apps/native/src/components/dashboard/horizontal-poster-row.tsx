@@ -1,4 +1,4 @@
-import { FlatList, View } from "react-native";
+import { FlatList } from "react-native";
 
 import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
 
@@ -29,12 +29,9 @@ export function HorizontalPosterRow({
         showsHorizontalScrollIndicator={false}
         data={[1, 2, 3, 4]}
         keyExtractor={(item) => String(item)}
-        renderItem={() => (
-          <View className="mr-3">
-            <PosterCardSkeleton />
-          </View>
-        )}
-        contentContainerStyle={{ paddingHorizontal: 16 }}
+        renderItem={() => <PosterCardSkeleton />}
+        contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
+        style={{ overflow: "visible" }}
       />
     );
   }
@@ -46,21 +43,20 @@ export function HorizontalPosterRow({
       data={items}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <View className="mr-3">
-          <PosterCard
-            id={item.id}
-            tmdbId={item.tmdbId}
-            title={item.title}
-            type={item.type as "movie" | "tv"}
-            posterPath={item.posterPath}
-            releaseDate={item.releaseDate ?? item.firstAirDate}
-            voteAverage={item.voteAverage}
-            userStatus={item.userStatus}
-            episodeProgress={item.episodeProgress}
-          />
-        </View>
+        <PosterCard
+          id={item.id}
+          tmdbId={item.tmdbId}
+          title={item.title}
+          type={item.type as "movie" | "tv"}
+          posterPath={item.posterPath}
+          releaseDate={item.releaseDate ?? item.firstAirDate}
+          voteAverage={item.voteAverage}
+          userStatus={item.userStatus}
+          episodeProgress={item.episodeProgress}
+        />
       )}
-      contentContainerStyle={{ paddingHorizontal: 16 }}
+      contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
+      style={{ overflow: "visible" }}
     />
   );
 }

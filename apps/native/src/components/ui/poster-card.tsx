@@ -9,7 +9,6 @@ import {
   IconStarFilled,
 } from "@tabler/icons-react-native";
 import { useMutation } from "@tanstack/react-query";
-import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
@@ -22,6 +21,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
+import { Image } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";

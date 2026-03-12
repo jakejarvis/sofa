@@ -8,7 +8,6 @@ import {
   IconUsers,
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Image } from "expo-image";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
@@ -26,6 +25,7 @@ import { CastCard } from "@/components/titles/cast-card";
 import { SeasonAccordion } from "@/components/titles/season-accordion";
 import { StatusActionButton } from "@/components/titles/status-action-button";
 import { ExpandableText } from "@/components/ui/expandable-text";
+import { Image } from "@/components/ui/image";
 import { PosterCard } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -464,7 +464,8 @@ export default function TitleDetailScreen() {
             data={cast}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => <CastCard person={item} />}
-            contentContainerStyle={{ paddingHorizontal: 16 }}
+            contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
+            style={{ overflow: "visible" }}
           />
         </Animated.View>
       )}
@@ -485,25 +486,23 @@ export default function TitleDetailScreen() {
               data={recommendations.data.recommendations}
               keyExtractor={(item) => item.id ?? String(item.tmdbId)}
               renderItem={({ item }) => (
-                <View className="mr-3">
-                  <PosterCard
-                    id={item.id}
-                    tmdbId={item.tmdbId}
-                    title={item.title}
-                    type={item.type}
-                    posterPath={item.posterPath}
-                    releaseDate={item.releaseDate ?? item.firstAirDate}
-                    voteAverage={item.voteAverage}
-                    userStatus={
-                      item.id
-                        ? (recommendations.data?.userStatuses?.[item.id] ??
-                          null)
-                        : null
-                    }
-                  />
-                </View>
+                <PosterCard
+                  id={item.id}
+                  tmdbId={item.tmdbId}
+                  title={item.title}
+                  type={item.type}
+                  posterPath={item.posterPath}
+                  releaseDate={item.releaseDate ?? item.firstAirDate}
+                  voteAverage={item.voteAverage}
+                  userStatus={
+                    item.id
+                      ? (recommendations.data?.userStatuses?.[item.id] ?? null)
+                      : null
+                  }
+                />
               )}
-              contentContainerStyle={{ paddingHorizontal: 16 }}
+              contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
+              style={{ overflow: "visible" }}
             />
           </Animated.View>
         )}

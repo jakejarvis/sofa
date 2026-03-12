@@ -12,7 +12,6 @@ import {
   IconUserPlus,
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -33,6 +32,7 @@ import { BackupsSection } from "@/components/settings/backups-section";
 import { IntegrationRow } from "@/components/settings/integration-row";
 import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
+import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
 import { getServerUrl } from "@/lib/server-url";

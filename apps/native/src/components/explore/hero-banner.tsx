@@ -1,6 +1,5 @@
 import { IconStarFilled } from "@tabler/icons-react-native";
 import { useMutation } from "@tanstack/react-query";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
 import { View } from "react-native";
@@ -13,6 +12,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
+import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 
 import { orpc } from "@/utils/orpc";

@@ -16,10 +16,10 @@ import { Button, ButtonLabel } from "@/components/ui/button";
 import { SofaLogo } from "@/components/ui/sofa-logo";
 import { Text } from "@/components/ui/text";
 import {
+  getServerUrl,
   hasStoredServerUrl,
   normalizeUrl,
   setServerUrl,
-  splitUrl,
   type ValidationError,
   validateServerUrl,
 } from "@/lib/server-url";
@@ -48,8 +48,9 @@ export default function ServerUrlScreen() {
   const inputRef = useRef<TextInput>(null);
   const successTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [protocol, setProtocol] = useState("https://");
-  const [host, setHost] = useState("");
+  const [url, setUrl] = useState(() =>
+    hasStoredServerUrl() ? getServerUrl() : "",
+  );
   const [connection, setConnection] = useState<ConnectionState>({
     phase: "idle",
   });
@@ -99,26 +100,17 @@ export default function ServerUrlScreen() {
   }, [isFirstLaunch]);
 
   const handleChangeText = (text: string) => {
-    // If user pastes/types a full URL with protocol, split it
-    if (text.includes("://")) {
-      const { protocol: p, host: h } = splitUrl(text);
-      setProtocol(p);
-      setHost(h.replace(/\/+$/, ""));
-    } else {
-      setHost(text);
-    }
-
-    // Clear error when user starts typing again
+    setUrl(text);
     if (connection.phase === "error") {
       setConnection({ phase: "idle" });
     }
   };
 
   const handleConnect = async () => {
-    const trimmedHost = host.trim().replace(/\/+$/, "");
-    if (!trimmedHost) return;
+    const trimmed = url.trim().replace(/\/+$/, "");
+    if (!trimmed) return;
 
-    const fullUrl = normalizeUrl(`${protocol}${trimmedHost}`);
+    const fullUrl = normalizeUrl(trimmed);
     setConnection({ phase: "connecting" });
 
     const result = await validateServerUrl(fullUrl);
@@ -156,12 +148,12 @@ export default function ServerUrlScreen() {
       {/* Header */}
       <Animated.View
         entering={FadeIn.duration(400)}
-        className="mb-8 items-center"
+        className="mb-6 items-center"
       >
         <Animated.View style={iconAnimatedStyle}>
           <SofaLogo size={48} />
         </Animated.View>
-        <Text className="mt-3 font-display text-[32px] text-foreground">
+        <Text className="mt-1.5 font-display text-[32px] text-foreground">
           Sofa
         </Text>
       </Animated.View>
@@ -178,12 +170,11 @@ export default function ServerUrlScreen() {
           className="h-12 flex-row items-center rounded-[12px] border border-border bg-input px-3.5"
           style={{ borderCurve: "continuous" }}
         >
-          <Text className="text-[15px] text-muted-foreground">{protocol}</Text>
           <TextInput
             ref={inputRef}
-            value={host}
+            value={url}
             onChangeText={handleChangeText}
-            placeholder="sofa.example.com"
+            placeholder="http://192.168.1.100:3000"
             placeholderTextColorClassName="accent-muted-foreground/50"
             keyboardType="url"
             autoCapitalize="none"

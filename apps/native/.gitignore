@@ -29,6 +29,5 @@ google-service-account.json
 expo-env.d.ts
 # @end expo-cli
 
-*.p8
 credentials.json
 credentials/

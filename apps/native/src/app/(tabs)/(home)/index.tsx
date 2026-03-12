@@ -78,7 +78,8 @@ export default function DashboardScreen() {
             renderItem={({ item }) => (
               <StatsCard label={item.label} value={item.value} />
             )}
-            contentContainerStyle={{ paddingHorizontal: 16 }}
+            contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
+            style={{ overflow: "visible" }}
           />
         </Animated.View>
 
@@ -94,7 +95,8 @@ export default function DashboardScreen() {
               data={continueWatching.data?.items ?? []}
               keyExtractor={(item) => item.title.id}
               renderItem={({ item }) => <ContinueWatchingCard item={item} />}
-              contentContainerStyle={{ paddingHorizontal: 16 }}
+              contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
+              style={{ overflow: "visible" }}
             />
           </Animated.View>
         )}
