@@ -110,6 +110,13 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200
         }
+      ],
+      ["expo-system-ui"],
+      [
+        "expo-image-picker",
+        {
+          "microphonePermission": false
+        }
       ]
     ],
     "experiments": {
