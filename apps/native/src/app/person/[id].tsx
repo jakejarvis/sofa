@@ -16,7 +16,7 @@ import { PosterCard } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
-import { orpc } from "@/utils/orpc";
+import { orpc } from "@/lib/orpc";
 
 const FILMOGRAPHY_GAP = 12;
 const FILMOGRAPHY_PADDING = 16;

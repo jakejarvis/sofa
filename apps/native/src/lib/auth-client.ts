@@ -3,9 +3,9 @@ import { adminClient, genericOAuthClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import * as SecureStore from "expo-secure-store";
 
-import { storage } from "@/lib/mmkv";
+import { QUERY_CACHE_KEY, storage } from "@/lib/mmkv";
+import { queryClient } from "@/lib/query-client";
 import { getServerUrl, onServerUrlChange } from "@/lib/server-url";
-import { queryClient } from "@/utils/orpc";
 
 function buildAuthClient() {
   return createAuthClient({
@@ -40,6 +40,6 @@ onServerUrlChange(async () => {
   // old server is discarded. React hooks referencing the old client
   // will re-mount via navigation flow (server URL change → auth
   // screens → fresh mount).
-  storage.clearAll();
+  storage.remove(QUERY_CACHE_KEY);
   queryClient.clear();
 });

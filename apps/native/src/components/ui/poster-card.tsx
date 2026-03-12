@@ -25,8 +25,9 @@ import * as ContextMenu from "zeego/context-menu";
 import { Image } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
-import { client, orpc, queryClient } from "@/utils/orpc";
-import { toast } from "@/utils/toast";
+import { client, orpc } from "@/lib/orpc";
+import { queryClient } from "@/lib/query-client";
+import { toast } from "@/lib/toast";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 

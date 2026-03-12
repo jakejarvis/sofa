@@ -6,7 +6,7 @@ import { GenreChip } from "@/components/explore/genre-chip";
 import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Text } from "@/components/ui/text";
-import { orpc } from "@/utils/orpc";
+import { orpc } from "@/lib/orpc";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 

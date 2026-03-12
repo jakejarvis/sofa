@@ -12,8 +12,9 @@ import Animated, {
 import { useCSSVariable } from "uniwind";
 import { EpisodeRow } from "@/components/titles/episode-row";
 import { Text } from "@/components/ui/text";
-import { orpc, queryClient } from "@/utils/orpc";
-import { toast } from "@/utils/toast";
+import { orpc } from "@/lib/orpc";
+import { queryClient } from "@/lib/query-client";
+import { toast } from "@/lib/toast";
 
 export function SeasonAccordion({
   season,

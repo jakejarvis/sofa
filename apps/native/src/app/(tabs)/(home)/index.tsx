@@ -15,7 +15,8 @@ import { StatsCard } from "@/components/dashboard/stats-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SectionHeader } from "@/components/ui/section-header";
 import { authClient } from "@/lib/auth-client";
-import { orpc, queryClient } from "@/utils/orpc";
+import { orpc } from "@/lib/orpc";
+import { queryClient } from "@/lib/query-client";
 
 export default function DashboardScreen() {
   const { push } = useRouter();

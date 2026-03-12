@@ -9,6 +9,9 @@ const mmkvStorage = {
   removeItem: (key: string) => void storage.remove(key),
 };
 
+export const QUERY_CACHE_KEY = "REACT_QUERY_OFFLINE_CACHE";
+
 export const queryPersister = createAsyncStoragePersister({
   storage: mmkvStorage,
+  key: QUERY_CACHE_KEY,
 });

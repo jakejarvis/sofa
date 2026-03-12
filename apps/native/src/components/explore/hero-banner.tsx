@@ -14,9 +14,8 @@ import Animated, {
 import { useCSSVariable } from "uniwind";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
-
-import { orpc } from "@/utils/orpc";
-import { toast } from "@/utils/toast";
+import { orpc } from "@/lib/orpc";
+import { toast } from "@/lib/toast";
 
 export interface HeroBannerItem {
   tmdbId: number;

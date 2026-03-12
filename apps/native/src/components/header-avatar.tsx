@@ -4,8 +4,8 @@ import * as DropdownMenu from "zeego/dropdown-menu";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
+import { queryClient } from "@/lib/query-client";
 import * as Haptics from "@/utils/haptics";
-import { queryClient } from "@/utils/orpc";
 
 export function HeaderAvatar() {
   const { data: session } = authClient.useSession();

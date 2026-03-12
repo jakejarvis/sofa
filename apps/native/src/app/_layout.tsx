@@ -12,8 +12,8 @@ import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { authClient } from "@/lib/auth-client";
 import { queryPersister } from "@/lib/mmkv";
+import { queryClient } from "@/lib/query-client";
 import { hasStoredServerUrl } from "@/lib/server-url";
-import { queryClient } from "@/utils/orpc";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -49,6 +49,8 @@ function AppContent() {
           animation: "slide_from_right",
         }}
       >
+        <Stack.Screen name="connect" options={{ presentation: "modal" }} />
+
         <Stack.Protected guard={!session}>
           <Stack.Screen name="(auth)" />
         </Stack.Protected>

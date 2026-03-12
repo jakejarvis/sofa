@@ -20,7 +20,7 @@ import { scheduleOnRN } from "react-native-worklets";
 import { useCSSVariable } from "uniwind";
 
 import { Text } from "@/components/ui/text";
-import type { ToastItem } from "@/utils/toast";
+import type { ToastItem } from "@/lib/toast";
 
 const DISMISS_THRESHOLD = 50;
 
@@ -56,15 +56,12 @@ export function ToastView({ toast, onDismiss }: ToastViewProps) {
 
   const pan = Gesture.Pan()
     .onUpdate((e) => {
-      if (e.translationY > 0) {
-        translateY.value = e.translationY;
-      } else {
-        translateY.value = e.translationY * 0.15;
-      }
+      translateY.value = e.translationY;
     })
     .onEnd((e) => {
-      if (e.translationY > DISMISS_THRESHOLD) {
-        translateY.value = withTiming(200, { duration: 200 }, () => {
+      if (Math.abs(e.translationY) > DISMISS_THRESHOLD) {
+        const target = e.translationY > 0 ? 200 : -200;
+        translateY.value = withTiming(target, { duration: 200 }, () => {
           scheduleOnRN(handleDismiss);
         });
       } else {
@@ -74,7 +71,7 @@ export function ToastView({ toast, onDismiss }: ToastViewProps) {
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
-    opacity: interpolate(translateY.value, [0, 100], [1, 0]),
+    opacity: interpolate(Math.abs(translateY.value), [0, 100], [1, 0]),
   }));
 
   return (

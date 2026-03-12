@@ -11,9 +11,10 @@ import {
 } from "@/components/search/search-result-row";
 import { Text } from "@/components/ui/text";
 import { useDebounce } from "@/hooks/use-debounce";
+import { orpc } from "@/lib/orpc";
+import { queryClient } from "@/lib/query-client";
+import { toast } from "@/lib/toast";
 import * as Haptics from "@/utils/haptics";
-import { orpc, queryClient } from "@/utils/orpc";
-import { toast } from "@/utils/toast";
 
 export default function SearchScreen() {
   const { navigate } = useRouter();

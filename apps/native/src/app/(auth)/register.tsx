@@ -16,8 +16,9 @@ import {
   TextField,
 } from "@/components/ui/text-field";
 import { authClient } from "@/lib/auth-client";
+import { orpc } from "@/lib/orpc";
+import { queryClient } from "@/lib/query-client";
 import * as Haptics from "@/utils/haptics";
-import { orpc, queryClient } from "@/utils/orpc";
 
 const signUpSchema = z.object({
   name: z

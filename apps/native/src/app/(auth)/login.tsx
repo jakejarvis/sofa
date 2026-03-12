@@ -16,8 +16,9 @@ import {
   TextField,
 } from "@/components/ui/text-field";
 import { authClient } from "@/lib/auth-client";
+import { orpc } from "@/lib/orpc";
+import { queryClient } from "@/lib/query-client";
 import * as Haptics from "@/utils/haptics";
-import { orpc, queryClient } from "@/utils/orpc";
 
 const signInSchema = z.object({
   email: z
@@ -197,7 +198,7 @@ export default function LoginScreen() {
         entering={FadeIn.duration(300).delay(500)}
         className="mt-4 items-center"
       >
-        <Link href="/(auth)/server-url" asChild>
+        <Link href="/connect" asChild>
           <Pressable>
             <Text className="text-muted-foreground text-xs">Change server</Text>
           </Pressable>

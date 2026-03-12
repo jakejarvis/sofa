@@ -20,8 +20,9 @@ import Animated, {
 import { useCSSVariable } from "uniwind";
 import type { IntegrationConfig } from "@/components/settings/integration-configs";
 import { Text } from "@/components/ui/text";
-import { orpc, queryClient } from "@/utils/orpc";
-import { toast } from "@/utils/toast";
+import { orpc } from "@/lib/orpc";
+import { queryClient } from "@/lib/query-client";
+import { toast } from "@/lib/toast";
 
 interface IntegrationCardProps {
   config: IntegrationConfig;

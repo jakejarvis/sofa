@@ -37,9 +37,10 @@ import { TmdbLogo } from "@/components/tmdb-logo";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
+import { orpc } from "@/lib/orpc";
+import { queryClient } from "@/lib/query-client";
 import { getServerUrl } from "@/lib/server-url";
-import { orpc, queryClient } from "@/utils/orpc";
-import { toast } from "@/utils/toast";
+import { toast } from "@/lib/toast";
 
 export default function SettingsScreen() {
   const { push } = useRouter();
@@ -329,7 +330,7 @@ export default function SettingsScreen() {
             label="Server URL"
             value={serverUrl}
             icon={IconLink}
-            onPress={() => push("/(auth)/server-url")}
+            onPress={() => push("/connect")}
           />
         </SettingsSection>
       </Animated.View>

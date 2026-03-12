@@ -1,8 +1,8 @@
 import { useEffect, useSyncExternalStore } from "react";
 
 import { ToastView } from "@/components/ui/toast";
+import { dismiss, getSnapshot, subscribe } from "@/lib/toast";
 import * as Haptics from "@/utils/haptics";
-import { dismiss, getSnapshot, subscribe } from "@/utils/toast";
 
 const hapticMap = {
   success: () =>

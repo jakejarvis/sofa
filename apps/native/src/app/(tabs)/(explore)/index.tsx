@@ -7,7 +7,8 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
 import { FilterableTitleRow } from "@/components/explore/filterable-title-row";
 import { HeroBanner } from "@/components/explore/hero-banner";
-import { orpc, queryClient } from "@/utils/orpc";
+import { orpc } from "@/lib/orpc";
+import { queryClient } from "@/lib/query-client";
 
 export default function ExploreScreen() {
   const trending = useQuery(

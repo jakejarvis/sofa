@@ -33,8 +33,9 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StarRating } from "@/components/ui/star-rating";
 import { Text } from "@/components/ui/text";
-import { orpc, queryClient } from "@/utils/orpc";
-import { toast } from "@/utils/toast";
+import { orpc } from "@/lib/orpc";
+import { queryClient } from "@/lib/query-client";
+import { toast } from "@/lib/toast";
 
 export default function TitleDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
