@@ -6,7 +6,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
+import { useCallback } from "react";
+import { FlatList, Pressable, useWindowDimensions, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
@@ -32,6 +33,36 @@ export default function PersonDetailScreen() {
 
   const { data, isPending, isError } = useQuery(
     orpc.people.detail.queryOptions({ input: { id } }),
+  );
+
+  const person = data?.person;
+  const filmography = data?.filmography ?? [];
+
+  const renderFilmographyItem = useCallback(
+    ({ item: credit }: { item: (typeof filmography)[number] }) => (
+      <View style={{ width: columnWidth }}>
+        <PosterCard
+          id={credit.titleId}
+          tmdbId={credit.tmdbId}
+          title={credit.title}
+          type={credit.type}
+          posterPath={credit.posterPath}
+          releaseDate={credit.releaseDate ?? credit.firstAirDate}
+          voteAverage={credit.voteAverage}
+          userStatus={data?.userStatuses?.[credit.titleId] ?? null}
+          width={undefined}
+        />
+        {credit.character ? (
+          <Text
+            numberOfLines={1}
+            className="mt-1 text-center text-[11px] text-muted-foreground"
+          >
+            as {credit.character}
+          </Text>
+        ) : null}
+      </View>
+    ),
+    [columnWidth, data?.userStatuses],
   );
 
   if (isPending) {
@@ -88,9 +119,6 @@ export default function PersonDetailScreen() {
     );
   }
 
-  const person = data?.person;
-  const filmography = data?.filmography ?? [];
-
   if (!person) {
     return (
       <View
@@ -110,6 +138,68 @@ export default function PersonDetailScreen() {
     );
   }
 
+  const listHeader = (
+    <>
+      {/* Profile hero */}
+      <Animated.View
+        entering={FadeIn.duration(400)}
+        className="items-center"
+        style={{ paddingTop: insets.top + 56, paddingBottom: 24 }}
+      >
+        <View className="size-[120px] overflow-hidden rounded-full bg-secondary">
+          {person.profilePath && (
+            <Image
+              source={{ uri: person.profilePath }}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="cover"
+            />
+          )}
+        </View>
+
+        <Text
+          selectable
+          className="mt-4 text-center font-display text-[28px] text-foreground"
+        >
+          {person.name}
+        </Text>
+
+        {person.knownForDepartment ? (
+          <View className="mt-2 rounded-full bg-secondary px-3 py-1">
+            <Text className="text-muted-foreground text-xs">
+              {person.knownForDepartment}
+            </Text>
+          </View>
+        ) : null}
+
+        {person.birthday || person.deathday ? (
+          <Text selectable className="mt-2 text-[13px] text-muted-foreground">
+            {person.birthday?.slice(0, 4)}
+            {person.deathday ? ` — ${person.deathday.slice(0, 4)}` : ""}
+          </Text>
+        ) : null}
+      </Animated.View>
+
+      {/* Biography */}
+      {person.biography ? (
+        <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+          <View className="mb-6 px-4">
+            <ExpandableText text={person.biography} maxLines={4} />
+          </View>
+        </Animated.View>
+      ) : null}
+
+      {/* Filmography section header */}
+      {filmography.length > 0 && (
+        <Animated.View
+          entering={FadeInDown.duration(300).delay(200)}
+          className="px-4"
+        >
+          <SectionHeader title="Filmography" icon={IconMovie} />
+        </Animated.View>
+      )}
+    </>
+  );
+
   return (
     <>
       <Stack.Screen
@@ -122,96 +212,25 @@ export default function PersonDetailScreen() {
           headerTitle: "",
         }}
       />
-      <ScrollView
+      <FlatList
+        data={filmography}
+        keyExtractor={(item) => item.titleId}
+        renderItem={renderFilmographyItem}
+        numColumns={2}
+        columnWrapperStyle={{
+          gap: FILMOGRAPHY_GAP,
+          paddingHorizontal: FILMOGRAPHY_PADDING,
+        }}
+        contentContainerStyle={{
+          paddingBottom: insets.bottom + 32,
+          gap: FILMOGRAPHY_GAP,
+        }}
+        ListHeaderComponent={listHeader}
         className="bg-background"
-        contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
-      >
-        {/* Profile hero */}
-        <Animated.View
-          entering={FadeIn.duration(400)}
-          className="items-center"
-          style={{ paddingTop: insets.top + 56, paddingBottom: 24 }}
-        >
-          <View className="size-[120px] overflow-hidden rounded-full bg-secondary">
-            {person.profilePath && (
-              <Image
-                source={{ uri: person.profilePath }}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="cover"
-              />
-            )}
-          </View>
-
-          <Text
-            selectable
-            className="mt-4 text-center font-display text-[28px] text-foreground"
-          >
-            {person.name}
-          </Text>
-
-          {person.knownForDepartment ? (
-            <View className="mt-2 rounded-full bg-secondary px-3 py-1">
-              <Text className="text-muted-foreground text-xs">
-                {person.knownForDepartment}
-              </Text>
-            </View>
-          ) : null}
-
-          {person.birthday || person.deathday ? (
-            <Text selectable className="mt-2 text-[13px] text-muted-foreground">
-              {person.birthday?.slice(0, 4)}
-              {person.deathday ? ` — ${person.deathday.slice(0, 4)}` : ""}
-            </Text>
-          ) : null}
-        </Animated.View>
-
-        {/* Biography */}
-        {person.biography ? (
-          <Animated.View entering={FadeInDown.duration(300).delay(100)}>
-            <View className="mb-6 px-4">
-              <ExpandableText text={person.biography} maxLines={4} />
-            </View>
-          </Animated.View>
-        ) : null}
-
-        {/* Filmography */}
-        {filmography.length > 0 && (
-          <Animated.View
-            entering={FadeInDown.duration(300).delay(200)}
-            className="px-4"
-          >
-            <SectionHeader title="Filmography" icon={IconMovie} />
-            <View
-              className="flex-row flex-wrap"
-              style={{ gap: FILMOGRAPHY_GAP }}
-            >
-              {filmography.map((credit) => (
-                <View key={credit.titleId} style={{ width: columnWidth }}>
-                  <PosterCard
-                    id={credit.titleId}
-                    tmdbId={credit.tmdbId}
-                    title={credit.title}
-                    type={credit.type}
-                    posterPath={credit.posterPath}
-                    releaseDate={credit.releaseDate ?? credit.firstAirDate}
-                    voteAverage={credit.voteAverage}
-                    userStatus={data?.userStatuses?.[credit.titleId] ?? null}
-                    width={undefined}
-                  />
-                  {credit.character ? (
-                    <Text
-                      numberOfLines={1}
-                      className="mt-1 text-center text-[11px] text-muted-foreground"
-                    >
-                      as {credit.character}
-                    </Text>
-                  ) : null}
-                </View>
-              ))}
-            </View>
-          </Animated.View>
-        )}
-      </ScrollView>
+        initialNumToRender={6}
+        maxToRenderPerBatch={8}
+        windowSize={5}
+      />
     </>
   );
 }

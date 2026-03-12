@@ -15,7 +15,7 @@ export function AddIntegrationRow({ existing }: { existing: string[] }) {
     orpc.integrations.create.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.integrations.key() });
       },
     }),
   );

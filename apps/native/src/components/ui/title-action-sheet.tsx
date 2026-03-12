@@ -62,7 +62,8 @@ export function TitleActionSheetProvider({
     orpc.titles.quickAdd.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
         bottomSheetRef.current?.close();
       },
     }),
@@ -72,7 +73,8 @@ export function TitleActionSheetProvider({
     orpc.titles.updateStatus.mutationOptions({
       onSuccess: () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
         bottomSheetRef.current?.close();
       },
     }),
@@ -82,7 +84,8 @@ export function TitleActionSheetProvider({
     orpc.titles.watchMovie.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
         bottomSheetRef.current?.close();
       },
     }),

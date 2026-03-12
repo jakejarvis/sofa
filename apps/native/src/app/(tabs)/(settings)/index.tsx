@@ -63,7 +63,7 @@ export default function SettingsScreen() {
     orpc.account.updateName.mutationOptions({
       onSuccess: () => {
         setIsEditingName(false);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.account.key() });
         refetchSession();
       },
     }),
@@ -73,7 +73,7 @@ export default function SettingsScreen() {
     orpc.account.uploadAvatar.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.account.key() });
         refetchSession();
       },
       onError: () => {
@@ -86,7 +86,7 @@ export default function SettingsScreen() {
     orpc.account.removeAvatar.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.account.key() });
         refetchSession();
       },
     }),
@@ -140,7 +140,9 @@ export default function SettingsScreen() {
     orpc.admin.toggleRegistration.mutationOptions({
       onSuccess: () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({
+          queryKey: orpc.admin.registration.key(),
+        });
       },
     }),
   );
@@ -154,7 +156,9 @@ export default function SettingsScreen() {
     orpc.admin.toggleUpdateCheck.mutationOptions({
       onSuccess: () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({
+          queryKey: orpc.admin.updateCheck.key(),
+        });
       },
     }),
   );

@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -24,17 +25,18 @@ export function CastCard({
     transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.95]) }],
   }));
 
+  const tapGesture = Gesture.Tap()
+    .onBegin(() => {
+      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
+    })
+    .onFinalize(() => {
+      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
+    });
+
   return (
     <Link href={`/person/${person.id}` as `/person/${string}`}>
       <Link.Trigger>
-        <Pressable
-          onPressIn={() =>
-            pressed.set(withSpring(1, { damping: 15, stiffness: 300 }))
-          }
-          onPressOut={() =>
-            pressed.set(withSpring(0, { damping: 15, stiffness: 300 }))
-          }
-        >
+        <GestureDetector gesture={tapGesture}>
           <Animated.View
             className="mr-4 w-20 items-center"
             style={animatedStyle}
@@ -63,7 +65,7 @@ export function CastCard({
               </Text>
             ) : null}
           </Animated.View>
-        </Pressable>
+        </GestureDetector>
       </Link.Trigger>
       <Link.Preview />
     </Link>

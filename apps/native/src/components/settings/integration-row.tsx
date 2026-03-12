@@ -20,7 +20,8 @@ export function IntegrationRow({
 }) {
   const deleteIntegration = useMutation(
     orpc.integrations.delete.mutationOptions({
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: () =>
+        queryClient.invalidateQueries({ queryKey: orpc.integrations.key() }),
     }),
   );
 
@@ -28,7 +29,7 @@ export function IntegrationRow({
     orpc.integrations.regenerateToken.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.integrations.key() });
       },
     }),
   );

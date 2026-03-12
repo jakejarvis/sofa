@@ -228,23 +228,25 @@ export function PosterCard({
     </View>
   );
 
+  // Gesture for UI-thread press animation (used by both paths)
+  const pressGesture = Gesture.Tap()
+    .onBegin(() => {
+      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
+    })
+    .onFinalize(() => {
+      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
+    });
+
   // Cards with id: use Link with native preview and context menu
   if (id) {
     return (
       <Link href={`/title/${id}` as `/title/${string}`}>
         <Link.Trigger>
-          <Pressable
-            onPressIn={() =>
-              pressed.set(withSpring(1, { damping: 15, stiffness: 300 }))
-            }
-            onPressOut={() =>
-              pressed.set(withSpring(0, { damping: 15, stiffness: 300 }))
-            }
-          >
+          <GestureDetector gesture={pressGesture}>
             <Animated.View style={[animatedStyle, { width }]}>
               {cardContent}
             </Animated.View>
-          </Pressable>
+          </GestureDetector>
         </Link.Trigger>
         <Link.Preview />
         <Link.Menu>
@@ -315,7 +317,7 @@ export function PosterCard({
   }
 
   // Cards without id: use GestureDetector for resolve-then-navigate
-  const tapGesture = Gesture.Tap()
+  const resolveTapGesture = Gesture.Tap()
     .onBegin(() => {
       pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
     })
@@ -327,7 +329,7 @@ export function PosterCard({
     });
 
   return (
-    <GestureDetector gesture={tapGesture}>
+    <GestureDetector gesture={resolveTapGesture}>
       <Animated.View style={[animatedStyle, { width }]}>
         {cardContent}
       </Animated.View>

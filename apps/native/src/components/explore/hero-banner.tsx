@@ -3,9 +3,11 @@ import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -48,16 +50,19 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
     });
   }, [item.tmdbId, item.type, resolveMutation]);
 
+  const tapGesture = Gesture.Tap()
+    .onBegin(() => {
+      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
+    })
+    .onFinalize(() => {
+      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
+    })
+    .onEnd(() => {
+      runOnJS(handlePress)();
+    });
+
   return (
-    <Pressable
-      onPress={handlePress}
-      onPressIn={() =>
-        pressed.set(withSpring(1, { damping: 15, stiffness: 300 }))
-      }
-      onPressOut={() =>
-        pressed.set(withSpring(0, { damping: 15, stiffness: 300 }))
-      }
-    >
+    <GestureDetector gesture={tapGesture}>
       <Animated.View
         className="mx-4 overflow-hidden rounded-2xl"
         style={[
@@ -104,6 +109,6 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
           </View>
         </View>
       </Animated.View>
-    </Pressable>
+    </GestureDetector>
   );
 }

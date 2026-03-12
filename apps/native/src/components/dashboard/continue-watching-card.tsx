@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -30,17 +31,18 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
     transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.97]) }],
   }));
 
+  const tapGesture = Gesture.Tap()
+    .onBegin(() => {
+      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
+    })
+    .onFinalize(() => {
+      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
+    });
+
   return (
     <Link href={`/title/${item.title.id}` as `/title/${string}`}>
       <Link.Trigger>
-        <Pressable
-          onPressIn={() =>
-            pressed.set(withSpring(1, { damping: 15, stiffness: 300 }))
-          }
-          onPressOut={() =>
-            pressed.set(withSpring(0, { damping: 15, stiffness: 300 }))
-          }
-        >
+        <GestureDetector gesture={tapGesture}>
           <Animated.View
             className="mr-3 w-[200px] overflow-hidden rounded-[12px] border bg-card"
             style={[
@@ -90,7 +92,7 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
               )}
             </View>
           </Animated.View>
-        </Pressable>
+        </GestureDetector>
       </Link.Trigger>
       <Link.Preview />
     </Link>

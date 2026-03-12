@@ -1,7 +1,7 @@
 import { IconChevronDown } from "@tabler/icons-react-native";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { Pressable, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { InteractionManager, Pressable, View } from "react-native";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -43,6 +43,24 @@ export function SeasonAccordion({
     watchedEpisodeIds.has(e.id),
   ).length;
   const progress = episodes.length > 0 ? watchedCount / episodes.length : 0;
+
+  // Progressive rendering: show first batch immediately, defer rest
+  const INITIAL_BATCH = 10;
+  const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH);
+
+  useEffect(() => {
+    if (expanded) {
+      setVisibleCount(INITIAL_BATCH);
+      if (episodes.length > INITIAL_BATCH) {
+        const task = InteractionManager.runAfterInteractions(() => {
+          setVisibleCount(episodes.length);
+        });
+        return () => task.cancel();
+      }
+    }
+  }, [expanded, episodes.length]);
+
+  const toggleExpanded = useCallback(() => setExpanded((v) => !v), []);
 
   useEffect(() => {
     chevronRotation.set(withTiming(expanded ? 180 : 0, { duration: 200 }));
@@ -90,7 +108,7 @@ export function SeasonAccordion({
       }}
     >
       <Pressable
-        onPress={() => setExpanded(!expanded)}
+        onPress={toggleExpanded}
         className="flex-row items-center justify-between p-4"
       >
         <View className="flex-1">
@@ -136,7 +154,7 @@ export function SeasonAccordion({
             </Pressable>
           )}
 
-          {episodes.map((episode) => (
+          {episodes.slice(0, visibleCount).map((episode) => (
             <EpisodeRow
               key={episode.id}
               episode={episode}

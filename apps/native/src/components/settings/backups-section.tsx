@@ -20,7 +20,7 @@ export function BackupsSection() {
     orpc.admin.backups.create.mutationOptions({
       onSuccess: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: orpc.admin.backups.key() });
       },
       onError: () => Alert.alert("Error", "Failed to create backup"),
     }),
@@ -28,7 +28,8 @@ export function BackupsSection() {
 
   const deleteBackup = useMutation(
     orpc.admin.backups.delete.mutationOptions({
-      onSuccess: () => queryClient.invalidateQueries(),
+      onSuccess: () =>
+        queryClient.invalidateQueries({ queryKey: orpc.admin.backups.key() }),
     }),
   );
 
