@@ -198,7 +198,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                 color={primaryColor}
                 className="mt-px"
               />
-              <Text className="flex-1 text-[12px] text-foreground/80 leading-[18px]">
+              <Text className="flex-1 text-[12px] text-foreground/80">
                 {config.requirementNote}
               </Text>
             </View>
@@ -211,9 +211,9 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                 connectMutation.mutate({ provider: providerInput })
               }
               disabled={connectMutation.isPending}
-              className="items-center rounded-lg bg-primary py-3 active:opacity-80"
+              className="items-center rounded-lg bg-primary py-2.5 active:opacity-80"
             >
-              <Text className="font-sans-medium text-[15px] text-primary-foreground">
+              <Text className="font-sans-medium text-primary-foreground">
                 {connectMutation.isPending ? "Connecting…" : `Connect ${label}`}
               </Text>
             </Pressable>

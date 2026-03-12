@@ -72,7 +72,7 @@ export function HeaderAvatar() {
             ios={{ name: "rectangle.portrait.and.arrow.right" }}
             androidIconName="ic_menu_close_clear_cancel"
           />
-          <DropdownMenu.ItemTitle>Sign Out</DropdownMenu.ItemTitle>
+          <DropdownMenu.ItemTitle>Sign out</DropdownMenu.ItemTitle>
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu.Root>

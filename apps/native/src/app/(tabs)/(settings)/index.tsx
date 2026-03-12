@@ -25,7 +25,6 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
-  Switch,
   TextInput,
   View,
 } from "react-native";
@@ -37,6 +36,7 @@ import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { Image } from "@/components/ui/image";
+import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/lib/orpc";
@@ -318,7 +318,7 @@ export default function SettingsScreen() {
           </View>
 
           <SettingsRow
-            label="Sign Out"
+            label="Sign out"
             icon={IconLogout}
             onPress={handleSignOut}
             destructive
@@ -408,37 +408,23 @@ export default function SettingsScreen() {
         <Animated.View entering={FadeInDown.duration(300).delay(500)}>
           <SettingsSection title="Security" icon={IconShield} badge="Admin">
             <SettingsRow
-              label="Registration"
+              label="Open registration"
               icon={IconUserPlus}
               right={
                 <Switch
                   value={registration.data?.open ?? false}
                   onValueChange={(open) => toggleRegistration.mutate({ open })}
-                  trackColorOffClassName="accent-secondary"
-                  trackColorOnClassName="accent-primary/50"
-                  thumbColorClassName={
-                    registration.data?.open
-                      ? "accent-primary"
-                      : "accent-muted-foreground"
-                  }
                 />
               }
             />
             <SettingsRow
-              label="Update Checks"
+              label="Check for updates"
               icon={IconCloud}
               right={
                 <Switch
                   value={updateCheck.data?.enabled ?? false}
                   onValueChange={(enabled) =>
                     toggleUpdateCheck.mutate({ enabled })
-                  }
-                  trackColorOffClassName="accent-secondary"
-                  trackColorOnClassName="accent-primary/50"
-                  thumbColorClassName={
-                    updateCheck.data?.enabled
-                      ? "accent-primary"
-                      : "accent-muted-foreground"
                   }
                 />
               }
