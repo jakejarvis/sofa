@@ -66,6 +66,21 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
                 />
               )}
               <View
+                className="absolute inset-0"
+                style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+              />
+              {item.nextEpisode && (
+                <View className="absolute right-2.5 bottom-3 left-2.5">
+                  <Text
+                    numberOfLines={1}
+                    className="font-sans-medium text-[11px] text-white/60"
+                  >
+                    S{item.nextEpisode.seasonNumber} E
+                    {item.nextEpisode.episodeNumber}
+                  </Text>
+                </View>
+              )}
+              <View
                 className="absolute right-0 bottom-0 left-0 h-[3px]"
                 style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
               >
@@ -89,9 +104,7 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
                   numberOfLines={1}
                   className="mt-0.5 text-[11px] text-muted-foreground"
                 >
-                  S{item.nextEpisode.seasonNumber}E
-                  {item.nextEpisode.episodeNumber}
-                  {item.nextEpisode.name ? ` · ${item.nextEpisode.name}` : ""}
+                  {item.nextEpisode.name}
                 </Text>
               )}
             </View>

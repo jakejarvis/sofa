@@ -22,6 +22,7 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
 import { CastCard } from "@/components/titles/cast-card";
+import { ContinueWatchingBanner } from "@/components/titles/continue-watching-banner";
 import { SeasonAccordion } from "@/components/titles/season-accordion";
 import { StatusActionButton } from "@/components/titles/status-action-button";
 import { ExpandableText } from "@/components/ui/expandable-text";
@@ -441,6 +442,16 @@ export default function TitleDetailScreen() {
             ))}
           </ScrollView>
         </Animated.View>
+      )}
+
+      {/* Continue Watching */}
+      {title.type === "tv" && (
+        <ContinueWatchingBanner
+          seasons={seasons}
+          watchedEpisodeIds={watchedEpisodeIds}
+          userStatus={userInfo.data?.status ?? null}
+          backdropPath={title.backdropPath}
+        />
       )}
 
       {/* Seasons & Episodes */}
