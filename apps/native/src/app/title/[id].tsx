@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -261,6 +262,24 @@ export default function TitleDetailScreen() {
           className="absolute inset-0"
           style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
         />
+
+        {title.trailerVideoKey && (
+          <Pressable
+            onPress={() =>
+              WebBrowser.openBrowserAsync(
+                `https://www.youtube.com/watch?v=${title.trailerVideoKey}`,
+              )
+            }
+            className="absolute inset-0 items-center justify-center"
+          >
+            <View
+              className="h-14 w-14 items-center justify-center rounded-full"
+              style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+            >
+              <IconPlayerPlay size={28} color="white" fill="white" />
+            </View>
+          </Pressable>
+        )}
 
         <View className="absolute right-0 bottom-0 left-0 flex-row items-end p-4">
           {title.posterPath && (
