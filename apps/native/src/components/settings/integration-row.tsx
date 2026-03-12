@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { Alert } from "react-native";
 
 import { SettingsRow } from "@/components/settings/settings-row";
-import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
+import { toast } from "@/utils/toast";
 
 type Provider = "plex" | "jellyfin" | "emby" | "sonarr" | "radarr";
 
@@ -18,19 +18,27 @@ export function IntegrationRow({
     lastEventAt: string | null;
   };
 }) {
+  const label =
+    integration.provider.charAt(0).toUpperCase() +
+    integration.provider.slice(1);
+
   const deleteIntegration = useMutation(
     orpc.integrations.delete.mutationOptions({
-      onSuccess: () =>
-        queryClient.invalidateQueries({ queryKey: orpc.integrations.key() }),
+      onSuccess: () => {
+        toast.success(`${label} disconnected`);
+        queryClient.invalidateQueries({ queryKey: orpc.integrations.key() });
+      },
+      onError: () => toast.error(`Failed to disconnect ${label}`),
     }),
   );
 
   const regenerateToken = useMutation(
     orpc.integrations.regenerateToken.mutationOptions({
       onSuccess: () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success(`${label} URL regenerated`);
         queryClient.invalidateQueries({ queryKey: orpc.integrations.key() });
       },
+      onError: () => toast.error(`Failed to regenerate ${label} URL`),
     }),
   );
 

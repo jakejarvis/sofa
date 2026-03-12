@@ -4,8 +4,8 @@ import { ActivityIndicator, Alert, View } from "react-native";
 
 import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
-import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
+import { toast } from "@/utils/toast";
 
 function formatSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -19,17 +19,20 @@ export function BackupsSection() {
   const createBackup = useMutation(
     orpc.admin.backups.create.mutationOptions({
       onSuccess: () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success("Backup created");
         queryClient.invalidateQueries({ queryKey: orpc.admin.backups.key() });
       },
-      onError: () => Alert.alert("Error", "Failed to create backup"),
+      onError: () => toast.error("Failed to create backup"),
     }),
   );
 
   const deleteBackup = useMutation(
     orpc.admin.backups.delete.mutationOptions({
-      onSuccess: () =>
-        queryClient.invalidateQueries({ queryKey: orpc.admin.backups.key() }),
+      onSuccess: () => {
+        toast.success("Backup deleted");
+        queryClient.invalidateQueries({ queryKey: orpc.admin.backups.key() });
+      },
+      onError: () => toast.error("Failed to delete backup"),
     }),
   );
 

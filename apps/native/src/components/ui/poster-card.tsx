@@ -24,8 +24,8 @@ import { useCSSVariable } from "uniwind";
 import { Image } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
-import * as Haptics from "@/utils/haptics";
 import { client, orpc, queryClient } from "@/utils/orpc";
+import { toast } from "@/utils/toast";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
@@ -82,6 +82,7 @@ export function PosterCard({
           navigate(`/title/${resolvedId}`);
         }
       },
+      onError: () => toast.error("Failed to load title"),
     }),
   );
 
@@ -89,10 +90,11 @@ export function PosterCard({
     orpc.titles.quickAdd.mutationOptions({
       onSuccess: () => {
         setLocalStatus("watchlist");
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success("Added to watchlist");
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
+      onError: () => toast.error("Failed to add to watchlist"),
     }),
   );
 
@@ -266,7 +268,7 @@ export function PosterCard({
                   id,
                   status: "in_progress",
                 });
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                toast.success("Added to watchlist");
                 queryClient.invalidateQueries({
                   queryKey: orpc.titles.key(),
                 });
@@ -282,8 +284,8 @@ export function PosterCard({
               icon="checkmark.circle"
               onPress={async () => {
                 await client.titles.watchMovie({ id });
-                Haptics.notificationAsync(
-                  Haptics.NotificationFeedbackType.Success,
+                toast.success(
+                  title ? `Marked "${title}" as watched` : "Marked as watched",
                 );
                 queryClient.invalidateQueries({
                   queryKey: orpc.titles.key(),
@@ -302,6 +304,7 @@ export function PosterCard({
               onPress={async () => {
                 await client.titles.updateStatus({ id, status: null });
                 setLocalStatus(null);
+                toast.success("Removed from library");
                 queryClient.invalidateQueries({
                   queryKey: orpc.titles.key(),
                 });

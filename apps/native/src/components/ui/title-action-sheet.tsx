@@ -23,6 +23,7 @@ import { useCSSVariable } from "uniwind";
 import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
+import { toast } from "@/utils/toast";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
@@ -61,33 +62,40 @@ export function TitleActionSheetProvider({
   const quickAdd = useMutation(
     orpc.titles.quickAdd.mutationOptions({
       onSuccess: () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success("Added to watchlist");
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
         bottomSheetRef.current?.close();
       },
+      onError: () => toast.error("Failed to add to watchlist"),
     }),
   );
 
   const updateStatus = useMutation(
     orpc.titles.updateStatus.mutationOptions({
-      onSuccess: () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      onSuccess: (_data, { status }) => {
+        toast.success(status ? "Added to watchlist" : "Removed from library");
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
         bottomSheetRef.current?.close();
       },
+      onError: () => toast.error("Failed to update status"),
     }),
   );
 
   const watchMovie = useMutation(
     orpc.titles.watchMovie.mutationOptions({
       onSuccess: () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success(
+          target?.title
+            ? `Marked "${target.title}" as watched`
+            : "Marked as watched",
+        );
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
         bottomSheetRef.current?.close();
       },
+      onError: () => toast.error("Failed to mark as watched"),
     }),
   );
 

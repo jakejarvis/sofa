@@ -39,8 +39,8 @@ import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
 import { getServerUrl } from "@/lib/server-url";
-import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
+import { toast } from "@/utils/toast";
 
 export default function SettingsScreen() {
   const { push } = useRouter();
@@ -65,33 +65,34 @@ export default function SettingsScreen() {
   const updateName = useMutation(
     orpc.account.updateName.mutationOptions({
       onSuccess: () => {
+        toast.success("Name updated");
         setIsEditingName(false);
         queryClient.invalidateQueries({ queryKey: orpc.account.key() });
         refetchSession();
       },
+      onError: () => toast.error("Failed to update name"),
     }),
   );
 
   const uploadAvatar = useMutation(
     orpc.account.uploadAvatar.mutationOptions({
       onSuccess: () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success("Profile picture updated");
         queryClient.invalidateQueries({ queryKey: orpc.account.key() });
         refetchSession();
       },
-      onError: () => {
-        Alert.alert("Error", "Failed to upload avatar");
-      },
+      onError: () => toast.error("Failed to upload avatar"),
     }),
   );
 
   const removeAvatar = useMutation(
     orpc.account.removeAvatar.mutationOptions({
       onSuccess: () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success("Profile picture removed");
         queryClient.invalidateQueries({ queryKey: orpc.account.key() });
         refetchSession();
       },
+      onError: () => toast.error("Failed to remove profile picture"),
     }),
   );
 
@@ -141,12 +142,13 @@ export default function SettingsScreen() {
 
   const toggleRegistration = useMutation(
     orpc.admin.toggleRegistration.mutationOptions({
-      onSuccess: () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onSuccess: (_data, { open }) => {
+        toast.success(open ? "Registration opened" : "Registration closed");
         queryClient.invalidateQueries({
           queryKey: orpc.admin.registration.key(),
         });
       },
+      onError: () => toast.error("Failed to update registration setting"),
     }),
   );
 
@@ -157,12 +159,15 @@ export default function SettingsScreen() {
 
   const toggleUpdateCheck = useMutation(
     orpc.admin.toggleUpdateCheck.mutationOptions({
-      onSuccess: () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onSuccess: (_data, { enabled }) => {
+        toast.success(
+          enabled ? "Update checks enabled" : "Update checks disabled",
+        );
         queryClient.invalidateQueries({
           queryKey: orpc.admin.updateCheck.key(),
         });
       },
+      onError: () => toast.error("Failed to update setting"),
     }),
   );
 

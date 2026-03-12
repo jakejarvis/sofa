@@ -9,7 +9,7 @@ import {
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -31,8 +31,8 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StarRating } from "@/components/ui/star-rating";
 import { Text } from "@/components/ui/text";
-import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
+import { toast } from "@/utils/toast";
 
 export default function TitleDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -55,48 +55,63 @@ export default function TitleDetailScreen() {
 
   const updateStatus = useMutation(
     orpc.titles.updateStatus.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (_data, { status }) => {
+        toast.success(status ? "Added to watchlist" : "Removed from library");
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
+      onError: () => toast.error("Failed to update status"),
     }),
   );
 
   const updateRating = useMutation(
     orpc.titles.updateRating.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (_data, { stars }) => {
+        toast.success(
+          stars > 0
+            ? `Rated ${stars} star${stars > 1 ? "s" : ""}`
+            : "Rating removed",
+        );
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
       },
+      onError: () => toast.error("Failed to update rating"),
     }),
   );
 
   const watchMovie = useMutation(
     orpc.titles.watchMovie.mutationOptions({
       onSuccess: () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success(
+          title?.title
+            ? `Marked "${title.title}" as watched`
+            : "Marked as watched",
+        );
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
+      onError: () => toast.error("Failed to mark as watched"),
     }),
   );
 
   const watchAll = useMutation(
     orpc.titles.watchAll.mutationOptions({
       onSuccess: () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success("Marked all episodes as watched");
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
+      onError: () => toast.error("Failed to mark all episodes as watched"),
     }),
   );
 
   const quickAddMutation = useMutation(
     orpc.titles.quickAdd.mutationOptions({
       onSuccess: () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success("Added to watchlist");
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
+      onError: () => toast.error("Failed to add to watchlist"),
     }),
   );
 
@@ -108,8 +123,11 @@ export default function TitleDetailScreen() {
     }),
   );
 
-  const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+    setRefreshing(false);
   }, []);
 
   const title = detail.data?.title;
@@ -208,7 +226,7 @@ export default function TitleDetailScreen() {
       contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       refreshControl={
         <RefreshControl
-          refreshing={detail.isRefetching}
+          refreshing={refreshing}
           onRefresh={onRefresh}
           tintColorClassName="accent-primary"
         />

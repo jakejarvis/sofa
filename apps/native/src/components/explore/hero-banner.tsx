@@ -16,6 +16,7 @@ import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 
 import { orpc } from "@/utils/orpc";
+import { toast } from "@/utils/toast";
 
 export interface HeroBannerItem {
   tmdbId: number;
@@ -40,6 +41,7 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
       onSuccess: ({ id }) => {
         navigate(`/title/${id}`);
       },
+      onError: () => toast.error("Failed to load title"),
     }),
   );
 

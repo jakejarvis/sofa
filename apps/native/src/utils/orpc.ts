@@ -7,11 +7,14 @@ import { QueryCache, QueryClient } from "@tanstack/react-query";
 
 import { authClient } from "@/lib/auth-client";
 import { getServerUrl } from "@/lib/server-url";
+import { toast } from "@/utils/toast";
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error) => {
-      console.error("[QueryCache]", error.message);
+      toast.error("Something went wrong\u2026", {
+        description: error.message,
+      });
     },
   }),
 });

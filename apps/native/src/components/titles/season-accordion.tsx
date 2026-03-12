@@ -12,8 +12,8 @@ import Animated, {
 import { useCSSVariable } from "uniwind";
 import { EpisodeRow } from "@/components/titles/episode-row";
 import { Text } from "@/components/ui/text";
-import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
+import { toast } from "@/utils/toast";
 
 export function SeasonAccordion({
   season,
@@ -72,30 +72,46 @@ export function SeasonAccordion({
 
   const watchEpisode = useMutation(
     orpc.episodes.watch.mutationOptions({
-      onSuccess: () => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onSuccess: (_data, { id: epId }) => {
+        const ep = episodes.find((e) => e.id === epId);
+        toast.success(
+          ep
+            ? `Watched S${season.seasonNumber} E${ep.episodeNumber}`
+            : "Episode watched",
+        );
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
+      onError: () => toast.error("Failed to mark episode"),
     }),
   );
 
   const unwatchEpisode = useMutation(
     orpc.episodes.unwatch.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (_data, { id: epId }) => {
+        const ep = episodes.find((e) => e.id === epId);
+        toast.success(
+          ep
+            ? `Unwatched S${season.seasonNumber} E${ep.episodeNumber}`
+            : "Episode unwatched",
+        );
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
+      onError: () => toast.error("Failed to unmark episode"),
     }),
   );
 
   const watchSeason = useMutation(
     orpc.seasons.watch.mutationOptions({
       onSuccess: () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success(
+          `Watched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
+        );
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
+      onError: () => toast.error("Failed to mark some episodes"),
     }),
   );
 

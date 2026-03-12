@@ -13,6 +13,7 @@ import { Text } from "@/components/ui/text";
 import { useDebounce } from "@/hooks/use-debounce";
 import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
+import { toast } from "@/utils/toast";
 
 export default function SearchScreen() {
   const { navigate } = useRouter();
@@ -35,7 +36,10 @@ export default function SearchScreen() {
         setResolvingId(null);
         if (id) navigate(`/title/${id}`);
       },
-      onError: () => setResolvingId(null),
+      onError: () => {
+        setResolvingId(null);
+        toast.error("Failed to load title");
+      },
     }),
   );
 
@@ -45,7 +49,10 @@ export default function SearchScreen() {
         setResolvingId(null);
         if (id) navigate(`/person/${id}`);
       },
-      onError: () => setResolvingId(null),
+      onError: () => {
+        setResolvingId(null);
+        toast.error("Failed to load person");
+      },
     }),
   );
 
@@ -53,11 +60,14 @@ export default function SearchScreen() {
     orpc.titles.quickAdd.mutationOptions({
       onSuccess: () => {
         setAddingId(null);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        toast.success("Added to watchlist");
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },
-      onError: () => setAddingId(null),
+      onError: () => {
+        setAddingId(null);
+        toast.error("Failed to add to watchlist");
+      },
     }),
   );
 
