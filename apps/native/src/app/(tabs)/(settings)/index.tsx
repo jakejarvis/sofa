@@ -1,9 +1,10 @@
 import {
+  IconArrowUpRight,
   IconCamera,
   IconCloud,
   IconDatabase,
   IconDeviceMobileCog,
-  IconExternalLink,
+  IconDots,
   IconLink,
   IconLogout,
   IconPhoto,
@@ -11,6 +12,7 @@ import {
   IconShield,
   IconUser,
   IconUserPlus,
+  IconWorld,
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
@@ -152,6 +154,7 @@ export default function SettingsScreen() {
   );
 
   const primaryFgColor = useCSSVariable("--color-primary-foreground") as string;
+  const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(async () => {
@@ -325,7 +328,7 @@ export default function SettingsScreen() {
 
       {/* Server */}
       <Animated.View entering={FadeInDown.duration(300).delay(200)}>
-        <SettingsSection title="App Settings" icon={IconDeviceMobileCog}>
+        <SettingsSection title="Application" icon={IconDeviceMobileCog}>
           <SettingsRow
             label="Server URL"
             value={serverUrl}
@@ -453,17 +456,24 @@ export default function SettingsScreen() {
 
       {/* More Settings */}
       <Animated.View entering={FadeInDown.duration(300).delay(400)}>
-        <SettingsRow
-          label="More Settings"
-          icon={IconExternalLink}
-          onPress={() => Linking.openURL(`${serverUrl}/settings`)}
-        />
+        <SettingsSection title="More Settings" icon={IconDots}>
+          <Pressable
+            onPress={() => Linking.openURL(`${serverUrl}/settings`)}
+            className="flex-row items-center justify-center py-3.5 active:opacity-70"
+          >
+            <IconWorld size={18} color={mutedFgColor} />
+            <Text className="ml-2 flex-1 text-[15px] text-foreground">
+              Open in browser…
+            </Text>
+            <IconArrowUpRight size={16} color={mutedFgColor} />
+          </Pressable>
+        </SettingsSection>
       </Animated.View>
 
       {/* Version */}
       <Animated.View
         entering={FadeInDown.duration(300).delay(400)}
-        className="mt-4 items-center"
+        className="mt-6 items-center"
       >
         <Text className="text-muted-foreground text-xs">
           Sofa Mobile
