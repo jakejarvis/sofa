@@ -116,7 +116,7 @@ export const create = os.integrations.create
     return serializeIntegration(row);
   });
 
-export const deleteProcedure = os.integrations.delete
+export const deleteIntegration = os.integrations.delete
   .use(authed)
   .handler(({ input, context }) => {
     db.delete(integrations)

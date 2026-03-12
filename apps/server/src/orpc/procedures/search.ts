@@ -13,7 +13,7 @@ import { authed } from "../middleware";
 export const search = os.search.use(authed).handler(async ({ input }) => {
   if (!isTmdbConfigured()) {
     throw new ORPCError("PRECONDITION_FAILED", {
-      message: "TMDB API key is not configured.",
+      message: "TMDB API key is not configured",
     });
   }
 
@@ -32,15 +32,16 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
         title: r.name ?? "",
         posterPath: null,
         profilePath: tmdbImageUrl(r.profile_path ?? null, "profiles"),
-        overview: "",
+        overview: null,
         releaseDate: null,
-        popularity: r.popularity,
-        voteAverage: 0,
-        knownForDepartment: r.known_for_department,
-        knownFor: r.known_for
-          ?.slice(0, 3)
-          .map((k) => k.title ?? (k as { name?: string }).name)
-          .filter(Boolean) as string[] | undefined,
+        popularity: r.popularity ?? null,
+        voteAverage: null,
+        knownForDepartment: r.known_for_department ?? null,
+        knownFor:
+          (r.known_for
+            ?.slice(0, 3)
+            .map((k) => k.title ?? (k as { name?: string }).name)
+            .filter((s): s is string => !!s) as string[]) ?? null,
       })),
     };
   }
@@ -75,10 +76,12 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
           title: r.name ?? "Unknown",
           posterPath: null,
           profilePath: tmdbImageUrl(r.profile_path ?? null, "profiles"),
-          overview: "",
+          overview: null,
           releaseDate: null,
-          popularity: r.popularity ?? 0,
-          voteAverage: 0,
+          popularity: r.popularity ?? null,
+          voteAverage: null,
+          knownForDepartment: null,
+          knownFor: null,
         };
       }
 
@@ -90,11 +93,14 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
         tmdbId: r.id,
         type: mediaType,
         title: r.title ?? r.name ?? "",
-        overview: r.overview ?? "",
+        overview: r.overview ?? null,
         releaseDate: r.release_date ?? r.first_air_date ?? null,
         posterPath: tmdbImageUrl(r.poster_path ?? null, "posters"),
-        popularity: r.popularity ?? 0,
-        voteAverage: r.vote_average ?? 0,
+        profilePath: null,
+        popularity: r.popularity ?? null,
+        voteAverage: r.vote_average ?? null,
+        knownForDepartment: null,
+        knownFor: null,
       };
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);

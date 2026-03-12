@@ -1,17 +1,12 @@
 import { getSystemHealth } from "@sofa/core/system-health";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { os } from "../context";
-import { authed } from "../middleware";
+import { admin, authed } from "../middleware";
 
-export const systemStatus = os.systemStatus
-  .use(authed)
-  .handler(async ({ context }) => {
-    const tmdbConfigured = isTmdbConfigured();
+export const status = os.system.status.use(authed).handler(() => {
+  return { tmdbConfigured: isTmdbConfigured() };
+});
 
-    if (context.user.role === "admin") {
-      const health = await getSystemHealth();
-      return { tmdbConfigured, health };
-    }
-
-    return { tmdbConfigured };
-  });
+export const health = os.system.health.use(admin).handler(async () => {
+  return await getSystemHealth();
+});

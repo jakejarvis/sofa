@@ -14,11 +14,11 @@ import {
   DiscoverOutput,
   FilenameParam,
   GenresOutput,
+  HydrateSeasonsInput,
   HydrateSeasonsOutput,
   IdParam,
   IntegrationOutput,
   IntegrationsListOutput,
-  IntegrationTokenOutput,
   LibraryOutput,
   MediaTypeParam,
   PersonDetailOutput,
@@ -31,12 +31,12 @@ import {
   RestoreBackupInput,
   SearchInput,
   SearchOutput,
-  StatsInput,
-  StatsOutput,
+  SystemHealthOutput,
   SystemStatusOutput,
   TitleDetailOutput,
   TitleRecommendationsOutput,
   TitleResolveOutput,
+  TmdbIdParam,
   TmdbIdTypeParam,
   ToggleRegistrationInput,
   ToggleUpdateCheckInput,
@@ -52,6 +52,8 @@ import {
   UploadAvatarInput,
   UploadAvatarOutput,
   UserInfoOutput,
+  WatchHistoryInput,
+  WatchHistoryOutput,
 } from "./schemas";
 
 export const contract = {
@@ -65,15 +67,27 @@ export const contract = {
       .input(TmdbIdTypeParam)
       .output(TitleResolveOutput),
     updateStatus: oc
-      .route({ method: "PUT", path: "/titles/{id}/status", tags: ["Titles"] })
+      .route({
+        method: "PUT",
+        path: "/titles/{id}/status",
+        tags: ["Titles"],
+      })
       .input(UpdateStatusInput)
       .output(z.void()),
     updateRating: oc
-      .route({ method: "PUT", path: "/titles/{id}/rating", tags: ["Titles"] })
+      .route({
+        method: "PUT",
+        path: "/titles/{id}/rating",
+        tags: ["Titles"],
+      })
       .input(UpdateRatingInput)
       .output(z.void()),
     watchMovie: oc
-      .route({ method: "POST", path: "/titles/{id}/watch", tags: ["Titles"] })
+      .route({
+        method: "POST",
+        path: "/titles/{id}/watch",
+        tags: ["Titles"],
+      })
       .input(IdParam)
       .output(z.void()),
     watchAll: oc
@@ -106,8 +120,16 @@ export const contract = {
         path: "/titles/{id}/hydrate-seasons",
         tags: ["Titles"],
       })
-      .input(z.object({ id: z.string(), tmdbId: z.number().int() }))
+      .input(HydrateSeasonsInput)
       .output(HydrateSeasonsOutput),
+    quickAdd: oc
+      .route({
+        method: "POST",
+        path: "/titles/quick-add",
+        tags: ["Titles"],
+      })
+      .input(TmdbIdTypeParam)
+      .output(QuickAddOutput),
   },
   episodes: {
     watch: oc
@@ -160,12 +182,16 @@ export const contract = {
       .output(PersonDetailOutput),
     resolve: oc
       .route({ method: "POST", path: "/people/resolve", tags: ["People"] })
-      .input(z.object({ tmdbId: z.number().int() }))
+      .input(TmdbIdParam)
       .output(PersonResolveOutput),
   },
   dashboard: {
     stats: oc
-      .route({ method: "GET", path: "/dashboard/stats", tags: ["Dashboard"] })
+      .route({
+        method: "GET",
+        path: "/dashboard/stats",
+        tags: ["Dashboard"],
+      })
       .output(DashboardStatsOutput),
     continueWatching: oc
       .route({
@@ -188,18 +214,38 @@ export const contract = {
         tags: ["Dashboard"],
       })
       .output(DashboardRecommendationsOutput),
+    watchHistory: oc
+      .route({
+        method: "GET",
+        path: "/dashboard/watch-history",
+        tags: ["Dashboard"],
+      })
+      .input(WatchHistoryInput)
+      .output(WatchHistoryOutput),
   },
   explore: {
     trending: oc
-      .route({ method: "GET", path: "/explore/trending", tags: ["Explore"] })
+      .route({
+        method: "GET",
+        path: "/explore/trending",
+        tags: ["Explore"],
+      })
       .input(TrendingTypeParam)
       .output(TrendingOutput),
     popular: oc
-      .route({ method: "GET", path: "/explore/popular", tags: ["Explore"] })
+      .route({
+        method: "GET",
+        path: "/explore/popular",
+        tags: ["Explore"],
+      })
       .input(MediaTypeParam)
       .output(PopularOutput),
     genres: oc
-      .route({ method: "GET", path: "/explore/genres", tags: ["Explore"] })
+      .route({
+        method: "GET",
+        path: "/explore/genres",
+        tags: ["Explore"],
+      })
       .input(MediaTypeParam)
       .output(GenresOutput),
   },
@@ -211,27 +257,42 @@ export const contract = {
     .route({ method: "GET", path: "/discover", tags: ["Discover"] })
     .input(DiscoverInput)
     .output(DiscoverOutput),
-  stats: oc
-    .route({ method: "GET", path: "/stats", tags: ["Stats"] })
-    .input(StatsInput)
-    .output(StatsOutput),
-  systemStatus: oc
-    .route({ method: "GET", path: "/system-status", tags: ["System"] })
-    .output(SystemStatusOutput),
   system: {
     publicInfo: oc
-      .route({ method: "GET", path: "/system/public-info", tags: ["System"] })
+      .route({
+        method: "GET",
+        path: "/system/public-info",
+        tags: ["System"],
+      })
       .output(PublicInfoOutput),
     authConfig: oc
-      .route({ method: "GET", path: "/system/auth-config", tags: ["System"] })
+      .route({
+        method: "GET",
+        path: "/system/auth-config",
+        tags: ["System"],
+      })
       .output(AuthConfigOutput),
+    status: oc
+      .route({ method: "GET", path: "/system/status", tags: ["System"] })
+      .output(SystemStatusOutput),
+    health: oc
+      .route({ method: "GET", path: "/system/health", tags: ["System"] })
+      .output(SystemHealthOutput),
   },
   integrations: {
     list: oc
-      .route({ method: "GET", path: "/integrations", tags: ["Integrations"] })
+      .route({
+        method: "GET",
+        path: "/integrations",
+        tags: ["Integrations"],
+      })
       .output(IntegrationsListOutput),
     create: oc
-      .route({ method: "POST", path: "/integrations", tags: ["Integrations"] })
+      .route({
+        method: "POST",
+        path: "/integrations",
+        tags: ["Integrations"],
+      })
       .input(CreateIntegrationInput)
       .output(IntegrationOutput),
     delete: oc
@@ -249,7 +310,7 @@ export const contract = {
         tags: ["Integrations"],
       })
       .input(ProviderParam)
-      .output(IntegrationTokenOutput),
+      .output(IntegrationOutput),
   },
   admin: {
     backups: {
@@ -325,18 +386,12 @@ export const contract = {
       .input(UploadAvatarInput)
       .output(UploadAvatarOutput),
     removeAvatar: oc
-      .route({ method: "DELETE", path: "/account/avatar", tags: ["Account"] })
+      .route({
+        method: "DELETE",
+        path: "/account/avatar",
+        tags: ["Account"],
+      })
       .input(z.void())
       .output(z.void()),
-  },
-  watchlist: {
-    quickAdd: oc
-      .route({
-        method: "POST",
-        path: "/watchlist/quick-add",
-        tags: ["Watchlist"],
-      })
-      .input(TmdbIdTypeParam)
-      .output(QuickAddOutput),
   },
 };

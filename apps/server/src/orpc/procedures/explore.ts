@@ -12,7 +12,7 @@ import { authed } from "../middleware";
 function requireTmdb() {
   if (!isTmdbConfigured()) {
     throw new ORPCError("PRECONDITION_FAILED", {
-      message: "TMDB API key is not configured.",
+      message: "TMDB API key is not configured",
     });
   }
 }
@@ -40,8 +40,9 @@ export const trending = os.explore.trending
             (r.poster_path as string) ?? null,
             "posters",
           ),
-          releaseDate: ((r.release_date ?? r.first_air_date) as string) ?? null,
-          voteAverage: r.vote_average as number,
+          releaseDate: (r.release_date as string | undefined) ?? null,
+          firstAirDate: (r.first_air_date as string | undefined) ?? null,
+          voteAverage: (r.vote_average as number | undefined) ?? null,
         };
       });
 
@@ -89,8 +90,9 @@ export const popular = os.explore.popular
         type: input.type,
         title: ((r.title ?? r.name) as string) || "",
         posterPath: tmdbImageUrl((r.poster_path as string) ?? null, "posters"),
-        releaseDate: ((r.release_date ?? r.first_air_date) as string) ?? null,
-        voteAverage: r.vote_average as number,
+        releaseDate: (r.release_date as string | undefined) ?? null,
+        firstAirDate: (r.first_air_date as string | undefined) ?? null,
+        voteAverage: (r.vote_average as number | undefined) ?? null,
       }));
 
     const lookups = items.map((r) => ({ tmdbId: r.tmdbId, type: r.type }));

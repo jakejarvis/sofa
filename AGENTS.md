@@ -1,0 +1,120 @@
+# CLAUDE.md
+
+## Commands
+
+```bash
+# Root commands (via Turborepo)
+bun run dev              # Start API server + Vite dev server
+bun run build            # Production build (both apps)
+bun run lint             # Biome lint check
+bun run format           # Biome format (auto-fix)
+bun run check-types      # TypeScript type check
+bun run test             # Run tests
+
+# Database commands (run from packages/db/)
+cd packages/db && bun run db:push       # Push schema changes to SQLite database
+cd packages/db && bun run db:generate   # Generate Drizzle migration files
+cd packages/db && bun run db:migrate    # Run Drizzle migrations
+cd packages/db && bun run db:studio     # Open Drizzle Studio (visual DB browser)
+```
+
+**Use Bun, not Node.js** — `bun <file>`, `bun test`, `bun install`, `bun run <script>`, `bunx <pkg>`. Bun auto-loads `.env`.
+
+## Pre-commit checks
+
+All three must pass with zero warnings or errors:
+
+```bash
+bun run lint
+bun run check-types
+bun run test
+```
+
+## Architecture
+
+**Sofa** is a self-hosted movie & TV tracking app built as a Turborepo monorepo.
+
+```
+couch-potato/
+├── apps/
+│   ├── native/        # @sofa/native — Expo 55 React Native app (Expo Router, UniWind)
+│   ├── server/        # @sofa/server — Hono API server (oRPC, auth, cron, webhooks)
+│   └── web/           # @sofa/web — Vite SPA (TanStack Router, TanStack Query)
+├── packages/
+│   ├── api/           # @sofa/api — oRPC contract + Zod schemas (shared, JIT)
+│   ├── auth/          # @sofa/auth — Better Auth server config (JIT)
+│   ├── config/        # @sofa/config — Path constants + TMDB URLs from env (JIT)
+│   ├── core/          # @sofa/core — Business logic services (JIT)
+│   ├── db/            # @sofa/db — Drizzle schema, client, migrations (JIT)
+│   ├── logger/        # @sofa/logger — Pino-based structured logging (JIT)
+│   └── tmdb/          # @sofa/tmdb — TMDB API client + image URL helper (JIT)
+├── turbo.json
+├── biome.json
+├── Dockerfile
+└── package.json
+```
+
+All shared packages are JIT (raw TypeScript exports, no build step).
+
+### Apps
+
+- **`@sofa/server`** — Hono API server. Hosts oRPC procedures, Better Auth, webhook/image/backup routes, and cron jobs. Runs DB migrations on startup. Dev: port 3001. Prod: serves SPA static files too, port 3000.
+- **`@sofa/web`** — Vite SPA with TanStack Router (file-based routing). No SSR, no DB. All data via oRPC. Vite dev server proxies `/api/*` and `/rpc/*` to the API server.
+- **`@sofa/native`** — Expo Router app with 4-tab layout (Home, Explore, Search, Settings). UniWind for styling, `@better-auth/expo` with SecureStore for auth, oRPC client for API calls. Dark-only cinema theme matching web.
+
+### Stack
+
+- **Frontend**: Vite 7 SPA, React 19, TanStack Router (file-based), Tailwind CSS v4, shadcn, Jotai
+- **Mobile**: Expo 55, Expo Router, UniWind (Tailwind for RN), `@tabler/icons-react-native`
+- **API**: Hono on Bun, oRPC (contract-first) with `@orpc/tanstack-query`
+- **Database**: SQLite via `bun:sqlite` + Drizzle ORM (WAL mode, sync queries, auto-migrations)
+- **Auth**: Better Auth with Drizzle adapter — email/password + optional OIDC/SSO
+- **Monorepo**: Turborepo with Bun workspaces
+- **Linting**: Biome (2-space indent, organized imports)
+- **External API**: TMDB (The Movie Database)
+
+### Package imports
+
+Path aliases: `@/*` maps to `src/` in both `apps/web/` and `apps/native/`.
+
+Cross-package imports:
+- `@sofa/api/contract`, `@sofa/api/schemas` — Contract and Zod types
+- `@sofa/db/client`, `@sofa/db/schema`, `@sofa/db/helpers`, `@sofa/db/migrate`, `@sofa/db/test-utils`
+- `@sofa/tmdb/client`, `@sofa/tmdb/image`
+- `@sofa/core/metadata`, `@sofa/core/tracking`, etc.
+- `@sofa/auth/server`, `@sofa/auth/config`
+- `@sofa/config` — Path constants (`DATA_DIR`, `DATABASE_URL`, `CACHE_DIR`, `BACKUP_DIR`, `AVATAR_DIR`) and TMDB URLs
+- `@sofa/logger` — `createLogger(name)` for structured logging
+
+### Key patterns
+
+**oRPC queries** use `orpc.*.queryOptions()` with TanStack Query. **Mutations** use `client.*()` directly. **Route loaders** prefetch via `queryClient.ensureQueryData()`.
+
+**Auth guards** — Web routes use `beforeLoad` + `authClient.getSession()`. API procedures use auth middleware that calls `auth.api.getSession()`.
+
+**TMDB images** — Only paths stored in DB. The API server resolves full URLs via `tmdbImageUrl()`. When `IMAGE_CACHE_ENABLED` (default), images are downloaded to disk and served via `/images/:category/:filename`.
+
+**Database IDs** — All app tables use UUIDv7 text PKs via `Bun.randomUUIDv7()`.
+
+### Environment variables
+
+Required: `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`.
+
+Optional:
+- `DATA_DIR` — Root for DB + cache (default `./data`). `DATABASE_URL` and `CACHE_DIR` derived from it but overridable.
+- `TMDB_API_BASE_URL`, `TMDB_IMAGE_BASE_URL` — Override TMDB endpoints.
+- `IMAGE_CACHE_ENABLED` — Default `true`. Set `false` for direct TMDB CDN URLs.
+- `LOG_LEVEL` — `error`/`warn`/`info`/`debug` (default: `info`).
+- OIDC: `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_ISSUER_URL`, `OIDC_PROVIDER_NAME`, `OIDC_AUTO_REGISTER`, `DISABLE_PASSWORD_LOGIN`.
+
+### Testing
+
+Tests live in `packages/core/test/`. `preload.ts` mocks `@sofa/db/client` with in-memory SQLite. Never mock a service module with stubs — `bun`'s `mock.module` persists across test files.
+
+### Docker
+
+Single container, single process. Hono serves API + SPA on port 3000. API routes (`/rpc/*`, `/api/*`) mounted first; unmatched routes fall back to `index.html`.
+
+## Browser Automation
+
+Use `agent-browser` for web automation (`agent-browser --help` for all commands). Auth credentials: `demo@sofa.watch` / `password`.

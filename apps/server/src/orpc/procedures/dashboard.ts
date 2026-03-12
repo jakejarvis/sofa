@@ -3,10 +3,14 @@ import {
   getNewAvailableFeed,
   getRecommendationsFeed,
   getUserStats,
+  getWatchCount,
+  getWatchHistory,
 } from "@sofa/core/discovery";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { os } from "../context";
 import { authed } from "../middleware";
+
+const watchHistoryTypeMap = { movie: "movies", episode: "episodes" } as const;
 
 export const stats = os.dashboard.stats.use(authed).handler(({ context }) => {
   return getUserStats(context.user.id);
@@ -46,7 +50,8 @@ export const library = os.dashboard.library
       type: t.type,
       title: t.title,
       posterPath: tmdbImageUrl(t.posterPath, "posters"),
-      releaseDate: t.releaseDate ?? t.firstAirDate ?? null,
+      releaseDate: t.releaseDate ?? null,
+      firstAirDate: t.firstAirDate ?? null,
       voteAverage: t.voteAverage,
       userStatus: t.userStatus,
     }));
@@ -66,8 +71,18 @@ export const recommendations = os.dashboard.recommendations
         type: t.type,
         title: t.title,
         posterPath: tmdbImageUrl(t.posterPath, "posters"),
-        releaseDate: t.releaseDate ?? t.firstAirDate ?? null,
+        releaseDate: t.releaseDate ?? null,
+        firstAirDate: t.firstAirDate ?? null,
         voteAverage: t.voteAverage,
       }));
     return { items };
+  });
+
+export const watchHistory = os.dashboard.watchHistory
+  .use(authed)
+  .handler(({ input, context }) => {
+    const coreType = watchHistoryTypeMap[input.type];
+    const count = getWatchCount(context.user.id, coreType, input.period);
+    const history = getWatchHistory(context.user.id, coreType, input.period);
+    return { count, history };
   });

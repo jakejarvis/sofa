@@ -1,0 +1,47 @@
+{
+  "fill": {
+    "linear-gradient": [
+      "display-p3:0.89697,0.77637,0.64404,1.00000",
+      "display-p3:0.07726,0.07726,0.07726,1.00000"
+    ],
+    "orientation": {
+      "start": {
+        "x": 0.5,
+        "y": 0
+      },
+      "stop": {
+        "x": 0.5,
+        "y": 0.7
+      }
+    }
+  },
+  "groups": [
+    {
+      "blend-mode": "normal",
+      "blur-material": null,
+      "hidden": false,
+      "layers": [
+        {
+          "blend-mode": "normal",
+          "fill": "none",
+          "glass": true,
+          "image-name": "couch-with-glow.svg",
+          "name": "couch-with-glow"
+        }
+      ],
+      "lighting": "individual",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": true,
+        "value": 0.5
+      }
+    }
+  ],
+  "supported-platforms": {
+    "squares": ["iOS"]
+  }
+}

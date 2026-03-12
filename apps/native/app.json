@@ -1,0 +1,138 @@
+{
+  "expo": {
+    "name": "Sofa",
+    "slug": "sofa",
+    "owner": "jakejarvis",
+    "scheme": "sofa",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "icon": "./assets/images/sofa.icon",
+      "bundleIdentifier": "com.jakejarvis.sofa",
+      "appleTeamId": "B5ZWKBCUTU"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "package": "com.jakejarvis.sofa"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "root": "./src/app"
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "ios": {
+            "fonts": [
+              "../../node_modules/@expo-google-fonts/dm-sans/400Regular/DMSans_400Regular.ttf",
+              "../../node_modules/@expo-google-fonts/dm-sans/500Medium/DMSans_500Medium.ttf",
+              "../../node_modules/@expo-google-fonts/dm-sans/600SemiBold/DMSans_600SemiBold.ttf",
+              "../../node_modules/@expo-google-fonts/dm-sans/700Bold/DMSans_700Bold.ttf",
+              "../../node_modules/@expo-google-fonts/dm-serif-display/400Regular/DMSerifDisplay_400Regular.ttf",
+              "../../node_modules/@expo-google-fonts/geist-mono/400Regular/GeistMono_400Regular.ttf"
+            ]
+          },
+          "android": {
+            "fonts": [
+              {
+                "fontFamily": "DMSans-Regular",
+                "fontDefinitions": [
+                  {
+                    "path": "../../node_modules/@expo-google-fonts/dm-sans/400Regular/DMSans_400Regular.ttf",
+                    "weight": 400
+                  }
+                ]
+              },
+              {
+                "fontFamily": "DMSans-Medium",
+                "fontDefinitions": [
+                  {
+                    "path": "../../node_modules/@expo-google-fonts/dm-sans/500Medium/DMSans_500Medium.ttf",
+                    "weight": 500
+                  }
+                ]
+              },
+              {
+                "fontFamily": "DMSans-SemiBold",
+                "fontDefinitions": [
+                  {
+                    "path": "../../node_modules/@expo-google-fonts/dm-sans/600SemiBold/DMSans_600SemiBold.ttf",
+                    "weight": 600
+                  }
+                ]
+              },
+              {
+                "fontFamily": "DMSans-Bold",
+                "fontDefinitions": [
+                  {
+                    "path": "../../node_modules/@expo-google-fonts/dm-sans/700Bold/DMSans_700Bold.ttf",
+                    "weight": 700
+                  }
+                ]
+              },
+              {
+                "fontFamily": "DMSerifDisplay-Regular",
+                "fontDefinitions": [
+                  {
+                    "path": "../../node_modules/@expo-google-fonts/dm-serif-display/400Regular/DMSerifDisplay_400Regular.ttf",
+                    "weight": 400
+                  }
+                ]
+              },
+              {
+                "fontFamily": "GeistMono-Regular",
+                "fontDefinitions": [
+                  {
+                    "path": "../../node_modules/@expo-google-fonts/geist-mono/400Regular/GeistMono_400Regular.ttf",
+                    "weight": 400
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#101010",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200
+        }
+      ],
+      ["expo-system-ui"],
+      [
+        "expo-image-picker",
+        {
+          "microphonePermission": false
+        }
+      ],
+      ["expo-localization"]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a9f021eb-f58d-49af-b291-d72f7dc34051"
+      }
+    }
+  }
+}

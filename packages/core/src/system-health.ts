@@ -213,7 +213,7 @@ async function getImageCacheHealth(): Promise<SystemHealthData["imageCache"]> {
     return { enabled: false, totalSizeBytes: 0, imageCount: 0, categories: {} };
   }
 
-  const categoryNames = ["posters", "backdrops", "stills", "logos"];
+  const categoryNames = ["posters", "backdrops", "stills", "logos", "profiles"];
   const categories: Record<string, { count: number; sizeBytes: number }> = {};
   let totalSizeBytes = 0;
   let imageCount = 0;

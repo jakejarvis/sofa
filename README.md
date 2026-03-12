@@ -128,9 +128,8 @@ Useful commands:
 - `bun run test`
 - `bun run lint`
 - `bun run check-types`
-- `bun run db:generate`
-- `bun run db:migrate`
-- `bun run db:seed`
+- `cd packages/db && bun run db:generate`
+- `cd packages/db && bun run db:migrate`
 
 ## TMDB notice
 

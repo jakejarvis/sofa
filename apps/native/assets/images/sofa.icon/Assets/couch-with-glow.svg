@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+	<defs>
+		<radialGradient id="b" cx=".5" cy=".33" r=".4">
+			<stop offset="0%" stop-color="#e8a87c" stop-opacity=".2"/>
+			<stop offset="50%" stop-color="#c48060" stop-opacity=".06"/>
+			<stop offset="100%" stop-opacity="0"/>
+		</radialGradient>
+		<radialGradient id="f" cx=".5" cy=".5" r=".7">
+			<stop offset="55%" stop-opacity="0"/>
+			<stop offset="100%" stop-opacity=".3"/>
+		</radialGradient>
+		<radialGradient id="c" cx=".5" cy=".5" r=".5">
+			<stop offset="0%" stop-opacity=".25"/>
+			<stop offset="100%" stop-opacity="0"/>
+		</radialGradient>
+		<linearGradient id="a" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0%" stop-color="#151210"/>
+			<stop offset="100%" stop-color="#080605"/>
+		</linearGradient>
+		<linearGradient id="d" x1="12" y1="5" x2="12" y2="13" gradientUnits="userSpaceOnUse">
+			<stop offset="0%" stop-color="#f0c9a4"/>
+			<stop offset="100%" stop-color="#dda278"/>
+		</linearGradient>
+		<linearGradient id="e" x1="12" y1="11" x2="12" y2="19.5" gradientUnits="userSpaceOnUse">
+			<stop offset="0%" stop-color="#e8a87c"/>
+			<stop offset="100%" stop-color="#ba7d52"/>
+		</linearGradient>
+	</defs>
+	<g clip-path="url(#m)">
+		<path fill="url(#a)" d="M0 0h1024v1024H0z"/>
+		<path fill="url(#b)" d="M0 0h1024v1024H0z"/>
+		<ellipse cx="512" cy="710" rx="220" ry="22" fill="url(#c)"/>
+		<path fill="url(#d)" d="M7 12v1h10v-1a3 3 0 0 1 2.993-3 4.6 4.6 0 0 0-.07-.78 4 4 0 0 0-3.143-3.143C16.394 5 15.93 5 15 5H9c-.93 0-1.394 0-1.78.077A4 4 0 0 0 4.077 8.22a4.6 4.6 0 0 0-.07.78A3 3 0 0 1 7 12" transform="matrix(28 0 0 28 176 172)"/>
+		<path fill="url(#e)" d="M18.444 18H5.556a3.6 3.6 0 0 1-.806-.092V19a.75.75 0 0 1-1.5 0v-1.849A3.55 3.55 0 0 1 2 14.444V12a2 2 0 1 1 4 0v1.2a.8.8 0 0 0 .8.8h10.4a.8.8 0 0 0 .8-.8V12a2 2 0 1 1 4 0v2.444a3.55 3.55 0 0 1-1.25 2.707V19a.75.75 0 0 1-1.5 0v-1.092a3.6 3.6 0 0 1-.806.092" transform="matrix(28 0 0 28 176 172)"/>
+		<path fill="url(#f)" d="M0 0h1024v1024H0z"/>
+	</g>
+</svg>

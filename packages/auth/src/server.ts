@@ -1,4 +1,5 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { expo } from "@better-auth/expo";
 import {
   getUserCount,
   isRegistrationOpen,
@@ -18,6 +19,7 @@ import {
 const authLog = createLogger("auth");
 
 export const auth = betterAuth({
+  trustedOrigins: ["sofa://"],
   logger: {
     // Suppress unset secret/low entropy warnings during build
     disabled: process.env.NEXT_PHASE === "phase-production-build",
@@ -69,9 +71,7 @@ export const auth = betterAuth({
           }),
         ]
       : []),
-    // NOTE: nextCookies() removed — Better Auth works with standard
-    // Request/Response natively on Hono. The web app proxies auth
-    // requests to the API server.
+    expo(),
   ],
   advanced: {
     database: {

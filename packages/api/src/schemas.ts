@@ -2,11 +2,12 @@ import { z } from "zod";
 
 // ─── Shared input schemas ─────────────────────────────────────
 
-export const IdParam = z.object({ id: z.string() });
+export const IdParam = z.object({ id: z.string().min(1) });
 export const ProviderParam = z.object({
   provider: z.enum(["plex", "jellyfin", "emby", "sonarr", "radarr"]),
 });
-export const FilenameParam = z.object({ filename: z.string() });
+export const TmdbIdParam = z.object({ tmdbId: z.number().int() });
+export const FilenameParam = z.object({ filename: z.string().min(1) });
 export const MediaTypeParam = z.object({
   type: z.enum(["movie", "tv"]),
 });
@@ -21,12 +22,12 @@ export const TmdbIdTypeParam = z.object({
 // ─── Title inputs ──────────────────────────────────────────────
 
 export const UpdateStatusInput = z.object({
-  id: z.string(),
-  status: z.enum(["in_progress"]).nullable(),
+  id: z.string().min(1),
+  status: z.enum(["in_progress", "completed"]).nullable(),
 });
 
 export const UpdateRatingInput = z.object({
-  id: z.string(),
+  id: z.string().min(1),
   stars: z.number().int().min(0).max(5),
 });
 
@@ -34,22 +35,27 @@ export const BatchWatchInput = z.object({
   episodeIds: z.array(z.string()).min(1),
 });
 
+export const HydrateSeasonsInput = z.object({
+  id: z.string().min(1),
+  tmdbId: z.number().int(),
+});
+
 // ─── Search / Discover inputs ──────────────────────────────────
 
 export const SearchInput = z.object({
-  query: z.string().min(1),
+  query: z.string().min(1).max(200),
   type: z.enum(["movie", "tv", "person"]).optional(),
 });
 
 export const DiscoverInput = z.object({
-  mediaType: z.enum(["movie", "tv"]),
+  type: z.enum(["movie", "tv"]),
   genreId: z.number().int(),
 });
 
-// ─── Stats input ───────────────────────────────────────────────
+// ─── Watch history input ──────────────────────────────────────
 
-export const StatsInput = z.object({
-  type: z.enum(["movies", "episodes"]),
+export const WatchHistoryInput = z.object({
+  type: z.enum(["movie", "episode"]),
   period: z.enum(["today", "this_week", "this_month", "this_year"]),
 });
 
@@ -64,11 +70,25 @@ export const CreateIntegrationInput = z.object({
 
 export const ToggleRegistrationInput = z.object({ open: z.boolean() });
 export const ToggleUpdateCheckInput = z.object({ enabled: z.boolean() });
-export const TriggerJobInput = z.object({ name: z.string() });
+
+const cronJobName = z.enum([
+  "scheduledBackup",
+  "nightlyRefreshLibrary",
+  "refreshAvailability",
+  "refreshRecommendations",
+  "refreshTvChildren",
+  "cacheImages",
+  "refreshCredits",
+  "updateCheck",
+]);
+
+export const TriggerJobInput = z.object({ name: cronJobName });
+
+const backupFrequency = z.enum(["6h", "12h", "1d", "7d"]);
 
 export const UpdateScheduleInput = z.object({
   enabled: z.boolean().optional(),
-  frequency: z.enum(["6h", "12h", "1d", "7d"]).optional(),
+  frequency: backupFrequency.optional(),
   time: z
     .string()
     .regex(/^\d{2}:\d{2}$/, "Invalid time format")
@@ -217,7 +237,20 @@ const TmdbBrowseItem = z.object({
   title: z.string(),
   posterPath: z.string().nullable(),
   releaseDate: z.string().nullable(),
-  voteAverage: z.number(),
+  firstAirDate: z.string().nullable(),
+  voteAverage: z.number().nullable(),
+});
+
+/** Recommendation item (shared by title and dashboard recommendations) */
+const RecommendationItemSchema = z.object({
+  id: z.string(),
+  tmdbId: z.number(),
+  type: mediaType,
+  title: z.string(),
+  posterPath: z.string().nullable(),
+  releaseDate: z.string().nullable(),
+  firstAirDate: z.string().nullable(),
+  voteAverage: z.number().nullable(),
 });
 
 const userStatusMap = z.record(
@@ -255,18 +288,7 @@ export const UserInfoOutput = z.object({
 });
 
 export const TitleRecommendationsOutput = z.object({
-  recommendations: z.array(
-    z.object({
-      id: z.string(),
-      tmdbId: z.number(),
-      type: mediaType,
-      title: z.string(),
-      posterPath: z.string().nullable(),
-      releaseDate: z.string().nullable(),
-      firstAirDate: z.string().nullable(),
-      voteAverage: z.number().nullable(),
-    }),
-  ),
+  recommendations: z.array(RecommendationItemSchema),
   userStatuses: userStatusMap,
 });
 
@@ -320,6 +342,7 @@ export const LibraryOutput = z.object({
       title: z.string(),
       posterPath: z.string().nullable(),
       releaseDate: z.string().nullable(),
+      firstAirDate: z.string().nullable(),
       voteAverage: z.number().nullable(),
       userStatus: z.enum(["watchlist", "in_progress", "completed"]).nullable(),
     }),
@@ -327,17 +350,7 @@ export const LibraryOutput = z.object({
 });
 
 export const DashboardRecommendationsOutput = z.object({
-  items: z.array(
-    z.object({
-      id: z.string(),
-      tmdbId: z.number(),
-      type: mediaType,
-      title: z.string(),
-      posterPath: z.string().nullable(),
-      releaseDate: z.string().nullable(),
-      voteAverage: z.number().nullable(),
-    }),
-  ),
+  items: z.array(RecommendationItemSchema),
 });
 
 // ─── Explore outputs ───────────────────────────────────────────
@@ -372,14 +385,14 @@ export const SearchOutput = z.object({
       tmdbId: z.number(),
       type: z.enum(["movie", "tv", "person"]),
       title: z.string(),
-      overview: z.string().optional(),
-      posterPath: z.string().nullable().optional(),
-      profilePath: z.string().nullable().optional(),
-      releaseDate: z.string().nullable().optional(),
-      popularity: z.number().optional(),
-      voteAverage: z.number().optional(),
-      knownForDepartment: z.string().optional(),
-      knownFor: z.array(z.string()).optional(),
+      overview: z.string().nullable(),
+      posterPath: z.string().nullable(),
+      profilePath: z.string().nullable(),
+      releaseDate: z.string().nullable(),
+      popularity: z.number().nullable(),
+      voteAverage: z.number().nullable(),
+      knownForDepartment: z.string().nullable(),
+      knownFor: z.array(z.string()).nullable(),
     }),
   ),
 });
@@ -388,11 +401,16 @@ export const SearchOutput = z.object({
 
 export const DiscoverOutput = BrowseOutput;
 
-// ─── Stats output ──────────────────────────────────────────────
+// ─── Watch history output ──────────────────────────────────────
 
-export const StatsOutput = z.object({
+const HistoryBucketSchema = z.object({
+  bucket: z.string(),
   count: z.number(),
-  history: z.array(z.object({ bucket: z.string(), count: z.number() })),
+});
+
+export const WatchHistoryOutput = z.object({
+  count: z.number(),
+  history: z.array(HistoryBucketSchema),
 });
 
 // ─── System status output ──────────────────────────────────────
@@ -452,8 +470,9 @@ const SystemHealthSchema = z.object({
 
 export const SystemStatusOutput = z.object({
   tmdbConfigured: z.boolean(),
-  health: SystemHealthSchema.optional(),
 });
+
+export const SystemHealthOutput = SystemHealthSchema;
 
 // ─── Integration outputs ───────────────────────────────────────
 
@@ -486,11 +505,9 @@ export const IntegrationsListOutput = z.object({
 
 export const IntegrationOutput = IntegrationSchema;
 
-export const IntegrationTokenOutput = IntegrationSchema;
-
 // ─── Admin outputs ─────────────────────────────────────────────
 
-const BackupSchema = z.object({
+export const BackupSchema = z.object({
   filename: z.string(),
   sizeBytes: z.number(),
   createdAt: z.string(),
@@ -506,36 +523,36 @@ export const BackupCreateOutput = BackupSchema;
 export const BackupScheduleOutput = z.object({
   enabled: z.boolean(),
   maxRetention: z.number(),
-  frequency: z.string(),
+  frequency: backupFrequency,
   time: z.string(),
   dayOfWeek: z.number(),
 });
 
 export const RegistrationOutput = z.object({ open: z.boolean() });
 
+const UpdateCheckResultSchema = z.object({
+  updateAvailable: z.boolean(),
+  currentVersion: z.string(),
+  latestVersion: z.string().nullable(),
+  releaseUrl: z.string().nullable(),
+  lastCheckedAt: z.string().nullable(),
+});
+
 export const UpdateCheckOutput = z.object({
   enabled: z.boolean(),
-  updateCheck: z
-    .object({
-      updateAvailable: z.boolean(),
-      currentVersion: z.string(),
-      latestVersion: z.string().nullable(),
-      releaseUrl: z.string().nullable(),
-      lastCheckedAt: z.string().nullable(),
-    })
-    .nullable(),
+  updateCheck: UpdateCheckResultSchema.nullable(),
 });
 
 export const TriggerJobOutput = z.object({ ok: z.literal(true) });
 
-// ─── Watchlist outputs ─────────────────────────────────────────
+// ─── Quick add output ──────────────────────────────────────────
 
 export const QuickAddOutput = z.object({
   id: z.string(),
   alreadyAdded: z.boolean(),
 });
 
-// ─── System outputs (new) ─────────────────────────────────────
+// ─── System outputs ───────────────────────────────────────────
 
 export const PublicInfoOutput = z.object({
   tmdbConfigured: z.boolean(),
@@ -558,19 +575,6 @@ export const HydrateSeasonsOutput = z.object({
   seasons: z.array(SeasonSchema),
 });
 
-// ─── Types used by web app (moved from services) ─────────────
-
-export type BackupFrequency = "6h" | "12h" | "1d" | "7d";
-
-export type BackupInfo = {
-  filename: string;
-  sizeBytes: number;
-  createdAt: string;
-  source: "manual" | "scheduled" | "pre-restore";
-};
-
-export type SystemHealthData = z.infer<typeof SystemHealthSchema>;
-
 // ═══════════════════════════════════════════════════════════════
 // Inferred types — use these instead of hand-written interfaces
 // ═══════════════════════════════════════════════════════════════
@@ -583,25 +587,13 @@ export type ColorPalette = z.infer<typeof ColorPaletteSchema>;
 export type ResolvedTitle = z.infer<typeof ResolvedTitleSchema>;
 export type ResolvedPerson = z.infer<typeof PersonSchema>;
 export type PersonCredit = z.infer<typeof PersonCreditSchema>;
+export type RecommendationItem = z.infer<typeof RecommendationItemSchema>;
 
-export type UpdateCheckResult = {
-  updateAvailable: boolean;
-  currentVersion: string;
-  latestVersion: string | null;
-  releaseUrl: string | null;
-  lastCheckedAt: string | null;
-};
-
-export type TimePeriod = "today" | "this_week" | "this_month" | "this_year";
-
-export interface HistoryBucket {
-  bucket: string;
-  count: number;
-}
-
-export interface DashboardStats {
-  moviesThisMonth: number;
-  episodesThisWeek: number;
-  librarySize: number;
-  completed: number;
-}
+export type BackupFrequency = z.infer<typeof backupFrequency>;
+export type BackupInfo = z.infer<typeof BackupSchema>;
+export type SystemHealthData = z.infer<typeof SystemHealthSchema>;
+export type UpdateCheckResult = z.infer<typeof UpdateCheckResultSchema>;
+export type TimePeriod = z.infer<typeof WatchHistoryInput>["period"];
+export type HistoryBucket = z.infer<typeof HistoryBucketSchema>;
+export type DashboardStats = z.infer<typeof DashboardStatsOutput>;
+export type CronJobName = z.infer<typeof cronJobName>;

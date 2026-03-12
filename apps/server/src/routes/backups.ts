@@ -29,14 +29,14 @@ app.get("/:filename", async (c) => {
   }
 
   const file = Bun.file(backupPath);
-  const buffer = await file.arrayBuffer();
 
-  return new Response(new Uint8Array(buffer), {
+  return new Response(file.stream(), {
     status: 200,
     headers: {
       "Content-Type": "application/x-sqlite3",
       "Content-Disposition": `attachment; filename="${safe}"`,
       "Content-Length": String(file.size),
+      "Cache-Control": "no-store",
     },
   });
 });

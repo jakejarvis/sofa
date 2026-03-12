@@ -1,4 +1,4 @@
-import type { SystemHealthData } from "@sofa/api/schemas";
+import type { CronJobName, SystemHealthData } from "@sofa/api/schemas";
 import {
   IconActivity,
   IconAlertTriangle,
@@ -129,15 +129,12 @@ function LiveTimeAgo({
 /** Hydrates system health state and renders the 3 cards */
 export function SystemHealthCards() {
   const queryClient = useQueryClient();
-  const {
-    data: statusData,
-    isPending,
-    isFetching,
-  } = useQuery(orpc.systemStatus.queryOptions());
-  const data = statusData?.health ?? null;
+  const { data, isPending, isFetching } = useQuery(
+    orpc.system.health.queryOptions(),
+  );
   const isRefreshing = isFetching;
   const refresh = () =>
-    queryClient.invalidateQueries({ queryKey: orpc.systemStatus.key() });
+    queryClient.invalidateQueries({ queryKey: orpc.system.health.key() });
 
   if (isPending || !data) return <SkeletonCards />;
 
@@ -519,7 +516,9 @@ function BackgroundJobsCard({
                             className="size-6"
                             disabled={isRunning || job.disabled}
                             onClick={() =>
-                              triggerJobMutation.mutate({ name: job.jobName })
+                              triggerJobMutation.mutate({
+                                name: job.jobName as CronJobName,
+                              })
                             }
                           />
                         }

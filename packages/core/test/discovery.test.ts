@@ -336,4 +336,26 @@ describe("getRecommendationsForTitle", () => {
     const recs = getRecommendationsForTitle("m1");
     expect(recs).toHaveLength(0);
   });
+
+  test("deduplicates titles returned by multiple recommendation sources", () => {
+    insertTitle({ id: "m1", tmdbId: 1 });
+    insertTitle({ id: "rec1", tmdbId: 10, title: "Rec One" });
+    insertTitle({ id: "rec2", tmdbId: 20, title: "Rec Two" });
+    insertRecommendation("m1", "rec1", {
+      source: "tmdb_similar",
+      rank: 1,
+    });
+    insertRecommendation("m1", "rec1", {
+      source: "tmdb_recommendations",
+      rank: 2,
+    });
+    insertRecommendation("m1", "rec2", {
+      source: "tmdb_recommendations",
+      rank: 3,
+    });
+
+    const recs = getRecommendationsForTitle("m1");
+    expect(recs).toHaveLength(2);
+    expect(recs.map((rec) => rec.id)).toEqual(["rec1", "rec2"]);
+  });
 });

@@ -13,7 +13,7 @@ import {
   getCachedUpdateCheck,
   isUpdateCheckEnabled,
 } from "@sofa/core/update-check";
-import { rescheduleBackup, triggerJob } from "../../cron";
+import { rescheduleBackup, triggerJob as triggerCronJob } from "../../cron";
 import { os } from "../context";
 import { admin } from "../middleware";
 
@@ -35,7 +35,16 @@ export const backupsCreate = os.admin.backups.create
 export const backupsDelete = os.admin.backups.delete
   .use(admin)
   .handler(async ({ input }) => {
-    await deleteBackup(input.filename);
+    try {
+      await deleteBackup(input.filename);
+    } catch (err) {
+      if (err instanceof ORPCError) throw err;
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("not found")) {
+        throw new ORPCError("NOT_FOUND", { message: msg });
+      }
+      throw new ORPCError("BAD_REQUEST", { message: msg });
+    }
   });
 
 export const backupsRestore = os.admin.backups.restore
@@ -54,7 +63,9 @@ export const backupsRestore = os.admin.backups.restore
       // Clean up the upload file if restoreFromBackup didn't consume it
       const f = Bun.file(tmpPath);
       if (await f.exists()) await f.delete();
-      throw err;
+      if (err instanceof ORPCError) throw err;
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new ORPCError("BAD_REQUEST", { message: msg });
     }
   });
 
@@ -67,7 +78,11 @@ export const backupsSchedule = os.admin.backups.schedule
         getSetting("maxBackupRetention") ?? "7",
         10,
       ),
-      frequency: getSetting("backupScheduleFrequency") ?? "1d",
+      frequency: (getSetting("backupScheduleFrequency") ?? "1d") as
+        | "6h"
+        | "12h"
+        | "1d"
+        | "7d",
       time: getSetting("backupScheduleTime") ?? "02:00",
       dayOfWeek: Number.parseInt(getSetting("backupScheduleDow") ?? "0", 10),
     };
@@ -119,10 +134,10 @@ export const toggleUpdateCheck = os.admin.toggleUpdateCheck
 
 // ─── Jobs ──────────────────────────────────────────────────────
 
-export const triggerJobProcedure = os.admin.triggerJob
+export const triggerJob = os.admin.triggerJob
   .use(admin)
   .handler(async ({ input }) => {
-    const triggered = await triggerJob(input.name);
+    const triggered = await triggerCronJob(input.name);
     if (!triggered) {
       throw new ORPCError("NOT_FOUND", { message: "Job not found" });
     }
