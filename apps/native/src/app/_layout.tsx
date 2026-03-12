@@ -1,8 +1,13 @@
 import "@/global.css";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import { Stack } from "expo-router";
+import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import {
+  PostHogErrorBoundary,
+  PostHogProvider,
+  usePostHog,
+} from "posthog-react-native";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -12,6 +17,7 @@ import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { authClient } from "@/lib/auth-client";
 import { queryPersister } from "@/lib/mmkv";
+import { posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
 import { hasStoredServerUrl, onServerUrlChange } from "@/lib/server-url";
 
@@ -32,6 +38,17 @@ function AppContent() {
   const { data: session, isPending } = authClient.useSession();
   const hasServerUrl =
     !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
+
+  // --- PostHog screen tracking ---
+  const ph = usePostHog();
+  const pathname = usePathname();
+  const params = useGlobalSearchParams();
+
+  useEffect(() => {
+    if (ph && pathname) {
+      ph.screen(pathname, params);
+    }
+  }, [ph, pathname, params]);
 
   useEffect(() => {
     Uniwind.setTheme("dark");
@@ -95,15 +112,19 @@ function AppContent() {
 
 export default function RootLayout() {
   return (
-    <PersistQueryClientProvider
-      client={queryClient}
-      persistOptions={{ persister: queryPersister }}
-    >
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <KeyboardProvider>
-          <AppContent />
-        </KeyboardProvider>
-      </GestureHandlerRootView>
-    </PersistQueryClientProvider>
+    <PostHogProvider client={posthog} autocapture={{ captureScreens: false }}>
+      <PostHogErrorBoundary>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={{ persister: queryPersister }}
+        >
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <KeyboardProvider>
+              <AppContent />
+            </KeyboardProvider>
+          </GestureHandlerRootView>
+        </PersistQueryClientProvider>
+      </PostHogErrorBoundary>
+    </PostHogProvider>
   );
 }

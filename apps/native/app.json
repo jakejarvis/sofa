@@ -23,7 +23,12 @@
       "package": "com.jakejarvis.sofa"
     },
     "plugins": [
-      ["expo-router", { "root": "./src/app" }],
+      [
+        "expo-router",
+        {
+          "root": "./src/app"
+        }
+      ],
       [
         "expo-secure-store",
         {
@@ -117,7 +122,8 @@
         {
           "microphonePermission": false
         }
-      ]
+      ],
+      ["expo-localization"]
     ],
     "experiments": {
       "typedRoutes": true,

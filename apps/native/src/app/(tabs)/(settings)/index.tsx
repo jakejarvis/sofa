@@ -2,6 +2,7 @@ import {
   IconArrowUpRight,
   IconBrandGithub,
   IconCamera,
+  IconChartBar,
   IconCloud,
   IconDatabase,
   IconDeviceMobileCog,
@@ -42,6 +43,7 @@ import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/lib/orpc";
+import { isAnalyticsEnabled, setAnalyticsEnabled } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
 import { getServerUrl } from "@/lib/server-url";
 import { toast } from "@/lib/toast";
@@ -56,6 +58,7 @@ export default function SettingsScreen() {
     if (session?.user?.name) setNameInput(session.user.name);
   }, [session?.user?.name]);
 
+  const [analyticsEnabled, setAnalyticsToggle] = useState(isAnalyticsEnabled);
   const isAdmin = session?.user?.role === "admin";
   const serverUrl = getServerUrl();
 
@@ -347,6 +350,19 @@ export default function SettingsScreen() {
                 ],
               );
             }}
+          />
+          <SettingsRow
+            label="Anonymous usage reporting"
+            icon={IconChartBar}
+            right={
+              <Switch
+                value={analyticsEnabled}
+                onValueChange={(enabled) => {
+                  setAnalyticsToggle(enabled);
+                  setAnalyticsEnabled(enabled);
+                }}
+              />
+            }
           />
         </SettingsSection>
       </Animated.View>
