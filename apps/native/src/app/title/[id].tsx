@@ -399,10 +399,13 @@ export default function TitleDetailScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 16 }}
+            contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}
           >
             {availability.map((offer) => (
-              <View key={offer.providerName} className="mr-4 items-center">
+              <View
+                key={`${offer.providerId}-${offer.offerType}`}
+                className="items-center"
+              >
                 {offer.logoPath && (
                   <Image
                     source={{ uri: offer.logoPath }}

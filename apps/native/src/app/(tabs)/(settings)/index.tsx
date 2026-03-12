@@ -192,6 +192,7 @@ export default function SettingsScreen() {
     <ScrollView
       className="bg-background"
       contentContainerStyle={{
+        paddingTop: 8,
         paddingBottom: 32,
         paddingHorizontal: 16,
       }}

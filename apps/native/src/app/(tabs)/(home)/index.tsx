@@ -55,6 +55,7 @@ export default function DashboardScreen() {
     <ScrollView
       className="bg-background"
       contentContainerStyle={{
+        paddingTop: 8,
         paddingBottom: 16,
       }}
       contentInsetAdjustmentBehavior="automatic"
