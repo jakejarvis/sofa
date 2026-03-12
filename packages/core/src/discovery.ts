@@ -487,8 +487,26 @@ export function getRecommendationsForTitle(titleId: string) {
 
   if (recs.length === 0) return [];
 
+  const sourcePriority = {
+    tmdb_recommendations: 0,
+    tmdb_similar: 1,
+  } as const;
+  const orderedRecs = [...recs].sort(
+    (a, b) =>
+      a.rank - b.rank || sourcePriority[a.source] - sourcePriority[b.source],
+  );
+
+  const seenRecommendedTitleIds = new Set<string>();
+  const uniqueRecs = orderedRecs.filter((rec) => {
+    if (seenRecommendedTitleIds.has(rec.recommendedTitleId)) {
+      return false;
+    }
+    seenRecommendedTitleIds.add(rec.recommendedTitleId);
+    return true;
+  });
+
   // Batch fetch all recommended titles (1 query)
-  const recTitleIds = recs.map((r) => r.recommendedTitleId);
+  const recTitleIds = uniqueRecs.map((r) => r.recommendedTitleId);
   const recTitles = db
     .select()
     .from(titles)
@@ -496,7 +514,7 @@ export function getRecommendationsForTitle(titleId: string) {
     .all();
   const recTitleMap = new Map(recTitles.map((t) => [t.id, t]));
 
-  return recs
+  return uniqueRecs
     .map((rec) => {
       const r = recTitleMap.get(rec.recommendedTitleId);
       if (!r) return null;

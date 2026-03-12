@@ -47,17 +47,24 @@ export function SettingsSection({
         className="rounded-xl border border-white/[0.06] bg-card px-3"
         style={{ borderCurve: "continuous" }}
       >
-        {items.map((child, i) => (
-          <Fragment key={isValidElement(child) ? child.key : i}>
-            {i > 0 && (
-              <View
-                className="border-border border-t"
-                style={{ borderTopWidth: 0.5 }}
-              />
-            )}
-            {child}
-          </Fragment>
-        ))}
+        {items.map((child, i) => {
+          const key =
+            isValidElement(child) && child.key != null
+              ? String(child.key)
+              : `settings-item-${i}`;
+
+          return (
+            <Fragment key={key}>
+              {i > 0 && (
+                <View
+                  className="border-border border-t"
+                  style={{ borderTopWidth: 0.5 }}
+                />
+              )}
+              {child}
+            </Fragment>
+          );
+        })}
       </View>
     </View>
   );
