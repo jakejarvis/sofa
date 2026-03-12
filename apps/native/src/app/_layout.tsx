@@ -46,7 +46,9 @@ function AppContent() {
           animation: "slide_from_right",
         }}
       >
-        <Stack.Screen name="(auth)" />
+        <Stack.Protected guard={!session}>
+          <Stack.Screen name="(auth)" />
+        </Stack.Protected>
 
         <Stack.Protected guard={!!session}>
           <Stack.Screen name="(tabs)" />
