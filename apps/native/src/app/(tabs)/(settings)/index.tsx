@@ -2,6 +2,7 @@ import {
   IconCamera,
   IconCloud,
   IconDatabase,
+  IconDeviceMobileCog,
   IconLink,
   IconLogout,
   IconPhoto,
@@ -18,6 +19,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -32,6 +34,7 @@ import { BackupsSection } from "@/components/settings/backups-section";
 import { IntegrationRow } from "@/components/settings/integration-row";
 import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
+import { TmdbLogo } from "@/components/tmdb-logo";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
@@ -299,7 +302,7 @@ export default function SettingsScreen() {
 
       {/* Server */}
       <Animated.View entering={FadeInDown.duration(300).delay(200)}>
-        <SettingsSection title="Server" icon={IconServer}>
+        <SettingsSection title="App Settings" icon={IconDeviceMobileCog}>
           <SettingsRow
             label="Server URL"
             value={serverUrl}
@@ -455,9 +458,26 @@ export default function SettingsScreen() {
         <Text className="text-muted-foreground text-xs">
           Sofa Mobile
           {updateCheck.data?.updateCheck?.currentVersion
-            ? ` · Server ${updateCheck.data.updateCheck.currentVersion}`
+            ? ` · Server v${updateCheck.data.updateCheck.currentVersion}`
             : ""}
         </Text>
+      </Animated.View>
+
+      {/* TMDB Attribution */}
+      <Animated.View
+        entering={FadeInDown.duration(300).delay(500)}
+        className="mt-4 items-center gap-2"
+      >
+        <Pressable
+          onPress={() => Linking.openURL("https://www.themoviedb.org/")}
+          className="items-center gap-2 active:opacity-70"
+        >
+          <TmdbLogo height={12} />
+          <Text className="text-center text-[10px] text-muted-foreground leading-relaxed">
+            This product uses the TMDB API but is not endorsed or certified by
+            TMDB.
+          </Text>
+        </Pressable>
       </Animated.View>
     </ScrollView>
   );
