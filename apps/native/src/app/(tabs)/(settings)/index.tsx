@@ -19,7 +19,6 @@ import * as ImagePicker from "expo-image-picker";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Linking,
   Pressable,
@@ -36,6 +35,7 @@ import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { Image } from "@/components/ui/image";
+import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
@@ -207,10 +207,7 @@ export default function SettingsScreen() {
                     <View className="size-11 overflow-hidden rounded-full bg-secondary">
                       {uploadAvatar.isPending ? (
                         <View className="flex-1 items-center justify-center">
-                          <ActivityIndicator
-                            size="small"
-                            colorClassName="accent-primary"
-                          />
+                          <Spinner size="sm" colorClassName="accent-primary" />
                         </View>
                       ) : (
                         <Image
@@ -251,10 +248,7 @@ export default function SettingsScreen() {
                 <View className="size-11 overflow-hidden rounded-full bg-secondary">
                   {uploadAvatar.isPending ? (
                     <View className="flex-1 items-center justify-center">
-                      <ActivityIndicator
-                        size="small"
-                        colorClassName="accent-primary"
-                      />
+                      <Spinner size="sm" colorClassName="accent-primary" />
                     </View>
                   ) : (
                     <View className="flex-1 items-center justify-center bg-primary/[0.08]">
@@ -370,7 +364,7 @@ export default function SettingsScreen() {
           >
             {systemHealth.isPending ? (
               <View className="items-center py-4">
-                <ActivityIndicator colorClassName="accent-primary" />
+                <Spinner colorClassName="accent-primary" />
               </View>
             ) : systemHealth.data ? (
               <>

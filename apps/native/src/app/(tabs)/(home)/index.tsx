@@ -1,7 +1,7 @@
 import {
-  IconLibrary,
+  IconBooks,
   IconPlayerPlay,
-  IconSparkles,
+  IconThumbUp,
 } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
@@ -106,7 +106,7 @@ export default function DashboardScreen() {
         {/* Library */}
         <Animated.View entering={FadeInDown.duration(300).delay(300)}>
           <View className="px-4">
-            <SectionHeader title="Your Library" icon={IconLibrary} />
+            <SectionHeader title="In Your Library" icon={IconBooks} />
           </View>
           {library.isPending ? (
             <HorizontalPosterRow items={[]} isLoading />
@@ -126,7 +126,7 @@ export default function DashboardScreen() {
         {hasRecommendations && (
           <Animated.View entering={FadeInDown.duration(300).delay(400)}>
             <View className="px-4">
-              <SectionHeader title="Recommended for You" icon={IconSparkles} />
+              <SectionHeader title="Recommended for You" icon={IconThumbUp} />
             </View>
             <HorizontalPosterRow
               items={recommendations.data?.items ?? []}

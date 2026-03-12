@@ -3,8 +3,8 @@ import {
   IconList,
   IconMovie,
   IconPlayerPlay,
-  IconSparkles,
   IconStarFilled,
+  IconThumbUp,
   IconUsers,
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -12,7 +12,6 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   FlatList,
   Pressable,
   RefreshControl,
@@ -31,6 +30,7 @@ import { Image } from "@/components/ui/image";
 import { PosterCard } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import { StarRating } from "@/components/ui/star-rating";
 import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
@@ -409,10 +409,7 @@ export default function TitleDetailScreen() {
               className="flex-row items-center gap-1.5 rounded-full bg-primary px-4 py-2"
             >
               {watchMovie.isPending ? (
-                <ActivityIndicator
-                  size="small"
-                  colorClassName="accent-primary-foreground"
-                />
+                <Spinner size="sm" />
               ) : (
                 <>
                   <IconCheck size={16} color={primaryForeground} />
@@ -503,7 +500,7 @@ export default function TitleDetailScreen() {
 
       {hydrateMutation.isPending && (
         <View className="items-center py-6">
-          <ActivityIndicator colorClassName="accent-primary" />
+          <Spinner colorClassName="accent-primary" />
           <Text className="mt-2 text-[13px] text-muted-foreground">
             Loading season data...
           </Text>
@@ -539,7 +536,7 @@ export default function TitleDetailScreen() {
             className="mt-6"
           >
             <View className="px-4">
-              <SectionHeader title="More Like This" icon={IconSparkles} />
+              <SectionHeader title="More Like This" icon={IconThumbUp} />
             </View>
             <FlatList
               horizontal

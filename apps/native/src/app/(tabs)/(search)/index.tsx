@@ -2,13 +2,14 @@ import { IconSearch } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, View } from "react-native";
+import { FlatList, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
 import {
   type SearchResultItem,
   SearchResultRow,
 } from "@/components/search/search-result-row";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useDebounce } from "@/hooks/use-debounce";
 import { orpc } from "@/lib/orpc";
@@ -151,7 +152,7 @@ export default function SearchScreen() {
         </Animated.View>
       ) : searchResults.isPending ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" colorClassName="accent-primary" />
+          <Spinner colorClassName="accent-primary" />
         </View>
       ) : allResults.length === 0 ? (
         <Animated.View

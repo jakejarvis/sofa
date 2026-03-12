@@ -1,9 +1,10 @@
 import { IconRefresh, IconWebhook } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
-import { ActivityIndicator, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { IntegrationCard } from "@/components/settings/integration-card";
 import { INTEGRATION_CONFIGS } from "@/components/settings/integration-configs";
 import { SectionHeader } from "@/components/ui/section-header";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
 
@@ -16,7 +17,7 @@ export function IntegrationsSection() {
 
       {integrations.isPending ? (
         <View className="items-center py-4">
-          <ActivityIndicator colorClassName="accent-primary" />
+          <Spinner colorClassName="accent-primary" />
         </View>
       ) : integrations.isError ? (
         <View className="items-center gap-2 py-4">

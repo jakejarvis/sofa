@@ -1,8 +1,9 @@
 import { IconLoader, IconPlus } from "@tabler/icons-react-native";
 import { memo } from "react";
-import { ActivityIndicator, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
 import { Image } from "@/components/ui/image";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 
 export interface SearchResultItem {
@@ -99,11 +100,7 @@ export const SearchResultRow = memo(function SearchResultRow({
       )}
 
       {isResolving && (
-        <ActivityIndicator
-          size="small"
-          colorClassName="accent-primary"
-          className="ml-2"
-        />
+        <Spinner size="sm" colorClassName="accent-primary" className="ml-2" />
       )}
     </Pressable>
   );
