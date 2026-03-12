@@ -58,7 +58,16 @@ export default function TitleDetailScreen() {
   const updateStatus = useMutation(
     orpc.titles.updateStatus.mutationOptions({
       onSuccess: (_data, { status }) => {
-        toast.success(status ? "Added to watchlist" : "Removed from library");
+        const statusMessages: Record<string, string> = {
+          watchlist: "Added to watchlist",
+          in_progress: "Marked as watching",
+          completed: "Marked as completed",
+        };
+        toast.success(
+          status
+            ? (statusMessages[status] ?? "Status updated")
+            : "Removed from library",
+        );
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
         queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
       },

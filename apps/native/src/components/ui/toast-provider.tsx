@@ -23,7 +23,7 @@ export function ToastProvider() {
   const activeDuration = activeToast?.duration;
 
   useEffect(() => {
-    if (!activeId || !activeType || !activeDuration) return;
+    if (!activeId || !activeType || activeDuration == null) return;
 
     hapticMap[activeType]();
 

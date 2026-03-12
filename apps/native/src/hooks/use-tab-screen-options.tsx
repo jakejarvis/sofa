@@ -17,7 +17,7 @@ export function useTabScreenOptions() {
   const contentStyle = useResolveClassNames("bg-background");
 
   return {
-    headerLargeTitleEnabled: true,
+    headerLargeTitle: true,
     headerTransparent: true,
     headerBlurEffect: "dark" as const,
     headerLargeStyle: { backgroundColor: "transparent" },

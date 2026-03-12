@@ -40,7 +40,7 @@ export function splitUrl(input: string): { protocol: string; host: string } {
 
 export function resolveUrl(path: string | null): string | null {
   if (!path) return null;
-  if (path.startsWith("http")) return path;
+  if (!path.startsWith("/")) return path;
   return `${getServerUrl()}${path}`;
 }
 
