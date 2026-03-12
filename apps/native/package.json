@@ -22,6 +22,7 @@
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
     "@orpc/tanstack-query": "catalog:",
+    "@react-native-menu/menu": "2.0.0",
     "@react-navigation/elements": "2.9.10",
     "@sofa/api": "workspace:*",
     "@sofa/tmdb": "workspace:*",
@@ -48,6 +49,8 @@
     "react-dom": "19.2.0",
     "react-native": "0.83.2",
     "react-native-gesture-handler": "2.30.0",
+    "react-native-ios-context-menu": "3.2.0",
+    "react-native-ios-utilities": "5.2.0",
     "react-native-keyboard-controller": "1.20.7",
     "react-native-reanimated": "4.2.1",
     "react-native-safe-area-context": "5.6.2",
@@ -57,6 +60,7 @@
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",
     "uniwind": "1.5.0",
+    "zeego": "3.0.6",
     "zod": "catalog:"
   },
   "devDependencies": {

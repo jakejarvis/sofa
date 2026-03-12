@@ -15,7 +15,7 @@ import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
 
 export default function SearchScreen() {
-  const { push } = useRouter();
+  const { navigate } = useRouter();
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query.trim(), 300);
@@ -33,7 +33,7 @@ export default function SearchScreen() {
     orpc.titles.resolve.mutationOptions({
       onSuccess: ({ id }) => {
         setResolvingId(null);
-        if (id) push(`/title/${id}`);
+        if (id) navigate(`/title/${id}`);
       },
       onError: () => setResolvingId(null),
     }),
@@ -43,7 +43,7 @@ export default function SearchScreen() {
     orpc.people.resolve.mutationOptions({
       onSuccess: ({ id }) => {
         setResolvingId(null);
-        if (id) push(`/person/${id}`);
+        if (id) navigate(`/person/${id}`);
       },
       onError: () => setResolvingId(null),
     }),

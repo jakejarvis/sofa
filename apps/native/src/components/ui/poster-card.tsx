@@ -54,7 +54,7 @@ export function PosterCard({
   episodeProgress,
   width = 140,
 }: PosterCardProps) {
-  const { push } = useRouter();
+  const { navigate } = useRouter();
   const primaryColor = useCSSVariable("--color-primary") as string;
   const watchlistColor = useCSSVariable("--color-status-watchlist") as string;
   const watchingColor = useCSSVariable("--color-status-watching") as string;
@@ -79,7 +79,7 @@ export function PosterCard({
     orpc.titles.resolve.mutationOptions({
       onSuccess: ({ id: resolvedId }) => {
         if (resolvedId) {
-          push(`/title/${resolvedId}`);
+          navigate(`/title/${resolvedId}`);
         }
       },
     }),

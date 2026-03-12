@@ -1,6 +1,7 @@
 import type { Stack } from "expo-router";
 import type { ComponentProps } from "react";
 import { useCSSVariable, useResolveClassNames } from "uniwind";
+import { HeaderAvatar } from "@/components/header-avatar";
 
 type ScreenOptions = NonNullable<
   Extract<ComponentProps<typeof Stack>["screenOptions"], object>
@@ -26,13 +27,19 @@ export function useTabScreenOptions() {
     headerShadowVisible: false,
     headerLargeTitleShadowVisible: false,
     headerBackButtonDisplayMode: "minimal" as const,
-    // should fix "Using both `blurEffect` and `scrollEdgeEffects` simultaneously may cause overlapping effects" warning:
     scrollEdgeEffects: {
       top: "hidden" as const,
       bottom: "hidden" as const,
       left: "hidden" as const,
       right: "hidden" as const,
     },
+    unstable_headerRightItems: () => [
+      {
+        type: "custom" as const,
+        element: <HeaderAvatar />,
+        hidesSharedBackground: true,
+      },
+    ],
     contentStyle,
   } satisfies ScreenOptions;
 }

@@ -28,7 +28,7 @@ export interface HeroBannerItem {
 }
 
 export function HeroBanner({ item }: { item: HeroBannerItem }) {
-  const { push } = useRouter();
+  const { navigate } = useRouter();
   const primary = useCSSVariable("--color-primary") as string;
   const pressed = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => ({
@@ -38,7 +38,7 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
   const resolveMutation = useMutation(
     orpc.titles.resolve.mutationOptions({
       onSuccess: ({ id }) => {
-        push(`/title/${id}`);
+        navigate(`/title/${id}`);
       },
     }),
   );

@@ -53,7 +53,7 @@ export function TitleActionSheetProvider({
 }) {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [target, setTarget] = useState<TitleActionTarget | null>(null);
-  const { push } = useRouter();
+  const { navigate } = useRouter();
 
   const cardColor = useCSSVariable("--color-card") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
@@ -128,7 +128,7 @@ export function TitleActionSheetProvider({
               target={target}
               onViewDetails={() => {
                 bottomSheetRef.current?.close();
-                if (target.id) push(`/title/${target.id}`);
+                if (target.id) navigate(`/title/${target.id}`);
               }}
               onQuickAdd={() =>
                 quickAdd.mutate({
