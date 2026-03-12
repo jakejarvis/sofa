@@ -15,6 +15,7 @@ export function CastCard({
 }: {
   person: {
     id: string;
+    personId: string;
     name: string;
     character: string | null;
     profilePath: string | null;
@@ -34,7 +35,7 @@ export function CastCard({
     });
 
   return (
-    <Link href={`/person/${person.id}` as `/person/${string}`}>
+    <Link href={`/person/${person.personId}` as `/person/${string}`}>
       <Link.Trigger>
         <GestureDetector gesture={tapGesture}>
           <Animated.View className="w-20 items-center" style={animatedStyle}>

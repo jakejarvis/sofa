@@ -24,7 +24,12 @@
     },
     "plugins": [
       ["expo-router", { "root": "./src/app" }],
-      "expo-secure-store",
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true
+        }
+      ],
       [
         "expo-font",
         {
