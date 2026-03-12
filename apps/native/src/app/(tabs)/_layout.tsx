@@ -1,12 +1,15 @@
 import { Redirect } from "expo-router";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
-import { colors } from "@/constants/colors";
+import { useCSSVariable } from "uniwind";
 import { authClient } from "@/lib/auth-client";
 import { hasStoredServerUrl } from "@/lib/server-url";
 import * as Haptics from "@/utils/haptics";
 
 export default function TabLayout() {
   const { data: session, isPending } = authClient.useSession();
+
+  const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
+  const primaryColor = useCSSVariable("--color-primary") as string;
 
   if (!process.env.EXPO_PUBLIC_SERVER_URL && !hasStoredServerUrl()) {
     return <Redirect href="/(auth)/server-url" />;
@@ -17,12 +20,12 @@ export default function TabLayout() {
   return (
     <NativeTabs
       iconColor={{
-        default: colors.mutedForeground,
-        selected: colors.primary,
+        default: mutedFgColor,
+        selected: primaryColor,
       }}
       labelStyle={{
-        default: { color: colors.mutedForeground },
-        selected: { color: colors.primary },
+        default: { color: mutedFgColor },
+        selected: { color: primaryColor },
       }}
       screenListeners={{
         tabPress: () => {

@@ -14,7 +14,6 @@ import { HorizontalPosterRow } from "@/components/dashboard/horizontal-poster-ro
 import { StatsCard } from "@/components/dashboard/stats-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SectionHeader } from "@/components/ui/section-header";
-import { colors } from "@/constants/colors";
 import { authClient } from "@/lib/auth-client";
 import { orpc, queryClient } from "@/utils/orpc";
 
@@ -54,7 +53,7 @@ export default function DashboardScreen() {
 
   return (
     <ScrollView
-      style={{ backgroundColor: colors.background }}
+      className="bg-background"
       contentContainerStyle={{
         paddingBottom: 16,
       }}
@@ -63,7 +62,7 @@ export default function DashboardScreen() {
         <RefreshControl
           refreshing={isRefreshing}
           onRefresh={onRefresh}
-          tintColor={colors.primary}
+          tintColorClassName="accent-primary"
         />
       }
     >

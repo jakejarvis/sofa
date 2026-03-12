@@ -1,25 +1,26 @@
 import { Stack } from "expo-router";
-
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { useCSSVariable, useResolveClassNames } from "uniwind";
 
 export default function HomeLayout() {
+  const headerLargeTitleStyle = useResolveClassNames(
+    "font-display text-foreground",
+  );
+  const headerTitleStyle = useResolveClassNames("text-foreground");
+  const contentStyle = useResolveClassNames("bg-background");
+
   return (
     <Stack
       screenOptions={{
         headerLargeTitle: true,
         headerTransparent: true,
         headerBlurEffect: "systemMaterialDark",
-        headerLargeTitleStyle: {
-          color: colors.foreground,
-          fontFamily: fonts.display,
-        },
-        headerTitleStyle: { color: colors.foreground },
-        headerTintColor: colors.primary,
+        headerLargeTitleStyle: headerLargeTitleStyle as { color?: string },
+        headerTitleStyle: headerTitleStyle as { color?: string },
+        headerTintColor: useCSSVariable("--color-primary") as string,
         headerShadowVisible: false,
         headerLargeTitleShadowVisible: false,
         headerBackButtonDisplayMode: "minimal",
-        contentStyle: { backgroundColor: colors.background },
+        contentStyle,
       }}
     />
   );

@@ -1,7 +1,5 @@
-import { Pressable, Text } from "react-native";
-
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Pressable } from "react-native";
+import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
 
 export function GenreChip({
@@ -19,17 +17,10 @@ export function GenreChip({
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         onPress();
       }}
-      className="mr-2 rounded-full px-3 py-1.5"
-      style={{
-        backgroundColor: isSelected ? colors.primary : colors.secondary,
-      }}
+      className={`mr-2 rounded-full px-3 py-1.5 ${isSelected ? "bg-primary" : "bg-secondary"}`}
     >
       <Text
-        style={{
-          fontFamily: fonts.sansMedium,
-          fontSize: 12,
-          color: isSelected ? colors.primaryForeground : colors.foreground,
-        }}
+        className={`font-sans-medium text-[12px] ${isSelected ? "text-primary-foreground" : "text-foreground"}`}
       >
         {label}
       </Text>

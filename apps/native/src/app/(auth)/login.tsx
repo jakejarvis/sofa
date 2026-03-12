@@ -6,7 +6,6 @@ import {
   Alert,
   Pressable,
   ScrollView,
-  Text,
   type TextInput,
   View,
 } from "react-native";
@@ -16,14 +15,13 @@ import { z } from "zod";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { SofaLogo } from "@/components/ui/sofa-logo";
 import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
 import {
   FieldError,
   Input,
   Label,
   TextField,
 } from "@/components/ui/text-field";
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
 import { authClient } from "@/lib/auth-client";
 import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
@@ -81,30 +79,17 @@ export default function LoginScreen() {
       }}
       keyboardShouldPersistTaps="handled"
       bounces={false}
-      style={{ backgroundColor: colors.background }}
+      className="bg-background"
     >
       <Animated.View
         entering={FadeIn.duration(400)}
         className="mb-8 items-center"
       >
         <SofaLogo size={48} />
-        <Text
-          style={{
-            fontFamily: fonts.display,
-            fontSize: 32,
-            color: colors.foreground,
-            marginTop: 12,
-          }}
-        >
+        <Text className="mt-3 font-display text-[32px] text-foreground">
           Sofa
         </Text>
-        <Text
-          style={{
-            fontSize: 14,
-            color: colors.mutedForeground,
-            marginTop: 4,
-          }}
-        >
+        <Text className="mt-1 text-muted-foreground text-sm">
           Sign in to continue
         </Text>
       </Animated.View>
@@ -131,23 +116,9 @@ export default function LoginScreen() {
 
           {showPasswordLogin && (
             <View className="my-4 flex-row items-center">
-              <View
-                className="h-px flex-1"
-                style={{ backgroundColor: colors.border }}
-              />
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: colors.mutedForeground,
-                  paddingHorizontal: 12,
-                }}
-              >
-                OR
-              </Text>
-              <View
-                className="h-px flex-1"
-                style={{ backgroundColor: colors.border }}
-              />
+              <View className="h-px flex-1 bg-border" />
+              <Text className="px-3 text-muted-foreground text-xs">OR</Text>
+              <View className="h-px flex-1 bg-border" />
             </View>
           )}
         </Animated.View>
@@ -219,8 +190,7 @@ export default function LoginScreen() {
                 <Button
                   onPress={form.handleSubmit}
                   disabled={isSubmitting}
-                  style={{ backgroundColor: colors.primary }}
-                  className="mt-1"
+                  className="mt-1 bg-primary"
                 >
                   {isSubmitting ? (
                     <Spinner size="sm" />
@@ -241,9 +211,7 @@ export default function LoginScreen() {
         >
           <Link href="/(auth)/register" asChild>
             <Pressable>
-              <Text style={{ color: colors.primary, fontSize: 14 }}>
-                Create an account
-              </Text>
+              <Text className="text-primary text-sm">Create an account</Text>
             </Pressable>
           </Link>
         </Animated.View>
@@ -255,9 +223,7 @@ export default function LoginScreen() {
       >
         <Link href="/(auth)/server-url" asChild>
           <Pressable>
-            <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>
-              Change server
-            </Text>
+            <Text className="text-muted-foreground text-xs">Change server</Text>
           </Pressable>
         </Link>
       </Animated.View>

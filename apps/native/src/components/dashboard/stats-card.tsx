@@ -1,7 +1,5 @@
-import { Text, View } from "react-native";
-
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 export function StatsCard({
   label,
@@ -12,34 +10,16 @@ export function StatsCard({
 }) {
   return (
     <View
-      className="mr-3 rounded-xl px-4 py-3"
-      style={{
-        backgroundColor: colors.card,
-        borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.06)",
-        borderCurve: "continuous",
-        minWidth: 120,
-      }}
+      className="mr-3 min-w-[120px] rounded-xl border border-white/[0.06] bg-card px-4 py-3"
+      style={{ borderCurve: "continuous" }}
     >
       <Text
-        style={{
-          fontFamily: fonts.sansBold,
-          fontSize: 24,
-          color: colors.primary,
-          fontVariant: ["tabular-nums"],
-        }}
+        className="font-sans-bold text-[24px] text-primary"
+        style={{ fontVariant: ["tabular-nums"] }}
       >
         {value ?? "—"}
       </Text>
-      <Text
-        style={{
-          fontSize: 11,
-          color: colors.mutedForeground,
-          marginTop: 2,
-        }}
-      >
-        {label}
-      </Text>
+      <Text className="mt-0.5 text-[11px] text-muted-foreground">{label}</Text>
     </View>
   );
 }

@@ -1,15 +1,13 @@
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Text } from "@/components/ui/text";
 
 export interface ContinueWatchingItem {
   title: {
@@ -44,40 +42,31 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
           }
         >
           <Animated.View
+            className="mr-3 w-[200px] overflow-hidden rounded-[12px] border bg-card"
             style={[
               animatedStyle,
               {
-                width: 200,
-                marginRight: 12,
-                backgroundColor: colors.card,
-                borderWidth: 1,
                 borderColor: "rgba(255,255,255,0.06)",
-                borderRadius: 12,
                 borderCurve: "continuous",
-                overflow: "hidden",
               },
             ]}
           >
-            <View style={{ width: 200, height: 112 }}>
+            <View className="h-28 w-[200px]">
               {item.title.backdropPath && (
                 <Image
                   source={{ uri: item.title.backdropPath }}
-                  style={{ width: "100%", height: "100%" }}
+                  className="h-full w-full"
                   contentFit="cover"
                 />
               )}
               <View
-                className="absolute right-0 bottom-0 left-0"
-                style={{
-                  height: 3,
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                }}
+                className="absolute right-0 bottom-0 left-0 h-[3px]"
+                style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
               >
                 <View
+                  className="h-full bg-status-watching"
                   style={{
-                    height: "100%",
                     width: `${item.totalEpisodes > 0 ? (item.watchedEpisodes / item.totalEpisodes) * 100 : 0}%`,
-                    backgroundColor: colors.statusWatching,
                   }}
                 />
               </View>
@@ -85,22 +74,14 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
             <View className="p-2.5">
               <Text
                 numberOfLines={1}
-                style={{
-                  fontFamily: fonts.sansMedium,
-                  fontSize: 13,
-                  color: colors.foreground,
-                }}
+                className="font-sans-medium text-[13px] text-foreground"
               >
                 {item.title.title}
               </Text>
               {item.nextEpisode && (
                 <Text
                   numberOfLines={1}
-                  style={{
-                    fontSize: 11,
-                    color: colors.mutedForeground,
-                    marginTop: 2,
-                  }}
+                  className="mt-0.5 text-[11px] text-muted-foreground"
                 >
                   S{item.nextEpisode.seasonNumber}E
                   {item.nextEpisode.episodeNumber}

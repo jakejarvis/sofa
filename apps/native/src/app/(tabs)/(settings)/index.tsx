@@ -23,18 +23,17 @@ import {
   RefreshControl,
   ScrollView,
   Switch,
-  Text,
   TextInput,
   View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useCSSVariable } from "uniwind";
 import { AddIntegrationRow } from "@/components/settings/add-integration-row";
 import { BackupsSection } from "@/components/settings/backups-section";
 import { IntegrationRow } from "@/components/settings/integration-row";
 import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
 import { getServerUrl } from "@/lib/server-url";
 import * as Haptics from "@/utils/haptics";
@@ -160,6 +159,9 @@ export default function SettingsScreen() {
     }),
   );
 
+  const primaryFgColor = useCSSVariable("--color-primary-foreground") as string;
+  const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
+
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -184,7 +186,7 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView
-      style={{ backgroundColor: colors.background }}
+      className="bg-background"
       contentContainerStyle={{
         paddingBottom: 32,
         paddingHorizontal: 16,
@@ -194,7 +196,7 @@ export default function SettingsScreen() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColor={colors.primary}
+          tintColorClassName="accent-primary"
         />
       }
     >
@@ -204,25 +206,17 @@ export default function SettingsScreen() {
       <Animated.View entering={FadeInDown.duration(300).delay(100)}>
         <SettingsSection title="Account" icon={IconUser}>
           <View
-            className="flex-row items-center py-3.5"
-            style={{
-              borderBottomWidth: 0.5,
-              borderBottomColor: colors.border,
-            }}
+            className="flex-row items-center border-border border-b py-3.5"
+            style={{ borderBottomWidth: 0.5 }}
           >
             <Pressable onPress={handleAvatarPress} className="mr-3">
-              <View
-                className="overflow-hidden"
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 22,
-                  backgroundColor: colors.secondary,
-                }}
-              >
+              <View className="size-11 overflow-hidden rounded-full bg-secondary">
                 {uploadAvatar.isPending ? (
                   <View className="flex-1 items-center justify-center">
-                    <ActivityIndicator size="small" color={colors.primary} />
+                    <ActivityIndicator
+                      size="small"
+                      colorClassName="accent-primary"
+                    />
                   </View>
                 ) : session?.user?.image ? (
                   <Image
@@ -231,31 +225,15 @@ export default function SettingsScreen() {
                     contentFit="cover"
                   />
                 ) : (
-                  <View
-                    className="flex-1 items-center justify-center"
-                    style={{ backgroundColor: `${colors.primary}15` }}
-                  >
-                    <Text
-                      style={{
-                        fontFamily: fonts.sansMedium,
-                        fontSize: 18,
-                        color: colors.primary,
-                      }}
-                    >
+                  <View className="flex-1 items-center justify-center bg-primary/[0.08]">
+                    <Text className="font-sans-medium text-lg text-primary">
                       {session?.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
                     </Text>
                   </View>
                 )}
               </View>
-              <View
-                className="absolute right-0 bottom-0 items-center justify-center rounded-full"
-                style={{
-                  width: 18,
-                  height: 18,
-                  backgroundColor: colors.primary,
-                }}
-              >
-                <IconCamera size={10} color={colors.primaryForeground} />
+              <View className="absolute right-0 bottom-0 size-[18px] items-center justify-center rounded-full bg-primary">
+                <IconCamera size={10} color={primaryFgColor} />
               </View>
             </Pressable>
             <View className="flex-1">
@@ -264,22 +242,13 @@ export default function SettingsScreen() {
                   <TextInput
                     value={nameInput}
                     onChangeText={setNameInput}
-                    style={{
-                      flex: 1,
-                      color: colors.foreground,
-                      fontSize: 15,
-                      borderBottomWidth: 1,
-                      borderBottomColor: colors.primary,
-                      paddingVertical: 2,
-                    }}
+                    className="flex-1 border-primary border-b py-0.5 font-sans text-[15px] text-foreground"
                     autoFocus
                   />
                   <Pressable
                     onPress={() => updateName.mutate({ name: nameInput })}
                   >
-                    <Text style={{ color: colors.primary, fontSize: 14 }}>
-                      Save
-                    </Text>
+                    <Text className="text-primary text-sm">Save</Text>
                   </Pressable>
                   <Pressable
                     onPress={() => {
@@ -287,49 +256,28 @@ export default function SettingsScreen() {
                       setIsEditingName(false);
                     }}
                   >
-                    <Text
-                      style={{ color: colors.mutedForeground, fontSize: 14 }}
-                    >
+                    <Text className="text-muted-foreground text-sm">
                       Cancel
                     </Text>
                   </Pressable>
                 </View>
               ) : (
                 <Pressable onPress={() => setIsEditingName(true)}>
-                  <Text
-                    style={{
-                      fontFamily: fonts.sansMedium,
-                      fontSize: 16,
-                      color: colors.foreground,
-                    }}
-                  >
+                  <Text className="font-sans-medium text-base text-foreground">
                     {session?.user?.name}
                   </Text>
                 </Pressable>
               )}
               <Text
                 selectable
-                style={{
-                  fontSize: 13,
-                  color: colors.mutedForeground,
-                  marginTop: 2,
-                }}
+                className="mt-0.5 text-[13px] text-muted-foreground"
               >
                 {session?.user?.email}
               </Text>
             </View>
             {isAdmin && (
-              <View
-                className="rounded-full px-2 py-0.5"
-                style={{ backgroundColor: `${colors.primary}20` }}
-              >
-                <Text
-                  style={{
-                    fontSize: 10,
-                    color: colors.primary,
-                    fontFamily: fonts.sansMedium,
-                  }}
-                >
+              <View className="rounded-full bg-primary/10 px-2 py-0.5">
+                <Text className="font-sans-medium text-[10px] text-primary">
                   Admin
                 </Text>
               </View>
@@ -362,7 +310,7 @@ export default function SettingsScreen() {
         <SettingsSection title="Integrations" icon={IconPuzzle}>
           {integrations.isPending ? (
             <View className="items-center py-4">
-              <ActivityIndicator color={colors.primary} />
+              <ActivityIndicator colorClassName="accent-primary" />
             </View>
           ) : (
             <>
@@ -394,7 +342,7 @@ export default function SettingsScreen() {
           >
             {systemHealth.isPending ? (
               <View className="items-center py-4">
-                <ActivityIndicator color={colors.primary} />
+                <ActivityIndicator colorClassName="accent-primary" />
               </View>
             ) : systemHealth.data ? (
               <>
@@ -432,42 +380,34 @@ export default function SettingsScreen() {
         <Animated.View entering={FadeInDown.duration(300).delay(500)}>
           <SettingsSection title="Security" icon={IconShield} badge="Admin">
             <View
-              className="flex-row items-center justify-between py-3.5"
-              style={{
-                borderBottomWidth: 0.5,
-                borderBottomColor: colors.border,
-              }}
+              className="flex-row items-center justify-between border-border border-b py-3.5"
+              style={{ borderBottomWidth: 0.5 }}
             >
               <View className="flex-row items-center gap-3">
-                <IconUserPlus size={20} color={colors.mutedForeground} />
-                <Text style={{ fontSize: 15, color: colors.foreground }}>
+                <IconUserPlus size={20} color={mutedFgColor} />
+                <Text className="text-[15px] text-foreground">
                   Registration
                 </Text>
               </View>
               <Switch
                 value={registration.data?.open ?? false}
                 onValueChange={(open) => toggleRegistration.mutate({ open })}
-                trackColor={{
-                  false: colors.secondary,
-                  true: `${colors.primary}80`,
-                }}
-                thumbColor={
+                trackColorOffClassName="accent-secondary"
+                trackColorOnClassName="accent-primary/50"
+                thumbColorClassName={
                   registration.data?.open
-                    ? colors.primary
-                    : colors.mutedForeground
+                    ? "accent-primary"
+                    : "accent-muted-foreground"
                 }
               />
             </View>
             <View
-              className="flex-row items-center justify-between py-3.5"
-              style={{
-                borderBottomWidth: 0.5,
-                borderBottomColor: colors.border,
-              }}
+              className="flex-row items-center justify-between border-border border-b py-3.5"
+              style={{ borderBottomWidth: 0.5 }}
             >
               <View className="flex-row items-center gap-3">
-                <IconCloud size={20} color={colors.mutedForeground} />
-                <Text style={{ fontSize: 15, color: colors.foreground }}>
+                <IconCloud size={20} color={mutedFgColor} />
+                <Text className="text-[15px] text-foreground">
                   Update Checks
                 </Text>
               </View>
@@ -476,26 +416,18 @@ export default function SettingsScreen() {
                 onValueChange={(enabled) =>
                   toggleUpdateCheck.mutate({ enabled })
                 }
-                trackColor={{
-                  false: colors.secondary,
-                  true: `${colors.primary}80`,
-                }}
-                thumbColor={
+                trackColorOffClassName="accent-secondary"
+                trackColorOnClassName="accent-primary/50"
+                thumbColorClassName={
                   updateCheck.data?.enabled
-                    ? colors.primary
-                    : colors.mutedForeground
+                    ? "accent-primary"
+                    : "accent-muted-foreground"
                 }
               />
             </View>
             {updateCheck.data?.updateCheck?.updateAvailable && (
               <View className="py-3.5">
-                <Text
-                  style={{
-                    fontSize: 13,
-                    color: colors.statusCompleted,
-                    fontFamily: fonts.sansMedium,
-                  }}
-                >
+                <Text className="font-sans-medium text-[13px] text-status-completed">
                   Update available: {updateCheck.data.updateCheck.latestVersion}
                 </Text>
               </View>
@@ -516,7 +448,7 @@ export default function SettingsScreen() {
         entering={FadeInDown.duration(300).delay(400)}
         className="mt-4 items-center"
       >
-        <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
+        <Text className="text-muted-foreground text-xs">
           Sofa Mobile
           {updateCheck.data?.updateCheck?.currentVersion
             ? ` · Server ${updateCheck.data.updateCheck.currentVersion}`

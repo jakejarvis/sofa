@@ -1,11 +1,10 @@
 import { IconWifiOff } from "@tabler/icons-react-native";
 import * as Network from "expo-network";
 import { useEffect, useRef, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import Animated, { SlideInUp, SlideOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
 
 export function OfflineBanner() {
@@ -52,18 +51,9 @@ export function OfflineBanner() {
         zIndex: 100,
       }}
     >
-      <View
-        className="mx-4 flex-row items-center justify-center gap-2 rounded-xl px-4 py-2.5"
-        style={{ backgroundColor: colors.destructive }}
-      >
+      <View className="mx-4 flex-row items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5">
         <IconWifiOff size={16} color="white" />
-        <Text
-          style={{
-            fontFamily: fonts.sansMedium,
-            fontSize: 13,
-            color: "white",
-          }}
-        >
+        <Text className="font-sans-medium text-[13px] text-white">
           No internet connection
         </Text>
       </View>

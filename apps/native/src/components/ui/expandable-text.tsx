@@ -1,9 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import type { NativeSyntheticEvent, TextLayoutEventData } from "react-native";
-import { Pressable, Text, View } from "react-native";
-
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Pressable, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
 export function ExpandableText({
   text,
@@ -42,23 +40,13 @@ export function ExpandableText({
         selectable
         numberOfLines={expanded ? undefined : maxLines}
         onTextLayout={onTextLayout}
-        style={{
-          fontSize: 14,
-          lineHeight: 22,
-          color: colors.foreground,
-        }}
+        className="text-[14px] text-foreground leading-[22px]"
       >
         {text}
       </Text>
       {needsTruncation && (
         <Pressable onPress={() => setExpanded(!expanded)} className="mt-1">
-          <Text
-            style={{
-              fontSize: 13,
-              color: colors.primary,
-              fontFamily: fonts.sansMedium,
-            }}
-          >
+          <Text className="font-sans-medium text-[13px] text-primary">
             {expanded ? "Show less" : "Show more"}
           </Text>
         </Pressable>

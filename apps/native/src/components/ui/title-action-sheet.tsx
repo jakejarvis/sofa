@@ -18,9 +18,9 @@ import {
   useRef,
   useState,
 } from "react";
-import { Pressable, Text, View } from "react-native";
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Pressable, View } from "react-native";
+import { useCSSVariable } from "uniwind";
+import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
 
@@ -54,6 +54,9 @@ export function TitleActionSheetProvider({
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [target, setTarget] = useState<TitleActionTarget | null>(null);
   const { push } = useRouter();
+
+  const cardColor = useCSSVariable("--color-card") as string;
+  const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
   const quickAdd = useMutation(
     orpc.titles.quickAdd.mutationOptions({
@@ -113,10 +116,10 @@ export function TitleActionSheetProvider({
         enableDynamicSizing
         enablePanDownToClose
         backdropComponent={renderBackdrop}
-        backgroundStyle={{ backgroundColor: colors.card }}
-        handleIndicatorStyle={{ backgroundColor: colors.mutedForeground }}
+        backgroundStyle={{ backgroundColor: cardColor }}
+        handleIndicatorStyle={{ backgroundColor: mutedFgColor }}
       >
-        <BottomSheetView style={{ paddingBottom: 40 }}>
+        <BottomSheetView className="pb-10">
           {target && (
             <SheetContent
               target={target}
@@ -158,23 +161,24 @@ function SheetContent({
   onMarkWatched: (id: string) => void;
   onRemove: (id: string) => void;
 }) {
+  const foregroundColor = useCSSVariable("--color-foreground") as string;
+  const primaryColor = useCSSVariable("--color-primary") as string;
+  const watchingColor = useCSSVariable("--color-status-watching") as string;
+  const completedColor = useCSSVariable("--color-status-completed") as string;
+  const destructiveColor = useCSSVariable("--color-destructive") as string;
+
   return (
     <View className="px-4 pb-4">
       <Text
         numberOfLines={1}
-        style={{
-          fontFamily: fonts.display,
-          fontSize: 18,
-          color: colors.foreground,
-          marginBottom: 16,
-        }}
+        className="mb-4 font-display text-foreground text-lg"
       >
         {target.title}
       </Text>
 
       {target.id && (
         <ActionRow
-          icon={<IconPlayerPlay size={20} color={colors.foreground} />}
+          icon={<IconPlayerPlay size={20} color={foregroundColor} />}
           label="View Details"
           onPress={onViewDetails}
         />
@@ -182,7 +186,7 @@ function SheetContent({
 
       {!target.userStatus && (
         <ActionRow
-          icon={<IconBookmark size={20} color={colors.primary} />}
+          icon={<IconBookmark size={20} color={primaryColor} />}
           label="Add to Watchlist"
           onPress={onQuickAdd}
         />
@@ -190,7 +194,7 @@ function SheetContent({
 
       {target.id && target.userStatus !== "in_progress" && (
         <ActionRow
-          icon={<IconPlayerPlay size={20} color={colors.statusWatching} />}
+          icon={<IconPlayerPlay size={20} color={watchingColor} />}
           label="Mark as Watching"
           onPress={() => onMarkWatching(target.id as string)}
         />
@@ -198,7 +202,7 @@ function SheetContent({
 
       {target.id && target.type === "movie" && (
         <ActionRow
-          icon={<IconCheck size={20} color={colors.statusCompleted} />}
+          icon={<IconCheck size={20} color={completedColor} />}
           label="Mark as Watched"
           onPress={() => onMarkWatched(target.id as string)}
         />
@@ -206,7 +210,7 @@ function SheetContent({
 
       {target.id && target.userStatus && (
         <ActionRow
-          icon={<IconTrash size={20} color={colors.destructive} />}
+          icon={<IconTrash size={20} color={destructiveColor} />}
           label="Remove from Library"
           onPress={() => onRemove(target.id as string)}
           destructive
@@ -230,18 +234,11 @@ function ActionRow({
   return (
     <Pressable
       onPress={onPress}
-      className="flex-row items-center gap-3 rounded-xl px-3 py-3.5"
-      style={({ pressed }) => ({
-        backgroundColor: pressed ? colors.secondary : "transparent",
-      })}
+      className="flex-row items-center gap-3 rounded-xl px-3 py-3.5 active:bg-secondary"
     >
       {icon}
       <Text
-        style={{
-          fontFamily: fonts.sansMedium,
-          fontSize: 15,
-          color: destructive ? colors.destructive : colors.foreground,
-        }}
+        className={`font-sans-medium text-[15px] ${destructive ? "text-destructive" : "text-foreground"}`}
       >
         {label}
       </Text>

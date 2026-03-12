@@ -7,7 +7,6 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
 import { FilterableTitleRow } from "@/components/explore/filterable-title-row";
 import { HeroBanner } from "@/components/explore/hero-banner";
-import { colors } from "@/constants/colors";
 import { orpc, queryClient } from "@/utils/orpc";
 
 export default function ExploreScreen() {
@@ -41,7 +40,7 @@ export default function ExploreScreen() {
 
   return (
     <ScrollView
-      style={{ backgroundColor: colors.background }}
+      className="bg-background"
       contentContainerStyle={{
         paddingBottom: 16,
       }}
@@ -50,7 +49,7 @@ export default function ExploreScreen() {
         <RefreshControl
           refreshing={isRefreshing}
           onRefresh={onRefresh}
-          tintColor={colors.primary}
+          tintColorClassName="accent-primary"
         />
       }
     >

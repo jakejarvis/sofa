@@ -5,10 +5,9 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import { Uniwind } from "uniwind";
+import { Uniwind, useResolveClassNames } from "uniwind";
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { TitleActionSheetProvider } from "@/components/ui/title-action-sheet";
-import { colors } from "@/constants/colors";
 import { queryClient } from "@/utils/orpc";
 
 export const unstable_settings = {
@@ -16,6 +15,8 @@ export const unstable_settings = {
 };
 
 function AppContent() {
+  const contentStyle = useResolveClassNames("bg-background");
+
   useEffect(() => {
     Uniwind.setTheme("dark");
   }, []);
@@ -27,7 +28,7 @@ function AppContent() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: colors.background },
+          contentStyle,
           animation: "slide_from_right",
         }}
       >

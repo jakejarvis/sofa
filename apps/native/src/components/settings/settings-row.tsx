@@ -1,9 +1,8 @@
 import type { Icon } from "@tabler/icons-react-native";
 import { IconChevronRight } from "@tabler/icons-react-native";
-import { Pressable, Text } from "react-native";
-
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Pressable } from "react-native";
+import { useCSSVariable } from "uniwind";
+import { Text } from "@/components/ui/text";
 
 export function SettingsRow({
   label,
@@ -20,48 +19,41 @@ export function SettingsRow({
   destructive?: boolean;
   disabled?: boolean;
 }) {
+  const destructiveColor = useCSSVariable("--color-destructive") as string;
+  const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
+
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled || !onPress}
-      className="flex-row items-center py-3.5"
+      className="flex-row items-center border-border border-b py-3.5"
       style={[
-        { borderBottomWidth: 0.5, borderBottomColor: colors.border },
+        { borderBottomWidth: 0.5 },
         disabled ? { opacity: 0.5 } : undefined,
       ]}
     >
       {IconComponent && (
         <IconComponent
           size={20}
-          color={destructive ? colors.destructive : colors.mutedForeground}
-          style={{ marginRight: 12 }}
+          color={destructive ? destructiveColor : mutedFgColor}
+          className="mr-3"
         />
       )}
       <Text
-        style={{
-          flex: 1,
-          fontFamily: fonts.sans,
-          fontSize: 15,
-          color: destructive ? colors.destructive : colors.foreground,
-        }}
+        className={`flex-1 text-[15px] ${destructive ? "text-destructive" : "text-foreground"}`}
       >
         {label}
       </Text>
       {value ? (
         <Text
           selectable
-          style={{
-            fontSize: 14,
-            color: colors.mutedForeground,
-            marginRight: 4,
-            maxWidth: 160,
-          }}
+          className="mr-1 max-w-[160px] text-[14px] text-muted-foreground"
           numberOfLines={1}
         >
           {value}
         </Text>
       ) : null}
-      {onPress && <IconChevronRight size={16} color={colors.mutedForeground} />}
+      {onPress && <IconChevronRight size={16} color={mutedFgColor} />}
     </Pressable>
   );
 }

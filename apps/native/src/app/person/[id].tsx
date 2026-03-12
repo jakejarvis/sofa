@@ -6,22 +6,15 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import {
-  Pressable,
-  ScrollView,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
+import { useCSSVariable } from "uniwind";
 import { ExpandableText } from "@/components/ui/expandable-text";
 import { PosterCard } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Text } from "@/components/ui/text";
 import { orpc } from "@/utils/orpc";
 
 const FILMOGRAPHY_GAP = 12;
@@ -35,6 +28,8 @@ export default function PersonDetailScreen() {
   const columnWidth =
     (screenWidth - FILMOGRAPHY_PADDING * 2 - FILMOGRAPHY_GAP) / 2;
 
+  const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
+
   const { data, isPending, isError } = useQuery(
     orpc.people.detail.queryOptions({ input: { id } }),
   );
@@ -42,12 +37,8 @@ export default function PersonDetailScreen() {
   if (isPending) {
     return (
       <View
-        style={{
-          backgroundColor: colors.background,
-          flex: 1,
-          paddingTop: insets.top + 56,
-        }}
-        className="items-center"
+        className="flex-1 items-center bg-background"
+        style={{ paddingTop: insets.top + 56 }}
       >
         {/* Profile photo skeleton */}
         <Skeleton width={120} height={120} borderRadius={60} />
@@ -66,14 +57,7 @@ export default function PersonDetailScreen() {
           style={{ marginTop: 8 }}
         />
         {/* Bio skeleton */}
-        <View
-          style={{
-            alignSelf: "stretch",
-            paddingHorizontal: 16,
-            marginTop: 24,
-            gap: 8,
-          }}
-        >
+        <View className="mt-6 gap-2 self-stretch px-4">
           <Skeleton width="100%" height={14} />
           <Skeleton width="100%" height={14} />
           <Skeleton width="60%" height={14} />
@@ -85,36 +69,19 @@ export default function PersonDetailScreen() {
   if (isError && !data) {
     return (
       <View
-        className="flex-1 items-center justify-center"
-        style={{
-          backgroundColor: colors.background,
-          paddingTop: insets.top,
-        }}
+        className="flex-1 items-center justify-center bg-background"
+        style={{ paddingTop: insets.top }}
       >
         <Animated.View entering={FadeIn.duration(400)} className="items-center">
-          <IconAlertTriangle size={48} color={colors.mutedForeground} />
-          <Text
-            style={{
-              fontFamily: fonts.display,
-              fontSize: 20,
-              color: colors.foreground,
-              marginTop: 12,
-            }}
-          >
+          <IconAlertTriangle size={48} color={mutedForeground} />
+          <Text className="mt-3 font-display text-foreground text-xl">
             Something went wrong
           </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              color: colors.mutedForeground,
-              textAlign: "center",
-              marginTop: 4,
-            }}
-          >
+          <Text className="mt-1 text-center text-muted-foreground text-sm">
             Could not load person details
           </Text>
           <Pressable onPress={() => back()} className="mt-4">
-            <Text style={{ color: colors.primary }}>Go back</Text>
+            <Text className="text-primary">Go back</Text>
           </Pressable>
         </Animated.View>
       </View>
@@ -127,26 +94,16 @@ export default function PersonDetailScreen() {
   if (!person) {
     return (
       <View
-        className="flex-1 items-center justify-center"
-        style={{
-          backgroundColor: colors.background,
-          paddingTop: insets.top,
-        }}
+        className="flex-1 items-center justify-center bg-background"
+        style={{ paddingTop: insets.top }}
       >
         <Animated.View entering={FadeIn.duration(400)} className="items-center">
-          <IconUser size={48} color={colors.mutedForeground} />
-          <Text
-            style={{
-              fontFamily: fonts.display,
-              fontSize: 20,
-              color: colors.foreground,
-              marginTop: 12,
-            }}
-          >
+          <IconUser size={48} color={mutedForeground} />
+          <Text className="mt-3 font-display text-foreground text-xl">
             Person not found
           </Text>
           <Pressable onPress={() => back()} className="mt-4">
-            <Text style={{ color: colors.primary }}>Go back</Text>
+            <Text className="text-primary">Go back</Text>
           </Pressable>
         </Animated.View>
       </View>
@@ -166,7 +123,7 @@ export default function PersonDetailScreen() {
         }}
       />
       <ScrollView
-        style={{ backgroundColor: colors.background }}
+        className="bg-background"
         contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       >
         {/* Profile hero */}
@@ -175,15 +132,7 @@ export default function PersonDetailScreen() {
           className="items-center"
           style={{ paddingTop: insets.top + 56, paddingBottom: 24 }}
         >
-          <View
-            className="overflow-hidden"
-            style={{
-              width: 120,
-              height: 120,
-              borderRadius: 60,
-              backgroundColor: colors.secondary,
-            }}
-          >
+          <View className="size-[120px] overflow-hidden rounded-full bg-secondary">
             {person.profilePath && (
               <Image
                 source={{ uri: person.profilePath }}
@@ -195,37 +144,21 @@ export default function PersonDetailScreen() {
 
           <Text
             selectable
-            style={{
-              fontFamily: fonts.display,
-              fontSize: 28,
-              color: colors.foreground,
-              marginTop: 16,
-              textAlign: "center",
-            }}
+            className="mt-4 text-center font-display text-[28px] text-foreground"
           >
             {person.name}
           </Text>
 
           {person.knownForDepartment ? (
-            <View
-              className="mt-2 rounded-full px-3 py-1"
-              style={{ backgroundColor: colors.secondary }}
-            >
-              <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
+            <View className="mt-2 rounded-full bg-secondary px-3 py-1">
+              <Text className="text-muted-foreground text-xs">
                 {person.knownForDepartment}
               </Text>
             </View>
           ) : null}
 
           {person.birthday || person.deathday ? (
-            <Text
-              selectable
-              style={{
-                fontSize: 13,
-                color: colors.mutedForeground,
-                marginTop: 8,
-              }}
-            >
+            <Text selectable className="mt-2 text-[13px] text-muted-foreground">
               {person.birthday?.slice(0, 4)}
               {person.deathday ? ` — ${person.deathday.slice(0, 4)}` : ""}
             </Text>
@@ -268,12 +201,7 @@ export default function PersonDetailScreen() {
                   {credit.character ? (
                     <Text
                       numberOfLines={1}
-                      style={{
-                        fontSize: 11,
-                        color: colors.mutedForeground,
-                        marginTop: 4,
-                        textAlign: "center",
-                      }}
+                      className="mt-1 text-center text-[11px] text-muted-foreground"
                     >
                       as {credit.character}
                     </Text>

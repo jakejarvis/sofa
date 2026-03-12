@@ -1,10 +1,9 @@
 import { IconLoader, IconPlus } from "@tabler/icons-react-native";
 import { Image } from "expo-image";
 import { memo } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
-
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { ActivityIndicator, Pressable, View } from "react-native";
+import { useCSSVariable } from "uniwind";
+import { Text } from "@/components/ui/text";
 
 export interface SearchResultItem {
   tmdbId: number;
@@ -28,25 +27,24 @@ export const SearchResultRow = memo(function SearchResultRow({
   isResolving: boolean;
   isAdding: boolean;
 }) {
+  const primary = useCSSVariable("--color-primary") as string;
   const imageSrc = item.posterPath ?? item.profilePath;
 
   return (
     <Pressable
       onPress={() => onResolve(item)}
       disabled={isResolving}
-      className="flex-row items-center px-4 py-3"
+      className="flex-row items-center border-border border-b px-4 py-3"
       style={{
         borderBottomWidth: 0.5,
-        borderBottomColor: colors.border,
         opacity: isResolving ? 0.6 : 1,
       }}
     >
       <View
-        className="mr-3 overflow-hidden"
+        className="mr-3 overflow-hidden bg-secondary"
         style={{
           width: 44,
           height: item.type === "person" ? 44 : 66,
-          backgroundColor: colors.secondary,
           borderRadius: item.type === "person" ? 22 : 8,
           borderCurve: item.type === "person" ? undefined : "continuous",
         }}
@@ -54,7 +52,7 @@ export const SearchResultRow = memo(function SearchResultRow({
         {imageSrc ? (
           <Image
             source={{ uri: imageSrc }}
-            style={{ width: "100%", height: "100%" }}
+            className="h-full w-full"
             contentFit="cover"
           />
         ) : null}
@@ -63,20 +61,13 @@ export const SearchResultRow = memo(function SearchResultRow({
       <View className="flex-1">
         <Text
           numberOfLines={1}
-          style={{
-            fontFamily: fonts.sansMedium,
-            fontSize: 15,
-            color: colors.foreground,
-          }}
+          className="font-sans-medium text-[15px] text-foreground"
         >
           {item.title}
         </Text>
         <View className="mt-1 flex-row items-center gap-2">
-          <View
-            className="rounded-full px-2 py-0.5"
-            style={{ backgroundColor: colors.secondary }}
-          >
-            <Text style={{ fontSize: 10, color: colors.mutedForeground }}>
+          <View className="rounded-full bg-secondary px-2 py-0.5">
+            <Text className="text-[10px] text-muted-foreground">
               {item.type === "movie"
                 ? "Movie"
                 : item.type === "tv"
@@ -85,7 +76,7 @@ export const SearchResultRow = memo(function SearchResultRow({
             </Text>
           </View>
           {item.releaseDate ? (
-            <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
+            <Text className="text-muted-foreground text-xs">
               {item.releaseDate.slice(0, 4)}
             </Text>
           ) : null}
@@ -100,9 +91,9 @@ export const SearchResultRow = memo(function SearchResultRow({
           className="ml-2"
         >
           {isAdding ? (
-            <IconLoader size={22} color={colors.primary} />
+            <IconLoader size={22} color={primary} />
           ) : (
-            <IconPlus size={22} color={colors.primary} />
+            <IconPlus size={22} color={primary} />
           )}
         </Pressable>
       )}
@@ -110,8 +101,8 @@ export const SearchResultRow = memo(function SearchResultRow({
       {isResolving && (
         <ActivityIndicator
           size="small"
-          color={colors.primary}
-          style={{ marginLeft: 8 }}
+          colorClassName="accent-primary"
+          className="ml-2"
         />
       )}
     </Pressable>

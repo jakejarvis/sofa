@@ -1,7 +1,7 @@
 import { IconChevronDown } from "@tabler/icons-react-native";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -9,10 +9,9 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-
+import { useCSSVariable } from "uniwind";
 import { EpisodeRow } from "@/components/titles/episode-row";
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
 
@@ -34,6 +33,10 @@ export function SeasonAccordion({
   }>;
   watchedEpisodeIds: Set<string>;
 }) {
+  const completedColor = useCSSVariable("--color-status-completed") as string;
+  const watchingColor = useCSSVariable("--color-status-watching") as string;
+  const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
+
   const [expanded, setExpanded] = useState(false);
   const chevronRotation = useSharedValue(0);
   const watchedCount = episodes.filter((e) =>
@@ -80,10 +83,8 @@ export function SeasonAccordion({
 
   return (
     <View
-      className="mb-2 overflow-hidden rounded-xl"
+      className="mb-2 overflow-hidden rounded-xl border bg-card"
       style={{
-        backgroundColor: colors.card,
-        borderWidth: 1,
         borderColor: "rgba(255,255,255,0.06)",
         borderCurve: "continuous",
       }}
@@ -93,46 +94,29 @@ export function SeasonAccordion({
         className="flex-row items-center justify-between p-4"
       >
         <View className="flex-1">
-          <Text
-            style={{
-              fontFamily: fonts.sansMedium,
-              fontSize: 15,
-              color: colors.foreground,
-            }}
-          >
+          <Text className="font-sans-medium text-[15px] text-foreground">
             {season.name ?? `Season ${season.seasonNumber}`}
           </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              color: colors.mutedForeground,
-              marginTop: 2,
-            }}
-          >
+          <Text className="mt-0.5 text-muted-foreground text-xs">
             {watchedCount}/{episodes.length} episodes
           </Text>
         </View>
 
         <View
-          className="mx-3 overflow-hidden rounded-full"
-          style={{
-            width: 60,
-            height: 4,
-            backgroundColor: "rgba(255,255,255,0.1)",
-          }}
+          className="mx-3 h-1 w-[60px] overflow-hidden rounded-full"
+          style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
         >
           <View
             style={{
               height: "100%",
               width: `${progress * 100}%`,
-              backgroundColor:
-                progress === 1 ? colors.statusCompleted : colors.statusWatching,
+              backgroundColor: progress === 1 ? completedColor : watchingColor,
             }}
           />
         </View>
 
         <Animated.View style={chevronStyle}>
-          <IconChevronDown size={18} color={colors.mutedForeground} />
+          <IconChevronDown size={18} color={mutedFgColor} />
         </Animated.View>
       </Pressable>
 
@@ -144,16 +128,9 @@ export function SeasonAccordion({
           {watchedCount < episodes.length && (
             <Pressable
               onPress={() => watchSeason.mutate({ id: season.id })}
-              className="mx-4 mb-2 flex-row items-center justify-center rounded-lg py-2"
-              style={{ backgroundColor: colors.secondary }}
+              className="mx-4 mb-2 flex-row items-center justify-center rounded-lg bg-secondary py-2"
             >
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: colors.primary,
-                  fontFamily: fonts.sansMedium,
-                }}
-              >
+              <Text className="font-sans-medium text-primary text-xs">
                 Mark All Watched
               </Text>
             </Pressable>

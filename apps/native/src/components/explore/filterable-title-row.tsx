@@ -1,12 +1,11 @@
 import type { Icon } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { FlatList, ScrollView, Text, View } from "react-native";
-
+import { FlatList, ScrollView, View } from "react-native";
 import { GenreChip } from "@/components/explore/genre-chip";
 import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
-import { colors } from "@/constants/colors";
+import { Text } from "@/components/ui/text";
 import { orpc } from "@/utils/orpc";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
@@ -106,7 +105,7 @@ export function FilterableTitleRow({
         />
       ) : items.length === 0 && selectedGenre !== null ? (
         <View className="items-center py-6">
-          <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
+          <Text className="text-[13px] text-muted-foreground">
             No titles found for this genre.
           </Text>
         </View>

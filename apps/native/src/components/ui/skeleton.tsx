@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { colors } from "@/constants/colors";
+import { useCSSVariable } from "uniwind";
 
 interface SkeletonProps {
   width?: number | `${number}%`;
@@ -22,6 +22,7 @@ export function Skeleton({
   borderRadius = 4,
   style,
 }: SkeletonProps) {
+  const secondaryColor = useCSSVariable("--color-secondary") as string;
   const opacity = useSharedValue(0.4);
 
   useEffect(() => {
@@ -39,7 +40,7 @@ export function Skeleton({
           width,
           height,
           borderRadius,
-          backgroundColor: colors.secondary,
+          backgroundColor: secondaryColor,
         },
         animatedStyle,
         style,

@@ -1,8 +1,7 @@
 import type { Icon } from "@tabler/icons-react-native";
-import { Text, View } from "react-native";
-
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { View } from "react-native";
+import { useCSSVariable } from "uniwind";
+import { Text } from "@/components/ui/text";
 
 interface SectionHeaderProps {
   title: string;
@@ -13,19 +12,15 @@ interface SectionHeaderProps {
 export function SectionHeader({
   title,
   icon: IconComponent,
-  iconColor = colors.primary,
+  iconColor,
 }: SectionHeaderProps) {
+  const primaryColor = useCSSVariable("--color-primary") as string;
+  const resolvedColor = iconColor ?? primaryColor;
+
   return (
     <View className="mb-3 flex-row items-center gap-2">
-      {IconComponent && <IconComponent size={20} color={iconColor} />}
-      <Text
-        style={{
-          fontFamily: fonts.display,
-          fontSize: 20,
-          color: colors.foreground,
-          letterSpacing: -0.3,
-        }}
-      >
+      {IconComponent && <IconComponent size={20} color={resolvedColor} />}
+      <Text className="font-display text-[20px] text-foreground tracking-tight">
         {title}
       </Text>
     </View>

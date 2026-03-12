@@ -3,10 +3,9 @@ import {
   IconCircleCheck,
   IconPlayerPlay,
 } from "@tabler/icons-react-native";
-import { Pressable, Text, View } from "react-native";
-
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Pressable, View } from "react-native";
+import { useCSSVariable } from "uniwind";
+import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
@@ -30,6 +29,9 @@ export function StatusActionButton({
     { status: "completed", label: "Completed", Icon: IconCircleCheck },
   ];
 
+  const primaryColor = useCSSVariable("--color-primary") as string;
+  const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
+
   return (
     <View className="flex-row gap-2">
       {statuses.map(({ status, label, Icon }) => {
@@ -42,23 +44,15 @@ export function StatusActionButton({
               onStatusChange(isActive ? null : status);
             }}
             disabled={isPending}
-            className="flex-row items-center gap-1.5 rounded-full px-3 py-2"
-            style={{
-              backgroundColor: isActive ? `${colors.primary}20` : colors.card,
-              borderWidth: 1,
-              borderColor: isActive ? colors.primary : colors.border,
-            }}
+            className={`flex-row items-center gap-1.5 rounded-full border px-3 py-2 ${
+              isActive
+                ? "border-primary bg-primary/10"
+                : "border-border bg-card"
+            }`}
           >
-            <Icon
-              size={14}
-              color={isActive ? colors.primary : colors.mutedForeground}
-            />
+            <Icon size={14} color={isActive ? primaryColor : mutedFgColor} />
             <Text
-              style={{
-                fontFamily: fonts.sansMedium,
-                fontSize: 12,
-                color: isActive ? colors.primary : colors.foreground,
-              }}
+              className={`font-sans-medium text-xs ${isActive ? "text-primary" : "text-foreground"}`}
             >
               {label}
             </Text>

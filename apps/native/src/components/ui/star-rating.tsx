@@ -1,6 +1,6 @@
 import { IconStar, IconStarFilled } from "@tabler/icons-react-native";
 import { Pressable, View } from "react-native";
-import { colors } from "@/constants/colors";
+import { useCSSVariable } from "uniwind";
 import * as Haptics from "@/utils/haptics";
 
 interface StarRatingProps {
@@ -16,6 +16,11 @@ export function StarRating({
   size = 22,
   interactive = true,
 }: StarRatingProps) {
+  const [primary, mutedForeground] = useCSSVariable([
+    "--color-primary",
+    "--color-muted-foreground",
+  ]) as [string, string];
+
   return (
     <View className="flex-row items-center gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -30,9 +35,9 @@ export function StarRating({
           hitSlop={6}
         >
           {star <= rating ? (
-            <IconStarFilled size={size} color={colors.primary} />
+            <IconStarFilled size={size} color={primary} />
           ) : (
-            <IconStar size={size} color={colors.mutedForeground} />
+            <IconStar size={size} color={mutedForeground} />
           )}
         </Pressable>
       ))}

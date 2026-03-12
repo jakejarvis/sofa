@@ -2,19 +2,21 @@ import { IconSearch } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
+import { useCSSVariable } from "uniwind";
 import {
   type SearchResultItem,
   SearchResultRow,
 } from "@/components/search/search-result-row";
-import { colors } from "@/constants/colors";
+import { Text } from "@/components/ui/text";
 import { useDebounce } from "@/hooks/use-debounce";
 import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
 
 export default function SearchScreen() {
   const { push } = useRouter();
+  const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query.trim(), 300);
 
@@ -115,7 +117,7 @@ export default function SearchScreen() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View className="flex-1 bg-background">
       <Stack.Screen
         options={{
           headerSearchBarOptions: {
@@ -131,27 +133,21 @@ export default function SearchScreen() {
           entering={FadeIn.duration(400)}
           className="flex-1 items-center justify-center"
         >
-          <IconSearch size={64} color={colors.mutedForeground} />
-          <Text
-            style={{
-              color: colors.mutedForeground,
-              fontSize: 15,
-              marginTop: 12,
-            }}
-          >
+          <IconSearch size={64} color={mutedForeground} />
+          <Text className="mt-3 text-[15px] text-muted-foreground">
             Search for movies, shows, or people
           </Text>
         </Animated.View>
       ) : searchResults.isPending ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" colorClassName="accent-primary" />
         </View>
       ) : allResults.length === 0 ? (
         <Animated.View
           entering={FadeIn.duration(300)}
           className="flex-1 items-center justify-center"
         >
-          <Text style={{ color: colors.mutedForeground, fontSize: 15 }}>
+          <Text className="text-[15px] text-muted-foreground">
             No results for "{debouncedQuery}"
           </Text>
         </Animated.View>

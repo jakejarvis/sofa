@@ -7,24 +7,23 @@ import {
   Alert,
   Pressable,
   ScrollView,
-  Text,
   type TextInput,
   View,
 } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useCSSVariable } from "uniwind";
 import { z } from "zod";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { SofaLogo } from "@/components/ui/sofa-logo";
 import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
 import {
   FieldError,
   Input,
   Label,
   TextField,
 } from "@/components/ui/text-field";
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
 import { authClient } from "@/lib/auth-client";
 import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
@@ -84,46 +83,30 @@ export default function RegisterScreen() {
     },
   });
 
+  const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
+
   if (!registrationOpen && !publicInfo.isPending) {
     return (
       <View
-        className="flex-1 items-center justify-center px-6"
+        className="flex-1 items-center justify-center bg-background px-6"
         style={{
-          backgroundColor: colors.background,
           paddingTop: insets.top,
           paddingBottom: insets.bottom,
         }}
       >
         <Animated.View entering={FadeIn.duration(400)} className="items-center">
-          <IconLock size={48} color={colors.mutedForeground} />
-          <Text
-            style={{
-              fontFamily: fonts.display,
-              fontSize: 24,
-              color: colors.foreground,
-              marginTop: 16,
-            }}
-          >
+          <IconLock size={48} color={mutedForeground} />
+          <Text className="mt-4 font-display text-2xl text-foreground">
             Registration Closed
           </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              color: colors.mutedForeground,
-              marginTop: 8,
-              textAlign: "center",
-            }}
-          >
+          <Text className="mt-2 text-center text-muted-foreground text-sm">
             New account creation is currently disabled.
           </Text>
         </Animated.View>
         <Animated.View entering={FadeInDown.duration(300).delay(200)}>
           <Link href="/(auth)/login" asChild>
-            <Button
-              className="mt-6"
-              style={{ backgroundColor: colors.primary }}
-            >
-              <ButtonLabel style={{ color: colors.primaryForeground }}>
+            <Button className="mt-6 bg-primary">
+              <ButtonLabel className="text-primary-foreground">
                 Back to Login
               </ButtonLabel>
             </Button>
@@ -144,21 +127,14 @@ export default function RegisterScreen() {
       }}
       keyboardShouldPersistTaps="handled"
       bounces={false}
-      style={{ backgroundColor: colors.background }}
+      className="bg-background"
     >
       <Animated.View
         entering={FadeIn.duration(400)}
         className="mb-8 items-center"
       >
         <SofaLogo size={48} />
-        <Text
-          style={{
-            fontFamily: fonts.display,
-            fontSize: 32,
-            color: colors.foreground,
-            marginTop: 12,
-          }}
-        >
+        <Text className="mt-3 font-display text-[32px] text-foreground">
           Create Account
         </Text>
       </Animated.View>
@@ -250,8 +226,7 @@ export default function RegisterScreen() {
               <Button
                 onPress={form.handleSubmit}
                 disabled={isSubmitting}
-                style={{ backgroundColor: colors.primary }}
-                className="mt-1"
+                className="mt-1 bg-primary"
               >
                 {isSubmitting ? (
                   <Spinner size="sm" />
@@ -270,7 +245,7 @@ export default function RegisterScreen() {
       >
         <Link href="/(auth)/login" asChild>
           <Pressable>
-            <Text style={{ color: colors.primary, fontSize: 14 }}>
+            <Text className="text-primary text-sm">
               Already have an account? Sign in
             </Text>
           </Pressable>

@@ -1,13 +1,14 @@
 import { Stack } from "expo-router";
-
-import { colors } from "@/constants/colors";
+import { useResolveClassNames } from "uniwind";
 
 export default function AuthLayout() {
+  const contentStyle = useResolveClassNames("bg-background");
+
   return (
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: colors.background },
+        contentStyle,
         animation: "fade",
       }}
     />

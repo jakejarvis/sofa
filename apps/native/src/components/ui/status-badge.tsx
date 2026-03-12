@@ -4,51 +4,49 @@ import {
   IconCircleCheckFilled,
   IconPlayerPlayFilled,
 } from "@tabler/icons-react-native";
-import { Text, View } from "react-native";
-
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { View } from "react-native";
+import { useCSSVariable } from "uniwind";
+import { Text } from "@/components/ui/text";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
-const statusConfig: Record<
-  TitleStatus,
-  { label: string; Icon: Icon; color: string }
-> = {
-  watchlist: {
-    label: "Watchlist",
-    Icon: IconBookmarkFilled,
-    color: colors.statusWatchlist,
-  },
-  in_progress: {
-    label: "Watching",
-    Icon: IconPlayerPlayFilled,
-    color: colors.statusWatching,
-  },
-  completed: {
-    label: "Completed",
-    Icon: IconCircleCheckFilled,
-    color: colors.statusCompleted,
-  },
+const bgClasses: Record<TitleStatus, string> = {
+  watchlist: "bg-status-watchlist/10",
+  in_progress: "bg-status-watching/10",
+  completed: "bg-status-completed/10",
+};
+
+const textClasses: Record<TitleStatus, string> = {
+  watchlist: "text-status-watchlist",
+  in_progress: "text-status-watching",
+  completed: "text-status-completed",
+};
+
+const icons: Record<TitleStatus, { label: string; Icon: Icon }> = {
+  watchlist: { label: "Watchlist", Icon: IconBookmarkFilled },
+  in_progress: { label: "Watching", Icon: IconPlayerPlayFilled },
+  completed: { label: "Completed", Icon: IconCircleCheckFilled },
 };
 
 export function StatusBadge({ status }: { status: TitleStatus }) {
-  const config = statusConfig[status];
-  const StatusIcon = config.Icon;
+  const watchlistColor = useCSSVariable("--color-status-watchlist") as string;
+  const watchingColor = useCSSVariable("--color-status-watching") as string;
+  const completedColor = useCSSVariable("--color-status-completed") as string;
+
+  const colorMap: Record<TitleStatus, string> = {
+    watchlist: watchlistColor,
+    in_progress: watchingColor,
+    completed: completedColor,
+  };
+
+  const { label, Icon: StatusIcon } = icons[status];
   return (
     <View
-      className="flex-row items-center gap-1.5 rounded-full px-2.5 py-1"
-      style={{ backgroundColor: `${config.color}20` }}
+      className={`flex-row items-center gap-1.5 rounded-full px-2.5 py-1 ${bgClasses[status]}`}
     >
-      <StatusIcon size={12} color={config.color} />
-      <Text
-        style={{
-          fontFamily: fonts.sansMedium,
-          fontSize: 11,
-          color: config.color,
-        }}
-      >
-        {config.label}
+      <StatusIcon size={12} color={colorMap[status]} />
+      <Text className={`font-sans-medium text-[11px] ${textClasses[status]}`}>
+        {label}
       </Text>
     </View>
   );

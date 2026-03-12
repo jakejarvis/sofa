@@ -4,7 +4,6 @@ import { ActivityIndicator, Alert, View } from "react-native";
 
 import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
-import { colors } from "@/constants/colors";
 import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
 
@@ -48,7 +47,7 @@ export function BackupsSection() {
     <SettingsSection title="Backups" icon={IconDatabaseExport} badge="Admin">
       {backups.isPending ? (
         <View className="items-center py-4">
-          <ActivityIndicator color={colors.primary} />
+          <ActivityIndicator colorClassName="accent-primary" />
         </View>
       ) : (
         <>

@@ -1,13 +1,15 @@
 import { IconAlertTriangle } from "@tabler/icons-react-native";
 import { Link, Stack } from "expo-router";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import { useCSSVariable } from "uniwind";
 import { Container } from "@/components/container";
 import { Button, ButtonLabel } from "@/components/ui/button";
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Text } from "@/components/ui/text";
 
 export default function NotFoundScreen() {
+  const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
+
   return (
     <>
       <Stack.Screen options={{ title: "Not Found" }} />
@@ -17,33 +19,18 @@ export default function NotFoundScreen() {
             entering={FadeIn.duration(400)}
             className="items-center"
           >
-            <IconAlertTriangle size={48} color={colors.mutedForeground} />
-            <Text
-              style={{
-                fontFamily: fonts.display,
-                fontSize: 20,
-                color: colors.foreground,
-                marginTop: 12,
-              }}
-            >
+            <IconAlertTriangle size={48} color={mutedForeground} />
+            <Text className="mt-3 font-display text-foreground text-xl">
               Page Not Found
             </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                color: colors.mutedForeground,
-                textAlign: "center",
-                marginTop: 4,
-                marginBottom: 16,
-              }}
-            >
+            <Text className="mt-1 mb-4 text-center text-muted-foreground text-sm">
               The page you're looking for doesn't exist.
             </Text>
           </Animated.View>
           <Animated.View entering={FadeInDown.duration(300).delay(200)}>
             <Link href="/" asChild>
-              <Button size="sm" style={{ backgroundColor: colors.primary }}>
-                <ButtonLabel style={{ color: colors.primaryForeground }}>
+              <Button size="sm" className="bg-primary">
+                <ButtonLabel className="text-primary-foreground">
                   Go Home
                 </ButtonLabel>
               </Button>

@@ -1,7 +1,7 @@
 import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react-native";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, TextInput, View } from "react-native";
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -11,10 +11,10 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useCSSVariable } from "uniwind";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { SofaLogo } from "@/components/ui/sofa-logo";
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Text } from "@/components/ui/text";
 import {
   hasStoredServerUrl,
   normalizeUrl,
@@ -53,6 +53,11 @@ export default function ServerUrlScreen() {
   const [connection, setConnection] = useState<ConnectionState>({
     phase: "idle",
   });
+
+  const statusCompletedColor = useCSSVariable(
+    "--color-status-completed",
+  ) as string;
+  const destructiveColor = useCSSVariable("--color-destructive") as string;
 
   const [isFirstLaunch] = useState(() => !hasStoredServerUrl());
 
@@ -146,7 +151,7 @@ export default function ServerUrlScreen() {
       }}
       keyboardShouldPersistTaps="handled"
       bounces={false}
-      style={{ backgroundColor: colors.background }}
+      className="bg-background"
     >
       {/* Header */}
       <Animated.View
@@ -156,27 +161,13 @@ export default function ServerUrlScreen() {
         <Animated.View style={iconAnimatedStyle}>
           <SofaLogo size={48} />
         </Animated.View>
-        <Text
-          style={{
-            fontFamily: fonts.display,
-            fontSize: 32,
-            color: colors.foreground,
-            marginTop: 12,
-          }}
-        >
+        <Text className="mt-3 font-display text-[32px] text-foreground">
           Sofa
         </Text>
       </Animated.View>
 
       <Animated.View entering={FadeIn.duration(400).delay(100)}>
-        <Text
-          style={{
-            fontSize: 14,
-            color: colors.mutedForeground,
-            textAlign: "center",
-            marginBottom: 24,
-          }}
-        >
+        <Text className="mb-6 text-center text-muted-foreground text-sm">
           Enter your Sofa server URL to get started
         </Text>
       </Animated.View>
@@ -184,33 +175,16 @@ export default function ServerUrlScreen() {
       {/* URL Input */}
       <Animated.View entering={FadeInDown.duration(300).delay(200)}>
         <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: colors.input,
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 12,
-            borderCurve: "continuous",
-            paddingHorizontal: 14,
-            height: 48,
-          }}
+          className="h-12 flex-row items-center rounded-[12px] border border-border bg-input px-3.5"
+          style={{ borderCurve: "continuous" }}
         >
-          <Text
-            style={{
-              color: colors.mutedForeground,
-              fontSize: 15,
-              fontFamily: fonts.sans,
-            }}
-          >
-            {protocol}
-          </Text>
+          <Text className="text-[15px] text-muted-foreground">{protocol}</Text>
           <TextInput
             ref={inputRef}
             value={host}
             onChangeText={handleChangeText}
             placeholder="sofa.example.com"
-            placeholderTextColor={`${colors.mutedForeground}80`}
+            placeholderTextColorClassName="accent-muted-foreground/50"
             keyboardType="url"
             autoCapitalize="none"
             autoCorrect={false}
@@ -218,13 +192,7 @@ export default function ServerUrlScreen() {
             returnKeyType="go"
             editable={!isDisabled}
             onSubmitEditing={handleConnect}
-            style={{
-              flex: 1,
-              color: colors.foreground,
-              fontSize: 15,
-              fontFamily: fonts.sans,
-              paddingVertical: 0,
-            }}
+            className="flex-1 py-0 font-sans text-[15px] text-foreground"
           />
         </View>
       </Animated.View>
@@ -232,16 +200,12 @@ export default function ServerUrlScreen() {
       {/* Connect Button */}
       <Animated.View
         entering={FadeInDown.duration(300).delay(300)}
-        style={{ marginTop: 16 }}
+        className="mt-4"
       >
         <Button
           onPress={handleConnect}
           disabled={isDisabled}
-          style={{
-            backgroundColor: isSuccess
-              ? colors.statusCompleted
-              : colors.primary,
-          }}
+          className={isSuccess ? "bg-status-completed" : "bg-primary"}
         >
           {isConnecting ? (
             <ButtonLabel>Connecting...</ButtonLabel>
@@ -257,32 +221,13 @@ export default function ServerUrlScreen() {
       {connection.phase === "connecting" && (
         <Animated.View
           entering={FadeIn.duration(200)}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: 16,
-            gap: 8,
-          }}
+          className="mt-4 flex-row items-center justify-center gap-2"
         >
           <Animated.View
-            style={[
-              {
-                width: 6,
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: colors.primary,
-              },
-              dotAnimatedStyle,
-            ]}
+            className="size-1.5 rounded-full bg-primary"
+            style={dotAnimatedStyle}
           />
-          <Text
-            style={{
-              color: colors.mutedForeground,
-              fontSize: 13,
-              fontFamily: fonts.sans,
-            }}
-          >
+          <Text className="text-[13px] text-muted-foreground">
             Connecting to server...
           </Text>
         </Animated.View>
@@ -291,22 +236,10 @@ export default function ServerUrlScreen() {
       {connection.phase === "success" && (
         <Animated.View
           entering={FadeIn.duration(200)}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: 16,
-            gap: 6,
-          }}
+          className="mt-4 flex-row items-center justify-center gap-1.5"
         >
-          <IconCircleCheck size={16} color={colors.statusCompleted} />
-          <Text
-            style={{
-              color: colors.statusCompleted,
-              fontSize: 13,
-              fontFamily: fonts.sansMedium,
-            }}
-          >
+          <IconCircleCheck size={16} color={statusCompletedColor} />
+          <Text className="font-sans-medium text-[13px] text-status-completed">
             Connected
           </Text>
         </Animated.View>
@@ -315,27 +248,14 @@ export default function ServerUrlScreen() {
       {connection.phase === "error" && (
         <Animated.View
           entering={FadeIn.duration(200)}
-          style={{
-            flexDirection: "row",
-            alignItems: "flex-start",
-            marginTop: 16,
-            gap: 8,
-            paddingHorizontal: 4,
-          }}
+          className="mt-4 flex-row items-start gap-2 px-1"
         >
           <IconAlertCircle
             size={16}
-            color={colors.destructive}
+            color={destructiveColor}
             style={{ marginTop: 1 }}
           />
-          <Text
-            style={{
-              color: colors.destructive,
-              fontSize: 13,
-              fontFamily: fonts.sans,
-              flex: 1,
-            }}
-          >
+          <Text className="flex-1 text-[13px] text-destructive">
             {ERROR_MESSAGES[connection.error]}
           </Text>
         </Animated.View>

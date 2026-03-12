@@ -12,7 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
@@ -21,10 +21,9 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-
+import { useCSSVariable } from "uniwind";
 import { Skeleton } from "@/components/ui/skeleton";
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
 import { client, orpc, queryClient } from "@/utils/orpc";
 
@@ -43,12 +42,6 @@ interface PosterCardProps {
   width?: number;
 }
 
-const statusColors: Record<TitleStatus, string> = {
-  watchlist: colors.statusWatchlist,
-  in_progress: colors.statusWatching,
-  completed: colors.statusCompleted,
-};
-
 export function PosterCard({
   id,
   tmdbId,
@@ -62,6 +55,17 @@ export function PosterCard({
   width = 140,
 }: PosterCardProps) {
   const { push } = useRouter();
+  const primaryColor = useCSSVariable("--color-primary") as string;
+  const watchlistColor = useCSSVariable("--color-status-watchlist") as string;
+  const watchingColor = useCSSVariable("--color-status-watching") as string;
+  const completedColor = useCSSVariable("--color-status-completed") as string;
+
+  const statusColors: Record<TitleStatus, string> = {
+    watchlist: watchlistColor,
+    in_progress: watchingColor,
+    completed: completedColor,
+  };
+
   const pressed = useSharedValue(0);
   const [localStatus, setLocalStatus] = useState<TitleStatus | null>(
     userStatus ?? null,
@@ -114,15 +118,10 @@ export function PosterCard({
 
   const cardContent = (
     <View
-      className="overflow-hidden rounded-xl"
-      style={{
-        backgroundColor: colors.card,
-        borderWidth: 1,
-        borderColor: localStatus
-          ? `${colors.primary}40`
-          : "rgba(255,255,255,0.06)",
-        borderCurve: "continuous",
-      }}
+      className={`overflow-hidden rounded-xl border bg-card ${
+        localStatus ? "border-primary/25" : "border-white/[0.06]"
+      }`}
+      style={{ borderCurve: "continuous" }}
     >
       {/* Poster image */}
       <View style={{ width, height: imageHeight }}>
@@ -135,18 +134,8 @@ export function PosterCard({
             transition={200}
           />
         ) : (
-          <View
-            className="flex-1 items-center justify-center p-3"
-            style={{ backgroundColor: colors.secondary }}
-          >
-            <Text
-              style={{
-                fontFamily: fonts.display,
-                color: `${colors.foreground}70`,
-                fontSize: 13,
-                textAlign: "center",
-              }}
-            >
+          <View className="flex-1 items-center justify-center bg-secondary p-3">
+            <Text className="text-center font-display text-[13px] text-foreground/[0.44]">
               {title}
             </Text>
           </View>
@@ -156,12 +145,8 @@ export function PosterCard({
         {!localStatus && (
           <Pressable
             onPress={handleQuickAdd}
-            className="absolute top-2 right-2 items-center justify-center rounded-full"
-            style={{
-              width: 30,
-              height: 30,
-              backgroundColor: "rgba(0,0,0,0.5)",
-            }}
+            className="absolute top-2 right-2 size-[30px] items-center justify-center rounded-full"
+            style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
           >
             {quickAddMutation.isPending ? (
               <IconLoader size={16} color="white" />
@@ -174,12 +159,8 @@ export function PosterCard({
         {/* Status indicator */}
         {localStatus && (
           <View
-            className="absolute top-2 right-2 items-center justify-center rounded-full"
-            style={{
-              width: 30,
-              height: 30,
-              backgroundColor: "rgba(0,0,0,0.5)",
-            }}
+            className="absolute top-2 right-2 size-[30px] items-center justify-center rounded-full"
+            style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
           >
             {localStatus === "completed" ? (
               <IconCheckbox size={16} color="white" />
@@ -196,17 +177,13 @@ export function PosterCard({
           episodeProgress.total > 0 &&
           episodeProgress.watched > 0 && (
             <View
-              className="absolute right-0 bottom-0 left-0"
-              style={{
-                height: 3,
-                backgroundColor: "rgba(255,255,255,0.1)",
-              }}
+              className="absolute right-0 bottom-0 left-0 h-[3px]"
+              style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
             >
               <View
+                className="h-full bg-status-watching"
                 style={{
-                  height: "100%",
                   width: `${episodeProgress.total > 0 ? (episodeProgress.watched / episodeProgress.total) * 100 : 0}%`,
-                  backgroundColor: colors.statusWatching,
                 }}
               />
             </View>
@@ -218,41 +195,30 @@ export function PosterCard({
         <View className="flex-row items-center gap-1.5">
           {localStatus && (
             <View
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: statusColors[localStatus],
-              }}
+              className="size-1.5 rounded-full"
+              style={{ backgroundColor: statusColors[localStatus] }}
             />
           )}
           <Text
+            className="flex-1 font-sans-medium text-[13px] text-foreground"
             numberOfLines={1}
-            style={{
-              fontFamily: fonts.sansMedium,
-              fontSize: 13,
-              color: colors.foreground,
-              flex: 1,
-            }}
           >
             {title}
           </Text>
         </View>
         <View className="mt-1 flex-row items-center gap-2">
           {type === "movie" ? (
-            <IconMovie size={12} color={`${colors.primary}99`} />
+            <IconMovie size={12} color={primaryColor} opacity={0.6} />
           ) : (
-            <IconDeviceTv size={12} color={`${colors.primary}99`} />
+            <IconDeviceTv size={12} color={primaryColor} opacity={0.6} />
           )}
           {year ? (
-            <Text style={{ fontSize: 11, color: colors.mutedForeground }}>
-              {year}
-            </Text>
+            <Text className="text-[11px] text-muted-foreground">{year}</Text>
           ) : null}
           {voteAverage != null && voteAverage > 0 && (
             <View className="ml-auto flex-row items-center gap-0.5">
-              <IconStarFilled size={10} color={`${colors.primary}cc`} />
-              <Text style={{ fontSize: 11, color: `${colors.primary}cc` }}>
+              <IconStarFilled size={10} color={primaryColor} opacity={0.8} />
+              <Text className="text-[11px] text-primary/80">
                 {voteAverage.toFixed(1)}
               </Text>
             </View>
@@ -373,14 +339,10 @@ export function PosterCardSkeleton({ width = 140 }: { width?: number }) {
   const imageHeight = width * 1.5;
   return (
     <View
+      className="overflow-hidden rounded-xl border border-white/[0.06] bg-card"
       style={{
         width,
-        borderRadius: 12,
         borderCurve: "continuous",
-        overflow: "hidden",
-        backgroundColor: colors.card,
-        borderWidth: 1,
-        borderColor: "rgba(255,255,255,0.06)",
       }}
     >
       <Skeleton width={width} height={imageHeight} borderRadius={0} />

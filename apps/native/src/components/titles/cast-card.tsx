@@ -1,15 +1,13 @@
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-
-import { colors } from "@/constants/colors";
-import { fonts } from "@/constants/fonts";
+import { Text } from "@/components/ui/text";
 
 export function CastCard({
   person,
@@ -38,47 +36,28 @@ export function CastCard({
           }
         >
           <Animated.View
-            style={[
-              animatedStyle,
-              { width: 80, marginRight: 16, alignItems: "center" },
-            ]}
+            className="mr-4 w-20 items-center"
+            style={animatedStyle}
           >
-            <View
-              className="mb-2 overflow-hidden"
-              style={{
-                width: 64,
-                height: 64,
-                borderRadius: 32,
-                backgroundColor: colors.secondary,
-              }}
-            >
+            <View className="mb-2 h-16 w-16 overflow-hidden rounded-full bg-secondary">
               {person.profilePath && (
                 <Image
                   source={{ uri: person.profilePath }}
-                  style={{ width: "100%", height: "100%" }}
+                  className="h-full w-full"
                   contentFit="cover"
                 />
               )}
             </View>
             <Text
               numberOfLines={1}
-              style={{
-                fontFamily: fonts.sansMedium,
-                fontSize: 11,
-                color: colors.foreground,
-                textAlign: "center",
-              }}
+              className="text-center font-sans-medium text-[11px] text-foreground"
             >
               {person.name}
             </Text>
             {person.character ? (
               <Text
                 numberOfLines={1}
-                style={{
-                  fontSize: 10,
-                  color: colors.mutedForeground,
-                  textAlign: "center",
-                }}
+                className="text-center text-[10px] text-muted-foreground"
               >
                 {person.character}
               </Text>
