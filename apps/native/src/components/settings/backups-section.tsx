@@ -1,9 +1,16 @@
-import { IconDatabaseExport, IconPlus } from "@tabler/icons-react-native";
+import {
+  IconChevronRight,
+  IconDatabaseExport,
+  IconPlus,
+} from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ActivityIndicator, Alert, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
+import { useCSSVariable } from "uniwind";
+import * as DropdownMenu from "zeego/dropdown-menu";
 
 import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
+import { Text } from "@/components/ui/text";
 import { orpc, queryClient } from "@/utils/orpc";
 import { toast } from "@/utils/toast";
 
@@ -15,6 +22,7 @@ function formatSize(bytes: number) {
 
 export function BackupsSection() {
   const backups = useQuery(orpc.admin.backups.list.queryOptions());
+  const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
   const createBackup = useMutation(
     orpc.admin.backups.create.mutationOptions({
@@ -36,17 +44,6 @@ export function BackupsSection() {
     }),
   );
 
-  const handleBackupPress = (filename: string) => {
-    Alert.alert("Backup", filename, [
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => deleteBackup.mutate({ filename }),
-      },
-      { text: "Cancel", style: "cancel" },
-    ]);
-  };
-
   return (
     <SettingsSection title="Backups" icon={IconDatabaseExport} badge="Admin">
       {backups.isPending ? (
@@ -56,12 +53,34 @@ export function BackupsSection() {
       ) : (
         <>
           {backups.data?.backups.map((backup) => (
-            <SettingsRow
-              key={backup.filename}
-              label={backup.filename}
-              value={formatSize(backup.sizeBytes)}
-              onPress={() => handleBackupPress(backup.filename)}
-            />
+            <DropdownMenu.Root key={backup.filename}>
+              <DropdownMenu.Trigger asChild>
+                <Pressable
+                  className="flex-row items-center border-border border-b py-3.5"
+                  style={{ borderBottomWidth: 0.5 }}
+                >
+                  <Text className="flex-1 text-[15px] text-foreground">
+                    {backup.filename}
+                  </Text>
+                  <Text className="mr-1 text-[14px] text-muted-foreground">
+                    {formatSize(backup.sizeBytes)}
+                  </Text>
+                  <IconChevronRight size={16} color={mutedFgColor} />
+                </Pressable>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content>
+                <DropdownMenu.Item
+                  key="delete"
+                  destructive
+                  onSelect={() =>
+                    deleteBackup.mutate({ filename: backup.filename })
+                  }
+                >
+                  <DropdownMenu.ItemIcon ios={{ name: "trash" }} />
+                  <DropdownMenu.ItemTitle>Delete Backup</DropdownMenu.ItemTitle>
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
           ))}
           <SettingsRow
             label={createBackup.isPending ? "Creating..." : "Create Backup"}

@@ -29,6 +29,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
+import * as DropdownMenu from "zeego/dropdown-menu";
 import { AddIntegrationRow } from "@/components/settings/add-integration-row";
 import { BackupsSection } from "@/components/settings/backups-section";
 import { IntegrationRow } from "@/components/settings/integration-row";
@@ -115,25 +116,7 @@ export default function SettingsScreen() {
     uploadAvatar.mutate(file);
   }, [uploadAvatar]);
 
-  const handleAvatarPress = useCallback(async () => {
-    const hasImage = !!session?.user?.image;
-    if (hasImage) {
-      Alert.alert("Profile Picture", "Choose an option", [
-        {
-          text: "Change Photo",
-          onPress: () => pickAvatar(),
-        },
-        {
-          text: "Remove Photo",
-          style: "destructive",
-          onPress: () => removeAvatar.mutate(),
-        },
-        { text: "Cancel", style: "cancel" },
-      ]);
-    } else {
-      pickAvatar();
-    }
-  }, [session?.user?.image, removeAvatar, pickAvatar]);
+  const hasAvatarImage = !!session?.user?.image;
 
   const registration = useQuery({
     ...orpc.admin.registration.queryOptions(),
@@ -221,33 +204,75 @@ export default function SettingsScreen() {
             className="flex-row items-center border-border border-b py-3.5"
             style={{ borderBottomWidth: 0.5 }}
           >
-            <Pressable onPress={handleAvatarPress} className="mr-3">
-              <View className="size-11 overflow-hidden rounded-full bg-secondary">
-                {uploadAvatar.isPending ? (
-                  <View className="flex-1 items-center justify-center">
-                    <ActivityIndicator
-                      size="small"
-                      colorClassName="accent-primary"
+            {hasAvatarImage ? (
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <Pressable className="mr-3">
+                    <View className="size-11 overflow-hidden rounded-full bg-secondary">
+                      {uploadAvatar.isPending ? (
+                        <View className="flex-1 items-center justify-center">
+                          <ActivityIndicator
+                            size="small"
+                            colorClassName="accent-primary"
+                          />
+                        </View>
+                      ) : (
+                        <Image
+                          source={{ uri: session.user.image ?? undefined }}
+                          style={{ width: "100%", height: "100%" }}
+                          contentFit="cover"
+                        />
+                      )}
+                    </View>
+                    <View className="absolute right-0 bottom-0 size-[18px] items-center justify-center rounded-full bg-primary">
+                      <IconCamera size={10} color={primaryFgColor} />
+                    </View>
+                  </Pressable>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  <DropdownMenu.Item key="change" onSelect={() => pickAvatar()}>
+                    <DropdownMenu.ItemIcon
+                      ios={{ name: "photo.on.rectangle.angled" }}
                     />
-                  </View>
-                ) : session?.user?.image ? (
-                  <Image
-                    source={{ uri: session.user.image }}
-                    style={{ width: "100%", height: "100%" }}
-                    contentFit="cover"
-                  />
-                ) : (
-                  <View className="flex-1 items-center justify-center bg-primary/[0.08]">
-                    <Text className="font-sans-medium text-lg text-primary">
-                      {session?.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
-                    </Text>
-                  </View>
-                )}
-              </View>
-              <View className="absolute right-0 bottom-0 size-[18px] items-center justify-center rounded-full bg-primary">
-                <IconCamera size={10} color={primaryFgColor} />
-              </View>
-            </Pressable>
+                    <DropdownMenu.ItemTitle>
+                      Change Photo
+                    </DropdownMenu.ItemTitle>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    key="remove"
+                    destructive
+                    onSelect={() => removeAvatar.mutate()}
+                  >
+                    <DropdownMenu.ItemIcon ios={{ name: "trash" }} />
+                    <DropdownMenu.ItemTitle>
+                      Remove Photo
+                    </DropdownMenu.ItemTitle>
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+            ) : (
+              <Pressable onPress={pickAvatar} className="mr-3">
+                <View className="size-11 overflow-hidden rounded-full bg-secondary">
+                  {uploadAvatar.isPending ? (
+                    <View className="flex-1 items-center justify-center">
+                      <ActivityIndicator
+                        size="small"
+                        colorClassName="accent-primary"
+                      />
+                    </View>
+                  ) : (
+                    <View className="flex-1 items-center justify-center bg-primary/[0.08]">
+                      <Text className="font-sans-medium text-lg text-primary">
+                        {session?.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+                <View className="absolute right-0 bottom-0 size-[18px] items-center justify-center rounded-full bg-primary">
+                  <IconCamera size={10} color={primaryFgColor} />
+                </View>
+              </Pressable>
+            )}
             <View className="flex-1">
               {isEditingName ? (
                 <View className="flex-row items-center gap-2">

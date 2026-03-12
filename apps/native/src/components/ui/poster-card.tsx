@@ -9,7 +9,7 @@ import {
   IconStarFilled,
 } from "@tabler/icons-react-native";
 import { useMutation } from "@tanstack/react-query";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -21,6 +21,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
+import * as ContextMenu from "zeego/context-menu";
 import { Image } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
@@ -239,36 +240,35 @@ export function PosterCard({
       pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
     });
 
-  // Cards with id: use Link with native preview and context menu
+  // Cards with id: use context menu with navigation
   if (id) {
     return (
-      <Link href={`/title/${id}` as `/title/${string}`}>
-        <Link.Trigger>
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>
           <GestureDetector gesture={pressGesture}>
             <Animated.View style={[animatedStyle, { width }]}>
-              {cardContent}
+              <Pressable onPress={() => navigate(`/title/${id}`)}>
+                {cardContent}
+              </Pressable>
             </Animated.View>
           </GestureDetector>
-        </Link.Trigger>
-        <Link.Preview />
-        <Link.Menu>
+        </ContextMenu.Trigger>
+        <ContextMenu.Content>
           {!localStatus && (
-            <Link.MenuAction
-              title="Add to Watchlist"
-              icon="bookmark"
-              onPress={handleQuickAdd}
-            />
+            <ContextMenu.Item key="watchlist" onSelect={handleQuickAdd}>
+              <ContextMenu.ItemIcon ios={{ name: "bookmark" }} />
+              <ContextMenu.ItemTitle>Add to Watchlist</ContextMenu.ItemTitle>
+            </ContextMenu.Item>
           )}
           {localStatus !== "in_progress" && (
-            <Link.MenuAction
-              title="Mark as Watching"
-              icon="play.fill"
-              onPress={async () => {
+            <ContextMenu.Item
+              key="watching"
+              onSelect={async () => {
                 await client.titles.updateStatus({
                   id,
                   status: "in_progress",
                 });
-                toast.success("Added to watchlist");
+                toast.success("Marked as watching");
                 queryClient.invalidateQueries({
                   queryKey: orpc.titles.key(),
                 });
@@ -276,13 +276,15 @@ export function PosterCard({
                   queryKey: orpc.dashboard.key(),
                 });
               }}
-            />
+            >
+              <ContextMenu.ItemIcon ios={{ name: "play.fill" }} />
+              <ContextMenu.ItemTitle>Mark as Watching</ContextMenu.ItemTitle>
+            </ContextMenu.Item>
           )}
           {type === "movie" && (
-            <Link.MenuAction
-              title="Mark as Watched"
-              icon="checkmark.circle"
-              onPress={async () => {
+            <ContextMenu.Item
+              key="watched"
+              onSelect={async () => {
                 await client.titles.watchMovie({ id });
                 toast.success(
                   title ? `Marked "${title}" as watched` : "Marked as watched",
@@ -294,14 +296,16 @@ export function PosterCard({
                   queryKey: orpc.dashboard.key(),
                 });
               }}
-            />
+            >
+              <ContextMenu.ItemIcon ios={{ name: "checkmark.circle" }} />
+              <ContextMenu.ItemTitle>Mark as Watched</ContextMenu.ItemTitle>
+            </ContextMenu.Item>
           )}
           {localStatus && (
-            <Link.MenuAction
-              title="Remove from Library"
-              icon="trash"
+            <ContextMenu.Item
+              key="remove"
               destructive
-              onPress={async () => {
+              onSelect={async () => {
                 await client.titles.updateStatus({ id, status: null });
                 setLocalStatus(null);
                 toast.success("Removed from library");
@@ -312,10 +316,13 @@ export function PosterCard({
                   queryKey: orpc.dashboard.key(),
                 });
               }}
-            />
+            >
+              <ContextMenu.ItemIcon ios={{ name: "trash" }} />
+              <ContextMenu.ItemTitle>Remove from Library</ContextMenu.ItemTitle>
+            </ContextMenu.Item>
           )}
-        </Link.Menu>
-      </Link>
+        </ContextMenu.Content>
+      </ContextMenu.Root>
     );
   }
 

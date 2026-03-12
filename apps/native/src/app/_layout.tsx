@@ -9,7 +9,6 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { Uniwind, useResolveClassNames } from "uniwind";
 
 import { OfflineBanner } from "@/components/ui/offline-banner";
-import { TitleActionSheetProvider } from "@/components/ui/title-action-sheet";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { authClient } from "@/lib/auth-client";
 import { hasStoredServerUrl } from "@/lib/server-url";
@@ -38,7 +37,7 @@ function AppContent() {
   }, [isPending, hasServerUrl]);
 
   return (
-    <TitleActionSheetProvider>
+    <>
       <StatusBar style="light" />
       <OfflineBanner />
       <ToastProvider />
@@ -81,7 +80,7 @@ function AppContent() {
           />
         </Stack.Protected>
       </Stack>
-    </TitleActionSheetProvider>
+    </>
   );
 }
 
