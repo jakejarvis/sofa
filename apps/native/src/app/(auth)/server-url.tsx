@@ -1,7 +1,7 @@
 import { IconAlertCircle, IconCircleCheck } from "@tabler/icons-react-native";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -10,10 +10,9 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
+import { AuthScreen } from "@/components/auth-screen";
 import { Button, ButtonLabel } from "@/components/ui/button";
-import { SofaLogo } from "@/components/ui/sofa-logo";
 import { Text } from "@/components/ui/text";
 import {
   getServerUrl,
@@ -44,7 +43,6 @@ const ERROR_MESSAGES: Record<ValidationError, string> = {
 
 export default function ServerUrlScreen() {
   const { replace } = useRouter();
-  const insets = useSafeAreaInsets();
   const inputRef = useRef<TextInput>(null);
   const successTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -133,38 +131,11 @@ export default function ServerUrlScreen() {
   const isDisabled = isConnecting || isSuccess;
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        flexGrow: 1,
-        justifyContent: "center",
-        paddingHorizontal: 24,
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
-      }}
-      keyboardShouldPersistTaps="handled"
-      bounces={false}
-      className="bg-background"
+    <AuthScreen
+      title="Sofa"
+      subtitle="Enter your Sofa server URL to get started"
+      logoStyle={iconAnimatedStyle}
     >
-      {/* Header */}
-      <Animated.View
-        entering={FadeIn.duration(400)}
-        className="mb-6 items-center"
-      >
-        <Animated.View style={iconAnimatedStyle}>
-          <SofaLogo size={48} />
-        </Animated.View>
-        <Text className="mt-1.5 font-display text-[32px] text-foreground">
-          Sofa
-        </Text>
-      </Animated.View>
-
-      <Animated.View entering={FadeIn.duration(400).delay(100)}>
-        <Text className="mb-6 text-center text-muted-foreground text-sm">
-          Enter your Sofa server URL to get started
-        </Text>
-      </Animated.View>
-
-      {/* URL Input */}
       <Animated.View entering={FadeInDown.duration(300).delay(200)}>
         <View
           className="h-12 flex-row items-center rounded-[12px] border border-border bg-input px-3.5"
@@ -188,69 +159,52 @@ export default function ServerUrlScreen() {
         </View>
       </Animated.View>
 
-      {/* Connect Button */}
+      {/* Connect Button / Status */}
       <Animated.View
         entering={FadeInDown.duration(300).delay(300)}
         className="mt-4"
       >
-        <Button
-          onPress={handleConnect}
-          disabled={isDisabled}
-          className={isSuccess ? "bg-status-completed" : "bg-primary"}
-        >
-          {isConnecting ? (
-            <ButtonLabel>Connecting...</ButtonLabel>
-          ) : isSuccess ? (
-            <ButtonLabel>Connected</ButtonLabel>
-          ) : (
+        {isConnecting ? (
+          <View className="h-12 flex-row items-center justify-center gap-2">
+            <Animated.View
+              className="size-1.5 rounded-full bg-primary"
+              style={dotAnimatedStyle}
+            />
+            <Text className="text-[13px] text-muted-foreground">
+              Connecting to server...
+            </Text>
+          </View>
+        ) : isSuccess ? (
+          <View className="h-12 flex-row items-center justify-center gap-1.5">
+            <IconCircleCheck size={16} color={statusCompletedColor} />
+            <Text className="font-sans-medium text-[13px] text-status-completed">
+              Connected
+            </Text>
+          </View>
+        ) : (
+          <Button onPress={handleConnect} className="bg-primary">
             <ButtonLabel>Connect</ButtonLabel>
-          )}
-        </Button>
+          </Button>
+        )}
       </Animated.View>
 
-      {/* Connection Status Feedback */}
-      {connection.phase === "connecting" && (
-        <Animated.View
-          entering={FadeIn.duration(200)}
-          className="mt-4 flex-row items-center justify-center gap-2"
-        >
+      <View className="mt-3 min-h-10">
+        {connection.phase === "error" && (
           <Animated.View
-            className="size-1.5 rounded-full bg-primary"
-            style={dotAnimatedStyle}
-          />
-          <Text className="text-[13px] text-muted-foreground">
-            Connecting to server...
-          </Text>
-        </Animated.View>
-      )}
-
-      {connection.phase === "success" && (
-        <Animated.View
-          entering={FadeIn.duration(200)}
-          className="mt-4 flex-row items-center justify-center gap-1.5"
-        >
-          <IconCircleCheck size={16} color={statusCompletedColor} />
-          <Text className="font-sans-medium text-[13px] text-status-completed">
-            Connected
-          </Text>
-        </Animated.View>
-      )}
-
-      {connection.phase === "error" && (
-        <Animated.View
-          entering={FadeIn.duration(200)}
-          className="mt-4 flex-row items-start gap-2 px-1"
-        >
-          <IconAlertCircle
-            size={16}
-            color={destructiveColor}
-            style={{ marginTop: 1 }}
-          />
-          <Text className="flex-1 text-[13px] text-destructive">
-            {ERROR_MESSAGES[connection.error]}
-          </Text>
-        </Animated.View>
-      )}
-    </ScrollView>
+            entering={FadeIn.duration(200)}
+            className="flex-row items-start gap-2 px-1"
+          >
+            <IconAlertCircle
+              size={16}
+              color={destructiveColor}
+              style={{ marginTop: 1 }}
+            />
+            <Text className="flex-1 text-[13px] text-destructive">
+              {ERROR_MESSAGES[connection.error]}
+            </Text>
+          </Animated.View>
+        )}
+      </View>
+    </AuthScreen>
   );
 }

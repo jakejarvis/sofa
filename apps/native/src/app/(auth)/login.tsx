@@ -1,19 +1,12 @@
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { useRef } from "react";
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  type TextInput,
-  View,
-} from "react-native";
+import { Alert, Pressable, type TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
+import { AuthScreen } from "@/components/auth-screen";
 import { Button, ButtonLabel } from "@/components/ui/button";
-import { SofaLogo } from "@/components/ui/sofa-logo";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import {
@@ -35,9 +28,19 @@ const signInSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+function formatFormErrors(errors: unknown): string | null {
+  if (!errors) return null;
+  if (typeof errors === "string") return errors;
+  if (typeof errors === "object") {
+    const first = Object.values(errors as Record<string, { message: string }[]>)
+      .flat()
+      .find((e) => e.message);
+    if (first) return first.message;
+  }
+  return null;
+}
+
 export default function LoginScreen() {
-  const { replace } = useRouter();
-  const insets = useSafeAreaInsets();
   const passwordRef = useRef<TextInput>(null);
 
   const authConfig = useQuery(orpc.system.authConfig.queryOptions());
@@ -57,7 +60,6 @@ export default function LoginScreen() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             formApi.reset();
             queryClient.invalidateQueries();
-            replace("/(tabs)/(home)");
           },
         },
       );
@@ -69,31 +71,7 @@ export default function LoginScreen() {
   const showRegister = authConfig.data?.registrationOpen;
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        flexGrow: 1,
-        justifyContent: "center",
-        paddingHorizontal: 24,
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
-      }}
-      keyboardShouldPersistTaps="handled"
-      bounces={false}
-      className="bg-background"
-    >
-      <Animated.View
-        entering={FadeIn.duration(400)}
-        className="mb-8 items-center"
-      >
-        <SofaLogo size={48} />
-        <Text className="mt-3 font-display text-[32px] text-foreground">
-          Sofa
-        </Text>
-        <Text className="mt-1 text-muted-foreground text-sm">
-          Sign in to continue
-        </Text>
-      </Animated.View>
-
+    <AuthScreen title="Sofa" subtitle="Sign in to continue">
       {showOidc && (
         <Animated.View
           entering={FadeInDown.duration(300).delay(100)}
@@ -128,9 +106,7 @@ export default function LoginScreen() {
         <form.Subscribe
           selector={(state) => ({
             isSubmitting: state.isSubmitting,
-            validationError: state.errorMap.onSubmit
-              ? String(state.errorMap.onSubmit)
-              : null,
+            validationError: formatFormErrors(state.errorMap.onSubmit),
           })}
         >
           {({ isSubmitting, validationError }) => (
@@ -227,6 +203,6 @@ export default function LoginScreen() {
           </Pressable>
         </Link>
       </Animated.View>
-    </ScrollView>
+    </AuthScreen>
   );
 }

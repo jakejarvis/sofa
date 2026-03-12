@@ -40,7 +40,7 @@ import * as Haptics from "@/utils/haptics";
 import { orpc, queryClient } from "@/utils/orpc";
 
 export default function SettingsScreen() {
-  const { push, replace } = useRouter();
+  const { push } = useRouter();
   const { data: session, refetch: refetchSession } = authClient.useSession();
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
@@ -182,7 +182,6 @@ export default function SettingsScreen() {
         onPress: () => {
           authClient.signOut();
           queryClient.clear();
-          replace("/(auth)/login");
         },
       },
     ]);
