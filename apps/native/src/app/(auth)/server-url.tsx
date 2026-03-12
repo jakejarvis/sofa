@@ -174,7 +174,7 @@ export default function ServerUrlScreen() {
             ref={inputRef}
             value={url}
             onChangeText={handleChangeText}
-            placeholder="http://192.168.1.100:3000"
+            placeholder="https://sofa.example.com"
             placeholderTextColorClassName="accent-muted-foreground/50"
             keyboardType="url"
             autoCapitalize="none"

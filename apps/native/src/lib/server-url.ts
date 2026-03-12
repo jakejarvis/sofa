@@ -2,7 +2,7 @@ import * as SecureStore from "expo-secure-store";
 
 const SERVER_URL_KEY = "sofa_server_url";
 const DEFAULT_URL =
-  process.env.EXPO_PUBLIC_SERVER_URL ?? "http://localhost:3000";
+  process.env.EXPO_PUBLIC_SERVER_URL ?? "https://sofa.example.com";
 
 let cachedUrl: string = "";
 const serverUrlListeners: Array<() => void> = [];
