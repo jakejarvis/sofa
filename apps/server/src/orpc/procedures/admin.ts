@@ -35,7 +35,16 @@ export const backupsCreate = os.admin.backups.create
 export const backupsDelete = os.admin.backups.delete
   .use(admin)
   .handler(async ({ input }) => {
-    await deleteBackup(input.filename);
+    try {
+      await deleteBackup(input.filename);
+    } catch (err) {
+      if (err instanceof ORPCError) throw err;
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("not found")) {
+        throw new ORPCError("NOT_FOUND", { message: msg });
+      }
+      throw new ORPCError("BAD_REQUEST", { message: msg });
+    }
   });
 
 export const backupsRestore = os.admin.backups.restore
@@ -54,7 +63,9 @@ export const backupsRestore = os.admin.backups.restore
       // Clean up the upload file if restoreFromBackup didn't consume it
       const f = Bun.file(tmpPath);
       if (await f.exists()) await f.delete();
-      throw err;
+      if (err instanceof ORPCError) throw err;
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new ORPCError("BAD_REQUEST", { message: msg });
     }
   });
 
