@@ -29,7 +29,7 @@ export function AuthScreen({
           flexGrow: 1,
           justifyContent: "center",
           paddingHorizontal: 24,
-          paddingTop: insets.top,
+          paddingTop: insets.top + 24,
           paddingBottom: insets.bottom,
         }}
         keyboardShouldPersistTaps="handled"
