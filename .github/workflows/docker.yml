@@ -3,6 +3,17 @@ name: Docker
 on:
   push:
     branches: [main]
+    paths:
+      - "apps/server/**"
+      - "apps/web/**"
+      - "packages/**"
+      - "Dockerfile"
+      - "turbo.json"
+      - "package.json"
+      - "bun.lock"
+      - "biome.json"
+      - "tsconfig.json"
+      - ".github/workflows/docker.yml"
     tags: ["v*"]
 
 permissions:
