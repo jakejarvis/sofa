@@ -108,6 +108,8 @@ export default function ServerUrlScreen() {
     try {
       new URL(fullUrl);
     } catch {
+      setConnection({ phase: "error", error: "invalid_url" });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
     setConnection({ phase: "connecting" });
