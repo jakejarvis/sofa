@@ -1,6 +1,5 @@
 import type { ColorPalette } from "@sofa/api/schemas";
-import { useFocusEffect } from "expo-router";
-import { useCallback } from "react";
+import { useEffect } from "react";
 import { Uniwind } from "uniwind";
 
 function hexToRelativeLuminance(hex: string): number {
@@ -12,38 +11,19 @@ function hexToRelativeLuminance(hex: string): number {
   return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
 }
 
-const DEFAULTS: Record<string, string> = {
-  "--color-primary": "oklch(0.8 0.14 65)",
-  "--color-ring": "oklch(0.8 0.14 65)",
-  "--color-primary-foreground": "oklch(0.13 0.006 55)",
-  "--color-status-watching": "oklch(0.78 0.14 65)",
-};
-
-function applyPalette(vibrant: string): void {
-  const luminance = hexToRelativeLuminance(vibrant);
-  const foreground =
-    luminance > 0.3 ? "oklch(0.13 0.006 55)" : "oklch(0.93 0.015 80)";
-
-  Uniwind.updateCSSVariables("dark", {
-    "--color-primary": vibrant,
-    "--color-ring": vibrant,
-    "--color-primary-foreground": foreground,
-    "--color-status-watching": vibrant,
-  });
-}
-
 export function useTitleTheme(palette: ColorPalette | null | undefined): void {
   const vibrant = palette?.vibrant ?? null;
 
-  useFocusEffect(
-    useCallback(() => {
-      if (vibrant) {
-        applyPalette(vibrant);
-      }
+  useEffect(() => {
+    if (!vibrant) return;
 
-      return () => {
-        Uniwind.updateCSSVariables("dark", DEFAULTS);
-      };
-    }, [vibrant]),
-  );
+    const luminance = hexToRelativeLuminance(vibrant);
+    const foreground =
+      luminance > 0.3 ? "oklch(0.13 0.006 55)" : "oklch(0.93 0.015 80)";
+
+    Uniwind.updateCSSVariables("dark", {
+      "--color-title-accent": vibrant,
+      "--color-title-accent-foreground": foreground,
+    });
+  }, [vibrant]);
 }

@@ -8,6 +8,7 @@ interface StarRatingProps {
   onRate?: (rating: number) => void;
   size?: number;
   interactive?: boolean;
+  accentColor?: string;
 }
 
 export function StarRating({
@@ -15,11 +16,14 @@ export function StarRating({
   onRate,
   size = 22,
   interactive = true,
+  accentColor,
 }: StarRatingProps) {
-  const [primary, mutedForeground] = useCSSVariable([
+  const [defaultPrimary, mutedForeground] = useCSSVariable([
     "--color-primary",
     "--color-muted-foreground",
   ]) as [string, string];
+
+  const primary = accentColor ?? defaultPrimary;
 
   return (
     <View className="flex-row items-center gap-1">

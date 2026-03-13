@@ -29,7 +29,7 @@ export function StatusActionButton({
     { status: "completed", label: "Completed", Icon: IconCircleCheck },
   ];
 
-  const primaryColor = useCSSVariable("--color-primary") as string;
+  const primaryColor = useCSSVariable("--color-title-accent") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
   return (
@@ -46,13 +46,13 @@ export function StatusActionButton({
             disabled={isPending}
             className={`flex-row items-center gap-1.5 rounded-full border px-3 py-2 ${
               isActive
-                ? "border-primary bg-primary/10"
+                ? "border-title-accent bg-title-accent/10"
                 : "border-border bg-card"
             }`}
           >
             <Icon size={14} color={isActive ? primaryColor : mutedFgColor} />
             <Text
-              className={`font-sans-medium text-xs ${isActive ? "text-primary" : "text-foreground"}`}
+              className={`font-sans-medium text-xs ${isActive ? "text-title-accent" : "text-foreground"}`}
             >
               {label}
             </Text>

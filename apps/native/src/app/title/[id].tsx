@@ -1,4 +1,6 @@
 import {
+  IconBrandAppstore,
+  IconBrandGooglePlay,
   IconCheck,
   IconList,
   IconMovie,
@@ -15,6 +17,7 @@ import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -45,10 +48,10 @@ export default function TitleDetailScreen() {
   const insets = useSafeAreaInsets();
   const { back } = useRouter();
 
-  const [primary, mutedForeground, primaryForeground] = useCSSVariable([
-    "--color-primary",
+  const [titleAccent, mutedForeground, titleAccentForeground] = useCSSVariable([
+    "--color-title-accent",
     "--color-muted-foreground",
-    "--color-primary-foreground",
+    "--color-title-accent-foreground",
   ]) as [string, string, string];
 
   const detail = useQuery(orpc.titles.detail.queryOptions({ input: { id } }));
@@ -246,7 +249,7 @@ export default function TitleDetailScreen() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColorClassName="accent-primary"
+          tintColorClassName="accent-title-accent"
         />
       }
     >
@@ -305,11 +308,7 @@ export default function TitleDetailScreen() {
         )}
         {/* Bottom fade to background */}
         <LinearGradient
-          colors={[
-            "transparent",
-            "rgba(0,0,0,0.6)",
-            "rgba(0,0,0,0.95)",
-          ]}
+          colors={["transparent", "rgba(0,0,0,0.6)", "rgba(0,0,0,0.95)"]}
           locations={[0, 0.5, 1]}
           style={{
             position: "absolute",
@@ -370,8 +369,8 @@ export default function TitleDetailScreen() {
               {title.title}
             </Text>
             <View className="mt-1.5 flex-row flex-wrap items-center gap-2">
-              <View className="rounded-full bg-primary px-2 py-0.5">
-                <Text className="font-sans-medium text-[10px] text-primary-foreground">
+              <View className="rounded-full bg-title-accent px-2 py-0.5">
+                <Text className="font-sans-medium text-[10px] text-title-accent-foreground">
                   {title.type === "movie" ? "Movie" : "TV"}
                 </Text>
               </View>
@@ -385,8 +384,8 @@ export default function TitleDetailScreen() {
               ) : null}
               {title.voteAverage != null && title.voteAverage > 0 && (
                 <View className="flex-row items-center gap-0.5">
-                  <IconStarFilled size={12} color={primary} />
-                  <Text className="text-primary text-xs">
+                  <IconStarFilled size={12} color={titleAccent} />
+                  <Text className="text-title-accent text-xs">
                     {title.voteAverage.toFixed(1)}
                   </Text>
                 </View>
@@ -454,20 +453,21 @@ export default function TitleDetailScreen() {
           <StarRating
             rating={userInfo.data?.rating ?? 0}
             onRate={(stars) => updateRating.mutate({ id, stars })}
+            accentColor={titleAccent}
           />
 
           {title.type === "movie" && (
             <Pressable
               onPress={() => watchMovie.mutate({ id })}
               disabled={watchMovie.isPending}
-              className="flex-row items-center gap-1.5 rounded-full bg-primary px-4 py-2"
+              className="flex-row items-center gap-1.5 rounded-full bg-title-accent px-4 py-2"
             >
               {watchMovie.isPending ? (
                 <Spinner size="sm" />
               ) : (
                 <>
-                  <IconCheck size={16} color={primaryForeground} />
-                  <Text className="font-sans-medium text-[13px] text-primary-foreground">
+                  <IconCheck size={16} color={titleAccentForeground} />
+                  <Text className="font-sans-medium text-[13px] text-title-accent-foreground">
                     Mark Watched
                   </Text>
                 </>
@@ -493,7 +493,13 @@ export default function TitleDetailScreen() {
           className="mt-6"
         >
           <View className="px-4">
-            <SectionHeader title="Where to Watch" icon={IconPlayerPlay} />
+            <SectionHeader
+              title="Where to Watch"
+              icon={
+                Platform.OS === "ios" ? IconBrandAppstore : IconBrandGooglePlay
+              }
+              iconColor={titleAccent}
+            />
           </View>
           <ScrollView
             horizontal
@@ -540,7 +546,11 @@ export default function TitleDetailScreen() {
           entering={FadeInDown.duration(300).delay(400)}
           className="mt-6 px-4"
         >
-          <SectionHeader title="Seasons" icon={IconList} />
+          <SectionHeader
+            title="Seasons"
+            icon={IconList}
+            iconColor={titleAccent}
+          />
           {seasons.map((season) => (
             <SeasonAccordion
               key={season.id}
@@ -554,7 +564,7 @@ export default function TitleDetailScreen() {
 
       {hydrateMutation.isPending && (
         <View className="items-center py-6">
-          <Spinner colorClassName="accent-primary" />
+          <Spinner colorClassName="accent-title-accent" />
           <Text className="mt-2 text-[13px] text-muted-foreground">
             Loading season data...
           </Text>
@@ -568,7 +578,11 @@ export default function TitleDetailScreen() {
           className="mt-6"
         >
           <View className="px-4">
-            <SectionHeader title="Cast" icon={IconUsers} />
+            <SectionHeader
+              title="Cast"
+              icon={IconUsers}
+              iconColor={titleAccent}
+            />
           </View>
           <FlatList
             horizontal
@@ -590,7 +604,11 @@ export default function TitleDetailScreen() {
             className="mt-6"
           >
             <View className="px-4">
-              <SectionHeader title="More Like This" icon={IconThumbUp} />
+              <SectionHeader
+                title="More Like This"
+                icon={IconThumbUp}
+                iconColor={titleAccent}
+              />
             </View>
             <FlatList
               horizontal

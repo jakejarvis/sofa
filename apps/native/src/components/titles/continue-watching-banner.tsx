@@ -4,6 +4,7 @@ import { IconPlayerPlay } from "@tabler/icons-react-native";
 import { useMemo } from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useCSSVariable } from "uniwind";
 import { Image } from "@/components/ui/image";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Text } from "@/components/ui/text";
@@ -19,6 +20,8 @@ export function ContinueWatchingBanner({
   userStatus: string | null;
   backdropPath: string | null;
 }) {
+  const titleAccentColor = useCSSVariable("--color-title-accent") as string;
+
   const { nextEpisode, totalEpisodes, watchedEpisodes } = useMemo(
     () => getNextEpisode(seasons, watchedEpisodeIds),
     [seasons, watchedEpisodeIds],
@@ -35,7 +38,11 @@ export function ContinueWatchingBanner({
       entering={FadeInDown.duration(300).delay(350)}
       className="mt-6 px-4"
     >
-      <SectionHeader title="Next Episode" icon={IconPlayerPlay} />
+      <SectionHeader
+        title="Next Episode"
+        icon={IconPlayerPlay}
+        iconColor={titleAccentColor}
+      />
       <View
         className="overflow-hidden rounded-[12px] border bg-card"
         style={{
@@ -59,8 +66,8 @@ export function ContinueWatchingBanner({
           />
           <View className="absolute right-3 bottom-2.5 left-3">
             <View className="flex-row items-center gap-1.5">
-              <View className="h-1.5 w-1.5 rounded-full bg-primary" />
-              <Text className="font-sans-medium text-[10px] text-primary uppercase tracking-wider">
+              <View className="h-1.5 w-1.5 rounded-full bg-title-accent" />
+              <Text className="font-sans-medium text-[10px] text-title-accent uppercase tracking-wider">
                 Up next
               </Text>
             </View>
@@ -80,7 +87,7 @@ export function ContinueWatchingBanner({
             style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
           >
             <View
-              className="h-full bg-status-watching"
+              className="h-full bg-title-accent"
               style={{ width: `${progress}%` }}
             />
           </View>

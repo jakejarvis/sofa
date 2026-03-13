@@ -20,7 +20,7 @@ export function EpisodeRow({
   isWatched: boolean;
   onToggle: () => void;
 }) {
-  const completedColor = useCSSVariable("--color-status-completed") as string;
+  const titleAccentColor = useCSSVariable("--color-title-accent") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
   return (
@@ -30,7 +30,7 @@ export function EpisodeRow({
       style={{ borderBottomWidth: 0.5 }}
     >
       {isWatched ? (
-        <IconCircleCheckFilled size={22} color={completedColor} />
+        <IconCircleCheckFilled size={22} color={titleAccentColor} />
       ) : (
         <IconCircleDashed size={22} color={mutedFgColor} />
       )}

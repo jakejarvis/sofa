@@ -34,8 +34,7 @@ export function SeasonAccordion({
   }>;
   watchedEpisodeIds: Set<string>;
 }) {
-  const completedColor = useCSSVariable("--color-status-completed") as string;
-  const watchingColor = useCSSVariable("--color-status-watching") as string;
+  const titleAccentColor = useCSSVariable("--color-title-accent") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
   const [expanded, setExpanded] = useState(false);
@@ -145,7 +144,7 @@ export function SeasonAccordion({
             style={{
               height: "100%",
               width: `${progress * 100}%`,
-              backgroundColor: progress === 1 ? completedColor : watchingColor,
+              backgroundColor: titleAccentColor,
             }}
           />
         </View>
@@ -165,7 +164,7 @@ export function SeasonAccordion({
               onPress={() => watchSeason.mutate({ id: season.id })}
               className="mx-4 mb-2 flex-row items-center justify-center rounded-lg bg-secondary py-2"
             >
-              <Text className="font-sans-medium text-primary text-xs">
+              <Text className="font-sans-medium text-title-accent text-xs">
                 Mark All Watched
               </Text>
             </Pressable>

@@ -32,6 +32,8 @@
   --color-status-watchlist: oklch(0.72 0.12 220);
   --color-status-watching: oklch(0.78 0.14 65);
   --color-status-completed: oklch(0.75 0.14 155);
+  --color-title-accent: oklch(0.8 0.14 65);
+  --color-title-accent-foreground: oklch(0.13 0.006 55);
 
   --radius: 0.625rem;
 }
