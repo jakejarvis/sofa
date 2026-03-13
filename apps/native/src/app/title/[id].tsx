@@ -263,34 +263,23 @@ export default function TitleDetailScreen() {
             contentFit="cover"
           />
         )}
-        {/* Backdrop overlay: glass effect on supported devices, colored Views elsewhere */}
-        {isLiquidGlassAvailable() && palette?.vibrant ? (
-          <GlassView
-            glassEffectStyle="regular"
-            tintColor={palette.vibrant}
+        {/* Base darkening overlay */}
+        <View
+          className="absolute inset-0"
+          style={{ backgroundColor: "rgba(0,0,0,0.1)" }}
+        />
+        {/* Colored tint from palette */}
+        {palette?.darkMuted && (
+          <View
             className="absolute inset-0"
+            style={{ backgroundColor: palette.darkMuted, opacity: 0.2 }}
           />
-        ) : (
-          <>
-            {/* Base darkening overlay */}
-            <View
-              className="absolute inset-0"
-              style={{ backgroundColor: "rgba(0,0,0,0.45)" }}
-            />
-            {/* Colored tint from palette */}
-            {palette?.darkMuted && (
-              <View
-                className="absolute inset-0"
-                style={{ backgroundColor: palette.darkMuted, opacity: 0.25 }}
-              />
-            )}
-            {palette?.vibrant && (
-              <View
-                className="absolute inset-0"
-                style={{ backgroundColor: palette.vibrant, opacity: 0.06 }}
-              />
-            )}
-          </>
+        )}
+        {palette?.vibrant && (
+          <View
+            className="absolute inset-0"
+            style={{ backgroundColor: palette.vibrant, opacity: 0.06 }}
+          />
         )}
         {/* Bottom fade to background */}
         <LinearGradient
@@ -314,12 +303,29 @@ export default function TitleDetailScreen() {
             }
             className="absolute inset-0 items-center justify-center"
           >
-            <View
-              className="h-14 w-14 items-center justify-center rounded-full"
-              style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
-            >
-              <IconPlayerPlay size={28} color="white" fill="white" />
-            </View>
+            {isLiquidGlassAvailable() ? (
+              <GlassView
+                glassEffectStyle="clear"
+                colorScheme="dark"
+                isInteractive={true}
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 28,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <IconPlayerPlay size={28} color="white" fill="white" />
+              </GlassView>
+            ) : (
+              <View
+                className="h-14 w-14 items-center justify-center rounded-full"
+                style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+              >
+                <IconPlayerPlay size={28} color="white" fill="white" />
+              </View>
+            )}
           </Pressable>
         )}
 
