@@ -104,6 +104,12 @@ export default function ServerUrlScreen() {
     if (!trimmed) return;
 
     const fullUrl = normalizeUrl(trimmed);
+
+    try {
+      new URL(fullUrl);
+    } catch {
+      return;
+    }
     setConnection({ phase: "connecting" });
 
     const result = await validateServerUrl(fullUrl);
