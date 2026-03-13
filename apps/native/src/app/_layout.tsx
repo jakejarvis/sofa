@@ -3,6 +3,11 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import {
+  getAdvertisingId,
+  getTrackingPermissionsAsync,
+  requestTrackingPermissionsAsync,
+} from "expo-tracking-transparency";
 import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -13,7 +18,7 @@ import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { authClient } from "@/lib/auth-client";
 import { queryPersister } from "@/lib/mmkv";
-import { posthog } from "@/lib/posthog";
+import { applyTrackingTransparency, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
 import { hasStoredServerUrl, onServerUrlChange } from "@/lib/server-url";
 
@@ -44,6 +49,28 @@ function AppContent() {
       posthog.screen(pathname, params);
     }
   }, [pathname, params]);
+
+  // --- App Tracking Transparency ---
+  useEffect(() => {
+    (async () => {
+      const { status } = await getTrackingPermissionsAsync();
+      const granted =
+        status === "undetermined"
+          ? (await requestTrackingPermissionsAsync()).granted
+          : status === "granted";
+
+      applyTrackingTransparency(granted);
+
+      // Use the platform advertising ID (IDFA / AAID) as the PostHog
+      // distinct ID so events are tied to the device ad identifier.
+      if (granted && posthog) {
+        const advertisingId = await getAdvertisingId();
+        if (advertisingId) {
+          posthog.identify(advertisingId);
+        }
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     Uniwind.setTheme("dark");
