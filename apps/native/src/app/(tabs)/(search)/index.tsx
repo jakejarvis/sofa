@@ -1,10 +1,9 @@
-import { IconSearch } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { useCSSVariable } from "uniwind";
+import { RecentlyViewedList } from "@/components/search/recently-viewed-list";
 import {
   type SearchResultItem,
   SearchResultRow,
@@ -19,7 +18,6 @@ import * as Haptics from "@/utils/haptics";
 
 export default function SearchScreen() {
   const { navigate } = useRouter();
-  const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query.trim(), 300);
 
@@ -141,15 +139,7 @@ export default function SearchScreen() {
       />
 
       {debouncedQuery.length === 0 ? (
-        <Animated.View
-          entering={FadeIn.duration(400)}
-          className="flex-1 items-center justify-center"
-        >
-          <IconSearch size={64} color={mutedForeground} />
-          <Text className="mt-3 text-[15px] text-muted-foreground">
-            Search for movies, shows, or people
-          </Text>
-        </Animated.View>
+        <RecentlyViewedList />
       ) : searchResults.isPending ? (
         <View className="flex-1 items-center justify-center">
           <Spinner colorClassName="accent-primary" />

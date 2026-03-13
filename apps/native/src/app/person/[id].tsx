@@ -8,7 +8,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { FlatList, Pressable, useWindowDimensions, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,6 +20,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
+import { addRecentlyViewed } from "@/lib/recently-viewed";
 
 const FILMOGRAPHY_GAP = 12;
 const FILMOGRAPHY_PADDING = 16;
@@ -60,6 +61,22 @@ export default function PersonDetailScreen() {
 
   const person = data?.person;
   const filmography = data?.filmography ?? [];
+
+  const personName = person?.name;
+  const personProfilePath = person?.profilePath ?? null;
+  const personDepartment = person?.knownForDepartment ?? null;
+
+  useEffect(() => {
+    if (personName) {
+      addRecentlyViewed({
+        id,
+        type: "person",
+        title: personName,
+        imagePath: personProfilePath,
+        subtitle: personDepartment,
+      });
+    }
+  }, [id, personName, personProfilePath, personDepartment]);
 
   const renderFilmographyItem = useCallback(
     ({ item: credit }: { item: (typeof filmography)[number] }) => (

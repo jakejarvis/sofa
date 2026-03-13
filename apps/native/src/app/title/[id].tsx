@@ -34,6 +34,7 @@ import { Text } from "@/components/ui/text";
 import { useTitleTheme } from "@/hooks/use-title-theme";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
+import { addRecentlyViewed } from "@/lib/recently-viewed";
 import { toast } from "@/lib/toast";
 
 export default function TitleDetailScreen() {
@@ -133,6 +134,24 @@ export default function TitleDetailScreen() {
   const title = detail.data?.title;
   const palette = title?.colorPalette ?? null;
   useTitleTheme(palette);
+
+  const titleName = title?.title;
+  const titleType = title?.type;
+  const titlePosterPath = title?.posterPath ?? null;
+  const titleYear =
+    (title?.releaseDate ?? title?.firstAirDate)?.slice(0, 4) ?? null;
+
+  useEffect(() => {
+    if (titleName && titleType) {
+      addRecentlyViewed({
+        id,
+        type: titleType,
+        title: titleName,
+        imagePath: titlePosterPath,
+        subtitle: titleYear,
+      });
+    }
+  }, [id, titleName, titleType, titlePosterPath, titleYear]);
 
   const seasons = detail.data?.seasons ?? [];
   const cast = detail.data?.cast ?? [];
