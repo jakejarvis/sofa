@@ -15,11 +15,11 @@ import { Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { useCSSVariable } from "uniwind";
 import * as ContextMenu from "zeego/context-menu";
 import { Image } from "@/components/ui/image";
@@ -210,19 +210,19 @@ export function PosterCard({
             {title}
           </Text>
         </View>
-        <View className="mt-1 flex-row items-center gap-2">
+        <View className="mt-1 flex-row items-center gap-1">
           {type === "movie" ? (
-            <IconMovie size={12} color={primaryColor} opacity={0.6} />
+            <IconMovie size={12} color={primaryColor} />
           ) : (
-            <IconDeviceTv size={12} color={primaryColor} opacity={0.6} />
+            <IconDeviceTv size={12} color={primaryColor} />
           )}
           {year ? (
             <Text className="text-[11px] text-muted-foreground">{year}</Text>
           ) : null}
           {voteAverage != null && voteAverage > 0 && (
-            <View className="ml-auto flex-row items-center gap-0.5">
-              <IconStarFilled size={10} color={primaryColor} opacity={0.8} />
-              <Text className="text-[11px] text-primary/80">
+            <View className="ml-auto flex-row items-center gap-1">
+              <IconStarFilled size={10} color={primaryColor} />
+              <Text className="text-[11px] text-primary">
                 {voteAverage.toFixed(1)}
               </Text>
             </View>
@@ -336,7 +336,7 @@ export function PosterCard({
       pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
     })
     .onEnd(() => {
-      runOnJS(handleResolve)();
+      scheduleOnRN(handleResolve);
     });
 
   return (

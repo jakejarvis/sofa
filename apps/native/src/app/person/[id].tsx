@@ -1,9 +1,12 @@
 import {
   IconAlertTriangle,
+  IconCalendar,
+  IconMapPin,
   IconMovie,
   IconUser,
 } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
+import { format, parseISO } from "date-fns";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { FlatList, Pressable, useWindowDimensions, View } from "react-native";
@@ -21,6 +24,25 @@ import { orpc } from "@/lib/orpc";
 const FILMOGRAPHY_GAP = 12;
 const FILMOGRAPHY_PADDING = 16;
 
+function calculateAge(birthday: string, deathday?: string | null): number {
+  const birth = new Date(birthday);
+  const end = deathday ? new Date(deathday) : new Date();
+  let age = end.getFullYear() - birth.getFullYear();
+  const m = end.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && end.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+const departmentLabels: Record<string, string> = {
+  Acting: "Actor",
+  Directing: "Director",
+  Writing: "Writer",
+  Production: "Producer",
+  Editing: "Editor",
+};
+
 export default function PersonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
@@ -30,6 +52,7 @@ export default function PersonDetailScreen() {
     (screenWidth - FILMOGRAPHY_PADDING * 2 - FILMOGRAPHY_GAP) / 2;
 
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
+  const primaryColor = useCSSVariable("--color-primary") as string;
 
   const { data, isPending, isError } = useQuery(
     orpc.people.detail.queryOptions({ input: { id } }),
@@ -52,14 +75,6 @@ export default function PersonDetailScreen() {
           userStatus={data?.userStatuses?.[credit.titleId] ?? null}
           width={undefined}
         />
-        {credit.character ? (
-          <Text
-            numberOfLines={1}
-            className="mt-1 text-center text-[11px] text-muted-foreground"
-          >
-            as {credit.character}
-          </Text>
-        ) : null}
       </View>
     ),
     [columnWidth, data?.userStatuses],
@@ -165,17 +180,38 @@ export default function PersonDetailScreen() {
 
         {person.knownForDepartment ? (
           <View className="mt-2 rounded-full bg-secondary px-3 py-1">
-            <Text className="text-muted-foreground text-xs">
-              {person.knownForDepartment}
+            <Text className="text-muted-foreground text-xs uppercase tracking-wider">
+              {departmentLabels[person.knownForDepartment] ??
+                person.knownForDepartment}
             </Text>
           </View>
         ) : null}
 
-        {person.birthday || person.deathday ? (
-          <Text selectable className="mt-2 text-[13px] text-muted-foreground">
-            {person.birthday?.slice(0, 4)}
-            {person.deathday ? ` — ${person.deathday.slice(0, 4)}` : ""}
-          </Text>
+        {person.birthday || person.placeOfBirth ? (
+          <View className="mt-3 items-center gap-1.5">
+            {person.birthday ? (
+              <View className="flex-row items-center gap-1.5">
+                <IconCalendar size={14} color={primaryColor} />
+                <Text selectable className="text-[13px] text-muted-foreground">
+                  {format(parseISO(person.birthday), "MMMM d, yyyy")}
+                  {(() => {
+                    const age = calculateAge(person.birthday, person.deathday);
+                    return person.deathday
+                      ? ` (died at ${age})`
+                      : ` (age ${age})`;
+                  })()}
+                </Text>
+              </View>
+            ) : null}
+            {person.placeOfBirth ? (
+              <View className="flex-row items-center gap-1.5">
+                <IconMapPin size={14} color={primaryColor} />
+                <Text selectable className="text-[13px] text-muted-foreground">
+                  {person.placeOfBirth}
+                </Text>
+              </View>
+            ) : null}
+          </View>
         ) : null}
       </Animated.View>
 

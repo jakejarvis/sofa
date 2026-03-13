@@ -457,7 +457,7 @@ export default function TitleDetailScreen() {
       {title.overview ? (
         <Animated.View entering={FadeIn.duration(300).delay(300)}>
           <View className="mt-5 px-4">
-            <ExpandableText text={title.overview} />
+            <ExpandableText text={title.overview} actionColor={titleAccent} />
           </View>
         </Animated.View>
       ) : null}

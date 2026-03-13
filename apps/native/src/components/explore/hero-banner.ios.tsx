@@ -7,11 +7,11 @@ import { View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { useCSSVariable } from "uniwind";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
@@ -60,7 +60,7 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
       pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
     })
     .onEnd(() => {
-      runOnJS(handlePress)();
+      scheduleOnRN(handlePress);
     });
 
   const useGlass = isLiquidGlassAvailable();

@@ -33,6 +33,7 @@
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-query-persist-client": "5.90.24",
     "better-auth": "catalog:",
+    "date-fns": "catalog:",
     "expo": "55.0.6",
     "expo-application": "55.0.9",
     "expo-clipboard": "55.0.8",

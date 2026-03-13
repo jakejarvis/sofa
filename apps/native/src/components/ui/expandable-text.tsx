@@ -6,9 +6,11 @@ import { Text } from "@/components/ui/text";
 export function ExpandableText({
   text,
   maxLines = 3,
+  actionColor,
 }: {
   text: string;
   maxLines?: number;
+  actionColor?: string;
 }) {
   const prevTextRef = useRef(text);
   let expanded: boolean;
@@ -27,7 +29,7 @@ export function ExpandableText({
     needsTruncation = needsTruncationState;
   }
 
-  const onTextLayout = useCallback(
+  const onMeasureLayout = useCallback(
     (e: NativeSyntheticEvent<TextLayoutEventData>) => {
       setNeedsTruncation(e.nativeEvent.lines.length > maxLines);
     },
@@ -36,17 +38,26 @@ export function ExpandableText({
 
   return (
     <View>
+      {/* Hidden text without numberOfLines to measure true line count */}
+      <Text
+        onTextLayout={onMeasureLayout}
+        className="pointer-events-none absolute text-[14px] leading-[22px] opacity-0"
+      >
+        {text}
+      </Text>
       <Text
         selectable
         numberOfLines={expanded ? undefined : maxLines}
-        onTextLayout={onTextLayout}
         className="text-[14px] text-foreground leading-[22px]"
       >
         {text}
       </Text>
       {needsTruncation && (
         <Pressable onPress={() => setExpanded(!expanded)} className="mt-1">
-          <Text className="font-sans-medium text-[13px] text-primary">
+          <Text
+            className="font-sans-medium text-[13px] text-primary"
+            style={actionColor ? { color: actionColor } : undefined}
+          >
             {expanded ? "Show less" : "Show more"}
           </Text>
         </Pressable>

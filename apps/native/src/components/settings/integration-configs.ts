@@ -1,3 +1,4 @@
+import { formatDistanceToNow } from "date-fns";
 import type { SvgProps } from "react-native-svg";
 import {
   EmbyIcon,
@@ -7,7 +8,6 @@ import {
   SonarrIcon,
 } from "@/components/settings/icons";
 import { getServerUrl } from "@/lib/server-url";
-import { timeAgo } from "@/utils/time-ago";
 
 export interface IntegrationConfig {
   provider: "plex" | "jellyfin" | "emby" | "sonarr" | "radarr";
@@ -23,13 +23,13 @@ export interface IntegrationConfig {
 
 function webhookStatus(lastEventAt: string | null): string {
   return lastEventAt
-    ? `Last event ${timeAgo(lastEventAt)}`
+    ? `Last event ${formatDistanceToNow(new Date(lastEventAt), { addSuffix: true })}`
     : "Ready — nothing received yet";
 }
 
 function listStatus(lastEventAt: string | null): string {
   return lastEventAt
-    ? `Last polled ${timeAgo(lastEventAt)}`
+    ? `Last polled ${formatDistanceToNow(new Date(lastEventAt), { addSuffix: true })}`
     : "Ready — not polled yet";
 }
 
