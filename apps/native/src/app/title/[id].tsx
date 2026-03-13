@@ -305,8 +305,19 @@ export default function TitleDetailScreen() {
         )}
         {/* Bottom fade to background */}
         <LinearGradient
-          colors={["transparent", "rgba(0,0,0,0.7)"]}
-          className="absolute inset-0"
+          colors={[
+            "transparent",
+            "rgba(0,0,0,0.6)",
+            "rgba(0,0,0,0.95)",
+          ]}
+          locations={[0, 0.5, 1]}
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: "70%",
+          }}
         />
 
         {title.trailerVideoKey && (
@@ -384,27 +395,6 @@ export default function TitleDetailScreen() {
           </View>
         </View>
       </View>
-
-      {/* Ambient color glow below hero */}
-      {(() => {
-        const glowColor =
-          palette?.vibrant ?? palette?.darkMuted ?? palette?.muted;
-        if (!glowColor) return null;
-        return (
-          <View
-            pointerEvents="none"
-            style={{
-              height: 0,
-              overflow: "visible",
-            }}
-          >
-            <LinearGradient
-              colors={[`${glowColor}14`, "transparent"]}
-              style={{ height: 300 }}
-            />
-          </View>
-        );
-      })()}
 
       {/* Genres */}
       {title.genres && title.genres.length > 0 && (
