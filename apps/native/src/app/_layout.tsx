@@ -40,17 +40,9 @@ function AppContent() {
   const hasServerUrl =
     !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
 
-  // --- PostHog screen tracking ---
-  const pathname = usePathname();
-  const params = useGlobalSearchParams();
+  // --- App Tracking Transparency (must resolve before screen tracking) ---
+  const [trackingReady, setTrackingReady] = useState(false);
 
-  useEffect(() => {
-    if (posthog && pathname) {
-      posthog.screen(pathname, params);
-    }
-  }, [pathname, params]);
-
-  // --- App Tracking Transparency ---
   useEffect(() => {
     (async () => {
       const { status } = await getTrackingPermissionsAsync();
@@ -59,18 +51,31 @@ function AppContent() {
           ? (await requestTrackingPermissionsAsync()).granted
           : status === "granted";
 
-      applyTrackingTransparency(granted);
+      const enabled = applyTrackingTransparency(granted);
 
       // Use the platform advertising ID (IDFA / AAID) as the PostHog
-      // distinct ID so events are tied to the device ad identifier.
-      if (granted && posthog) {
+      // distinct ID, but only when the resolved state is actually enabled
+      // (respects both ATT result and the user's settings override).
+      if (enabled && posthog) {
         const advertisingId = await getAdvertisingId();
         if (advertisingId) {
           posthog.identify(advertisingId);
         }
       }
+
+      setTrackingReady(true);
     })();
   }, []);
+
+  // --- PostHog screen tracking (waits for ATT to resolve) ---
+  const pathname = usePathname();
+  const params = useGlobalSearchParams();
+
+  useEffect(() => {
+    if (trackingReady && posthog && pathname) {
+      posthog.screen(pathname, params);
+    }
+  }, [trackingReady, pathname, params]);
 
   useEffect(() => {
     Uniwind.setTheme("dark");

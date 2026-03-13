@@ -63,17 +63,31 @@ export function syncPosthog(enabled: boolean): void {
 
 /**
  * Resolve analytics state after an ATT permission check.
- * If the user has an explicit preference, that wins. Otherwise the ATT
- * result is stored as the current default and PostHog is synced.
+ * If the user has an explicit preference (or a legacy preference from before
+ * ATT was introduced), that wins. Otherwise the ATT result is stored as the
+ * current default and PostHog is synced.
+ *
+ * Returns the resolved enabled state so callers can decide whether to proceed
+ * with identifying, etc.
  */
-export function applyTrackingTransparency(granted: boolean): void {
+export function applyTrackingTransparency(granted: boolean): boolean {
+  // Migrate legacy preference: if the user previously toggled analytics
+  // (ANALYTICS_ENABLED_KEY exists) but the explicit flag was never set
+  // (pre-ATT upgrade), treat it as an explicit choice so we don't overwrite it.
+  const legacyValue = storage.getBoolean(ANALYTICS_ENABLED_KEY);
+  if (legacyValue !== undefined && !hasExplicitPreference()) {
+    storage.set(ANALYTICS_EXPLICIT_KEY, true);
+  }
+
   if (hasExplicitPreference()) {
     // User already made a choice in settings — honour it.
-    syncPosthog(isAnalyticsEnabled());
-    return;
+    const enabled = isAnalyticsEnabled();
+    syncPosthog(enabled);
+    return enabled;
   }
 
   // No explicit preference yet — follow the ATT result.
   storage.set(ANALYTICS_ENABLED_KEY, granted);
   syncPosthog(granted);
+  return granted;
 }
