@@ -15,7 +15,6 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { Uniwind, useResolveClassNames } from "uniwind";
 
 import { OfflineBanner } from "@/components/ui/offline-banner";
-import { ToastProvider } from "@/components/ui/toast-provider";
 import { authClient } from "@/lib/auth-client";
 import { queryPersister } from "@/lib/mmkv";
 import { applyTrackingTransparency, posthog } from "@/lib/posthog";
@@ -91,7 +90,6 @@ function AppContent() {
     <>
       <StatusBar style="light" />
       <OfflineBanner />
-      <ToastProvider />
       <Stack
         screenOptions={{
           headerShown: false,

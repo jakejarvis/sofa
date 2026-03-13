@@ -1,68 +1,33 @@
-type ToastType = "success" | "error" | "info" | "warning";
+import { toast as burntToast } from "burnt";
 
-interface ToastAction {
-  label: string;
-  onPress: () => void;
-}
-
-interface ToastOptions {
+type ToastOptions = {
   description?: string;
   duration?: number;
-  action?: ToastAction;
-}
+};
 
-export interface ToastItem {
-  id: string;
-  type: ToastType;
-  message: string;
-  description?: string;
-  duration: number;
-  action?: ToastAction;
-}
-
-let queue: ToastItem[] = [];
-const listeners = new Set<() => void>();
-
-function emit() {
-  for (const listener of listeners) listener();
-}
-
-export function getSnapshot(): ToastItem[] {
-  return queue;
-}
-
-export function subscribe(listener: () => void): () => void {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-}
-
-function addToast(type: ToastType, message: string, options?: ToastOptions) {
-  const item: ToastItem = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    type,
-    message,
-    description: options?.description,
-    duration: options?.duration ?? 4000,
-    action: options?.action,
-  };
-  queue = [...queue, item];
-  emit();
-}
-
-export function dismiss(id: string) {
-  queue = queue.filter((t) => t.id !== id);
-  emit();
+function show(
+  preset: "done" | "error" | "none",
+  haptic: "success" | "warning" | "error" | "none",
+  message: string,
+  options?: ToastOptions,
+) {
+  burntToast({
+    title: message,
+    message: options?.description,
+    preset,
+    haptic,
+    duration: options?.duration ? options.duration / 1000 : 4,
+    from: "bottom",
+  });
 }
 
 export const toast = {
   success: (message: string, options?: ToastOptions) =>
-    addToast("success", message, options),
+    show("done", "success", message, options),
   error: (message: string, options?: ToastOptions) =>
-    addToast("error", message, options),
+    show("error", "error", message, options),
   info: (message: string, options?: ToastOptions) =>
-    addToast("info", message, options),
+    show("none", "none", message, options),
   warning: (message: string, options?: ToastOptions) =>
-    addToast("warning", message, options),
+    show("none", "warning", message, options),
 };
