@@ -8,6 +8,8 @@ import {
   IconUsers,
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
+import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -33,6 +35,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { StarRating } from "@/components/ui/star-rating";
 import { Text } from "@/components/ui/text";
+import { useTitleTheme } from "@/hooks/use-title-theme";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { toast } from "@/lib/toast";
@@ -143,6 +146,9 @@ export default function TitleDetailScreen() {
   }, []);
 
   const title = detail.data?.title;
+  const palette = title?.colorPalette ?? null;
+  useTitleTheme(palette);
+
   const seasons = detail.data?.seasons ?? [];
   const cast = detail.data?.cast ?? [];
   const availability = detail.data?.availability ?? [];
@@ -268,9 +274,39 @@ export default function TitleDetailScreen() {
             contentFit="cover"
           />
         )}
-        <View
+        {/* Backdrop overlay: glass effect on supported devices, colored Views elsewhere */}
+        {isLiquidGlassAvailable() && palette?.vibrant ? (
+          <GlassView
+            glassEffectStyle="regular"
+            tintColor={palette.vibrant}
+            className="absolute inset-0"
+          />
+        ) : (
+          <>
+            {/* Base darkening overlay */}
+            <View
+              className="absolute inset-0"
+              style={{ backgroundColor: "rgba(0,0,0,0.45)" }}
+            />
+            {/* Colored tint from palette */}
+            {palette?.darkMuted && (
+              <View
+                className="absolute inset-0"
+                style={{ backgroundColor: palette.darkMuted, opacity: 0.25 }}
+              />
+            )}
+            {palette?.vibrant && (
+              <View
+                className="absolute inset-0"
+                style={{ backgroundColor: palette.vibrant, opacity: 0.06 }}
+              />
+            )}
+          </>
+        )}
+        {/* Bottom fade to background */}
+        <LinearGradient
+          colors={["transparent", "rgba(0,0,0,0.7)"]}
           className="absolute inset-0"
-          style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
         />
 
         {title.trailerVideoKey && (
@@ -295,7 +331,14 @@ export default function TitleDetailScreen() {
           {title.posterPath && (
             <View
               className="mr-3 h-[150px] w-[100px] overflow-hidden rounded-lg"
-              style={{ borderCurve: "continuous" }}
+              style={[
+                { borderCurve: "continuous" },
+                palette?.darkVibrant
+                  ? {
+                      boxShadow: `0 12px 28px -8px ${palette.darkVibrant}80`,
+                    }
+                  : undefined,
+              ]}
             >
               <Image
                 source={{ uri: title.posterPath }}
@@ -341,6 +384,27 @@ export default function TitleDetailScreen() {
           </View>
         </View>
       </View>
+
+      {/* Ambient color glow below hero */}
+      {(() => {
+        const glowColor =
+          palette?.vibrant ?? palette?.darkMuted ?? palette?.muted;
+        if (!glowColor) return null;
+        return (
+          <View
+            pointerEvents="none"
+            style={{
+              height: 0,
+              overflow: "visible",
+            }}
+          >
+            <LinearGradient
+              colors={[`${glowColor}14`, "transparent"]}
+              style={{ height: 300 }}
+            />
+          </View>
+        );
+      })()}
 
       {/* Genres */}
       {title.genres && title.genres.length > 0 && (
