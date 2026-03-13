@@ -245,13 +245,6 @@ export default function TitleDetailScreen() {
     <ScrollView
       className="bg-background"
       contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColorClassName="accent-title-accent"
-        />
-      }
     >
       <Stack.Screen
         options={{
