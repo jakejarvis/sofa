@@ -8,6 +8,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
@@ -273,23 +274,34 @@ export default function TitleDetailScreen() {
             contentFit="cover"
           />
         )}
-        {/* Base darkening overlay */}
-        <View
-          className="absolute inset-0"
-          style={{ backgroundColor: "rgba(0,0,0,0.45)" }}
-        />
-        {/* Colored tint from palette */}
-        {palette?.darkMuted && (
-          <View
+        {/* Backdrop overlay: glass effect on supported devices, colored Views elsewhere */}
+        {isLiquidGlassAvailable() && palette?.vibrant ? (
+          <GlassView
+            glassEffectStyle="regular"
+            tintColor={palette.vibrant}
             className="absolute inset-0"
-            style={{ backgroundColor: palette.darkMuted, opacity: 0.25 }}
           />
-        )}
-        {palette?.vibrant && (
-          <View
-            className="absolute inset-0"
-            style={{ backgroundColor: palette.vibrant, opacity: 0.06 }}
-          />
+        ) : (
+          <>
+            {/* Base darkening overlay */}
+            <View
+              className="absolute inset-0"
+              style={{ backgroundColor: "rgba(0,0,0,0.45)" }}
+            />
+            {/* Colored tint from palette */}
+            {palette?.darkMuted && (
+              <View
+                className="absolute inset-0"
+                style={{ backgroundColor: palette.darkMuted, opacity: 0.25 }}
+              />
+            )}
+            {palette?.vibrant && (
+              <View
+                className="absolute inset-0"
+                style={{ backgroundColor: palette.vibrant, opacity: 0.06 }}
+              />
+            )}
+          </>
         )}
         {/* Bottom fade to background */}
         <LinearGradient
