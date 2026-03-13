@@ -85,6 +85,17 @@
         "typescript": "catalog:",
       },
     },
+    "apps/public-api": {
+      "name": "@sofa/public-api",
+      "version": "0.1.0",
+      "dependencies": {
+        "hono": "4.12.7",
+      },
+      "devDependencies": {
+        "@types/bun": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
     "apps/server": {
       "name": "@sofa/server",
       "version": "0.1.0",
@@ -996,6 +1007,8 @@
     "@sofa/logger": ["@sofa/logger@workspace:packages/logger"],
 
     "@sofa/native": ["@sofa/native@workspace:apps/native"],
+
+    "@sofa/public-api": ["@sofa/public-api@workspace:apps/public-api"],
 
     "@sofa/server": ["@sofa/server@workspace:apps/server"],
 

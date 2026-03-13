@@ -5,8 +5,8 @@ const APP_VERSION = process.env.APP_VERSION || "0.0.0";
 
 const log = createLogger("update-check");
 
-const GITHUB_RELEASES_URL =
-  "https://api.github.com/repos/jakejarvis/sofa/releases/latest";
+const PUBLIC_API_URL =
+  process.env.PUBLIC_API_URL || "https://public-api.sofa.watch";
 const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 export interface UpdateCheckResult {
@@ -70,20 +70,17 @@ export async function performUpdateCheck(): Promise<UpdateCheckResult> {
   }
 
   try {
-    const res = await fetch(GITHUB_RELEASES_URL, {
-      headers: {
-        Accept: "application/vnd.github.v3+json",
-        "User-Agent": "sofa-update-check",
-      },
+    const res = await fetch(`${PUBLIC_API_URL}/v1/version`, {
+      headers: { "User-Agent": "sofa-update-check" },
       signal: AbortSignal.timeout(10_000),
     });
-    if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+    if (!res.ok) throw new Error(`Public API ${res.status}`);
 
-    const data = (await res.json()) as { tag_name: string; html_url: string };
-    const version = data.tag_name.replace(/^v/, "");
+    const data = (await res.json()) as { version: string; releaseUrl: string };
+    const version = data.version;
 
     setSetting("updateCheckLatestVersion", version);
-    setSetting("updateCheckReleaseUrl", data.html_url);
+    setSetting("updateCheckReleaseUrl", data.releaseUrl);
     setSetting("updateCheckLastCheckedAt", new Date().toISOString());
 
     log.info(
@@ -94,7 +91,7 @@ export async function performUpdateCheck(): Promise<UpdateCheckResult> {
       updateAvailable: isNewerVersion(version, APP_VERSION),
       currentVersion: APP_VERSION,
       latestVersion: version,
-      releaseUrl: data.html_url,
+      releaseUrl: data.releaseUrl,
       lastCheckedAt: new Date().toISOString(),
     };
   } catch (err) {

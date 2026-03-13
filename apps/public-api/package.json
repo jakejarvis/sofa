@@ -1,0 +1,20 @@
+{
+  "name": "@sofa/public-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "PORT=3002 bun --watch src/app.ts",
+    "start": "PORT=3002 bun src/app.ts",
+    "lint": "biome check",
+    "format": "biome format --write",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "4.12.7"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
+  }
+}
