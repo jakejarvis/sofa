@@ -63,8 +63,6 @@ export default function ServerUrlScreen() {
   const destructiveColor = useCSSVariable("--color-destructive") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
-  const [isFirstLaunch] = useState(() => !hasStoredServerUrl());
-
   // Icon pulse animation
   const iconOpacity = useSharedValue(1);
   const iconAnimatedStyle = useAnimatedStyle(() => ({
@@ -94,14 +92,6 @@ export default function ServerUrlScreen() {
     };
   }, []);
 
-  // Auto-focus on first launch
-  useEffect(() => {
-    if (isFirstLaunch) {
-      const timer = setTimeout(() => inputRef.current?.focus(), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [isFirstLaunch]);
-
   const handleChangeText = (text: string) => {
     setUrl(text);
     if (connection.phase === "error") {
@@ -114,6 +104,14 @@ export default function ServerUrlScreen() {
     if (!trimmed) return;
 
     const fullUrl = normalizeUrl(trimmed);
+
+    try {
+      new URL(fullUrl);
+    } catch {
+      setConnection({ phase: "error", error: "invalid_url" });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      return;
+    }
     setConnection({ phase: "connecting" });
 
     const result = await validateServerUrl(fullUrl);
@@ -133,6 +131,16 @@ export default function ServerUrlScreen() {
 
   const isConnecting = connection.phase === "connecting";
   const isSuccess = connection.phase === "success";
+  const trimmedUrl = url.trim().replace(/\/+$/, "");
+  const isValidUrl = (() => {
+    if (!trimmedUrl) return false;
+    try {
+      new URL(normalizeUrl(trimmedUrl));
+      return true;
+    } catch {
+      return false;
+    }
+  })();
   const isDisabled = isConnecting || isSuccess;
 
   return (
@@ -187,7 +195,11 @@ export default function ServerUrlScreen() {
             </Text>
           </View>
         ) : (
-          <Button onPress={handleConnect} className="bg-primary">
+          <Button
+            onPress={handleConnect}
+            disabled={!isValidUrl}
+            className="bg-primary"
+          >
             <ButtonLabel>Connect</ButtonLabel>
           </Button>
         )}
