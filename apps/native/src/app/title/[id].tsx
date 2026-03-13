@@ -104,17 +104,6 @@ export default function TitleDetailScreen() {
     }),
   );
 
-  const watchAll = useMutation(
-    orpc.titles.watchAll.mutationOptions({
-      onSuccess: () => {
-        toast.success("Marked all episodes as watched");
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
-      },
-      onError: () => toast.error("Failed to mark all episodes as watched"),
-    }),
-  );
-
   const quickAddMutation = useMutation(
     orpc.titles.quickAdd.mutationOptions({
       onSuccess: () => {
@@ -193,10 +182,10 @@ export default function TitleDetailScreen() {
           <Skeleton width={50} height={24} borderRadius={12} />
         </View>
         {/* Actions skeleton */}
-        <View className="mt-4 flex-row gap-2 px-4">
-          <Skeleton width={100} height={36} borderRadius={18} />
-          <Skeleton width={90} height={36} borderRadius={18} />
-          <Skeleton width={105} height={36} borderRadius={18} />
+        <View className="mt-4 flex-row items-center gap-3 px-4">
+          <Skeleton width={110} height={36} borderRadius={8} />
+          <Skeleton width={1} height={24} borderRadius={0} />
+          <Skeleton width={120} height={22} borderRadius={4} />
         </View>
         {/* Overview skeleton */}
         <View className="mt-5 gap-2 px-4">
@@ -415,57 +404,52 @@ export default function TitleDetailScreen() {
         entering={FadeInDown.duration(300).delay(200)}
         className="mt-4 px-4"
       >
-        <StatusActionButton
-          currentStatus={userInfo.data?.status ?? null}
-          onStatusChange={(status) => {
-            if (status === null) {
-              updateStatus.mutate({ id, status: null });
-            } else if (status === "watchlist") {
-              quickAddMutation.mutate({
-                tmdbId: title.tmdbId,
-                type: title.type,
-              });
-            } else if (status === "completed" && title.type === "movie") {
-              watchMovie.mutate({ id });
-            } else if (status === "completed" && title.type === "tv") {
-              watchAll.mutate({ id });
-            } else {
-              updateStatus.mutate({ id, status });
+        <View className="flex-row flex-wrap items-center gap-3">
+          <StatusActionButton
+            currentStatus={userInfo.data?.status ?? null}
+            onStatusChange={(status) => {
+              if (status === "watchlist") {
+                quickAddMutation.mutate({
+                  tmdbId: title.tmdbId,
+                  type: title.type,
+                });
+              } else {
+                updateStatus.mutate({ id, status: null });
+              }
+            }}
+            isPending={
+              updateStatus.isPending ||
+              quickAddMutation.isPending ||
+              watchMovie.isPending
             }
-          }}
-          isPending={
-            updateStatus.isPending ||
-            quickAddMutation.isPending ||
-            watchMovie.isPending ||
-            watchAll.isPending
-          }
-        />
-
-        <View className="mt-4 flex-row items-center justify-between">
-          <StarRating
-            rating={userInfo.data?.rating ?? 0}
-            onRate={(stars) => updateRating.mutate({ id, stars })}
-            accentColor={titleAccent}
           />
 
           {title.type === "movie" && (
             <Pressable
               onPress={() => watchMovie.mutate({ id })}
               disabled={watchMovie.isPending}
-              className="flex-row items-center gap-1.5 rounded-full bg-title-accent px-4 py-2"
+              className="flex-row items-center gap-1.5 rounded-lg bg-title-accent px-4 py-2"
             >
               {watchMovie.isPending ? (
                 <Spinner size="sm" />
               ) : (
                 <>
                   <IconCheck size={16} color={titleAccentForeground} />
-                  <Text className="font-sans-medium text-[13px] text-title-accent-foreground">
+                  <Text className="font-sans-medium text-sm text-title-accent-foreground">
                     Mark Watched
                   </Text>
                 </>
               )}
             </Pressable>
           )}
+
+          <View className="h-6 w-px bg-border/50" />
+
+          <StarRating
+            rating={userInfo.data?.rating ?? 0}
+            onRate={(stars) => updateRating.mutate({ id, stars })}
+            accentColor={titleAccent}
+          />
         </View>
       </Animated.View>
 

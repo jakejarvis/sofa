@@ -1,14 +1,32 @@
 import {
-  IconBookmark,
-  IconCircleCheck,
-  IconPlayerPlay,
+  IconCheck,
+  IconPlayerPlayFilled,
+  IconPlus,
 } from "@tabler/icons-react-native";
-import { Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 import { useCSSVariable } from "uniwind";
 import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
+
+const watchingStyle = {
+  label: "Watching",
+  Icon: IconPlayerPlayFilled,
+  bgClass: "bg-title-accent/10 border-title-accent/20",
+  textClass: "text-title-accent",
+};
+
+const statusConfig = {
+  watchlist: watchingStyle,
+  in_progress: watchingStyle,
+  completed: {
+    label: "Completed",
+    Icon: IconCheck,
+    bgClass: "bg-status-completed/10 border-status-completed/20",
+    textClass: "text-status-completed",
+  },
+} as const;
 
 export function StatusActionButton({
   currentStatus,
@@ -19,46 +37,49 @@ export function StatusActionButton({
   onStatusChange: (status: TitleStatus | null) => void;
   isPending: boolean;
 }) {
-  const statuses: Array<{
-    status: TitleStatus;
-    label: string;
-    Icon: typeof IconBookmark;
-  }> = [
-    { status: "watchlist", label: "Watchlist", Icon: IconBookmark },
-    { status: "in_progress", label: "Watching", Icon: IconPlayerPlay },
-    { status: "completed", label: "Completed", Icon: IconCircleCheck },
-  ];
+  const [titleAccent, completedColor] = useCSSVariable([
+    "--color-title-accent",
+    "--color-status-completed",
+  ]) as [string, string];
 
-  const primaryColor = useCSSVariable("--color-title-accent") as string;
-  const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
+  const config = currentStatus
+    ? statusConfig[currentStatus as keyof typeof statusConfig]
+    : null;
+
+  if (!config) {
+    return (
+      <Pressable
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          onStatusChange("watchlist");
+        }}
+        disabled={isPending}
+        className="flex-row items-center gap-1.5 rounded-lg border border-title-accent/20 bg-title-accent/10 px-4 py-2"
+      >
+        <IconPlus size={14} color={titleAccent} strokeWidth={2.5} />
+        <Text className="font-sans-medium text-sm text-title-accent">
+          Watchlist
+        </Text>
+      </Pressable>
+    );
+  }
+
+  const iconColor =
+    currentStatus === "completed" ? completedColor : titleAccent;
 
   return (
-    <View className="flex-row gap-2">
-      {statuses.map(({ status, label, Icon }) => {
-        const isActive = currentStatus === status;
-        return (
-          <Pressable
-            key={status}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              onStatusChange(isActive ? null : status);
-            }}
-            disabled={isPending}
-            className={`flex-row items-center gap-1.5 rounded-full border px-3 py-2 ${
-              isActive
-                ? "border-title-accent bg-title-accent/10"
-                : "border-border bg-card"
-            }`}
-          >
-            <Icon size={14} color={isActive ? primaryColor : mutedFgColor} />
-            <Text
-              className={`font-sans-medium text-xs ${isActive ? "text-title-accent" : "text-foreground"}`}
-            >
-              {label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
+    <Pressable
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        onStatusChange(null);
+      }}
+      disabled={isPending}
+      className={`flex-row items-center gap-1.5 rounded-lg border px-4 py-2 ${config.bgClass}`}
+    >
+      <config.Icon size={14} color={iconColor} />
+      <Text className={`font-sans-medium text-sm ${config.textClass}`}>
+        {config.label}
+      </Text>
+    </Pressable>
   );
 }
