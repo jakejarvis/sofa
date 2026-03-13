@@ -123,7 +123,13 @@
           "microphonePermission": false
         }
       ],
-      ["expo-localization"]
+      ["expo-localization"],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "This identifier will be used to measure app performance and improve your experience."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
