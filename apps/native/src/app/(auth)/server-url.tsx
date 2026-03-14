@@ -22,6 +22,7 @@ import {
   getServerUrl,
   hasStoredServerUrl,
   normalizeUrl,
+  registerServer,
   setServerUrl,
   type ValidationError,
   validateServerUrl,
@@ -119,6 +120,7 @@ export default function ServerUrlScreen() {
     if (result.status === "success") {
       setConnection({ phase: "success" });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      registerServer(fullUrl, result.instanceId);
       setServerUrl(fullUrl);
       successTimeout.current = setTimeout(() => {
         replace("/(auth)/login");

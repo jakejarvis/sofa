@@ -1,17 +1,51 @@
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { createMMKV } from "react-native-mmkv";
 
-export const storage = createMMKV();
+// Global storage — app-wide settings, server mappings, analytics
+export const globalStorage = createMMKV();
 
-const mmkvStorage = {
-  getItem: (key: string) => storage.getString(key) ?? null,
-  setItem: (key: string, value: string) => storage.set(key, value),
-  removeItem: (key: string) => void storage.remove(key),
+// Server+user scoped storage — switches when scope changes
+let _scopedStore: ReturnType<typeof createMMKV> | null = null;
+
+const scopeChangeListeners: Array<() => void> = [];
+
+export function scopedStorage() {
+  if (!_scopedStore) throw new Error("Scoped storage not initialized");
+  return _scopedStore;
+}
+
+export function hasScopedStorage(): boolean {
+  return _scopedStore !== null;
+}
+
+export function setStorageScope(instanceId: string, userId: string) {
+  _scopedStore = createMMKV({ id: `${instanceId}_${userId}` });
+  for (const listener of scopeChangeListeners) listener();
+}
+
+export function clearStorageScope() {
+  _scopedStore = null;
+  for (const listener of scopeChangeListeners) listener();
+}
+
+export function onStorageScopeChange(callback: () => void): () => void {
+  scopeChangeListeners.push(callback);
+  return () => {
+    const idx = scopeChangeListeners.indexOf(callback);
+    if (idx !== -1) scopeChangeListeners.splice(idx, 1);
+  };
+}
+
+// Query persister — reads/writes through _scopedStore via closure
+const scopedMmkvStorage = {
+  getItem: (key: string) => _scopedStore?.getString(key) ?? null,
+  setItem: (key: string, value: string) => _scopedStore?.set(key, value),
+  removeItem: (key: string) => void _scopedStore?.remove(key),
 };
 
 export const QUERY_CACHE_KEY = "REACT_QUERY_OFFLINE_CACHE";
 
 export const queryPersister = createAsyncStoragePersister({
-  storage: mmkvStorage,
+  storage: scopedMmkvStorage,
   key: QUERY_CACHE_KEY,
 });

@@ -1,4 +1,5 @@
 import "@/global.css";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -15,11 +16,22 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { Uniwind, useResolveClassNames } from "uniwind";
 
 import { OfflineBanner } from "@/components/ui/offline-banner";
-import { authClient } from "@/lib/auth-client";
-import { queryPersister } from "@/lib/mmkv";
+import { authClient, rebuildAuthClient } from "@/lib/auth-client";
+import {
+  clearStorageScope,
+  hasScopedStorage,
+  onStorageScopeChange,
+  queryPersister,
+  setStorageScope,
+} from "@/lib/mmkv";
 import { applyTrackingTransparency, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
-import { hasStoredServerUrl, onServerUrlChange } from "@/lib/server-url";
+import {
+  ensureInstanceId,
+  getCurrentInstanceId,
+  hasStoredServerUrl,
+  onServerUrlChange,
+} from "@/lib/server-url";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,6 +50,36 @@ function AppContent() {
   const { data: session, isPending } = authClient.useSession();
   const hasServerUrl =
     !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
+
+  // --- Ensure instance ID is available (handles upgrades and env-based URLs) ---
+  const [instanceId, setInstanceId] = useState(getCurrentInstanceId);
+
+  useEffect(() => {
+    if (!instanceId && hasServerUrl) {
+      ensureInstanceId().then((id) => {
+        if (id) {
+          setInstanceId(id);
+          rebuildAuthClient();
+        }
+      });
+    }
+  }, [instanceId, hasServerUrl]);
+
+  // Re-sync instanceId when server URL changes (registerServer sets it synchronously)
+  useEffect(() => {
+    return onServerUrlChange(() => setInstanceId(getCurrentInstanceId()));
+  }, []);
+
+  // --- Set storage scope when we have both instanceId and userId ---
+  const userId = session?.user?.id;
+
+  useEffect(() => {
+    if (instanceId && userId) {
+      setStorageScope(instanceId, userId);
+    } else if (!userId && hasScopedStorage()) {
+      clearStorageScope();
+    }
+  }, [instanceId, userId]);
 
   // --- App Tracking Transparency (must resolve before screen tracking) ---
   const [trackingReady, setTrackingReady] = useState(false);
@@ -135,18 +177,49 @@ function AppContent() {
   );
 }
 
+/**
+ * Wraps children with PersistQueryClientProvider when scoped storage is ready,
+ * otherwise uses plain QueryClientProvider. The key prop forces a remount when
+ * the scope changes, triggering a restore from the new MMKV instance.
+ */
+function QueryProvider({ children }: { children: React.ReactNode }) {
+  // Re-render when scope changes so we switch between providers
+  const [, setScopeVersion] = useState(0);
+  const { data: session } = authClient.useSession();
+  const instanceId = getCurrentInstanceId();
+  const scopeReady = hasScopedStorage();
+
+  // When scope changes (via setStorageScope), force re-render
+  useEffect(() => {
+    return onStorageScopeChange(() => setScopeVersion((n) => n + 1));
+  }, []);
+
+  if (scopeReady && instanceId && session?.user?.id) {
+    return (
+      <PersistQueryClientProvider
+        key={`${instanceId}_${session.user.id}`}
+        client={queryClient}
+        persistOptions={{ persister: queryPersister }}
+      >
+        {children}
+      </PersistQueryClientProvider>
+    );
+  }
+
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+}
+
 export default function RootLayout() {
   const inner = (
-    <PersistQueryClientProvider
-      client={queryClient}
-      persistOptions={{ persister: queryPersister }}
-    >
+    <QueryProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <KeyboardProvider>
           <AppContent />
         </KeyboardProvider>
       </GestureHandlerRootView>
-    </PersistQueryClientProvider>
+    </QueryProvider>
   );
 
   if (!posthog) return inner;

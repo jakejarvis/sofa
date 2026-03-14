@@ -1,7 +1,7 @@
 import type { PostHogCustomStorage } from "posthog-react-native";
 import { PostHog } from "posthog-react-native";
 
-import { storage } from "@/lib/mmkv";
+import { globalStorage } from "@/lib/mmkv";
 
 const posthogApiKey = process.env.EXPO_PUBLIC_POSTHOG_KEY ?? "";
 const host = process.env.EXPO_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
@@ -11,8 +11,8 @@ const ANALYTICS_EXPLICIT_KEY = "sofa_analytics_explicit";
 const ATT_MIGRATED_KEY = "sofa_att_migrated";
 
 const posthogStorage: PostHogCustomStorage = {
-  getItem: (key: string) => storage.getString(key) ?? null,
-  setItem: (key: string, value: string) => storage.set(key, value),
+  getItem: (key: string) => globalStorage.getString(key) ?? null,
+  setItem: (key: string, value: string) => globalStorage.set(key, value),
 };
 
 // PostHog throws if apiKey is empty, so only construct when configured.
@@ -35,18 +35,18 @@ export const posthog: PostHog | null = posthogApiKey
 
 /** Whether the user has explicitly set a preference via the settings toggle. */
 export function hasExplicitPreference(): boolean {
-  return storage.getBoolean(ANALYTICS_EXPLICIT_KEY) === true;
+  return globalStorage.getBoolean(ANALYTICS_EXPLICIT_KEY) === true;
 }
 
 /** Current analytics enabled state (explicit preference or default). */
 export function isAnalyticsEnabled(): boolean {
-  return storage.getBoolean(ANALYTICS_ENABLED_KEY) ?? true;
+  return globalStorage.getBoolean(ANALYTICS_ENABLED_KEY) ?? true;
 }
 
 /** Called by the settings toggle — marks the preference as explicit. */
 export function setAnalyticsEnabled(enabled: boolean): void {
-  storage.set(ANALYTICS_ENABLED_KEY, enabled);
-  storage.set(ANALYTICS_EXPLICIT_KEY, true);
+  globalStorage.set(ANALYTICS_ENABLED_KEY, enabled);
+  globalStorage.set(ANALYTICS_EXPLICIT_KEY, true);
   syncPosthog(enabled);
 }
 
@@ -79,13 +79,13 @@ export function applyTrackingTransparency(granted: boolean): boolean {
   // it. This runs exactly once — subsequent launches skip it because
   // ATT_MIGRATED_KEY is set, preventing applyTrackingTransparency's own
   // writes to ANALYTICS_ENABLED_KEY from being misidentified as legacy.
-  if (!storage.getBoolean(ATT_MIGRATED_KEY)) {
-    storage.set(ATT_MIGRATED_KEY, true);
+  if (!globalStorage.getBoolean(ATT_MIGRATED_KEY)) {
+    globalStorage.set(ATT_MIGRATED_KEY, true);
     if (
-      storage.getBoolean(ANALYTICS_ENABLED_KEY) !== undefined &&
+      globalStorage.getBoolean(ANALYTICS_ENABLED_KEY) !== undefined &&
       !hasExplicitPreference()
     ) {
-      storage.set(ANALYTICS_EXPLICIT_KEY, true);
+      globalStorage.set(ANALYTICS_EXPLICIT_KEY, true);
     }
   }
 
@@ -97,7 +97,7 @@ export function applyTrackingTransparency(granted: boolean): boolean {
   }
 
   // No explicit preference yet — follow the ATT result.
-  storage.set(ANALYTICS_ENABLED_KEY, granted);
+  globalStorage.set(ANALYTICS_ENABLED_KEY, granted);
   syncPosthog(granted);
   return granted;
 }

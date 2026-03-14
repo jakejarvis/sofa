@@ -1,6 +1,9 @@
 import { useSyncExternalStore } from "react";
-import { storage } from "@/lib/mmkv";
-import { onServerUrlChange } from "@/lib/server-url";
+import {
+  hasScopedStorage,
+  onStorageScopeChange,
+  scopedStorage,
+} from "@/lib/mmkv";
 
 const STORAGE_KEY = "recently_viewed";
 const MAX_ITEMS = 50;
@@ -14,25 +17,44 @@ export interface RecentlyViewedItem {
   viewedAt: number;
 }
 
-// --- In-memory cache synced with MMKV ---
+// --- In-memory cache synced with scoped MMKV ---
 
 const listeners = new Set<() => void>();
 
-let items: RecentlyViewedItem[] = (() => {
-  const raw = storage.getString(STORAGE_KEY);
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw) as RecentlyViewedItem[];
-  } catch {
-    return [];
+let items: RecentlyViewedItem[] = [];
+
+function loadItems() {
+  if (!hasScopedStorage()) {
+    items = [];
+    return;
   }
-})();
+  const raw = scopedStorage().getString(STORAGE_KEY);
+  if (!raw) {
+    items = [];
+    return;
+  }
+  try {
+    items = JSON.parse(raw) as RecentlyViewedItem[];
+  } catch {
+    items = [];
+  }
+}
 
 function persist(next: RecentlyViewedItem[]) {
+  if (!hasScopedStorage()) return;
   items = next;
-  storage.set(STORAGE_KEY, JSON.stringify(next));
+  scopedStorage().set(STORAGE_KEY, JSON.stringify(next));
   for (const listener of listeners) listener();
 }
+
+// Load persisted items if scoped storage is already initialized
+loadItems();
+
+// Reload items when the storage scope changes (server/user switch)
+onStorageScopeChange(() => {
+  loadItems();
+  for (const listener of listeners) listener();
+});
 
 // --- Public API ---
 
@@ -75,9 +97,3 @@ export function useRecentlyViewed() {
     clearAll: clearRecentlyViewed,
   };
 }
-
-// Clear recently-viewed when the user switches servers — stored IDs
-// are server-specific and become dead links on a different backend.
-onServerUrlChange(() => {
-  clearRecentlyViewed();
-});

@@ -5,7 +5,6 @@ import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
 import { queryClient } from "@/lib/query-client";
-import { clearRecentlyViewed } from "@/lib/recently-viewed";
 import * as Haptics from "@/utils/haptics";
 
 export function HeaderAvatar() {
@@ -64,7 +63,6 @@ export function HeaderAvatar() {
                 onPress: () => {
                   authClient.signOut();
                   queryClient.clear();
-                  clearRecentlyViewed();
                 },
               },
             ]);

@@ -46,7 +46,6 @@ import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/lib/orpc";
 import { isAnalyticsEnabled, setAnalyticsEnabled } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
-import { clearRecentlyViewed } from "@/lib/recently-viewed";
 import { getServerUrl } from "@/lib/server-url";
 import { toast } from "@/lib/toast";
 
@@ -194,7 +193,6 @@ export default function SettingsScreen() {
         onPress: () => {
           authClient.signOut();
           queryClient.clear();
-          clearRecentlyViewed();
         },
       },
     ]);
