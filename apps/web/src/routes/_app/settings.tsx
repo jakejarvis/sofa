@@ -8,6 +8,7 @@ import { AccountSection } from "@/components/settings/account-section";
 import { BackupRestoreSection } from "@/components/settings/backup-restore-section";
 import { BackupScheduleSection } from "@/components/settings/backup-schedule-section";
 import { BackupSection } from "@/components/settings/backup-section";
+import { ChangePasswordSection } from "@/components/settings/change-password-section";
 import { IntegrationsSection } from "@/components/settings/integrations-section";
 import { RegistrationSection } from "@/components/settings/registration-section";
 import { SettingsShell } from "@/components/settings/settings-shell";
@@ -82,6 +83,7 @@ function SettingsPage() {
           role: session.user.role ?? undefined,
         }}
       />
+      <ChangePasswordSection />
       <IntegrationsSection />
       {isAdmin && (
         <>

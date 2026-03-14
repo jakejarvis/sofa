@@ -103,6 +103,7 @@ Required: `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`.
 Optional:
 - `DATA_DIR` — Root for DB + cache (default `./data`). `DATABASE_URL` and `CACHE_DIR` derived from it but overridable.
 - `TMDB_API_BASE_URL`, `TMDB_IMAGE_BASE_URL` — Override TMDB endpoints.
+- `PUBLIC_API_URL` — Base URL for centralized public API (default: `https://public-api.sofa.watch`). Used for update checks.
 - `IMAGE_CACHE_ENABLED` — Default `true`. Set `false` for direct TMDB CDN URLs.
 - `LOG_LEVEL` — `error`/`warn`/`info`/`debug` (default: `info`).
 - OIDC: `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_ISSUER_URL`, `OIDC_PROVIDER_NAME`, `OIDC_AUTO_REGISTER`, `DISABLE_PASSWORD_LOGIN`.

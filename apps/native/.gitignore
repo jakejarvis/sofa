@@ -9,6 +9,7 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 *.tar.gz
+*.ipa
 web-build/
 
 # macOS

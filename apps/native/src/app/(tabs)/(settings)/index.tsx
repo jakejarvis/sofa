@@ -8,6 +8,7 @@ import {
   IconDeviceMobileCog,
   IconDots,
   IconLink,
+  IconLock,
   IconLogout,
   IconPhoto,
   IconServer,
@@ -62,6 +63,21 @@ export default function SettingsScreen() {
   const [analyticsEnabled, setAnalyticsToggle] = useState(isAnalyticsEnabled);
   const isAdmin = session?.user?.role === "admin";
   const serverUrl = getServerUrl();
+
+  const authConfig = useQuery(orpc.system.authConfig.queryOptions());
+  const { data: accounts } = useQuery({
+    queryKey: ["auth", "listAccounts"],
+    queryFn: async () => {
+      const result = await authClient.listAccounts();
+      return result.data;
+    },
+  });
+  const hasPassword =
+    accounts?.some(
+      (a: { providerId: string }) => a.providerId === "credential",
+    ) ?? false;
+  const showPasswordOption =
+    hasPassword && !(authConfig.data?.passwordLoginDisabled ?? true);
 
   const systemHealth = useQuery({
     ...orpc.system.health.queryOptions(),
@@ -317,6 +333,14 @@ export default function SettingsScreen() {
               </View>
             )}
           </View>
+
+          {showPasswordOption && (
+            <SettingsRow
+              label={hasPassword ? "Change password" : "Set password"}
+              icon={IconLock}
+              onPress={() => push("/(tabs)/(settings)/change-password")}
+            />
+          )}
 
           <SettingsRow
             label="Sign out"
