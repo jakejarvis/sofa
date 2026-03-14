@@ -8,8 +8,6 @@ import {
   IconPlus,
   IconStarFilled,
 } from "@tabler/icons-react-native";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -42,6 +40,13 @@ interface PosterCardProps {
   userStatus?: TitleStatus | null;
   episodeProgress?: { watched: number; total: number } | null;
   width?: number;
+  onPress: (
+    id: string | undefined,
+    tmdbId: number,
+    type: "movie" | "tv",
+  ) => void;
+  onQuickAdd: (tmdbId: number, type: "movie" | "tv") => void;
+  isAdding?: boolean;
 }
 
 export function PosterCard({
@@ -55,8 +60,10 @@ export function PosterCard({
   userStatus,
   episodeProgress,
   width = 140,
+  onPress,
+  onQuickAdd,
+  isAdding,
 }: PosterCardProps) {
-  const { navigate } = useRouter();
   const primaryColor = useCSSVariable("--color-primary") as string;
   const watchlistColor = useCSSVariable("--color-status-watchlist") as string;
   const watchingColor = useCSSVariable("--color-status-watching") as string;
@@ -77,29 +84,6 @@ export function PosterCard({
     setLocalStatus(userStatus ?? null);
   }, [userStatus]);
 
-  const resolveMutation = useMutation(
-    orpc.titles.resolve.mutationOptions({
-      onSuccess: ({ id: resolvedId }) => {
-        if (resolvedId) {
-          navigate(`/title/${resolvedId}`);
-        }
-      },
-      onError: () => toast.error("Failed to load title"),
-    }),
-  );
-
-  const quickAddMutation = useMutation(
-    orpc.titles.quickAdd.mutationOptions({
-      onSuccess: () => {
-        setLocalStatus("watchlist");
-        toast.success("Added to watchlist");
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
-      },
-      onError: () => toast.error("Failed to add to watchlist"),
-    }),
-  );
-
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       {
@@ -108,14 +92,15 @@ export function PosterCard({
     ],
   }));
 
-  const handleResolve = useCallback(() => {
-    resolveMutation.mutate({ tmdbId, type });
-  }, [tmdbId, type, resolveMutation]);
+  const handlePressAction = useCallback(() => {
+    onPress(id, tmdbId, type);
+  }, [onPress, id, tmdbId, type]);
 
-  const handleQuickAdd = useCallback(() => {
-    if (localStatus || quickAddMutation.isPending) return;
-    quickAddMutation.mutate({ tmdbId, type });
-  }, [localStatus, quickAddMutation, tmdbId, type]);
+  const handleQuickAddPress = useCallback(() => {
+    if (localStatus || isAdding) return;
+    setLocalStatus("watchlist");
+    onQuickAdd(tmdbId, type);
+  }, [localStatus, isAdding, onQuickAdd, tmdbId, type]);
 
   const year = releaseDate?.slice(0, 4);
   const imageHeight = width * 1.5;
@@ -148,11 +133,11 @@ export function PosterCard({
         {/* Quick-add button */}
         {!localStatus && (
           <Pressable
-            onPress={handleQuickAdd}
+            onPress={handleQuickAddPress}
             className="absolute top-2 right-2 size-[30px] items-center justify-center rounded-full"
             style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
           >
-            {quickAddMutation.isPending ? (
+            {isAdding ? (
               <IconLoader size={16} color="white" />
             ) : (
               <IconPlus size={16} color="white" />
@@ -248,15 +233,13 @@ export function PosterCard({
         <ContextMenu.Trigger>
           <GestureDetector gesture={pressGesture}>
             <Animated.View style={[animatedStyle, { width }]}>
-              <Pressable onPress={() => navigate(`/title/${id}`)}>
-                {cardContent}
-              </Pressable>
+              <Pressable onPress={handlePressAction}>{cardContent}</Pressable>
             </Animated.View>
           </GestureDetector>
         </ContextMenu.Trigger>
         <ContextMenu.Content>
           {!localStatus && (
-            <ContextMenu.Item key="watchlist" onSelect={handleQuickAdd}>
+            <ContextMenu.Item key="watchlist" onSelect={handleQuickAddPress}>
               <ContextMenu.ItemIcon ios={{ name: "bookmark" }} />
               <ContextMenu.ItemTitle>Add to Watchlist</ContextMenu.ItemTitle>
             </ContextMenu.Item>
@@ -336,7 +319,7 @@ export function PosterCard({
       pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
     })
     .onEnd(() => {
-      scheduleOnRN(handleResolve);
+      scheduleOnRN(handlePressAction);
     });
 
   return (

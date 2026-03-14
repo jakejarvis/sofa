@@ -3,13 +3,14 @@ import {
   IconCircleDashed,
 } from "@tabler/icons-react-native";
 import { Pressable, View } from "react-native";
-import { useCSSVariable } from "uniwind";
 import { Text } from "@/components/ui/text";
 
 export function EpisodeRow({
   episode,
   isWatched,
   onToggle,
+  accentColor,
+  mutedColor,
 }: {
   episode: {
     id: string;
@@ -19,10 +20,9 @@ export function EpisodeRow({
   };
   isWatched: boolean;
   onToggle: () => void;
+  accentColor: string;
+  mutedColor: string;
 }) {
-  const titleAccentColor = useCSSVariable("--color-title-accent") as string;
-  const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
-
   return (
     <Pressable
       onPress={onToggle}
@@ -30,9 +30,9 @@ export function EpisodeRow({
       style={{ borderBottomWidth: 0.5 }}
     >
       {isWatched ? (
-        <IconCircleCheckFilled size={22} color={titleAccentColor} />
+        <IconCircleCheckFilled size={22} color={accentColor} />
       ) : (
-        <IconCircleDashed size={22} color={mutedFgColor} />
+        <IconCircleDashed size={22} color={mutedColor} />
       )}
       <View className="ml-3 flex-1">
         <Text

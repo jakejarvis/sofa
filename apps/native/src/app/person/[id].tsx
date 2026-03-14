@@ -19,6 +19,7 @@ import { PosterCard } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
+import { usePosterActions } from "@/hooks/use-poster-actions";
 import { orpc } from "@/lib/orpc";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
 
@@ -54,6 +55,8 @@ export default function PersonDetailScreen() {
 
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const primaryColor = useCSSVariable("--color-primary") as string;
+
+  const { handlePress, handleQuickAdd, addingKey } = usePosterActions();
 
   const { data, isPending, isError } = useQuery(
     orpc.people.detail.queryOptions({ input: { id } }),
@@ -91,10 +94,13 @@ export default function PersonDetailScreen() {
           voteAverage={credit.voteAverage}
           userStatus={data?.userStatuses?.[credit.titleId] ?? null}
           width={undefined}
+          onPress={handlePress}
+          onQuickAdd={handleQuickAdd}
+          isAdding={addingKey === `${credit.tmdbId}-${credit.type}`}
         />
       </View>
     ),
-    [columnWidth, data?.userStatuses],
+    [columnWidth, data?.userStatuses, handlePress, handleQuickAdd, addingKey],
   );
 
   if (isPending) {

@@ -31,7 +31,7 @@ export function Switch({
 
   const trackStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(
-      progress.value,
+      progress.get(),
       [0, 1],
       [secondaryColor, primaryColor],
     ),
@@ -42,11 +42,11 @@ export function Switch({
       {
         translateX:
           THUMB_OFFSET +
-          progress.value * (TRACK_WIDTH - THUMB_SIZE - THUMB_OFFSET * 2),
+          progress.get() * (TRACK_WIDTH - THUMB_SIZE - THUMB_OFFSET * 2),
       },
     ],
     backgroundColor: interpolateColor(
-      progress.value,
+      progress.get(),
       [0, 1],
       [mutedFgColor, "#fff"],
     ),
@@ -77,11 +77,7 @@ export function Switch({
               borderRadius: THUMB_SIZE / 2,
               position: "absolute",
               top: (TRACK_HEIGHT - THUMB_SIZE) / 2,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.3,
-              shadowRadius: 2,
-              elevation: 3,
+              boxShadow: "0 1px 2px rgba(0, 0, 0, 0.3)",
             },
             thumbStyle,
           ]}

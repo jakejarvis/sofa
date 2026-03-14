@@ -1,9 +1,10 @@
 import { FlatList } from "react-native";
 
 import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
+import { usePosterActions } from "@/hooks/use-poster-actions";
 
 export interface PosterRowItem {
-  id: string;
+  id?: string;
   tmdbId: number;
   title: string;
   type: string;
@@ -15,6 +16,9 @@ export interface PosterRowItem {
   episodeProgress?: { watched: number; total: number } | null;
 }
 
+const listContentStyle = { gap: 12, paddingHorizontal: 16 };
+const listStyle = { overflow: "visible" as const };
+
 export function HorizontalPosterRow({
   items,
   isLoading,
@@ -22,6 +26,8 @@ export function HorizontalPosterRow({
   items: PosterRowItem[];
   isLoading?: boolean;
 }) {
+  const { handlePress, handleQuickAdd, addingKey } = usePosterActions();
+
   if (isLoading) {
     return (
       <FlatList
@@ -30,8 +36,8 @@ export function HorizontalPosterRow({
         data={[1, 2, 3, 4]}
         keyExtractor={(item) => String(item)}
         renderItem={() => <PosterCardSkeleton />}
-        contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
-        style={{ overflow: "visible" }}
+        contentContainerStyle={listContentStyle}
+        style={listStyle}
       />
     );
   }
@@ -41,7 +47,7 @@ export function HorizontalPosterRow({
       horizontal
       showsHorizontalScrollIndicator={false}
       data={items}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.id ?? `${item.tmdbId}-${item.type}`}
       renderItem={({ item }) => (
         <PosterCard
           id={item.id}
@@ -53,10 +59,13 @@ export function HorizontalPosterRow({
           voteAverage={item.voteAverage}
           userStatus={item.userStatus}
           episodeProgress={item.episodeProgress}
+          onPress={handlePress}
+          onQuickAdd={handleQuickAdd}
+          isAdding={addingKey === `${item.tmdbId}-${item.type}`}
         />
       )}
-      contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
-      style={{ overflow: "visible" }}
+      contentContainerStyle={listContentStyle}
+      style={listStyle}
     />
   );
 }

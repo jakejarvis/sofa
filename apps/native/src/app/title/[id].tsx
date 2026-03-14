@@ -14,18 +14,21 @@ import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { FlatList, Platform, Pressable, ScrollView, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
+import {
+  HorizontalPosterRow,
+  type PosterRowItem,
+} from "@/components/dashboard/horizontal-poster-row";
 import { CastCard } from "@/components/titles/cast-card";
 import { ContinueWatchingBanner } from "@/components/titles/continue-watching-banner";
 import { SeasonAccordion } from "@/components/titles/season-accordion";
 import { StatusActionButton } from "@/components/titles/status-action-button";
 import { ExpandableText } from "@/components/ui/expandable-text";
 import { Image } from "@/components/ui/image";
-import { PosterCard } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
@@ -124,13 +127,6 @@ export default function TitleDetailScreen() {
     }),
   );
 
-  const [_refreshing, setRefreshing] = useState(false);
-  const _onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-    setRefreshing(false);
-  }, []);
-
   const title = detail.data?.title;
   const palette = title?.colorPalette ?? null;
   useTitleTheme(palette);
@@ -159,6 +155,24 @@ export default function TitleDetailScreen() {
   const watchedEpisodeIds = useMemo(
     () => new Set(userInfo.data?.episodeWatches ?? []),
     [userInfo.data?.episodeWatches],
+  );
+
+  const recItems = useMemo<PosterRowItem[]>(
+    () =>
+      (recommendations.data?.recommendations ?? []).map((item) => ({
+        id: item.id,
+        tmdbId: item.tmdbId,
+        title: item.title,
+        type: item.type,
+        posterPath: item.posterPath,
+        releaseDate: item.releaseDate,
+        firstAirDate: item.firstAirDate,
+        voteAverage: item.voteAverage,
+        userStatus: item.id
+          ? (recommendations.data?.userStatuses?.[item.id] ?? null)
+          : null,
+      })),
+    [recommendations.data],
   );
 
   const hydratedTitleId = useRef<string | null>(null);
@@ -592,45 +606,21 @@ export default function TitleDetailScreen() {
       )}
 
       {/* Recommendations */}
-      {recommendations.data &&
-        recommendations.data.recommendations?.length > 0 && (
-          <Animated.View
-            entering={FadeInDown.duration(300).delay(600)}
-            className="mt-6"
-          >
-            <View className="px-4">
-              <SectionHeader
-                title="More Like This"
-                icon={IconThumbUp}
-                iconColor={titleAccent}
-              />
-            </View>
-            <FlatList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={recommendations.data.recommendations}
-              keyExtractor={(item) => item.id ?? String(item.tmdbId)}
-              renderItem={({ item }) => (
-                <PosterCard
-                  id={item.id}
-                  tmdbId={item.tmdbId}
-                  title={item.title}
-                  type={item.type}
-                  posterPath={item.posterPath}
-                  releaseDate={item.releaseDate ?? item.firstAirDate}
-                  voteAverage={item.voteAverage}
-                  userStatus={
-                    item.id
-                      ? (recommendations.data?.userStatuses?.[item.id] ?? null)
-                      : null
-                  }
-                />
-              )}
-              contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
-              style={{ overflow: "visible" }}
+      {recItems.length > 0 && (
+        <Animated.View
+          entering={FadeInDown.duration(300).delay(600)}
+          className="mt-6"
+        >
+          <View className="px-4">
+            <SectionHeader
+              title="More Like This"
+              icon={IconThumbUp}
+              iconColor={titleAccent}
             />
-          </Animated.View>
-        )}
+          </View>
+          <HorizontalPosterRow items={recItems} />
+        </Animated.View>
+      )}
     </ScrollView>
   );
 }

@@ -1,12 +1,5 @@
 import { Link } from "expo-router";
-import { View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import { Pressable, View } from "react-native";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 
@@ -21,24 +14,11 @@ export function CastCard({
     profilePath: string | null;
   };
 }) {
-  const pressed = useSharedValue(0);
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.95]) }],
-  }));
-
-  const tapGesture = Gesture.Tap()
-    .onBegin(() => {
-      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
-    })
-    .onFinalize(() => {
-      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
-    });
-
   return (
     <Link href={`/person/${person.personId}` as `/person/${string}`}>
       <Link.Trigger>
-        <GestureDetector gesture={tapGesture}>
-          <Animated.View className="w-20 items-center" style={animatedStyle}>
+        <Pressable style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+          <View className="w-20 items-center">
             <View className="mb-2 h-16 w-16 overflow-hidden rounded-full bg-secondary">
               {person.profilePath && (
                 <Image
@@ -62,8 +42,8 @@ export function CastCard({
                 {person.character}
               </Text>
             ) : null}
-          </Animated.View>
-        </GestureDetector>
+          </View>
+        </Pressable>
       </Link.Trigger>
       <Link.Preview />
     </Link>

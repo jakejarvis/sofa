@@ -1,9 +1,12 @@
 import type { Icon } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { FlatList, ScrollView, View } from "react-native";
+import { useMemo, useState } from "react";
+import { ScrollView, View } from "react-native";
+import {
+  HorizontalPosterRow,
+  type PosterRowItem,
+} from "@/components/dashboard/horizontal-poster-row";
 import { GenreChip } from "@/components/explore/genre-chip";
-import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
@@ -46,7 +49,7 @@ export function FilterableTitleRow({
     enabled: selectedGenre !== null,
   });
 
-  const items =
+  const rawItems =
     selectedGenre === null ? defaultItems : (discover.data?.items ?? []);
   const userStatuses =
     selectedGenre === null
@@ -58,6 +61,20 @@ export function FilterableTitleRow({
       : (discover.data?.episodeProgress ?? {});
   const showLoading =
     isLoading || (selectedGenre !== null && discover.isPending);
+
+  // Map items into PosterRowItem shape with status/progress resolved
+  const items = useMemo<PosterRowItem[]>(
+    () =>
+      rawItems.map((item) => {
+        const key = `${item.tmdbId}-${item.type}`;
+        return {
+          ...item,
+          userStatus: userStatuses[key] ?? null,
+          episodeProgress: episodeProgress[key] ?? null,
+        };
+      }),
+    [rawItems, userStatuses, episodeProgress],
+  );
 
   return (
     <View>
@@ -90,45 +107,14 @@ export function FilterableTitleRow({
         </ScrollView>
       )}
 
-      {showLoading ? (
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={[1, 2, 3, 4]}
-          keyExtractor={(item) => String(item)}
-          renderItem={() => <PosterCardSkeleton />}
-          contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
-          style={{ overflow: "visible" }}
-        />
-      ) : items.length === 0 && selectedGenre !== null ? (
+      {!showLoading && items.length === 0 && selectedGenre !== null ? (
         <View className="items-center py-6">
           <Text className="text-[13px] text-muted-foreground">
             No titles found for this genre.
           </Text>
         </View>
       ) : (
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={items}
-          keyExtractor={(item) => `${item.tmdbId}-${item.type}`}
-          renderItem={({ item }) => (
-            <PosterCard
-              tmdbId={item.tmdbId}
-              title={item.title}
-              type={item.type as "movie" | "tv"}
-              posterPath={item.posterPath}
-              releaseDate={item.releaseDate ?? item.firstAirDate}
-              voteAverage={item.voteAverage}
-              userStatus={userStatuses[`${item.tmdbId}-${item.type}`] ?? null}
-              episodeProgress={
-                episodeProgress[`${item.tmdbId}-${item.type}`] ?? null
-              }
-            />
-          )}
-          contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
-          style={{ overflow: "visible" }}
-        />
+        <HorizontalPosterRow items={items} isLoading={showLoading} />
       )}
     </View>
   );

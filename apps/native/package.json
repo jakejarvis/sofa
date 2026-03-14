@@ -20,7 +20,6 @@
     "@expo-google-fonts/geist-mono": "0.4.1",
     "@expo/metro-runtime": "55.0.6",
     "@expo/ui": "55.0.2",
-    "@gorhom/bottom-sheet": "5.2.8",
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
     "@orpc/tanstack-query": "catalog:",

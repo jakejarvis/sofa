@@ -115,6 +115,17 @@ export function SeasonAccordion({
     }),
   );
 
+  const handleEpisodeToggle = useCallback(
+    (episodeId: string) => {
+      if (watchedEpisodeIds.has(episodeId)) {
+        unwatchEpisode.mutate({ id: episodeId });
+      } else {
+        watchEpisode.mutate({ id: episodeId });
+      }
+    },
+    [watchedEpisodeIds, unwatchEpisode, watchEpisode],
+  );
+
   return (
     <View
       className="mb-2 overflow-hidden rounded-xl border bg-card"
@@ -175,13 +186,9 @@ export function SeasonAccordion({
               key={episode.id}
               episode={episode}
               isWatched={watchedEpisodeIds.has(episode.id)}
-              onToggle={() => {
-                if (watchedEpisodeIds.has(episode.id)) {
-                  unwatchEpisode.mutate({ id: episode.id });
-                } else {
-                  watchEpisode.mutate({ id: episode.id });
-                }
-              }}
+              onToggle={() => handleEpisodeToggle(episode.id)}
+              accentColor={titleAccentColor}
+              mutedColor={mutedFgColor}
             />
           ))}
         </Animated.View>

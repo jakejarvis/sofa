@@ -13,7 +13,7 @@ const ACTION_WIDTH = 80;
 
 function RightAction({ drag }: { drag: SharedValue<number> }) {
   const animatedStyle = useAnimatedStyle(() => {
-    const scale = interpolate(drag.value, [0, -ACTION_WIDTH], [0.6, 1], {
+    const scale = interpolate(drag.get(), [0, -ACTION_WIDTH], [0.6, 1], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     });
