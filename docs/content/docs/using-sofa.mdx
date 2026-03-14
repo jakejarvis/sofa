@@ -1,0 +1,122 @@
+---
+title: Using Sofa
+description: A guide to tracking movies and TV shows with Sofa.
+icon: Compass
+---
+
+## Dashboard
+
+The dashboard is your home screen after logging in. It shows a personalized overview of your tracking activity.
+
+- **Stats** — Cards showing movies watched, episodes watched, library size, and completed titles. Each card has a period selector (today, this week, this month, this year).
+- **Continue Watching** — TV shows you're currently watching, with the next unwatched episode highlighted. Click a show to jump to its detail page and pick up where you left off.
+- **In Your Library** — A grid of all titles you're tracking, regardless of status.
+- **Recommended for You** — Personalized suggestions based on titles you've watched and rated highly.
+
+If your library is empty, the dashboard shows an invitation to start exploring.
+
+## Tracking Movies & TV Shows
+
+### The Status System
+
+Every title in your library has one of three statuses:
+
+| Status | Meaning |
+|---|---|
+| **Watchlist** | You plan to watch this |
+| **In Progress** | You're currently watching this |
+| **Completed** | You've finished watching this |
+
+Set a status from any title's detail page by clicking the status button, or press <kbd>W</kbd> to cycle through statuses.
+
+### Automatic Status Transitions
+
+Sofa automatically updates statuses as you log watches so you don't have to manage them manually:
+
+- **First episode watched** on a TV show → status changes to **In Progress** (if it was on your Watchlist or had no status)
+- **All episodes watched** on a TV show → status changes to **Completed**
+- **Unwatch an episode** on a completed show → status drops back to **In Progress**
+- **Mark a movie as watched** → status changes to **Completed**
+
+These same transitions apply when watches are logged automatically via [webhook integrations](/docs/integrations) (Plex, Jellyfin, Emby).
+
+### Logging Watches
+
+**Movies**: Click the **Mark Watched** button on the title page (or press <kbd>M</kbd>) to log a watch and mark the movie as completed.
+
+**TV episodes**: On the title page, expand a season and toggle individual episodes. You can also:
+
+- **Mark an entire season** — Click the checkmark button on a season header to mark all its episodes as watched.
+- **Mark all episodes** — Mark the entire show as watched in one action.
+- **Catch up** — When you mark an episode as watched while earlier episodes are unwatched, a toast notification offers a "Catch up" button to batch-mark all prior episodes.
+
+<Callout type="info">
+Duplicate watches within 5 minutes are automatically ignored. This prevents double-counting when webhook integrations send the same event multiple times.
+</Callout>
+
+## Rating Titles
+
+Rate any title from 1 to 5 stars on its detail page. Click a star to set the rating, or click the same star again to clear it. You can also press <kbd>1</kbd> through <kbd>5</kbd> on a title page to rate with the keyboard.
+
+Ratings are independent of status — you can rate a title at any point, whether it's on your watchlist or completed. Highly-rated titles contribute to your personalized recommendations.
+
+## Exploring & Discovering Content
+
+The **Explore** page helps you find new things to watch:
+
+- **Hero banner** — A featured trending title with backdrop, rating, and overview.
+- **Trending Today** — A scrollable row of titles currently trending on TMDB.
+- **Popular Movies** — Browse popular movies, filterable by genre using the dropdown.
+- **Popular TV Shows** — Browse popular TV shows, also filterable by genre.
+
+Title cards show your tracking status as an overlay, so you can see at a glance which titles you've already added to your library.
+
+## Search
+
+Press <kbd>/</kbd> or <kbd>⌘K</kbd> (Mac) / <kbd>Ctrl+K</kbd> (Windows) to open the command palette. Start typing to search movies, TV shows, and people via TMDB.
+
+Results show a poster or profile photo, type badge (Movie, TV, or Person), release year, and rating. Click a result to navigate to its detail page.
+
+The command palette also shows:
+
+- **Recent searches** — Your last few searches, with options to re-run or clear them.
+- **Quick actions** — Shortcuts to navigate to the dashboard or explore page.
+
+## Streaming Availability
+
+Title detail pages include a **Where to Watch** section showing which streaming services carry the title. Providers are grouped by offer type:
+
+- **Stream** — Available with a subscription (Netflix, Disney+, etc.)
+- **Rent** — Available to rent digitally
+- **Buy** — Available to purchase digitally
+- **Free** — Available for free
+- **With Ads** — Available on ad-supported tiers
+
+Click a provider's logo to open their page for that title in a new tab.
+
+<Callout type="info">
+Streaming availability data is currently limited to the **United States**. Provider information is refreshed automatically every 6 hours for titles in your library.
+</Callout>
+
+## Account Management
+
+Manage your profile in **Settings**:
+
+- **Display name** — Click your name to edit it inline.
+- **Profile picture** — Click your avatar to upload a new image (JPEG, PNG, WebP, or GIF) or remove the current one.
+- **Change password** — Available for email/password accounts. Not shown for OIDC/SSO-only accounts.
+
+## Keyboard Shortcuts
+
+Press <kbd>?</kbd> anywhere in the app to see the full shortcut reference. Here's a summary:
+
+| Scope | Keys | Action |
+|---|---|---|
+| Global | `/` | Open search |
+| Global | `?` | Show keyboard shortcuts |
+| Navigation | `g` then `h` | Go to dashboard |
+| Navigation | `g` then `e` | Go to explore |
+| Title page | `w` | Cycle watch status |
+| Title page | `m` | Mark movie as watched |
+| Title page | `Escape` | Go back |
+| Title page | `1`–`5` | Rate 1–5 stars |

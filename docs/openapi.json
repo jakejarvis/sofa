@@ -1,0 +1,4588 @@
+{
+  "info": {
+    "title": "Sofa API",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://sofa.example.com/api/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Titles",
+      "description": "Movie and TV show management"
+    },
+    {
+      "name": "Episodes",
+      "description": "Episode watch tracking"
+    },
+    {
+      "name": "Seasons",
+      "description": "Season watch tracking"
+    },
+    {
+      "name": "People",
+      "description": "Cast and crew information"
+    },
+    {
+      "name": "Dashboard",
+      "description": "User dashboard data"
+    },
+    {
+      "name": "Explore",
+      "description": "Discover trending and popular content"
+    },
+    {
+      "name": "Search",
+      "description": "Search for movies and TV shows"
+    },
+    {
+      "name": "Discover",
+      "description": "Advanced content discovery with filters"
+    },
+    {
+      "name": "System",
+      "description": "Server status and configuration"
+    },
+    {
+      "name": "Integrations",
+      "description": "Media server integrations"
+    },
+    {
+      "name": "Admin",
+      "description": "Server administration"
+    },
+    {
+      "name": "Account",
+      "description": "User account management"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "session": {
+        "type": "apiKey",
+        "name": "better-auth.session_token",
+        "in": "cookie",
+        "description": "Better Auth session cookie"
+      }
+    }
+  },
+  "openapi": "3.1.1",
+  "paths": {
+    "/titles/{id}": {
+      "get": {
+        "operationId": "titles.detail",
+        "tags": [
+          "Titles"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "tmdbId": {
+                          "type": "number"
+                        },
+                        "type": {
+                          "enum": [
+                            "movie",
+                            "tv"
+                          ]
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "originalTitle": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "overview": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "releaseDate": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "firstAirDate": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "posterPath": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "backdropPath": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "popularity": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "voteAverage": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "voteCount": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "status": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "contentRating": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "colorPalette": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "vibrant": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "darkVibrant": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "lightVibrant": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "muted": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "darkMuted": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "lightMuted": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "vibrant",
+                                "darkVibrant",
+                                "lightVibrant",
+                                "muted",
+                                "darkMuted",
+                                "lightMuted"
+                              ]
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "trailerVideoKey": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "genres": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "tmdbId",
+                        "type",
+                        "title",
+                        "originalTitle",
+                        "overview",
+                        "releaseDate",
+                        "firstAirDate",
+                        "posterPath",
+                        "backdropPath",
+                        "popularity",
+                        "voteAverage",
+                        "voteCount",
+                        "status",
+                        "contentRating",
+                        "colorPalette",
+                        "trailerVideoKey",
+                        "genres"
+                      ]
+                    },
+                    "seasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "seasonNumber": {
+                            "type": "number"
+                          },
+                          "name": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "episodes": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "episodeNumber": {
+                                  "type": "number"
+                                },
+                                "name": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "overview": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "stillPath": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "airDate": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "runtimeMinutes": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "episodeNumber",
+                                "name",
+                                "overview",
+                                "stillPath",
+                                "airDate",
+                                "runtimeMinutes"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "seasonNumber",
+                          "name",
+                          "episodes"
+                        ]
+                      }
+                    },
+                    "needsHydration": {
+                      "type": "boolean"
+                    },
+                    "availability": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "providerId": {
+                            "type": "number"
+                          },
+                          "providerName": {
+                            "type": "string"
+                          },
+                          "logoPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "offerType": {
+                            "type": "string"
+                          },
+                          "watchUrl": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "providerId",
+                          "providerName",
+                          "logoPath",
+                          "offerType",
+                          "watchUrl"
+                        ]
+                      }
+                    },
+                    "cast": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "personId": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "character": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "department": {
+                            "type": "string"
+                          },
+                          "job": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "displayOrder": {
+                            "type": "number"
+                          },
+                          "episodeCount": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "profilePath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "tmdbId": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "personId",
+                          "name",
+                          "character",
+                          "department",
+                          "job",
+                          "displayOrder",
+                          "episodeCount",
+                          "profilePath",
+                          "tmdbId"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "seasons",
+                    "needsHydration",
+                    "availability",
+                    "cast"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/titles/resolve": {
+      "post": {
+        "operationId": "titles.resolve",
+        "tags": [
+          "Titles"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tmdbId": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "type": {
+                    "enum": [
+                      "movie",
+                      "tv"
+                    ]
+                  }
+                },
+                "required": [
+                  "tmdbId",
+                  "type"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/titles/{id}/status": {
+      "put": {
+        "operationId": "titles.updateStatus",
+        "tags": [
+          "Titles"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "in_progress",
+                          "completed"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/titles/{id}/rating": {
+      "put": {
+        "operationId": "titles.updateRating",
+        "tags": [
+          "Titles"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "stars": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 5
+                  }
+                },
+                "required": [
+                  "stars"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/titles/{id}/watch": {
+      "post": {
+        "operationId": "titles.watchMovie",
+        "tags": [
+          "Titles"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/titles/{id}/watch-all": {
+      "post": {
+        "operationId": "titles.watchAll",
+        "tags": [
+          "Titles"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/titles/{id}/user-info": {
+      "get": {
+        "operationId": "titles.userInfo",
+        "tags": [
+          "Titles"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "watchlist",
+                            "in_progress",
+                            "completed"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "rating": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "episodeWatches": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "rating",
+                    "episodeWatches"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/titles/{id}/recommendations": {
+      "get": {
+        "operationId": "titles.recommendations",
+        "tags": [
+          "Titles"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "recommendations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "tmdbId": {
+                            "type": "number"
+                          },
+                          "type": {
+                            "enum": [
+                              "movie",
+                              "tv"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "posterPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "releaseDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "firstAirDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "voteAverage": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "tmdbId",
+                          "type",
+                          "title",
+                          "posterPath",
+                          "releaseDate",
+                          "firstAirDate",
+                          "voteAverage"
+                        ]
+                      }
+                    },
+                    "userStatuses": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "enum": [
+                          "watchlist",
+                          "in_progress",
+                          "completed"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "recommendations",
+                    "userStatuses"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/titles/{id}/hydrate-seasons": {
+      "post": {
+        "operationId": "titles.hydrateSeasons",
+        "tags": [
+          "Titles"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tmdbId": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "tmdbId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "seasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "seasonNumber": {
+                            "type": "number"
+                          },
+                          "name": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "episodes": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "episodeNumber": {
+                                  "type": "number"
+                                },
+                                "name": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "overview": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "stillPath": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "airDate": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "runtimeMinutes": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "episodeNumber",
+                                "name",
+                                "overview",
+                                "stillPath",
+                                "airDate",
+                                "runtimeMinutes"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "seasonNumber",
+                          "name",
+                          "episodes"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "seasons"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/titles/quick-add": {
+      "post": {
+        "operationId": "titles.quickAdd",
+        "tags": [
+          "Titles"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tmdbId": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "type": {
+                    "enum": [
+                      "movie",
+                      "tv"
+                    ]
+                  }
+                },
+                "required": [
+                  "tmdbId",
+                  "type"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "alreadyAdded": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "alreadyAdded"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/episodes/{id}/watch": {
+      "post": {
+        "operationId": "episodes.watch",
+        "tags": [
+          "Episodes"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/episodes/{id}/unwatch": {
+      "post": {
+        "operationId": "episodes.unwatch",
+        "tags": [
+          "Episodes"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/episodes/batch-watch": {
+      "post": {
+        "operationId": "episodes.batchWatch",
+        "tags": [
+          "Episodes"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "episodeIds": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "episodeIds"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/seasons/{id}/watch": {
+      "post": {
+        "operationId": "seasons.watch",
+        "tags": [
+          "Seasons"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/seasons/{id}/unwatch": {
+      "post": {
+        "operationId": "seasons.unwatch",
+        "tags": [
+          "Seasons"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/people/{id}": {
+      "get": {
+        "operationId": "people.detail",
+        "tags": [
+          "People"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "person": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "tmdbId": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "biography": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "birthday": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "deathday": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "placeOfBirth": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "profilePath": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "knownForDepartment": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "imdbId": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "tmdbId",
+                        "name",
+                        "biography",
+                        "birthday",
+                        "deathday",
+                        "placeOfBirth",
+                        "profilePath",
+                        "knownForDepartment",
+                        "imdbId"
+                      ]
+                    },
+                    "filmography": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "titleId": {
+                            "type": "string"
+                          },
+                          "tmdbId": {
+                            "type": "number"
+                          },
+                          "type": {
+                            "enum": [
+                              "movie",
+                              "tv"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "posterPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "releaseDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "firstAirDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "voteAverage": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "character": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "department": {
+                            "type": "string"
+                          },
+                          "job": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "titleId",
+                          "tmdbId",
+                          "type",
+                          "title",
+                          "posterPath",
+                          "releaseDate",
+                          "firstAirDate",
+                          "voteAverage",
+                          "character",
+                          "department",
+                          "job"
+                        ]
+                      }
+                    },
+                    "userStatuses": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "enum": [
+                          "watchlist",
+                          "in_progress",
+                          "completed"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "person",
+                    "filmography",
+                    "userStatuses"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/people/resolve": {
+      "post": {
+        "operationId": "people.resolve",
+        "tags": [
+          "People"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tmdbId": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "tmdbId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/stats": {
+      "get": {
+        "operationId": "dashboard.stats",
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "moviesThisMonth": {
+                      "type": "number"
+                    },
+                    "episodesThisWeek": {
+                      "type": "number"
+                    },
+                    "librarySize": {
+                      "type": "number"
+                    },
+                    "completed": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "moviesThisMonth",
+                    "episodesThisWeek",
+                    "librarySize",
+                    "completed"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/continue-watching": {
+      "get": {
+        "operationId": "dashboard.continueWatching",
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "backdropPath": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "title",
+                              "backdropPath"
+                            ]
+                          },
+                          "nextEpisode": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "seasonNumber": {
+                                    "type": "number"
+                                  },
+                                  "episodeNumber": {
+                                    "type": "number"
+                                  },
+                                  "name": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "stillPath": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "seasonNumber",
+                                  "episodeNumber",
+                                  "name",
+                                  "stillPath"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "totalEpisodes": {
+                            "type": "number"
+                          },
+                          "watchedEpisodes": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "nextEpisode",
+                          "totalEpisodes",
+                          "watchedEpisodes"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/library": {
+      "get": {
+        "operationId": "dashboard.library",
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "tmdbId": {
+                            "type": "number"
+                          },
+                          "type": {
+                            "enum": [
+                              "movie",
+                              "tv"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "posterPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "releaseDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "firstAirDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "voteAverage": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "userStatus": {
+                            "anyOf": [
+                              {
+                                "enum": [
+                                  "watchlist",
+                                  "in_progress",
+                                  "completed"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "tmdbId",
+                          "type",
+                          "title",
+                          "posterPath",
+                          "releaseDate",
+                          "firstAirDate",
+                          "voteAverage",
+                          "userStatus"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/recommendations": {
+      "get": {
+        "operationId": "dashboard.recommendations",
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "tmdbId": {
+                            "type": "number"
+                          },
+                          "type": {
+                            "enum": [
+                              "movie",
+                              "tv"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "posterPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "releaseDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "firstAirDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "voteAverage": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "tmdbId",
+                          "type",
+                          "title",
+                          "posterPath",
+                          "releaseDate",
+                          "firstAirDate",
+                          "voteAverage"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/watch-history": {
+      "get": {
+        "operationId": "dashboard.watchHistory",
+        "tags": [
+          "Dashboard"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "movie",
+                "episode"
+              ]
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "today",
+                "this_week",
+                "this_month",
+                "this_year"
+              ]
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    },
+                    "history": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "bucket": {
+                            "type": "string"
+                          },
+                          "count": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "bucket",
+                          "count"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "count",
+                    "history"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/explore/trending": {
+      "get": {
+        "operationId": "explore.trending",
+        "tags": [
+          "Explore"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "all",
+                "movie",
+                "tv"
+              ]
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "tmdbId": {
+                            "type": "number"
+                          },
+                          "type": {
+                            "enum": [
+                              "movie",
+                              "tv"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "posterPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "releaseDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "firstAirDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "voteAverage": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "tmdbId",
+                          "type",
+                          "title",
+                          "posterPath",
+                          "releaseDate",
+                          "firstAirDate",
+                          "voteAverage"
+                        ]
+                      }
+                    },
+                    "hero": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "tmdbId": {
+                              "type": "number"
+                            },
+                            "type": {
+                              "enum": [
+                                "movie",
+                                "tv"
+                              ]
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "overview": {
+                              "type": "string"
+                            },
+                            "backdropPath": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "voteAverage": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "tmdbId",
+                            "type",
+                            "title",
+                            "overview",
+                            "backdropPath",
+                            "voteAverage"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "userStatuses": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "enum": [
+                          "watchlist",
+                          "in_progress",
+                          "completed"
+                        ]
+                      }
+                    },
+                    "episodeProgress": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "watched": {
+                            "type": "number"
+                          },
+                          "total": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "watched",
+                          "total"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "hero",
+                    "userStatuses",
+                    "episodeProgress"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/explore/popular": {
+      "get": {
+        "operationId": "explore.popular",
+        "tags": [
+          "Explore"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "movie",
+                "tv"
+              ]
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "tmdbId": {
+                            "type": "number"
+                          },
+                          "type": {
+                            "enum": [
+                              "movie",
+                              "tv"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "posterPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "releaseDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "firstAirDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "voteAverage": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "tmdbId",
+                          "type",
+                          "title",
+                          "posterPath",
+                          "releaseDate",
+                          "firstAirDate",
+                          "voteAverage"
+                        ]
+                      }
+                    },
+                    "userStatuses": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "enum": [
+                          "watchlist",
+                          "in_progress",
+                          "completed"
+                        ]
+                      }
+                    },
+                    "episodeProgress": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "watched": {
+                            "type": "number"
+                          },
+                          "total": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "watched",
+                          "total"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "userStatuses",
+                    "episodeProgress"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/explore/genres": {
+      "get": {
+        "operationId": "explore.genres",
+        "tags": [
+          "Explore"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "movie",
+                "tv"
+              ]
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "genres": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "genres"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "operationId": "search",
+        "tags": [
+          "Search"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "movie",
+                "tv",
+                "person"
+              ]
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "tmdbId": {
+                            "type": "number"
+                          },
+                          "type": {
+                            "enum": [
+                              "movie",
+                              "tv",
+                              "person"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "overview": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "posterPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "profilePath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "releaseDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "popularity": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "voteAverage": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "knownForDepartment": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "knownFor": {
+                            "anyOf": [
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "tmdbId",
+                          "type",
+                          "title",
+                          "overview",
+                          "posterPath",
+                          "profilePath",
+                          "releaseDate",
+                          "popularity",
+                          "voteAverage",
+                          "knownForDepartment",
+                          "knownFor"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "results"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/discover": {
+      "get": {
+        "operationId": "discover",
+        "tags": [
+          "Discover"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "movie",
+                "tv"
+              ]
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "genreId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "tmdbId": {
+                            "type": "number"
+                          },
+                          "type": {
+                            "enum": [
+                              "movie",
+                              "tv"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "posterPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "releaseDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "firstAirDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "voteAverage": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "tmdbId",
+                          "type",
+                          "title",
+                          "posterPath",
+                          "releaseDate",
+                          "firstAirDate",
+                          "voteAverage"
+                        ]
+                      }
+                    },
+                    "userStatuses": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "enum": [
+                          "watchlist",
+                          "in_progress",
+                          "completed"
+                        ]
+                      }
+                    },
+                    "episodeProgress": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "watched": {
+                            "type": "number"
+                          },
+                          "total": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "watched",
+                          "total"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "userStatuses",
+                    "episodeProgress"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/public-info": {
+      "get": {
+        "operationId": "system.publicInfo",
+        "tags": [
+          "System"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "instanceId": {
+                      "type": "string"
+                    },
+                    "tmdbConfigured": {
+                      "type": "boolean"
+                    },
+                    "userCount": {
+                      "type": "number"
+                    },
+                    "registrationOpen": {
+                      "type": "boolean"
+                    },
+                    "posterUrls": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "instanceId",
+                    "tmdbConfigured",
+                    "userCount",
+                    "registrationOpen",
+                    "posterUrls"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/auth-config": {
+      "get": {
+        "operationId": "system.authConfig",
+        "tags": [
+          "System"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "oidcEnabled": {
+                      "type": "boolean"
+                    },
+                    "oidcProviderName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "passwordLoginDisabled": {
+                      "type": "boolean"
+                    },
+                    "registrationOpen": {
+                      "type": "boolean"
+                    },
+                    "userCount": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "oidcEnabled",
+                    "oidcProviderName",
+                    "passwordLoginDisabled",
+                    "registrationOpen",
+                    "userCount"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/status": {
+      "get": {
+        "operationId": "system.status",
+        "tags": [
+          "System"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tmdbConfigured": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "tmdbConfigured"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/health": {
+      "get": {
+        "operationId": "system.health",
+        "tags": [
+          "System"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "database": {
+                      "type": "object",
+                      "properties": {
+                        "dbSizeBytes": {
+                          "type": "number"
+                        },
+                        "walSizeBytes": {
+                          "type": "number"
+                        },
+                        "titleCount": {
+                          "type": "number"
+                        },
+                        "episodeCount": {
+                          "type": "number"
+                        },
+                        "userCount": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "dbSizeBytes",
+                        "walSizeBytes",
+                        "titleCount",
+                        "episodeCount",
+                        "userCount"
+                      ]
+                    },
+                    "tmdb": {
+                      "type": "object",
+                      "properties": {
+                        "connected": {
+                          "type": "boolean"
+                        },
+                        "tokenValid": {
+                          "type": "boolean"
+                        },
+                        "tokenConfigured": {
+                          "type": "boolean"
+                        },
+                        "responseTimeMs": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "error": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "connected",
+                        "tokenValid",
+                        "tokenConfigured",
+                        "responseTimeMs",
+                        "error"
+                      ]
+                    },
+                    "jobs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "jobName": {
+                            "type": "string"
+                          },
+                          "cronPattern": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "nextRunAt": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "lastRunAt": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "lastDurationMs": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "lastStatus": {
+                            "anyOf": [
+                              {
+                                "enum": [
+                                  "running",
+                                  "success",
+                                  "error"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "lastError": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "isCurrentlyRunning": {
+                            "type": "boolean"
+                          },
+                          "disabled": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "jobName",
+                          "cronPattern",
+                          "nextRunAt",
+                          "lastRunAt",
+                          "lastDurationMs",
+                          "lastStatus",
+                          "lastError",
+                          "isCurrentlyRunning",
+                          "disabled"
+                        ]
+                      }
+                    },
+                    "imageCache": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "totalSizeBytes": {
+                          "type": "number"
+                        },
+                        "imageCount": {
+                          "type": "number"
+                        },
+                        "categories": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "count": {
+                                "type": "number"
+                              },
+                              "sizeBytes": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "count",
+                              "sizeBytes"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "totalSizeBytes",
+                        "imageCount",
+                        "categories"
+                      ]
+                    },
+                    "backups": {
+                      "type": "object",
+                      "properties": {
+                        "lastBackupAt": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "lastBackupAgeHours": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "backupCount": {
+                          "type": "number"
+                        },
+                        "totalSizeBytes": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "lastBackupAt",
+                        "lastBackupAgeHours",
+                        "backupCount",
+                        "totalSizeBytes"
+                      ]
+                    },
+                    "environment": {
+                      "type": "object",
+                      "properties": {
+                        "dataDir": {
+                          "type": "string"
+                        },
+                        "dataDirWritable": {
+                          "type": "boolean"
+                        },
+                        "envVars": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "value"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "dataDir",
+                        "dataDirWritable",
+                        "envVars"
+                      ]
+                    },
+                    "checkedAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "database",
+                    "tmdb",
+                    "jobs",
+                    "imageCache",
+                    "backups",
+                    "environment",
+                    "checkedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations": {
+      "get": {
+        "operationId": "integrations.list",
+        "tags": [
+          "Integrations"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "integrations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "provider": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "enum": [
+                              "webhook",
+                              "list"
+                            ]
+                          },
+                          "token": {
+                            "type": "string"
+                          },
+                          "enabled": {
+                            "type": "boolean"
+                          },
+                          "lastEventAt": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "recentEvents": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "eventType": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "mediaType": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "mediaTitle": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "status": {
+                                  "enum": [
+                                    "success",
+                                    "ignored",
+                                    "error"
+                                  ]
+                                },
+                                "receivedAt": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "eventType",
+                                "mediaType",
+                                "mediaTitle",
+                                "status",
+                                "receivedAt"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "provider",
+                          "type",
+                          "token",
+                          "enabled",
+                          "lastEventAt",
+                          "createdAt",
+                          "recentEvents"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "integrations"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "integrations.create",
+        "tags": [
+          "Integrations"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "provider": {
+                    "enum": [
+                      "plex",
+                      "jellyfin",
+                      "emby",
+                      "sonarr",
+                      "radarr"
+                    ]
+                  },
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "provider"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "enum": [
+                        "webhook",
+                        "list"
+                      ]
+                    },
+                    "token": {
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "lastEventAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "provider",
+                    "type",
+                    "token",
+                    "enabled",
+                    "lastEventAt",
+                    "createdAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/{provider}": {
+      "delete": {
+        "operationId": "integrations.delete",
+        "tags": [
+          "Integrations"
+        ],
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plex",
+                "jellyfin",
+                "emby",
+                "sonarr",
+                "radarr"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/{provider}/regenerate-token": {
+      "post": {
+        "operationId": "integrations.regenerateToken",
+        "tags": [
+          "Integrations"
+        ],
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "plex",
+                "jellyfin",
+                "emby",
+                "sonarr",
+                "radarr"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "enum": [
+                        "webhook",
+                        "list"
+                      ]
+                    },
+                    "token": {
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "lastEventAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "provider",
+                    "type",
+                    "token",
+                    "enabled",
+                    "lastEventAt",
+                    "createdAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/backups": {
+      "get": {
+        "operationId": "admin.backups.list",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "backups": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "filename": {
+                            "type": "string"
+                          },
+                          "sizeBytes": {
+                            "type": "number"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "source": {
+                            "enum": [
+                              "manual",
+                              "scheduled",
+                              "pre-restore"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "filename",
+                          "sizeBytes",
+                          "createdAt",
+                          "source"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "backups"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "admin.backups.create",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "not": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "filename": {
+                      "type": "string"
+                    },
+                    "sizeBytes": {
+                      "type": "number"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "enum": [
+                        "manual",
+                        "scheduled",
+                        "pre-restore"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "filename",
+                    "sizeBytes",
+                    "createdAt",
+                    "source"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/backups/{filename}": {
+      "delete": {
+        "operationId": "admin.backups.delete",
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/backups/restore": {
+      "post": {
+        "operationId": "admin.backups.restore",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/backups/schedule": {
+      "get": {
+        "operationId": "admin.backups.schedule",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "maxRetention": {
+                      "type": "number"
+                    },
+                    "frequency": {
+                      "enum": [
+                        "6h",
+                        "12h",
+                        "1d",
+                        "7d"
+                      ]
+                    },
+                    "time": {
+                      "type": "string"
+                    },
+                    "dayOfWeek": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "maxRetention",
+                    "frequency",
+                    "time",
+                    "dayOfWeek"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "admin.backups.updateSchedule",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "frequency": {
+                    "enum": [
+                      "6h",
+                      "12h",
+                      "1d",
+                      "7d"
+                    ]
+                  },
+                  "time": {
+                    "type": "string",
+                    "pattern": "^\\d{2}:\\d{2}$"
+                  },
+                  "dayOfWeek": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 6
+                  },
+                  "maxRetention": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/registration": {
+      "get": {
+        "operationId": "admin.registration",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "open": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "open"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "admin.toggleRegistration",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "open": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "open"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/update-check": {
+      "get": {
+        "operationId": "admin.updateCheck",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "updateCheck": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "updateAvailable": {
+                              "type": "boolean"
+                            },
+                            "currentVersion": {
+                              "type": "string"
+                            },
+                            "latestVersion": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "releaseUrl": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "lastCheckedAt": {
+                              "anyOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "required": [
+                            "updateAvailable",
+                            "currentVersion",
+                            "latestVersion",
+                            "releaseUrl",
+                            "lastCheckedAt"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "updateCheck"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "admin.toggleUpdateCheck",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/telemetry": {
+      "get": {
+        "operationId": "admin.telemetry",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "lastReportedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "lastReportedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "admin.toggleTelemetry",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/jobs/trigger": {
+      "post": {
+        "operationId": "admin.triggerJob",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "enum": [
+                      "scheduledBackup",
+                      "nightlyRefreshLibrary",
+                      "refreshAvailability",
+                      "refreshRecommendations",
+                      "refreshTvChildren",
+                      "cacheImages",
+                      "refreshCredits",
+                      "updateCheck",
+                      "telemetryReport"
+                    ]
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/name": {
+      "put": {
+        "operationId": "account.updateName",
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/avatar": {
+      "post": {
+        "operationId": "account.uploadAvatar",
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": []
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "imageUrl": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "imageUrl"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "account.removeAvatar",
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "not": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "not": {}
+                    },
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

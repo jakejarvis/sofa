@@ -18,7 +18,7 @@ Sofa can export your TV show watchlist as a custom import list that Sonarr polls
 The list URL looks like:
 
 ```
-https://your-sofa-server.com/api/lists/{token}
+https://sofa.example.com/api/lists/{token}
 ```
 
 Sonarr polls the list periodically (default: every 6 hours) and adds any new shows it finds.
@@ -29,13 +29,13 @@ By default, the list exports titles with a **watchlist** status. You can customi
 
 ```
 # Only watchlist items (default)
-https://your-sofa-server.com/api/lists/{token}?status=watchlist
+https://sofa.example.com/api/lists/{token}?status=watchlist
 
 # Watchlist and in-progress items
-https://your-sofa-server.com/api/lists/{token}?status=watchlist,in_progress
+https://sofa.example.com/api/lists/{token}?status=watchlist,in_progress
 
 # All tracked items
-https://your-sofa-server.com/api/lists/{token}?status=watchlist,in_progress,completed
+https://sofa.example.com/api/lists/{token}?status=watchlist,in_progress,completed
 ```
 
 ## How It Works

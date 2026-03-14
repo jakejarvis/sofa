@@ -1,6 +1,7 @@
 ---
 title: Configuration
 description: Environment variables and server settings.
+icon: Settings
 ---
 
 ## Required Variables
@@ -109,6 +110,21 @@ OIDC_PROVIDER_NAME=Keycloak
 ### Disabling Password Login
 
 To enforce SSO-only login, set `DISABLE_PASSWORD_LOGIN=true`. This only takes effect when OIDC is configured. The admin account created during setup will still work via OIDC.
+
+### Account Linking
+
+When OIDC is enabled, account linking is active by default. If a user logs in via OIDC with an email address that matches an existing Sofa account, the accounts are automatically linked — no manual confirmation is required. This means existing users can start using SSO without losing their library or watch history.
+
+### Auto-Registration and Password Login
+
+`OIDC_AUTO_REGISTER` and `DISABLE_PASSWORD_LOGIN` interact to control how users can access your instance:
+
+| `OIDC_AUTO_REGISTER` | `DISABLE_PASSWORD_LOGIN` | Behavior |
+|---|---|---|
+| `true` (default) | `false` (default) | Both login methods available. New OIDC users get accounts created automatically. |
+| `true` | `true` | OIDC only. Accounts are auto-created on first login. Password form is hidden. |
+| `false` | `false` | Both login methods available. OIDC users must have a pre-existing account with a matching email. |
+| `false` | `true` | OIDC only, no auto-registration. Admin must create accounts first via the registration toggle. |
 
 ## TMDB Overrides
 

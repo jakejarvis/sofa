@@ -1,23 +1,41 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { getLatestVersion } from "./lib/github";
+
+const GITHUB_RELEASES_URL =
+  "https://api.github.com/repos/jakejarvis/sofa/releases/latest";
 
 const app = new Hono();
 
 app.use("*", cors());
 
-app.get("/health", (c) => c.json({ status: "healthy" }));
-
 app.get("/v1/version", async (c) => {
   try {
-    const latest = await getLatestVersion();
+    const res = await fetch(GITHUB_RELEASES_URL, {
+      headers: {
+        Accept: "application/vnd.github.v3+json",
+        "User-Agent": "sofa-public-api",
+        ...(process.env.GITHUB_TOKEN && {
+          Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        }),
+      },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
+
+    const data = (await res.json()) as {
+      tag_name: string;
+      html_url: string;
+    };
 
     c.header(
       "Cache-Control",
       "public, s-maxage=900, stale-while-revalidate=3600",
     );
 
-    return c.json(latest);
+    return c.json({
+      version: data.tag_name.replace(/^v/, ""),
+      release_url: data.html_url,
+    });
   } catch (e) {
     return c.json(
       { error: e instanceof Error ? e.message : "Failed to fetch version" },
@@ -35,6 +53,7 @@ app.post("/v1/telemetry", async (c) => {
 
   const posthogKey = process.env.POSTHOG_API_KEY;
   if (!posthogKey) {
+    // return okay, this isn't the user's problem
     return c.body(null, 204);
   }
 

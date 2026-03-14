@@ -16,9 +16,11 @@ export function baseOptions(): BaseLayoutProps {
           <span className="font-display text-[17px] leading-none">Sofa</span>
         </>
       ),
-      transparentMode: "top",
     },
-    links: [{ text: "Docs", url: "/docs" }],
+    links: [
+      { text: "Docs", url: "/docs" },
+      { text: "API Reference", url: "/docs/api" },
+    ],
     githubUrl: "https://github.com/jakejarvis/sofa",
     themeSwitch: { enabled: false },
   };

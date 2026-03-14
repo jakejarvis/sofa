@@ -10,6 +10,15 @@ const config = {
     // docs site is essentially self-contained from the rest of the monorepo
     root: import.meta.dirname,
   },
+  async redirects() {
+    return [
+      {
+        source: "/docs/api",
+        destination: "/docs/api/account",
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

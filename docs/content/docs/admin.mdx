@@ -1,0 +1,104 @@
+---
+title: Administration
+description: Server administration and management features.
+icon: ShieldUser
+---
+
+All admin features are found in the **Settings** page, in sections marked as admin-only.
+
+## Admin Account
+
+The first user to register automatically becomes the admin. After the first account is created, registration closes by default.
+
+There is currently no way to transfer the admin role to another user.
+
+## Registration
+
+Toggle user registration open or closed in **Settings → Security → Open Registration**.
+
+<Callout type="info">
+Registration is always open when no users exist — this is how the initial admin account is created. After the first account is registered, it closes automatically.
+</Callout>
+
+When registration is closed, new users cannot create accounts unless they authenticate via [OIDC/SSO](/docs/configuration#oidc--sso) with `OIDC_AUTO_REGISTER` enabled.
+
+## System Health
+
+The **Server** section in Settings displays health information across three cards:
+
+### Status
+
+- **Database** — Size of the SQLite database and WAL file.
+- **TMDB** — Connection status (Connected, Invalid token, or Unreachable) with response time.
+- **Environment** — Configured environment variables (sensitive values are redacted) and data directory write permission.
+
+### Background Jobs
+
+A table of all scheduled jobs showing:
+
+- Job name and schedule
+- Last run status (success, error, or never run) with duration
+- Next scheduled run time
+- A **trigger button** to run any job immediately
+
+See [Background Jobs](/docs/configuration#background-jobs) for the full schedule reference.
+
+### Storage
+
+- **Image cache** — Enabled/disabled status, total size, image count, and breakdown by category (posters, backdrops, stills, logos, profiles).
+- **Backups** — Total count, combined size, and time since last backup.
+
+## Backup Management
+
+### Manual Backups
+
+Click **Create backup** to generate an immediate database backup. Each backup is an atomic SQLite dump named with a timestamp (e.g. `sofa-manual-2025-01-15-143052123.db`). You can download or delete individual backups from the list.
+
+### Scheduled Backups
+
+Enable scheduled backups with the toggle and configure:
+
+| Setting | Default | Options |
+|---|---|---|
+| Frequency | Every day | `6h`, `12h`, `1d`, `7d` |
+| Time | 02:00 | Any `HH:MM` (UTC) |
+| Day of week | Sunday | For weekly backups only |
+| Retention | 7 | Max number of scheduled backups to keep |
+
+Old backups beyond the retention count are automatically pruned. Scheduled backups are named `sofa-scheduled-*.db`.
+
+### Restoring from a Backup
+
+Upload a backup file or select one from the existing backup list to restore. Before restoring:
+
+1. A **pre-restore snapshot** of the current database is automatically created, so you can revert if needed.
+2. The backup is **validated** — Sofa checks database integrity, foreign key consistency, and required tables before proceeding.
+3. After the database is replaced, **migrations run automatically** to bring older backups up to the current schema.
+
+<Callout type="warn">
+Restoring a backup replaces the entire database. All data since the backup was created will be lost. The pre-restore snapshot lets you undo the restore if something goes wrong.
+</Callout>
+
+## Background Jobs
+
+Sofa runs several automated background jobs. Each can be triggered manually from the Background Jobs card in Settings by clicking the play button next to any job.
+
+This is useful for:
+
+- Forcing a metadata refresh after adding titles to your library
+- Updating streaming availability data on demand
+- Checking for new episodes of tracked shows
+- Running a backup outside the regular schedule
+- Checking for app updates immediately
+
+See the [Background Jobs](/docs/configuration#background-jobs) table in Configuration for the full list with schedules.
+
+## Update Checking
+
+Found in **Settings → Security**. When enabled (the default), Sofa checks for new versions every 6 hours. If an update is available, the current and latest versions are displayed with a link to the release notes.
+
+Toggle this off if you prefer to check for updates manually or manage updates through your own deployment pipeline.
+
+## Telemetry
+
+Anonymous usage telemetry can be enabled in Settings. It is **disabled by default** and sends only aggregated, non-identifying data. See the [Telemetry](/docs/telemetry) page for full details on what is and isn't collected.

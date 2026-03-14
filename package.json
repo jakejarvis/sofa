@@ -32,7 +32,8 @@
     "lint": "turbo run lint",
     "format": "turbo run format",
     "check-types": "turbo run check-types",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "generate:openapi": "bun scripts/generate-openapi-spec.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.7",

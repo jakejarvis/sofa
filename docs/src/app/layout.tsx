@@ -6,6 +6,7 @@ import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import "./global.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://sofa.watch"),
   title: {
     default: "Sofa — Self-hosted movie & TV tracker",
     template: "%s | Sofa",

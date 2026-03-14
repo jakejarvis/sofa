@@ -1,0 +1,158 @@
+---
+title: Troubleshooting
+description: Solutions for common issues.
+icon: LifeBuoy
+---
+
+## TMDB API Issues
+
+### Invalid or Missing Token
+
+**Symptom**: Health status shows "Invalid token" or "Not configured."
+
+- Verify that `TMDB_API_READ_ACCESS_TOKEN` is set. This is the **Read Access Token** (a long `eyJ...` string), not the shorter API Key.
+- Double-check the token at [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api).
+- Restart the container after changing environment variables.
+
+### TMDB Unreachable
+
+**Symptom**: Health status shows "Unreachable."
+
+- Check network connectivity from the container: `docker exec sofa ping api.themoviedb.org`
+- If you're using a proxy, verify `TMDB_API_BASE_URL` points to the correct endpoint.
+- TMDB may be experiencing downtime — check [status.themoviedb.org](https://status.themoviedb.org).
+
+### Rate Limiting
+
+Sofa includes a 300ms delay between TMDB requests per title to stay within API limits. If you see intermittent errors during large library refreshes, the affected titles will be retried on the next scheduled run. Avoid manually triggering multiple jobs at the same time.
+
+## Webhook Integration Issues
+
+### Watches Not Being Logged
+
+Check the **event log** in Settings → Integrations → your provider. Common errors:
+
+- **"Could not resolve TMDB ID"** — The media's external IDs (TMDB, IMDB, or TVDB) in your media server don't match a TMDB entry. Refresh the metadata in your media server.
+- **"Season/episode not found"** — The show's season data hasn't been loaded in Sofa. Search for the show in Sofa first to trigger a metadata import, then try playing again.
+- **"Failed to import"** — A TMDB API error occurred. Check the TMDB connection in [System Health](/docs/admin#status).
+
+### Events Showing as "Ignored"
+
+- **"Duplicate watch within 5 minutes"** — Normal deduplication. Some media servers send the same event multiple times.
+- **Partial playback** — For Jellyfin and Emby, only playback events with `PlayedToCompletion: true` are processed. Partially watched content is intentionally ignored.
+- **Wrong event type** — For Plex, only `media.scrobble` events are processed. Test events and other event types are ignored.
+
+### Plex
+
+- Plex Pass is required for webhooks.
+- Configure webhooks at [app.plex.tv → Settings → Webhooks](https://app.plex.tv/desktop/#!/settings/webhooks).
+- Plex's "Test Webhook" button sends a non-scrobble event that Sofa will ignore — this is expected.
+
+### Jellyfin
+
+- The [Webhook plugin](https://github.com/jellyfin/jellyfin-plugin-webhook) must be installed from the Jellyfin plugin catalog (Dashboard → Plugins → Catalog).
+- Ensure the **Playback Stop** notification type is enabled in the webhook destination settings.
+- Restart Jellyfin after installing the plugin.
+
+### Emby
+
+- Emby Premiere and Emby Server 4.7.9+ are required.
+- Both `playback.stop` and `PlaybackStop` event formats are supported — no special configuration needed.
+
+## Image Caching Issues
+
+### Images Not Loading
+
+- Verify `IMAGE_CACHE_ENABLED` is `true` (the default).
+- Check that the data directory is writable — look at the write permission indicator in [System Health](/docs/admin#status).
+- Check available disk space. The image cache grows with your library and stores five categories: posters (500px), backdrops (1280px), stills (1280px), logos (92px), and profiles (185px).
+
+### Clearing the Image Cache
+
+Image files are stored in subdirectories under `CACHE_DIR` (default: `/data/images/`). To clear the cache:
+
+1. Delete the contents of the images directory.
+2. Trigger the **Image cache** job from [Background Jobs](/docs/admin#background-jobs) to re-download images.
+
+Alternatively, set `IMAGE_CACHE_ENABLED=false` to bypass the cache entirely and serve images directly from TMDB's CDN.
+
+## OIDC / SSO Issues
+
+### Login Button Not Appearing
+
+All three OIDC environment variables must be set for the SSO button to appear: `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, and `OIDC_ISSUER_URL`. The button label is controlled by `OIDC_PROVIDER_NAME` (defaults to "SSO"). Restart the container after changing OIDC configuration.
+
+### "Account Not Found" After OIDC Login
+
+If `OIDC_AUTO_REGISTER` is set to `false`, new users must have a pre-existing Sofa account with a matching email address. Either set `OIDC_AUTO_REGISTER=true` to auto-create accounts on first OIDC login, or create accounts manually before users attempt SSO.
+
+### Account Linking
+
+When OIDC is enabled, account linking is automatic. If a user logs in via OIDC with an email that matches an existing password-based account, the accounts are linked — no manual step is required. See [Account Linking](/docs/configuration#account-linking) in the configuration docs for more details.
+
+### Password Login Disabled But OIDC Not Working
+
+`DISABLE_PASSWORD_LOGIN=true` hides the email/password form but only takes effect when OIDC is properly configured. If you're locked out:
+
+1. Unset `DISABLE_PASSWORD_LOGIN` in your environment (or set it to `false`).
+2. Restart the container.
+3. Log in with email/password and fix your OIDC configuration.
+
+### Callback URL Mismatch
+
+The redirect URI configured in your identity provider must exactly match:
+
+```
+https://your-sofa-url/api/auth/oauth2/callback/oidc
+```
+
+Replace `https://your-sofa-url` with your `BETTER_AUTH_URL` value. The protocol, hostname, and port must match exactly.
+
+## Database & Backup Issues
+
+### Database Locked or Corrupt
+
+Sofa uses SQLite with WAL (Write-Ahead Logging) mode. If the database appears locked:
+
+- Ensure only **one Sofa instance** is accessing the same database file. Running multiple containers against the same volume will cause locking issues.
+- After an unclean shutdown, stale `-wal` and `-shm` files may remain alongside the database. These are usually handled automatically on next startup.
+- If corruption is detected, [restore from a backup](/docs/admin#restoring-from-a-backup).
+
+### Restore Fails Validation
+
+Backup validation checks integrity (`PRAGMA integrity_check`), foreign keys (`PRAGMA foreign_key_check`), and the presence of required tables. If a backup fails validation:
+
+- It may be from an incompatible version or was corrupted during transfer.
+- Try downloading the backup again if it was transferred over a network.
+- A pre-restore snapshot is created before every restore attempt, so your current data is always safe.
+
+### Data Directory Permissions
+
+The `/data` directory (or your custom `DATA_DIR`) must be writable by the container process. Check the write permission indicator in [System Health](/docs/admin#status). For Docker, ensure the volume mount has the correct ownership and permissions.
+
+## General Tips
+
+### Checking Logs
+
+Set `LOG_LEVEL=debug` for verbose output during troubleshooting. Sofa uses structured JSON logging via [Pino](https://getpino.io/).
+
+```bash
+# View logs
+docker logs sofa
+
+# Follow logs in real time
+docker logs -f sofa
+```
+
+### Health Endpoint
+
+`GET /api/health` returns `{"status": "healthy"}` when the server is running. Use this for uptime monitoring or reverse proxy health checks. The Docker image includes a built-in health check that polls this endpoint every 30 seconds.
+
+### Forcing a Full Refresh
+
+Trigger jobs manually from the [Background Jobs](/docs/admin#background-jobs) panel in Settings:
+
+- **Library refresh** — Re-fetch metadata for all tracked titles.
+- **Streaming availability** — Update provider data for all titles.
+- **New episodes** — Check for new episodes of tracked TV shows.
+- **Image cache** — Re-download any missing cached images.
