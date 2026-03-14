@@ -10,13 +10,15 @@ import {
   requestTrackingPermissionsAsync,
 } from "expo-tracking-transparency";
 import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { Uniwind, useResolveClassNames } from "uniwind";
 
 import { OfflineBanner } from "@/components/ui/offline-banner";
+import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-banner";
 import { authClient, rebuildAuthClient } from "@/lib/auth-client";
+import { getCachedSession } from "@/lib/cached-session";
 import {
   clearStorageScope,
   hasScopedStorage,
@@ -27,13 +29,35 @@ import {
 import { applyTrackingTransparency, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
 import {
+  onServerReachabilityChange,
+  startReachabilityMonitor,
+} from "@/lib/server-reachability";
+import {
   ensureInstanceId,
   getCurrentInstanceId,
   hasStoredServerUrl,
   onServerUrlChange,
 } from "@/lib/server-url";
+import { toast } from "@/lib/toast";
 
 SplashScreen.preventAutoHideAsync();
+
+// Seed the session atom with cached data from SecureStore before React renders.
+// This allows the app to show cached data immediately when the server is
+// unreachable, instead of hanging on the splash screen or dumping the user
+// on the login screen. Better Auth's background fetch will still fire and
+// update the atom when the server responds.
+const cachedSession = getCachedSession();
+if (cachedSession) {
+  const sessionAtom = authClient.$store.atoms.session;
+  sessionAtom.set({
+    data: cachedSession,
+    error: null,
+    isPending: false,
+    isRefetching: true,
+    refetch: sessionAtom.get().refetch,
+  });
+}
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
@@ -122,16 +146,55 @@ function AppContent() {
     Uniwind.setTheme("dark");
   }, []);
 
+  // --- Safety splash timeout (belt-and-suspenders if seeding fails) ---
+  useEffect(() => {
+    const timer = setTimeout(() => SplashScreen.hideAsync(), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     if (!isPending || !hasServerUrl) {
       SplashScreen.hideAsync();
     }
   }, [isPending, hasServerUrl]);
 
+  // --- Server reachability monitor ---
+  useEffect(() => {
+    if (!hasServerUrl) return;
+    return startReachabilityMonitor();
+  }, [hasServerUrl]);
+
+  // --- Session reconciliation: re-validate when server comes back ---
+  const hadOptimisticSession = useRef(!!cachedSession);
+  const prevSession = useRef(session);
+
+  useEffect(() => {
+    return onServerReachabilityChange((reachable) => {
+      if (reachable) {
+        // Server came back — trigger session re-validation
+        const atom = authClient.$store.atoms.session;
+        atom.get().refetch?.();
+      }
+    });
+  }, []);
+
+  // If session was seeded from cache and then invalidated by the server,
+  // show a toast so the user knows why they were signed out.
+  useEffect(() => {
+    if (prevSession.current && !session && hadOptimisticSession.current) {
+      toast.info("Session expired", {
+        description: "Please sign in again.",
+      });
+      hadOptimisticSession.current = false;
+    }
+    prevSession.current = session;
+  }, [session]);
+
   return (
     <>
       <StatusBar style="light" />
       <OfflineBanner />
+      <ServerUnreachableBanner />
       <Stack
         screenOptions={{
           headerShown: false,
