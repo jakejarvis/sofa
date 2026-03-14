@@ -1,6 +1,8 @@
+import { Analytics } from "@vercel/analytics/next";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import { DM_Sans, DM_Serif_Display } from "next/font/google";
+
 import "./global.css";
 
 export const metadata: Metadata = {
@@ -32,6 +34,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-screen flex-col font-[family-name:var(--font-dm-sans)]">
         <RootProvider theme={{ forcedTheme: "dark" }}>{children}</RootProvider>
+        <Analytics />
       </body>
     </html>
   );
