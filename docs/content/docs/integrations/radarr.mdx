@@ -1,0 +1,43 @@
+---
+title: Radarr
+description: Export your movie watchlist to Radarr.
+---
+
+Sofa can export your movie watchlist as a custom import list that Radarr polls automatically.
+
+## Setup
+
+1. In Sofa, go to **Settings → Integrations** and click **Connect** next to Radarr
+2. Copy the generated list URL
+3. In Radarr, go to **Settings → Import Lists**
+4. Click **+** and select **Custom Lists**
+5. Paste the URL into the **List URL** field
+6. Configure your preferred quality profile and root folder
+7. Save
+
+The list URL looks like:
+
+```
+https://your-sofa-server.com/api/lists/{token}
+```
+
+Radarr polls the list periodically (default: every 12 hours) and adds any new movies it finds.
+
+## Status Filtering
+
+By default, the list exports titles with a **watchlist** status. You can customize which statuses are included by appending a query parameter:
+
+```
+# Only watchlist items (default)
+https://your-sofa-server.com/api/lists/{token}?status=watchlist
+
+# Watchlist and in-progress items
+https://your-sofa-server.com/api/lists/{token}?status=watchlist,in_progress
+
+# All tracked items
+https://your-sofa-server.com/api/lists/{token}?status=watchlist,in_progress,completed
+```
+
+## How It Works
+
+When Radarr polls the list, Sofa returns all matching movies in Radarr's custom list format with TMDB IDs. Only movies are included — TV shows are filtered out.

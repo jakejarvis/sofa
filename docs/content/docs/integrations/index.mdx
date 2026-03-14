@@ -1,0 +1,42 @@
+---
+title: Integrations
+description: Connect Sofa to your media stack.
+---
+
+Sofa integrates with popular media servers and the *arr stack to automate your tracking workflow.
+
+## Webhook Integrations
+
+Webhook integrations automatically log what you watch. When you finish a movie or episode on your media server, Sofa records it — no manual input needed.
+
+- [Plex](/docs/integrations/plex) — requires Plex Pass
+- [Jellyfin](/docs/integrations/jellyfin) — requires the Webhook plugin
+- [Emby](/docs/integrations/emby) — requires Emby Premiere 4.7.9+
+
+## Import List Integrations
+
+Import list integrations export your Sofa watchlist so Sonarr and Radarr can automatically grab new content.
+
+- [Sonarr](/docs/integrations/sonarr) — exports TV shows from your watchlist
+- [Radarr](/docs/integrations/radarr) — exports movies from your watchlist
+
+## Setup
+
+All integrations are managed in **Settings → Integrations**. The general flow:
+
+1. Click **Connect** next to the integration you want
+2. A unique URL is generated for your account
+3. Copy the URL and paste it into your media server's configuration
+4. Sofa will start receiving events or serving your watchlist
+
+Each integration URL contains a unique token for authentication. You can regenerate the token at any time if it's compromised — just update the URL in your media server.
+
+## Event Log
+
+Every webhook event is logged and visible in the integration settings. The event log shows:
+
+- Whether the event was processed successfully, ignored, or caused an error
+- The media title and type (movie or episode)
+- A timestamp for each event
+
+This makes it easy to troubleshoot if something isn't being tracked as expected.

@@ -17,7 +17,8 @@
       "!**/routeTree.gen.ts",
       "!apps/native/.expo/types/**/*.ts",
       "!apps/native/expo-env.d.ts",
-      "!apps/native/uniwind-types.d.ts"
+      "!apps/native/uniwind-types.d.ts",
+      "!docs"
     ]
   },
   "css": {

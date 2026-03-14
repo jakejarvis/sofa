@@ -1,0 +1,84 @@
+---
+title: Mobile App
+description: Set up the iOS and Android app.
+---
+
+Sofa has a native mobile app for iOS and Android built with [Expo](https://expo.dev/) and React Native. It connects to your self-hosted Sofa server and provides the same core features as the web app.
+
+<Callout type="info">
+The mobile app is not currently available on the App Store or Google Play. You'll need to build it from source.
+</Callout>
+
+## Features
+
+The mobile app includes:
+
+- **Home** — dashboard with stats, continue watching, and recommendations
+- **Explore** — trending and popular movies and TV shows, genre browsing
+- **Search** — full-text search for movies, TV shows, and people
+- **Settings** — account management, integrations, and admin controls
+- Episode-level tracking, ratings, and watchlist management
+- Media server integration management (Plex, Jellyfin, Emby, Sonarr, Radarr)
+
+## Building from Source
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) 22+
+- [Bun](https://bun.sh/) runtime
+- [Xcode](https://developer.apple.com/xcode/) (for iOS) or [Android Studio](https://developer.android.com/studio) (for Android)
+- An Apple Developer account (for running on a physical iOS device)
+
+### Steps
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/jakejarvis/sofa.git
+cd sofa
+bun install
+```
+
+Generate native projects:
+
+```bash
+cd apps/native
+bun prebuild
+```
+
+Run on your target platform:
+
+```bash
+# iOS Simulator
+bun ios
+
+# Android Emulator
+bun android
+```
+
+For physical devices, follow the [Expo development build guide](https://docs.expo.dev/develop/development-builds/create-a-build/).
+
+## Connecting to Your Server
+
+On first launch, the app will ask for your Sofa server URL:
+
+1. Enter the URL of your self-hosted instance (e.g. `https://sofa.example.com`)
+2. The app validates the connection by checking the `/api/health` endpoint
+3. Once connected, log in with the same credentials you use on the web
+
+The server URL is stored locally on the device. You can change it at any time from the login screen by tapping **Change server**.
+
+### Connection Requirements
+
+- Your server must be reachable from the device's network
+- HTTPS is recommended, especially when connecting over the internet
+- If using a self-signed certificate, you may need to trust it on the device
+
+## Authentication
+
+The mobile app uses the same authentication system as the web app:
+
+- **Email & password** — standard login
+- **OIDC / SSO** — if configured on your server, the SSO button appears on the login screen
+
+Auth tokens are stored in the platform's secure storage (iOS Keychain / Android Keystore) and scoped per server instance, so you can connect to multiple Sofa servers without conflicts.

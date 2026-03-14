@@ -1,0 +1,136 @@
+---
+title: Getting Started
+description: Deploy Sofa with Docker in under a minute.
+---
+
+## Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) and Docker Compose installed
+- A free TMDB API Read Access Token — [get one here](https://www.themoviedb.org/settings/api)
+
+## Quick Start
+
+Create a `docker-compose.yml`:
+
+```yaml title="docker-compose.yml"
+services:
+  sofa:
+    image: ghcr.io/jakejarvis/sofa:edge
+    container_name: sofa
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - sofa-data:/data
+    environment:
+      - TMDB_API_READ_ACCESS_TOKEN=${TMDB_API_READ_ACCESS_TOKEN}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
+
+volumes:
+  sofa-data:
+```
+
+Create a `.env` file next to it with your configuration:
+
+```bash title=".env"
+# Get a token at https://www.themoviedb.org/settings/api
+TMDB_API_READ_ACCESS_TOKEN=your_token_here
+
+# Random secret for session encryption (min 32 chars)
+BETTER_AUTH_SECRET=your_secret_here
+
+# Public URL of your instance
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+Generate a secure secret:
+
+```bash
+openssl rand -base64 32
+```
+
+Start the container:
+
+```bash
+docker compose up -d
+```
+
+Open [http://localhost:3000](http://localhost:3000) and create your account.
+
+## First Account
+
+The first account you create automatically becomes the **admin**. After that, registration closes by default. You can reopen it in **Settings → Admin → Registration**.
+
+## Reverse Proxy
+
+If you're running Sofa behind a reverse proxy (Caddy, nginx, Traefik, etc.), make sure to:
+
+1. Set `BETTER_AUTH_URL` to your public URL (e.g. `https://sofa.example.com`)
+2. Set `CORS_ORIGIN` to the same URL if your proxy uses a different origin
+3. Forward the `Host` header and WebSocket connections
+
+Example with Caddy:
+
+```txt title="Caddyfile"
+sofa.example.com {
+  reverse_proxy localhost:3000
+}
+```
+
+Example with nginx:
+
+```nginx title="nginx.conf"
+server {
+    listen 443 ssl;
+    server_name sofa.example.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+## Updating
+
+Pull the latest image and recreate the container:
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+Database migrations run automatically on startup — no manual steps needed.
+
+## Health Check
+
+Sofa exposes a health endpoint at `GET /api/health`:
+
+```json
+{
+  "status": "healthy",
+  "instanceId": "..."
+}
+```
+
+The Docker image includes a built-in health check that polls this endpoint every 30 seconds.
+
+## Data Directory
+
+All persistent data lives in the `/data` volume:
+
+```
+/data/
+├── sqlite.db          # SQLite database
+├── backups/           # Manual and scheduled backups
+├── images/            # Cached TMDB images (if enabled)
+└── avatars/           # User profile pictures
+```
+
+To back up your instance, you can either:
+
+- Use Sofa's built-in backup system (Settings → Admin → Backups)
+- Copy the Docker volume directly: `docker cp sofa:/data ./sofa-backup`

@@ -1,0 +1,45 @@
+---
+title: Jellyfin
+description: Automatically log watches from Jellyfin.
+---
+
+Sofa can automatically log movies and episodes when you finish watching them on Jellyfin.
+
+## Requirements
+
+- The [Webhook plugin](https://github.com/jellyfin/jellyfin-plugin-webhook) installed from the Jellyfin plugin catalog
+
+## Setup
+
+1. Install the Webhook plugin: **Dashboard → Plugins → Catalog → Webhook** and restart Jellyfin
+2. In Sofa, go to **Settings → Integrations** and click **Connect** next to Jellyfin
+3. Copy the generated webhook URL
+4. In Jellyfin, go to **Dashboard → Plugins → Webhook**
+5. Click **Add Generic Destination**
+6. Paste the webhook URL
+7. Enable the **Playback Stop** notification type
+8. Save
+
+The webhook URL looks like:
+
+```
+https://your-sofa-server.com/api/webhooks/{token}
+```
+
+## How It Works
+
+When you finish watching something on Jellyfin, the Webhook plugin sends a `PlaybackStop` event to Sofa. Sofa only processes events where `PlayedToCompletion` is `true` — partially watched content is ignored.
+
+Sofa resolves titles using TMDB, IMDB, or TVDB IDs from Jellyfin's provider metadata.
+
+## Deduplication
+
+Duplicate events within 5 minutes are automatically ignored.
+
+## Troubleshooting
+
+Check the event log in **Settings → Integrations → Jellyfin**:
+
+- **No events appearing** — make sure the Webhook plugin is installed and the **Playback Stop** notification type is enabled.
+- **Events show as "ignored"** — the content wasn't played to completion. Jellyfin only reports `PlayedToCompletion: true` when the full runtime is watched.
+- **"Could not resolve TMDB ID"** — ensure the title has provider IDs configured in Jellyfin (TMDB, IMDB, or TVDB).

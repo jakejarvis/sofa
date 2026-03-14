@@ -1,0 +1,44 @@
+---
+title: Emby
+description: Automatically log watches from Emby.
+---
+
+Sofa can automatically log movies and episodes when you finish watching them on Emby.
+
+## Requirements
+
+- [Emby Premiere](https://emby.media/premiere.html) license
+- Emby Server **4.7.9** or later
+
+## Setup
+
+1. In Sofa, go to **Settings → Integrations** and click **Connect** next to Emby
+2. Copy the generated webhook URL
+3. In Emby, go to **Settings → Webhooks**
+4. Add a new webhook and paste the URL
+5. Enable the **Playback** event category
+6. Save
+
+The webhook URL looks like:
+
+```
+https://your-sofa-server.com/api/webhooks/{token}
+```
+
+## How It Works
+
+When you finish watching something on Emby, it sends a `playback.stop` event to Sofa. Sofa only processes events where `PlayedToCompletion` is `true`.
+
+Sofa resolves titles using TMDB, IMDB, or TVDB IDs from Emby's provider metadata.
+
+## Deduplication
+
+Duplicate events within 5 minutes are automatically ignored.
+
+## Troubleshooting
+
+Check the event log in **Settings → Integrations → Emby**:
+
+- **No events appearing** — verify you have Emby Premiere active and are running Emby Server 4.7.9+. Webhooks require Premiere.
+- **Events show as "ignored"** — the content wasn't played to completion.
+- **"Could not resolve TMDB ID"** — ensure the title has provider IDs configured in Emby's metadata settings.

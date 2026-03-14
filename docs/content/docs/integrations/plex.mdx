@@ -1,0 +1,45 @@
+---
+title: Plex
+description: Automatically log watches from Plex.
+---
+
+Sofa can automatically log movies and episodes when you finish watching them on Plex.
+
+## Requirements
+
+- An active [Plex Pass](https://www.plex.tv/plex-pass/) subscription (required for webhooks)
+
+## Setup
+
+1. In Sofa, go to **Settings → Integrations** and click **Connect** next to Plex
+2. Copy the generated webhook URL
+3. Open [Plex Webhook Settings](https://app.plex.tv/desktop/#!/settings/webhooks)
+4. Click **Add Webhook** and paste the URL
+
+The webhook URL looks like:
+
+```
+https://your-sofa-server.com/api/webhooks/{token}
+```
+
+## How It Works
+
+When you finish watching something on Plex, it sends a `media.scrobble` event to Sofa. Sofa then:
+
+1. Extracts the media IDs (TMDB, IMDB, or TVDB) from the webhook payload
+2. Resolves the title in the TMDB database
+3. Logs the watch to your Sofa account with a `plex` source tag
+
+For TV shows, Sofa matches the specific season and episode number to track your progress accurately.
+
+## Deduplication
+
+If Plex sends the same event multiple times within 5 minutes (which can happen with some clients), Sofa ignores the duplicates.
+
+## Troubleshooting
+
+If watches aren't being logged, check the event log in **Settings → Integrations → Plex**:
+
+- **"Could not resolve TMDB ID"** — the media's external IDs don't map to a TMDB entry. This is rare but can happen with obscure titles.
+- **"Season/episode not found"** — the show's season data hasn't been loaded yet. Try searching for the show in Sofa first.
+- **No events appearing** — verify the webhook URL is correct in Plex settings and that your Sofa server is reachable from the Plex server.

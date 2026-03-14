@@ -1,0 +1,125 @@
+---
+title: Telemetry
+description: How Sofa collects anonymous usage statistics.
+---
+
+Sofa includes optional, privacy-focused telemetry to help understand how the project is used. Both systems are **opt-in** and can be disabled at any time.
+
+## What We Collect
+
+Sofa has two separate telemetry systems depending on the platform:
+
+| | Server | Mobile App | Web App |
+|---|---|---|---|
+| **System** | Custom reporting | PostHog | None |
+| **Default** | Disabled | Disabled | N/A |
+| **Opt-in** | Admin toggle | User toggle + ATT | N/A |
+
+The web app has **zero analytics** — no tracking scripts, no third-party services.
+
+---
+
+## Server Telemetry
+
+The self-hosted server can send a small, anonymous report once every 24 hours. It is **disabled by default** and must be explicitly enabled by an admin.
+
+### Enabling
+
+Toggle telemetry in **Settings → Admin → Telemetry**.
+
+### What Gets Sent
+
+A single JSON payload is sent to `https://public-api.sofa.watch/v1/telemetry`:
+
+```json
+{
+  "instanceId": "a1b2c3d4-...",
+  "version": "1.2.0",
+  "arch": "linux-arm64",
+  "users": "2-5",
+  "titles": "51-200",
+  "features": {
+    "imageCache": true,
+    "oidc": false,
+    "scheduledBackups": true
+  }
+}
+```
+
+| Field | Description |
+|---|---|
+| `instanceId` | A random UUID generated once per server instance. Not tied to any user or IP. |
+| `version` | The Sofa version running on your server. |
+| `arch` | OS and CPU architecture (e.g. `linux-x64`, `darwin-arm64`). |
+| `users` | User count in a bucketed range: `1`, `2-5`, `6-10`, `11-25`, or `26+`. |
+| `titles` | Tracked title count in a bucketed range: `0`, `1-50`, `51-200`, `201-500`, or `501+`. |
+| `features` | Which optional features are enabled — not how they're used, just whether they're on. |
+
+User and title counts are bucketed into ranges so we can understand general adoption without knowing exact numbers.
+
+### What Is NOT Sent
+
+- No personal data (names, emails, IP addresses)
+- No watch history, ratings, or library contents
+- No API keys or credentials
+- No information about individual users
+- No tracking of feature usage patterns — only whether features are enabled
+
+### How It Works
+
+- Reports are sent at most **once every 24 hours** (cron job at 12:30 AM UTC)
+- The instance ID is generated with `Bun.randomUUIDv7()` on first use and stored locally in your database — it is never tied to your identity
+- If the report fails (network error, timeout), it is silently skipped — telemetry never blocks normal operation
+- The `PUBLIC_API_URL` environment variable controls where reports are sent (default: `https://public-api.sofa.watch`)
+
+---
+
+## Mobile App Analytics
+
+The native iOS and Android app uses [PostHog](https://posthog.com/) for anonymous usage analytics. It is **disabled by default** and requires explicit user consent.
+
+### Consent Flow
+
+On iOS, the app follows Apple's App Tracking Transparency (ATT) framework:
+
+1. On first launch, iOS prompts you to allow or deny tracking
+2. If you allow, analytics is enabled by default (you can still disable it in settings)
+3. If you deny, analytics stays disabled
+
+On Android, analytics starts disabled and can be toggled on in settings.
+
+Regardless of platform, you can change your preference at any time in **Settings → Anonymous Usage Reporting**.
+
+### What Gets Tracked
+
+When analytics is enabled:
+
+- **Screen views** — which screens you navigate to (e.g. "home", "search", "title detail"), without any content identifiers
+- **App lifecycle** — when the app is opened or backgrounded
+- **Errors** — uncaught JavaScript exceptions for crash reporting
+
+### What Is NOT Tracked
+
+- No personal data (name, email, watch history, ratings)
+- No media library contents or search queries
+- No passwords or authentication tokens
+- No user profiles are created in PostHog (`personProfiles: "never"`)
+
+### Identification
+
+When analytics is enabled, the app uses your device's platform advertising ID (IDFA on iOS, AAID on Android) as an anonymous identifier. This is the same ID managed by your device's privacy settings — if you've disabled ad tracking at the OS level, the app won't attempt to use it.
+
+No other identifying information is sent.
+
+### Disabling
+
+Toggle analytics off in **Settings → Anonymous Usage Reporting**. This immediately opts out of PostHog and stops all event collection. Your explicit preference persists even if ATT permissions change later.
+
+---
+
+## Source Code
+
+Both telemetry implementations are fully open source:
+
+- Server telemetry: [`packages/core/src/telemetry.ts`](https://github.com/jakejarvis/sofa/blob/main/packages/core/src/telemetry.ts)
+- Mobile analytics: [`apps/native/src/lib/posthog.ts`](https://github.com/jakejarvis/sofa/blob/main/apps/native/src/lib/posthog.ts)
