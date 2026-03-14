@@ -8,6 +8,10 @@ import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { os } from "../context";
 import { authed } from "../middleware";
+import {
+  browseLookupKey,
+  getBrowsePosterThumbHashes,
+} from "./browse-thumbhashes";
 
 export const discover = os.discover
   .use(authed)
@@ -31,7 +35,7 @@ export const discover = os.discover
       first_air_date?: string;
     };
 
-    const items = ((results.results ?? []) as DiscoverResult[])
+    const baseItems = ((results.results ?? []) as DiscoverResult[])
       .filter((r) => r.poster_path)
       .map((r) => ({
         tmdbId: r.id,
@@ -42,6 +46,11 @@ export const discover = os.discover
         firstAirDate: (r.first_air_date as string | undefined) ?? null,
         voteAverage: r.vote_average ?? null,
       }));
+    const posterThumbHashes = getBrowsePosterThumbHashes(baseItems);
+    const items = baseItems.map((item) => ({
+      ...item,
+      posterThumbHash: posterThumbHashes.get(browseLookupKey(item)) ?? null,
+    }));
 
     const lookups = items.map((r) => ({ tmdbId: r.tmdbId, type: r.type }));
     const [userStatuses, episodeProgress] =

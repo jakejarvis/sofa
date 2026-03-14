@@ -35,6 +35,7 @@ interface PosterCardProps {
   title: string;
   type: "movie" | "tv";
   posterPath: string | null;
+  posterThumbHash?: string | null;
   releaseDate?: string | null;
   voteAverage?: number | null;
   userStatus?: TitleStatus | null;
@@ -55,6 +56,7 @@ export function PosterCard({
   title,
   type,
   posterPath,
+  posterThumbHash,
   releaseDate,
   voteAverage,
   userStatus,
@@ -117,6 +119,7 @@ export function PosterCard({
         {posterPath ? (
           <Image
             source={{ uri: posterPath }}
+            thumbHash={posterThumbHash}
             style={{ width: "100%", height: "100%" }}
             contentFit="cover"
             recyclingKey={`poster-${tmdbId}`}

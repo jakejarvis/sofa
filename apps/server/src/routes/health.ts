@@ -1,6 +1,4 @@
 import { getInstanceId } from "@sofa/core/settings";
-import { db } from "@sofa/db/client";
-import { sql } from "@sofa/db/helpers";
 import { createLogger } from "@sofa/logger";
 import { Hono } from "hono";
 
@@ -10,7 +8,6 @@ const app = new Hono();
 
 app.get("/", (c) => {
   try {
-    db.run(sql`SELECT 1`);
     return c.json({ status: "healthy", instanceId: getInstanceId() }, 200);
   } catch (err) {
     log.error("Health check failed:", err);

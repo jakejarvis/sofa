@@ -177,6 +177,7 @@ export interface ContinueWatchingItem {
     title: string;
     posterPath: string | null;
     backdropPath: string | null;
+    backdropThumbHash: string | null;
     type: string;
   };
   nextEpisode: {
@@ -185,6 +186,7 @@ export interface ContinueWatchingItem {
     episodeNumber: number;
     name: string | null;
     stillPath: string | null;
+    stillThumbHash: string | null;
     overview: string | null;
   } | null;
   lastWatchedAt: Date | null;
@@ -322,6 +324,7 @@ export function getContinueWatchingFeed(
             episodeNumber: ep.episodeNumber,
             name: ep.name,
             stillPath: ep.stillPath,
+            stillThumbHash: ep.stillThumbHash,
             overview: ep.overview,
           };
         }
@@ -335,6 +338,7 @@ export function getContinueWatchingFeed(
           title: title.title,
           posterPath: title.posterPath,
           backdropPath: title.backdropPath,
+          backdropThumbHash: title.backdropThumbHash,
           type: title.type,
         },
         nextEpisode,
@@ -366,6 +370,7 @@ export function getNewAvailableFeed(userId: string, days = 14) {
       type: titles.type,
       tmdbId: titles.tmdbId,
       posterPath: titles.posterPath,
+      posterThumbHash: titles.posterThumbHash,
       releaseDate: titles.releaseDate,
       firstAirDate: titles.firstAirDate,
       voteAverage: titles.voteAverage,
@@ -524,6 +529,7 @@ export function getRecommendationsForTitle(titleId: string) {
         type: r.type as "movie" | "tv",
         title: r.title,
         posterPath: tmdbImageUrl(r.posterPath, "posters"),
+        posterThumbHash: r.posterThumbHash,
         releaseDate: r.releaseDate,
         firstAirDate: r.firstAirDate,
         voteAverage: r.voteAverage,

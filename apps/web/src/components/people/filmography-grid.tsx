@@ -129,6 +129,7 @@ export function FilmographyGrid({
               type={credit.type}
               title={credit.title}
               posterPath={credit.posterPath}
+              posterThumbHash={credit.posterThumbHash}
               releaseDate={credit.releaseDate ?? credit.firstAirDate}
               voteAverage={credit.voteAverage}
               userStatus={userStatuses?.[credit.titleId]}

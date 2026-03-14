@@ -10,6 +10,7 @@ bun run lint             # Biome lint check
 bun run format           # Biome format (auto-fix)
 bun run check-types      # TypeScript type check
 bun run test             # Run tests
+bun run generate:openapi # Regenerate OpenAPI spec + docs API pages (run after contract/schema changes)
 
 # Database commands (run from packages/db/)
 cd packages/db && bun run db:push       # Push schema changes to SQLite database
@@ -38,8 +39,10 @@ bun run test
 couch-potato/
 ├── apps/
 │   ├── native/        # @sofa/native — Expo 55 React Native app (Expo Router, UniWind)
+│   ├── public-api/    # @sofa/public-api — Hono microservice on Vercel (version check, telemetry)
 │   ├── server/        # @sofa/server — Hono API server (oRPC, auth, cron, webhooks)
 │   └── web/           # @sofa/web — Vite SPA (TanStack Router, TanStack Query)
+├── docs/              # sofa-docs — Fumadocs (Next.js) documentation site + OpenAPI reference
 ├── packages/
 │   ├── api/           # @sofa/api — oRPC contract + Zod schemas (shared, JIT)
 │   ├── auth/          # @sofa/auth — Better Auth server config (JIT)
@@ -61,6 +64,8 @@ All shared packages are JIT (raw TypeScript exports, no build step).
 - **`@sofa/server`** — Hono API server. Hosts oRPC procedures, Better Auth, webhook/image/backup routes, and cron jobs. Runs DB migrations on startup. Dev: port 3001. Prod: serves SPA static files too, port 3000.
 - **`@sofa/web`** — Vite SPA with TanStack Router (file-based routing). No SSR, no DB. All data via oRPC. Vite dev server proxies `/api/*` and `/rpc/*` to the API server.
 - **`@sofa/native`** — Expo Router app with 4-tab layout (Home, Explore, Search, Settings). UniWind for styling, `@better-auth/expo` with SecureStore for auth, oRPC client for API calls. Dark-only cinema theme matching web.
+- **`@sofa/public-api`** — Minimal Hono microservice deployed on Vercel. Two endpoints: `GET /v1/version` (latest release from GitHub) and `POST /v1/telemetry` (forwards instance stats to PostHog). Dev: port 3002.
+- **`sofa-docs`** — Fumadocs site (Next.js) with landing page, Markdown docs, and auto-generated OpenAPI API reference. Content lives in `docs/content/docs/`. API docs are generated from `docs/openapi.json` via `fumadocs-openapi`.
 
 ### Stack
 
@@ -70,6 +75,7 @@ All shared packages are JIT (raw TypeScript exports, no build step).
 - **Database**: SQLite via `bun:sqlite` + Drizzle ORM (WAL mode, sync queries, auto-migrations)
 - **Auth**: Better Auth with Drizzle adapter — email/password + optional OIDC/SSO
 - **Monorepo**: Turborepo with Bun workspaces
+- **Docs**: Fumadocs (Next.js), fumadocs-openapi for API reference
 - **Linting**: Biome (2-space indent, organized imports)
 - **External API**: TMDB (The Movie Database)
 

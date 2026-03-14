@@ -9,10 +9,11 @@ import {
   IconRefresh,
   IconStarFilled,
 } from "@tabler/icons-react";
-
 import type { ReactNode } from "react";
+
 import { ExpandableText } from "@/components/expandable-text";
 import { TmdbLogo } from "@/components/tmdb-logo";
+import { thumbHashToUrl } from "@/lib/thumbhash";
 import { GenreCollapse } from "./genre-collapse";
 import { TrailerDialog } from "./trailer-dialog";
 
@@ -35,7 +36,17 @@ export function TitleHero({
     <>
       {/* Backdrop hero */}
       {title.backdropPath && (
-        <div className="relative -mt-6 mr-[calc(-50vw+50%)] ml-[calc(-50vw+50%)] h-80 overflow-hidden md:h-[28rem]">
+        <div
+          className="relative -mt-6 mr-[calc(-50vw+50%)] ml-[calc(-50vw+50%)] h-80 overflow-hidden md:h-[28rem]"
+          style={
+            title.backdropThumbHash
+              ? {
+                  backgroundImage: `url(${thumbHashToUrl(title.backdropThumbHash)})`,
+                  backgroundSize: "cover",
+                }
+              : undefined
+          }
+        >
           <img
             src={title.backdropPath}
             alt=""
@@ -92,6 +103,12 @@ export function TitleHero({
                 boxShadow: palette?.darkVibrant
                   ? `0 25px 60px -12px ${palette.darkVibrant}50, 0 12px 28px -8px rgba(0,0,0,0.5)`
                   : "0 25px 50px -12px rgba(0,0,0,0.5)",
+                ...(title.posterThumbHash
+                  ? {
+                      backgroundImage: `url(${thumbHashToUrl(title.posterThumbHash)})`,
+                      backgroundSize: "cover",
+                    }
+                  : {}),
               }}
             >
               <img

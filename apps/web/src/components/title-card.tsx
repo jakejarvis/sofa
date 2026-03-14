@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useTiltEffect } from "@/hooks/use-tilt-effect";
 import { orpc } from "@/lib/orpc/client";
+import { thumbHashToUrl } from "@/lib/thumbhash";
 
 export function TitleCardSkeleton() {
   return (
@@ -47,6 +48,7 @@ interface CardInnerProps {
   title: string;
   type: string;
   posterPath: string | null;
+  posterThumbHash?: string | null;
   releaseDate?: string | null;
   voteAverage?: number | null;
   userStatus?: TitleStatus | null;
@@ -169,6 +171,7 @@ function CardInner({
   title,
   type,
   posterPath,
+  posterThumbHash,
   releaseDate,
   voteAverage,
   userStatus,
@@ -177,6 +180,7 @@ function CardInner({
 }: CardInnerProps) {
   const year = releaseDate?.slice(0, 4);
   const TypeIcon = type === "movie" ? IconMovie : IconDeviceTv;
+  const placeholderUrl = thumbHashToUrl(posterThumbHash);
 
   const ringClass = userStatus
     ? "ring-primary/25 shadow-sm shadow-primary/5"
@@ -186,7 +190,17 @@ function CardInner({
     <div
       className={`relative overflow-hidden rounded-xl bg-card ring-1 transition-[box-shadow,ring-color] duration-200 ease-out hover:shadow-lg hover:shadow-primary/5 hover:ring-primary/25 ${ringClass}`}
     >
-      <div className="aspect-[2/3] overflow-hidden bg-card">
+      <div
+        className="aspect-[2/3] overflow-hidden bg-card"
+        style={
+          placeholderUrl
+            ? {
+                backgroundImage: `url(${placeholderUrl})`,
+                backgroundSize: "cover",
+              }
+            : undefined
+        }
+      >
         {posterPath ? (
           <motion.div style={tiltStyles?.imageStyle}>
             <img
@@ -282,6 +296,7 @@ export function TitleCard({
   type,
   title,
   posterPath,
+  posterThumbHash,
   releaseDate,
   voteAverage,
   userStatus,
@@ -310,6 +325,7 @@ export function TitleCard({
         title={title}
         type={type}
         posterPath={posterPath}
+        posterThumbHash={posterThumbHash}
         releaseDate={releaseDate}
         voteAverage={voteAverage}
         userStatus={userStatus}

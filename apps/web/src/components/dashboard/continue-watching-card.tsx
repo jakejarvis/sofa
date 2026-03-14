@@ -1,18 +1,21 @@
 import { IconPlayerPlay } from "@tabler/icons-react";
 
 import { Link } from "@tanstack/react-router";
+import { thumbHashToUrl } from "@/lib/thumbhash";
 
 export interface ContinueWatchingItemProps {
   title: {
     id: string;
     title: string;
     backdropPath: string | null;
+    backdropThumbHash?: string | null;
   };
   nextEpisode: {
     seasonNumber: number;
     episodeNumber: number;
     name: string | null;
     stillPath: string | null;
+    stillThumbHash?: string | null;
   } | null;
   totalEpisodes: number;
   watchedEpisodes: number;
@@ -36,7 +39,17 @@ export function ContinueWatchingCard({
       params={{ id: item.title.id }}
       className="group relative inline-block w-64 shrink-0 overflow-hidden rounded-xl bg-card/50 ring-1 ring-white/[0.06] transition-shadow hover:shadow-black/25 hover:shadow-lg sm:w-72"
     >
-      <div className="relative aspect-video overflow-hidden rounded-t-xl bg-muted">
+      <div
+        className="relative aspect-video overflow-hidden rounded-t-xl bg-muted"
+        style={(() => {
+          const hash =
+            item.nextEpisode?.stillThumbHash ?? item.title.backdropThumbHash;
+          const url = thumbHashToUrl(hash);
+          return url
+            ? { backgroundImage: `url(${url})`, backgroundSize: "cover" }
+            : undefined;
+        })()}
+      >
         {stillUrl ? (
           <img
             src={stillUrl}

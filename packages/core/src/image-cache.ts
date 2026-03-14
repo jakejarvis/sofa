@@ -12,26 +12,22 @@ import {
   titles,
 } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
-import type { ImageCategory } from "@sofa/tmdb/image";
+import {
+  IMAGE_CATEGORY_SIZES,
+  type ImageCategory,
+  tmdbCdnImageUrl,
+} from "@sofa/tmdb/image";
 
 const log = createLogger("image-cache");
 
 export type { ImageCategory };
-
-const CATEGORY_SIZES: Record<ImageCategory, string> = {
-  posters: "w500",
-  backdrops: "w1280",
-  stills: "w1280",
-  logos: "w92",
-  profiles: "w185",
-};
 
 export function imageCacheEnabled(): boolean {
   return process.env.IMAGE_CACHE_ENABLED !== "false";
 }
 
 export async function ensureImageDirs() {
-  for (const category of Object.keys(CATEGORY_SIZES)) {
+  for (const category of Object.keys(IMAGE_CATEGORY_SIZES) as ImageCategory[]) {
     await mkdir(path.join(CACHE_DIR, category), { recursive: true });
   }
 }
@@ -60,20 +56,33 @@ export async function readCachedImage(
   return Buffer.from(await file.arrayBuffer());
 }
 
+async function fetchRemoteImage(
+  tmdbPath: string,
+  category: ImageCategory,
+): Promise<{ buffer: Buffer; contentType: string } | null> {
+  const url =
+    tmdbCdnImageUrl(tmdbPath, category) ?? `${TMDB_IMAGE_BASE_URL}${tmdbPath}`;
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    log.warn(`Fetch failed: ${url} -> ${res.status}`);
+    return null;
+  }
+
+  return {
+    buffer: Buffer.from(await res.arrayBuffer()),
+    contentType: res.headers.get("content-type") || "image/jpeg",
+  };
+}
+
 export async function downloadAndCacheImage(
   tmdbPath: string,
   category: ImageCategory,
 ): Promise<Buffer | null> {
-  const size = CATEGORY_SIZES[category];
-  const url = `${TMDB_IMAGE_BASE_URL}/${size}${tmdbPath}`;
+  const remote = await fetchRemoteImage(tmdbPath, category);
+  if (!remote) return null;
 
-  const res = await fetch(url);
-  if (!res.ok) {
-    log.warn(`Download failed: ${url} -> ${res.status}`);
-    return null;
-  }
-
-  const buffer = Buffer.from(await res.arrayBuffer());
+  const { buffer } = remote;
   const filename = path.basename(tmdbPath);
   const finalPath = getLocalImagePath(category, filename);
   const tmpPath = `${finalPath}.tmp.${Date.now()}`;
@@ -109,16 +118,10 @@ export async function fetchAndMaybeCache(
   }
 
   // Fetch from TMDB
-  const size = CATEGORY_SIZES[category];
-  const url = `${TMDB_IMAGE_BASE_URL}/${size}${tmdbPath}`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    log.warn(`Fetch failed: ${url} -> ${res.status}`);
-    return null;
-  }
+  const remote = await fetchRemoteImage(tmdbPath, category);
+  if (!remote) return null;
 
-  const buffer = Buffer.from(await res.arrayBuffer());
-  const contentType = res.headers.get("content-type") || "image/jpeg";
+  const { buffer, contentType } = remote;
 
   // Fire-and-forget save to disk
   const finalPath = getLocalImagePath(category, filename);
@@ -128,6 +131,22 @@ export async function fetchAndMaybeCache(
     .catch((err) => log.warn(`Failed to cache ${category}/${filename}:`, err));
 
   return { buffer, contentType };
+}
+
+export async function loadImageBuffer(
+  tmdbPath: string,
+  category: ImageCategory,
+): Promise<Buffer | null> {
+  const filename = path.basename(tmdbPath);
+
+  if (imageCacheEnabled()) {
+    const cached = await readCachedImage(category, filename);
+    if (cached) return cached;
+    return downloadAndCacheImage(tmdbPath, category);
+  }
+
+  const remote = await fetchRemoteImage(tmdbPath, category);
+  return remote?.buffer ?? null;
 }
 
 export async function cacheImagesForTitle(titleId: string) {

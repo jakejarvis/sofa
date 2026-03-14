@@ -91,6 +91,7 @@ export default function PersonDetailScreen() {
           title={credit.title}
           type={credit.type}
           posterPath={credit.posterPath}
+          posterThumbHash={credit.posterThumbHash}
           releaseDate={credit.releaseDate ?? credit.firstAirDate}
           voteAverage={credit.voteAverage}
           userStatus={data?.userStatuses?.[credit.titleId] ?? null}
@@ -189,6 +190,7 @@ export default function PersonDetailScreen() {
           {person.profilePath && (
             <Image
               source={{ uri: person.profilePath }}
+              thumbHash={person.profileThumbHash}
               style={{ width: "100%", height: "100%" }}
               contentFit="cover"
             />

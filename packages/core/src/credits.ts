@@ -6,6 +6,7 @@ import { createLogger } from "@sofa/logger";
 import { getMovieCredits, getTvAggregateCredits } from "@sofa/tmdb/client";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { cacheProfilePhotos, imageCacheEnabled } from "./image-cache";
+import { generatePersonThumbHash } from "./thumbhash";
 
 const log = createLogger("credits");
 
@@ -37,47 +38,105 @@ function batchUpsertPersons(people: PersonData[]): Map<number, string> {
 
   // Batch prefetch existing persons (1 query)
   const existing = db
-    .select({ id: persons.id, tmdbId: persons.tmdbId })
+    .select({
+      id: persons.id,
+      tmdbId: persons.tmdbId,
+      name: persons.name,
+      profilePath: persons.profilePath,
+      profileThumbHash: persons.profileThumbHash,
+      popularity: persons.popularity,
+    })
     .from(persons)
     .where(inArray(persons.tmdbId, tmdbIds))
     .all();
+  const existingMap = new Map(existing.map((p) => [p.tmdbId, p]));
   const idMap = new Map<number, string>(existing.map((p) => [p.tmdbId, p.id]));
 
-  // Insert only new persons in a transaction
-  const newPeople = uniquePeople.filter((p) => !idMap.has(p.tmdbId));
-  if (newPeople.length > 0) {
-    db.transaction((tx) => {
-      for (const p of newPeople) {
-        const row = tx
-          .insert(persons)
-          .values({
-            tmdbId: p.tmdbId,
+  db.transaction((tx) => {
+    for (const p of uniquePeople) {
+      const existingPerson = existingMap.get(p.tmdbId);
+      if (existingPerson) {
+        const nextPopularity = p.popularity ?? null;
+        const pathChanged = existingPerson.profilePath !== p.profilePath;
+        const needsUpdate =
+          existingPerson.name !== p.name ||
+          pathChanged ||
+          existingPerson.popularity !== nextPopularity;
+        if (!needsUpdate) continue;
+
+        tx.update(persons)
+          .set({
             name: p.name,
             profilePath: p.profilePath,
-            popularity: p.popularity ?? null,
+            popularity: nextPopularity,
+            profileThumbHash: pathChanged
+              ? null
+              : existingPerson.profileThumbHash,
           })
-          .onConflictDoNothing()
-          .returning()
-          .get();
-        if (row) idMap.set(p.tmdbId, row.id);
+          .where(eq(persons.id, existingPerson.id))
+          .run();
+        continue;
       }
-    });
 
-    // One fallback query for any that conflicted
-    const stillMissing = newPeople
-      .filter((p) => !idMap.has(p.tmdbId))
-      .map((p) => p.tmdbId);
-    if (stillMissing.length > 0) {
-      const fallbacks = db
-        .select({ id: persons.id, tmdbId: persons.tmdbId })
-        .from(persons)
-        .where(inArray(persons.tmdbId, stillMissing))
-        .all();
-      for (const f of fallbacks) idMap.set(f.tmdbId, f.id);
+      const row = tx
+        .insert(persons)
+        .values({
+          tmdbId: p.tmdbId,
+          name: p.name,
+          profilePath: p.profilePath,
+          popularity: p.popularity ?? null,
+        })
+        .onConflictDoNothing()
+        .returning()
+        .get();
+      if (row) idMap.set(p.tmdbId, row.id);
     }
+  });
+
+  // One fallback query for any concurrent inserts that conflicted
+  const stillMissing = uniquePeople
+    .filter((p) => !idMap.has(p.tmdbId))
+    .map((p) => p.tmdbId);
+  if (stillMissing.length > 0) {
+    const fallbacks = db
+      .select({ id: persons.id, tmdbId: persons.tmdbId })
+      .from(persons)
+      .where(inArray(persons.tmdbId, stillMissing))
+      .all();
+    for (const f of fallbacks) idMap.set(f.tmdbId, f.id);
   }
 
   return idMap;
+}
+
+export async function syncCastProfileThumbHashes(
+  titleId: string,
+  personIds?: string[],
+  options?: { warmCache?: boolean },
+) {
+  if (options?.warmCache !== false && imageCacheEnabled()) {
+    await cacheProfilePhotos(titleId);
+  }
+
+  const personRows = db
+    .select({
+      id: persons.id,
+      profilePath: persons.profilePath,
+      profileThumbHash: persons.profileThumbHash,
+    })
+    .from(titleCast)
+    .innerJoin(persons, eq(titleCast.personId, persons.id))
+    .where(eq(titleCast.titleId, titleId))
+    .all();
+
+  const allowedIds = personIds ? new Set(personIds) : null;
+  const uniqueRows = new Map(personRows.map((p) => [p.id, p]));
+  await Promise.all(
+    [...uniqueRows.values()]
+      .filter((p) => (!allowedIds || allowedIds.has(p.id)) && p.profilePath)
+      .filter((p) => !p.profileThumbHash)
+      .map((p) => generatePersonThumbHash(p.id, p.profilePath)),
+  );
 }
 
 export async function refreshCredits(titleId: string) {
@@ -276,11 +335,9 @@ export async function refreshCredits(titleId: string) {
 
     log.debug(`Credits refreshed for "${title.title}"`);
 
-    if (imageCacheEnabled()) {
-      cacheProfilePhotos(titleId).catch((err) =>
-        log.debug("Profile photo caching failed:", err),
-      );
-    }
+    (async () => {
+      await syncCastProfileThumbHashes(titleId, [...personIds.values()]);
+    })().catch((err) => log.debug("Profile cache/thumbhash failed:", err));
   } catch (err) {
     log.error(`Failed to refresh credits for title ${titleId}:`, err);
   }
@@ -298,6 +355,7 @@ export function getCastForTitle(titleId: string): CastMember[] {
       displayOrder: titleCast.displayOrder,
       episodeCount: titleCast.episodeCount,
       profilePath: persons.profilePath,
+      profileThumbHash: persons.profileThumbHash,
       tmdbId: persons.tmdbId,
     })
     .from(titleCast)

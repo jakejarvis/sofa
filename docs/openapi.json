@@ -163,7 +163,27 @@
                             }
                           ]
                         },
+                        "posterThumbHash": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
                         "backdropPath": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "backdropThumbHash": {
                           "anyOf": [
                             {
                               "type": "string"
@@ -330,7 +350,9 @@
                         "releaseDate",
                         "firstAirDate",
                         "posterPath",
+                        "posterThumbHash",
                         "backdropPath",
+                        "backdropThumbHash",
                         "popularity",
                         "voteAverage",
                         "voteCount",
@@ -403,6 +425,16 @@
                                     }
                                   ]
                                 },
+                                "stillThumbHash": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
                                 "airDate": {
                                   "anyOf": [
                                     {
@@ -430,6 +462,7 @@
                                 "name",
                                 "overview",
                                 "stillPath",
+                                "stillThumbHash",
                                 "airDate",
                                 "runtimeMinutes"
                               ]
@@ -551,6 +584,16 @@
                               }
                             ]
                           },
+                          "profileThumbHash": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "tmdbId": {
                             "type": "number"
                           }
@@ -565,6 +608,7 @@
                           "displayOrder",
                           "episodeCount",
                           "profilePath",
+                          "profileThumbHash",
                           "tmdbId"
                         ]
                       }
@@ -986,6 +1030,16 @@
                               }
                             ]
                           },
+                          "posterThumbHash": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "releaseDate": {
                             "anyOf": [
                               {
@@ -1023,6 +1077,7 @@
                           "type",
                           "title",
                           "posterPath",
+                          "posterThumbHash",
                           "releaseDate",
                           "firstAirDate",
                           "voteAverage"
@@ -1161,6 +1216,16 @@
                                     }
                                   ]
                                 },
+                                "stillThumbHash": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
                                 "airDate": {
                                   "anyOf": [
                                     {
@@ -1188,6 +1253,7 @@
                                 "name",
                                 "overview",
                                 "stillPath",
+                                "stillThumbHash",
                                 "airDate",
                                 "runtimeMinutes"
                               ]
@@ -1608,6 +1674,16 @@
                             }
                           ]
                         },
+                        "profileThumbHash": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
                         "knownForDepartment": {
                           "anyOf": [
                             {
@@ -1638,6 +1714,7 @@
                         "deathday",
                         "placeOfBirth",
                         "profilePath",
+                        "profileThumbHash",
                         "knownForDepartment",
                         "imdbId"
                       ]
@@ -1663,6 +1740,16 @@
                             "type": "string"
                           },
                           "posterPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "posterThumbHash": {
                             "anyOf": [
                               {
                                 "type": "string"
@@ -1732,6 +1819,7 @@
                           "type",
                           "title",
                           "posterPath",
+                          "posterThumbHash",
                           "releaseDate",
                           "firstAirDate",
                           "voteAverage",
@@ -1892,12 +1980,23 @@
                                     "type": "null"
                                   }
                                 ]
+                              },
+                              "backdropThumbHash": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
                               }
                             },
                             "required": [
                               "id",
                               "title",
-                              "backdropPath"
+                              "backdropPath",
+                              "backdropThumbHash"
                             ]
                           },
                           "nextEpisode": {
@@ -1930,13 +2029,24 @@
                                         "type": "null"
                                       }
                                     ]
+                                  },
+                                  "stillThumbHash": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
                                   }
                                 },
                                 "required": [
                                   "seasonNumber",
                                   "episodeNumber",
                                   "name",
-                                  "stillPath"
+                                  "stillPath",
+                                  "stillThumbHash"
                                 ]
                               },
                               {
@@ -2014,6 +2124,16 @@
                               }
                             ]
                           },
+                          "posterThumbHash": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "releaseDate": {
                             "anyOf": [
                               {
@@ -2065,6 +2185,7 @@
                           "type",
                           "title",
                           "posterPath",
+                          "posterThumbHash",
                           "releaseDate",
                           "firstAirDate",
                           "voteAverage",
@@ -2127,6 +2248,16 @@
                               }
                             ]
                           },
+                          "posterThumbHash": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "releaseDate": {
                             "anyOf": [
                               {
@@ -2164,6 +2295,7 @@
                           "type",
                           "title",
                           "posterPath",
+                          "posterThumbHash",
                           "releaseDate",
                           "firstAirDate",
                           "voteAverage"

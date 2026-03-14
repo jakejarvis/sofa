@@ -50,6 +50,7 @@ export function TitleRecommendations({ titleId }: { titleId: string }) {
               type={rec.type}
               title={rec.title}
               posterPath={rec.posterPath}
+              posterThumbHash={rec.posterThumbHash}
               releaseDate={rec.releaseDate ?? rec.firstAirDate}
               voteAverage={rec.voteAverage}
               userStatus={data.userStatuses[rec.id]}

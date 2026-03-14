@@ -6,7 +6,7 @@ import type {
   Season,
 } from "@sofa/api/schemas";
 import { db } from "@sofa/db/client";
-import { eq, inArray, sql } from "@sofa/db/helpers";
+import { and, eq, inArray, isNotNull, sql } from "@sofa/db/helpers";
 import {
   availabilityOffers,
   episodes,
@@ -39,8 +39,15 @@ import {
   cacheEpisodeStills,
   cacheImagesForTitle,
   imageCacheEnabled,
+  loadImageBuffer,
 } from "./image-cache";
 import { generateProviderUrl } from "./providers";
+import {
+  generateEpisodeThumbHash,
+  generateSeasonThumbHash,
+  generateTitleBackdropThumbHash,
+  generateTitlePosterThumbHash,
+} from "./thumbhash";
 
 const log = createLogger("metadata");
 
@@ -84,6 +91,47 @@ function upsertGenres(titleId: string, tmdbGenres: TmdbGenre[]) {
         .run();
     }
   });
+}
+
+export function updateTitleWithArtInvalidation(
+  title: Pick<
+    typeof titles.$inferSelect,
+    | "id"
+    | "posterPath"
+    | "backdropPath"
+    | "posterThumbHash"
+    | "backdropThumbHash"
+    | "colorPalette"
+  >,
+  values: Partial<typeof titles.$inferInsert>,
+) {
+  const nextPosterPath = Object.hasOwn(values, "posterPath")
+    ? (values.posterPath ?? null)
+    : title.posterPath;
+  const nextBackdropPath = Object.hasOwn(values, "backdropPath")
+    ? (values.backdropPath ?? null)
+    : title.backdropPath;
+
+  const posterPathChanged = nextPosterPath !== title.posterPath;
+  const backdropPathChanged = nextBackdropPath !== title.backdropPath;
+
+  db.update(titles)
+    .set({
+      ...values,
+      ...(posterPathChanged
+        ? {
+            posterThumbHash: null,
+            colorPalette: null,
+          }
+        : {}),
+      ...(backdropPathChanged
+        ? {
+            backdropThumbHash: null,
+          }
+        : {}),
+    })
+    .where(eq(titles.id, title.id))
+    .run();
 }
 
 /** @internal */
@@ -148,18 +196,15 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
       if (!hasSeason) {
         const show = await getTvDetails(tmdbId);
         if (!existing.lastFetchedAt) {
-          db.update(titles)
-            .set({
-              overview: show.overview,
-              posterPath: show.poster_path,
-              backdropPath: show.backdrop_path,
-              status: show.status,
-              contentRating: extractTvContentRating(show),
-              tvdbId: show.external_ids?.tvdb_id ?? null,
-              lastFetchedAt: new Date(),
-            })
-            .where(eq(titles.id, existing.id))
-            .run();
+          updateTitleWithArtInvalidation(existing, {
+            overview: show.overview,
+            posterPath: show.poster_path,
+            backdropPath: show.backdrop_path,
+            status: show.status,
+            contentRating: extractTvContentRating(show),
+            tvdbId: show.external_ids?.tvdb_id ?? null,
+            lastFetchedAt: new Date(),
+          });
         }
         upsertGenres(existing.id, show.genres ?? []);
         await refreshTvChildren(existing.id, tmdbId, show.number_of_seasons);
@@ -169,23 +214,18 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
         refreshRecommendations(existing.id).catch((err) =>
           log.debug("Recommendations enrichment failed:", err),
         );
-        extractAndStoreColors(existing.id, show.poster_path ?? null).catch(
-          (err) => log.debug("Color extraction failed:", err),
-        );
+        syncTitleArt(
+          existing.id,
+          show.poster_path,
+          show.backdrop_path,
+          "tv",
+        ).catch((err) => log.debug("Cache/thumbhash failed:", err));
         refreshCredits(existing.id).catch((err) =>
           log.debug("Credits enrichment failed:", err),
         );
         refreshTrailer(existing.id).catch((err) =>
           log.debug("Trailer enrichment failed:", err),
         );
-        if (imageCacheEnabled()) {
-          cacheImagesForTitle(existing.id).catch((err) =>
-            log.debug("Image caching failed:", err),
-          );
-          cacheEpisodeStills(existing.id).catch((err) =>
-            log.debug("Episode stills caching failed:", err),
-          );
-        }
         return db.select().from(titles).where(eq(titles.id, existing.id)).get();
       }
     }
@@ -223,8 +263,8 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
     refreshRecommendations(row.id).catch((err) =>
       log.debug("Recommendations enrichment failed:", err),
     );
-    extractAndStoreColors(row.id, movie.poster_path ?? null).catch((err) =>
-      log.debug("Color extraction failed:", err),
+    syncTitleArt(row.id, movie.poster_path, movie.backdrop_path, "movie").catch(
+      (err) => log.debug("Cache/thumbhash failed:", err),
     );
     refreshCredits(row.id).catch((err) =>
       log.debug("Credits enrichment failed:", err),
@@ -232,11 +272,6 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
     refreshTrailer(row.id).catch((err) =>
       log.debug("Trailer enrichment failed:", err),
     );
-    if (imageCacheEnabled()) {
-      cacheImagesForTitle(row.id).catch((err) =>
-        log.debug("Image caching failed:", err),
-      );
-    }
     log.info(`Imported movie "${movie.title}" (TMDB ${tmdbId})`);
     return row;
   }
@@ -272,8 +307,8 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
   refreshRecommendations(row.id).catch((err) =>
     log.debug("Recommendations enrichment failed:", err),
   );
-  extractAndStoreColors(row.id, show.poster_path ?? null).catch((err) =>
-    log.debug("Color extraction failed:", err),
+  syncTitleArt(row.id, show.poster_path, show.backdrop_path, "tv").catch(
+    (err) => log.debug("Cache/thumbhash failed:", err),
   );
   refreshCredits(row.id).catch((err) =>
     log.debug("Credits enrichment failed:", err),
@@ -281,14 +316,6 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
   refreshTrailer(row.id).catch((err) =>
     log.debug("Trailer enrichment failed:", err),
   );
-  if (imageCacheEnabled()) {
-    cacheImagesForTitle(row.id).catch((err) =>
-      log.debug("Image caching failed:", err),
-    );
-    cacheEpisodeStills(row.id).catch((err) =>
-      log.debug("Episode stills caching failed:", err),
-    );
-  }
   log.info(`Imported TV show "${show.name}" (TMDB ${tmdbId})`);
   return row;
 }
@@ -301,69 +328,56 @@ export async function refreshTitle(titleId: string) {
 
   if (title.type === "movie") {
     const movie = await getMovieDetails(title.tmdbId);
-    db.update(titles)
-      .set({
-        title: movie.title,
-        originalTitle: movie.original_title,
-        overview: movie.overview,
-        releaseDate: movie.release_date || null,
-        posterPath: movie.poster_path,
-        backdropPath: movie.backdrop_path,
-        popularity: movie.popularity,
-        voteAverage: movie.vote_average,
-        voteCount: movie.vote_count,
-        status: movie.status,
-        contentRating: extractMovieContentRating(movie),
-        lastFetchedAt: now,
-      })
-      .where(eq(titles.id, titleId))
-      .run();
+    updateTitleWithArtInvalidation(title, {
+      title: movie.title,
+      originalTitle: movie.original_title,
+      overview: movie.overview,
+      releaseDate: movie.release_date || null,
+      posterPath: movie.poster_path,
+      backdropPath: movie.backdrop_path,
+      popularity: movie.popularity,
+      voteAverage: movie.vote_average,
+      voteCount: movie.vote_count,
+      status: movie.status,
+      contentRating: extractMovieContentRating(movie),
+      lastFetchedAt: now,
+    });
     upsertGenres(titleId, movie.genres ?? []);
   } else {
     const show = await getTvDetails(title.tmdbId);
-    db.update(titles)
-      .set({
-        title: show.name,
-        originalTitle: show.original_name,
-        overview: show.overview,
-        firstAirDate: show.first_air_date || null,
-        posterPath: show.poster_path,
-        backdropPath: show.backdrop_path,
-        popularity: show.popularity,
-        voteAverage: show.vote_average,
-        voteCount: show.vote_count,
-        status: show.status,
-        contentRating: extractTvContentRating(show),
-        tvdbId: show.external_ids?.tvdb_id ?? null,
-        lastFetchedAt: now,
-      })
-      .where(eq(titles.id, titleId))
-      .run();
+    updateTitleWithArtInvalidation(title, {
+      title: show.name,
+      originalTitle: show.original_name,
+      overview: show.overview,
+      firstAirDate: show.first_air_date || null,
+      posterPath: show.poster_path,
+      backdropPath: show.backdrop_path,
+      popularity: show.popularity,
+      voteAverage: show.vote_average,
+      voteCount: show.vote_count,
+      status: show.status,
+      contentRating: extractTvContentRating(show),
+      tvdbId: show.external_ids?.tvdb_id ?? null,
+      lastFetchedAt: now,
+    });
     upsertGenres(titleId, show.genres ?? []);
     await refreshTvChildren(titleId, title.tmdbId, show.number_of_seasons);
   }
 
   const updated = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (updated) {
-    extractAndStoreColors(updated.id, updated.posterPath).catch((err) =>
-      log.debug("Color extraction failed:", err),
-    );
+    syncTitleArt(
+      updated.id,
+      updated.posterPath,
+      updated.backdropPath,
+      updated.type as "movie" | "tv",
+    ).catch((err) => log.debug("Cache/thumbhash failed:", err));
     refreshTrailer(updated.id).catch((err) =>
       log.debug("Trailer enrichment failed:", err),
     );
     refreshCredits(updated.id).catch((err) =>
       log.debug("Credits enrichment failed:", err),
     );
-    if (imageCacheEnabled()) {
-      cacheImagesForTitle(updated.id).catch((err) =>
-        log.debug("Image caching failed:", err),
-      );
-      if (updated.type === "tv") {
-        cacheEpisodeStills(updated.id).catch((err) =>
-          log.debug("Episode stills caching failed:", err),
-        );
-      }
-    }
   }
   return updated;
 }
@@ -381,6 +395,14 @@ export async function refreshTvChildren(
 
     try {
       const seasonData = await getTvSeasonDetails(tmdbId, sn);
+      const existingSeason = db
+        .select({
+          id: seasons.id,
+          posterPath: seasons.posterPath,
+        })
+        .from(seasons)
+        .where(and(eq(seasons.titleId, titleId), eq(seasons.seasonNumber, sn)))
+        .get();
 
       const seasonRow = db
         .insert(seasons)
@@ -405,6 +427,19 @@ export async function refreshTvChildren(
         })
         .returning()
         .get();
+
+      // Snapshot existing episode still paths before upsert so we can detect changes
+      const oldEpStills = new Map(
+        db
+          .select({
+            episodeNumber: episodes.episodeNumber,
+            stillPath: episodes.stillPath,
+          })
+          .from(episodes)
+          .where(eq(episodes.seasonId, existingSeason?.id ?? seasonRow.id))
+          .all()
+          .map((e) => [e.episodeNumber, e.stillPath] as const),
+      );
 
       // Batch all episode upserts in a single transaction per season
       const eps = seasonData.episodes ?? [];
@@ -434,6 +469,38 @@ export async function refreshTvChildren(
               .run();
           }
         });
+      }
+
+      // Clear stale hashes when image paths change during the upsert.
+      // Full hash (re)generation is handled by syncTitleArt() after
+      // cache warming, so we only need to null out stale values here.
+      if (
+        (existingSeason?.posterPath ?? null) !==
+        (seasonData.poster_path ?? null)
+      ) {
+        db.update(seasons)
+          .set({ posterThumbHash: null })
+          .where(eq(seasons.id, seasonRow.id))
+          .run();
+      }
+      const seasonEps = db
+        .select({
+          id: episodes.id,
+          episodeNumber: episodes.episodeNumber,
+          stillPath: episodes.stillPath,
+          stillThumbHash: episodes.stillThumbHash,
+        })
+        .from(episodes)
+        .where(eq(episodes.seasonId, seasonRow.id))
+        .all();
+      for (const ep of seasonEps) {
+        const oldStill = oldEpStills.get(ep.episodeNumber);
+        if (oldStill !== ep.stillPath && ep.stillThumbHash) {
+          db.update(episodes)
+            .set({ stillThumbHash: null })
+            .where(eq(episodes.id, ep.id))
+            .run();
+        }
       }
     } catch (err) {
       // Skip this season and continue with the rest — partial data is
@@ -492,47 +559,123 @@ export async function refreshRecommendations(titleId: string) {
 
   if (allItems.length === 0) return;
 
+  const uniqueTitles = new Map<
+    number,
+    {
+      tmdbId: number;
+      type: "movie" | "tv";
+      title: string;
+      originalTitle: string | null;
+      overview: string | null;
+      releaseDate: string | null;
+      firstAirDate: string | null;
+      posterPath: string | null;
+      backdropPath: string | null;
+      popularity: number | null;
+      voteAverage: number | null;
+      voteCount: number | null;
+    }
+  >();
+  for (const item of allItems) {
+    if (uniqueTitles.has(item.result.id)) continue;
+    uniqueTitles.set(item.result.id, {
+      tmdbId: item.result.id,
+      type: item.type,
+      title: item.result.title ?? item.result.name ?? "Unknown",
+      originalTitle:
+        item.result.original_title ?? item.result.original_name ?? null,
+      overview: item.result.overview ?? null,
+      releaseDate: item.result.release_date ?? null,
+      firstAirDate: item.result.first_air_date ?? null,
+      posterPath: item.result.poster_path ?? null,
+      backdropPath: item.result.backdrop_path ?? null,
+      popularity: item.result.popularity ?? null,
+      voteAverage: item.result.vote_average ?? null,
+      voteCount: item.result.vote_count ?? null,
+    });
+  }
+
   // Batch prefetch existing titles (1 query)
-  const tmdbIds = [...new Set(allItems.map((item) => item.result.id))];
+  const tmdbIds = [...uniqueTitles.keys()];
   const existingTitles = db
-    .select({ id: titles.id, tmdbId: titles.tmdbId })
+    .select({
+      id: titles.id,
+      tmdbId: titles.tmdbId,
+      posterPath: titles.posterPath,
+      backdropPath: titles.backdropPath,
+      posterThumbHash: titles.posterThumbHash,
+      backdropThumbHash: titles.backdropThumbHash,
+    })
     .from(titles)
     .where(inArray(titles.tmdbId, tmdbIds))
     .all();
+  const existingTitleMap = new Map(existingTitles.map((t) => [t.tmdbId, t]));
   const titleIdMap = new Map<number, string>(
     existingTitles.map((t) => [t.tmdbId, t.id]),
   );
 
   // Insert missing titles + upsert recommendations in a single transaction
   db.transaction((tx) => {
-    // Insert only new titles
-    const newItems = allItems.filter((item) => !titleIdMap.has(item.result.id));
     const insertedTmdbIds = new Set<number>();
-    for (const item of newItems) {
-      if (insertedTmdbIds.has(item.result.id)) continue;
-      insertedTmdbIds.add(item.result.id);
-      const r = item.result;
+    for (const item of uniqueTitles.values()) {
+      const existingTitle = existingTitleMap.get(item.tmdbId);
+      if (existingTitle) {
+        const posterPathChanged = existingTitle.posterPath !== item.posterPath;
+        const backdropPathChanged =
+          existingTitle.backdropPath !== item.backdropPath;
+
+        tx.update(titles)
+          .set({
+            type: item.type,
+            title: item.title,
+            originalTitle: item.originalTitle,
+            overview: item.overview,
+            releaseDate: item.releaseDate,
+            firstAirDate: item.firstAirDate,
+            posterPath: item.posterPath,
+            backdropPath: item.backdropPath,
+            popularity: item.popularity,
+            voteAverage: item.voteAverage,
+            voteCount: item.voteCount,
+            ...(posterPathChanged
+              ? {
+                  posterThumbHash: null,
+                  colorPalette: null,
+                }
+              : {}),
+            ...(backdropPathChanged
+              ? {
+                  backdropThumbHash: null,
+                }
+              : {}),
+          })
+          .where(eq(titles.id, existingTitle.id))
+          .run();
+        continue;
+      }
+
+      insertedTmdbIds.add(item.tmdbId);
       const row = tx
         .insert(titles)
         .values({
-          tmdbId: r.id,
+          tmdbId: item.tmdbId,
           type: item.type,
-          title: r.title ?? r.name ?? "Unknown",
-          originalTitle: r.original_title ?? r.original_name,
-          overview: r.overview,
-          releaseDate: r.release_date,
-          firstAirDate: r.first_air_date,
-          posterPath: r.poster_path,
-          backdropPath: r.backdrop_path,
-          popularity: r.popularity,
-          voteAverage: r.vote_average,
-          voteCount: r.vote_count,
+          title: item.title,
+          originalTitle: item.originalTitle,
+          overview: item.overview,
+          releaseDate: item.releaseDate,
+          firstAirDate: item.firstAirDate,
+          posterPath: item.posterPath,
+          backdropPath: item.backdropPath,
+          popularity: item.popularity,
+          voteAverage: item.voteAverage,
+          voteCount: item.voteCount,
           lastFetchedAt: null,
         })
         .onConflictDoNothing()
         .returning()
         .get();
-      if (row) titleIdMap.set(r.id, row.id);
+      if (row) titleIdMap.set(item.tmdbId, row.id);
     }
 
     // One fallback query for any that conflicted
@@ -580,6 +723,31 @@ export async function refreshRecommendations(titleId: string) {
         .run();
     }
   });
+
+  // Fire-and-forget thumbhash generation for recommendation titles missing one
+  const recTitleIds = [
+    ...new Set(
+      allItems.map((i) => titleIdMap.get(i.result.id)).filter(Boolean),
+    ),
+  ] as string[];
+  if (recTitleIds.length > 0) {
+    const needingHash = db
+      .select({ id: titles.id, posterPath: titles.posterPath })
+      .from(titles)
+      .where(
+        and(
+          inArray(titles.id, recTitleIds),
+          isNotNull(titles.posterPath),
+          sql`${titles.posterThumbHash} IS NULL`,
+        ),
+      )
+      .all();
+    for (const t of needingHash) {
+      generateTitlePosterThumbHash(t.id, t.posterPath).catch((err) =>
+        log.debug("Recommendation poster thumbhash failed:", err),
+      );
+    }
+  }
 }
 
 /** Fetch seasons from the DB, building the Season[] structure. */
@@ -610,6 +778,7 @@ function fetchSeasonsFromDb(titleId: string): Season[] {
       name: ep.name,
       overview: ep.overview,
       stillPath: tmdbImageUrl(ep.stillPath, "stills"),
+      stillThumbHash: ep.stillThumbHash,
       airDate: ep.airDate,
       runtimeMinutes: ep.runtimeMinutes,
     });
@@ -639,17 +808,14 @@ export async function ensureTvHydrated(
   if (!title.lastFetchedAt) {
     try {
       const show = await getTvDetails(tmdbId);
-      db.update(titles)
-        .set({
-          overview: show.overview,
-          posterPath: show.poster_path,
-          backdropPath: show.backdrop_path,
-          status: show.status,
-          contentRating: extractTvContentRating(show),
-          lastFetchedAt: new Date(),
-        })
-        .where(eq(titles.id, titleId))
-        .run();
+      updateTitleWithArtInvalidation(title, {
+        overview: show.overview,
+        posterPath: show.poster_path,
+        backdropPath: show.backdrop_path,
+        status: show.status,
+        contentRating: extractTvContentRating(show),
+        lastFetchedAt: new Date(),
+      });
       upsertGenres(titleId, show.genres ?? []);
       await refreshTvChildren(titleId, tmdbId, show.number_of_seasons);
     } catch (err) {
@@ -686,7 +852,7 @@ async function ensureEnriched(
   title: typeof titles.$inferSelect,
   existing: { hasCast: boolean; hasAvailability: boolean },
 ): Promise<boolean> {
-  const tasks: Promise<void>[] = [];
+  const tasks: Promise<unknown>[] = [];
 
   if (!existing.hasCast) {
     tasks.push(
@@ -720,12 +886,20 @@ async function ensureEnriched(
     );
   }
 
-  if (!title.colorPalette && title.posterPath) {
+  const needsTitleArtSync =
+    (!title.posterPath && (!!title.posterThumbHash || !!title.colorPalette)) ||
+    (!!title.posterPath && (!title.posterThumbHash || !title.colorPalette)) ||
+    (!title.backdropPath && !!title.backdropThumbHash) ||
+    (!!title.backdropPath && !title.backdropThumbHash);
+
+  if (needsTitleArtSync) {
     tasks.push(
-      extractAndStoreColors(titleId, title.posterPath).then(
-        () => {},
-        (err) => log.debug("Color enrichment failed:", err),
-      ),
+      syncTitleArt(
+        titleId,
+        title.posterPath,
+        title.backdropPath,
+        title.type as "movie" | "tv",
+      ).catch((err) => log.debug("Title art enrichment failed:", err)),
     );
   }
 
@@ -786,23 +960,20 @@ export async function getOrFetchTitle(id: string): Promise<{
   if (title.type === "movie" && !title.lastFetchedAt) {
     try {
       const movie = await getMovieDetails(title.tmdbId);
-      db.update(titles)
-        .set({
-          title: movie.title,
-          originalTitle: movie.original_title,
-          overview: movie.overview,
-          releaseDate: movie.release_date || null,
-          posterPath: movie.poster_path,
-          backdropPath: movie.backdrop_path,
-          popularity: movie.popularity,
-          voteAverage: movie.vote_average,
-          voteCount: movie.vote_count,
-          status: movie.status,
-          contentRating: extractMovieContentRating(movie),
-          lastFetchedAt: new Date(),
-        })
-        .where(eq(titles.id, id))
-        .run();
+      updateTitleWithArtInvalidation(title, {
+        title: movie.title,
+        originalTitle: movie.original_title,
+        overview: movie.overview,
+        releaseDate: movie.release_date || null,
+        posterPath: movie.poster_path,
+        backdropPath: movie.backdrop_path,
+        popularity: movie.popularity,
+        voteAverage: movie.vote_average,
+        voteCount: movie.vote_count,
+        status: movie.status,
+        contentRating: extractMovieContentRating(movie),
+        lastFetchedAt: new Date(),
+      });
       upsertGenres(id, movie.genres ?? []);
       title = db.select().from(titles).where(eq(titles.id, id)).get() ?? title;
     } catch (err) {
@@ -849,7 +1020,9 @@ export async function getOrFetchTitle(id: string): Promise<{
     releaseDate: title.releaseDate,
     firstAirDate: title.firstAirDate,
     posterPath: tmdbImageUrl(title.posterPath, "posters"),
+    posterThumbHash: title.posterThumbHash,
     backdropPath: tmdbImageUrl(title.backdropPath, "backdrops"),
+    backdropThumbHash: title.backdropThumbHash,
     popularity: title.popularity,
     voteAverage: title.voteAverage,
     voteCount: title.voteCount,
@@ -913,6 +1086,92 @@ export async function refreshTrailer(titleId: string) {
     );
   } catch (err) {
     log.debug(`Failed to fetch trailer for title ${titleId}:`, err);
+  }
+}
+
+async function generateMissingTvChildThumbHashes(titleId: string) {
+  const titleSeasons = db
+    .select()
+    .from(seasons)
+    .where(eq(seasons.titleId, titleId))
+    .all();
+
+  const hashTasks: Promise<unknown>[] = [];
+
+  for (const s of titleSeasons) {
+    if (s.posterPath && !s.posterThumbHash) {
+      hashTasks.push(generateSeasonThumbHash(s.id, s.posterPath));
+    }
+  }
+
+  const seasonIds = titleSeasons.map((s) => s.id);
+  if (seasonIds.length > 0) {
+    const epsNeedingHash = db
+      .select({
+        id: episodes.id,
+        stillPath: episodes.stillPath,
+      })
+      .from(episodes)
+      .where(
+        and(
+          inArray(episodes.seasonId, seasonIds),
+          isNotNull(episodes.stillPath),
+          sql`${episodes.stillThumbHash} IS NULL`,
+        ),
+      )
+      .all();
+    for (const ep of epsNeedingHash) {
+      hashTasks.push(generateEpisodeThumbHash(ep.id, ep.stillPath));
+    }
+  }
+
+  await Promise.all(hashTasks);
+}
+
+export async function syncTvChildArt(
+  titleId: string,
+  options?: { warmCache?: boolean },
+) {
+  if (options?.warmCache !== false && imageCacheEnabled()) {
+    await Promise.all([
+      cacheImagesForTitle(titleId),
+      cacheEpisodeStills(titleId),
+    ]);
+  }
+
+  await generateMissingTvChildThumbHashes(titleId);
+}
+
+/**
+ * Warm the image cache for a title, then derive poster colors and thumbhashes.
+ * Sequencing avoids duplicate TMDB downloads on cold caches.
+ */
+async function syncTitleArt(
+  titleId: string,
+  posterPath: string | null | undefined,
+  backdropPath: string | null | undefined,
+  type: "movie" | "tv",
+) {
+  if (imageCacheEnabled()) {
+    await cacheImagesForTitle(titleId);
+    if (type === "tv") {
+      await cacheEpisodeStills(titleId);
+    }
+  }
+
+  const posterBuffer = posterPath
+    ? await loadImageBuffer(posterPath, "posters")
+    : undefined;
+
+  // Title poster colors + thumbhash, then backdrop thumbhash
+  await Promise.all([
+    extractAndStoreColors(titleId, posterPath ?? null, posterBuffer),
+    generateTitlePosterThumbHash(titleId, posterPath ?? null, posterBuffer),
+    generateTitleBackdropThumbHash(titleId, backdropPath ?? null),
+  ]);
+
+  if (type === "tv") {
+    await syncTvChildArt(titleId, { warmCache: false });
   }
 }
 

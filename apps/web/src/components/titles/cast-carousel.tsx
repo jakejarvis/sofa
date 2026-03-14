@@ -1,8 +1,9 @@
 import type { CastMember } from "@sofa/api/schemas";
 import { IconUser, IconUsers } from "@tabler/icons-react";
-
 import { Link } from "@tanstack/react-router";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { thumbHashToUrl } from "@/lib/thumbhash";
 
 interface CastCarouselProps {
   actors: CastMember[];
@@ -31,7 +32,17 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
                     params={{ id: member.personId }}
                     className="group flex flex-col items-center gap-2"
                   >
-                    <div className="size-20 overflow-hidden rounded-full ring-1 ring-white/10 transition-all group-hover:ring-primary/25 sm:size-24">
+                    <div
+                      className="size-20 overflow-hidden rounded-full ring-1 ring-white/10 transition-all group-hover:ring-primary/25 sm:size-24"
+                      style={
+                        member.profileThumbHash
+                          ? {
+                              backgroundImage: `url(${thumbHashToUrl(member.profileThumbHash)})`,
+                              backgroundSize: "cover",
+                            }
+                          : undefined
+                      }
+                    >
                       {member.profilePath ? (
                         <img
                           src={member.profilePath}

@@ -5,8 +5,9 @@ import { resolveUrl } from "@/lib/server-url";
 export function Image({
   source,
   className,
+  thumbHash,
   ...props
-}: ImageProps & { className?: string }) {
+}: ImageProps & { className?: string; thumbHash?: string | null }) {
   const resolved =
     source && typeof source === "object" && "uri" in source && source.uri
       ? { ...source, uri: resolveUrl(source.uri) ?? undefined }
@@ -15,6 +16,11 @@ export function Image({
   const style = useResolveClassNames(className ?? "");
 
   return (
-    <ExpoImage source={resolved} style={[style, props.style]} {...props} />
+    <ExpoImage
+      source={resolved}
+      placeholder={thumbHash ? { thumbhash: thumbHash } : undefined}
+      style={[style, props.style]}
+      {...props}
+    />
   );
 }

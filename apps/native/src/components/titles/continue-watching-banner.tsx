@@ -14,11 +14,13 @@ export function ContinueWatchingBanner({
   watchedEpisodeIds,
   userStatus,
   backdropPath,
+  backdropThumbHash,
 }: {
   seasons: Season[];
   watchedEpisodeIds: Set<string>;
   userStatus: string | null;
   backdropPath: string | null;
+  backdropThumbHash?: string | null;
 }) {
   const titleAccentColor = useCSSVariable("--color-title-accent") as string;
 
@@ -54,6 +56,7 @@ export function ContinueWatchingBanner({
           {stillUrl && (
             <Image
               source={{ uri: stillUrl }}
+              thumbHash={nextEpisode.stillThumbHash ?? backdropThumbHash}
               className="h-full w-full"
               contentFit="cover"
             />

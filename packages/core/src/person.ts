@@ -5,8 +5,29 @@ import { persons, titleCast, titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getPersonCombinedCredits, getPersonDetails } from "@sofa/tmdb/client";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
+import { generatePersonThumbHash } from "./thumbhash";
 
 const log = createLogger("person");
+
+async function ensureProfileThumbHash(
+  person: Pick<
+    typeof persons.$inferSelect,
+    "id" | "profilePath" | "profileThumbHash"
+  >,
+) {
+  if (!person.profilePath) {
+    if (person.profileThumbHash) {
+      await generatePersonThumbHash(person.id, null);
+    }
+    return null;
+  }
+
+  if (person.profileThumbHash) {
+    return person.profileThumbHash;
+  }
+
+  return (await generatePersonThumbHash(person.id, person.profilePath)) ?? null;
+}
 
 export async function getOrFetchPerson(
   personId: string,
@@ -38,6 +59,20 @@ export async function getOrFetchPerson(
         .where(eq(persons.id, personId))
         .run();
 
+      const newProfilePath = details.profile_path ?? null;
+      const pathChanged = newProfilePath !== person.profilePath;
+      const profileThumbHash = pathChanged
+        ? await ensureProfileThumbHash({
+            id: personId,
+            profilePath: newProfilePath,
+            profileThumbHash: null,
+          })
+        : await ensureProfileThumbHash({
+            id: personId,
+            profilePath: newProfilePath,
+            profileThumbHash: person.profileThumbHash,
+          });
+
       return {
         id: person.id,
         tmdbId: person.tmdbId,
@@ -47,6 +82,7 @@ export async function getOrFetchPerson(
         deathday: details.deathday ?? null,
         placeOfBirth: details.place_of_birth ?? null,
         profilePath: tmdbImageUrl(details.profile_path ?? null, "profiles"),
+        profileThumbHash,
         knownForDepartment: details.known_for_department ?? null,
         imdbId: details.imdb_id ?? null,
       };
@@ -54,6 +90,8 @@ export async function getOrFetchPerson(
       log.error(`Failed to hydrate person ${personId}:`, err);
     }
   }
+
+  const profileThumbHash = await ensureProfileThumbHash(person);
 
   return {
     id: person.id,
@@ -64,6 +102,7 @@ export async function getOrFetchPerson(
     deathday: person.deathday,
     placeOfBirth: person.placeOfBirth,
     profilePath: tmdbImageUrl(person.profilePath, "profiles"),
+    profileThumbHash,
     knownForDepartment: person.knownForDepartment,
     imdbId: person.imdbId,
   };
@@ -108,6 +147,8 @@ export async function getOrFetchPersonByTmdbId(
       row ?? db.select().from(persons).where(eq(persons.tmdbId, tmdbId)).get();
     if (!person) return null;
 
+    const profileThumbHash = await ensureProfileThumbHash(person);
+
     return {
       id: person.id,
       tmdbId: person.tmdbId,
@@ -117,6 +158,7 @@ export async function getOrFetchPersonByTmdbId(
       deathday: person.deathday,
       placeOfBirth: person.placeOfBirth,
       profilePath: tmdbImageUrl(person.profilePath, "profiles"),
+      profileThumbHash,
       knownForDepartment: person.knownForDepartment,
       imdbId: person.imdbId,
     };
@@ -134,6 +176,7 @@ export function getLocalFilmography(personId: string): PersonCredit[] {
       type: titles.type,
       title: titles.title,
       posterPath: titles.posterPath,
+      posterThumbHash: titles.posterThumbHash,
       releaseDate: titles.releaseDate,
       firstAirDate: titles.firstAirDate,
       voteAverage: titles.voteAverage,
@@ -152,6 +195,7 @@ export function getLocalFilmography(personId: string): PersonCredit[] {
     type: r.type as "movie" | "tv",
     title: r.title,
     posterPath: tmdbImageUrl(r.posterPath, "posters"),
+    posterThumbHash: r.posterThumbHash,
     releaseDate: r.releaseDate,
     firstAirDate: r.firstAirDate,
     voteAverage: r.voteAverage,
@@ -251,6 +295,7 @@ export async function fetchFullFilmography(
       type: c.media_type as "movie" | "tv",
       title: c.title ?? c.name ?? "Unknown",
       posterPath: tmdbImageUrl(c.poster_path ?? null, "posters"),
+      posterThumbHash: null,
       releaseDate: c.release_date ?? null,
       firstAirDate: c.first_air_date ?? null,
       voteAverage: c.vote_average,

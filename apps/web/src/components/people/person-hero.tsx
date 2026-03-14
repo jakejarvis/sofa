@@ -4,6 +4,7 @@ import { format, parseISO } from "date-fns";
 
 import { ExpandableText } from "@/components/expandable-text";
 import { Badge } from "@/components/ui/badge";
+import { thumbHashToUrl } from "@/lib/thumbhash";
 
 interface PersonHeroProps {
   person: ResolvedPerson;
@@ -27,7 +28,17 @@ export function PersonHero({ person }: PersonHeroProps) {
 
   return (
     <div className="flex animate-stagger-item flex-col gap-6 sm:flex-row sm:gap-8">
-      <div className="size-40 shrink-0 self-center overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10 sm:size-56 sm:self-start">
+      <div
+        className="size-40 shrink-0 self-center overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10 sm:size-56 sm:self-start"
+        style={
+          person.profileThumbHash
+            ? {
+                backgroundImage: `url(${thumbHashToUrl(person.profileThumbHash)})`,
+                backgroundSize: "cover",
+              }
+            : undefined
+        }
+      >
         {person.profilePath ? (
           <img
             src={person.profilePath}

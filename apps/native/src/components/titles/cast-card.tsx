@@ -12,6 +12,7 @@ export function CastCard({
     name: string;
     character: string | null;
     profilePath: string | null;
+    profileThumbHash?: string | null;
   };
 }) {
   return (
@@ -23,6 +24,7 @@ export function CastCard({
               {person.profilePath && (
                 <Image
                   source={{ uri: person.profilePath }}
+                  thumbHash={person.profileThumbHash}
                   className="h-full w-full"
                   contentFit="cover"
                 />

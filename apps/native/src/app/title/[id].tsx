@@ -165,6 +165,7 @@ export default function TitleDetailScreen() {
         title: item.title,
         type: item.type,
         posterPath: item.posterPath,
+        posterThumbHash: item.posterThumbHash,
         releaseDate: item.releaseDate,
         firstAirDate: item.firstAirDate,
         voteAverage: item.voteAverage,
@@ -277,6 +278,7 @@ export default function TitleDetailScreen() {
         {title.backdropPath && (
           <Image
             source={{ uri: title.backdropPath }}
+            thumbHash={title.backdropThumbHash}
             style={{
               width: "100%",
               height: "100%",
@@ -366,6 +368,7 @@ export default function TitleDetailScreen() {
             >
               <Image
                 source={{ uri: title.posterPath }}
+                thumbHash={title.posterThumbHash}
                 style={{
                   width: "100%",
                   height: "100%",
@@ -546,6 +549,7 @@ export default function TitleDetailScreen() {
           watchedEpisodeIds={watchedEpisodeIds}
           userStatus={userInfo.data?.status ?? null}
           backdropPath={title.backdropPath}
+          backdropThumbHash={title.backdropThumbHash}
         />
       )}
 

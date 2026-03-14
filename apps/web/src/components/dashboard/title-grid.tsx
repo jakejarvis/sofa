@@ -7,6 +7,7 @@ interface TitleGridItem {
   type: string;
   title: string;
   posterPath: string | null;
+  posterThumbHash?: string | null;
   releaseDate?: string | null;
   firstAirDate?: string | null;
   voteAverage?: number | null;
@@ -46,6 +47,7 @@ export function TitleGrid({ items }: { items: TitleGridItem[] }) {
             type={t.type}
             title={t.title}
             posterPath={t.posterPath}
+            posterThumbHash={t.posterThumbHash}
             releaseDate={t.releaseDate ?? t.firstAirDate}
             voteAverage={t.voteAverage}
             userStatus={t.userStatus}

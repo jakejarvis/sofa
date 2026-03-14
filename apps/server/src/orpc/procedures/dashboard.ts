@@ -25,6 +25,7 @@ export const continueWatching = os.dashboard.continueWatching
         id: item.title.id,
         title: item.title.title,
         backdropPath: tmdbImageUrl(item.title.backdropPath, "backdrops"),
+        backdropThumbHash: item.title.backdropThumbHash,
       },
       nextEpisode: item.nextEpisode
         ? {
@@ -32,6 +33,7 @@ export const continueWatching = os.dashboard.continueWatching
             episodeNumber: item.nextEpisode.episodeNumber,
             name: item.nextEpisode.name,
             stillPath: tmdbImageUrl(item.nextEpisode.stillPath, "stills"),
+            stillThumbHash: item.nextEpisode.stillThumbHash,
           }
         : null,
       totalEpisodes: item.totalEpisodes,
@@ -50,6 +52,7 @@ export const library = os.dashboard.library
       type: t.type,
       title: t.title,
       posterPath: tmdbImageUrl(t.posterPath, "posters"),
+      posterThumbHash: t.posterThumbHash ?? null,
       releaseDate: t.releaseDate ?? null,
       firstAirDate: t.firstAirDate ?? null,
       voteAverage: t.voteAverage,
@@ -71,6 +74,7 @@ export const recommendations = os.dashboard.recommendations
         type: t.type,
         title: t.title,
         posterPath: tmdbImageUrl(t.posterPath, "posters"),
+        posterThumbHash: t.posterThumbHash ?? null,
         releaseDate: t.releaseDate ?? null,
         firstAirDate: t.firstAirDate ?? null,
         voteAverage: t.voteAverage,

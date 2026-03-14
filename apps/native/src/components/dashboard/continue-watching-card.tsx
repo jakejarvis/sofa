@@ -15,6 +15,7 @@ export interface ContinueWatchingItem {
     id: string;
     title: string;
     backdropPath: string | null;
+    backdropThumbHash?: string | null;
   };
   watchedEpisodes: number;
   totalEpisodes: number;
@@ -23,6 +24,7 @@ export interface ContinueWatchingItem {
     episodeNumber: number;
     name: string | null;
     stillPath: string | null;
+    stillThumbHash?: string | null;
   } | null;
 }
 
@@ -61,6 +63,10 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
                     uri: (item.nextEpisode?.stillPath ??
                       item.title.backdropPath) as string,
                   }}
+                  thumbHash={
+                    item.nextEpisode?.stillThumbHash ??
+                    item.title.backdropThumbHash
+                  }
                   className="h-full w-full"
                   contentFit="cover"
                 />

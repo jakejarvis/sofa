@@ -6,6 +6,7 @@ interface NextEpisodeInfo {
   episodeNumber: number;
   name: string | null;
   stillPath: string | null;
+  stillThumbHash: string | null;
 }
 
 export interface NextEpisodeResult {
@@ -41,6 +42,7 @@ export function getNextEpisode(
           episodeNumber: ep.episodeNumber,
           name: ep.name,
           stillPath: ep.stillPath,
+          stillThumbHash: ep.stillThumbHash,
         };
       }
     }

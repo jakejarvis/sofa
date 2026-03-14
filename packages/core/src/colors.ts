@@ -1,15 +1,9 @@
-import path from "node:path";
 import { db } from "@sofa/db/client";
 import { eq } from "@sofa/db/helpers";
 import { titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { Vibrant } from "node-vibrant/node";
-import {
-  downloadAndCacheImage,
-  getLocalImagePath,
-  imageCacheEnabled,
-  isImageCached,
-} from "./image-cache";
+import { loadImageBuffer } from "./image-cache";
 
 const log = createLogger("colors");
 
@@ -25,27 +19,23 @@ export interface ColorPalette {
 export async function extractAndStoreColors(
   titleId: string,
   posterPath: string | null,
+  sourceBuffer?: Buffer | null,
 ): Promise<ColorPalette | null> {
-  if (!posterPath) return null;
-
-  // Use local cached image, downloading first if needed
-  let source: string;
-  const filename = path.basename(posterPath);
-  if (imageCacheEnabled()) {
-    if (!(await isImageCached("posters", filename))) {
-      await downloadAndCacheImage(posterPath, "posters");
-    }
-    source = getLocalImagePath("posters", filename);
-  } else {
-    const baseUrl =
-      process.env.TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p";
-    source = `${baseUrl}/w300${posterPath}`;
+  if (!posterPath) {
+    db.update(titles)
+      .set({ colorPalette: null })
+      .where(eq(titles.id, titleId))
+      .run();
+    return null;
   }
 
+  const source =
+    sourceBuffer === undefined
+      ? await loadImageBuffer(posterPath, "posters")
+      : sourceBuffer;
+  if (!source) return null;
+
   try {
-    log.debug(
-      `Extracting colors for title ${titleId} from ${imageCacheEnabled() ? "cache" : "remote"}`,
-    );
     const palette = await Vibrant.from(source).getPalette();
 
     const colors: ColorPalette = {

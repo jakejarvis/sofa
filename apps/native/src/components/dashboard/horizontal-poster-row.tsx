@@ -9,6 +9,7 @@ export interface PosterRowItem {
   title: string;
   type: string;
   posterPath: string | null;
+  posterThumbHash?: string | null;
   releaseDate?: string | null;
   firstAirDate?: string | null;
   voteAverage?: number | null;
@@ -55,6 +56,7 @@ export function HorizontalPosterRow({
           title={item.title}
           type={item.type as "movie" | "tv"}
           posterPath={item.posterPath}
+          posterThumbHash={item.posterThumbHash}
           releaseDate={item.releaseDate ?? item.firstAirDate}
           voteAverage={item.voteAverage}
           userStatus={item.userStatus}

@@ -156,6 +156,7 @@ const EpisodeSchema = z.object({
   name: z.string().nullable(),
   overview: z.string().nullable(),
   stillPath: z.string().nullable(),
+  stillThumbHash: z.string().nullable(),
   airDate: z.string().nullable(),
   runtimeMinutes: z.number().nullable(),
 });
@@ -185,6 +186,7 @@ const CastMemberSchema = z.object({
   displayOrder: z.number(),
   episodeCount: z.number().nullable(),
   profilePath: z.string().nullable(),
+  profileThumbHash: z.string().nullable(),
   tmdbId: z.number(),
 });
 
@@ -198,7 +200,9 @@ const ResolvedTitleSchema = z.object({
   releaseDate: z.string().nullable(),
   firstAirDate: z.string().nullable(),
   posterPath: z.string().nullable(),
+  posterThumbHash: z.string().nullable(),
   backdropPath: z.string().nullable(),
+  backdropThumbHash: z.string().nullable(),
   popularity: z.number().nullable(),
   voteAverage: z.number().nullable(),
   voteCount: z.number().nullable(),
@@ -218,6 +222,7 @@ const PersonSchema = z.object({
   deathday: z.string().nullable(),
   placeOfBirth: z.string().nullable(),
   profilePath: z.string().nullable(),
+  profileThumbHash: z.string().nullable(),
   knownForDepartment: z.string().nullable(),
   imdbId: z.string().nullable(),
 });
@@ -228,6 +233,7 @@ const PersonCreditSchema = z.object({
   type: mediaType,
   title: z.string(),
   posterPath: z.string().nullable(),
+  posterThumbHash: z.string().nullable(),
   releaseDate: z.string().nullable(),
   firstAirDate: z.string().nullable(),
   voteAverage: z.number().nullable(),
@@ -242,6 +248,7 @@ const TmdbBrowseItem = z.object({
   type: mediaType,
   title: z.string(),
   posterPath: z.string().nullable(),
+  posterThumbHash: z.string().nullable(),
   releaseDate: z.string().nullable(),
   firstAirDate: z.string().nullable(),
   voteAverage: z.number().nullable(),
@@ -254,6 +261,7 @@ const RecommendationItemSchema = z.object({
   type: mediaType,
   title: z.string(),
   posterPath: z.string().nullable(),
+  posterThumbHash: z.string().nullable(),
   releaseDate: z.string().nullable(),
   firstAirDate: z.string().nullable(),
   voteAverage: z.number().nullable(),
@@ -324,6 +332,7 @@ export const ContinueWatchingOutput = z.object({
         id: z.string(),
         title: z.string(),
         backdropPath: z.string().nullable(),
+        backdropThumbHash: z.string().nullable(),
       }),
       nextEpisode: z
         .object({
@@ -331,6 +340,7 @@ export const ContinueWatchingOutput = z.object({
           episodeNumber: z.number(),
           name: z.string().nullable(),
           stillPath: z.string().nullable(),
+          stillThumbHash: z.string().nullable(),
         })
         .nullable(),
       totalEpisodes: z.number(),
@@ -347,6 +357,7 @@ export const LibraryOutput = z.object({
       type: mediaType,
       title: z.string(),
       posterPath: z.string().nullable(),
+      posterThumbHash: z.string().nullable(),
       releaseDate: z.string().nullable(),
       firstAirDate: z.string().nullable(),
       voteAverage: z.number().nullable(),

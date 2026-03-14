@@ -15,6 +15,7 @@ interface TitleRowItem {
   type: "movie" | "tv";
   title: string;
   posterPath: string | null;
+  posterThumbHash?: string | null;
   releaseDate: string | null;
   firstAirDate: string | null;
   voteAverage: number | null;
@@ -141,6 +142,7 @@ export function FilterableTitleRow({
                     type={item.type}
                     title={item.title}
                     posterPath={item.posterPath}
+                    posterThumbHash={item.posterThumbHash}
                     releaseDate={item.releaseDate ?? item.firstAirDate}
                     voteAverage={item.voteAverage}
                     userStatus={userStatuses[`${item.tmdbId}-${item.type}`]}

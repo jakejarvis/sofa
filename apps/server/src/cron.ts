@@ -1,6 +1,6 @@
 import { refreshAvailability } from "@sofa/core/availability";
 import { createBackup, ensureBackupDir, pruneBackups } from "@sofa/core/backup";
-import { refreshCredits } from "@sofa/core/credits";
+import { refreshCredits, syncCastProfileThumbHashes } from "@sofa/core/credits";
 import {
   cacheEpisodeStills,
   cacheImagesForTitle,
@@ -12,15 +12,22 @@ import {
   refreshRecommendations,
   refreshTitle,
   refreshTvChildren,
+  syncTvChildArt,
 } from "@sofa/core/metadata";
 import { getSetting } from "@sofa/core/settings";
 import { performTelemetryReport } from "@sofa/core/telemetry";
+import {
+  generateTitleBackdropThumbHash,
+  generateTitlePosterThumbHash,
+} from "@sofa/core/thumbhash";
 import { performUpdateCheck } from "@sofa/core/update-check";
 import { db } from "@sofa/db/client";
-import { and, eq, inArray, isNotNull, lt, or } from "@sofa/db/helpers";
+import { and, eq, inArray, isNotNull, lt, or, sql } from "@sofa/db/helpers";
 import {
   availabilityOffers,
   cronRuns,
+  episodes,
+  persons,
   seasons,
   titleCast,
   titles,
@@ -110,6 +117,83 @@ function getLibraryTitleIds(): string[] {
     .groupBy(userTitleStatus.titleId)
     .all();
   return rows.map((r) => r.titleId);
+}
+
+function getThumbhashBackfillTitleIds(): string[] {
+  const titleIds = new Set(getLibraryTitleIds());
+
+  const addIds = (ids: string[]) => {
+    for (const id of ids) titleIds.add(id);
+  };
+
+  addIds(
+    db
+      .select({ id: titles.id })
+      .from(titles)
+      .where(
+        or(
+          and(
+            isNotNull(titles.posterPath),
+            sql`${titles.posterThumbHash} IS NULL`,
+          ),
+          and(
+            isNotNull(titles.backdropPath),
+            sql`${titles.backdropThumbHash} IS NULL`,
+          ),
+        ),
+      )
+      .all()
+      .map((row) => row.id),
+  );
+
+  addIds(
+    db
+      .select({ titleId: seasons.titleId })
+      .from(seasons)
+      .where(
+        and(
+          isNotNull(seasons.posterPath),
+          sql`${seasons.posterThumbHash} IS NULL`,
+        ),
+      )
+      .groupBy(seasons.titleId)
+      .all()
+      .map((row) => row.titleId),
+  );
+
+  addIds(
+    db
+      .select({ titleId: seasons.titleId })
+      .from(episodes)
+      .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
+      .where(
+        and(
+          isNotNull(episodes.stillPath),
+          sql`${episodes.stillThumbHash} IS NULL`,
+        ),
+      )
+      .groupBy(seasons.titleId)
+      .all()
+      .map((row) => row.titleId),
+  );
+
+  addIds(
+    db
+      .select({ titleId: titleCast.titleId })
+      .from(titleCast)
+      .innerJoin(persons, eq(titleCast.personId, persons.id))
+      .where(
+        and(
+          isNotNull(persons.profilePath),
+          sql`${persons.profileThumbHash} IS NULL`,
+        ),
+      )
+      .groupBy(titleCast.titleId)
+      .all()
+      .map((row) => row.titleId),
+  );
+
+  return [...titleIds];
 }
 
 // Refresh titles where lastFetchedAt is stale
@@ -248,25 +332,58 @@ async function refreshTvChildrenJob() {
     if (titlesWithStaleSeasons.has(show.id)) {
       const details = await getTvDetails(show.tmdbId);
       await refreshTvChildren(show.id, show.tmdbId, details.number_of_seasons);
+      await syncTvChildArt(show.id, { warmCache: true });
       await Bun.sleep(RATE_LIMIT_MS);
     }
   }
 }
 
 async function cacheImagesJob() {
-  if (!imageCacheEnabled()) return;
+  const titleIds = getThumbhashBackfillTitleIds();
+  log.debug(
+    `Caching images for ${titleIds.length} titles needing art backfill`,
+  );
 
-  const libraryIds = getLibraryTitleIds();
-  log.debug(`Caching images for ${libraryIds.length} library titles`);
-
-  for (const titleId of libraryIds) {
+  for (const titleId of titleIds) {
     try {
-      await Promise.all([
-        cacheImagesForTitle(titleId),
-        cacheEpisodeStills(titleId),
-        cacheProviderLogos(titleId),
-        cacheProfilePhotos(titleId),
-      ]);
+      const title = db
+        .select()
+        .from(titles)
+        .where(eq(titles.id, titleId))
+        .get();
+      if (!title) continue;
+
+      // Phase 1: warm the image cache so thumbhash generation can read from disk
+      if (imageCacheEnabled()) {
+        await Promise.all([
+          cacheImagesForTitle(titleId),
+          cacheEpisodeStills(titleId),
+          cacheProviderLogos(titleId),
+          cacheProfilePhotos(titleId),
+        ]);
+      }
+
+      // Phase 2: generate thumbhashes (reads from warm cache, no duplicate downloads)
+      const hashTasks: Promise<unknown>[] = [];
+
+      if (!title.posterThumbHash && title.posterPath) {
+        hashTasks.push(generateTitlePosterThumbHash(titleId, title.posterPath));
+      }
+      if (!title.backdropThumbHash && title.backdropPath) {
+        hashTasks.push(
+          generateTitleBackdropThumbHash(titleId, title.backdropPath),
+        );
+      }
+
+      if (title.type === "tv") {
+        hashTasks.push(syncTvChildArt(titleId, { warmCache: false }));
+      }
+
+      hashTasks.push(
+        syncCastProfileThumbHashes(titleId, undefined, { warmCache: false }),
+      );
+
+      await Promise.all(hashTasks);
     } catch (err) {
       log.warn(`Failed to cache images for title ${titleId}:`, err);
     }

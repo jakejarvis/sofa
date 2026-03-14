@@ -8,6 +8,10 @@ import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { os } from "../context";
 import { authed } from "../middleware";
+import {
+  browseLookupKey,
+  getBrowsePosterThumbHashes,
+} from "./browse-thumbhashes";
 
 function requireTmdb() {
   if (!isTmdbConfigured()) {
@@ -25,7 +29,7 @@ export const trending = os.explore.trending
     const data = await getTrending(input.type, "day");
     const results = (data.results ?? []) as Record<string, unknown>[];
 
-    const items = results
+    const baseItems = results
       .filter((r) => r.poster_path)
       .map((r) => {
         const mediaType =
@@ -45,6 +49,11 @@ export const trending = os.explore.trending
           voteAverage: (r.vote_average as number | undefined) ?? null,
         };
       });
+    const posterThumbHashes = getBrowsePosterThumbHashes(baseItems);
+    const items = baseItems.map((item) => ({
+      ...item,
+      posterThumbHash: posterThumbHashes.get(browseLookupKey(item)) ?? null,
+    }));
 
     const heroResult = results.find(
       (r) =>
@@ -83,7 +92,7 @@ export const popular = os.explore.popular
     requireTmdb();
 
     const data = await getPopular(input.type);
-    const items = ((data.results ?? []) as Record<string, unknown>[])
+    const baseItems = ((data.results ?? []) as Record<string, unknown>[])
       .filter((r) => r.poster_path)
       .map((r) => ({
         tmdbId: r.id as number,
@@ -94,6 +103,11 @@ export const popular = os.explore.popular
         firstAirDate: (r.first_air_date as string | undefined) ?? null,
         voteAverage: (r.vote_average as number | undefined) ?? null,
       }));
+    const posterThumbHashes = getBrowsePosterThumbHashes(baseItems);
+    const items = baseItems.map((item) => ({
+      ...item,
+      posterThumbHash: posterThumbHashes.get(browseLookupKey(item)) ?? null,
+    }));
 
     const lookups = items.map((r) => ({ tmdbId: r.tmdbId, type: r.type }));
     const [userStatuses, episodeProgress] =
