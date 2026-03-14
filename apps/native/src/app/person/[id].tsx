@@ -1,3 +1,4 @@
+import { FlashList } from "@shopify/flash-list";
 import {
   IconAlertTriangle,
   IconCalendar,
@@ -9,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect } from "react";
-import { FlatList, Pressable, useWindowDimensions, View } from "react-native";
+import { Pressable, useWindowDimensions, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
@@ -83,7 +84,7 @@ export default function PersonDetailScreen() {
 
   const renderFilmographyItem = useCallback(
     ({ item: credit }: { item: (typeof filmography)[number] }) => (
-      <View style={{ width: columnWidth }}>
+      <View style={{ width: columnWidth, paddingBottom: FILMOGRAPHY_GAP }}>
         <PosterCard
           id={credit.titleId}
           tmdbId={credit.tmdbId}
@@ -271,25 +272,19 @@ export default function PersonDetailScreen() {
           headerTitle: "",
         }}
       />
-      <FlatList
-        data={filmography}
-        keyExtractor={(item) => item.titleId}
-        renderItem={renderFilmographyItem}
-        numColumns={2}
-        columnWrapperStyle={{
-          gap: FILMOGRAPHY_GAP,
-          paddingHorizontal: FILMOGRAPHY_PADDING,
-        }}
-        contentContainerStyle={{
-          paddingBottom: insets.bottom + 32,
-          gap: FILMOGRAPHY_GAP,
-        }}
-        ListHeaderComponent={listHeader}
-        className="bg-background"
-        initialNumToRender={6}
-        maxToRenderPerBatch={8}
-        windowSize={5}
-      />
+      <View className="flex-1 bg-background">
+        <FlashList
+          data={filmography}
+          keyExtractor={(item) => item.titleId}
+          renderItem={renderFilmographyItem}
+          numColumns={2}
+          contentContainerStyle={{
+            paddingBottom: insets.bottom + 32,
+            paddingHorizontal: FILMOGRAPHY_PADDING,
+          }}
+          ListHeaderComponent={listHeader}
+        />
+      </View>
     </>
   );
 }

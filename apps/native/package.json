@@ -25,6 +25,7 @@
     "@orpc/tanstack-query": "catalog:",
     "@react-native-menu/menu": "2.0.0",
     "@react-navigation/elements": "2.9.10",
+    "@shopify/flash-list": "2.3.0",
     "@sofa/api": "workspace:*",
     "@sofa/tmdb": "workspace:*",
     "@tabler/icons-react-native": "3.40.0",

@@ -1,7 +1,8 @@
+import { FlashList } from "@shopify/flash-list";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { FlatList, View } from "react-native";
+import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { RecentlyViewedList } from "@/components/search/recently-viewed-list";
 import {
@@ -154,7 +155,7 @@ export default function SearchScreen() {
           </Text>
         </Animated.View>
       ) : (
-        <FlatList
+        <FlashList
           data={allResults}
           keyExtractor={keyExtractor}
           renderItem={renderItem}

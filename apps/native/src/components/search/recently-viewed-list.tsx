@@ -1,7 +1,8 @@
+import { FlashList } from "@shopify/flash-list";
 import { IconHistory, IconSearch } from "@tabler/icons-react-native";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
-import { Alert, FlatList, Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
 import { RecentlyViewedRow } from "@/components/search/recently-viewed-row";
@@ -84,7 +85,7 @@ export function RecentlyViewedList() {
 
   return (
     <Animated.View entering={FadeIn.duration(400)} className="flex-1">
-      <FlatList
+      <FlashList
         data={items}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
