@@ -1,10 +1,12 @@
-# 🛋️&nbsp; Sofa
+<p align="center">
+<a href="https://sofa.watch"><img width="72" height="72" alt="Sofa" src="https://sofa.watch/icon.svg" /></a>
+<br/>
+<a href="https://sofa.watch"><strong>Sofa</strong></a> — Self-hosted movie & TV tracker
+</p>
 
 Sofa is a self-hosted movie and TV tracker for nerds. Track what you've watched, discover what's next, and plug your data into your existing home media stack.
 
-<p align="center">
-<img width="1335" height="848" alt="Screenshot 2026-03-08 at 7 26 43 PM" src="https://github.com/user-attachments/assets/ece86930-cb92-4faf-984b-74f3d1e7ce07" />
-</p>
+![Title page screenshot](screenshot.png)
 
 ## What it does
 
