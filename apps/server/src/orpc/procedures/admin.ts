@@ -9,6 +9,7 @@ import {
   restoreFromBackup,
 } from "@sofa/core/backup";
 import { getSetting, setSetting } from "@sofa/core/settings";
+import { isTelemetryEnabled } from "@sofa/core/telemetry";
 import {
   getCachedUpdateCheck,
   isUpdateCheckEnabled,
@@ -130,6 +131,21 @@ export const toggleUpdateCheck = os.admin.toggleUpdateCheck
   .use(admin)
   .handler(({ input }) => {
     setSetting("updateCheckEnabled", String(input.enabled));
+  });
+
+// ─── Telemetry ────────────────────────────────────────────────
+
+export const telemetry = os.admin.telemetry.use(admin).handler(() => {
+  return {
+    enabled: isTelemetryEnabled(),
+    lastReportedAt: getSetting("telemetryLastReportedAt"),
+  };
+});
+
+export const toggleTelemetry = os.admin.toggleTelemetry
+  .use(admin)
+  .handler(({ input }) => {
+    setSetting("telemetryEnabled", String(input.enabled));
   });
 
 // ─── Jobs ──────────────────────────────────────────────────────

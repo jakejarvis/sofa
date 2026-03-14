@@ -78,6 +78,8 @@ export const router = os.router({
     toggleRegistration: admin.toggleRegistration,
     updateCheck: admin.updateCheck,
     toggleUpdateCheck: admin.toggleUpdateCheck,
+    telemetry: admin.telemetry,
+    toggleTelemetry: admin.toggleTelemetry,
     triggerJob: admin.triggerJob,
   },
   account: {

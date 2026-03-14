@@ -16,6 +16,7 @@
     "./providers": "./src/providers.ts",
     "./settings": "./src/settings.ts",
     "./system-health": "./src/system-health.ts",
+    "./telemetry": "./src/telemetry.ts",
     "./tracking": "./src/tracking.ts",
     "./update-check": "./src/update-check.ts",
     "./webhooks": "./src/webhooks.ts"

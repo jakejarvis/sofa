@@ -70,6 +70,11 @@ export const CreateIntegrationInput = z.object({
 
 export const ToggleRegistrationInput = z.object({ open: z.boolean() });
 export const ToggleUpdateCheckInput = z.object({ enabled: z.boolean() });
+export const ToggleTelemetryInput = z.object({ enabled: z.boolean() });
+export const TelemetryOutput = z.object({
+  enabled: z.boolean(),
+  lastReportedAt: z.string().nullable(),
+});
 
 const cronJobName = z.enum([
   "scheduledBackup",
@@ -80,6 +85,7 @@ const cronJobName = z.enum([
   "cacheImages",
   "refreshCredits",
   "updateCheck",
+  "telemetryReport",
 ]);
 
 export const TriggerJobInput = z.object({ name: cronJobName });
@@ -555,6 +561,7 @@ export const QuickAddOutput = z.object({
 // ─── System outputs ───────────────────────────────────────────
 
 export const PublicInfoOutput = z.object({
+  instanceId: z.string(),
   tmdbConfigured: z.boolean(),
   userCount: z.number(),
   registrationOpen: z.boolean(),

@@ -33,12 +33,14 @@ import {
   SearchOutput,
   SystemHealthOutput,
   SystemStatusOutput,
+  TelemetryOutput,
   TitleDetailOutput,
   TitleRecommendationsOutput,
   TitleResolveOutput,
   TmdbIdParam,
   TmdbIdTypeParam,
   ToggleRegistrationInput,
+  ToggleTelemetryInput,
   ToggleUpdateCheckInput,
   TrendingOutput,
   TrendingTypeParam,
@@ -366,6 +368,13 @@ export const contract = {
     toggleUpdateCheck: oc
       .route({ method: "PUT", path: "/admin/update-check", tags: ["Admin"] })
       .input(ToggleUpdateCheckInput)
+      .output(z.void()),
+    telemetry: oc
+      .route({ method: "GET", path: "/admin/telemetry", tags: ["Admin"] })
+      .output(TelemetryOutput),
+    toggleTelemetry: oc
+      .route({ method: "PUT", path: "/admin/telemetry", tags: ["Admin"] })
+      .input(ToggleTelemetryInput)
       .output(z.void()),
     triggerJob: oc
       .route({

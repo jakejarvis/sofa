@@ -14,6 +14,7 @@ import {
   refreshTvChildren,
 } from "@sofa/core/metadata";
 import { getSetting } from "@sofa/core/settings";
+import { performTelemetryReport } from "@sofa/core/telemetry";
 import { performUpdateCheck } from "@sofa/core/update-check";
 import { db } from "@sofa/db/client";
 import { and, eq, inArray, isNotNull, lt, or } from "@sofa/db/helpers";
@@ -365,6 +366,9 @@ export function startJobs() {
   schedule("refreshCredits", "0 2 * * *", refreshCreditsJob);
   schedule("updateCheck", "0 */6 * * *", async () => {
     await performUpdateCheck();
+  });
+  schedule("telemetryReport", "30 0 * * *", async () => {
+    await performTelemetryReport();
   });
 
   log.info(`Started ${jobs.size} jobs`);

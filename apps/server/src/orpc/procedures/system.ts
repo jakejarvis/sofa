@@ -3,7 +3,11 @@ import {
   isOidcConfigured,
   isPasswordLoginDisabled,
 } from "@sofa/auth/config";
-import { getUserCount, isRegistrationOpen } from "@sofa/core/settings";
+import {
+  getInstanceId,
+  getUserCount,
+  isRegistrationOpen,
+} from "@sofa/core/settings";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { os } from "../context";
@@ -30,6 +34,7 @@ export const publicInfo = os.system.publicInfo.handler(async () => {
     .filter(Boolean) as string[];
 
   return {
+    instanceId: getInstanceId(),
     tmdbConfigured: isTmdbConfigured(),
     userCount: getUserCount(),
     registrationOpen: isRegistrationOpen(),

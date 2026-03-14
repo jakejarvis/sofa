@@ -23,6 +23,14 @@ export function getUserCount(): number {
   return result?.count ?? 0;
 }
 
+export function getInstanceId(): string {
+  const existing = getSetting("instanceId");
+  if (existing) return existing;
+  const id = Bun.randomUUIDv7();
+  setSetting("instanceId", id);
+  return id;
+}
+
 export function isRegistrationOpen(): boolean {
   const userCount = getUserCount();
   if (userCount === 0) return true;
