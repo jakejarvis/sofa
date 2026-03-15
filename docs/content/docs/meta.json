@@ -1,13 +1,15 @@
 {
   "pages": [
+    "---Documentation---",
     "index",
     "using-sofa",
     "admin",
     "configuration",
     "integrations",
     "troubleshooting",
-    "api",
     "mobile-app",
-    "telemetry"
+    "telemetry",
+    "---API Reference---",
+    "...api"
   ]
 }

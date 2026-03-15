@@ -4,6 +4,7 @@ import { openapi } from "../src/lib/openapi";
 void generateFiles({
   input: openapi,
   output: "./content/docs/api",
-  per: "tag",
+  groupBy: "tag",
   addGeneratedComment: true,
+  includeDescription: true,
 });

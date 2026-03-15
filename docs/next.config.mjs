@@ -14,7 +14,7 @@ const config = {
     return [
       {
         source: "/docs/api",
-        destination: "/docs/api/account",
+        destination: "/docs/api/account/account.removeAvatar",
         permanent: false,
       },
     ];
