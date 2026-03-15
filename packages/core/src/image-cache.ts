@@ -63,7 +63,7 @@ async function fetchRemoteImage(
   const url =
     tmdbCdnImageUrl(tmdbPath, category) ?? `${TMDB_IMAGE_BASE_URL}${tmdbPath}`;
 
-  const res = await fetch(url);
+  const res = await globalThis.fetch(url);
   if (!res.ok) {
     log.warn(`Fetch failed: ${url} -> ${res.status}`);
     return null;

@@ -1,11 +1,4 @@
-import { describe, expect, mock, test } from "bun:test";
-
-mock.module("../src/image-cache", () => ({
-  downloadAndCacheImage: async () => {},
-  getLocalImagePath: () => "",
-  imageCacheEnabled: () => false,
-  isImageCached: async () => false,
-}));
+import { describe, expect, test } from "bun:test";
 
 import { parseColorPalette } from "../src/colors";
 

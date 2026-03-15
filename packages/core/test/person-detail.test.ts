@@ -1,4 +1,12 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  mock,
+  spyOn,
+  test,
+} from "bun:test";
 import { eq } from "@sofa/db/helpers";
 import { persons } from "@sofa/db/schema";
 import { clearAllTables, testDb } from "@sofa/db/test-utils";
@@ -22,10 +30,6 @@ let nextPersonDetails = {
   imdb_id: null,
 };
 
-mock.module("../src/image-cache", () => ({
-  loadImageBuffer: async () => nextBuffer,
-}));
-
 mock.module("@sofa/tmdb/client", () => ({
   getPersonDetails: async () => nextPersonDetails,
   getPersonCombinedCredits: async () => ({ cast: [] }),
@@ -35,6 +39,7 @@ import { getOrFetchPerson } from "../src/person";
 
 beforeEach(() => {
   clearAllTables();
+  process.env.IMAGE_CACHE_ENABLED = "false";
   nextBuffer = TINY_PNG;
   nextPersonDetails = {
     id: 100,
@@ -48,6 +53,24 @@ beforeEach(() => {
     popularity: 10,
     imdb_id: null,
   };
+  spyOn(globalThis, "fetch").mockImplementation((async (
+    _input: string | URL | Request,
+    _init?: RequestInit,
+  ) => {
+    if (!nextBuffer) {
+      return new Response(null, { status: 404 });
+    }
+
+    return new Response(nextBuffer, {
+      status: 200,
+      headers: { "content-type": "image/png" },
+    });
+  }) as typeof fetch);
+});
+
+afterEach(() => {
+  delete process.env.IMAGE_CACHE_ENABLED;
+  mock.restore();
 });
 
 describe("getOrFetchPerson", () => {

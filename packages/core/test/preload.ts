@@ -1,5 +1,7 @@
-import { mock } from "bun:test";
+import { afterEach, mock } from "bun:test";
 import { applyMigrations, testDb } from "@sofa/db/test-utils";
+
+process.env.LOG_LEVEL ??= "error";
 
 mock.module("@sofa/db/client", () => ({
   db: testDb,
@@ -7,3 +9,7 @@ mock.module("@sofa/db/client", () => ({
 }));
 
 applyMigrations();
+
+afterEach(() => {
+  mock.restore();
+});

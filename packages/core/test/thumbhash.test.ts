@@ -1,4 +1,12 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  mock,
+  spyOn,
+  test,
+} from "bun:test";
 import { eq } from "@sofa/db/helpers";
 import { episodes, seasons, titles } from "@sofa/db/schema";
 import { clearAllTables, testDb } from "@sofa/db/test-utils";
@@ -10,15 +18,30 @@ const TINY_PNG = Buffer.from(
 
 let nextBuffer: Buffer | null = TINY_PNG;
 
-mock.module("../src/image-cache", () => ({
-  loadImageBuffer: async () => nextBuffer,
-}));
-
 import { generateEpisodeThumbHash, generateThumbHash } from "../src/thumbhash";
 
 beforeEach(() => {
   clearAllTables();
+  process.env.IMAGE_CACHE_ENABLED = "false";
   nextBuffer = TINY_PNG;
+  spyOn(globalThis, "fetch").mockImplementation((async (
+    _input: string | URL | Request,
+    _init?: RequestInit,
+  ) => {
+    if (!nextBuffer) {
+      return new Response(null, { status: 404 });
+    }
+
+    return new Response(nextBuffer, {
+      status: 200,
+      headers: { "content-type": "image/png" },
+    });
+  }) as typeof fetch);
+});
+
+afterEach(() => {
+  delete process.env.IMAGE_CACHE_ENABLED;
+  mock.restore();
 });
 
 describe("thumbhash generation", () => {
