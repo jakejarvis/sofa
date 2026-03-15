@@ -1,4 +1,7 @@
-import { OpenAPIGenerator } from "@orpc/openapi";
+import {
+  OpenAPIGenerator,
+  type OpenAPIGeneratorGenerateOptions,
+} from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import {
   BackupSchema,
@@ -214,7 +217,7 @@ export function normalizeOpenApiSpec<T extends OpenApiSpec>(spec: T): T {
 export async function generateOpenApiSpec(options: {
   title: string;
   version: string;
-  servers: Array<{ url: string }>;
+  servers: OpenAPIGeneratorGenerateOptions["servers"];
   sessionCookieName: string;
   tags?: Array<{ name: string; description?: string }>;
 }): Promise<OpenApiSpec> {

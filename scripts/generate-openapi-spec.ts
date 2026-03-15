@@ -7,7 +7,23 @@ import {
 const spec = await generateOpenApiSpec({
   title: "Sofa API",
   version: packageJson.version || "1.0.0",
-  servers: [{ url: "https://sofa.example.com/api/v1" }],
+  servers: [
+    {
+      url: "{protocol}://{host}:{port}/api/v1",
+      variables: {
+        protocol: {
+          default: "http",
+          enum: ["http", "https"],
+        },
+        host: {
+          default: "localhost",
+        },
+        port: {
+          default: "3000",
+        },
+      },
+    },
+  ],
   sessionCookieName: "better-auth.session_token",
   tags: [...openApiTags],
 });
@@ -55,5 +71,5 @@ for (const pathItem of Object.values(spec.paths ?? {})) {
   }
 }
 
-await Bun.write("docs/openapi.json", JSON.stringify(spec, null, 2));
+await Bun.write("docs/public/openapi.json", JSON.stringify(spec, null, 2));
 console.log("OpenAPI spec written to docs/openapi.json");

@@ -5,7 +5,22 @@
   },
   "servers": [
     {
-      "url": "https://sofa.example.com/api/v1"
+      "url": "{protocol}://{host}:{port}/api/v1",
+      "variables": {
+        "protocol": {
+          "default": "http",
+          "enum": [
+            "http",
+            "https"
+          ]
+        },
+        "host": {
+          "default": "localhost"
+        },
+        "port": {
+          "default": "3000"
+        }
+      }
     }
   ],
   "tags": [
