@@ -5,73 +5,111 @@ full: true
 _openapi:
   toc:
     - depth: 2
-      title: List
-      url: '#list'
+      title: List backups
+      url: '#list-backups'
     - depth: 2
-      title: Create
-      url: '#create'
+      title: Create backup
+      url: '#create-backup'
     - depth: 2
-      title: Delete
-      url: '#delete'
+      title: Delete backup
+      url: '#delete-backup'
     - depth: 2
-      title: Restore
-      url: '#restore'
+      title: Restore from backup
+      url: '#restore-from-backup'
     - depth: 2
-      title: Schedule
-      url: '#schedule'
+      title: Get backup schedule
+      url: '#get-backup-schedule'
     - depth: 2
-      title: Update Schedule
-      url: '#update-schedule'
+      title: Update backup schedule
+      url: '#update-backup-schedule'
     - depth: 2
-      title: Registration
-      url: '#registration'
+      title: Get registration status
+      url: '#get-registration-status'
     - depth: 2
-      title: Toggle Registration
+      title: Toggle registration
       url: '#toggle-registration'
     - depth: 2
-      title: Update Check
-      url: '#update-check'
+      title: Get update check status
+      url: '#get-update-check-status'
     - depth: 2
-      title: Toggle Update Check
-      url: '#toggle-update-check'
+      title: Toggle update checks
+      url: '#toggle-update-checks'
     - depth: 2
-      title: Telemetry
-      url: '#telemetry'
+      title: Get telemetry status
+      url: '#get-telemetry-status'
     - depth: 2
-      title: Toggle Telemetry
+      title: Toggle telemetry
       url: '#toggle-telemetry'
     - depth: 2
-      title: Trigger Job
-      url: '#trigger-job'
+      title: Trigger cron job
+      url: '#trigger-cron-job'
   structuredData:
     headings:
-      - content: List
-        id: list
-      - content: Create
-        id: create
-      - content: Delete
-        id: delete
-      - content: Restore
-        id: restore
-      - content: Schedule
-        id: schedule
-      - content: Update Schedule
-        id: update-schedule
-      - content: Registration
-        id: registration
-      - content: Toggle Registration
+      - content: List backups
+        id: list-backups
+      - content: Create backup
+        id: create-backup
+      - content: Delete backup
+        id: delete-backup
+      - content: Restore from backup
+        id: restore-from-backup
+      - content: Get backup schedule
+        id: get-backup-schedule
+      - content: Update backup schedule
+        id: update-backup-schedule
+      - content: Get registration status
+        id: get-registration-status
+      - content: Toggle registration
         id: toggle-registration
-      - content: Update Check
-        id: update-check
-      - content: Toggle Update Check
-        id: toggle-update-check
-      - content: Telemetry
-        id: telemetry
-      - content: Toggle Telemetry
+      - content: Get update check status
+        id: get-update-check-status
+      - content: Toggle update checks
+        id: toggle-update-checks
+      - content: Get telemetry status
+        id: get-telemetry-status
+      - content: Toggle telemetry
         id: toggle-telemetry
-      - content: Trigger Job
-        id: trigger-job
-    contents: []
+      - content: Trigger cron job
+        id: trigger-cron-job
+    contents:
+      - content: Fetch all database backups with their sizes and creation times.
+        heading: list-backups
+      - content: >-
+          Create a new manual database backup. The backup is tagged as a manual
+          backup.
+        heading: create-backup
+      - content: Permanently delete a database backup file by filename.
+        heading: delete-backup
+      - content: >-
+          Upload a database backup file and restore it. A pre-restore backup is
+          automatically created before overwriting the current database.
+        heading: restore-from-backup
+      - content: Fetch the current automated backup schedule configuration.
+        heading: get-backup-schedule
+      - content: >-
+          Update the automated backup schedule. Only provided fields are
+          changed; omitted fields keep their current values.
+        heading: update-backup-schedule
+      - content: Check whether new user registration is currently open or closed.
+        heading: get-registration-status
+      - content: Open or close new user registration.
+        heading: toggle-registration
+      - content: >-
+          Fetch whether automatic update checks are enabled, and the latest
+          cached check result if available.
+        heading: get-update-check-status
+      - content: Enable or disable automatic update checks against the public API.
+        heading: toggle-update-checks
+      - content: >-
+          Fetch whether anonymous telemetry is enabled and when the last report
+          was sent.
+        heading: get-telemetry-status
+      - content: Enable or disable anonymous telemetry reporting.
+        heading: toggle-telemetry
+      - content: >-
+          Manually trigger a background cron job by name. The job runs
+          asynchronously.
+        heading: trigger-cron-job
 ---
 
 {/* This file was generated by Fumadocs. Do not edit this file directly. Any changes should be made by running the generation command again. */}

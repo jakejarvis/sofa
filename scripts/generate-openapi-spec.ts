@@ -1,43 +1,15 @@
-import { OpenAPIGenerator } from "@orpc/openapi";
-import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import { contract } from "@sofa/api/contract";
-
 import packageJson from "../apps/server/package.json" with { type: "json" };
+import {
+  generateOpenApiSpec,
+  openApiTags,
+} from "../apps/server/src/orpc/openapi-spec";
 
-const generator = new OpenAPIGenerator({
-  schemaConverters: [new ZodToJsonSchemaConverter()],
-});
-
-const spec = await generator.generate(contract, {
-  info: { title: "Sofa API", version: packageJson.version || "1.0.0" },
+const spec = await generateOpenApiSpec({
+  title: "Sofa API",
+  version: packageJson.version || "1.0.0",
   servers: [{ url: "https://sofa.example.com/api/v1" }],
-  tags: [
-    { name: "Titles", description: "Movie and TV show management" },
-    { name: "Episodes", description: "Episode watch tracking" },
-    { name: "Seasons", description: "Season watch tracking" },
-    { name: "People", description: "Cast and crew information" },
-    { name: "Dashboard", description: "User dashboard data" },
-    { name: "Explore", description: "Discover trending and popular content" },
-    { name: "Search", description: "Search for movies and TV shows" },
-    {
-      name: "Discover",
-      description: "Advanced content discovery with filters",
-    },
-    { name: "System", description: "Server status and configuration" },
-    { name: "Integrations", description: "Media server integrations" },
-    { name: "Admin", description: "Server administration" },
-    { name: "Account", description: "User account management" },
-  ],
-  components: {
-    securitySchemes: {
-      session: {
-        type: "apiKey",
-        name: "better-auth.session_token",
-        in: "cookie",
-        description: "Better Auth session cookie",
-      },
-    },
-  },
+  sessionCookieName: "better-auth.session_token",
+  tags: [...openApiTags],
 });
 
 // Normalize file upload media types that fumadocs-openapi doesn't support

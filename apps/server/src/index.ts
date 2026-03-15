@@ -5,7 +5,7 @@ import { registerJobScheduleProvider } from "@sofa/core/system-health";
 import { closeDatabase } from "@sofa/db/client";
 import { runMigrations } from "@sofa/db/migrate";
 import { createLogger } from "@sofa/logger";
-import { Hono } from "hono";
+import { type Context, Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { getJobSchedules, startJobs, stopJobs } from "./cron";
@@ -84,13 +84,16 @@ app.all("/rpc/*", async (c) => {
 });
 
 // oRPC OpenAPI handler + Scalar docs
-app.all("/api/v1/*", async (c) => {
+const handleOpenApi = async (c: Context) => {
   const { response } = await openApiHandler.handle(c.req.raw, {
     prefix: "/api/v1",
     context: { headers: c.req.raw.headers },
   });
   return response ?? c.text("Not found", 404);
-});
+};
+
+app.all("/api/v1", handleOpenApi);
+app.all("/api/v1/*", handleOpenApi);
 
 // ─── SPA static serving (production) ─────────────────────────
 

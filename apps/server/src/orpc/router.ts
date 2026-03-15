@@ -13,7 +13,7 @@ import * as status from "./procedures/status";
 import * as system from "./procedures/system";
 import * as titles from "./procedures/titles";
 
-export const router = os.router({
+export const implementedRouter = {
   titles: {
     detail: titles.detail,
     resolve: titles.resolve,
@@ -87,6 +87,8 @@ export const router = os.router({
     uploadAvatar: account.uploadAvatar,
     removeAvatar: account.removeAvatar,
   },
-});
+};
+
+export const router = os.router(implementedRouter);
 
 export type Router = typeof router;
