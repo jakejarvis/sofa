@@ -45,7 +45,7 @@ export function ServerUnreachableBanner() {
 
   return (
     <Animated.View
-      entering={SlideInUp.duration(300).springify().damping(18)}
+      entering={SlideInUp.duration(300).damping(18)}
       exiting={SlideOutUp.duration(250)}
       style={{
         position: "absolute",

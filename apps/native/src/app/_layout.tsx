@@ -1,4 +1,5 @@
 import "@/global.css";
+import { ThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
@@ -14,7 +15,6 @@ import { useEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { Uniwind, useResolveClassNames } from "uniwind";
-
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-banner";
 import { authClient, rebuildAuthClient } from "@/lib/auth-client";
@@ -38,6 +38,7 @@ import {
   hasStoredServerUrl,
   onServerUrlChange,
 } from "@/lib/server-url";
+import { sofaTheme } from "@/lib/theme";
 import { toast } from "@/lib/toast";
 
 SplashScreen.preventAutoHideAsync();
@@ -191,7 +192,7 @@ function AppContent() {
   }, [session]);
 
   return (
-    <>
+    <ThemeProvider value={sofaTheme}>
       <StatusBar style="light" />
       <OfflineBanner />
       <ServerUnreachableBanner />
@@ -236,7 +237,7 @@ function AppContent() {
           />
         </Stack.Protected>
       </Stack>
-    </>
+    </ThemeProvider>
   );
 }
 
