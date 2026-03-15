@@ -324,9 +324,7 @@ export function TitleSeasons({
                                 >
                                   E{String(ep.episodeNumber).padStart(2, "0")}
                                 </span>
-                                {stillPath && (
-                                  <span className="hidden sm:inline"> </span>
-                                )}
+                                <span className="hidden sm:inline"> </span>
                                 <span className="font-medium">
                                   {ep.name ?? "Untitled"}
                                 </span>

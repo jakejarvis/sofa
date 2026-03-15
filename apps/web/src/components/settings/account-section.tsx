@@ -1,6 +1,8 @@
 import {
+  IconAlertTriangle,
   IconCamera,
   IconCheck,
+  IconLockPassword,
   IconLogout,
   IconPencil,
   IconTrash,
@@ -12,6 +14,7 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,13 +24,25 @@ import {
   CardDescription,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { signOut } from "@/lib/auth/client";
+import { authClient, signOut } from "@/lib/auth/client";
 import { orpc } from "@/lib/orpc/client";
 
 export function AccountSection({
@@ -317,18 +332,167 @@ export function AccountSection({
             </p>
           </div>
 
-          <Button
-            variant="destructive"
-            onClick={async () => {
-              await signOut();
-              void navigate({ to: "/" });
-            }}
-          >
-            <IconLogout aria-hidden={true} />
-            Sign out
-          </Button>
+          <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+            <ChangePasswordDialog />
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                await signOut();
+                void navigate({ to: "/" });
+              }}
+            >
+              <IconLogout aria-hidden={true} />
+              Sign out
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function ChangePasswordDialog() {
+  const [open, setOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function resetForm() {
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setRevokeOtherSessions(false);
+    setError("");
+  }
+
+  function handleOpenChange(nextOpen: boolean) {
+    setOpen(nextOpen);
+    if (!nextOpen) resetForm();
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    if (!currentPassword) {
+      setError("Current password is required");
+      return;
+    }
+    if (newPassword.length < 8) {
+      setError("New password must be at least 8 characters");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const result = await authClient.changePassword({
+        currentPassword,
+        newPassword,
+        revokeOtherSessions,
+      });
+      if (result.error) {
+        setError(result.error.message ?? "Failed to change password");
+        return;
+      }
+      toast.success("Password updated");
+      handleOpenChange(false);
+    } catch {
+      setError("Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        <IconLockPassword aria-hidden={true} />
+        Change password
+      </Button>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Change password</DialogTitle>
+          <DialogDescription>
+            Enter your current password and choose a new one.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="grid gap-3">
+          {error && (
+            <Alert variant="destructive">
+              <IconAlertTriangle />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="grid gap-1.5">
+            <Label htmlFor="current-password">Current password</Label>
+            <Input
+              id="current-password"
+              type="password"
+              autoComplete="current-password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div className="grid gap-1.5">
+            <Label htmlFor="new-password">New password</Label>
+            <Input
+              id="new-password"
+              type="password"
+              autoComplete="new-password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div className="grid gap-1.5">
+            <Label htmlFor="confirm-password">Confirm new password</Label>
+            <Input
+              id="confirm-password"
+              type="password"
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div className="flex items-center gap-2 pt-1">
+            <Checkbox
+              id="revoke-sessions"
+              checked={revokeOtherSessions}
+              onCheckedChange={(checked) =>
+                setRevokeOtherSessions(checked === true)
+              }
+              disabled={isSubmitting}
+            />
+            <Label htmlFor="revoke-sessions" className="cursor-pointer">
+              Sign out of other sessions
+            </Label>
+          </div>
+
+          <DialogFooter className="pt-2">
+            <DialogClose render={<Button variant="outline" />}>
+              Cancel
+            </DialogClose>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Spinner className="size-3.5" />}
+              Update password
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

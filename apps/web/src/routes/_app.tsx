@@ -29,7 +29,7 @@ function AppLayout() {
   const { session, updateCheck } = Route.useRouteContext();
   return (
     <>
-      <div className="relative z-0 min-h-screen pb-[calc(3.5rem+env(safe-area-inset-bottom))] sm:pb-0">
+      <div className="relative z-0 min-h-screen overflow-x-clip pb-[calc(3.5rem+env(safe-area-inset-bottom))] sm:pb-0">
         <NavBar
           userName={session.user.name}
           userEmail={session.user.email}

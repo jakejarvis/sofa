@@ -43,7 +43,7 @@ export function ScrollIndicator() {
   return (
     <div
       ref={ref}
-      className="absolute bottom-8 flex flex-col items-center gap-1.5 text-fd-muted-foreground transition-opacity duration-500"
+      className="absolute bottom-9 flex flex-col items-center gap-1.5 text-fd-muted-foreground transition-opacity duration-500"
       style={{ opacity: shown && !scrolled && fits ? 1 : 0 }}
     >
       <ArrowDown

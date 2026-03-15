@@ -41,13 +41,13 @@ export function IntegrationsSection() {
         </h2>
       </div>
       {isPending ? (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {INTEGRATION_CONFIGS.map((c) => (
             <Skeleton key={c.provider} className="h-20 w-full rounded-xl" />
           ))}
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {INTEGRATION_CONFIGS.map((config) => (
             <IntegrationCard
               key={config.provider}

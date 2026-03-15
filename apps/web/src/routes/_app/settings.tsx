@@ -9,7 +9,6 @@ import { AccountSection } from "@/components/settings/account-section";
 import { BackupRestoreSection } from "@/components/settings/backup-restore-section";
 import { BackupScheduleSection } from "@/components/settings/backup-schedule-section";
 import { BackupSection } from "@/components/settings/backup-section";
-import { ChangePasswordSection } from "@/components/settings/change-password-section";
 import { CacheSection } from "@/components/settings/danger-section";
 import { IntegrationsSection } from "@/components/settings/integrations-section";
 import { RegistrationSection } from "@/components/settings/registration-section";
@@ -85,97 +84,102 @@ function SettingsPage() {
           role: session.user.role ?? undefined,
         }}
       />
-      <ChangePasswordSection />
+
       <IntegrationsSection />
+
+      {/* Server health */}
       {isAdmin && (
-        <>
-          {/* Server health */}
-          <div>
-            <div className="mb-3 flex items-center gap-2">
-              <IconServer2
-                aria-hidden={true}
-                className="size-4 text-muted-foreground"
-              />
-              <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-                Server
-              </h2>
-              <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
-                Admin only
-              </span>
-            </div>
-            <SystemHealthCards />
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <IconServer2
+              aria-hidden={true}
+              className="size-4 text-muted-foreground"
+            />
+            <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+              Server
+            </h2>
+            <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
+              Admin only
+            </span>
           </div>
+          <SystemHealthCards />
+        </div>
+      )}
 
-          {/* Security */}
-          <div>
-            <div className="mb-3 flex items-center gap-2">
-              <IconShieldLock
-                aria-hidden={true}
-                className="size-4 text-muted-foreground"
-              />
-              <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-                Security
-              </h2>
-              <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
-                Admin only
-              </span>
-            </div>
-            <div className="space-y-3">
-              <Card className="border-l-2 border-l-primary/30">
-                <RegistrationSection />
-              </Card>
-              <Card className="border-l-2 border-l-primary/30">
-                <UpdateCheckSection />
-              </Card>
-            </div>
+      {/* Security */}
+      {isAdmin && (
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <IconShieldLock
+              aria-hidden={true}
+              className="size-4 text-muted-foreground"
+            />
+            <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+              Security
+            </h2>
+            <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
+              Admin only
+            </span>
           </div>
-
-          {/* Backups */}
-          <div>
-            <div className="mb-3 flex items-center gap-2">
-              <IconDatabaseExport
-                aria-hidden={true}
-                className="size-4 text-muted-foreground"
-              />
-              <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-                Backups
-              </h2>
-              <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
-                Admin only
-              </span>
-            </div>
-            <div className="space-y-3">
-              <Card className="border-l-2 border-l-primary/30">
-                <BackupSection />
-              </Card>
-              <Card className="border-l-2 border-l-primary/30">
-                <BackupScheduleSection />
-              </Card>
-              <Card className="border-l-2 border-l-primary/30">
-                <BackupRestoreSection />
-              </Card>
-            </div>
-          </div>
-
-          {/* Cache */}
-          <div>
-            <div className="mb-3 flex items-center gap-2">
-              <IconAlertTriangle
-                aria-hidden={true}
-                className="size-4 text-destructive"
-              />
-              <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-                Danger Zone
-              </h2>
-              <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
-                Admin only
-              </span>
-            </div>
+          <div className="space-y-3">
             <Card className="border-l-2 border-l-primary/30">
-              <CacheSection />
+              <RegistrationSection />
+            </Card>
+            <Card className="border-l-2 border-l-primary/30">
+              <UpdateCheckSection />
             </Card>
           </div>
-        </>
+        </div>
+      )}
+
+      {/* Backups */}
+      {isAdmin && (
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <IconDatabaseExport
+              aria-hidden={true}
+              className="size-4 text-muted-foreground"
+            />
+            <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+              Backups
+            </h2>
+            <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
+              Admin only
+            </span>
+          </div>
+          <div className="space-y-3">
+            <Card className="border-l-2 border-l-primary/30">
+              <BackupSection />
+            </Card>
+            <Card className="border-l-2 border-l-primary/30">
+              <BackupScheduleSection />
+            </Card>
+            <Card className="border-l-2 border-l-primary/30">
+              <BackupRestoreSection />
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Cache */}
+      {isAdmin && (
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <IconAlertTriangle
+              aria-hidden={true}
+              className="size-4 text-destructive"
+            />
+            <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+              Danger Zone
+            </h2>
+            <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
+              Admin only
+            </span>
+          </div>
+          <Card className="border-l-2 border-l-primary/30">
+            <CacheSection />
+          </Card>
+        </div>
       )}
     </SettingsShell>
   );

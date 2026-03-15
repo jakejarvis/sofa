@@ -74,7 +74,7 @@ const steps = [
     step: "2",
     title: "Set three environment variables",
     content: (
-      <pre className="mt-2 rounded-lg bg-fd-background/80 p-3 text-xs text-fd-muted-foreground ring-1 ring-white/[0.06]">
+      <pre className="overflow-x-auto mt-2 rounded-lg bg-fd-background/80 p-3 text-xs text-fd-muted-foreground ring-1 ring-white/[0.06]">
         <code>{`TMDB_API_READ_ACCESS_TOKEN=...
 BETTER_AUTH_SECRET=...
 BETTER_AUTH_URL=https://sofa.example.com`}</code>
@@ -85,7 +85,7 @@ BETTER_AUTH_URL=https://sofa.example.com`}</code>
     step: "3",
     title: "Start the container",
     content: (
-      <pre className="mt-2 rounded-lg bg-fd-background/80 p-3 text-xs text-fd-muted-foreground ring-1 ring-white/[0.06]">
+      <pre className="overflow-x-auto mt-2 rounded-lg bg-fd-background/80 p-3 text-xs text-fd-muted-foreground ring-1 ring-white/[0.06]">
         <code>docker compose up -d</code>
       </pre>
     ),
