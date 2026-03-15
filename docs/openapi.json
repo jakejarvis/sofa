@@ -5584,6 +5584,90 @@
         ]
       }
     },
+    "/admin/cache/purge-metadata": {
+      "post": {
+        "operationId": "admin.purgeMetadataCache",
+        "summary": "Purge metadata cache",
+        "description": "Delete un-enriched stub titles not in any user's library and clean up orphaned person records.",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Counts of deleted titles and persons",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deletedTitles": {
+                      "type": "number",
+                      "description": "Number of un-enriched stub titles deleted"
+                    },
+                    "deletedPersons": {
+                      "type": "number",
+                      "description": "Number of orphaned person records deleted"
+                    }
+                  },
+                  "required": [
+                    "deletedTitles",
+                    "deletedPersons"
+                  ],
+                  "description": "Result of purging un-enriched metadata from the database"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/admin/cache/purge-images": {
+      "post": {
+        "operationId": "admin.purgeImageCache",
+        "summary": "Purge image cache",
+        "description": "Delete all cached TMDB images from disk. Images will be re-downloaded on demand.",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Count of deleted files and bytes freed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deletedFiles": {
+                      "type": "number",
+                      "description": "Number of image files deleted from disk"
+                    },
+                    "freedBytes": {
+                      "type": "number",
+                      "description": "Total bytes freed from disk"
+                    }
+                  },
+                  "required": [
+                    "deletedFiles",
+                    "freedBytes"
+                  ],
+                  "description": "Result of purging the image cache from disk"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/account/name": {
       "put": {
         "operationId": "account.updateName",

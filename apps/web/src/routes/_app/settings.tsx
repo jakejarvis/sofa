@@ -1,4 +1,5 @@
 import {
+  IconAlertTriangle,
   IconDatabaseExport,
   IconServer2,
   IconShieldLock,
@@ -9,6 +10,7 @@ import { BackupRestoreSection } from "@/components/settings/backup-restore-secti
 import { BackupScheduleSection } from "@/components/settings/backup-schedule-section";
 import { BackupSection } from "@/components/settings/backup-section";
 import { ChangePasswordSection } from "@/components/settings/change-password-section";
+import { CacheSection } from "@/components/settings/danger-section";
 import { IntegrationsSection } from "@/components/settings/integrations-section";
 import { RegistrationSection } from "@/components/settings/registration-section";
 import { SettingsShell } from "@/components/settings/settings-shell";
@@ -153,6 +155,25 @@ function SettingsPage() {
                 <BackupRestoreSection />
               </Card>
             </div>
+          </div>
+
+          {/* Cache */}
+          <div>
+            <div className="mb-3 flex items-center gap-2">
+              <IconAlertTriangle
+                aria-hidden={true}
+                className="size-4 text-destructive"
+              />
+              <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+                Danger Zone
+              </h2>
+              <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
+                Admin only
+              </span>
+            </div>
+            <Card className="border-l-2 border-l-primary/30">
+              <CacheSection />
+            </Card>
           </div>
         </>
       )}

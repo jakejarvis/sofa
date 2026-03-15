@@ -8,6 +8,10 @@ import {
   listBackups,
   restoreFromBackup,
 } from "@sofa/core/backup";
+import {
+  purgeImageCache as purgeImagesFn,
+  purgeMetadataCache as purgeMetadataFn,
+} from "@sofa/core/cache";
 import { getSetting, setSetting } from "@sofa/core/settings";
 import { isTelemetryEnabled } from "@sofa/core/telemetry";
 import {
@@ -159,3 +163,13 @@ export const triggerJob = os.admin.triggerJob
     }
     return { ok: true as const };
   });
+
+// ─── Purge ────────────────────────────────────────────────────
+
+export const purgeMetadataCache = os.admin.purgeMetadataCache
+  .use(admin)
+  .handler(() => purgeMetadataFn());
+
+export const purgeImageCache = os.admin.purgeImageCache
+  .use(admin)
+  .handler(async () => purgeImagesFn());

@@ -6,6 +6,7 @@
   "exports": {
     "./availability": "./src/availability.ts",
     "./backup": "./src/backup.ts",
+    "./cache": "./src/cache.ts",
     "./colors": "./src/colors.ts",
     "./credits": "./src/credits.ts",
     "./discovery": "./src/discovery.ts",

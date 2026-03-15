@@ -6,7 +6,9 @@ export {
   gte,
   inArray,
   isNotNull,
+  isNull,
   lt,
+  notInArray,
   or,
   sql,
 } from "drizzle-orm";

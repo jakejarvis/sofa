@@ -26,6 +26,8 @@ import {
   PopularOutput,
   ProviderParam,
   PublicInfoOutput,
+  PurgeImageCacheOutput,
+  PurgeMetadataCacheOutput,
   QuickAddOutput,
   RegistrationOutput,
   RestoreBackupInput,
@@ -666,6 +668,30 @@ export const contract = {
       .errors({
         NOT_FOUND: { message: "Job not found" },
       }),
+    purgeMetadataCache: oc
+      .route({
+        method: "POST",
+        path: "/admin/cache/purge-metadata",
+        tags: ["Admin"],
+        summary: "Purge metadata cache",
+        description:
+          "Delete un-enriched stub titles not in any user's library and clean up orphaned person records.",
+        successDescription: "Counts of deleted titles and persons",
+      })
+      .input(z.void())
+      .output(PurgeMetadataCacheOutput),
+    purgeImageCache: oc
+      .route({
+        method: "POST",
+        path: "/admin/cache/purge-images",
+        tags: ["Admin"],
+        summary: "Purge image cache",
+        description:
+          "Delete all cached TMDB images from disk. Images will be re-downloaded on demand.",
+        successDescription: "Count of deleted files and bytes freed",
+      })
+      .input(z.void())
+      .output(PurgeImageCacheOutput),
   },
   account: {
     updateName: oc

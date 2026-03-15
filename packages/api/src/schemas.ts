@@ -997,6 +997,28 @@ export const TriggerJobOutput = z.object({
   ok: z.literal(true).describe("Always true on success"),
 });
 
+export const PurgeMetadataCacheOutput = z
+  .object({
+    deletedTitles: z
+      .number()
+      .describe("Number of un-enriched stub titles deleted"),
+    deletedPersons: z
+      .number()
+      .describe("Number of orphaned person records deleted"),
+  })
+  .meta({
+    description: "Result of purging un-enriched metadata from the database",
+  });
+
+export const PurgeImageCacheOutput = z
+  .object({
+    deletedFiles: z
+      .number()
+      .describe("Number of image files deleted from disk"),
+    freedBytes: z.number().describe("Total bytes freed from disk"),
+  })
+  .meta({ description: "Result of purging the image cache from disk" });
+
 // ─── Quick add output ──────────────────────────────────────────
 
 export const QuickAddOutput = z

@@ -81,6 +81,8 @@ export const implementedRouter = {
     telemetry: admin.telemetry,
     toggleTelemetry: admin.toggleTelemetry,
     triggerJob: admin.triggerJob,
+    purgeMetadataCache: admin.purgeMetadataCache,
+    purgeImageCache: admin.purgeImageCache,
   },
   account: {
     updateName: account.updateName,
