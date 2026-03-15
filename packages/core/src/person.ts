@@ -217,19 +217,29 @@ export async function fetchFullFilmography(
 
   const credits = await getPersonCombinedCredits(person.tmdbId);
 
-  // Filter to valid cast entries
-  // Schema types combined credits cast as movie-only; TV entries also carry
+  // Schema types combined credits as movie-only; TV entries also carry
   // `name` and `first_air_date` at runtime, so widen the type minimally.
   type CastEntry = (typeof credits)["cast"] extends (infer E)[] | undefined
     ? E & { name?: string; first_air_date?: string }
     : never;
+  type CrewEntry = (typeof credits)["crew"] extends (infer E)[] | undefined
+    ? E & { name?: string; first_air_date?: string }
+    : never;
+
   const validCast = ((credits.cast ?? []) as CastEntry[]).filter(
     (c) => c.media_type === "movie" || c.media_type === "tv",
   );
-  if (validCast.length === 0) return [];
+  const validCrew = ((credits.crew ?? []) as CrewEntry[]).filter(
+    (c) => c.media_type === "movie" || c.media_type === "tv",
+  );
+
+  if (validCast.length === 0 && validCrew.length === 0) return [];
+
+  // Collect all unique TMDB IDs from both cast and crew
+  const allEntries = [...validCast.map((c) => c), ...validCrew.map((c) => c)];
+  const tmdbIds = [...new Set(allEntries.map((c) => c.id))];
 
   // Batch prefetch existing titles (1 query)
-  const tmdbIds = [...new Set(validCast.map((c) => c.id))];
   const existingTitles = db
     .select({ id: titles.id, tmdbId: titles.tmdbId })
     .from(titles)
@@ -240,11 +250,11 @@ export async function fetchFullFilmography(
   );
 
   // Batch insert missing titles in a transaction
-  const newCast = validCast.filter((c) => !titleIdMap.has(c.id));
-  if (newCast.length > 0) {
+  const newEntries = allEntries.filter((c) => !titleIdMap.has(c.id));
+  if (newEntries.length > 0) {
     const insertedTmdbIds = new Set<number>();
     db.transaction((tx) => {
-      for (const c of newCast) {
+      for (const c of newEntries) {
         if (insertedTmdbIds.has(c.id)) continue;
         insertedTmdbIds.add(c.id);
         const row = tx
@@ -302,6 +312,24 @@ export async function fetchFullFilmography(
       character: c.character ?? null,
       department: "Acting",
       job: null,
+    });
+  }
+  for (const c of validCrew) {
+    const tid = titleIdMap.get(c.id);
+    if (!tid) continue;
+    results.push({
+      titleId: tid,
+      tmdbId: c.id,
+      type: c.media_type as "movie" | "tv",
+      title: c.title ?? c.name ?? "Unknown",
+      posterPath: tmdbImageUrl(c.poster_path ?? null, "posters"),
+      posterThumbHash: null,
+      releaseDate: c.release_date ?? null,
+      firstAirDate: c.first_air_date ?? null,
+      voteAverage: c.vote_average,
+      character: null,
+      department: c.department ?? "Crew",
+      job: c.job ?? null,
     });
   }
 

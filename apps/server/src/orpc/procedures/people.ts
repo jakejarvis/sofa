@@ -1,6 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import {
-  getLocalFilmography,
+  fetchFullFilmography,
   getOrFetchPerson,
   getOrFetchPersonByTmdbId,
 } from "@sofa/core/person";
@@ -15,7 +15,7 @@ export const detail = os.people.detail
     if (!person)
       throw new ORPCError("NOT_FOUND", { message: "Person not found" });
 
-    const filmography = getLocalFilmography(person.id);
+    const filmography = await fetchFullFilmography(person.id);
     const userStatuses = getUserStatusesByTitleIds(
       context.user.id,
       filmography.map((c) => c.titleId),
