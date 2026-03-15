@@ -1,13 +1,14 @@
 import type { PersonCredit, ResolvedPerson } from "@sofa/api/schemas";
 import { db } from "@sofa/db/client";
 import { eq, inArray } from "@sofa/db/helpers";
-import { persons, titleCast, titles } from "@sofa/db/schema";
+import { personFilmography, persons, titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getPersonCombinedCredits, getPersonDetails } from "@sofa/tmdb/client";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { generatePersonThumbHash } from "./thumbhash";
 
 const log = createLogger("person");
+const FILMOGRAPHY_STALE_MS = 30 * 24 * 60 * 60 * 1000;
 
 async function ensureProfileThumbHash(
   person: Pick<
@@ -180,13 +181,14 @@ export function getLocalFilmography(personId: string): PersonCredit[] {
       releaseDate: titles.releaseDate,
       firstAirDate: titles.firstAirDate,
       voteAverage: titles.voteAverage,
-      character: titleCast.character,
-      department: titleCast.department,
-      job: titleCast.job,
+      character: personFilmography.character,
+      department: personFilmography.department,
+      job: personFilmography.job,
     })
-    .from(titleCast)
-    .innerJoin(titles, eq(titleCast.titleId, titles.id))
-    .where(eq(titleCast.personId, personId))
+    .from(personFilmography)
+    .innerJoin(titles, eq(personFilmography.titleId, titles.id))
+    .where(eq(personFilmography.personId, personId))
+    .orderBy(personFilmography.displayOrder)
     .all();
 
   return rows.map((r) => ({
@@ -205,16 +207,9 @@ export function getLocalFilmography(personId: string): PersonCredit[] {
   }));
 }
 
-export async function fetchFullFilmography(
-  personId: string,
-): Promise<PersonCredit[]> {
-  const person = db
-    .select()
-    .from(persons)
-    .where(eq(persons.id, personId))
-    .get();
-  if (!person) return [];
-
+async function syncPersonFilmography(
+  person: Pick<typeof persons.$inferSelect, "id" | "tmdbId">,
+) {
   const credits = await getPersonCombinedCredits(person.tmdbId);
 
   // Schema types combined credits as movie-only; TV entries also carry
@@ -233,56 +228,53 @@ export async function fetchFullFilmography(
     (c) => c.media_type === "movie" || c.media_type === "tv",
   );
 
-  if (validCast.length === 0 && validCrew.length === 0) return [];
-
-  // Collect all unique TMDB IDs from both cast and crew
-  const allEntries = [...validCast.map((c) => c), ...validCrew.map((c) => c)];
+  const allEntries = [...validCast, ...validCrew];
   const tmdbIds = [...new Set(allEntries.map((c) => c.id))];
 
-  // Batch prefetch existing titles (1 query)
-  const existingTitles = db
-    .select({ id: titles.id, tmdbId: titles.tmdbId })
-    .from(titles)
-    .where(inArray(titles.tmdbId, tmdbIds))
-    .all();
+  const existingTitles =
+    tmdbIds.length > 0
+      ? db
+          .select({ id: titles.id, tmdbId: titles.tmdbId })
+          .from(titles)
+          .where(inArray(titles.tmdbId, tmdbIds))
+          .all()
+      : [];
   const titleIdMap = new Map<number, string>(
-    existingTitles.map((t) => [t.tmdbId, t.id]),
+    existingTitles.map((title) => [title.tmdbId, title.id]),
   );
 
-  // Batch insert missing titles in a transaction
-  const newEntries = allEntries.filter((c) => !titleIdMap.has(c.id));
+  const newEntries = allEntries.filter((entry) => !titleIdMap.has(entry.id));
   if (newEntries.length > 0) {
     const insertedTmdbIds = new Set<number>();
     db.transaction((tx) => {
-      for (const c of newEntries) {
-        if (insertedTmdbIds.has(c.id)) continue;
-        insertedTmdbIds.add(c.id);
+      for (const entry of newEntries) {
+        if (insertedTmdbIds.has(entry.id)) continue;
+        insertedTmdbIds.add(entry.id);
         const row = tx
           .insert(titles)
           .values({
-            tmdbId: c.id,
-            type: c.media_type as "movie" | "tv",
-            title: c.title ?? c.name ?? "Unknown",
-            overview: c.overview,
-            releaseDate: c.release_date,
-            firstAirDate: c.first_air_date,
-            posterPath: c.poster_path,
-            backdropPath: c.backdrop_path,
-            popularity: c.popularity,
-            voteAverage: c.vote_average,
-            voteCount: c.vote_count,
+            tmdbId: entry.id,
+            type: entry.media_type as "movie" | "tv",
+            title: entry.title ?? entry.name ?? "Unknown",
+            overview: entry.overview,
+            releaseDate: entry.release_date,
+            firstAirDate: entry.first_air_date,
+            posterPath: entry.poster_path,
+            backdropPath: entry.backdrop_path,
+            popularity: entry.popularity,
+            voteAverage: entry.vote_average,
+            voteCount: entry.vote_count,
             lastFetchedAt: null,
           })
           .onConflictDoNothing()
           .returning()
           .get();
-        if (row) titleIdMap.set(c.id, row.id);
+        if (row) titleIdMap.set(entry.id, row.id);
       }
     });
 
-    // One fallback query for any that conflicted
     const stillMissing = [...insertedTmdbIds].filter(
-      (id) => !titleIdMap.has(id),
+      (tmdbId) => !titleIdMap.has(tmdbId),
     );
     if (stillMissing.length > 0) {
       const fallbacks = db
@@ -290,48 +282,94 @@ export async function fetchFullFilmography(
         .from(titles)
         .where(inArray(titles.tmdbId, stillMissing))
         .all();
-      for (const f of fallbacks) titleIdMap.set(f.tmdbId, f.id);
+      for (const fallback of fallbacks) {
+        titleIdMap.set(fallback.tmdbId, fallback.id);
+      }
     }
   }
 
-  // Build results from map (0 queries)
-  const results: PersonCredit[] = [];
-  for (const c of validCast) {
-    const tid = titleIdMap.get(c.id);
-    if (!tid) continue;
-    results.push({
-      titleId: tid,
-      tmdbId: c.id,
-      type: c.media_type as "movie" | "tv",
-      title: c.title ?? c.name ?? "Unknown",
-      posterPath: tmdbImageUrl(c.poster_path ?? null, "posters"),
-      posterThumbHash: null,
-      releaseDate: c.release_date ?? null,
-      firstAirDate: c.first_air_date ?? null,
-      voteAverage: c.vote_average,
-      character: c.character ?? null,
+  const nextRows: (typeof personFilmography.$inferInsert)[] = [];
+  let displayOrder = 0;
+
+  for (const credit of validCast) {
+    const titleId = titleIdMap.get(credit.id);
+    if (!titleId) continue;
+
+    nextRows.push({
+      personId: person.id,
+      titleId,
+      character: credit.character ?? null,
       department: "Acting",
       job: null,
+      displayOrder,
     });
-  }
-  for (const c of validCrew) {
-    const tid = titleIdMap.get(c.id);
-    if (!tid) continue;
-    results.push({
-      titleId: tid,
-      tmdbId: c.id,
-      type: c.media_type as "movie" | "tv",
-      title: c.title ?? c.name ?? "Unknown",
-      posterPath: tmdbImageUrl(c.poster_path ?? null, "posters"),
-      posterThumbHash: null,
-      releaseDate: c.release_date ?? null,
-      firstAirDate: c.first_air_date ?? null,
-      voteAverage: c.vote_average,
-      character: null,
-      department: c.department ?? "Crew",
-      job: c.job ?? null,
-    });
+    displayOrder++;
   }
 
-  return results;
+  for (const credit of validCrew) {
+    const titleId = titleIdMap.get(credit.id);
+    if (!titleId) continue;
+
+    nextRows.push({
+      personId: person.id,
+      titleId,
+      character: null,
+      department: credit.department ?? "Crew",
+      job: credit.job ?? null,
+      displayOrder,
+    });
+    displayOrder++;
+  }
+
+  const now = new Date();
+  db.transaction((tx) => {
+    tx.delete(personFilmography)
+      .where(eq(personFilmography.personId, person.id))
+      .run();
+
+    for (const row of nextRows) {
+      tx.insert(personFilmography).values(row).run();
+    }
+
+    tx.update(persons)
+      .set({ filmographyLastFetchedAt: now })
+      .where(eq(persons.id, person.id))
+      .run();
+  });
+}
+
+export async function fetchFullFilmography(
+  personId: string,
+): Promise<PersonCredit[]> {
+  const person = db
+    .select()
+    .from(persons)
+    .where(eq(persons.id, personId))
+    .get();
+  if (!person) return [];
+
+  const localFilmography = getLocalFilmography(personId);
+  const isFresh =
+    person.filmographyLastFetchedAt &&
+    person.filmographyLastFetchedAt.getTime() >
+      Date.now() - FILMOGRAPHY_STALE_MS;
+
+  if (isFresh) {
+    return localFilmography;
+  }
+
+  try {
+    await syncPersonFilmography(person);
+    return getLocalFilmography(personId);
+  } catch (err) {
+    if (person.filmographyLastFetchedAt) {
+      log.warn(
+        `Failed to refresh filmography for person ${personId}, falling back to cached DB rows:`,
+        err,
+      );
+      return localFilmography;
+    }
+
+    throw err;
+  }
 }

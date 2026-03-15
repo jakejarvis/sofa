@@ -1,4 +1,5 @@
-import { FlatList } from "react-native";
+import { FlashList } from "@shopify/flash-list";
+import { useCallback } from "react";
 
 import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
 import { usePosterActions } from "@/hooks/use-poster-actions";
@@ -28,10 +29,34 @@ export function HorizontalPosterRow({
   isLoading?: boolean;
 }) {
   const { handlePress, handleQuickAdd, addingKey } = usePosterActions();
+  const keyExtractor = useCallback(
+    (item: PosterRowItem) => item.id ?? `${item.tmdbId}-${item.type}`,
+    [],
+  );
+  const renderItem = useCallback(
+    ({ item }: { item: PosterRowItem }) => (
+      <PosterCard
+        id={item.id}
+        tmdbId={item.tmdbId}
+        title={item.title}
+        type={item.type as "movie" | "tv"}
+        posterPath={item.posterPath}
+        posterThumbHash={item.posterThumbHash}
+        releaseDate={item.releaseDate ?? item.firstAirDate}
+        voteAverage={item.voteAverage}
+        userStatus={item.userStatus}
+        episodeProgress={item.episodeProgress}
+        onPress={handlePress}
+        onQuickAdd={handleQuickAdd}
+        isAdding={addingKey === `${item.tmdbId}-${item.type}`}
+      />
+    ),
+    [addingKey, handlePress, handleQuickAdd],
+  );
 
   if (isLoading) {
     return (
-      <FlatList
+      <FlashList
         horizontal
         showsHorizontalScrollIndicator={false}
         data={[1, 2, 3, 4]}
@@ -44,28 +69,12 @@ export function HorizontalPosterRow({
   }
 
   return (
-    <FlatList
+    <FlashList
       horizontal
       showsHorizontalScrollIndicator={false}
       data={items}
-      keyExtractor={(item) => item.id ?? `${item.tmdbId}-${item.type}`}
-      renderItem={({ item }) => (
-        <PosterCard
-          id={item.id}
-          tmdbId={item.tmdbId}
-          title={item.title}
-          type={item.type as "movie" | "tv"}
-          posterPath={item.posterPath}
-          posterThumbHash={item.posterThumbHash}
-          releaseDate={item.releaseDate ?? item.firstAirDate}
-          voteAverage={item.voteAverage}
-          userStatus={item.userStatus}
-          episodeProgress={item.episodeProgress}
-          onPress={handlePress}
-          onQuickAdd={handleQuickAdd}
-          isAdding={addingKey === `${item.tmdbId}-${item.type}`}
-        />
-      )}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
       contentContainerStyle={listContentStyle}
       style={listStyle}
     />

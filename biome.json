@@ -12,7 +12,7 @@
       "!node_modules",
       "!dist",
       "!build",
-      "!drizzle",
+      "!packages/db/drizzle",
       "!packages/tmdb/src/schema.d.ts",
       "!**/routeTree.gen.ts",
       "!apps/native/.expo/types/**/*.ts",

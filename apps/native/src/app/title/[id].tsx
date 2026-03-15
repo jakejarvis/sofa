@@ -1,3 +1,4 @@
+import { FlashList } from "@shopify/flash-list";
 import {
   IconBrandAppstore,
   IconBrandGooglePlay,
@@ -14,8 +15,8 @@ import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import { useEffect, useMemo, useRef } from "react";
-import { FlatList, Platform, Pressable, ScrollView, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { Platform, Pressable, ScrollView, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
@@ -39,6 +40,9 @@ import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
 import { toast } from "@/lib/toast";
+
+const castListContentStyle = { gap: 12, paddingHorizontal: 16 };
+const castListStyle = { overflow: "visible" as const };
 
 export default function TitleDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -174,6 +178,10 @@ export default function TitleDetailScreen() {
           : null,
       })),
     [recommendations.data],
+  );
+  const renderCastItem = useCallback(
+    ({ item }: { item: (typeof cast)[number] }) => <CastCard person={item} />,
+    [],
   );
 
   const hydratedTitleId = useRef<string | null>(null);
@@ -597,14 +605,14 @@ export default function TitleDetailScreen() {
               iconColor={titleAccent}
             />
           </View>
-          <FlatList
+          <FlashList
             horizontal
             showsHorizontalScrollIndicator={false}
             data={cast}
             keyExtractor={(item, index) => `${item.id}-${index}`}
-            renderItem={({ item }) => <CastCard person={item} />}
-            contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
-            style={{ overflow: "visible" }}
+            renderItem={renderCastItem}
+            contentContainerStyle={castListContentStyle}
+            style={castListStyle}
           />
         </Animated.View>
       )}

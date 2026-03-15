@@ -19,12 +19,12 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
 
   const query = input.query.trim();
   if (!query) {
-    return { results: [] };
+    return { results: [], page: 1, totalPages: 0, totalResults: 0 };
   }
   const type = input.type ?? null;
 
   if (type === "person") {
-    const personResults = await searchPerson(query);
+    const personResults = await searchPerson(query, input.page);
     return {
       results: (personResults.results ?? []).map((r) => ({
         tmdbId: r.id,
@@ -43,15 +43,18 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
             .map((k) => k.title ?? (k as { name?: string }).name)
             .filter((s): s is string => !!s) as string[]) ?? null,
       })),
+      page: personResults.page ?? input.page,
+      totalPages: personResults.total_pages ?? 1,
+      totalResults: personResults.total_results ?? 0,
     };
   }
 
   const raw =
     type === "movie"
-      ? await searchMovies(query)
+      ? await searchMovies(query, input.page)
       : type === "tv"
-        ? await searchTv(query)
-        : await searchMulti(query);
+        ? await searchTv(query, input.page)
+        : await searchMulti(query, input.page);
 
   type SearchResult = {
     id: number;
@@ -105,5 +108,10 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);
 
-  return { results: mapped };
+  return {
+    results: mapped,
+    page: raw.page ?? input.page,
+    totalPages: raw.total_pages ?? 1,
+    totalResults: raw.total_results ?? 0,
+  };
 });

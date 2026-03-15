@@ -31,6 +31,43 @@ export const TmdbIdTypeParam = z
   })
   .meta({ description: "TMDB ID and media type pair for resolving titles" });
 
+// ─── Pagination ──────────────────────────────────────────────
+
+/** Page param for TMDB-backed endpoints (fixed ~20 items/page from TMDB) */
+export const PageParam = z.object({
+  page: z
+    .number()
+    .int()
+    .min(1)
+    .max(500)
+    .default(1)
+    .describe("Page number (1-indexed)"),
+});
+
+/** Page + limit for locally-paginated endpoints */
+export const PaginatedInput = z.object({
+  page: z
+    .number()
+    .int()
+    .min(1)
+    .max(500)
+    .default(1)
+    .describe("Page number (1-indexed)"),
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(100)
+    .default(20)
+    .describe("Results per page (1-100, default 20)"),
+});
+
+export const PaginationMeta = z.object({
+  page: z.number().describe("Current page number"),
+  totalPages: z.number().describe("Total number of pages available"),
+  totalResults: z.number().describe("Total number of results across all pages"),
+});
+
 // ─── Title inputs ──────────────────────────────────────────────
 
 export const UpdateStatusInput = z
@@ -83,6 +120,7 @@ export const SearchInput = z
       .optional()
       .describe("Optional type filter to narrow results"),
   })
+  .merge(PageParam)
   .meta({ description: "Search query with optional type filter" });
 
 export const DiscoverInput = z
@@ -90,6 +128,7 @@ export const DiscoverInput = z
     type: z.enum(["movie", "tv"]).describe("Media type to discover"),
     genreId: z.number().int().describe("TMDB genre ID to filter by"),
   })
+  .merge(PageParam)
   .meta({ description: "Genre-based discovery filters" });
 
 // ─── Watch history input ──────────────────────────────────────
@@ -460,6 +499,7 @@ const BrowseOutput = z
     userStatuses: userStatusMap,
     episodeProgress: episodeProgressMap,
   })
+  .merge(PaginationMeta)
   .meta({
     description:
       "Browse results with user tracking statuses and episode progress",
@@ -528,12 +568,13 @@ export const PersonDetailOutput = z
     person: PersonSchema,
     filmography: z
       .array(PersonCreditSchema)
-      .describe("All credits for this person"),
+      .describe("Credits for this person (paginated)"),
     userStatuses: userStatusMap,
   })
+  .merge(PaginationMeta)
   .meta({
     description:
-      "Person profile with filmography and user's statuses for their titles",
+      "Person profile with paginated filmography and user's statuses for their titles",
   });
 
 export const PersonResolveOutput = z
@@ -631,7 +672,8 @@ export const LibraryOutput = z
         .meta({ description: "A library item with user status" }),
     ),
   })
-  .meta({ description: "All titles in the user's library" });
+  .merge(PaginationMeta)
+  .meta({ description: "Paginated titles in the user's library" });
 
 export const DashboardRecommendationsOutput = z
   .object({
@@ -660,6 +702,7 @@ export const TrendingOutput = z
     userStatuses: userStatusMap,
     episodeProgress: episodeProgressMap,
   })
+  .merge(PaginationMeta)
   .meta({
     description: "Trending titles with hero spotlight and user statuses",
   });
@@ -717,6 +760,7 @@ export const SearchOutput = z
         .meta({ description: "A search result (movie, TV show, or person)" }),
     ),
   })
+  .merge(PaginationMeta)
   .meta({ description: "Search results from TMDB" });
 
 // ─── Discover output ───────────────────────────────────────────
@@ -1098,5 +1142,6 @@ export type ResolvedPerson = z.infer<typeof PersonSchema>;
 export type ResolvedTitle = z.infer<typeof ResolvedTitleSchema>;
 export type Season = z.infer<typeof SeasonSchema>;
 export type SystemHealthData = z.infer<typeof SystemHealthSchema>;
+export type PaginationInfo = z.infer<typeof PaginationMeta>;
 export type TimePeriod = z.infer<typeof WatchHistoryInput>["period"];
 export type UpdateCheckResult = z.infer<typeof UpdateCheckResultSchema>;

@@ -22,11 +22,15 @@ export const discover = os.discover
       });
     }
 
-    const results = await discoverTmdb(input.type, {
-      sort_by: "popularity.desc",
-      "vote_count.gte": "50",
-      with_genres: String(input.genreId),
-    });
+    const results = await discoverTmdb(
+      input.type,
+      {
+        sort_by: "popularity.desc",
+        "vote_count.gte": "50",
+        with_genres: String(input.genreId),
+      },
+      input.page,
+    );
 
     type DiscoverResult = NonNullable<typeof results.results>[number] & {
       title?: string;
@@ -61,5 +65,12 @@ export const discover = os.discover
           ]
         : [{}, {}];
 
-    return { items, userStatuses, episodeProgress };
+    return {
+      items,
+      userStatuses,
+      episodeProgress,
+      page: results.page ?? input.page,
+      totalPages: results.total_pages ?? 1,
+      totalResults: results.total_results ?? 0,
+    };
   });

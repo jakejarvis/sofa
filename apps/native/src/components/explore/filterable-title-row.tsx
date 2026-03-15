@@ -1,5 +1,5 @@
 import type { Icon } from "@tabler/icons-react-native";
-import { useQuery } from "@tanstack/react-query";
+import { skipToken, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 import {
@@ -42,23 +42,48 @@ export function FilterableTitleRow({
 }) {
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
 
-  const discover = useQuery({
-    ...orpc.discover.queryOptions({
-      input: { type: mediaType, genreId: selectedGenre ?? 0 },
+  const discover = useInfiniteQuery({
+    ...orpc.discover.infiniteOptions({
+      input:
+        selectedGenre != null
+          ? (pageParam: number) => ({
+              type: mediaType,
+              genreId: selectedGenre,
+              page: pageParam,
+            })
+          : skipToken,
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) =>
+        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
     }),
-    enabled: selectedGenre !== null,
   });
 
-  const rawItems =
-    selectedGenre === null ? defaultItems : (discover.data?.items ?? []);
+  const discoverItems = useMemo(
+    () => discover.data?.pages.flatMap((p) => p.items) ?? [],
+    [discover.data?.pages],
+  );
+  const discoverStatuses = useMemo(
+    () =>
+      Object.assign(
+        {},
+        ...(discover.data?.pages.map((p) => p.userStatuses) ?? []),
+      ) as Record<string, TitleStatus>,
+    [discover.data?.pages],
+  );
+  const discoverProgress = useMemo(
+    () =>
+      Object.assign(
+        {},
+        ...(discover.data?.pages.map((p) => p.episodeProgress) ?? []),
+      ) as Record<string, { watched: number; total: number }>,
+    [discover.data?.pages],
+  );
+
+  const rawItems = selectedGenre === null ? defaultItems : discoverItems;
   const userStatuses =
-    selectedGenre === null
-      ? defaultUserStatuses
-      : (discover.data?.userStatuses ?? {});
+    selectedGenre === null ? defaultUserStatuses : discoverStatuses;
   const episodeProgress =
-    selectedGenre === null
-      ? defaultEpisodeProgress
-      : (discover.data?.episodeProgress ?? {});
+    selectedGenre === null ? defaultEpisodeProgress : discoverProgress;
   const showLoading =
     isLoading || (selectedGenre !== null && discover.isPending);
 

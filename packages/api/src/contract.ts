@@ -21,6 +21,8 @@ import {
   IntegrationsListOutput,
   LibraryOutput,
   MediaTypeParam,
+  PageParam,
+  PaginatedInput,
   PersonDetailOutput,
   PersonResolveOutput,
   PopularOutput,
@@ -256,11 +258,11 @@ export const contract = {
         tags: ["People"],
         summary: "Get person details",
         description:
-          "Fetch a person's profile and filmography. Imports from TMDB on first access if not yet cached locally.",
+          "Fetch a person's profile and paginated filmography. Imports from TMDB on first access if not yet cached locally.",
         successDescription:
-          "Person profile, filmography credits, and user statuses for their titles",
+          "Person profile, paginated filmography credits, and user statuses for their titles",
       })
-      .input(IdParam)
+      .input(IdParam.merge(PaginatedInput))
       .output(PersonDetailOutput)
       .errors({
         NOT_FOUND: { message: "Person not found" },
@@ -312,9 +314,10 @@ export const contract = {
         tags: ["Dashboard"],
         summary: "Get user library",
         description:
-          "Fetch all titles in the user's library with their tracking statuses.",
-        successDescription: "Library items with user statuses",
+          "Fetch paginated titles in the user's library with their tracking statuses.",
+        successDescription: "Paginated library items with user statuses",
       })
+      .input(PaginatedInput)
       .output(LibraryOutput),
     recommendations: oc
       .route({
@@ -351,7 +354,7 @@ export const contract = {
           "Fetch today's trending movies and/or TV shows from TMDB, including a featured hero title and the user's statuses.",
         successDescription: "Trending items, hero spotlight, and user statuses",
       })
-      .input(TrendingTypeParam)
+      .input(TrendingTypeParam.merge(PageParam))
       .output(TrendingOutput)
       .errors({
         PRECONDITION_FAILED: { message: "TMDB API key is not configured" },
@@ -366,7 +369,7 @@ export const contract = {
           "Fetch currently popular movies or TV shows from TMDB with the user's tracking statuses.",
         successDescription: "Popular items with user statuses",
       })
-      .input(MediaTypeParam)
+      .input(MediaTypeParam.merge(PageParam))
       .output(PopularOutput)
       .errors({
         PRECONDITION_FAILED: { message: "TMDB API key is not configured" },

@@ -1,8 +1,12 @@
 import { FlashList } from "@shopify/flash-list";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  skipToken,
+  useInfiniteQuery,
+  useMutation,
+} from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { RecentlyViewedList } from "@/components/search/recently-viewed-list";
 import {
@@ -22,9 +26,16 @@ export default function SearchScreen() {
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query.trim(), 300);
 
-  const searchResults = useQuery({
-    ...orpc.search.queryOptions({ input: { query: debouncedQuery } }),
-    enabled: debouncedQuery.length > 0,
+  const searchResults = useInfiniteQuery({
+    ...orpc.search.infiniteOptions({
+      input:
+        debouncedQuery.length > 0
+          ? (pageParam: number) => ({ query: debouncedQuery, page: pageParam })
+          : skipToken,
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) =>
+        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    }),
   });
 
   // Track which item is currently being resolved/added
@@ -98,15 +109,17 @@ export default function SearchScreen() {
   // Memoize mapped results to maintain stable references
   const allResults = useMemo<SearchResultItem[]>(
     () =>
-      searchResults.data?.results?.map((r) => ({
-        tmdbId: r.tmdbId,
-        title: r.title,
-        type: r.type,
-        posterPath: r.posterPath,
-        profilePath: r.profilePath,
-        releaseDate: r.releaseDate,
-      })) ?? [],
-    [searchResults.data?.results],
+      searchResults.data?.pages.flatMap((page) =>
+        page.results.map((r) => ({
+          tmdbId: r.tmdbId,
+          title: r.title,
+          type: r.type,
+          posterPath: r.posterPath,
+          profilePath: r.profilePath,
+          releaseDate: r.releaseDate,
+        })),
+      ) ?? [],
+    [searchResults.data?.pages],
   );
 
   const renderItem = useCallback(
@@ -161,6 +174,22 @@ export default function SearchScreen() {
           renderItem={renderItem}
           keyboardShouldPersistTaps="handled"
           contentInsetAdjustmentBehavior="automatic"
+          onEndReached={() => {
+            if (
+              searchResults.hasNextPage &&
+              !searchResults.isFetchingNextPage
+            ) {
+              searchResults.fetchNextPage();
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            searchResults.isFetchingNextPage ? (
+              <View className="items-center py-4">
+                <ActivityIndicator />
+              </View>
+            ) : null
+          }
         />
       )}
     </View>

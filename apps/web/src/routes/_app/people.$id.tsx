@@ -7,8 +7,17 @@ import { orpc } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_app/people/$id")({
   loader: async ({ params, context }) => {
-    await context.queryClient.ensureQueryData(
-      orpc.people.detail.queryOptions({ input: { id: params.id } }),
+    await context.queryClient.ensureInfiniteQueryData(
+      orpc.people.detail.infiniteOptions({
+        input: (pageParam: number) => ({
+          id: params.id,
+          page: pageParam,
+          limit: 20,
+        }),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) =>
+          lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+      }),
     );
   },
   head: ({ loaderData: _loaderData, params: _params }) => {

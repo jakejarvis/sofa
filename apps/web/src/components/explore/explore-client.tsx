@@ -1,5 +1,6 @@
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
 import { FilterableTitleRow } from "./filterable-title-row";
@@ -33,14 +34,32 @@ function ExploreSkeletons() {
   );
 }
 
+function mergeMaps<T>(
+  ...maps: (Record<string, T> | undefined)[]
+): Record<string, T> {
+  return Object.assign({}, ...maps.filter(Boolean));
+}
+
 export function ExploreClient() {
-  const { data: trending, isPending: trendingPending } = useQuery(
-    orpc.explore.trending.queryOptions({ input: { type: "all" } }),
+  const {
+    data: trendingData,
+    isPending: trendingPending,
+    fetchNextPage: fetchNextTrending,
+    hasNextPage: hasNextTrending,
+    isFetchingNextPage: isFetchingNextTrending,
+  } = useInfiniteQuery(
+    orpc.explore.trending.infiniteOptions({
+      input: (pageParam: number) => ({ type: "all" as const, page: pageParam }),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) =>
+        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    }),
   );
-  const { data: popularMovies, isPending: moviesPending } = useQuery(
+
+  const { data: popularMoviesData, isPending: moviesPending } = useQuery(
     orpc.explore.popular.queryOptions({ input: { type: "movie" } }),
   );
-  const { data: popularTv, isPending: tvPending } = useQuery(
+  const { data: popularTvData, isPending: tvPending } = useQuery(
     orpc.explore.popular.queryOptions({ input: { type: "tv" } }),
   );
   const { data: movieGenreData } = useQuery(
@@ -52,46 +71,60 @@ export function ExploreClient() {
 
   const isPending = trendingPending || moviesPending || tvPending;
 
+  const trendingItems = useMemo(
+    () => trendingData?.pages.flatMap((p) => p.items) ?? [],
+    [trendingData?.pages],
+  );
+
+  const hero = trendingData?.pages[0]?.hero ?? null;
+
   if (isPending) return <ExploreSkeletons />;
 
   // Merge user statuses and episode progress from all responses
-  const userStatuses = {
-    ...trending?.userStatuses,
-    ...popularMovies?.userStatuses,
-    ...popularTv?.userStatuses,
-  };
-  const episodeProgress = {
-    ...trending?.episodeProgress,
-    ...popularMovies?.episodeProgress,
-    ...popularTv?.episodeProgress,
-  };
+  const userStatuses = mergeMaps(
+    ...(trendingData?.pages.map((p) => p.userStatuses) ?? []),
+    popularMoviesData?.userStatuses,
+    popularTvData?.userStatuses,
+  );
+  const episodeProgress = mergeMaps(
+    ...(trendingData?.pages.map((p) => p.episodeProgress) ?? []),
+    popularMoviesData?.episodeProgress,
+    popularTvData?.episodeProgress,
+  );
 
   return (
     <div className="space-y-10">
-      {trending?.hero && (
+      {hero && (
         <HeroBanner
-          tmdbId={trending.hero.tmdbId}
-          type={trending.hero.type}
-          title={trending.hero.title}
-          overview={trending.hero.overview}
-          backdropPath={trending.hero.backdropPath}
-          voteAverage={trending.hero.voteAverage}
+          tmdbId={hero.tmdbId}
+          type={hero.type}
+          title={hero.title}
+          overview={hero.overview}
+          backdropPath={hero.backdropPath}
+          voteAverage={hero.voteAverage}
         />
       )}
 
-      <TitleRow
-        heading="Trending Today"
-        icon={<IconFlame aria-hidden={true} className="size-5 text-primary" />}
-        items={(trending?.items ?? []).slice(0, 20)}
-        userStatuses={userStatuses}
-        episodeProgress={episodeProgress}
-      />
+      <div>
+        <TitleRow
+          heading="Trending Today"
+          icon={
+            <IconFlame aria-hidden={true} className="size-5 text-primary" />
+          }
+          items={trendingItems}
+          userStatuses={userStatuses}
+          episodeProgress={episodeProgress}
+          onEndReached={fetchNextTrending}
+          hasNextPage={hasNextTrending}
+          isFetchingNextPage={isFetchingNextTrending}
+        />
+      </div>
 
       <FilterableTitleRow
         heading="Popular Movies"
         icon={<IconMovie aria-hidden={true} className="size-5 text-primary" />}
         mediaType="movie"
-        defaultItems={(popularMovies?.items ?? []).slice(0, 20)}
+        defaultItems={(popularMoviesData?.items ?? []).slice(0, 20)}
         genres={movieGenreData?.genres ?? []}
         userStatuses={userStatuses}
         episodeProgress={episodeProgress}
@@ -103,7 +136,7 @@ export function ExploreClient() {
           <IconDeviceTv aria-hidden={true} className="size-5 text-primary" />
         }
         mediaType="tv"
-        defaultItems={(popularTv?.items ?? []).slice(0, 20)}
+        defaultItems={(popularTvData?.items ?? []).slice(0, 20)}
         genres={tvGenreData?.genres ?? []}
         userStatuses={userStatuses}
         episodeProgress={episodeProgress}

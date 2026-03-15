@@ -1,6 +1,6 @@
 import {
   getContinueWatchingFeed,
-  getNewAvailableFeed,
+  getLibraryFeed,
   getRecommendationsFeed,
   getUserStats,
   getWatchCount,
@@ -44,9 +44,14 @@ export const continueWatching = os.dashboard.continueWatching
 
 export const library = os.dashboard.library
   .use(authed)
-  .handler(({ context }) => {
-    const feed = getNewAvailableFeed(context.user.id);
-    const items = feed.slice(0, 10).map((t) => ({
+  .handler(({ input, context }) => {
+    const {
+      items: feed,
+      page,
+      totalPages,
+      totalResults,
+    } = getLibraryFeed(context.user.id, input.page, input.limit);
+    const items = feed.map((t) => ({
       id: t.titleId,
       tmdbId: t.tmdbId,
       type: t.type,
@@ -58,7 +63,7 @@ export const library = os.dashboard.library
       voteAverage: t.voteAverage,
       userStatus: t.userStatus,
     }));
-    return { items };
+    return { items, page, totalPages, totalResults };
   });
 
 export const recommendations = os.dashboard.recommendations

@@ -6,11 +6,16 @@ import {
   IconMovie,
   IconUser,
 } from "@tabler/icons-react-native";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect } from "react";
-import { Pressable, useWindowDimensions, View } from "react-native";
+import { useCallback, useEffect, useMemo } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
@@ -59,12 +64,35 @@ export default function PersonDetailScreen() {
 
   const { handlePress, handleQuickAdd, addingKey } = usePosterActions();
 
-  const { data, isPending, isError } = useQuery(
-    orpc.people.detail.queryOptions({ input: { id } }),
+  const {
+    data,
+    isPending,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(
+    orpc.people.detail.infiniteOptions({
+      input: (pageParam: number) => ({ id, page: pageParam, limit: 20 }),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) =>
+        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    }),
   );
 
-  const person = data?.person;
-  const filmography = data?.filmography ?? [];
+  const person = data?.pages[0]?.person;
+  const filmography = useMemo(
+    () => data?.pages.flatMap((p) => p.filmography) ?? [],
+    [data?.pages],
+  );
+  const userStatuses = useMemo(
+    () =>
+      Object.assign(
+        {},
+        ...(data?.pages.map((p) => p.userStatuses) ?? []),
+      ) as Record<string, "watchlist" | "in_progress" | "completed">,
+    [data?.pages],
+  );
 
   const personName = person?.name;
   const personProfilePath = person?.profilePath ?? null;
@@ -94,7 +122,7 @@ export default function PersonDetailScreen() {
           posterThumbHash={credit.posterThumbHash}
           releaseDate={credit.releaseDate ?? credit.firstAirDate}
           voteAverage={credit.voteAverage}
-          userStatus={data?.userStatuses?.[credit.titleId] ?? null}
+          userStatus={userStatuses[credit.titleId] ?? null}
           width={undefined}
           onPress={handlePress}
           onQuickAdd={handleQuickAdd}
@@ -102,7 +130,7 @@ export default function PersonDetailScreen() {
         />
       </View>
     ),
-    [columnWidth, data?.userStatuses, handlePress, handleQuickAdd, addingKey],
+    [columnWidth, userStatuses, handlePress, handleQuickAdd, addingKey],
   );
 
   if (isPending) {
@@ -285,6 +313,19 @@ export default function PersonDetailScreen() {
             paddingHorizontal: FILMOGRAPHY_PADDING,
           }}
           ListHeaderComponent={listHeader}
+          onEndReached={() => {
+            if (hasNextPage && !isFetchingNextPage) {
+              fetchNextPage();
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <View className="items-center py-4">
+                <ActivityIndicator />
+              </View>
+            ) : null
+          }
         />
       </View>
     </>

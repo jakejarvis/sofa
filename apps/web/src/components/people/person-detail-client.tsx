@@ -1,6 +1,7 @@
-import type { PersonCredit, ResolvedPerson } from "@sofa/api/schemas";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { orpc } from "@/lib/orpc/client";
 import { FilmographyGrid } from "./filmography-grid";
 import { PersonHero } from "./person-hero";
@@ -28,27 +29,50 @@ export function PersonDetailSkeleton() {
   );
 }
 
-export interface PersonDetailResponse {
-  person: ResolvedPerson;
-  filmography: PersonCredit[];
-  userStatuses: Record<string, "watchlist" | "in_progress" | "completed">;
-}
-
 export function PersonDetailClient({ id }: { id: string }) {
-  const { data, isPending } = useQuery(
-    orpc.people.detail.queryOptions({ input: { id } }),
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery(
+      orpc.people.detail.infiniteOptions({
+        input: (pageParam: number) => ({ id, page: pageParam, limit: 20 }),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) =>
+          lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+      }),
+    );
+
+  const sentinelRef = useInfiniteScroll({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  });
+
+  const person = data?.pages[0]?.person;
+  const filmography = useMemo(
+    () => data?.pages.flatMap((p) => p.filmography) ?? [],
+    [data?.pages],
+  );
+  const userStatuses = useMemo(
+    () =>
+      Object.assign(
+        {},
+        ...(data?.pages.map((p) => p.userStatuses) ?? []),
+      ) as Record<string, "watchlist" | "in_progress" | "completed">,
+    [data?.pages],
   );
 
   if (isPending) return <PersonDetailSkeleton />;
-  if (!data) return null;
+  if (!person) return null;
 
   return (
     <div className="space-y-10">
-      <PersonHero person={data.person} />
-      <FilmographyGrid
-        credits={data.filmography}
-        userStatuses={data.userStatuses}
-      />
+      <PersonHero person={person} />
+      <FilmographyGrid credits={filmography} userStatuses={userStatuses} />
+      <div ref={sentinelRef} />
+      {isFetchingNextPage && (
+        <div className="flex justify-center py-4">
+          <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        </div>
+      )}
     </div>
   );
 }

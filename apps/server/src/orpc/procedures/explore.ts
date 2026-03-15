@@ -26,7 +26,7 @@ export const trending = os.explore.trending
   .handler(async ({ input, context }) => {
     requireTmdb();
 
-    const data = await getTrending(input.type, "day");
+    const data = await getTrending(input.type, "day", input.page);
     const results = (data.results ?? []) as Record<string, unknown>[];
 
     const baseItems = results
@@ -83,7 +83,15 @@ export const trending = os.explore.trending
           ]
         : [{}, {}];
 
-    return { items, hero, userStatuses, episodeProgress };
+    return {
+      items,
+      hero,
+      userStatuses,
+      episodeProgress,
+      page: (data as { page?: number }).page ?? input.page,
+      totalPages: (data as { total_pages?: number }).total_pages ?? 1,
+      totalResults: (data as { total_results?: number }).total_results ?? 0,
+    };
   });
 
 export const popular = os.explore.popular
@@ -91,7 +99,7 @@ export const popular = os.explore.popular
   .handler(async ({ input, context }) => {
     requireTmdb();
 
-    const data = await getPopular(input.type);
+    const data = await getPopular(input.type, input.page);
     const baseItems = ((data.results ?? []) as Record<string, unknown>[])
       .filter((r) => r.poster_path)
       .map((r) => ({
@@ -118,7 +126,14 @@ export const popular = os.explore.popular
           ]
         : [{}, {}];
 
-    return { items, userStatuses, episodeProgress };
+    return {
+      items,
+      userStatuses,
+      episodeProgress,
+      page: data.page ?? input.page,
+      totalPages: data.total_pages ?? 1,
+      totalResults: data.total_results ?? 0,
+    };
   });
 
 export const genres = os.explore.genres

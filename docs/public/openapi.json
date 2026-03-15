@@ -2584,7 +2584,7 @@
       "get": {
         "operationId": "people.detail",
         "summary": "Get person details",
-        "description": "Fetch a person's profile and filmography. Imports from TMDB on first access if not yet cached locally.",
+        "description": "Fetch a person's profile and paginated filmography. Imports from TMDB on first access if not yet cached locally.",
         "tags": [
           "People"
         ],
@@ -2598,11 +2598,39 @@
               "minLength": 1,
               "description": "Internal UUIDv7 identifier"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 1,
+              "description": "Page number (1-indexed)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "Results per page (1-100, default 20)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
           }
         ],
         "responses": {
           "200": {
-            "description": "Person profile, filmography credits, and user statuses for their titles",
+            "description": "Person profile, paginated filmography credits, and user statuses for their titles",
             "content": {
               "application/json": {
                 "schema": {
@@ -2616,7 +2644,7 @@
                       "items": {
                         "$ref": "#/components/schemas/PersonCredit"
                       },
-                      "description": "All credits for this person"
+                      "description": "Credits for this person (paginated)"
                     },
                     "userStatuses": {
                       "type": "object",
@@ -2631,14 +2659,29 @@
                         ]
                       },
                       "description": "Map of title ID to the user's tracking status"
+                    },
+                    "page": {
+                      "type": "number",
+                      "description": "Current page number"
+                    },
+                    "totalPages": {
+                      "type": "number",
+                      "description": "Total number of pages available"
+                    },
+                    "totalResults": {
+                      "type": "number",
+                      "description": "Total number of results across all pages"
                     }
                   },
                   "required": [
                     "person",
                     "filmography",
-                    "userStatuses"
+                    "userStatuses",
+                    "page",
+                    "totalPages",
+                    "totalResults"
                   ],
-                  "description": "Person profile with filmography and user's statuses for their titles"
+                  "description": "Person profile with paginated filmography and user's statuses for their titles"
                 }
               }
             }
@@ -3043,13 +3086,41 @@
       "get": {
         "operationId": "dashboard.library",
         "summary": "Get user library",
-        "description": "Fetch all titles in the user's library with their tracking statuses.",
+        "description": "Fetch paginated titles in the user's library with their tracking statuses.",
         "tags": [
           "Dashboard"
         ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 1,
+              "description": "Page number (1-indexed)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "Results per page (1-100, default 20)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Library items with user statuses",
+            "description": "Paginated library items with user statuses",
             "content": {
               "application/json": {
                 "schema": {
@@ -3164,12 +3235,27 @@
                         ],
                         "description": "A library item with user status"
                       }
+                    },
+                    "page": {
+                      "type": "number",
+                      "description": "Current page number"
+                    },
+                    "totalPages": {
+                      "type": "number",
+                      "description": "Total number of pages available"
+                    },
+                    "totalResults": {
+                      "type": "number",
+                      "description": "Total number of results across all pages"
                     }
                   },
                   "required": [
-                    "items"
+                    "items",
+                    "page",
+                    "totalPages",
+                    "totalResults"
                   ],
-                  "description": "All titles in the user's library"
+                  "description": "Paginated titles in the user's library"
                 }
               }
             }
@@ -3342,6 +3428,20 @@
             "explode": true,
             "allowEmptyValue": true,
             "allowReserved": true
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 1,
+              "description": "Page number (1-indexed)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
           }
         ],
         "responses": {
@@ -3449,13 +3549,28 @@
                         ]
                       },
                       "description": "Map of title ID to episode watch progress"
+                    },
+                    "page": {
+                      "type": "number",
+                      "description": "Current page number"
+                    },
+                    "totalPages": {
+                      "type": "number",
+                      "description": "Total number of pages available"
+                    },
+                    "totalResults": {
+                      "type": "number",
+                      "description": "Total number of results across all pages"
                     }
                   },
                   "required": [
                     "items",
                     "hero",
                     "userStatuses",
-                    "episodeProgress"
+                    "episodeProgress",
+                    "page",
+                    "totalPages",
+                    "totalResults"
                   ],
                   "description": "Trending titles with hero spotlight and user statuses"
                 }
@@ -3554,6 +3669,20 @@
             "explode": true,
             "allowEmptyValue": true,
             "allowReserved": true
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 1,
+              "description": "Page number (1-indexed)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
           }
         ],
         "responses": {
@@ -3605,12 +3734,27 @@
                         ]
                       },
                       "description": "Map of title ID to episode watch progress"
+                    },
+                    "page": {
+                      "type": "number",
+                      "description": "Current page number"
+                    },
+                    "totalPages": {
+                      "type": "number",
+                      "description": "Total number of pages available"
+                    },
+                    "totalResults": {
+                      "type": "number",
+                      "description": "Total number of results across all pages"
                     }
                   },
                   "required": [
                     "items",
                     "userStatuses",
-                    "episodeProgress"
+                    "episodeProgress",
+                    "page",
+                    "totalPages",
+                    "totalResults"
                   ],
                   "description": "Browse results with user tracking statuses and episode progress"
                 }
@@ -3854,6 +3998,20 @@
             "explode": true,
             "allowEmptyValue": true,
             "allowReserved": true
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 1,
+              "description": "Page number (1-indexed)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
           }
         ],
         "responses": {
@@ -3992,10 +4150,25 @@
                         ],
                         "description": "A search result (movie, TV show, or person)"
                       }
+                    },
+                    "page": {
+                      "type": "number",
+                      "description": "Current page number"
+                    },
+                    "totalPages": {
+                      "type": "number",
+                      "description": "Total number of pages available"
+                    },
+                    "totalResults": {
+                      "type": "number",
+                      "description": "Total number of results across all pages"
                     }
                   },
                   "required": [
-                    "results"
+                    "results",
+                    "page",
+                    "totalPages",
+                    "totalResults"
                   ],
                   "description": "Search results from TMDB"
                 }
@@ -4107,6 +4280,20 @@
             },
             "allowEmptyValue": true,
             "allowReserved": true
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 1,
+              "description": "Page number (1-indexed)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
           }
         ],
         "responses": {
@@ -4158,12 +4345,27 @@
                         ]
                       },
                       "description": "Map of title ID to episode watch progress"
+                    },
+                    "page": {
+                      "type": "number",
+                      "description": "Current page number"
+                    },
+                    "totalPages": {
+                      "type": "number",
+                      "description": "Total number of pages available"
+                    },
+                    "totalResults": {
+                      "type": "number",
+                      "description": "Total number of results across all pages"
                     }
                   },
                   "required": [
                     "items",
                     "userStatuses",
-                    "episodeProgress"
+                    "episodeProgress",
+                    "page",
+                    "totalPages",
+                    "totalResults"
                   ],
                   "description": "Browse results with user tracking statuses and episode progress"
                 }

@@ -1,3 +1,4 @@
+import { FlashList } from "@shopify/flash-list";
 import {
   IconBooks,
   IconPlayerPlay,
@@ -6,7 +7,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
-import { FlatList, RefreshControl, ScrollView, View } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { ContinueWatchingCard } from "@/components/dashboard/continue-watching-card";
@@ -18,6 +19,10 @@ import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 
+const horizontalListStyle = { overflow: "visible" as const };
+const statsListContentStyle = { gap: 12, paddingHorizontal: 16 };
+const continueWatchingContentStyle = { gap: 12, paddingHorizontal: 16 };
+
 export default function DashboardScreen() {
   const { push } = useRouter();
   authClient.useSession();
@@ -26,7 +31,7 @@ export default function DashboardScreen() {
   const continueWatching = useQuery(
     orpc.dashboard.continueWatching.queryOptions(),
   );
-  const library = useQuery(orpc.dashboard.library.queryOptions());
+  const library = useQuery(orpc.dashboard.library.queryOptions({ input: {} }));
   const recommendations = useQuery(
     orpc.dashboard.recommendations.queryOptions(),
   );
@@ -52,6 +57,21 @@ export default function DashboardScreen() {
     [stats.data],
   );
 
+  const renderStatItem = useCallback(
+    ({ item }: { item: (typeof statsData)[number] }) => (
+      <StatsCard label={item.label} value={item.value} />
+    ),
+    [],
+  );
+  const renderContinueWatchingItem = useCallback(
+    ({
+      item,
+    }: {
+      item: NonNullable<typeof continueWatching.data>["items"][number];
+    }) => <ContinueWatchingCard item={item} />,
+    [],
+  );
+
   return (
     <ScrollView
       className="bg-background"
@@ -72,16 +92,14 @@ export default function DashboardScreen() {
       <View className="gap-8">
         {/* Stats */}
         <Animated.View entering={FadeInDown.duration(300).delay(100)}>
-          <FlatList
+          <FlashList
             horizontal
             showsHorizontalScrollIndicator={false}
             data={statsData}
             keyExtractor={(item) => item.label}
-            renderItem={({ item }) => (
-              <StatsCard label={item.label} value={item.value} />
-            )}
-            contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
-            style={{ overflow: "visible" }}
+            renderItem={renderStatItem}
+            contentContainerStyle={statsListContentStyle}
+            style={horizontalListStyle}
           />
         </Animated.View>
 
@@ -91,14 +109,14 @@ export default function DashboardScreen() {
             <View className="px-4">
               <SectionHeader title="Continue Watching" icon={IconPlayerPlay} />
             </View>
-            <FlatList
+            <FlashList
               horizontal
               showsHorizontalScrollIndicator={false}
               data={continueWatching.data?.items ?? []}
               keyExtractor={(item) => item.title.id}
-              renderItem={({ item }) => <ContinueWatchingCard item={item} />}
-              contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}
-              style={{ overflow: "visible" }}
+              renderItem={renderContinueWatchingItem}
+              contentContainerStyle={continueWatchingContentStyle}
+              style={horizontalListStyle}
             />
           </Animated.View>
         )}

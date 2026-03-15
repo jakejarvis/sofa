@@ -395,6 +395,53 @@ export function getNewAvailableFeed(userId: string, days = 14) {
   return results;
 }
 
+export function getLibraryFeed(userId: string, page = 1, limit = 20) {
+  const offset = (page - 1) * limit;
+
+  const availabilityFilter = sql`EXISTS (SELECT 1 FROM ${availabilityOffers} WHERE ${availabilityOffers.titleId} = ${titles.id})`;
+  const joinCondition = and(
+    eq(userTitleStatus.titleId, titles.id),
+    eq(userTitleStatus.userId, userId),
+  );
+
+  const [{ count }] = db
+    .select({ count: sql<number>`count(*)` })
+    .from(titles)
+    .innerJoin(userTitleStatus, joinCondition)
+    .where(availabilityFilter)
+    .all();
+
+  const items = db
+    .select({
+      titleId: titles.id,
+      title: titles.title,
+      type: titles.type,
+      tmdbId: titles.tmdbId,
+      posterPath: titles.posterPath,
+      posterThumbHash: titles.posterThumbHash,
+      releaseDate: titles.releaseDate,
+      firstAirDate: titles.firstAirDate,
+      voteAverage: titles.voteAverage,
+      popularity: titles.popularity,
+      userStatus: userTitleStatus.status,
+    })
+    .from(titles)
+    .innerJoin(userTitleStatus, joinCondition)
+    .where(availabilityFilter)
+    .orderBy(desc(titles.popularity))
+    .limit(limit)
+    .offset(offset)
+    .all();
+
+  const totalResults = count ?? 0;
+  return {
+    items,
+    page,
+    totalPages: Math.max(1, Math.ceil(totalResults / limit)),
+    totalResults,
+  };
+}
+
 export function getRecommendationsFeed(userId: string) {
   // Get recommendations from user's highly-rated or completed titles
   const userCompletedOrRated = db

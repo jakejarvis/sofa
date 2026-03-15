@@ -348,6 +348,9 @@ export const persons = sqliteTable(
     popularity: real("popularity"),
     imdbId: text("imdbId"),
     lastFetchedAt: int("lastFetchedAt", { mode: "timestamp" }),
+    filmographyLastFetchedAt: int("filmographyLastFetchedAt", {
+      mode: "timestamp",
+    }),
   },
   (table) => [
     uniqueIndex("persons_tmdbId_unique").on(table.tmdbId),
@@ -384,6 +387,30 @@ export const titleCast = sqliteTable(
       table.displayOrder,
     ),
     index("titleCast_personId").on(table.personId),
+  ],
+);
+
+export const personFilmography = sqliteTable(
+  "personFilmography",
+  {
+    id: uuidPk(),
+    personId: text("personId")
+      .notNull()
+      .references(() => persons.id, { onDelete: "cascade" }),
+    titleId: text("titleId")
+      .notNull()
+      .references(() => titles.id, { onDelete: "cascade" }),
+    character: text("character"),
+    department: text("department").notNull().default("Acting"),
+    job: text("job"),
+    displayOrder: int("displayOrder").notNull().default(0),
+  },
+  (table) => [
+    index("personFilmography_personId_displayOrder").on(
+      table.personId,
+      table.displayOrder,
+    ),
+    index("personFilmography_titleId").on(table.titleId),
   ],
 );
 

@@ -1,7 +1,7 @@
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react-native";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
@@ -11,8 +11,13 @@ import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 
 export default function ExploreScreen() {
-  const trending = useQuery(
-    orpc.explore.trending.queryOptions({ input: { type: "all" } }),
+  const trending = useInfiniteQuery(
+    orpc.explore.trending.infiniteOptions({
+      input: (pageParam: number) => ({ type: "all" as const, page: pageParam }),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) =>
+        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    }),
   );
   const popularMovies = useQuery(
     orpc.explore.popular.queryOptions({ input: { type: "movie" } }),
@@ -37,7 +42,28 @@ export default function ExploreScreen() {
     queryClient.invalidateQueries({ queryKey: orpc.discover.key() });
   }, []);
 
-  const heroItem = trending.data?.hero;
+  const heroItem = trending.data?.pages[0]?.hero ?? null;
+
+  const trendingItems = useMemo(
+    () => trending.data?.pages.flatMap((p) => p.items) ?? [],
+    [trending.data?.pages],
+  );
+  const trendingStatuses = useMemo(
+    () =>
+      Object.assign(
+        {},
+        ...(trending.data?.pages.map((p) => p.userStatuses) ?? []),
+      ) as Record<string, "watchlist" | "in_progress" | "completed">,
+    [trending.data?.pages],
+  );
+  const trendingProgress = useMemo(
+    () =>
+      Object.assign(
+        {},
+        ...(trending.data?.pages.map((p) => p.episodeProgress) ?? []),
+      ) as Record<string, { watched: number; total: number }>,
+    [trending.data?.pages],
+  );
 
   return (
     <ScrollView
@@ -68,9 +94,9 @@ export default function ExploreScreen() {
             title="Trending Today"
             icon={IconFlame}
             mediaType="movie"
-            defaultItems={trending.data?.items ?? []}
-            defaultUserStatuses={trending.data?.userStatuses ?? {}}
-            defaultEpisodeProgress={trending.data?.episodeProgress ?? {}}
+            defaultItems={trendingItems}
+            defaultUserStatuses={trendingStatuses}
+            defaultEpisodeProgress={trendingProgress}
             isLoading={trending.isPending}
           />
         </Animated.View>

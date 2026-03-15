@@ -1,8 +1,9 @@
-import { skipToken, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { skipToken, useInfiniteQuery } from "@tanstack/react-query";
+import { useMemo, useRef, useState } from "react";
 import { TitleCard, TitleCardSkeleton } from "@/components/title-card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { hasReachedHorizontalEnd } from "@/hooks/use-infinite-scroll";
 import { orpc } from "@/lib/orpc/client";
 
 interface Genre {
@@ -43,25 +44,56 @@ export function FilterableTitleRow({
   episodeProgress: initialProgress = {},
 }: FilterableTitleRowProps) {
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
-  const { data: discoverData, isLoading: isPending } = useQuery(
-    orpc.discover.queryOptions({
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const {
+    data: discoverData,
+    isPending,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(
+    orpc.discover.infiniteOptions({
       input:
         selectedGenre != null
-          ? { type: mediaType, genreId: selectedGenre }
+          ? (pageParam: number) => ({
+              type: mediaType,
+              genreId: selectedGenre,
+              page: pageParam,
+            })
           : skipToken,
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) =>
+        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
     }),
   );
 
-  const items =
-    selectedGenre === null ? defaultItems : (discoverData?.items ?? []);
+  const discoverItems = useMemo(
+    () => discoverData?.pages.flatMap((p) => p.items) ?? [],
+    [discoverData?.pages],
+  );
+  const discoverStatuses = useMemo(
+    () =>
+      Object.assign(
+        {},
+        ...(discoverData?.pages.map((p) => p.userStatuses) ?? []),
+      ) as Record<string, TitleStatus>,
+    [discoverData?.pages],
+  );
+  const discoverProgress = useMemo(
+    () =>
+      Object.assign(
+        {},
+        ...(discoverData?.pages.map((p) => p.episodeProgress) ?? []),
+      ) as Record<string, { watched: number; total: number }>,
+    [discoverData?.pages],
+  );
+
+  const isLoading = selectedGenre !== null && isPending;
+  const items = selectedGenre === null ? defaultItems : discoverItems;
   const userStatuses =
-    selectedGenre === null
-      ? initialStatuses
-      : (discoverData?.userStatuses ?? {});
+    selectedGenre === null ? initialStatuses : discoverStatuses;
   const episodeProgress =
-    selectedGenre === null
-      ? initialProgress
-      : (discoverData?.episodeProgress ?? {});
+    selectedGenre === null ? initialProgress : discoverProgress;
 
   function toggleGenre(genreId: number) {
     setSelectedGenre(genreId === selectedGenre ? null : genreId);
@@ -98,7 +130,7 @@ export function FilterableTitleRow({
       </ScrollArea>
 
       {/* Loading skeleton */}
-      {isPending && (
+      {isLoading && (
         <div className="-mx-4 flex gap-4 overflow-hidden px-4 sm:-mx-0 sm:px-0">
           {Array.from({ length: 8 }).map((_, i) => (
             <div
@@ -113,22 +145,38 @@ export function FilterableTitleRow({
       )}
 
       {/* Empty state */}
-      {!isPending && selectedGenre !== null && items.length === 0 && (
+      {!isLoading && selectedGenre !== null && items.length === 0 && (
         <p className="py-8 text-center text-muted-foreground text-sm">
           No titles found for this genre.
         </p>
       )}
 
       {/* Title cards */}
-      {!isPending && items.length > 0 && (
+      {!isLoading && items.length > 0 && (
         <ScrollArea
           key={selectedGenre ?? "default"}
           scrollFade
           hideScrollbar
           className="-mx-6 sm:-mx-2"
+          scrollRef={scrollRef}
+          onScrollEnd={() => {
+            const viewport = scrollRef.current;
+
+            if (
+              selectedGenre === null ||
+              !viewport ||
+              !hasNextPage ||
+              isFetchingNextPage ||
+              !hasReachedHorizontalEnd(viewport)
+            ) {
+              return;
+            }
+
+            fetchNextPage();
+          }}
         >
           <div className="flex gap-4 px-6 py-2 sm:px-2">
-            {items.slice(0, 20).map((item: TitleRowItem, i: number) => (
+            {items.map((item: TitleRowItem, i: number) => (
               <div
                 key={`${item.type}-${item.tmdbId}`}
                 className="w-[140px] shrink-0 sm:w-[160px]"
@@ -153,6 +201,11 @@ export function FilterableTitleRow({
                 </div>
               </div>
             ))}
+            {isFetchingNextPage && (
+              <div className="flex shrink-0 items-center px-4">
+                <div className="size-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
+            )}
           </div>
         </ScrollArea>
       )}

@@ -1,5 +1,7 @@
+import { useRef } from "react";
 import { TitleCard } from "@/components/title-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { hasReachedHorizontalEnd } from "@/hooks/use-infinite-scroll";
 
 interface TitleRowItem {
   tmdbId: number;
@@ -18,6 +20,9 @@ interface TitleRowProps {
   items: TitleRowItem[];
   userStatuses?: Record<string, "watchlist" | "in_progress" | "completed">;
   episodeProgress?: Record<string, { watched: number; total: number }>;
+  onEndReached?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 export function TitleRow({
@@ -26,7 +31,12 @@ export function TitleRow({
   items,
   userStatuses,
   episodeProgress,
+  onEndReached,
+  hasNextPage = false,
+  isFetchingNextPage = false,
 }: TitleRowProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   if (items.length === 0) return null;
 
   return (
@@ -37,7 +47,27 @@ export function TitleRow({
           {heading}
         </h2>
       </div>
-      <ScrollArea scrollFade hideScrollbar className="-mx-6 sm:-mx-2">
+      <ScrollArea
+        scrollFade
+        hideScrollbar
+        className="-mx-6 sm:-mx-2"
+        scrollRef={scrollRef}
+        onScrollEnd={() => {
+          const viewport = scrollRef.current;
+
+          if (
+            !viewport ||
+            !onEndReached ||
+            !hasNextPage ||
+            isFetchingNextPage ||
+            !hasReachedHorizontalEnd(viewport)
+          ) {
+            return;
+          }
+
+          onEndReached();
+        }}
+      >
         <div className="flex gap-4 px-6 py-2 sm:px-2">
           {items.map((item, i) => (
             <div
@@ -64,6 +94,11 @@ export function TitleRow({
               </div>
             </div>
           ))}
+          {isFetchingNextPage && (
+            <div className="flex shrink-0 items-center px-4">
+              <div className="size-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            </div>
+          )}
         </div>
       </ScrollArea>
     </section>

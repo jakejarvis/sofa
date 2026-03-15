@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { persons, titleCast } from "@sofa/db/schema";
+import { personFilmography, persons } from "@sofa/db/schema";
 import { clearAllTables, insertTitle, testDb } from "@sofa/db/test-utils";
 import { getLocalFilmography } from "../src/person";
 
@@ -12,7 +12,7 @@ function insertPerson(id: string, tmdbId: number, name: string) {
   return id;
 }
 
-function insertCastEntry(
+function insertFilmographyEntry(
   titleId: string,
   personId: string,
   overrides: {
@@ -23,7 +23,7 @@ function insertCastEntry(
   } = {},
 ) {
   testDb
-    .insert(titleCast)
+    .insert(personFilmography)
     .values({
       titleId,
       personId,
@@ -31,7 +31,6 @@ function insertCastEntry(
       department: overrides.department ?? "Acting",
       job: overrides.job ?? null,
       displayOrder: overrides.displayOrder ?? 0,
-      lastFetchedAt: new Date(),
     })
     .run();
 }
@@ -41,8 +40,8 @@ describe("getLocalFilmography", () => {
     insertTitle({ id: "m1", tmdbId: 1, title: "Movie One" });
     insertTitle({ id: "m2", tmdbId: 2, title: "Movie Two" });
     insertPerson("p1", 100, "Test Actor");
-    insertCastEntry("m1", "p1", { character: "Hero" });
-    insertCastEntry("m2", "p1", { character: "Sidekick" });
+    insertFilmographyEntry("m1", "p1", { character: "Hero" });
+    insertFilmographyEntry("m2", "p1", { character: "Sidekick" });
 
     const filmography = getLocalFilmography("p1");
     expect(filmography).toHaveLength(2);
@@ -55,7 +54,7 @@ describe("getLocalFilmography", () => {
   test("includes crew roles", () => {
     insertTitle({ id: "m1", tmdbId: 1, title: "Directed Movie" });
     insertPerson("p1", 100, "Director Person");
-    insertCastEntry("m1", "p1", {
+    insertFilmographyEntry("m1", "p1", {
       character: null,
       department: "Directing",
       job: "Director",
@@ -77,8 +76,8 @@ describe("getLocalFilmography", () => {
     insertTitle({ id: "m1", tmdbId: 1, type: "movie", title: "A Movie" });
     insertTitle({ id: "tv1", tmdbId: 2, type: "tv", title: "A Show" });
     insertPerson("p1", 100, "Versatile Actor");
-    insertCastEntry("m1", "p1");
-    insertCastEntry("tv1", "p1");
+    insertFilmographyEntry("m1", "p1");
+    insertFilmographyEntry("tv1", "p1");
 
     const filmography = getLocalFilmography("p1");
     const types = filmography.map((f) => f.type).sort();
