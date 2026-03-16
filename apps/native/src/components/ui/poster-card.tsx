@@ -32,8 +32,7 @@ import { toast } from "@/lib/toast";
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
 interface PosterCardProps {
-  id?: string;
-  tmdbId: number;
+  id: string;
   title: string;
   type: "movie" | "tv";
   posterPath: string | null;
@@ -43,12 +42,7 @@ interface PosterCardProps {
   userStatus?: TitleStatus | null;
   episodeProgress?: { watched: number; total: number } | null;
   width?: number;
-  onPress: (
-    id: string | undefined,
-    tmdbId: number,
-    type: "movie" | "tv",
-  ) => void;
-  onQuickAdd: (tmdbId: number, type: "movie" | "tv") => void;
+  onQuickAdd: (id: string) => void;
   isAdding?: boolean;
   failedKey?: string | null;
   onQuickAddFailed?: () => void;
@@ -56,7 +50,6 @@ interface PosterCardProps {
 
 export function PosterCard({
   id,
-  tmdbId,
   title,
   type,
   posterPath,
@@ -66,7 +59,6 @@ export function PosterCard({
   userStatus,
   episodeProgress,
   width = 140,
-  onPress,
   onQuickAdd,
   isAdding,
   failedKey,
@@ -94,11 +86,11 @@ export function PosterCard({
   }, [userStatus]);
 
   useEffect(() => {
-    if (failedKey === `${tmdbId}-${type}`) {
+    if (failedKey === id) {
       setLocalStatus(userStatus ?? null);
       onQuickAddFailed?.();
     }
-  }, [failedKey, tmdbId, type, userStatus, onQuickAddFailed]);
+  }, [failedKey, id, userStatus, onQuickAddFailed]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -108,15 +100,11 @@ export function PosterCard({
     ],
   }));
 
-  const handlePressAction = useCallback(() => {
-    onPress(id, tmdbId, type);
-  }, [onPress, id, tmdbId, type]);
-
   const handleQuickAddPress = useCallback(() => {
     if (localStatus || isAdding) return;
     setLocalStatus("watchlist");
-    onQuickAdd(tmdbId, type);
-  }, [localStatus, isAdding, onQuickAdd, tmdbId, type]);
+    onQuickAdd(id);
+  }, [localStatus, isAdding, onQuickAdd, id]);
 
   const year = releaseDate?.slice(0, 4);
   const imageHeight = width * 1.5;
@@ -153,7 +141,7 @@ export function PosterCard({
             thumbHash={posterThumbHash}
             style={{ width: "100%", height: "100%" }}
             contentFit="cover"
-            recyclingKey={`poster-${tmdbId}`}
+            recyclingKey={`poster-${id}`}
             transition={200}
           />
         ) : (
@@ -271,120 +259,100 @@ export function PosterCard({
       pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
     });
 
-  // Cards with id: use context menu with navigation
-  if (id) {
-    const titleHref = `/title/${id}` as `/title/${string}`;
-
-    return (
-      <ContextMenu.Root>
-        <ContextMenu.Trigger>
-          <GestureDetector gesture={pressGesture}>
-            <Animated.View style={[animatedStyle, { width }]}>
-              <View>
-                <Link href={titleHref}>
-                  <Link.Trigger withAppleZoom>
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel={cardAccessibilityLabel}
-                    >
-                      {cardContent}
-                    </Pressable>
-                  </Link.Trigger>
-                  <Link.Preview />
-                </Link>
-                {quickAddButton}
-              </View>
-            </Animated.View>
-          </GestureDetector>
-        </ContextMenu.Trigger>
-        <ContextMenu.Content>
-          {!localStatus && (
-            <ContextMenu.Item key="watchlist" onSelect={handleQuickAddPress}>
-              <ContextMenu.ItemIcon ios={{ name: "bookmark" }} />
-              <ContextMenu.ItemTitle>Add to Watchlist</ContextMenu.ItemTitle>
-            </ContextMenu.Item>
-          )}
-          {localStatus !== "in_progress" && (
-            <ContextMenu.Item
-              key="watching"
-              onSelect={async () => {
-                await client.titles.updateStatus({
-                  id,
-                  status: "in_progress",
-                });
-                toast.success("Marked as watching");
-                queryClient.invalidateQueries({
-                  queryKey: orpc.titles.key(),
-                });
-                queryClient.invalidateQueries({
-                  queryKey: orpc.dashboard.key(),
-                });
-              }}
-            >
-              <ContextMenu.ItemIcon ios={{ name: "play.fill" }} />
-              <ContextMenu.ItemTitle>Mark as Watching</ContextMenu.ItemTitle>
-            </ContextMenu.Item>
-          )}
-          {type === "movie" && (
-            <ContextMenu.Item
-              key="watched"
-              onSelect={async () => {
-                await client.titles.watchMovie({ id });
-                toast.success(
-                  title ? `Marked "${title}" as watched` : "Marked as watched",
-                );
-                queryClient.invalidateQueries({
-                  queryKey: orpc.titles.key(),
-                });
-                queryClient.invalidateQueries({
-                  queryKey: orpc.dashboard.key(),
-                });
-              }}
-            >
-              <ContextMenu.ItemIcon ios={{ name: "checkmark.circle" }} />
-              <ContextMenu.ItemTitle>Mark as Watched</ContextMenu.ItemTitle>
-            </ContextMenu.Item>
-          )}
-          {localStatus && (
-            <ContextMenu.Item
-              key="remove"
-              destructive
-              onSelect={async () => {
-                await client.titles.updateStatus({ id, status: null });
-                setLocalStatus(null);
-                toast.success("Removed from library");
-                queryClient.invalidateQueries({
-                  queryKey: orpc.titles.key(),
-                });
-                queryClient.invalidateQueries({
-                  queryKey: orpc.dashboard.key(),
-                });
-              }}
-            >
-              <ContextMenu.ItemIcon ios={{ name: "trash" }} />
-              <ContextMenu.ItemTitle>Remove from Library</ContextMenu.ItemTitle>
-            </ContextMenu.Item>
-          )}
-        </ContextMenu.Content>
-      </ContextMenu.Root>
-    );
-  }
+  const titleHref = `/title/${id}` as `/title/${string}`;
 
   return (
-    <GestureDetector gesture={pressGesture}>
-      <Animated.View style={[animatedStyle, { width }]}>
-        <View>
-          <Pressable
-            onPress={handlePressAction}
-            accessibilityRole="button"
-            accessibilityLabel={cardAccessibilityLabel}
+    <ContextMenu.Root>
+      <ContextMenu.Trigger>
+        <GestureDetector gesture={pressGesture}>
+          <Animated.View style={[animatedStyle, { width }]}>
+            <View>
+              <Link href={titleHref}>
+                <Link.Trigger withAppleZoom>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={cardAccessibilityLabel}
+                  >
+                    {cardContent}
+                  </Pressable>
+                </Link.Trigger>
+                <Link.Preview />
+              </Link>
+              {quickAddButton}
+            </View>
+          </Animated.View>
+        </GestureDetector>
+      </ContextMenu.Trigger>
+      <ContextMenu.Content>
+        {!localStatus && (
+          <ContextMenu.Item key="watchlist" onSelect={handleQuickAddPress}>
+            <ContextMenu.ItemIcon ios={{ name: "bookmark" }} />
+            <ContextMenu.ItemTitle>Add to Watchlist</ContextMenu.ItemTitle>
+          </ContextMenu.Item>
+        )}
+        {localStatus !== "in_progress" && (
+          <ContextMenu.Item
+            key="watching"
+            onSelect={async () => {
+              await client.titles.updateStatus({
+                id,
+                status: "in_progress",
+              });
+              toast.success("Marked as watching");
+              queryClient.invalidateQueries({
+                queryKey: orpc.titles.key(),
+              });
+              queryClient.invalidateQueries({
+                queryKey: orpc.dashboard.key(),
+              });
+            }}
           >
-            {cardContent}
-          </Pressable>
-          {quickAddButton}
-        </View>
-      </Animated.View>
-    </GestureDetector>
+            <ContextMenu.ItemIcon ios={{ name: "play.fill" }} />
+            <ContextMenu.ItemTitle>Mark as Watching</ContextMenu.ItemTitle>
+          </ContextMenu.Item>
+        )}
+        {type === "movie" && (
+          <ContextMenu.Item
+            key="watched"
+            onSelect={async () => {
+              await client.titles.watchMovie({ id });
+              toast.success(
+                title ? `Marked "${title}" as watched` : "Marked as watched",
+              );
+              queryClient.invalidateQueries({
+                queryKey: orpc.titles.key(),
+              });
+              queryClient.invalidateQueries({
+                queryKey: orpc.dashboard.key(),
+              });
+            }}
+          >
+            <ContextMenu.ItemIcon ios={{ name: "checkmark.circle" }} />
+            <ContextMenu.ItemTitle>Mark as Watched</ContextMenu.ItemTitle>
+          </ContextMenu.Item>
+        )}
+        {localStatus && (
+          <ContextMenu.Item
+            key="remove"
+            destructive
+            onSelect={async () => {
+              await client.titles.updateStatus({ id, status: null });
+              setLocalStatus(null);
+              toast.success("Removed from library");
+              queryClient.invalidateQueries({
+                queryKey: orpc.titles.key(),
+              });
+              queryClient.invalidateQueries({
+                queryKey: orpc.dashboard.key(),
+              });
+            }}
+          >
+            <ContextMenu.ItemIcon ios={{ name: "trash" }} />
+            <ContextMenu.ItemTitle>Remove from Library</ContextMenu.ItemTitle>
+          </ContextMenu.Item>
+        )}
+      </ContextMenu.Content>
+    </ContextMenu.Root>
   );
 }
 

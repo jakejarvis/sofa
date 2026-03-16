@@ -248,6 +248,50 @@
             ],
             "description": "Content rating (e.g. PG-13, TV-MA)"
           },
+          "imdbId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "IMDb title ID (e.g. tt0137523)"
+          },
+          "tvdbId": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "TVDB ID (TV shows only)"
+          },
+          "originalLanguage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Original language ISO 639-1 code (e.g. en)"
+          },
+          "runtimeMinutes": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Runtime in minutes (movies only)"
+          },
           "colorPalette": {
             "anyOf": [
               {
@@ -366,6 +410,10 @@
           "voteCount",
           "status",
           "contentRating",
+          "imdbId",
+          "tvdbId",
+          "originalLanguage",
+          "runtimeMinutes",
           "colorPalette",
           "trailerVideoKey",
           "genres"
@@ -840,6 +888,10 @@
       "BrowseItem": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "description": "Internal title ID"
+          },
           "tmdbId": {
             "type": "number",
             "description": "TMDB numeric ID"
@@ -912,6 +964,7 @@
           }
         },
         "required": [
+          "id",
           "tmdbId",
           "type",
           "title",
@@ -1544,11 +1597,7 @@
                       "items": {
                         "$ref": "#/components/schemas/Season"
                       },
-                      "description": "TV seasons (empty for movies or unhydrated shows)"
-                    },
-                    "needsHydration": {
-                      "type": "boolean",
-                      "description": "Whether season/episode data needs to be fetched from TMDB before tracking"
+                      "description": "TV seasons (empty for movies)"
                     },
                     "availability": {
                       "type": "array",
@@ -1612,138 +1661,10 @@
                   "required": [
                     "title",
                     "seasons",
-                    "needsHydration",
                     "availability",
                     "cast"
                   ],
                   "description": "Full title details with seasons, cast, and streaming availability"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "404",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_FOUND"
-                        },
-                        "status": {
-                          "const": 404
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Title not found"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/titles/resolve": {
-      "post": {
-        "operationId": "titles.resolve",
-        "summary": "Resolve TMDB ID to local title",
-        "description": "Look up or import a title by its TMDB ID and media type. Returns the internal ID for use with other endpoints.",
-        "tags": [
-          "Titles"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "tmdbId": {
-                    "type": "integer",
-                    "minimum": -9007199254740991,
-                    "maximum": 9007199254740991,
-                    "description": "TMDB numeric ID"
-                  },
-                  "type": {
-                    "enum": [
-                      "movie",
-                      "tv"
-                    ],
-                    "description": "Media type"
-                  }
-                },
-                "required": [
-                  "tmdbId",
-                  "type"
-                ],
-                "description": "TMDB ID and media type pair for resolving titles"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Internal title ID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "Internal title ID"
-                    }
-                  },
-                  "required": [
-                    "id"
-                  ],
-                  "description": "Resolved internal title ID"
                 }
               }
             }
@@ -2162,11 +2083,11 @@
         ]
       }
     },
-    "/titles/{id}/hydrate-seasons": {
+    "/titles/{id}/quick-add": {
       "post": {
-        "operationId": "titles.hydrateSeasons",
-        "summary": "Hydrate TV seasons",
-        "description": "Fetch full season and episode data from TMDB for a TV show. Required before tracking individual episodes.",
+        "operationId": "titles.quickAdd",
+        "summary": "Quick add title to library",
+        "description": "Add a title to the user's watchlist and trigger a full TMDB import if needed. If the title already exists in the user's library, returns alreadyAdded: true.",
         "tags": [
           "Titles"
         ],
@@ -2178,98 +2099,16 @@
             "schema": {
               "type": "string",
               "minLength": 1,
-              "description": "Internal title ID"
+              "description": "Internal UUIDv7 identifier"
             }
           }
         ],
         "requestBody": {
-          "required": true,
+          "required": false,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "tmdbId": {
-                    "type": "integer",
-                    "minimum": -9007199254740991,
-                    "maximum": 9007199254740991,
-                    "description": "TMDB ID for fetching season data"
-                  }
-                },
-                "required": [
-                  "tmdbId"
-                ],
-                "description": "Title identifiers for fetching season/episode data"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Hydrated seasons with episodes",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "seasons": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Season"
-                      },
-                      "description": "Hydrated seasons with episodes"
-                    }
-                  },
-                  "required": [
-                    "seasons"
-                  ],
-                  "description": "Freshly fetched season and episode data from TMDB"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/titles/quick-add": {
-      "post": {
-        "operationId": "titles.quickAdd",
-        "summary": "Quick add title to library",
-        "description": "Import a title by TMDB ID and add it to the user's watchlist in one step. If the title already exists in the user's library, returns alreadyAdded: true.",
-        "tags": [
-          "Titles"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "tmdbId": {
-                    "type": "integer",
-                    "minimum": -9007199254740991,
-                    "maximum": 9007199254740991,
-                    "description": "TMDB numeric ID"
-                  },
-                  "type": {
-                    "enum": [
-                      "movie",
-                      "tv"
-                    ],
-                    "description": "Media type"
-                  }
-                },
-                "required": [
-                  "tmdbId",
-                  "type"
-                ],
-                "description": "TMDB ID and media type pair for resolving titles"
+                "type": "object"
               }
             }
           }
@@ -2300,8 +2139,8 @@
               }
             }
           },
-          "500": {
-            "description": "500",
+          "404": {
+            "description": "404",
             "content": {
               "application/json": {
                 "schema": {
@@ -2313,14 +2152,14 @@
                           "const": true
                         },
                         "code": {
-                          "const": "INTERNAL_SERVER_ERROR"
+                          "const": "NOT_FOUND"
                         },
                         "status": {
-                          "const": 500
+                          "const": 404
                         },
                         "message": {
                           "type": "string",
-                          "default": "Failed to import title from TMDB"
+                          "default": "Title not found"
                         },
                         "data": {}
                       },
@@ -2682,124 +2521,6 @@
                     "totalResults"
                   ],
                   "description": "Person profile with paginated filmography and user's statuses for their titles"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "404",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_FOUND"
-                        },
-                        "status": {
-                          "const": 404
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Person not found"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/people/resolve": {
-      "post": {
-        "operationId": "people.resolve",
-        "summary": "Resolve TMDB ID to local person",
-        "description": "Look up or import a person by their TMDB ID. Returns the internal ID for use with other endpoints.",
-        "tags": [
-          "People"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "tmdbId": {
-                    "type": "integer",
-                    "minimum": -9007199254740991,
-                    "maximum": 9007199254740991,
-                    "description": "The Movie Database (TMDB) numeric ID"
-                  }
-                },
-                "required": [
-                  "tmdbId"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Internal person ID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "Internal person ID"
-                    }
-                  },
-                  "required": [
-                    "id"
-                  ],
-                  "description": "Resolved internal person ID"
                 }
               }
             }
@@ -3464,6 +3185,10 @@
                         {
                           "type": "object",
                           "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "Internal title ID"
+                            },
                             "tmdbId": {
                               "type": "number",
                               "description": "TMDB numeric ID"
@@ -3500,6 +3225,7 @@
                             }
                           },
                           "required": [
+                            "id",
                             "tmdbId",
                             "type",
                             "title",
@@ -4027,6 +3753,10 @@
                       "items": {
                         "type": "object",
                         "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Internal title ID (present for movie/tv results, absent for people)"
+                          },
                           "tmdbId": {
                             "type": "number",
                             "description": "TMDB numeric ID"
@@ -4595,7 +4325,7 @@
       "get": {
         "operationId": "system.health",
         "summary": "Get system health report",
-        "description": "Comprehensive health check covering database, TMDB connectivity, cron jobs, image cache, backups, and environment. Does not require authentication.",
+        "description": "Comprehensive health check covering database, TMDB connectivity, cron jobs, image cache, backups, and environment. Admin only.",
         "tags": [
           "System"
         ],

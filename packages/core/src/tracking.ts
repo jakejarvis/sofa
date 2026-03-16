@@ -401,39 +401,6 @@ export function rateTitleStars(
     .run();
 }
 
-export function getUserStatusesByTmdbIds(
-  userId: string,
-  tmdbIds: { tmdbId: number; type: string }[],
-): Record<string, "watchlist" | "in_progress" | "completed"> {
-  if (tmdbIds.length === 0) return {};
-
-  const allTmdbIds = tmdbIds.map((t) => t.tmdbId);
-  const rows = db
-    .select({
-      tmdbId: titles.tmdbId,
-      type: titles.type,
-      status: userTitleStatus.status,
-    })
-    .from(userTitleStatus)
-    .innerJoin(titles, eq(userTitleStatus.titleId, titles.id))
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        inArray(titles.tmdbId, allTmdbIds),
-      ),
-    )
-    .all();
-
-  const result: Record<string, "watchlist" | "in_progress" | "completed"> = {};
-  for (const row of rows) {
-    result[`${row.tmdbId}-${row.type}`] = row.status as
-      | "watchlist"
-      | "in_progress"
-      | "completed";
-  }
-  return result;
-}
-
 export function getUserStatusesByTitleIds(
   userId: string,
   titleIds: string[],
@@ -464,16 +431,15 @@ export function getUserStatusesByTitleIds(
   return result;
 }
 
-export function getEpisodeProgressByTmdbIds(
+export function getEpisodeProgressByTitleIds(
   userId: string,
-  tmdbIds: { tmdbId: number; type: string }[],
+  titleIds: string[],
 ): Record<string, { watched: number; total: number }> {
-  const tvIds = tmdbIds.filter((t) => t.type === "tv").map((t) => t.tmdbId);
-  if (tvIds.length === 0) return {};
+  if (titleIds.length === 0) return {};
 
   const rows = db
     .select({
-      tmdbId: titles.tmdbId,
+      titleId: titles.id,
       totalEpisodes: sql<number>`count(distinct ${episodes.id})`.as(
         "totalEpisodes",
       ),
@@ -492,14 +458,14 @@ export function getEpisodeProgressByTmdbIds(
         eq(userEpisodeWatches.userId, userId),
       ),
     )
-    .where(and(inArray(titles.tmdbId, tvIds), eq(titles.type, "tv")))
-    .groupBy(titles.tmdbId)
+    .where(and(inArray(titles.id, titleIds), eq(titles.type, "tv")))
+    .groupBy(titles.id)
     .all();
 
   const result: Record<string, { watched: number; total: number }> = {};
   for (const row of rows) {
     if (row.watchedEpisodes > 0) {
-      result[`${row.tmdbId}-tv`] = {
+      result[row.titleId] = {
         watched: row.watchedEpisodes,
         total: row.totalEpisodes,
       };

@@ -12,7 +12,7 @@ interface Genre {
 }
 
 interface TitleRowItem {
-  tmdbId: number;
+  id: string;
   type: "movie" | "tv";
   title: string;
   posterPath: string | null;
@@ -177,26 +177,21 @@ export function FilterableTitleRow({
         >
           <div className="flex gap-4 px-6 py-2 sm:px-2">
             {items.map((item: TitleRowItem, i: number) => (
-              <div
-                key={`${item.type}-${item.tmdbId}`}
-                className="w-[140px] shrink-0 sm:w-[160px]"
-              >
+              <div key={item.id} className="w-[140px] shrink-0 sm:w-[160px]">
                 <div
                   className="animate-stagger-item"
                   style={{ "--stagger-index": i } as React.CSSProperties}
                 >
                   <TitleCard
-                    tmdbId={item.tmdbId}
+                    id={item.id}
                     type={item.type}
                     title={item.title}
                     posterPath={item.posterPath}
                     posterThumbHash={item.posterThumbHash}
                     releaseDate={item.releaseDate ?? item.firstAirDate}
                     voteAverage={item.voteAverage}
-                    userStatus={userStatuses[`${item.tmdbId}-${item.type}`]}
-                    episodeProgress={
-                      episodeProgress[`${item.tmdbId}-${item.type}`]
-                    }
+                    userStatus={userStatuses[item.id]}
+                    episodeProgress={episodeProgress[item.id]}
                   />
                 </div>
               </div>

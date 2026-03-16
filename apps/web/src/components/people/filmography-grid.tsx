@@ -125,7 +125,6 @@ export function FilmographyGrid({
           >
             <TitleCard
               id={credit.titleId}
-              tmdbId={credit.tmdbId}
               type={credit.type}
               title={credit.title}
               posterPath={credit.posterPath}

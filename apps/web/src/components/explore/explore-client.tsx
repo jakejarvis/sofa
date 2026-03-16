@@ -96,7 +96,7 @@ export function ExploreClient() {
     <div className="space-y-10">
       {hero && (
         <HeroBanner
-          tmdbId={hero.tmdbId}
+          id={hero.id}
           type={hero.type}
           title={hero.title}
           overview={hero.overview}

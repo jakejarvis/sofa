@@ -16,7 +16,7 @@ import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -168,14 +168,6 @@ export default function TitleDetailScreen() {
     }),
   );
 
-  const hydrateMutation = useMutation(
-    orpc.titles.hydrateSeasons.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-      },
-    }),
-  );
-
   const title = detail.data?.title;
   const palette = title?.colorPalette ?? null;
   useTitleTheme(palette);
@@ -212,7 +204,6 @@ export default function TitleDetailScreen() {
     () =>
       (recommendations.data?.recommendations ?? []).map((item) => ({
         id: item.id,
-        tmdbId: item.tmdbId,
         title: item.title,
         type: item.type,
         posterPath: item.posterPath,
@@ -230,12 +221,6 @@ export default function TitleDetailScreen() {
     ({ item }: { item: (typeof cast)[number] }) => <CastCard person={item} />,
     [],
   );
-
-  const hydratedTitleId = useRef<string | null>(null);
-  const hydrateSeasonsRef = useRef(hydrateMutation.mutate);
-  useEffect(() => {
-    hydrateSeasonsRef.current = hydrateMutation.mutate;
-  }, [hydrateMutation.mutate]);
 
   const titleScrollContentStyle = useMemo(
     () => ({
@@ -270,17 +255,6 @@ export default function TitleDetailScreen() {
         : undefined,
     [palette?.darkVibrant],
   );
-
-  useEffect(() => {
-    if (
-      detail.data?.needsHydration &&
-      title?.type === "tv" &&
-      hydratedTitleId.current !== id
-    ) {
-      hydratedTitleId.current = id;
-      hydrateSeasonsRef.current({ id, tmdbId: title.tmdbId });
-    }
-  }, [detail.data?.needsHydration, title?.type, title?.tmdbId, id]);
 
   if (detail.isPending) {
     return (
@@ -487,10 +461,7 @@ export default function TitleDetailScreen() {
               currentStatus={userInfo.data?.status ?? null}
               onStatusChange={(status) => {
                 if (status === "watchlist") {
-                  quickAddMutation.mutate({
-                    tmdbId: title.tmdbId,
-                    type: title.type,
-                  });
+                  quickAddMutation.mutate({ id });
                 } else {
                   updateStatus.mutate({ id, status: null });
                 }
@@ -618,15 +589,6 @@ export default function TitleDetailScreen() {
               />
             ))}
           </Animated.View>
-        )}
-
-        {hydrateMutation.isPending && (
-          <View className="items-center py-6">
-            <Spinner colorClassName="accent-title-accent" />
-            <Text className="mt-2 text-muted-foreground text-sm">
-              Loading season data...
-            </Text>
-          </View>
         )}
 
         {/* Cast */}

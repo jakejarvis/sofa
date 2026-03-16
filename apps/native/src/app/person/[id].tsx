@@ -75,7 +75,7 @@ export default function PersonDetailScreen() {
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const primaryColor = useCSSVariable("--color-primary") as string;
 
-  const { handlePress, handleQuickAdd, addingKey, failedKey, resetError } =
+  const { handleQuickAdd, addingKey, failedKey, resetError } =
     usePosterActions();
 
   const {
@@ -134,7 +134,6 @@ export default function PersonDetailScreen() {
       >
         <PosterCard
           id={credit.titleId}
-          tmdbId={credit.tmdbId}
           title={credit.title}
           type={credit.type}
           posterPath={credit.posterPath}
@@ -143,9 +142,8 @@ export default function PersonDetailScreen() {
           voteAverage={credit.voteAverage}
           userStatus={userStatuses[credit.titleId] ?? null}
           width={columnWidth}
-          onPress={handlePress}
           onQuickAdd={handleQuickAdd}
-          isAdding={addingKey === `${credit.tmdbId}-${credit.type}`}
+          isAdding={addingKey === credit.titleId}
           failedKey={failedKey}
           onQuickAddFailed={resetError}
         />
@@ -154,7 +152,6 @@ export default function PersonDetailScreen() {
     [
       columnWidth,
       userStatuses,
-      handlePress,
       handleQuickAdd,
       addingKey,
       failedKey,

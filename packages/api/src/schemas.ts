@@ -10,9 +10,6 @@ export const ProviderParam = z.object({
     .enum(["plex", "jellyfin", "emby", "sonarr", "radarr"])
     .describe("Media server provider type"),
 });
-export const TmdbIdParam = z.object({
-  tmdbId: z.number().int().describe("The Movie Database (TMDB) numeric ID"),
-});
 export const FilenameParam = z.object({
   filename: z.string().min(1).describe("Backup filename"),
 });
@@ -24,13 +21,6 @@ export const TrendingTypeParam = z.object({
     .enum(["all", "movie", "tv"])
     .describe("Trending category: all, movie, or tv"),
 });
-export const TmdbIdTypeParam = z
-  .object({
-    tmdbId: z.number().int().describe("TMDB numeric ID"),
-    type: z.enum(["movie", "tv"]).describe("Media type"),
-  })
-  .meta({ description: "TMDB ID and media type pair for resolving titles" });
-
 // ─── Pagination ──────────────────────────────────────────────
 
 /** Page param for TMDB-backed endpoints (fixed ~20 items/page from TMDB) */
@@ -102,13 +92,6 @@ export const BatchWatchInput = z
       .describe("List of episode IDs to mark as watched"),
   })
   .meta({ description: "Batch of episode IDs to mark as watched" });
-
-export const HydrateSeasonsInput = z
-  .object({
-    id: z.string().min(1).describe("Internal title ID"),
-    tmdbId: z.number().int().describe("TMDB ID for fetching season data"),
-  })
-  .meta({ description: "Title identifiers for fetching season/episode data" });
 
 // ─── Search / Discover inputs ──────────────────────────────────
 
@@ -394,6 +377,16 @@ export const ResolvedTitleSchema = z
       .string()
       .nullable()
       .describe("Content rating (e.g. PG-13, TV-MA)"),
+    imdbId: z.string().nullable().describe("IMDb title ID (e.g. tt0137523)"),
+    tvdbId: z.number().nullable().describe("TVDB ID (TV shows only)"),
+    originalLanguage: z
+      .string()
+      .nullable()
+      .describe("Original language ISO 639-1 code (e.g. en)"),
+    runtimeMinutes: z
+      .number()
+      .nullable()
+      .describe("Runtime in minutes (movies only)"),
     colorPalette: ColorPaletteSchema.nullable(),
     trailerVideoKey: z
       .string()
@@ -451,10 +444,7 @@ export const PersonCreditSchema = z
 /** Reusable TMDB browse result (trending / popular / discover items) */
 export const TmdbBrowseItem = z
   .object({
-    id: z
-      .string()
-      .optional()
-      .describe("Internal title ID when the title already exists locally"),
+    id: z.string().describe("Internal title ID"),
     tmdbId: z.number().describe("TMDB numeric ID"),
     type: mediaType,
     title: z.string().describe("Display title"),
@@ -514,14 +504,7 @@ const BrowseOutput = z
 export const TitleDetailOutput = z
   .object({
     title: ResolvedTitleSchema,
-    seasons: z
-      .array(SeasonSchema)
-      .describe("TV seasons (empty for movies or unhydrated shows)"),
-    needsHydration: z
-      .boolean()
-      .describe(
-        "Whether season/episode data needs to be fetched from TMDB before tracking",
-      ),
+    seasons: z.array(SeasonSchema).describe("TV seasons (empty for movies)"),
     availability: z
       .array(AvailabilityOfferSchema)
       .describe("Streaming availability offers"),
@@ -531,12 +514,6 @@ export const TitleDetailOutput = z
     description:
       "Full title details with seasons, cast, and streaming availability",
   });
-
-export const TitleResolveOutput = z
-  .object({
-    id: z.string().describe("Internal title ID"),
-  })
-  .meta({ description: "Resolved internal title ID" });
 
 export const UserInfoOutput = z
   .object({
@@ -580,12 +557,6 @@ export const PersonDetailOutput = z
     description:
       "Person profile with paginated filmography and user's statuses for their titles",
   });
-
-export const PersonResolveOutput = z
-  .object({
-    id: z.string().describe("Internal person ID"),
-  })
-  .meta({ description: "Resolved internal person ID" });
 
 // ─── Dashboard outputs ─────────────────────────────────────────
 
@@ -694,10 +665,7 @@ export const TrendingOutput = z
     items: z.array(TmdbBrowseItem).describe("Trending titles"),
     hero: z
       .object({
-        id: z
-          .string()
-          .optional()
-          .describe("Internal title ID when the title already exists locally"),
+        id: z.string().describe("Internal title ID"),
         tmdbId: z.number().describe("TMDB numeric ID"),
         type: mediaType,
         title: z.string().describe("Display title"),
@@ -735,6 +703,12 @@ export const SearchOutput = z
     results: z.array(
       z
         .object({
+          id: z
+            .string()
+            .optional()
+            .describe(
+              "Internal title ID (present for movie/tv results, absent for people)",
+            ),
           tmdbId: z.number().describe("TMDB numeric ID"),
           type: z.enum(["movie", "tv", "person"]).describe("Result type"),
           title: z.string().describe("Title or person name"),
@@ -1119,16 +1093,6 @@ export const AuthConfigOutput = z
   })
   .meta({
     description: "Authentication provider configuration",
-  });
-
-// ─── Title hydrate seasons output ─────────────────────────────
-
-export const HydrateSeasonsOutput = z
-  .object({
-    seasons: z.array(SeasonSchema).describe("Hydrated seasons with episodes"),
-  })
-  .meta({
-    description: "Freshly fetched season and episode data from TMDB",
   });
 
 // ═══════════════════════════════════════════════════════════════

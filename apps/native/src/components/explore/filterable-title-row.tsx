@@ -28,8 +28,7 @@ export function FilterableTitleRow({
   icon: Icon;
   mediaType: "movie" | "tv";
   defaultItems: Array<{
-    id?: string;
-    tmdbId: number;
+    id: string;
     title: string;
     type: string;
     posterPath: string | null;
@@ -93,14 +92,11 @@ export function FilterableTitleRow({
   // Map items into PosterRowItem shape with status/progress resolved
   const items = useMemo<PosterRowItem[]>(
     () =>
-      rawItems.map((item) => {
-        const key = `${item.tmdbId}-${item.type}`;
-        return {
-          ...item,
-          userStatus: userStatuses[key] ?? null,
-          episodeProgress: episodeProgress[key] ?? null,
-        };
-      }),
+      rawItems.map((item) => ({
+        ...item,
+        userStatus: userStatuses[item.id] ?? null,
+        episodeProgress: episodeProgress[item.id] ?? null,
+      })),
     [rawItems, userStatuses, episodeProgress],
   );
 

@@ -14,8 +14,6 @@ import {
   DiscoverOutput,
   FilenameParam,
   GenresOutput,
-  HydrateSeasonsInput,
-  HydrateSeasonsOutput,
   IdParam,
   IntegrationOutput,
   IntegrationsListOutput,
@@ -24,7 +22,6 @@ import {
   PageParam,
   PaginatedInput,
   PersonDetailOutput,
-  PersonResolveOutput,
   PopularOutput,
   ProviderParam,
   PublicInfoOutput,
@@ -40,9 +37,6 @@ import {
   TelemetryOutput,
   TitleDetailOutput,
   TitleRecommendationsOutput,
-  TitleResolveOutput,
-  TmdbIdParam,
-  TmdbIdTypeParam,
   ToggleRegistrationInput,
   ToggleTelemetryInput,
   ToggleUpdateCheckInput,
@@ -77,21 +71,6 @@ export const contract = {
       })
       .input(IdParam)
       .output(TitleDetailOutput)
-      .errors({
-        NOT_FOUND: { message: "Title not found" },
-      }),
-    resolve: oc
-      .route({
-        method: "POST",
-        path: "/titles/resolve",
-        tags: ["Titles"],
-        summary: "Resolve TMDB ID to local title",
-        description:
-          "Look up or import a title by its TMDB ID and media type. Returns the internal ID for use with other endpoints.",
-        successDescription: "Internal title ID",
-      })
-      .input(TmdbIdTypeParam)
-      .output(TitleResolveOutput)
       .errors({
         NOT_FOUND: { message: "Title not found" },
       }),
@@ -164,33 +143,21 @@ export const contract = {
       })
       .input(IdParam)
       .output(TitleRecommendationsOutput),
-    hydrateSeasons: oc
-      .route({
-        method: "POST",
-        path: "/titles/{id}/hydrate-seasons",
-        tags: ["Titles"],
-        summary: "Hydrate TV seasons",
-        description:
-          "Fetch full season and episode data from TMDB for a TV show. Required before tracking individual episodes.",
-        successDescription: "Hydrated seasons with episodes",
-      })
-      .input(HydrateSeasonsInput)
-      .output(HydrateSeasonsOutput),
     quickAdd: oc
       .route({
         method: "POST",
-        path: "/titles/quick-add",
+        path: "/titles/{id}/quick-add",
         tags: ["Titles"],
         summary: "Quick add title to library",
         description:
-          "Import a title by TMDB ID and add it to the user's watchlist in one step. If the title already exists in the user's library, returns alreadyAdded: true.",
+          "Add a title to the user's watchlist and trigger a full TMDB import if needed. If the title already exists in the user's library, returns alreadyAdded: true.",
         successDescription:
           "Title ID and whether it was already in the library",
       })
-      .input(TmdbIdTypeParam)
+      .input(IdParam)
       .output(QuickAddOutput)
       .errors({
-        INTERNAL_SERVER_ERROR: { message: "Failed to import title from TMDB" },
+        NOT_FOUND: { message: "Title not found" },
       }),
   },
   episodes: {
@@ -264,21 +231,6 @@ export const contract = {
       })
       .input(IdParam.merge(PaginatedInput))
       .output(PersonDetailOutput)
-      .errors({
-        NOT_FOUND: { message: "Person not found" },
-      }),
-    resolve: oc
-      .route({
-        method: "POST",
-        path: "/people/resolve",
-        tags: ["People"],
-        summary: "Resolve TMDB ID to local person",
-        description:
-          "Look up or import a person by their TMDB ID. Returns the internal ID for use with other endpoints.",
-        successDescription: "Internal person ID",
-      })
-      .input(TmdbIdParam)
-      .output(PersonResolveOutput)
       .errors({
         NOT_FOUND: { message: "Person not found" },
       }),
@@ -461,7 +413,7 @@ export const contract = {
         tags: ["System"],
         summary: "Get system health report",
         description:
-          "Comprehensive health check covering database, TMDB connectivity, cron jobs, image cache, backups, and environment. Does not require authentication.",
+          "Comprehensive health check covering database, TMDB connectivity, cron jobs, image cache, backups, and environment. Admin only.",
         successDescription: "Full system health report",
       })
       .output(SystemHealthOutput),

@@ -3,7 +3,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface TitleGridItem {
   id: string;
-  tmdbId: number;
   type: string;
   title: string;
   posterPath: string | null;
@@ -43,7 +42,6 @@ export function TitleGrid({ items }: { items: TitleGridItem[] }) {
         >
           <TitleCard
             id={t.id}
-            tmdbId={t.tmdbId}
             type={t.type}
             title={t.title}
             posterPath={t.posterPath}

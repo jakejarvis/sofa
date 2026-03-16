@@ -1,4 +1,6 @@
 import { ORPCError } from "@orpc/server";
+import { ensureBrowseTitlesExist } from "@sofa/core/metadata";
+import { ensureBrowsePersonsExist } from "@sofa/core/person";
 import {
   searchMovies,
   searchMulti,
@@ -25,23 +27,36 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
 
   if (type === "person") {
     const personResults = await searchPerson(query, input.page);
+    const personItems = (personResults.results ?? []).map((r) => ({
+      tmdbId: r.id,
+      type: "person" as const,
+      title: r.name ?? "",
+      posterPath: null,
+      profilePath: tmdbImageUrl(r.profile_path ?? null, "profiles"),
+      overview: null,
+      releaseDate: null,
+      popularity: r.popularity ?? null,
+      voteAverage: null,
+      knownForDepartment: r.known_for_department ?? null,
+      knownFor:
+        (r.known_for
+          ?.slice(0, 3)
+          .map((k) => k.title ?? (k as { name?: string }).name)
+          .filter((s): s is string => !!s) as string[]) ?? null,
+    }));
+    const personMap = ensureBrowsePersonsExist(
+      personItems.map((r) => ({
+        tmdbId: r.tmdbId,
+        name: r.title,
+        profilePath: r.profilePath,
+        knownForDepartment: r.knownForDepartment,
+        popularity: r.popularity,
+      })),
+    );
     return {
-      results: (personResults.results ?? []).map((r) => ({
-        tmdbId: r.id,
-        type: "person" as const,
-        title: r.name ?? "",
-        posterPath: null,
-        profilePath: tmdbImageUrl(r.profile_path ?? null, "profiles"),
-        overview: null,
-        releaseDate: null,
-        popularity: r.popularity ?? null,
-        voteAverage: null,
-        knownForDepartment: r.known_for_department ?? null,
-        knownFor:
-          (r.known_for
-            ?.slice(0, 3)
-            .map((k) => k.title ?? (k as { name?: string }).name)
-            .filter((s): s is string => !!s) as string[]) ?? null,
+      results: personItems.map((r) => ({
+        ...r,
+        id: personMap.get(r.tmdbId),
       })),
       page: personResults.page ?? input.page,
       totalPages: personResults.total_pages ?? 1,
@@ -108,8 +123,32 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);
 
+  // Batch-import movie/TV results so they have internal IDs
+  const titleResults = mapped.filter(
+    (r): r is typeof r & { type: "movie" | "tv" } => r.type !== "person",
+  );
+  const titleMap = ensureBrowseTitlesExist(titleResults);
+
+  // Batch-import person results so they have internal IDs
+  const personResults = mapped.filter((r) => r.type === "person");
+  const personMap = ensureBrowsePersonsExist(
+    personResults.map((r) => ({
+      tmdbId: r.tmdbId,
+      name: r.title,
+      profilePath: r.profilePath,
+      knownForDepartment: r.knownForDepartment,
+      popularity: r.popularity,
+    })),
+  );
+
+  const results = mapped.map((r) => {
+    if (r.type === "person") return { ...r, id: personMap.get(r.tmdbId) };
+    const entry = titleMap.get(`${r.tmdbId}-${r.type}`);
+    return { ...r, id: entry?.id };
+  });
+
   return {
-    results: mapped,
+    results,
     page: raw.page ?? input.page,
     totalPages: raw.total_pages ?? 1,
     totalResults: raw.total_results ?? 0,

@@ -1,9 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import {
-  fetchFullFilmography,
-  getOrFetchPerson,
-  getOrFetchPersonByTmdbId,
-} from "@sofa/core/person";
+import { fetchFullFilmography, getOrFetchPerson } from "@sofa/core/person";
 import { getUserStatusesByTitleIds } from "@sofa/core/tracking";
 import { os } from "../context";
 import { authed } from "../middleware";
@@ -33,13 +29,4 @@ export const detail = os.people.detail
       totalPages: Math.max(1, Math.ceil(allCredits.length / input.limit)),
       totalResults: allCredits.length,
     };
-  });
-
-export const resolve = os.people.resolve
-  .use(authed)
-  .handler(async ({ input }) => {
-    const person = await getOrFetchPersonByTmdbId(input.tmdbId);
-    if (!person)
-      throw new ORPCError("NOT_FOUND", { message: "Person not found" });
-    return { id: person.id };
   });

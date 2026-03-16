@@ -4,7 +4,7 @@ import {
   useInfiniteQuery,
   useMutation,
 } from "@tanstack/react-query";
-import { Stack, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -19,10 +19,8 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { toast } from "@/lib/toast";
-import * as Haptics from "@/utils/haptics";
 
 export default function SearchScreen() {
-  const { navigate } = useRouter();
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query.trim(), 300);
 
@@ -38,35 +36,8 @@ export default function SearchScreen() {
     }),
   });
 
-  // Track which item is currently being resolved/added
-  const [resolvingId, setResolvingId] = useState<string | null>(null);
+  // Track which item is currently being added
   const [addingId, setAddingId] = useState<string | null>(null);
-
-  const resolveTitleMutation = useMutation(
-    orpc.titles.resolve.mutationOptions({
-      onSuccess: ({ id }) => {
-        setResolvingId(null);
-        if (id) navigate(`/title/${id}`);
-      },
-      onError: () => {
-        setResolvingId(null);
-        toast.error("Failed to load title");
-      },
-    }),
-  );
-
-  const resolvePersonMutation = useMutation(
-    orpc.people.resolve.mutationOptions({
-      onSuccess: ({ id }) => {
-        setResolvingId(null);
-        if (id) navigate(`/person/${id}`);
-      },
-      onError: () => {
-        setResolvingId(null);
-        toast.error("Failed to load person");
-      },
-    }),
-  );
 
   const quickAddMutation = useMutation(
     orpc.titles.quickAdd.mutationOptions({
@@ -83,27 +54,13 @@ export default function SearchScreen() {
     }),
   );
 
-  // Use refs for mutation.mutate to keep callbacks stable across renders
-  const resolveTitleMutateRef = useRef(resolveTitleMutation.mutate);
-  resolveTitleMutateRef.current = resolveTitleMutation.mutate;
-  const resolvePersonMutateRef = useRef(resolvePersonMutation.mutate);
-  resolvePersonMutateRef.current = resolvePersonMutation.mutate;
+  // Use ref for mutation.mutate to keep callback stable across renders
   const quickAddMutateRef = useRef(quickAddMutation.mutate);
   quickAddMutateRef.current = quickAddMutation.mutate;
 
-  const handleResolve = useCallback((item: SearchResultItem) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setResolvingId(`${item.type}-${item.tmdbId}`);
-    if (item.type === "person") {
-      resolvePersonMutateRef.current({ tmdbId: item.tmdbId });
-    } else {
-      resolveTitleMutateRef.current({ tmdbId: item.tmdbId, type: item.type });
-    }
-  }, []);
-
-  const handleQuickAdd = useCallback((tmdbId: number, type: "movie" | "tv") => {
-    setAddingId(`${type}-${tmdbId}`);
-    quickAddMutateRef.current({ tmdbId, type });
+  const handleQuickAdd = useCallback((id: string) => {
+    setAddingId(id);
+    quickAddMutateRef.current({ id });
   }, []);
 
   // Memoize mapped results to maintain stable references
@@ -111,7 +68,7 @@ export default function SearchScreen() {
     () =>
       searchResults.data?.pages.flatMap((page) =>
         page.results.map((r) => ({
-          tmdbId: r.tmdbId,
+          id: r.id,
           title: r.title,
           type: r.type,
           posterPath: r.posterPath,
@@ -126,17 +83,15 @@ export default function SearchScreen() {
     ({ item }: { item: SearchResultItem }) => (
       <SearchResultRow
         item={item}
-        onResolve={handleResolve}
         onQuickAdd={handleQuickAdd}
-        isResolving={resolvingId === `${item.type}-${item.tmdbId}`}
-        isAdding={addingId === `${item.type}-${item.tmdbId}`}
+        isAdding={addingId === item.id}
       />
     ),
-    [handleResolve, handleQuickAdd, resolvingId, addingId],
+    [handleQuickAdd, addingId],
   );
 
   const keyExtractor = useCallback(
-    (item: SearchResultItem) => `${item.type}-${item.tmdbId}`,
+    (item: SearchResultItem) => `${item.type}-${item.id}`,
     [],
   );
 

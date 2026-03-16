@@ -1,9 +1,7 @@
 import { IconStarFilled } from "@tabler/icons-react-native";
-import { useMutation } from "@tanstack/react-query";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
-import { Link, useRouter } from "expo-router";
-import { useCallback } from "react";
-import { Pressable, View } from "react-native";
+import { Link } from "expo-router";
+import { View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
@@ -15,12 +13,9 @@ import Animated, {
 import { useCSSVariable } from "uniwind";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
-import { orpc } from "@/lib/orpc";
-import { toast } from "@/lib/toast";
 
 export interface HeroBannerItem {
-  id?: string;
-  tmdbId: number;
+  id: string;
   title: string;
   type: string;
   backdropPath?: string | null;
@@ -30,7 +25,6 @@ export interface HeroBannerItem {
 }
 
 export function HeroBanner({ item }: { item: HeroBannerItem }) {
-  const { navigate } = useRouter();
   const primary = useCSSVariable("--color-primary") as string;
   const reduceMotion = useReducedMotion();
   const pressed = useSharedValue(0);
@@ -41,22 +35,6 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
       },
     ],
   }));
-
-  const resolveMutation = useMutation(
-    orpc.titles.resolve.mutationOptions({
-      onSuccess: ({ id }) => {
-        navigate(`/title/${id}`);
-      },
-      onError: () => toast.error("Failed to load title"),
-    }),
-  );
-
-  const handlePress = useCallback(() => {
-    resolveMutation.mutate({
-      tmdbId: item.tmdbId,
-      type: item.type as "movie" | "tv",
-    });
-  }, [item.tmdbId, item.type, resolveMutation]);
 
   const tapGesture = Gesture.Tap()
     .onBegin(() => {
@@ -74,124 +52,117 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
   ]
     .filter(Boolean)
     .join(", ");
-  const titleHref = item.id
-    ? (`/title/${item.id}` as `/title/${string}`)
-    : null;
+  const titleHref = `/title/${item.id}` as `/title/${string}`;
 
-  const bannerContent = (
-    <GestureDetector gesture={tapGesture}>
-      <Animated.View
-        className="mx-4 overflow-hidden rounded-2xl"
-        style={[
-          animatedStyle,
-          {
-            height: 220,
-            opacity: resolveMutation.isPending ? 0.7 : 1,
-            borderCurve: "continuous",
-          },
-        ]}
-      >
-        <Pressable
-          onPress={titleHref ? undefined : handlePress}
-          accessibilityRole="button"
-          accessibilityLabel={accessibilityLabel}
-          accessibilityHint="Opens title details"
-          style={{ flex: 1 }}
-        >
-          {item.backdropPath && (
-            <Image
-              source={{ uri: item.backdropPath }}
-              className="absolute h-full w-full"
-              contentFit="cover"
-            />
-          )}
-          {useGlass ? (
-            <GlassView
-              glassEffectStyle="regular"
-              colorScheme="dark"
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                padding: 16,
-              }}
+  return (
+    <Link href={titleHref}>
+      <Link.Trigger>
+        <GestureDetector gesture={tapGesture}>
+          <Animated.View
+            className="mx-4 overflow-hidden rounded-2xl"
+            style={[
+              animatedStyle,
+              {
+                height: 220,
+                borderCurve: "continuous",
+              },
+            ]}
+          >
+            <View
+              accessibilityRole="button"
+              accessibilityLabel={accessibilityLabel}
+              accessibilityHint="Opens title details"
+              style={{ flex: 1 }}
             >
-              <Text
-                className="font-display text-2xl text-white"
-                numberOfLines={2}
-              >
-                {item.title}
-              </Text>
-              {item.overview ? (
-                <Text className="mt-1 text-white/70 text-xs" numberOfLines={2}>
-                  {item.overview}
-                </Text>
-              ) : null}
-              <View className="mt-2 flex-row items-center gap-2">
-                {item.voteAverage != null && item.voteAverage > 0 && (
-                  <View className="flex-row items-center gap-1">
-                    <IconStarFilled size={12} color={primary} />
-                    <Text className="text-primary text-xs">
-                      {item.voteAverage.toFixed(1)}
-                    </Text>
-                  </View>
-                )}
-                <Text className="text-white/50 text-xs">
-                  {item.releaseDate?.slice(0, 4)}
-                </Text>
-              </View>
-            </GlassView>
-          ) : (
-            <>
-              <View
-                className="absolute inset-0"
-                style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-              />
-              <View className="flex-1 justify-end p-4">
-                <Text
-                  className="font-display text-2xl text-white"
-                  numberOfLines={2}
+              {item.backdropPath && (
+                <Image
+                  source={{ uri: item.backdropPath }}
+                  className="absolute h-full w-full"
+                  contentFit="cover"
+                />
+              )}
+              {useGlass ? (
+                <GlassView
+                  glassEffectStyle="regular"
+                  colorScheme="dark"
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    padding: 16,
+                  }}
                 >
-                  {item.title}
-                </Text>
-                {item.overview ? (
                   <Text
-                    className="mt-1 text-white/70 text-xs"
+                    className="font-display text-2xl text-white"
                     numberOfLines={2}
                   >
-                    {item.overview}
+                    {item.title}
                   </Text>
-                ) : null}
-                <View className="mt-2 flex-row items-center gap-2">
-                  {item.voteAverage != null && item.voteAverage > 0 && (
-                    <View className="flex-row items-center gap-1">
-                      <IconStarFilled size={12} color={primary} />
-                      <Text className="text-primary text-xs">
-                        {item.voteAverage.toFixed(1)}
+                  {item.overview ? (
+                    <Text
+                      className="mt-1 text-white/70 text-xs"
+                      numberOfLines={2}
+                    >
+                      {item.overview}
+                    </Text>
+                  ) : null}
+                  <View className="mt-2 flex-row items-center gap-2">
+                    {item.voteAverage != null && item.voteAverage > 0 && (
+                      <View className="flex-row items-center gap-1">
+                        <IconStarFilled size={12} color={primary} />
+                        <Text className="text-primary text-xs">
+                          {item.voteAverage.toFixed(1)}
+                        </Text>
+                      </View>
+                    )}
+                    <Text className="text-white/50 text-xs">
+                      {item.releaseDate?.slice(0, 4)}
+                    </Text>
+                  </View>
+                </GlassView>
+              ) : (
+                <>
+                  <View
+                    className="absolute inset-0"
+                    style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+                  />
+                  <View className="flex-1 justify-end p-4">
+                    <Text
+                      className="font-display text-2xl text-white"
+                      numberOfLines={2}
+                    >
+                      {item.title}
+                    </Text>
+                    {item.overview ? (
+                      <Text
+                        className="mt-1 text-white/70 text-xs"
+                        numberOfLines={2}
+                      >
+                        {item.overview}
+                      </Text>
+                    ) : null}
+                    <View className="mt-2 flex-row items-center gap-2">
+                      {item.voteAverage != null && item.voteAverage > 0 && (
+                        <View className="flex-row items-center gap-1">
+                          <IconStarFilled size={12} color={primary} />
+                          <Text className="text-primary text-xs">
+                            {item.voteAverage.toFixed(1)}
+                          </Text>
+                        </View>
+                      )}
+                      <Text className="text-white/50 text-xs">
+                        {item.releaseDate?.slice(0, 4)}
                       </Text>
                     </View>
-                  )}
-                  <Text className="text-white/50 text-xs">
-                    {item.releaseDate?.slice(0, 4)}
-                  </Text>
-                </View>
-              </View>
-            </>
-          )}
-        </Pressable>
-      </Animated.View>
-    </GestureDetector>
+                  </View>
+                </>
+              )}
+            </View>
+          </Animated.View>
+        </GestureDetector>
+      </Link.Trigger>
+      <Link.Preview />
+    </Link>
   );
-
-  if (titleHref) {
-    return (
-      <Link href={titleHref}>
-        <Link.Trigger>{bannerContent}</Link.Trigger>
-        <Link.Preview />
-      </Link>
-    );
-  }
-
-  return bannerContent;
 }

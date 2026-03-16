@@ -16,14 +16,12 @@ import * as titles from "./procedures/titles";
 export const implementedRouter = {
   titles: {
     detail: titles.detail,
-    resolve: titles.resolve,
     updateStatus: titles.updateStatus,
     updateRating: titles.updateRating,
     watchMovie: titles.watchMovie,
     watchAll: titles.watchAll,
     userInfo: titles.userInfo,
     recommendations: titles.recommendations,
-    hydrateSeasons: titles.hydrateSeasons,
     quickAdd: titles.quickAdd,
   },
   episodes: {
@@ -37,7 +35,6 @@ export const implementedRouter = {
   },
   people: {
     detail: people.detail,
-    resolve: people.resolve,
   },
   dashboard: {
     stats: dashboard.stats,

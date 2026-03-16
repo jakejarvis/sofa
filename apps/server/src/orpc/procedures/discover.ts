@@ -1,18 +1,14 @@
 import { ORPCError } from "@orpc/server";
+import { ensureBrowseTitlesExist } from "@sofa/core/metadata";
 import {
-  getEpisodeProgressByTmdbIds,
-  getUserStatusesByTmdbIds,
+  getEpisodeProgressByTitleIds,
+  getUserStatusesByTitleIds,
 } from "@sofa/core/tracking";
 import { discover as discoverTmdb } from "@sofa/tmdb/client";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { os } from "../context";
 import { authed } from "../middleware";
-import {
-  browseLookupKey,
-  getBrowsePosterThumbHashes,
-} from "./browse-thumbhashes";
-import { getBrowseTitleIds } from "./browse-title-ids";
 
 export const discover = os.discover
   .use(authed)
@@ -51,22 +47,23 @@ export const discover = os.discover
         firstAirDate: (r.first_air_date as string | undefined) ?? null,
         voteAverage: r.vote_average ?? null,
       }));
-    const titleIdsByLookup = getBrowseTitleIds(
-      baseItems.map((item) => ({ tmdbId: item.tmdbId, type: item.type })),
-    );
-    const posterThumbHashes = getBrowsePosterThumbHashes(baseItems);
-    const items = baseItems.map((item) => ({
-      ...item,
-      id: titleIdsByLookup[browseLookupKey(item)],
-      posterThumbHash: posterThumbHashes.get(browseLookupKey(item)) ?? null,
-    }));
 
-    const lookups = items.map((r) => ({ tmdbId: r.tmdbId, type: r.type }));
+    const titleMap = ensureBrowseTitlesExist(baseItems);
+    const items = baseItems.map((item) => {
+      const entry = titleMap.get(`${item.tmdbId}-${item.type}`);
+      return {
+        ...item,
+        id: entry?.id ?? "",
+        posterThumbHash: entry?.posterThumbHash ?? null,
+      };
+    });
+
+    const titleIds = items.map((r) => r.id);
     const [userStatuses, episodeProgress] =
-      lookups.length > 0
+      titleIds.length > 0
         ? [
-            getUserStatusesByTmdbIds(context.user.id, lookups),
-            getEpisodeProgressByTmdbIds(context.user.id, lookups),
+            getUserStatusesByTitleIds(context.user.id, titleIds),
+            getEpisodeProgressByTitleIds(context.user.id, titleIds),
           ]
         : [{}, {}];
 

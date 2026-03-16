@@ -1,18 +1,14 @@
 import { ORPCError } from "@orpc/server";
+import { ensureBrowseTitlesExist } from "@sofa/core/metadata";
 import {
-  getEpisodeProgressByTmdbIds,
-  getUserStatusesByTmdbIds,
+  getEpisodeProgressByTitleIds,
+  getUserStatusesByTitleIds,
 } from "@sofa/core/tracking";
 import { getGenres, getPopular, getTrending } from "@sofa/tmdb/client";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 import { os } from "../context";
 import { authed } from "../middleware";
-import {
-  browseLookupKey,
-  getBrowsePosterThumbHashes,
-} from "./browse-thumbhashes";
-import { getBrowseTitleIds } from "./browse-title-ids";
 
 function requireTmdb() {
   if (!isTmdbConfigured()) {
@@ -54,29 +50,51 @@ export const trending = os.explore.trending
       (r) =>
         r.backdrop_path && (r.media_type === "movie" || r.media_type === "tv"),
     );
-    const titleIdsByLookup = getBrowseTitleIds([
-      ...baseItems.map((item) => ({ tmdbId: item.tmdbId, type: item.type })),
+
+    // Batch-upsert all browse items (+ hero) into the titles table
+    const allBrowseItems = [
+      ...baseItems,
       ...(heroResult
         ? [
             {
               tmdbId: heroResult.id as number,
               type: heroResult.media_type as "movie" | "tv",
+              title:
+                ((heroResult.title ?? heroResult.name) as string | undefined) ??
+                "",
+              posterPath: tmdbImageUrl(
+                (heroResult.poster_path as string) ?? null,
+                "posters",
+              ),
+              releaseDate:
+                (heroResult.release_date as string | undefined) ?? null,
+              firstAirDate:
+                (heroResult.first_air_date as string | undefined) ?? null,
+              voteAverage:
+                (heroResult.vote_average as number | undefined) ?? null,
             },
           ]
         : []),
-    ]);
-    const posterThumbHashes = getBrowsePosterThumbHashes(baseItems);
-    const items = baseItems.map((item) => ({
-      ...item,
-      id: titleIdsByLookup[browseLookupKey(item)],
-      posterThumbHash: posterThumbHashes.get(browseLookupKey(item)) ?? null,
-    }));
+    ];
+    const titleMap = ensureBrowseTitlesExist(allBrowseItems);
 
+    const items = baseItems.map((item) => {
+      const entry = titleMap.get(`${item.tmdbId}-${item.type}`);
+      return {
+        ...item,
+        id: entry?.id ?? "",
+        posterThumbHash: entry?.posterThumbHash ?? null,
+      };
+    });
+
+    const heroEntry = heroResult
+      ? titleMap.get(
+          `${heroResult.id as number}-${heroResult.media_type as string}`,
+        )
+      : undefined;
     const hero = heroResult
       ? {
-          id: titleIdsByLookup[
-            `${heroResult.id as number}-${heroResult.media_type as "movie" | "tv"}`
-          ],
+          id: heroEntry?.id ?? "",
           tmdbId: heroResult.id as number,
           type: heroResult.media_type as "movie" | "tv",
           title:
@@ -90,12 +108,12 @@ export const trending = os.explore.trending
         }
       : null;
 
-    const lookups = items.map((r) => ({ tmdbId: r.tmdbId, type: r.type }));
+    const titleIds = items.map((r) => r.id);
     const [userStatuses, episodeProgress] =
-      lookups.length > 0
+      titleIds.length > 0
         ? [
-            getUserStatusesByTmdbIds(context.user.id, lookups),
-            getEpisodeProgressByTmdbIds(context.user.id, lookups),
+            getUserStatusesByTitleIds(context.user.id, titleIds),
+            getEpisodeProgressByTitleIds(context.user.id, titleIds),
           ]
         : [{}, {}];
 
@@ -127,22 +145,23 @@ export const popular = os.explore.popular
         firstAirDate: (r.first_air_date as string | undefined) ?? null,
         voteAverage: (r.vote_average as number | undefined) ?? null,
       }));
-    const titleIdsByLookup = getBrowseTitleIds(
-      baseItems.map((item) => ({ tmdbId: item.tmdbId, type: item.type })),
-    );
-    const posterThumbHashes = getBrowsePosterThumbHashes(baseItems);
-    const items = baseItems.map((item) => ({
-      ...item,
-      id: titleIdsByLookup[browseLookupKey(item)],
-      posterThumbHash: posterThumbHashes.get(browseLookupKey(item)) ?? null,
-    }));
 
-    const lookups = items.map((r) => ({ tmdbId: r.tmdbId, type: r.type }));
+    const titleMap = ensureBrowseTitlesExist(baseItems);
+    const items = baseItems.map((item) => {
+      const entry = titleMap.get(`${item.tmdbId}-${item.type}`);
+      return {
+        ...item,
+        id: entry?.id ?? "",
+        posterThumbHash: entry?.posterThumbHash ?? null,
+      };
+    });
+
+    const titleIds = items.map((r) => r.id);
     const [userStatuses, episodeProgress] =
-      lookups.length > 0
+      titleIds.length > 0
         ? [
-            getUserStatusesByTmdbIds(context.user.id, lookups),
-            getEpisodeProgressByTmdbIds(context.user.id, lookups),
+            getUserStatusesByTitleIds(context.user.id, titleIds),
+            getEpisodeProgressByTitleIds(context.user.id, titleIds),
           ]
         : [{}, {}];
 

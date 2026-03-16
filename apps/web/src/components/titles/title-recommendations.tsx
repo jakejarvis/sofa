@@ -46,7 +46,6 @@ export function TitleRecommendations({ titleId }: { titleId: string }) {
           >
             <TitleCard
               id={rec.id}
-              tmdbId={rec.tmdbId}
               type={rec.type}
               title={rec.title}
               posterPath={rec.posterPath}

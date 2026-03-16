@@ -1,6 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Suspense } from "react";
-import { AsyncTitleSeasons } from "@/components/titles/async-title-seasons";
 import { TitleActions } from "@/components/titles/title-actions";
 import { TitleAvailability } from "@/components/titles/title-availability";
 import { TitleCast } from "@/components/titles/title-cast";
@@ -8,10 +6,7 @@ import { TitleHero } from "@/components/titles/title-hero";
 import { TitleKeyboardShortcuts } from "@/components/titles/title-keyboard-shortcuts";
 import { TitleProvider } from "@/components/titles/title-provider";
 import { TitleRecommendations } from "@/components/titles/title-recommendations";
-import {
-  SeasonsSkeleton,
-  TitleSeasons,
-} from "@/components/titles/title-seasons";
+import { TitleSeasons } from "@/components/titles/title-seasons";
 import { TitleTheme } from "@/components/titles/title-theme";
 import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
@@ -46,8 +41,7 @@ export const Route = createFileRoute("/_app/titles/$id")({
 });
 
 function TitleDetailPage() {
-  const { title, seasons, needsHydration, availability, cast } =
-    Route.useLoaderData();
+  const { title, seasons, availability, cast } = Route.useLoaderData();
 
   const themeStyle = getThemeCssProperties(title.colorPalette);
 
@@ -69,14 +63,7 @@ function TitleDetailPage() {
           <TitleAvailability availability={availability} />
         </TitleHero>
 
-        {title.type === "tv" && needsHydration && (
-          <Suspense fallback={<SeasonsSkeleton />}>
-            <AsyncTitleSeasons titleId={title.id} tmdbId={title.tmdbId} />
-          </Suspense>
-        )}
-        {title.type === "tv" && !needsHydration && seasons.length > 0 && (
-          <TitleSeasons />
-        )}
+        {title.type === "tv" && seasons.length > 0 && <TitleSeasons />}
 
         <TitleCast cast={cast} titleType={title.type} />
 

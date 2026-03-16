@@ -4,15 +4,10 @@ import {
   IconPlus,
   IconStar,
 } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
-
-import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
-import { useProgress } from "@/components/navigation-progress";
-import { orpc } from "@/lib/orpc/client";
+import { Link } from "@tanstack/react-router";
 
 interface HeroBannerProps {
-  tmdbId: number;
+  id: string;
   type: "movie" | "tv";
   title: string;
   overview: string;
@@ -21,34 +16,13 @@ interface HeroBannerProps {
 }
 
 export function HeroBanner({
-  tmdbId,
+  id,
   type,
   title,
   overview,
   backdropPath,
   voteAverage,
 }: HeroBannerProps) {
-  const navigate = useNavigate();
-  const progress = useProgress();
-  const resolveMutation = useMutation(
-    orpc.titles.resolve.mutationOptions({
-      onSuccess: ({ id }) => {
-        if (id) void navigate({ to: "/titles/$id", params: { id } });
-        else progress.done();
-      },
-      onError: () => {
-        progress.done();
-        toast.error("Failed to load title");
-      },
-    }),
-  );
-
-  function handleNavigate() {
-    if (resolveMutation.isPending) return;
-    progress.start();
-    resolveMutation.mutate({ tmdbId, type });
-  }
-
   return (
     <div className="relative -mt-6 mr-[calc(-50vw+50%)] mb-4 ml-[calc(-50vw+50%)] animate-stagger-item overflow-hidden">
       <div className="relative aspect-[21/9] max-h-[420px] min-h-[280px] w-full">
@@ -103,28 +77,26 @@ export function HeroBanner({
                     Trending today
                   </span>
                 </div>
-                <button
-                  type="button"
-                  className="group/title cursor-pointer text-left"
-                  onClick={handleNavigate}
-                  disabled={resolveMutation.isPending}
+                <Link
+                  to="/titles/$id"
+                  params={{ id }}
+                  className="group/title text-left"
                 >
                   <h2 className="text-balance font-display text-3xl tracking-tight transition-colors group-hover/title:text-primary sm:text-4xl">
                     {title}
                   </h2>
-                </button>
+                </Link>
                 <p className="mt-2 line-clamp-2 max-w-2xl text-muted-foreground text-sm">
                   {overview}
                 </p>
-                <button
-                  type="button"
-                  onClick={handleNavigate}
-                  disabled={resolveMutation.isPending}
-                  className="mt-4 inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-md hover:shadow-primary/20 disabled:opacity-70"
+                <Link
+                  to="/titles/$id"
+                  params={{ id }}
+                  className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-md hover:shadow-primary/20"
                 >
                   <IconPlus aria-hidden={true} className="size-4" />
                   Add to Library
-                </button>
+                </Link>
               </div>
             </div>
           </div>

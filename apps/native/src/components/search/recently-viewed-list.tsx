@@ -1,6 +1,5 @@
 import { FlashList } from "@shopify/flash-list";
 import { IconHistory, IconSearch } from "@tabler/icons-react-native";
-import { useRouter } from "expo-router";
 import { useCallback } from "react";
 import { Alert, Pressable, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
@@ -14,24 +13,11 @@ import {
 import * as Haptics from "@/utils/haptics";
 
 export function RecentlyViewedList() {
-  const { navigate } = useRouter();
   const { items, removeItem, clearAll } = useRecentlyViewed();
   const [mutedForeground, primaryColor] = useCSSVariable([
     "--color-muted-foreground",
     "--color-primary",
   ]) as [string, string];
-
-  const handlePress = useCallback(
-    (item: RecentlyViewedItem) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      if (item.type === "person") {
-        navigate(`/person/${item.id}`);
-      } else {
-        navigate(`/title/${item.id}`);
-      }
-    },
-    [navigate],
-  );
 
   const handleDelete = useCallback(
     (id: string) => {
@@ -58,13 +44,9 @@ export function RecentlyViewedList() {
 
   const renderItem = useCallback(
     ({ item }: { item: RecentlyViewedItem }) => (
-      <RecentlyViewedRow
-        item={item}
-        onPress={handlePress}
-        onDelete={handleDelete}
-      />
+      <RecentlyViewedRow item={item} onDelete={handleDelete} />
     ),
-    [handlePress, handleDelete],
+    [handleDelete],
   );
 
   const keyExtractor = useCallback((item: RecentlyViewedItem) => item.id, []);

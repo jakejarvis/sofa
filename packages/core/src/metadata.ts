@@ -152,25 +152,52 @@ export function extractTvContentRating(show: TmdbTvDetails): string | null {
   return us?.rating || null;
 }
 
+/** Fire-and-forget enrichment tasks (availability, recommendations, art, credits, trailer) */
+function fireAndForgetEnrichment(
+  titleId: string,
+  posterPath: string | null | undefined,
+  backdropPath: string | null | undefined,
+  type: "movie" | "tv",
+) {
+  refreshAvailability(titleId).catch((err) =>
+    log.debug("Availability enrichment failed:", err),
+  );
+  refreshRecommendations(titleId).catch((err) =>
+    log.debug("Recommendations enrichment failed:", err),
+  );
+  syncTitleArt(titleId, posterPath, backdropPath, type).catch((err) =>
+    log.debug("Cache/thumbhash failed:", err),
+  );
+  refreshCredits(titleId).catch((err) =>
+    log.debug("Credits enrichment failed:", err),
+  );
+  refreshTrailer(titleId).catch((err) =>
+    log.debug("Trailer enrichment failed:", err),
+  );
+}
+
 type ImportResult = ReturnType<typeof _getOrFetchTitleByTmdbId>;
 
-/** In-flight import promises keyed by tmdbId — coalesces concurrent calls */
-const inflightImports = new Map<number, ImportResult>();
+/** In-flight import promises keyed by `${tmdbId}-${type}` — coalesces concurrent calls */
+const inflightImports = new Map<string, ImportResult>();
 
 export function getOrFetchTitleByTmdbId(
   tmdbId: number,
   type: "movie" | "tv",
 ): ImportResult {
-  const inflight = inflightImports.get(tmdbId);
+  const key = `${tmdbId}-${type}`;
+  const inflight = inflightImports.get(key);
   if (inflight) {
-    log.debug(`Import already in-flight for TMDB ${tmdbId}, coalescing`);
+    log.debug(
+      `Import already in-flight for ${type} TMDB ${tmdbId}, coalescing`,
+    );
     return inflight;
   }
 
   const promise = _getOrFetchTitleByTmdbId(tmdbId, type).finally(() => {
-    inflightImports.delete(tmdbId);
+    inflightImports.delete(key);
   }) as ImportResult;
-  inflightImports.set(tmdbId, promise);
+  inflightImports.set(key, promise);
   return promise;
 }
 
@@ -180,12 +207,65 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
   const existing = db
     .select()
     .from(titles)
-    .where(eq(titles.tmdbId, tmdbId))
+    .where(and(eq(titles.tmdbId, tmdbId), eq(titles.type, type)))
     .get();
   if (existing) {
-    // For TV shows, check if seasons/episodes were actually loaded.
-    // They may be missing if a prior fetch failed or the title was created
-    // as a shell by the recommendations system (lastFetchedAt: null).
+    // Shell title — upgrade to full import
+    if (!existing.lastFetchedAt) {
+      if (type === "movie") {
+        const movie = await getMovieDetails(tmdbId);
+        updateTitleWithArtInvalidation(existing, {
+          title: movie.title ?? existing.title,
+          originalTitle: movie.original_title,
+          overview: movie.overview,
+          releaseDate: movie.release_date || null,
+          posterPath: movie.poster_path,
+          backdropPath: movie.backdrop_path,
+          popularity: movie.popularity,
+          voteAverage: movie.vote_average,
+          voteCount: movie.vote_count,
+          status: movie.status,
+          contentRating: extractMovieContentRating(movie),
+          imdbId: movie.imdb_id ?? null,
+          originalLanguage: movie.original_language ?? null,
+          runtimeMinutes: movie.runtime ?? null,
+          lastFetchedAt: new Date(),
+        });
+        upsertGenres(existing.id, movie.genres ?? []);
+        fireAndForgetEnrichment(
+          existing.id,
+          movie.poster_path,
+          movie.backdrop_path,
+          "movie",
+        );
+        return db.select().from(titles).where(eq(titles.id, existing.id)).get();
+      }
+
+      // TV shell — fetch details + children
+      const show = await getTvDetails(tmdbId);
+      updateTitleWithArtInvalidation(existing, {
+        overview: show.overview,
+        posterPath: show.poster_path,
+        backdropPath: show.backdrop_path,
+        status: show.status,
+        contentRating: extractTvContentRating(show),
+        tvdbId: show.external_ids?.tvdb_id ?? null,
+        imdbId: show.external_ids?.imdb_id ?? null,
+        originalLanguage: show.original_language ?? null,
+        lastFetchedAt: new Date(),
+      });
+      upsertGenres(existing.id, show.genres ?? []);
+      await refreshTvChildren(existing.id, tmdbId, show.number_of_seasons);
+      fireAndForgetEnrichment(
+        existing.id,
+        show.poster_path,
+        show.backdrop_path,
+        "tv",
+      );
+      return db.select().from(titles).where(eq(titles.id, existing.id)).get();
+    }
+
+    // For fully-fetched TV shows, check if seasons are missing (e.g. prior failure)
     if (existing.type === "tv") {
       const hasSeason = db
         .select({ id: seasons.id })
@@ -195,40 +275,18 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
         .get();
       if (!hasSeason) {
         const show = await getTvDetails(tmdbId);
-        if (!existing.lastFetchedAt) {
-          updateTitleWithArtInvalidation(existing, {
-            overview: show.overview,
-            posterPath: show.poster_path,
-            backdropPath: show.backdrop_path,
-            status: show.status,
-            contentRating: extractTvContentRating(show),
-            tvdbId: show.external_ids?.tvdb_id ?? null,
-            lastFetchedAt: new Date(),
-          });
-        }
         upsertGenres(existing.id, show.genres ?? []);
         await refreshTvChildren(existing.id, tmdbId, show.number_of_seasons);
-        refreshAvailability(existing.id).catch((err) =>
-          log.debug("Availability enrichment failed:", err),
-        );
-        refreshRecommendations(existing.id).catch((err) =>
-          log.debug("Recommendations enrichment failed:", err),
-        );
-        syncTitleArt(
+        fireAndForgetEnrichment(
           existing.id,
           show.poster_path,
           show.backdrop_path,
           "tv",
-        ).catch((err) => log.debug("Cache/thumbhash failed:", err));
-        refreshCredits(existing.id).catch((err) =>
-          log.debug("Credits enrichment failed:", err),
-        );
-        refreshTrailer(existing.id).catch((err) =>
-          log.debug("Trailer enrichment failed:", err),
         );
         return db.select().from(titles).where(eq(titles.id, existing.id)).get();
       }
     }
+
     return existing;
   }
 
@@ -251,26 +309,20 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
         voteCount: movie.vote_count,
         status: movie.status,
         contentRating: extractMovieContentRating(movie),
+        imdbId: movie.imdb_id ?? null,
+        originalLanguage: movie.original_language ?? null,
+        runtimeMinutes: movie.runtime ?? null,
         lastFetchedAt: now,
       },
       tmdbId,
     );
     if (!row) return undefined;
     upsertGenres(row.id, movie.genres ?? []);
-    refreshAvailability(row.id).catch((err) =>
-      log.debug("Availability enrichment failed:", err),
-    );
-    refreshRecommendations(row.id).catch((err) =>
-      log.debug("Recommendations enrichment failed:", err),
-    );
-    syncTitleArt(row.id, movie.poster_path, movie.backdrop_path, "movie").catch(
-      (err) => log.debug("Cache/thumbhash failed:", err),
-    );
-    refreshCredits(row.id).catch((err) =>
-      log.debug("Credits enrichment failed:", err),
-    );
-    refreshTrailer(row.id).catch((err) =>
-      log.debug("Trailer enrichment failed:", err),
+    fireAndForgetEnrichment(
+      row.id,
+      movie.poster_path,
+      movie.backdrop_path,
+      "movie",
     );
     log.info(`Imported movie "${movie.title}" (TMDB ${tmdbId})`);
     return row;
@@ -293,6 +345,8 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
       voteCount: show.vote_count,
       status: show.status,
       contentRating: extractTvContentRating(show),
+      imdbId: show.external_ids?.imdb_id ?? null,
+      originalLanguage: show.original_language ?? null,
       lastFetchedAt: now,
     },
     tmdbId,
@@ -301,21 +355,7 @@ async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
   upsertGenres(row.id, show.genres ?? []);
 
   await refreshTvChildren(row.id, tmdbId, show.number_of_seasons);
-  refreshAvailability(row.id).catch((err) =>
-    log.debug("Availability enrichment failed:", err),
-  );
-  refreshRecommendations(row.id).catch((err) =>
-    log.debug("Recommendations enrichment failed:", err),
-  );
-  syncTitleArt(row.id, show.poster_path, show.backdrop_path, "tv").catch(
-    (err) => log.debug("Cache/thumbhash failed:", err),
-  );
-  refreshCredits(row.id).catch((err) =>
-    log.debug("Credits enrichment failed:", err),
-  );
-  refreshTrailer(row.id).catch((err) =>
-    log.debug("Trailer enrichment failed:", err),
-  );
+  fireAndForgetEnrichment(row.id, show.poster_path, show.backdrop_path, "tv");
   log.info(`Imported TV show "${show.name}" (TMDB ${tmdbId})`);
   return row;
 }
@@ -340,6 +380,9 @@ export async function refreshTitle(titleId: string) {
       voteCount: movie.vote_count,
       status: movie.status,
       contentRating: extractMovieContentRating(movie),
+      imdbId: movie.imdb_id ?? null,
+      originalLanguage: movie.original_language ?? null,
+      runtimeMinutes: movie.runtime ?? null,
       lastFetchedAt: now,
     });
     upsertGenres(titleId, movie.genres ?? []);
@@ -358,6 +401,8 @@ export async function refreshTitle(titleId: string) {
       status: show.status,
       contentRating: extractTvContentRating(show),
       tvdbId: show.external_ids?.tvdb_id ?? null,
+      imdbId: show.external_ids?.imdb_id ?? null,
+      originalLanguage: show.original_language ?? null,
       lastFetchedAt: now,
     });
     upsertGenres(titleId, show.genres ?? []);
@@ -387,125 +432,135 @@ export async function refreshTvChildren(
   tmdbId: number,
   numberOfSeasons: number,
 ) {
+  // Fetch all seasons from TMDB concurrently (~40 req/s rate limit)
+  const seasonNumbers = Array.from(
+    { length: numberOfSeasons },
+    (_, i) => i + 1,
+  );
+  const fetched = await Promise.allSettled(
+    seasonNumbers.map((sn) => getTvSeasonDetails(tmdbId, sn)),
+  );
+
   const now = new Date();
 
-  for (let sn = 1; sn <= numberOfSeasons; sn++) {
-    // Rate-limit: 250ms between TMDB calls
-    if (sn > 1) await delay(250);
+  for (let i = 0; i < seasonNumbers.length; i++) {
+    const result = fetched[i];
+    const sn = seasonNumbers[i];
+    if (result.status === "rejected") {
+      log.error(
+        `Failed to fetch season ${sn} for TMDB ${tmdbId}:`,
+        result.reason,
+      );
+      continue;
+    }
 
-    try {
-      const seasonData = await getTvSeasonDetails(tmdbId, sn);
-      const existingSeason = db
-        .select({
-          id: seasons.id,
-          posterPath: seasons.posterPath,
-        })
-        .from(seasons)
-        .where(and(eq(seasons.titleId, titleId), eq(seasons.seasonNumber, sn)))
-        .get();
+    const seasonData = result.value;
 
-      const seasonRow = db
-        .insert(seasons)
-        .values({
-          titleId,
-          seasonNumber: seasonData.season_number,
+    const existingSeason = db
+      .select({
+        id: seasons.id,
+        posterPath: seasons.posterPath,
+      })
+      .from(seasons)
+      .where(and(eq(seasons.titleId, titleId), eq(seasons.seasonNumber, sn)))
+      .get();
+
+    const seasonRow = db
+      .insert(seasons)
+      .values({
+        titleId,
+        seasonNumber: seasonData.season_number,
+        name: seasonData.name,
+        overview: seasonData.overview,
+        posterPath: seasonData.poster_path,
+        airDate: seasonData.air_date,
+        lastFetchedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: [seasons.titleId, seasons.seasonNumber],
+        set: {
           name: seasonData.name,
           overview: seasonData.overview,
           posterPath: seasonData.poster_path,
           airDate: seasonData.air_date,
           lastFetchedAt: now,
-        })
-        .onConflictDoUpdate({
-          target: [seasons.titleId, seasons.seasonNumber],
-          set: {
-            name: seasonData.name,
-            overview: seasonData.overview,
-            posterPath: seasonData.poster_path,
-            airDate: seasonData.air_date,
-            lastFetchedAt: now,
-          },
-        })
-        .returning()
-        .get();
+        },
+      })
+      .returning()
+      .get();
 
-      // Snapshot existing episode still paths before upsert so we can detect changes
-      const oldEpStills = new Map(
-        db
-          .select({
-            episodeNumber: episodes.episodeNumber,
-            stillPath: episodes.stillPath,
-          })
-          .from(episodes)
-          .where(eq(episodes.seasonId, existingSeason?.id ?? seasonRow.id))
-          .all()
-          .map((e) => [e.episodeNumber, e.stillPath] as const),
-      );
+    // Snapshot existing episode still paths before upsert so we can detect changes
+    const oldEpStills = new Map(
+      db
+        .select({
+          episodeNumber: episodes.episodeNumber,
+          stillPath: episodes.stillPath,
+        })
+        .from(episodes)
+        .where(eq(episodes.seasonId, existingSeason?.id ?? seasonRow.id))
+        .all()
+        .map((e) => [e.episodeNumber, e.stillPath] as const),
+    );
 
-      // Batch all episode upserts in a single transaction per season
-      const eps = seasonData.episodes ?? [];
-      if (eps.length > 0) {
-        db.transaction((tx) => {
-          for (const ep of eps) {
-            tx.insert(episodes)
-              .values({
-                seasonId: seasonRow.id,
-                episodeNumber: ep.episode_number,
+    // Batch all episode upserts in a single transaction per season
+    const eps = seasonData.episodes ?? [];
+    if (eps.length > 0) {
+      db.transaction((tx) => {
+        for (const ep of eps) {
+          tx.insert(episodes)
+            .values({
+              seasonId: seasonRow.id,
+              episodeNumber: ep.episode_number,
+              name: ep.name,
+              overview: ep.overview,
+              stillPath: ep.still_path,
+              airDate: ep.air_date,
+              runtimeMinutes: ep.runtime,
+            })
+            .onConflictDoUpdate({
+              target: [episodes.seasonId, episodes.episodeNumber],
+              set: {
                 name: ep.name,
                 overview: ep.overview,
                 stillPath: ep.still_path,
                 airDate: ep.air_date,
                 runtimeMinutes: ep.runtime,
-              })
-              .onConflictDoUpdate({
-                target: [episodes.seasonId, episodes.episodeNumber],
-                set: {
-                  name: ep.name,
-                  overview: ep.overview,
-                  stillPath: ep.still_path,
-                  airDate: ep.air_date,
-                  runtimeMinutes: ep.runtime,
-                },
-              })
-              .run();
-          }
-        });
-      }
-
-      // Clear stale hashes when image paths change during the upsert.
-      // Full hash (re)generation is handled by syncTitleArt() after
-      // cache warming, so we only need to null out stale values here.
-      if (
-        (existingSeason?.posterPath ?? null) !==
-        (seasonData.poster_path ?? null)
-      ) {
-        db.update(seasons)
-          .set({ posterThumbHash: null })
-          .where(eq(seasons.id, seasonRow.id))
-          .run();
-      }
-      const seasonEps = db
-        .select({
-          id: episodes.id,
-          episodeNumber: episodes.episodeNumber,
-          stillPath: episodes.stillPath,
-          stillThumbHash: episodes.stillThumbHash,
-        })
-        .from(episodes)
-        .where(eq(episodes.seasonId, seasonRow.id))
-        .all();
-      for (const ep of seasonEps) {
-        const oldStill = oldEpStills.get(ep.episodeNumber);
-        if (oldStill !== ep.stillPath && ep.stillThumbHash) {
-          db.update(episodes)
-            .set({ stillThumbHash: null })
-            .where(eq(episodes.id, ep.id))
+              },
+            })
             .run();
         }
+      });
+    }
+
+    // Clear stale hashes when image paths change during the upsert.
+    // Full hash (re)generation is handled by syncTitleArt() after
+    // cache warming, so we only need to null out stale values here.
+    if (
+      (existingSeason?.posterPath ?? null) !== (seasonData.poster_path ?? null)
+    ) {
+      db.update(seasons)
+        .set({ posterThumbHash: null })
+        .where(eq(seasons.id, seasonRow.id))
+        .run();
+    }
+    const seasonEps = db
+      .select({
+        id: episodes.id,
+        episodeNumber: episodes.episodeNumber,
+        stillPath: episodes.stillPath,
+        stillThumbHash: episodes.stillThumbHash,
+      })
+      .from(episodes)
+      .where(eq(episodes.seasonId, seasonRow.id))
+      .all();
+    for (const ep of seasonEps) {
+      const oldStill = oldEpStills.get(ep.episodeNumber);
+      if (oldStill !== ep.stillPath && ep.stillThumbHash) {
+        db.update(episodes)
+          .set({ stillThumbHash: null })
+          .where(eq(episodes.id, ep.id))
+          .run();
       }
-    } catch (err) {
-      // Skip this season and continue with the rest — partial data is
-      // better than aborting entirely. The next refresh cycle will retry.
-      log.error(`Failed to fetch season ${sn} for TMDB ${tmdbId}:`, err);
     }
   }
 }
@@ -797,12 +852,11 @@ function fetchSeasonsFromDb(titleId: string): Season[] {
  * Ensure a TV title is fully hydrated (seasons/episodes fetched from TMDB).
  * Returns the hydrated seasons data.
  */
-export async function ensureTvHydrated(
-  titleId: string,
-  tmdbId: number,
-): Promise<Season[]> {
+export async function ensureTvHydrated(titleId: string): Promise<Season[]> {
   const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
   if (!title || title.type !== "tv") return [];
+
+  const { tmdbId } = title;
 
   // Shell title: fetch details + children
   if (!title.lastFetchedAt) {
@@ -814,6 +868,8 @@ export async function ensureTvHydrated(
         backdropPath: show.backdrop_path,
         status: show.status,
         contentRating: extractTvContentRating(show),
+        imdbId: show.external_ids?.imdb_id ?? null,
+        originalLanguage: show.original_language ?? null,
         lastFetchedAt: new Date(),
       });
       upsertGenres(titleId, show.genres ?? []);
@@ -942,19 +998,11 @@ function readAvailability(
 export async function getOrFetchTitle(id: string): Promise<{
   title: ResolvedTitle;
   seasons: Season[];
-  needsHydration: boolean;
   availability: AvailabilityOffer[];
   cast: CastMember[];
 } | null> {
   let title = db.select().from(titles).where(eq(titles.id, id)).get();
   if (!title) return null;
-
-  // For TV titles, check if seasons need hydration (reuse result below)
-  const existingSeasons =
-    title.type === "tv" && title.lastFetchedAt ? fetchSeasonsFromDb(id) : null;
-  const needsTvHydration =
-    title.type === "tv" &&
-    (!title.lastFetchedAt || existingSeasons?.length === 0);
 
   // If this is a shell movie title, fetch full details now (movies are fast)
   if (title.type === "movie" && !title.lastFetchedAt) {
@@ -972,6 +1020,9 @@ export async function getOrFetchTitle(id: string): Promise<{
         voteCount: movie.vote_count,
         status: movie.status,
         contentRating: extractMovieContentRating(movie),
+        imdbId: movie.imdb_id ?? null,
+        originalLanguage: movie.original_language ?? null,
+        runtimeMinutes: movie.runtime ?? null,
         lastFetchedAt: new Date(),
       });
       upsertGenres(id, movie.genres ?? []);
@@ -981,7 +1032,14 @@ export async function getOrFetchTitle(id: string): Promise<{
     }
   }
 
-  const titleSeasons = needsTvHydration ? [] : (existingSeasons ?? []);
+  // For TV titles, hydrate seasons inline if needed
+  let titleSeasons: Season[] = [];
+  if (title.type === "tv") {
+    titleSeasons = title.lastFetchedAt ? fetchSeasonsFromDb(id) : [];
+    if (titleSeasons.length === 0) {
+      titleSeasons = await ensureTvHydrated(id);
+    }
+  }
 
   // Read enrichment data, then backfill anything missing
   let availability = readAvailability(title.id, title.title);
@@ -1028,6 +1086,10 @@ export async function getOrFetchTitle(id: string): Promise<{
     voteCount: title.voteCount,
     status: title.status,
     contentRating: title.contentRating,
+    imdbId: title.imdbId,
+    tvdbId: title.tvdbId,
+    originalLanguage: title.originalLanguage,
+    runtimeMinutes: title.runtimeMinutes,
     colorPalette: palette,
     trailerVideoKey: title.trailerVideoKey,
     genres: titleGenreRows.map((r) => r.name),
@@ -1036,7 +1098,6 @@ export async function getOrFetchTitle(id: string): Promise<{
   return {
     title: resolvedTitle,
     seasons: titleSeasons,
-    needsHydration: needsTvHydration,
     availability,
     cast,
   };
@@ -1175,6 +1236,128 @@ async function syncTitleArt(
   }
 }
 
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+// ─── Browse batch upsert ─────────────────────────────────────
+
+interface BrowseTitleInput {
+  tmdbId: number;
+  type: "movie" | "tv";
+  title: string;
+  posterPath: string | null;
+  backdropPath?: string | null;
+  releaseDate?: string | null;
+  firstAirDate?: string | null;
+  overview?: string | null;
+  popularity?: number | null;
+  voteAverage?: number | null;
+  voteCount?: number | null;
+}
+
+function browseTitleKey(tmdbId: number, type: string): string {
+  return `${tmdbId}-${type}`;
+}
+
+/**
+ * Ensure every browse/search result has a local title row.
+ * Inserts shell titles (`lastFetchedAt = null`) for new (tmdbId, type) pairs.
+ * Returns a map keyed by `${tmdbId}-${type}` → { id, posterThumbHash }.
+ */
+export function ensureBrowseTitlesExist(
+  items: BrowseTitleInput[],
+): Map<string, { id: string; posterThumbHash: string | null }> {
+  if (items.length === 0) return new Map();
+
+  // Deduplicate by (tmdbId, type)
+  const unique = new Map<string, BrowseTitleInput>();
+  for (const item of items) {
+    const key = browseTitleKey(item.tmdbId, item.type);
+    if (!unique.has(key)) unique.set(key, item);
+  }
+
+  const tmdbIds = [...new Set(items.map((i) => i.tmdbId))];
+
+  // Batch-fetch existing titles (1 query)
+  const existing = db
+    .select({
+      id: titles.id,
+      tmdbId: titles.tmdbId,
+      type: titles.type,
+      posterThumbHash: titles.posterThumbHash,
+    })
+    .from(titles)
+    .where(inArray(titles.tmdbId, tmdbIds))
+    .all();
+
+  const result = new Map<
+    string,
+    { id: string; posterThumbHash: string | null }
+  >();
+  for (const row of existing) {
+    result.set(browseTitleKey(row.tmdbId, row.type), {
+      id: row.id,
+      posterThumbHash: row.posterThumbHash,
+    });
+  }
+
+  // Find items that need inserting
+  const missingKeys = [...unique.keys()].filter((key) => !result.has(key));
+  if (missingKeys.length === 0) return result;
+
+  // Insert missing in a single transaction
+  db.transaction((tx) => {
+    for (const key of missingKeys) {
+      const item = unique.get(key);
+      if (!item) continue;
+      const row = tx
+        .insert(titles)
+        .values({
+          tmdbId: item.tmdbId,
+          type: item.type,
+          title: item.title,
+          overview: item.overview ?? null,
+          releaseDate: item.releaseDate ?? null,
+          firstAirDate: item.firstAirDate ?? null,
+          posterPath: item.posterPath,
+          backdropPath: item.backdropPath ?? null,
+          popularity: item.popularity ?? null,
+          voteAverage: item.voteAverage ?? null,
+          voteCount: item.voteCount ?? null,
+          lastFetchedAt: null,
+        })
+        .onConflictDoNothing()
+        .returning({ id: titles.id, posterThumbHash: titles.posterThumbHash })
+        .get();
+      if (row) {
+        result.set(key, {
+          id: row.id,
+          posterThumbHash: row.posterThumbHash,
+        });
+      }
+    }
+
+    // Fallback for any that conflicted (concurrent insert)
+    const stillMissing = missingKeys.filter((key) => !result.has(key));
+    if (stillMissing.length > 0) {
+      const missingTmdbIds = stillMissing.map(
+        (key) => unique.get(key)?.tmdbId ?? 0,
+      );
+      const fallbacks = tx
+        .select({
+          id: titles.id,
+          tmdbId: titles.tmdbId,
+          type: titles.type,
+          posterThumbHash: titles.posterThumbHash,
+        })
+        .from(titles)
+        .where(inArray(titles.tmdbId, missingTmdbIds))
+        .all();
+      for (const f of fallbacks) {
+        result.set(browseTitleKey(f.tmdbId, f.type), {
+          id: f.id,
+          posterThumbHash: f.posterThumbHash,
+        });
+      }
+    }
+  });
+
+  return result;
 }

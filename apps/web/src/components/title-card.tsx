@@ -9,11 +9,9 @@ import {
   IconStarFilled,
 } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { type MotionStyle, type MotionValue, motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { useProgress } from "@/components/navigation-progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -57,8 +55,7 @@ interface CardInnerProps {
 }
 
 export interface TitleCardProps extends CardInnerProps {
-  id?: string;
-  tmdbId: number;
+  id: string;
 }
 
 const statusConfig = {
@@ -80,12 +77,10 @@ const statusConfig = {
 } as const;
 
 function QuickAddButton({
-  tmdbId,
-  type,
+  id,
   userStatus,
 }: {
-  tmdbId: number;
-  type: "movie" | "tv";
+  id: string;
   userStatus?: TitleStatus | null;
 }) {
   const [addedStatus, setAddedStatus] = useState<TitleStatus | null>(
@@ -112,7 +107,7 @@ function QuickAddButton({
     e.preventDefault();
     e.stopPropagation();
     if (quickAddMutation.isPending || isAdded) return;
-    quickAddMutation.mutate({ tmdbId, type });
+    quickAddMutation.mutate({ id });
   }
 
   if (isAdded && config) {
@@ -292,7 +287,6 @@ function CardInner({
 
 export function TitleCard({
   id,
-  tmdbId,
   type,
   title,
   posterPath,
@@ -303,21 +297,6 @@ export function TitleCard({
   episodeProgress,
 }: TitleCardProps) {
   const tilt = useTiltEffect();
-  const navigate = useNavigate();
-  const progress = useProgress();
-  const resolveMutation = useMutation(
-    orpc.titles.resolve.mutationOptions({
-      onSuccess: ({ id: resolvedId }) => {
-        if (resolvedId)
-          void navigate({ to: "/titles/$id", params: { id: resolvedId } });
-        else progress.done();
-      },
-      onError: () => {
-        progress.done();
-        toast.error("Failed to load title");
-      },
-    }),
-  );
 
   const cardContent = (
     <motion.div ref={tilt.ref} style={tilt.containerStyle} {...tilt.handlers}>
@@ -341,28 +320,10 @@ export function TitleCard({
 
   return (
     <div className="group relative">
-      <QuickAddButton
-        tmdbId={tmdbId}
-        type={type as "movie" | "tv"}
-        userStatus={userStatus}
-      />
-      {id ? (
-        <Link to="/titles/$id" params={{ id }}>
-          {cardContent}
-        </Link>
-      ) : (
-        <button
-          type="button"
-          disabled={resolveMutation.isPending}
-          className={`w-full text-left ${resolveMutation.isPending ? "pointer-events-none opacity-70" : "cursor-pointer"}`}
-          onClick={() => {
-            progress.start();
-            resolveMutation.mutate({ tmdbId, type: type as "movie" | "tv" });
-          }}
-        >
-          {cardContent}
-        </button>
-      )}
+      <QuickAddButton id={id} userStatus={userStatus} />
+      <Link to="/titles/$id" params={{ id }}>
+        {cardContent}
+      </Link>
     </div>
   );
 }

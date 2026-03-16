@@ -10,8 +10,7 @@ import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
 import { usePosterActions } from "@/hooks/use-poster-actions";
 
 export interface PosterRowItem {
-  id?: string;
-  tmdbId: number;
+  id: string;
   title: string;
   type: string;
   posterPath: string | null;
@@ -30,17 +29,13 @@ export function HorizontalPosterRow({
   items: PosterRowItem[];
   isLoading?: boolean;
 }) {
-  const { handlePress, handleQuickAdd, addingKey, failedKey, resetError } =
+  const { handleQuickAdd, addingKey, failedKey, resetError } =
     usePosterActions();
-  const keyExtractor = useCallback(
-    (item: PosterRowItem) => item.id ?? `${item.tmdbId}-${item.type}`,
-    [],
-  );
+  const keyExtractor = useCallback((item: PosterRowItem) => item.id, []);
   const renderItem = useCallback(
     ({ item }: { item: PosterRowItem }) => (
       <PosterCard
         id={item.id}
-        tmdbId={item.tmdbId}
         title={item.title}
         type={item.type as "movie" | "tv"}
         posterPath={item.posterPath}
@@ -49,14 +44,13 @@ export function HorizontalPosterRow({
         voteAverage={item.voteAverage}
         userStatus={item.userStatus}
         episodeProgress={item.episodeProgress}
-        onPress={handlePress}
         onQuickAdd={handleQuickAdd}
-        isAdding={addingKey === `${item.tmdbId}-${item.type}`}
+        isAdding={addingKey === item.id}
         failedKey={failedKey}
         onQuickAddFailed={resetError}
       />
     ),
-    [addingKey, failedKey, handlePress, handleQuickAdd, resetError],
+    [addingKey, failedKey, handleQuickAdd, resetError],
   );
 
   if (isLoading) {

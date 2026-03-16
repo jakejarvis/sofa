@@ -373,3 +373,82 @@ export async function fetchFullFilmography(
     throw err;
   }
 }
+
+// ─── Browse batch upsert ─────────────────────────────────────
+
+interface BrowsePersonInput {
+  tmdbId: number;
+  name: string;
+  profilePath: string | null;
+  knownForDepartment?: string | null;
+  popularity?: number | null;
+}
+
+/**
+ * Ensure every person search result has a local person row.
+ * Inserts shell persons (`lastFetchedAt = null`) for new tmdbIds.
+ * Returns a map of tmdbId → internal UUID.
+ */
+export function ensureBrowsePersonsExist(
+  items: BrowsePersonInput[],
+): Map<number, string> {
+  if (items.length === 0) return new Map();
+
+  const unique = new Map<number, BrowsePersonInput>();
+  for (const item of items) {
+    if (!unique.has(item.tmdbId)) unique.set(item.tmdbId, item);
+  }
+
+  const tmdbIds = [...unique.keys()];
+
+  const existing = db
+    .select({ id: persons.id, tmdbId: persons.tmdbId })
+    .from(persons)
+    .where(inArray(persons.tmdbId, tmdbIds))
+    .all();
+
+  const result = new Map<number, string>();
+  for (const row of existing) {
+    result.set(row.tmdbId, row.id);
+  }
+
+  const missing = tmdbIds.filter((id) => !result.has(id));
+  if (missing.length === 0) return result;
+
+  db.transaction((tx) => {
+    for (const tmdbId of missing) {
+      const item = unique.get(tmdbId);
+      if (!item) continue;
+      const row = tx
+        .insert(persons)
+        .values({
+          tmdbId: item.tmdbId,
+          name: item.name,
+          profilePath: item.profilePath,
+          knownForDepartment: item.knownForDepartment ?? null,
+          popularity: item.popularity ?? null,
+          lastFetchedAt: null,
+        })
+        .onConflictDoNothing()
+        .returning({ id: persons.id })
+        .get();
+      if (row) {
+        result.set(tmdbId, row.id);
+      }
+    }
+
+    const stillMissing = missing.filter((id) => !result.has(id));
+    if (stillMissing.length > 0) {
+      const fallbacks = tx
+        .select({ id: persons.id, tmdbId: persons.tmdbId })
+        .from(persons)
+        .where(inArray(persons.tmdbId, stillMissing))
+        .all();
+      for (const f of fallbacks) {
+        result.set(f.tmdbId, f.id);
+      }
+    }
+  });
+
+  return result;
+}

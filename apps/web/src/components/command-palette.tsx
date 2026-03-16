@@ -8,11 +8,10 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useHotkey, useHotkeySequence } from "@tanstack/react-hotkeys";
-import { skipToken, useMutation, useQuery } from "@tanstack/react-query";
+import { skipToken, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import { useProgress } from "@/components/navigation-progress";
 import {
   Command,
@@ -69,6 +68,7 @@ for (const entry of SHORTCUT_DESCRIPTIONS) {
 }
 
 interface SearchResult {
+  id?: string;
   tmdbId: number;
   type: "movie" | "tv" | "person";
   title: string;
@@ -144,51 +144,18 @@ export function CommandPalette() {
     };
   }, [debouncedQuery, results.length, setRecentSearches]);
 
-  const resolvePersonMutation = useMutation(
-    orpc.people.resolve.mutationOptions({
-      onSuccess: ({ id }) => {
-        if (id) void navigate({ to: "/people/$id", params: { id } });
-        else progress.done();
-      },
-      onError: () => {
-        progress.done();
-        toast.error("Failed to load person");
-      },
-    }),
-  );
-
-  const resolveTitleMutation = useMutation(
-    orpc.titles.resolve.mutationOptions({
-      onSuccess: ({ id }) => {
-        if (id) void navigate({ to: "/titles/$id", params: { id } });
-        else progress.done();
-      },
-      onError: () => {
-        progress.done();
-        toast.error("Failed to load title");
-      },
-    }),
-  );
-
   const handleSelect = useCallback(
     (result: SearchResult) => {
+      if (!result.id) return;
       setCommandPaletteOpen(false);
       progress.start();
       if (result.type === "person") {
-        resolvePersonMutation.mutate({ tmdbId: result.tmdbId });
+        void navigate({ to: "/people/$id", params: { id: result.id } });
       } else {
-        resolveTitleMutation.mutate({
-          tmdbId: result.tmdbId,
-          type: result.type,
-        });
+        void navigate({ to: "/titles/$id", params: { id: result.id } });
       }
     },
-    [
-      setCommandPaletteOpen,
-      progress,
-      resolvePersonMutation,
-      resolveTitleMutation,
-    ],
+    [setCommandPaletteOpen, progress, navigate],
   );
 
   const handleRecentSearch = useCallback((q: string) => {
@@ -251,7 +218,7 @@ export function CommandPalette() {
                 <CommandGroup heading="Results">
                   {results.map((r) => (
                     <CommandItem
-                      key={`${r.type}-${r.tmdbId}`}
+                      key={r.id ?? `${r.type}-${r.tmdbId}`}
                       onSelect={() => handleSelect(r)}
                       className="flex items-center gap-3 py-2"
                     >

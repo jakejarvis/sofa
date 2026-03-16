@@ -1,10 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import { getRecommendationsForTitle } from "@sofa/core/discovery";
-import {
-  ensureTvHydrated,
-  getOrFetchTitle,
-  getOrFetchTitleByTmdbId,
-} from "@sofa/core/metadata";
+import { getOrFetchTitle, getOrFetchTitleByTmdbId } from "@sofa/core/metadata";
 import {
   getUserStatusesByTitleIds,
   getUserTitleInfo,
@@ -16,7 +12,7 @@ import {
 } from "@sofa/core/tracking";
 import { db } from "@sofa/db/client";
 import { and, eq } from "@sofa/db/helpers";
-import { userTitleStatus } from "@sofa/db/schema";
+import { titles, userTitleStatus } from "@sofa/db/schema";
 import { os } from "../context";
 import { authed } from "../middleware";
 
@@ -27,15 +23,6 @@ export const detail = os.titles.detail
     if (!result)
       throw new ORPCError("NOT_FOUND", { message: "Title not found" });
     return result;
-  });
-
-export const resolve = os.titles.resolve
-  .use(authed)
-  .handler(async ({ input }) => {
-    const title = await getOrFetchTitleByTmdbId(input.tmdbId, input.type);
-    if (!title)
-      throw new ORPCError("NOT_FOUND", { message: "Title not found" });
-    return { id: title.id };
   });
 
 export const updateStatus = os.titles.updateStatus
@@ -83,22 +70,23 @@ export const recommendations = os.titles.recommendations
     return { recommendations: recs, userStatuses };
   });
 
-export const hydrateSeasons = os.titles.hydrateSeasons
-  .use(authed)
-  .handler(async ({ input }) => {
-    const seasons = await ensureTvHydrated(input.id, input.tmdbId);
-    return { seasons };
-  });
-
 export const quickAdd = os.titles.quickAdd
   .use(authed)
   .handler(async ({ input, context }) => {
-    const title = await getOrFetchTitleByTmdbId(input.tmdbId, input.type);
+    // Look up the title (it exists as a shell from browse/search import)
+    const title = db
+      .select({ id: titles.id, tmdbId: titles.tmdbId, type: titles.type })
+      .from(titles)
+      .where(eq(titles.id, input.id))
+      .get();
     if (!title) {
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
-        message: "Failed to import title",
-      });
+      throw new ORPCError("NOT_FOUND", { message: "Title not found" });
     }
+
+    // Trigger full TMDB import if still a shell
+    getOrFetchTitleByTmdbId(title.tmdbId, title.type as "movie" | "tv").catch(
+      () => {},
+    );
 
     const existing = db
       .select()
