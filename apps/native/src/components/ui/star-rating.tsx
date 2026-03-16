@@ -26,17 +26,30 @@ export function StarRating({
   const primary = accentColor ?? defaultPrimary;
 
   return (
-    <View className="flex-row items-center gap-1">
+    <View
+      className="flex-row items-center gap-1"
+      accessibilityLabel={`Rating: ${rating} out of 5 stars`}
+      accessibilityRole="adjustable"
+    >
       {[1, 2, 3, 4, 5].map((star) => (
         <Pressable
           key={star}
           disabled={!interactive}
+          accessibilityRole="button"
+          accessibilityLabel={`${star} star${star !== 1 ? "s" : ""}`}
+          accessibilityHint={
+            interactive
+              ? star === rating
+                ? "Double tap to clear rating"
+                : `Double tap to rate ${star} star${star !== 1 ? "s" : ""}`
+              : undefined
+          }
           onPress={() => {
             if (!onRate) return;
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             onRate(star === rating ? 0 : star);
           }}
-          hitSlop={6}
+          hitSlop={10}
         >
           {star <= rating ? (
             <IconStarFilled size={size} color={primary} />

@@ -1,4 +1,4 @@
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import type { SvgProps } from "react-native-svg";
 import {
   EmbyIcon,

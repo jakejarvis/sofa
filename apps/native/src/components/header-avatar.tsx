@@ -20,13 +20,20 @@ export function HeaderAvatar() {
       <DropdownMenu.Trigger asChild>
         <Pressable
           onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+          accessibilityRole="button"
+          accessibilityLabel="User menu"
+          hitSlop={8}
         >
-          <View className="size-8 overflow-hidden rounded-full">
+          <View
+            className="size-8 overflow-hidden rounded-full"
+            accessible={false}
+          >
             {user.image ? (
               <Image
                 source={{ uri: user.image }}
                 style={{ width: "100%", height: "100%" }}
                 contentFit="cover"
+                accessible={false}
               />
             ) : (
               <View className="flex-1 items-center justify-center bg-primary/[0.08]">

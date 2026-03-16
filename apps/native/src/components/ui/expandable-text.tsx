@@ -53,7 +53,12 @@ export function ExpandableText({
         {text}
       </Text>
       {needsTruncation && (
-        <Pressable onPress={() => setExpanded(!expanded)} className="mt-1">
+        <Pressable
+          onPress={() => setExpanded(!expanded)}
+          accessibilityRole="button"
+          accessibilityLabel={expanded ? "Show less" : "Show more"}
+          className="mt-1"
+        >
           <Text
             className="font-sans-medium text-[13px] text-primary"
             style={actionColor ? { color: actionColor } : undefined}

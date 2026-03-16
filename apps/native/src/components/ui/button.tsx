@@ -34,9 +34,11 @@ export const Button = forwardRef<
         <Pressable
           ref={ref}
           disabled={disabled}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !!disabled }}
           className={cn(
             "items-center justify-center rounded-xl",
-            size === "sm" ? "h-10 px-4" : "h-12 px-5",
+            size === "sm" ? "min-h-10 px-4 py-2" : "min-h-12 px-5 py-3",
             variant === "secondary" ? "bg-secondary" : "bg-primary",
             className,
           )}

@@ -3,15 +3,15 @@ import { useMutation } from "@tanstack/react-query";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
 import { useCSSVariable } from "uniwind";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
@@ -31,9 +31,14 @@ export interface HeroBannerItem {
 export function HeroBanner({ item }: { item: HeroBannerItem }) {
   const { navigate } = useRouter();
   const primary = useCSSVariable("--color-primary") as string;
+  const reduceMotion = useReducedMotion();
   const pressed = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.98]) }],
+    transform: [
+      {
+        scale: reduceMotion ? 1 : interpolate(pressed.get(), [0, 1], [1, 0.98]),
+      },
+    ],
   }));
 
   const resolveMutation = useMutation(
@@ -58,12 +63,16 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
     })
     .onFinalize(() => {
       pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
-    })
-    .onEnd(() => {
-      scheduleOnRN(handlePress);
     });
 
   const useGlass = isLiquidGlassAvailable();
+  const accessibilityLabel = [
+    item.title,
+    item.releaseDate?.slice(0, 4),
+    item.voteAverage ? `${item.voteAverage.toFixed(1)} stars` : undefined,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <GestureDetector gesture={tapGesture}>
@@ -78,57 +87,32 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
           },
         ]}
       >
-        {item.backdropPath && (
-          <Image
-            source={{ uri: item.backdropPath }}
-            className="absolute h-full w-full"
-            contentFit="cover"
-          />
-        )}
-        {useGlass ? (
-          <GlassView
-            glassEffectStyle="regular"
-            colorScheme="dark"
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              padding: 16,
-            }}
-          >
-            <Text
-              className="font-display text-2xl text-white"
-              numberOfLines={2}
-            >
-              {item.title}
-            </Text>
-            {item.overview ? (
-              <Text className="mt-1 text-white/70 text-xs" numberOfLines={2}>
-                {item.overview}
-              </Text>
-            ) : null}
-            <View className="mt-2 flex-row items-center gap-2">
-              {item.voteAverage != null && item.voteAverage > 0 && (
-                <View className="flex-row items-center gap-1">
-                  <IconStarFilled size={12} color={primary} />
-                  <Text className="text-primary text-xs">
-                    {item.voteAverage.toFixed(1)}
-                  </Text>
-                </View>
-              )}
-              <Text className="text-white/50 text-xs">
-                {item.releaseDate?.slice(0, 4)}
-              </Text>
-            </View>
-          </GlassView>
-        ) : (
-          <>
-            <View
-              className="absolute inset-0"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        <Pressable
+          onPress={handlePress}
+          accessibilityRole="button"
+          accessibilityLabel={accessibilityLabel}
+          accessibilityHint="Opens title details"
+          style={{ flex: 1 }}
+        >
+          {item.backdropPath && (
+            <Image
+              source={{ uri: item.backdropPath }}
+              className="absolute h-full w-full"
+              contentFit="cover"
             />
-            <View className="flex-1 justify-end p-4">
+          )}
+          {useGlass ? (
+            <GlassView
+              glassEffectStyle="regular"
+              colorScheme="dark"
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                padding: 16,
+              }}
+            >
               <Text
                 className="font-display text-2xl text-white"
                 numberOfLines={2}
@@ -153,9 +137,45 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
                   {item.releaseDate?.slice(0, 4)}
                 </Text>
               </View>
-            </View>
-          </>
-        )}
+            </GlassView>
+          ) : (
+            <>
+              <View
+                className="absolute inset-0"
+                style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+              />
+              <View className="flex-1 justify-end p-4">
+                <Text
+                  className="font-display text-2xl text-white"
+                  numberOfLines={2}
+                >
+                  {item.title}
+                </Text>
+                {item.overview ? (
+                  <Text
+                    className="mt-1 text-white/70 text-xs"
+                    numberOfLines={2}
+                  >
+                    {item.overview}
+                  </Text>
+                ) : null}
+                <View className="mt-2 flex-row items-center gap-2">
+                  {item.voteAverage != null && item.voteAverage > 0 && (
+                    <View className="flex-row items-center gap-1">
+                      <IconStarFilled size={12} color={primary} />
+                      <Text className="text-primary text-xs">
+                        {item.voteAverage.toFixed(1)}
+                      </Text>
+                    </View>
+                  )}
+                  <Text className="text-white/50 text-xs">
+                    {item.releaseDate?.slice(0, 4)}
+                  </Text>
+                </View>
+              </View>
+            </>
+          )}
+        </Pressable>
       </Animated.View>
     </GestureDetector>
   );

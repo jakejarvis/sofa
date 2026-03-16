@@ -14,10 +14,10 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
 import { useCSSVariable } from "uniwind";
 import * as ContextMenu from "zeego/context-menu";
 import { Image } from "@/components/ui/image";
@@ -48,6 +48,8 @@ interface PosterCardProps {
   ) => void;
   onQuickAdd: (tmdbId: number, type: "movie" | "tv") => void;
   isAdding?: boolean;
+  failedKey?: string | null;
+  onQuickAddFailed?: () => void;
 }
 
 export function PosterCard({
@@ -65,6 +67,8 @@ export function PosterCard({
   onPress,
   onQuickAdd,
   isAdding,
+  failedKey,
+  onQuickAddFailed,
 }: PosterCardProps) {
   const primaryColor = useCSSVariable("--color-primary") as string;
   const watchlistColor = useCSSVariable("--color-status-watchlist") as string;
@@ -77,6 +81,7 @@ export function PosterCard({
     completed: completedColor,
   };
 
+  const reduceMotion = useReducedMotion();
   const pressed = useSharedValue(0);
   const [localStatus, setLocalStatus] = useState<TitleStatus | null>(
     userStatus ?? null,
@@ -86,10 +91,17 @@ export function PosterCard({
     setLocalStatus(userStatus ?? null);
   }, [userStatus]);
 
+  useEffect(() => {
+    if (failedKey === `${tmdbId}-${type}`) {
+      setLocalStatus(userStatus ?? null);
+      onQuickAddFailed?.();
+    }
+  }, [failedKey, tmdbId, type, userStatus, onQuickAddFailed]);
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       {
-        scale: interpolate(pressed.get(), [0, 1], [1, 0.97]),
+        scale: reduceMotion ? 1 : interpolate(pressed.get(), [0, 1], [1, 0.97]),
       },
     ],
   }));
@@ -106,6 +118,23 @@ export function PosterCard({
 
   const year = releaseDate?.slice(0, 4);
   const imageHeight = width * 1.5;
+
+  const statusLabel =
+    localStatus === "completed"
+      ? "completed"
+      : localStatus === "in_progress"
+        ? "watching"
+        : localStatus === "watchlist"
+          ? "on watchlist"
+          : undefined;
+  const cardAccessibilityLabel = [
+    title,
+    type === "movie" ? "movie" : "TV show",
+    year,
+    statusLabel,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   const cardContent = (
     <View
@@ -133,24 +162,10 @@ export function PosterCard({
           </View>
         )}
 
-        {/* Quick-add button */}
-        {!localStatus && (
-          <Pressable
-            onPress={handleQuickAddPress}
-            className="absolute top-2 right-2 size-[30px] items-center justify-center rounded-full"
-            style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-          >
-            {isAdding ? (
-              <IconLoader size={16} color="white" />
-            ) : (
-              <IconPlus size={16} color="white" />
-            )}
-          </Pressable>
-        )}
-
         {/* Status indicator */}
         {localStatus && (
           <View
+            accessible={false}
             className="absolute top-2 right-2 size-[30px] items-center justify-center rounded-full"
             style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
           >
@@ -198,7 +213,7 @@ export function PosterCard({
             {title}
           </Text>
         </View>
-        <View className="mt-1 flex-row items-center gap-1">
+        <View className="mt-1 flex-row items-center gap-1" accessible={false}>
           {type === "movie" ? (
             <IconMovie size={12} color={primaryColor} />
           ) : (
@@ -219,6 +234,27 @@ export function PosterCard({
       </View>
     </View>
   );
+  const quickAddButton = !localStatus ? (
+    <Pressable
+      onPress={handleQuickAddPress}
+      disabled={!!isAdding}
+      accessibilityRole="button"
+      accessibilityLabel={`Add ${title} to watchlist`}
+      accessibilityState={{ disabled: !!isAdding }}
+      className="absolute top-1 right-1 size-[44px] items-center justify-center rounded-full"
+    >
+      <View
+        className="size-[30px] items-center justify-center rounded-full"
+        style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+      >
+        {isAdding ? (
+          <IconLoader size={16} color="white" />
+        ) : (
+          <IconPlus size={16} color="white" />
+        )}
+      </View>
+    </Pressable>
+  ) : null;
 
   // Gesture for UI-thread press animation (used by both paths)
   const pressGesture = Gesture.Tap()
@@ -236,7 +272,16 @@ export function PosterCard({
         <ContextMenu.Trigger>
           <GestureDetector gesture={pressGesture}>
             <Animated.View style={[animatedStyle, { width }]}>
-              <Pressable onPress={handlePressAction}>{cardContent}</Pressable>
+              <View>
+                <Pressable
+                  onPress={handlePressAction}
+                  accessibilityRole="button"
+                  accessibilityLabel={cardAccessibilityLabel}
+                >
+                  {cardContent}
+                </Pressable>
+                {quickAddButton}
+              </View>
             </Animated.View>
           </GestureDetector>
         </ContextMenu.Trigger>
@@ -313,22 +358,19 @@ export function PosterCard({
     );
   }
 
-  // Cards without id: use GestureDetector for resolve-then-navigate
-  const resolveTapGesture = Gesture.Tap()
-    .onBegin(() => {
-      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
-    })
-    .onFinalize(() => {
-      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
-    })
-    .onEnd(() => {
-      scheduleOnRN(handlePressAction);
-    });
-
   return (
-    <GestureDetector gesture={resolveTapGesture}>
+    <GestureDetector gesture={pressGesture}>
       <Animated.View style={[animatedStyle, { width }]}>
-        {cardContent}
+        <View>
+          <Pressable
+            onPress={handlePressAction}
+            accessibilityRole="button"
+            accessibilityLabel={cardAccessibilityLabel}
+          >
+            {cardContent}
+          </Pressable>
+          {quickAddButton}
+        </View>
       </Animated.View>
     </GestureDetector>
   );

@@ -22,6 +22,10 @@ import { queryClient } from "@/lib/query-client";
 const horizontalListStyle = { overflow: "visible" as const };
 const statsListContentStyle = { gap: 12, paddingHorizontal: 16 };
 const continueWatchingContentStyle = { gap: 12, paddingHorizontal: 16 };
+const dashboardContentContainerStyle = {
+  paddingTop: 8,
+  paddingBottom: 16,
+};
 
 export default function DashboardScreen() {
   const { push } = useRouter();
@@ -75,10 +79,7 @@ export default function DashboardScreen() {
   return (
     <ScrollView
       className="bg-background"
-      contentContainerStyle={{
-        paddingTop: 8,
-        paddingBottom: 16,
-      }}
+      contentContainerStyle={dashboardContentContainerStyle}
       contentInsetAdjustmentBehavior="automatic"
       refreshControl={
         <RefreshControl

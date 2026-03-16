@@ -14,6 +14,7 @@ import Animated, {
   FadeIn,
   FadeOut,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
@@ -47,6 +48,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
   const primaryColor = useCSSVariable("--color-primary") as string;
 
+  const reduceMotion = useReducedMotion();
   const [expanded, setExpanded] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -55,14 +57,24 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
   const setupChevronRotation = useSharedValue(0);
 
   useEffect(() => {
-    chevronRotation.set(withTiming(expanded ? 180 : 0, { duration: 200 }));
-  }, [expanded, chevronRotation]);
+    chevronRotation.set(
+      reduceMotion
+        ? expanded
+          ? 180
+          : 0
+        : withTiming(expanded ? 180 : 0, { duration: 200 }),
+    );
+  }, [expanded, chevronRotation, reduceMotion]);
 
   useEffect(() => {
     setupChevronRotation.set(
-      withTiming(setupOpen ? 180 : 0, { duration: 200 }),
+      reduceMotion
+        ? setupOpen
+          ? 180
+          : 0
+        : withTiming(setupOpen ? 180 : 0, { duration: 200 }),
     );
-  }, [setupOpen, setupChevronRotation]);
+  }, [setupOpen, setupChevronRotation, reduceMotion]);
 
   const chevronStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${chevronRotation.get()}deg` }],
@@ -158,6 +170,9 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
       {/* Header */}
       <Pressable
         onPress={toggleExpanded}
+        accessibilityRole="button"
+        accessibilityLabel={`${label}, ${connection ? config.connectedStatus(connection.lastEventAt) : "Not configured"}`}
+        accessibilityState={{ expanded }}
         className="flex-row items-center justify-between p-3"
       >
         <View className="flex-row items-center gap-3">
@@ -233,6 +248,8 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                   </Text>
                   <Pressable
                     onPress={handleCopy}
+                    accessibilityRole="button"
+                    accessibilityLabel={copied ? "Copied" : "Copy URL"}
                     className="ml-2 active:opacity-60"
                     hitSlop={8}
                   >

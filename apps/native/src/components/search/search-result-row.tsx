@@ -31,65 +31,86 @@ export const SearchResultRow = memo(function SearchResultRow({
   const primary = useCSSVariable("--color-primary") as string;
   const imageSrc = item.posterPath ?? item.profilePath;
 
+  const typeLabel =
+    item.type === "movie" ? "Movie" : item.type === "tv" ? "TV show" : "Person";
+  const accessibilityLabel = [
+    item.title,
+    typeLabel,
+    item.releaseDate?.slice(0, 4),
+  ]
+    .filter(Boolean)
+    .join(", ");
+
   return (
-    <Pressable
-      onPress={() => onResolve(item)}
-      disabled={isResolving}
+    <View
       className="flex-row items-center border-border border-b px-4 py-3"
       style={{
         borderBottomWidth: 0.5,
-        opacity: isResolving ? 0.6 : 1,
       }}
     >
-      <View
-        className="mr-3 overflow-hidden bg-secondary"
-        style={{
-          width: 44,
-          height: item.type === "person" ? 44 : 66,
-          borderRadius: item.type === "person" ? 22 : 8,
-          borderCurve: item.type === "person" ? undefined : "continuous",
-        }}
+      <Pressable
+        onPress={() => onResolve(item)}
+        disabled={isResolving}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        className="flex-1 flex-row items-center"
+        style={({ pressed }) => ({
+          opacity: pressed || isResolving ? 0.6 : 1,
+        })}
       >
-        {imageSrc ? (
-          <Image
-            source={{ uri: imageSrc }}
-            className="h-full w-full"
-            contentFit="cover"
-          />
-        ) : null}
-      </View>
-
-      <View className="flex-1">
-        <Text
-          numberOfLines={1}
-          className="font-sans-medium text-[15px] text-foreground"
+        <View
+          className="mr-3 overflow-hidden bg-secondary"
+          style={{
+            width: 44,
+            height: item.type === "person" ? 44 : 66,
+            borderRadius: item.type === "person" ? 22 : 8,
+            borderCurve: item.type === "person" ? undefined : "continuous",
+          }}
         >
-          {item.title}
-        </Text>
-        <View className="mt-1 flex-row items-center gap-2">
-          <View className="rounded-full bg-secondary px-2 py-0.5">
-            <Text className="text-[10px] text-muted-foreground">
-              {item.type === "movie"
-                ? "Movie"
-                : item.type === "tv"
-                  ? "TV"
-                  : "Person"}
-            </Text>
-          </View>
-          {item.releaseDate ? (
-            <Text className="text-muted-foreground text-xs">
-              {item.releaseDate.slice(0, 4)}
-            </Text>
+          {imageSrc ? (
+            <Image
+              source={{ uri: imageSrc }}
+              recyclingKey={imageSrc}
+              className="h-full w-full"
+              contentFit="cover"
+            />
           ) : null}
         </View>
-      </View>
+
+        <View className="flex-1">
+          <Text
+            numberOfLines={1}
+            className="font-sans-medium text-[15px] text-foreground"
+          >
+            {item.title}
+          </Text>
+          <View className="mt-1 flex-row items-center gap-2">
+            <View className="rounded-full bg-secondary px-2 py-0.5">
+              <Text className="text-[10px] text-muted-foreground">
+                {item.type === "movie"
+                  ? "Movie"
+                  : item.type === "tv"
+                    ? "TV"
+                    : "Person"}
+              </Text>
+            </View>
+            {item.releaseDate ? (
+              <Text className="text-muted-foreground text-xs">
+                {item.releaseDate.slice(0, 4)}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+      </Pressable>
 
       {item.type !== "person" && (
         <Pressable
           onPress={() => onQuickAdd(item.tmdbId, item.type as "movie" | "tv")}
-          disabled={isAdding}
-          hitSlop={8}
-          className="ml-2"
+          disabled={isAdding || isResolving}
+          accessibilityRole="button"
+          accessibilityLabel={`Add ${item.title} to watchlist`}
+          hitSlop={12}
+          className="ml-2 items-center justify-center self-stretch"
         >
           {isAdding ? (
             <IconLoader size={22} color={primary} />
@@ -102,6 +123,6 @@ export const SearchResultRow = memo(function SearchResultRow({
       {isResolving && (
         <Spinner size="sm" colorClassName="accent-primary" className="ml-2" />
       )}
-    </Pressable>
+    </View>
   );
 });

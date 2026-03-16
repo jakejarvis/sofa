@@ -3,7 +3,6 @@ import type { StyleProp, ViewStyle } from "react-native";
 import { ScrollView } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SofaLogo } from "@/components/ui/sofa-logo";
 import { Text } from "@/components/ui/text";
 
@@ -20,17 +19,20 @@ export function AuthScreen({
   logoStyle,
   children,
 }: AuthScreenProps) {
-  const insets = useSafeAreaInsets();
+  const useAutomaticInsets = process.env.EXPO_OS === "ios";
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       <ScrollView
+        contentInsetAdjustmentBehavior={
+          useAutomaticInsets ? "automatic" : "never"
+        }
         contentContainerStyle={{
           flexGrow: 1,
           justifyContent: "center",
           paddingHorizontal: 24,
-          paddingTop: insets.top + 24,
-          paddingBottom: insets.bottom,
+          paddingTop: 24,
+          paddingBottom: 24,
         }}
         keyboardShouldPersistTaps="handled"
         bounces={false}

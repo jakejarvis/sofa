@@ -15,18 +15,28 @@ export function CastCard({
     profileThumbHash?: string | null;
   };
 }) {
+  const accessibilityLabel = person.character
+    ? `${person.name} as ${person.character}`
+    : person.name;
+
   return (
     <Link href={`/person/${person.personId}` as `/person/${string}`}>
       <Link.Trigger>
-        <Pressable style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel={accessibilityLabel}
+          style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+        >
           <View className="w-20 items-center">
             <View className="mb-2 h-16 w-16 overflow-hidden rounded-full bg-secondary">
               {person.profilePath && (
                 <Image
                   source={{ uri: person.profilePath }}
                   thumbHash={person.profileThumbHash}
+                  recyclingKey={person.personId}
                   className="h-full w-full"
                   contentFit="cover"
+                  accessible={false}
                 />
               )}
             </View>

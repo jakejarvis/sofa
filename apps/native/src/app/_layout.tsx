@@ -218,7 +218,6 @@ function AppContent() {
               headerBlurEffect: "none",
               headerTintColor: "white",
               headerBackButtonDisplayMode: "minimal",
-              headerTitle: "",
               animation: "slide_from_right",
             }}
           />
@@ -231,7 +230,6 @@ function AppContent() {
               headerBlurEffect: "none",
               headerTintColor: "white",
               headerBackButtonDisplayMode: "minimal",
-              headerTitle: "",
               animation: "slide_from_right",
             }}
           />

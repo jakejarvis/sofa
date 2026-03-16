@@ -3,7 +3,7 @@ import {
   IconCircleCheck,
   IconInfoCircle,
 } from "@tabler/icons-react-native";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Linking, Pressable, TextInput, View } from "react-native";
 import Animated, {
@@ -151,14 +151,17 @@ export default function ServerUrlScreen() {
       subtitle="Enter your Sofa server URL to get started"
       logoStyle={iconAnimatedStyle}
     >
+      <Stack.Screen options={{ title: "Server" }} />
       <Animated.View entering={FadeInDown.duration(300).delay(200)}>
         <View
-          className="h-12 flex-row items-center rounded-[12px] border border-border bg-input px-3.5"
+          className="min-h-12 flex-row items-center rounded-[12px] border border-border bg-input px-3.5"
           style={{ borderCurve: "continuous" }}
         >
           <TextInput
             ref={inputRef}
             value={url}
+            accessibilityLabel="Server URL"
+            accessibilityHint="Enter the full URL for your Sofa server"
             onChangeText={handleChangeText}
             placeholder="https://sofa.example.com"
             placeholderTextColorClassName="accent-muted-foreground/50"
@@ -169,7 +172,7 @@ export default function ServerUrlScreen() {
             returnKeyType="go"
             editable={!isDisabled}
             onSubmitEditing={handleConnect}
-            className="flex-1 py-0 font-mono text-[15px] text-foreground"
+            className="flex-1 py-3 font-mono text-[15px] text-foreground"
           />
         </View>
       </Animated.View>
@@ -180,7 +183,7 @@ export default function ServerUrlScreen() {
         className="mt-4"
       >
         {isConnecting ? (
-          <View className="h-12 flex-row items-center justify-center gap-2">
+          <View className="min-h-12 flex-row items-center justify-center gap-2 py-2">
             <Animated.View
               className="size-1.5 rounded-full bg-primary"
               style={dotAnimatedStyle}
@@ -190,7 +193,7 @@ export default function ServerUrlScreen() {
             </Text>
           </View>
         ) : isSuccess ? (
-          <View className="h-12 flex-row items-center justify-center gap-1.5">
+          <View className="min-h-12 flex-row items-center justify-center gap-1.5 py-2">
             <IconCircleCheck size={16} color={statusCompletedColor} />
             <Text className="font-sans-medium text-[13px] text-status-completed">
               Connected
@@ -218,7 +221,7 @@ export default function ServerUrlScreen() {
               color={destructiveColor}
               style={{ marginTop: 1 }}
             />
-            <Text className="flex-1 text-[13px] text-destructive">
+            <Text selectable className="flex-1 text-[13px] text-destructive">
               {ERROR_MESSAGES[connection.error]}
             </Text>
           </Animated.View>

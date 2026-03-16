@@ -12,6 +12,7 @@ import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
+const genreChipsContentStyle = { paddingHorizontal: 16 };
 
 export function FilterableTitleRow({
   title,
@@ -112,7 +113,7 @@ export function FilterableTitleRow({
           horizontal
           showsHorizontalScrollIndicator={false}
           className="mb-3"
-          contentContainerStyle={{ paddingHorizontal: 16 }}
+          contentContainerStyle={genreChipsContentStyle}
         >
           <GenreChip
             label="All"

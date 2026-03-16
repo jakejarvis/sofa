@@ -10,6 +10,11 @@ import { HeroBanner } from "@/components/explore/hero-banner";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 
+const exploreContentContainerStyle = {
+  paddingTop: 8,
+  paddingBottom: 16,
+};
+
 export default function ExploreScreen() {
   const trending = useInfiniteQuery(
     orpc.explore.trending.infiniteOptions({
@@ -68,10 +73,7 @@ export default function ExploreScreen() {
   return (
     <ScrollView
       className="bg-background"
-      contentContainerStyle={{
-        paddingTop: 8,
-        paddingBottom: 16,
-      }}
+      contentContainerStyle={exploreContentContainerStyle}
       contentInsetAdjustmentBehavior="automatic"
       refreshControl={
         <RefreshControl

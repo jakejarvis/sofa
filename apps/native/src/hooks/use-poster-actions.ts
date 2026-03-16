@@ -60,5 +60,14 @@ export function usePosterActions() {
       ? `${quickAddMutation.variables.tmdbId}-${quickAddMutation.variables.type}`
       : null;
 
-  return { handlePress, handleQuickAdd, addingKey };
+  const failedKey =
+    quickAddMutation.isError && quickAddMutation.variables
+      ? `${quickAddMutation.variables.tmdbId}-${quickAddMutation.variables.type}`
+      : null;
+
+  const resetError = useCallback(() => {
+    quickAddMutation.reset();
+  }, [quickAddMutation.reset]);
+
+  return { handlePress, handleQuickAdd, addingKey, failedKey, resetError };
 }

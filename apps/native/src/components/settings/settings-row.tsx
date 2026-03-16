@@ -1,7 +1,7 @@
 import type { Icon } from "@tabler/icons-react-native";
 import { IconChevronRight } from "@tabler/icons-react-native";
 import type { ReactNode } from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
 import { Text } from "@/components/ui/text";
 
@@ -25,13 +25,9 @@ export function SettingsRow({
   const destructiveColor = useCSSVariable("--color-destructive") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled || !onPress}
-      className="flex-row items-center py-3.5"
-      style={disabled ? { opacity: 0.5 } : undefined}
-    >
+  const isDisabled = disabled || !onPress;
+  const content = (
+    <>
       {IconComponent && (
         <IconComponent
           size={18}
@@ -46,14 +42,41 @@ export function SettingsRow({
       {right}
       {!right && value ? (
         <Text
-          selectable
-          className="mr-1 max-w-[160px] text-[14px] text-muted-foreground"
-          numberOfLines={1}
+          selectable={!onPress}
+          className="mr-1 max-w-[180px] shrink text-right text-[14px] text-muted-foreground"
+          numberOfLines={2}
         >
           {value}
         </Text>
       ) : null}
-      {!right && onPress && <IconChevronRight size={16} color={mutedFgColor} />}
+      {!right && onPress && (
+        <IconChevronRight size={16} color={mutedFgColor} accessible={false} />
+      )}
+    </>
+  );
+
+  if (!onPress) {
+    return (
+      <View
+        className="flex-row items-center py-3.5"
+        style={disabled ? { opacity: 0.5 } : undefined}
+      >
+        {content}
+      </View>
+    );
+  }
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={isDisabled}
+      accessibilityRole="button"
+      accessibilityLabel={value ? `${label}, ${value}` : label}
+      accessibilityState={{ disabled: !!isDisabled }}
+      className="flex-row items-center py-3.5"
+      style={disabled ? { opacity: 0.5 } : undefined}
+    >
+      {content}
     </Pressable>
   );
 }

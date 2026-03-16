@@ -1,5 +1,6 @@
 import type { Icon } from "@tabler/icons-react-native";
 import { IconMovie } from "@tabler/icons-react-native";
+import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
 import { Button, ButtonLabel } from "@/components/ui/button";
@@ -26,8 +27,11 @@ export function EmptyState({
     <Animated.View
       entering={FadeIn.duration(400)}
       className="items-center justify-center px-6 py-12"
+      accessibilityLabel={description ? `${title}. ${description}` : title}
     >
-      <IconComponent size={48} color={mutedForeground} />
+      <View accessible={false}>
+        <IconComponent size={48} color={mutedForeground} />
+      </View>
       <Text className="mt-3 text-center font-sans-medium text-[16px] text-foreground">
         {title}
       </Text>

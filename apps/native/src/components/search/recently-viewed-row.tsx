@@ -31,10 +31,16 @@ export const RecentlyViewedRow = memo(function RecentlyViewedRow({
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const Icon = TypeIcon[item.type];
 
+  const accessibilityLabel = [item.title, TypeLabel[item.type], item.subtitle]
+    .filter(Boolean)
+    .join(", ");
+
   return (
     <SwipeableRow onDelete={() => onDelete(item.id)}>
       <Pressable
         onPress={() => onPress(item)}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
         className="flex-row items-center bg-background px-4 py-3"
         style={({ pressed }) => ({
           borderBottomWidth: 0.5,

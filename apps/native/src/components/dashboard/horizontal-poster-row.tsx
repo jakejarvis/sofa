@@ -28,7 +28,8 @@ export function HorizontalPosterRow({
   items: PosterRowItem[];
   isLoading?: boolean;
 }) {
-  const { handlePress, handleQuickAdd, addingKey } = usePosterActions();
+  const { handlePress, handleQuickAdd, addingKey, failedKey, resetError } =
+    usePosterActions();
   const keyExtractor = useCallback(
     (item: PosterRowItem) => item.id ?? `${item.tmdbId}-${item.type}`,
     [],
@@ -49,9 +50,11 @@ export function HorizontalPosterRow({
         onPress={handlePress}
         onQuickAdd={handleQuickAdd}
         isAdding={addingKey === `${item.tmdbId}-${item.type}`}
+        failedKey={failedKey}
+        onQuickAddFailed={resetError}
       />
     ),
-    [addingKey, handlePress, handleQuickAdd],
+    [addingKey, failedKey, handlePress, handleQuickAdd, resetError],
   );
 
   if (isLoading) {

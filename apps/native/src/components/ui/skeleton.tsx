@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import type { ViewStyle } from "react-native";
 import Animated, {
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withRepeat,
   withTiming,
@@ -23,11 +24,14 @@ export function Skeleton({
   style,
 }: SkeletonProps) {
   const secondaryColor = useCSSVariable("--color-secondary") as string;
-  const opacity = useSharedValue(0.4);
+  const reduceMotion = useReducedMotion();
+  const opacity = useSharedValue(reduceMotion ? 0.7 : 0.4);
 
   useEffect(() => {
-    opacity.set(withRepeat(withTiming(1, { duration: 800 }), -1, true));
-  }, [opacity]);
+    if (!reduceMotion) {
+      opacity.set(withRepeat(withTiming(1, { duration: 800 }), -1, true));
+    }
+  }, [opacity, reduceMotion]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.get(),
@@ -35,6 +39,8 @@ export function Skeleton({
 
   return (
     <Animated.View
+      accessible
+      accessibilityLabel="Loading"
       style={[
         {
           width,

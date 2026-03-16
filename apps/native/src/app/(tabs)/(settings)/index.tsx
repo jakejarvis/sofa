@@ -49,6 +49,12 @@ import { queryClient } from "@/lib/query-client";
 import { getServerUrl } from "@/lib/server-url";
 import { toast } from "@/lib/toast";
 
+const settingsContentContainerStyle = {
+  paddingTop: 8,
+  paddingBottom: 32,
+  paddingHorizontal: 16,
+};
+
 export default function SettingsScreen() {
   const { push } = useRouter();
   const { data: session, refetch: refetchSession } = authClient.useSession();
@@ -56,8 +62,8 @@ export default function SettingsScreen() {
   const [nameInput, setNameInput] = useState("");
 
   useEffect(() => {
-    if (session?.user?.name) setNameInput(session.user.name);
-  }, [session?.user?.name]);
+    if (!isEditingName && session?.user?.name) setNameInput(session.user.name);
+  }, [session?.user?.name, isEditingName]);
 
   const [analyticsEnabled, setAnalyticsToggle] = useState(isAnalyticsEnabled);
   const isAdmin = session?.user?.role === "admin";
@@ -201,11 +207,7 @@ export default function SettingsScreen() {
   return (
     <ScrollView
       className="bg-background"
-      contentContainerStyle={{
-        paddingTop: 8,
-        paddingBottom: 32,
-        paddingHorizontal: 16,
-      }}
+      contentContainerStyle={settingsContentContainerStyle}
       contentInsetAdjustmentBehavior="automatic"
       refreshControl={
         <RefreshControl
@@ -224,7 +226,13 @@ export default function SettingsScreen() {
             {hasAvatarImage ? (
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                  <Pressable className="mr-3">
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Edit profile photo"
+                    accessibilityHint="Opens options to change or remove your photo"
+                    className="mr-3"
+                    hitSlop={8}
+                  >
                     <View className="size-11 overflow-hidden rounded-full bg-secondary">
                       {uploadAvatar.isPending ? (
                         <View className="flex-1 items-center justify-center">
@@ -265,7 +273,13 @@ export default function SettingsScreen() {
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
             ) : (
-              <Pressable onPress={pickAvatar} className="mr-3">
+              <Pressable
+                onPress={pickAvatar}
+                accessibilityRole="button"
+                accessibilityLabel="Add profile photo"
+                className="mr-3"
+                hitSlop={8}
+              >
                 <View className="size-11 overflow-hidden rounded-full bg-secondary">
                   {uploadAvatar.isPending ? (
                     <View className="flex-1 items-center justify-center">
@@ -289,8 +303,9 @@ export default function SettingsScreen() {
                 <View className="flex-row items-center gap-2">
                   <TextInput
                     value={nameInput}
+                    accessibilityLabel="Display name"
                     onChangeText={setNameInput}
-                    className="flex-1 border-primary border-b py-0.5 font-sans text-[15px] text-foreground"
+                    className="min-h-10 flex-1 border-primary border-b py-2 font-sans text-[15px] text-foreground"
                     autoFocus
                   />
                   <Pressable
@@ -381,6 +396,7 @@ export default function SettingsScreen() {
             right={
               <Switch
                 value={analyticsEnabled}
+                accessibilityLabel="Anonymous usage reporting"
                 onValueChange={(enabled) => {
                   setAnalyticsToggle(enabled);
                   setAnalyticsEnabled(enabled);
@@ -449,6 +465,7 @@ export default function SettingsScreen() {
               right={
                 <Switch
                   value={registration.data?.open ?? false}
+                  accessibilityLabel="Open registration"
                   onValueChange={(open) => toggleRegistration.mutate({ open })}
                 />
               }
@@ -459,6 +476,7 @@ export default function SettingsScreen() {
               right={
                 <Switch
                   value={updateCheck.data?.enabled ?? false}
+                  accessibilityLabel="Check for updates"
                   onValueChange={(enabled) =>
                     toggleUpdateCheck.mutate({ enabled })
                   }

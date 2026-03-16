@@ -1,4 +1,10 @@
-import { forwardRef, type PropsWithChildren } from "react";
+import {
+  createContext,
+  forwardRef,
+  type PropsWithChildren,
+  useContext,
+  useId,
+} from "react";
 import {
   TextInput,
   type TextInputProps,
@@ -9,16 +15,26 @@ import { Text } from "@/components/ui/text";
 
 import { cn } from "@/utils/cn";
 
+const TextFieldContext = createContext<string | undefined>(undefined);
+
 export function TextField({ children }: PropsWithChildren) {
-  return <View className="gap-1.5">{children}</View>;
+  const id = useId();
+  return (
+    <TextFieldContext.Provider value={id}>
+      <View className="gap-1.5">{children}</View>
+    </TextFieldContext.Provider>
+  );
 }
 
 export function Label({
   className,
+  nativeID,
   ...props
 }: TextProps & { className?: string }) {
+  const ctxId = useContext(TextFieldContext);
   return (
     <Text
+      nativeID={nativeID ?? ctxId}
       className={cn("font-sans-medium text-foreground text-sm", className)}
       {...props}
     />
@@ -29,12 +45,14 @@ export const Input = forwardRef<
   TextInput,
   TextInputProps & { className?: string }
 >(({ className, style, ...props }, ref) => {
+  const ctxId = useContext(TextFieldContext);
   return (
     <TextInput
       ref={ref}
-      placeholderTextColorClassName="accent-muted-foreground/50"
+      accessibilityLabelledBy={ctxId}
+      placeholderTextColorClassName="accent-muted-foreground/70"
       className={cn(
-        "h-12 rounded-[12px] border border-border bg-input px-3.5 font-sans text-[15px] text-foreground",
+        "min-h-12 rounded-[12px] border border-border bg-input px-3.5 py-3 font-sans text-[15px] text-foreground",
         className,
       )}
       style={[{ borderCurve: "continuous" }, style]}
@@ -53,7 +71,11 @@ export function FieldError({
 }: PropsWithChildren<TextProps & { isInvalid?: boolean; className?: string }>) {
   if (!isInvalid) return null;
   return (
-    <Text className={cn("text-[13px] text-destructive", className)} {...props}>
+    <Text
+      selectable
+      className={cn("text-[13px] text-destructive", className)}
+      {...props}
+    >
       {children}
     </Text>
   );

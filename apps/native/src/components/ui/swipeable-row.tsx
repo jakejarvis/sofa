@@ -38,19 +38,28 @@ interface SwipeableRowProps extends PropsWithChildren {
 
 export function SwipeableRow({ onDelete, children }: SwipeableRowProps) {
   return (
-    <ReanimatedSwipeable
-      friction={2}
-      rightThreshold={40}
-      overshootRight={false}
-      renderRightActions={(_progress, drag) => <RightAction drag={drag} />}
-      onSwipeableOpen={(direction) => {
-        if (direction === "left") {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    <View
+      accessibilityActions={[{ name: "delete", label: "Delete" }]}
+      onAccessibilityAction={(event) => {
+        if (event.nativeEvent.actionName === "delete") {
           onDelete();
         }
       }}
     >
-      {children}
-    </ReanimatedSwipeable>
+      <ReanimatedSwipeable
+        friction={2}
+        rightThreshold={40}
+        overshootRight={false}
+        renderRightActions={(_progress, drag) => <RightAction drag={drag} />}
+        onSwipeableOpen={(direction) => {
+          if (direction === "left") {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            onDelete();
+          }
+        }}
+      >
+        {children}
+      </ReanimatedSwipeable>
+    </View>
   );
 }

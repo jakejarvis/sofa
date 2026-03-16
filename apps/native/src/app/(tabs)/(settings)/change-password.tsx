@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { Stack, useRouter } from "expo-router";
 import { useRef, useState } from "react";
-import { Alert, type TextInput, View } from "react-native";
+import { Alert, ScrollView, type TextInput, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { z } from "zod";
 import { Button, ButtonLabel } from "@/components/ui/button";
@@ -82,7 +82,16 @@ export default function ChangePasswordScreen() {
   });
 
   return (
-    <View className="flex-1 bg-background px-4 pt-4">
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerStyle={{
+        paddingHorizontal: 16,
+        paddingTop: 16,
+        paddingBottom: 24,
+      }}
+      contentInsetAdjustmentBehavior="automatic"
+      keyboardShouldPersistTaps="handled"
+    >
       <Stack.Screen options={{ title: "Change Password" }} />
 
       <form.Subscribe
@@ -106,6 +115,7 @@ export default function ChangePasswordScreen() {
                     <Label>Current password</Label>
                     <Input
                       value={field.state.value}
+                      accessibilityLabel="Current password"
                       onBlur={field.handleBlur}
                       onChangeText={field.handleChange}
                       placeholder="••••••••"
@@ -129,6 +139,7 @@ export default function ChangePasswordScreen() {
                     <Input
                       ref={newPasswordRef}
                       value={field.state.value}
+                      accessibilityLabel="New password"
                       onBlur={field.handleBlur}
                       onChangeText={field.handleChange}
                       placeholder="••••••••"
@@ -154,6 +165,7 @@ export default function ChangePasswordScreen() {
                     <Input
                       ref={confirmPasswordRef}
                       value={field.state.value}
+                      accessibilityLabel="Confirm new password"
                       onBlur={field.handleBlur}
                       onChangeText={field.handleChange}
                       placeholder="••••••••"
@@ -179,6 +191,7 @@ export default function ChangePasswordScreen() {
               <Switch
                 value={revokeOtherSessions}
                 onValueChange={setRevokeOtherSessions}
+                accessibilityLabel="Sign out of other sessions"
               />
             </Animated.View>
 
@@ -198,6 +211,6 @@ export default function ChangePasswordScreen() {
           </View>
         )}
       </form.Subscribe>
-    </View>
+    </ScrollView>
   );
 }

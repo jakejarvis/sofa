@@ -6,6 +6,7 @@ import Animated, {
   FadeIn,
   FadeOut,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
@@ -37,6 +38,7 @@ export function SeasonAccordion({
   const titleAccentColor = useCSSVariable("--color-title-accent") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
+  const reduceMotion = useReducedMotion();
   const [expanded, setExpanded] = useState(false);
   const chevronRotation = useSharedValue(0);
   const watchedCount = episodes.filter((e) =>
@@ -63,8 +65,14 @@ export function SeasonAccordion({
   const toggleExpanded = useCallback(() => setExpanded((v) => !v), []);
 
   useEffect(() => {
-    chevronRotation.set(withTiming(expanded ? 180 : 0, { duration: 200 }));
-  }, [expanded, chevronRotation]);
+    chevronRotation.set(
+      reduceMotion
+        ? expanded
+          ? 180
+          : 0
+        : withTiming(expanded ? 180 : 0, { duration: 200 }),
+    );
+  }, [expanded, chevronRotation, reduceMotion]);
 
   const chevronStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${chevronRotation.get()}deg` }],
@@ -136,6 +144,9 @@ export function SeasonAccordion({
     >
       <Pressable
         onPress={toggleExpanded}
+        accessibilityRole="button"
+        accessibilityLabel={`${season.name ?? `Season ${season.seasonNumber}`}, ${watchedCount} of ${episodes.length} episodes watched`}
+        accessibilityState={{ expanded }}
         className="flex-row items-center justify-between p-4"
       >
         <View className="flex-1">

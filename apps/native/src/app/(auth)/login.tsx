@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "expo-router";
+import { Link, Stack } from "expo-router";
 import { useRef } from "react";
 import { Alert, Pressable, type TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
@@ -73,6 +73,7 @@ export default function LoginScreen() {
 
   return (
     <AuthScreen title="Sofa" subtitle="Sign in to continue">
+      <Stack.Screen options={{ title: "Sign In" }} />
       {showOidc && (
         <Animated.View
           entering={FadeInDown.duration(300).delay(100)}
@@ -125,6 +126,7 @@ export default function LoginScreen() {
                       <Label>Email</Label>
                       <Input
                         value={field.state.value}
+                        accessibilityLabel="Email"
                         onBlur={field.handleBlur}
                         onChangeText={field.handleChange}
                         placeholder="email@example.com"
@@ -149,6 +151,7 @@ export default function LoginScreen() {
                       <Input
                         ref={passwordRef}
                         value={field.state.value}
+                        accessibilityLabel="Password"
                         onBlur={field.handleBlur}
                         onChangeText={field.handleChange}
                         placeholder="••••••••"

@@ -1,3 +1,4 @@
+import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
 import {
   IconAlertTriangle,
@@ -7,7 +8,8 @@ import {
   IconUser,
 } from "@tabler/icons-react-native";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns/format";
+import { parseISO } from "date-fns/parseISO";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
 import {
@@ -54,15 +56,18 @@ const departmentLabels: Record<string, string> = {
 export default function PersonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
   const { back } = useRouter();
   const { width: screenWidth } = useWindowDimensions();
+  const useAutomaticInsets = process.env.EXPO_OS === "ios";
   const columnWidth =
     (screenWidth - FILMOGRAPHY_PADDING * 2 - FILMOGRAPHY_GAP) / 2;
 
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const primaryColor = useCSSVariable("--color-primary") as string;
 
-  const { handlePress, handleQuickAdd, addingKey } = usePosterActions();
+  const { handlePress, handleQuickAdd, addingKey, failedKey, resetError } =
+    usePosterActions();
 
   const {
     data,
@@ -127,82 +132,131 @@ export default function PersonDetailScreen() {
           onPress={handlePress}
           onQuickAdd={handleQuickAdd}
           isAdding={addingKey === `${credit.tmdbId}-${credit.type}`}
+          failedKey={failedKey}
+          onQuickAddFailed={resetError}
         />
       </View>
     ),
-    [columnWidth, userStatuses, handlePress, handleQuickAdd, addingKey],
+    [
+      columnWidth,
+      userStatuses,
+      handlePress,
+      handleQuickAdd,
+      addingKey,
+      failedKey,
+      resetError,
+    ],
   );
 
   if (isPending) {
     return (
-      <View
-        className="flex-1 items-center bg-background"
-        style={{ paddingTop: insets.top + 56 }}
-      >
-        {/* Profile photo skeleton */}
-        <Skeleton width={120} height={120} borderRadius={60} />
-        {/* Name skeleton */}
-        <Skeleton
-          width={180}
-          height={28}
-          borderRadius={6}
-          style={{ marginTop: 16 }}
+      <>
+        <Stack.Screen
+          options={{
+            title: "Person",
+            headerTransparent: true,
+            headerBlurEffect: "none",
+            headerTintColor: "white",
+            headerBackButtonDisplayMode: "minimal",
+          }}
         />
-        {/* Department badge skeleton */}
-        <Skeleton
-          width={80}
-          height={24}
-          borderRadius={12}
-          style={{ marginTop: 8 }}
-        />
-        {/* Bio skeleton */}
-        <View className="mt-6 gap-2 self-stretch px-4">
-          <Skeleton width="100%" height={14} />
-          <Skeleton width="100%" height={14} />
-          <Skeleton width="60%" height={14} />
+        <View
+          className="flex-1 items-center bg-background"
+          style={{ paddingTop: headerHeight + 24 }}
+        >
+          {/* Profile photo skeleton */}
+          <Skeleton width={120} height={120} borderRadius={60} />
+          {/* Name skeleton */}
+          <Skeleton
+            width={180}
+            height={28}
+            borderRadius={6}
+            style={{ marginTop: 16 }}
+          />
+          {/* Department badge skeleton */}
+          <Skeleton
+            width={80}
+            height={24}
+            borderRadius={12}
+            style={{ marginTop: 8 }}
+          />
+          {/* Bio skeleton */}
+          <View className="mt-6 gap-2 self-stretch px-4">
+            <Skeleton width="100%" height={14} />
+            <Skeleton width="100%" height={14} />
+            <Skeleton width="60%" height={14} />
+          </View>
         </View>
-      </View>
+      </>
     );
   }
 
   if (isError && !data) {
     return (
-      <View
-        className="flex-1 items-center justify-center bg-background"
-        style={{ paddingTop: insets.top }}
-      >
-        <Animated.View entering={FadeIn.duration(400)} className="items-center">
-          <IconAlertTriangle size={48} color={mutedForeground} />
-          <Text className="mt-3 font-display text-foreground text-xl">
-            Something went wrong
-          </Text>
-          <Text className="mt-1 text-center text-muted-foreground text-sm">
-            Could not load person details
-          </Text>
-          <Pressable onPress={() => back()} className="mt-4">
-            <Text className="text-primary">Go back</Text>
-          </Pressable>
-        </Animated.View>
-      </View>
+      <>
+        <Stack.Screen
+          options={{
+            title: "Person",
+            headerTransparent: true,
+            headerBlurEffect: "none",
+            headerTintColor: "white",
+            headerBackButtonDisplayMode: "minimal",
+          }}
+        />
+        <View
+          className="flex-1 items-center justify-center bg-background"
+          style={{ paddingTop: insets.top }}
+        >
+          <Animated.View
+            entering={FadeIn.duration(400)}
+            className="items-center"
+          >
+            <IconAlertTriangle size={48} color={mutedForeground} />
+            <Text className="mt-3 font-display text-foreground text-xl">
+              Something went wrong
+            </Text>
+            <Text className="mt-1 text-center text-muted-foreground text-sm">
+              Could not load person details
+            </Text>
+            <Pressable onPress={() => back()} className="mt-4">
+              <Text className="text-primary">Go back</Text>
+            </Pressable>
+          </Animated.View>
+        </View>
+      </>
     );
   }
 
   if (!person) {
     return (
-      <View
-        className="flex-1 items-center justify-center bg-background"
-        style={{ paddingTop: insets.top }}
-      >
-        <Animated.View entering={FadeIn.duration(400)} className="items-center">
-          <IconUser size={48} color={mutedForeground} />
-          <Text className="mt-3 font-display text-foreground text-xl">
-            Person not found
-          </Text>
-          <Pressable onPress={() => back()} className="mt-4">
-            <Text className="text-primary">Go back</Text>
-          </Pressable>
-        </Animated.View>
-      </View>
+      <>
+        <Stack.Screen
+          options={{
+            title: "Person",
+            headerTransparent: true,
+            headerBlurEffect: "none",
+            headerTintColor: "white",
+            headerBackButtonDisplayMode: "minimal",
+          }}
+        />
+        <View
+          className="flex-1 items-center justify-center bg-background"
+          style={{ paddingTop: insets.top }}
+        >
+          <Animated.View
+            entering={FadeIn.duration(400)}
+            className="items-center"
+          >
+            <IconUser size={48} color={mutedForeground} />
+            <Text className="mt-3 font-display text-foreground text-xl">
+              Person not found
+            </Text>
+            <Pressable onPress={() => back()} className="mt-4">
+              <Text className="text-primary">Go back</Text>
+            </Pressable>
+          </Animated.View>
+        </View>
+      </>
     );
   }
 
@@ -212,7 +266,10 @@ export default function PersonDetailScreen() {
       <Animated.View
         entering={FadeIn.duration(400)}
         className="items-center"
-        style={{ paddingTop: insets.top + 56, paddingBottom: 24 }}
+        style={{
+          paddingTop: useAutomaticInsets ? 16 : insets.top + 56,
+          paddingBottom: 24,
+        }}
       >
         <View className="size-[120px] overflow-hidden rounded-full bg-secondary">
           {person.profilePath && (
@@ -225,10 +282,7 @@ export default function PersonDetailScreen() {
           )}
         </View>
 
-        <Text
-          selectable
-          className="mt-4 text-center font-display text-[28px] text-foreground"
-        >
+        <Text className="mt-4 text-center font-display text-[28px] text-foreground">
           {person.name}
         </Text>
 
@@ -294,12 +348,11 @@ export default function PersonDetailScreen() {
     <>
       <Stack.Screen
         options={{
-          title: person?.name ?? "",
+          title: person.name,
           headerTransparent: true,
           headerBlurEffect: "none",
           headerTintColor: "white",
           headerBackButtonDisplayMode: "minimal",
-          headerTitle: "",
         }}
       />
       <View className="flex-1 bg-background">
@@ -308,8 +361,11 @@ export default function PersonDetailScreen() {
           keyExtractor={(item) => item.titleId}
           renderItem={renderFilmographyItem}
           numColumns={2}
+          contentInsetAdjustmentBehavior={
+            useAutomaticInsets ? "automatic" : "never"
+          }
           contentContainerStyle={{
-            paddingBottom: insets.bottom + 32,
+            paddingBottom: useAutomaticInsets ? 32 : insets.bottom + 32,
             paddingHorizontal: FILMOGRAPHY_PADDING,
           }}
           ListHeaderComponent={listHeader}

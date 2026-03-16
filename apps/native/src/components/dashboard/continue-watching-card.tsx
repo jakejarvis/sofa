@@ -4,6 +4,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
@@ -29,9 +30,14 @@ export interface ContinueWatchingItem {
 }
 
 export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
+  const reduceMotion = useReducedMotion();
   const pressed = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: interpolate(pressed.get(), [0, 1], [1, 0.97]) }],
+    transform: [
+      {
+        scale: reduceMotion ? 1 : interpolate(pressed.get(), [0, 1], [1, 0.97]),
+      },
+    ],
   }));
 
   const tapGesture = Gesture.Tap()
@@ -42,11 +48,22 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
       pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
     });
 
+  const progressLabel = `${item.watchedEpisodes} of ${item.totalEpisodes} episodes`;
+  const nextEpLabel = item.nextEpisode
+    ? `Next: Season ${item.nextEpisode.seasonNumber} Episode ${item.nextEpisode.episodeNumber}`
+    : undefined;
+  const cardLabel = [item.title.title, progressLabel, nextEpLabel]
+    .filter(Boolean)
+    .join(", ");
+
   return (
     <Link href={`/title/${item.title.id}` as `/title/${string}`}>
       <Link.Trigger>
         <GestureDetector gesture={tapGesture}>
           <Animated.View
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={cardLabel}
             className="w-[200px] overflow-hidden rounded-[12px] border bg-card"
             style={[
               animatedStyle,
@@ -67,6 +84,7 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
                     item.nextEpisode?.stillThumbHash ??
                     item.title.backdropThumbHash
                   }
+                  recyclingKey={item.title.id}
                   className="h-full w-full"
                   contentFit="cover"
                 />
@@ -79,7 +97,7 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
                 <View className="absolute right-2.5 bottom-3 left-2.5">
                   <Text
                     numberOfLines={1}
-                    className="font-sans-medium text-[11px] text-white/60"
+                    className="font-sans-medium text-[11px] text-white/80"
                   >
                     S{item.nextEpisode.seasonNumber} E
                     {item.nextEpisode.episodeNumber}
