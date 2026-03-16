@@ -33,6 +33,7 @@ import { addRecentlyViewed } from "@/lib/recently-viewed";
 
 const FILMOGRAPHY_GAP = 12;
 const FILMOGRAPHY_PADDING = 16;
+const FILMOGRAPHY_GUTTER = FILMOGRAPHY_GAP / 2;
 
 function calculateAge(birthday: string, deathday?: string | null): number {
   const birth = new Date(birthday);
@@ -60,8 +61,14 @@ export default function PersonDetailScreen() {
   const { back } = useRouter();
   const { width: screenWidth } = useWindowDimensions();
   const useAutomaticInsets = process.env.EXPO_OS === "ios";
-  const columnWidth =
-    (screenWidth - FILMOGRAPHY_PADDING * 2 - FILMOGRAPHY_GAP) / 2;
+  const filmographyColumns =
+    screenWidth >= 900 ? 4 : screenWidth >= 600 ? 3 : 2;
+  const columnWidth = Math.floor(
+    (screenWidth -
+      FILMOGRAPHY_PADDING * 2 -
+      FILMOGRAPHY_GAP * (filmographyColumns - 1)) /
+      filmographyColumns,
+  );
 
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const primaryColor = useCSSVariable("--color-primary") as string;
@@ -117,7 +124,12 @@ export default function PersonDetailScreen() {
 
   const renderFilmographyItem = useCallback(
     ({ item: credit }: { item: (typeof filmography)[number] }) => (
-      <View style={{ width: columnWidth, paddingBottom: FILMOGRAPHY_GAP }}>
+      <View
+        style={{
+          paddingBottom: FILMOGRAPHY_GAP,
+          paddingHorizontal: FILMOGRAPHY_GUTTER,
+        }}
+      >
         <PosterCard
           id={credit.titleId}
           tmdbId={credit.tmdbId}
@@ -128,7 +140,7 @@ export default function PersonDetailScreen() {
           releaseDate={credit.releaseDate ?? credit.firstAirDate}
           voteAverage={credit.voteAverage}
           userStatus={userStatuses[credit.titleId] ?? null}
-          width={undefined}
+          width={columnWidth}
           onPress={handlePress}
           onQuickAdd={handleQuickAdd}
           isAdding={addingKey === `${credit.tmdbId}-${credit.type}`}
@@ -360,13 +372,14 @@ export default function PersonDetailScreen() {
           data={filmography}
           keyExtractor={(item) => item.titleId}
           renderItem={renderFilmographyItem}
-          numColumns={2}
+          numColumns={filmographyColumns}
+          showsVerticalScrollIndicator={false}
           contentInsetAdjustmentBehavior={
             useAutomaticInsets ? "automatic" : "never"
           }
           contentContainerStyle={{
             paddingBottom: useAutomaticInsets ? 32 : insets.bottom + 32,
-            paddingHorizontal: FILMOGRAPHY_PADDING,
+            paddingHorizontal: FILMOGRAPHY_PADDING - FILMOGRAPHY_GUTTER,
           }}
           ListHeaderComponent={listHeader}
           onEndReached={() => {
