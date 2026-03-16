@@ -17,6 +17,11 @@ const config = {
         destination: "/docs/api/account/account.removeAvatar",
         permanent: false,
       },
+      {
+        source: "/support",
+        destination: "https://github.com/jakejarvis/sofa/discussions",
+        permanent: false,
+      },
     ];
   },
   async rewrites() {

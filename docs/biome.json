@@ -14,7 +14,7 @@
       "!dist",
       "!build",
       "!.source",
-      "!openapi.json"
+      "!public/openapi.json"
     ]
   },
   "css": {

@@ -1,0 +1,39 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "info": {
+      "en-US": {
+        "title": "Sofa - Movie & TV Tracker",
+        "subtitle": "Companion app for Sofa servers",
+        "promoText": "Sofa connects to your self-hosted server to track movies and TV shows. Log what you watch, manage your watchlist, and auto-track from Plex, Jellyfin, and Emby.",
+        "description": "Sofa Mobile is the companion app for your self-hosted Sofa server. Track movies and TV shows, manage your watchlist, and pick up where you left off — all from your phone.\n\nA running Sofa server is required. Set one up at https://sofa.watch\n\nTRACK EVERYTHING YOU WATCH\nAdd movies and shows to your watchlist, mark them as watching or completed, and rate them on a 5-star scale. For TV shows, track progress down to individual episodes — mark a single episode, an entire season, or jump straight to where you left off.\n\nDISCOVER WHAT'S NEXT\nBrowse trending and popular titles, filter by genre, and get recommendations based on what's already in your library. Search across movies, TV shows, and people. Tap into any actor's filmography to find your next watch.\n\nSEE WHERE TO WATCH\nView streaming availability for any title so you know where to find it before you sit down.\n\nAUTO-TRACK FROM YOUR MEDIA SERVER\nConnect Plex, Jellyfin, or Emby to automatically log what you watch — no manual entry needed. Set up Sonarr and Radarr to sync your watchlist for automatic downloads.\n\nYOUR DATA, YOUR SERVER\nSofa is fully self-hosted. Your watch history, ratings, and library stay on your own server. No accounts with third parties, no data leaving your network unless you want it to.\n\nADMIN ON THE GO\nServer admins can check server health, manage registration settings, and see update notifications right from the app.\n\n• Watchlist, watching, and completed status tracking\n• Per-episode and per-season progress tracking\n• Continue Watching with next-episode info\n• Trending, popular, and personalized recommendations\n• Genre filtering\n• Full cast and filmography browsing\n• Streaming availability\n• Plex, Jellyfin, and Emby webhook integration\n• Sonarr and Radarr watchlist sync\n• Multi-user support with admin controls\n• Email/password and OIDC/SSO authentication",
+        "keywords": [
+          "sofa",
+          "self-hosted",
+          "movie",
+          "tv",
+          "tracker",
+          "watchlist",
+          "plex",
+          "jellyfin",
+          "emby",
+          "sonarr",
+          "radarr",
+          "tmdb",
+          "tracking"
+        ],
+        "marketingUrl": "https://sofa.watch",
+        "supportUrl": "https://sofa.watch/support",
+        "privacyPolicyUrl": "https://sofa.watch/privacy"
+      }
+    },
+    "categories": ["ENTERTAINMENT"],
+    "copyright": "2026 Jake Jarvis",
+    "review": {
+      "demoUsername": "apple-reviewer@sofa.watch",
+      "demoPassword": "cupertino",
+      "demoRequired": true,
+      "notes": "Use https://app-store-demo.sofa.watch to login to the demo account."
+    }
+  }
+}
