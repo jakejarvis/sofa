@@ -1,51 +1,34 @@
+import { Host, List, RNHostView, VStack } from "@expo/ui/swift-ui";
 import {
-  Button,
-  Host,
-  HStack,
-  Image,
-  List,
-  Section,
-  Spacer,
-  Text,
-  VStack,
-} from "@expo/ui/swift-ui";
-import {
-  font,
-  foregroundStyle,
+  deleteDisabled,
+  listRowBackground,
+  listRowInsets,
+  listRowSeparator,
   listStyle,
   onTapGesture,
   scrollContentBackground,
 } from "@expo/ui/swift-ui/modifiers";
-import { IconSearch } from "@tabler/icons-react-native";
+import { IconHistory, IconSearch } from "@tabler/icons-react-native";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
-import { Alert, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import type { SFSymbol } from "sf-symbols-typescript";
 import { useCSSVariable } from "uniwind";
-import { Text as RNText } from "@/components/ui/text";
+import { RecentlyViewedRowContent } from "@/components/search/recently-viewed-row-content";
+import { Text } from "@/components/ui/text";
 import {
   type RecentlyViewedItem,
   useRecentlyViewed,
 } from "@/lib/recently-viewed";
 import * as Haptics from "@/utils/haptics";
 
-const SF_SYMBOL: Record<RecentlyViewedItem["type"], SFSymbol> = {
-  movie: "film",
-  tv: "tv",
-  person: "person.fill",
-};
-
-const TYPE_LABEL: Record<RecentlyViewedItem["type"], string> = {
-  movie: "Movie",
-  tv: "TV Show",
-  person: "Person",
-};
-
 export function RecentlyViewedList() {
   const { navigate } = useRouter();
   const { items, removeItem, clearAll } = useRecentlyViewed();
-  const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
+  const [mutedForeground, primaryColor] = useCSSVariable([
+    "--color-muted-foreground",
+    "--color-primary",
+  ]) as [string, string];
 
   const handlePress = useCallback(
     (item: RecentlyViewedItem) => {
@@ -92,9 +75,9 @@ export function RecentlyViewedList() {
         className="flex-1 items-center justify-center"
       >
         <IconSearch size={64} color={mutedForeground} />
-        <RNText className="mt-3 text-[15px] text-muted-foreground">
+        <Text className="mt-3 text-[15px] text-muted-foreground">
           Search for movies, shows, or people
-        </RNText>
+        </Text>
       </Animated.View>
     );
   }
@@ -105,76 +88,50 @@ export function RecentlyViewedList() {
         <List
           modifiers={[listStyle("plain"), scrollContentBackground("hidden")]}
         >
-          <Section
-            header={
-              <HStack>
-                <Image systemName="clock.arrow.circlepath" size={14} />
-                <Text modifiers={[font({ weight: "semibold", size: 14 })]}>
-                  Recently Viewed
-                </Text>
-                <Spacer />
-                <Button
-                  label="Clear"
-                  onPress={handleClear}
-                  modifiers={[
-                    font({ size: 14 }),
-                    foregroundStyle({
-                      type: "hierarchical",
-                      style: "secondary",
-                    }),
-                  ]}
-                />
-              </HStack>
-            }
+          <VStack
+            modifiers={[
+              listRowBackground("clear"),
+              listRowInsets({ leading: 0, trailing: 0 }),
+              listRowSeparator("hidden"),
+              deleteDisabled(),
+            ]}
           >
-            <List.ForEach onDelete={handleDelete}>
-              {items.map((item) => (
-                <HStack
-                  key={item.id}
-                  spacing={12}
-                  alignment="center"
-                  modifiers={[onTapGesture(() => handlePress(item))]}
+            <RNHostView matchContents>
+              <View className="flex-row items-center justify-between bg-background px-2">
+                <View className="flex-row items-center gap-2">
+                  <IconHistory size={20} color={primaryColor} />
+                  <Text className="font-display text-[20px] text-foreground tracking-tight">
+                    Recently Viewed
+                  </Text>
+                </View>
+                <Pressable
+                  onPress={handleClear}
+                  hitSlop={8}
+                  style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
                 >
-                  <Image
-                    systemName={SF_SYMBOL[item.type]}
-                    size={20}
-                    modifiers={[
-                      foregroundStyle({
-                        type: "hierarchical",
-                        style: "secondary",
-                      }),
-                    ]}
-                  />
-                  <VStack alignment="leading" spacing={2}>
-                    <Text
-                      modifiers={[
-                        font({ weight: "medium", size: 16 }),
-                        foregroundStyle({
-                          type: "hierarchical",
-                          style: "primary",
-                        }),
-                      ]}
-                    >
-                      {item.title}
-                    </Text>
-                    <Text
-                      modifiers={[
-                        font({ size: 13 }),
-                        foregroundStyle({
-                          type: "hierarchical",
-                          style: "secondary",
-                        }),
-                      ]}
-                    >
-                      {TYPE_LABEL[item.type]}
-                      {item.subtitle ? ` · ${item.subtitle}` : ""}
-                    </Text>
-                  </VStack>
-                  <Spacer />
-                </HStack>
-              ))}
-            </List.ForEach>
-          </Section>
+                  <Text className="text-[13px] text-primary">Clear</Text>
+                </Pressable>
+              </View>
+            </RNHostView>
+          </VStack>
+          <List.ForEach onDelete={handleDelete}>
+            {items.map((item) => (
+              <VStack
+                key={item.id}
+                modifiers={[
+                  listRowBackground("clear"),
+                  listRowInsets({ leading: 0, trailing: 0 }),
+                  onTapGesture(() => handlePress(item)),
+                ]}
+              >
+                <RNHostView matchContents>
+                  <View className="bg-background px-2">
+                    <RecentlyViewedRowContent item={item} />
+                  </View>
+                </RNHostView>
+              </VStack>
+            ))}
+          </List.ForEach>
         </List>
       </Host>
     </View>
