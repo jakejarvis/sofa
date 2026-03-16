@@ -5,11 +5,13 @@ import { Pressable, View } from "react-native";
 import Animated, { SlideInUp, SlideOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
+import { authClient } from "@/lib/auth-client";
+import { queryClient } from "@/lib/query-client";
 import { useServerReachability } from "@/lib/server-reachability";
 import * as Haptics from "@/utils/haptics";
 
 export function ServerUnreachableBanner() {
-  const { isReachable, retry } = useServerReachability();
+  const { isReachable } = useServerReachability();
   const insets = useSafeAreaInsets();
   const wasReachable = useRef(true);
 
@@ -40,12 +42,22 @@ export function ServerUnreachableBanner() {
     wasReachable.current = isReachable;
   }, [isReachable]);
 
+  const handleRetry = () => {
+    const refetchSession = authClient.$store.atoms.session.get().refetch;
+
+    void Promise.allSettled([
+      queryClient.resumePausedMutations(),
+      queryClient.refetchQueries({ type: "active" }),
+      refetchSession?.() ?? Promise.resolve(),
+    ]);
+  };
+
   // Only show when device has internet but server is unreachable
   if (isReachable || !isDeviceOnline) return null;
 
   return (
     <Animated.View
-      entering={SlideInUp.duration(300).damping(18)}
+      entering={SlideInUp.duration(300)}
       exiting={SlideOutUp.duration(250)}
       style={{
         position: "absolute",
@@ -61,7 +73,7 @@ export function ServerUnreachableBanner() {
           Can't reach server
         </Text>
         <Pressable
-          onPress={retry}
+          onPress={handleRetry}
           className="ml-1 rounded-md bg-white/20 px-2 py-0.5"
         >
           <Text className="font-sans-medium text-[12px] text-white">Retry</Text>

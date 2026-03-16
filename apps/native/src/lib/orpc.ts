@@ -5,16 +5,16 @@ import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { contract } from "@sofa/api/contract";
 
 import { authClient } from "@/lib/auth-client";
+import { serverFetch } from "@/lib/server-reachability";
 import { getServerUrl } from "@/lib/server-url";
 
 export const link = new RPCLink({
   url: () => `${getServerUrl()}/rpc`,
-  fetch: (url, options) => {
-    return fetch(url, {
+  fetch: (url, options) =>
+    serverFetch(url, {
       ...options,
       credentials: process.env.EXPO_OS === "web" ? "include" : "omit",
-    });
-  },
+    }),
   headers() {
     if (process.env.EXPO_OS === "web") {
       return {};

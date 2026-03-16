@@ -4,6 +4,7 @@ import { createAuthClient } from "better-auth/react";
 import * as SecureStore from "expo-secure-store";
 
 import { queryClient } from "@/lib/query-client";
+import { serverFetch } from "@/lib/server-reachability";
 import {
   getCurrentInstanceId,
   getServerUrl,
@@ -21,6 +22,9 @@ function getStoragePrefix(): string {
 function buildAuthClient() {
   return createAuthClient({
     baseURL: getServerUrl(),
+    fetchOptions: {
+      customFetchImpl: serverFetch,
+    },
     plugins: [
       adminClient(),
       genericOAuthClient(),

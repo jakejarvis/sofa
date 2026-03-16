@@ -1,43 +1,78 @@
+import { focusManager, onlineManager } from "@tanstack/react-query";
+import * as Network from "expo-network";
 import { useEffect, useState } from "react";
-import { AppState } from "react-native";
+import { AppState, type AppStateStatus } from "react-native";
 
-import { getServerUrl, hasStoredServerUrl } from "@/lib/server-url";
+import { onServerUrlChange } from "@/lib/server-url";
 
-const REACHABLE_POLL_MS = 60_000;
-const UNREACHABLE_POLL_MS = 15_000;
-const PROBE_TIMEOUT_MS = 5_000;
-
-// --- Singleton state ---
-
-let isReachable = true; // Optimistic default
+let isReachable = true;
 const listeners: Array<(reachable: boolean) => void> = [];
 
 function notify() {
-  for (const l of listeners) l(isReachable);
+  for (const listener of listeners) {
+    listener(isReachable);
+  }
 }
 
-async function probe(): Promise<boolean> {
-  if (!hasStoredServerUrl() && !process.env.EXPO_PUBLIC_SERVER_URL) return true;
+function setReachable(nextReachable: boolean) {
+  if (isReachable === nextReachable) {
+    return;
+  }
 
-  try {
-    const res = await fetch(`${getServerUrl()}/api/health`, {
-      signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
-    });
-    return res.ok;
-  } catch {
+  isReachable = nextReachable;
+  notify();
+}
+
+function isDeviceOnline(state: Network.NetworkState): boolean {
+  return !!state.isConnected && state.isInternetReachable !== false;
+}
+
+function syncOnlineState(state: Network.NetworkState) {
+  onlineManager.setOnline(isDeviceOnline(state));
+}
+
+function syncAppFocus(state: AppStateStatus) {
+  focusManager.setFocused(state === "active");
+}
+
+export function isNetworkError(error: unknown): error is Error {
+  if (!(error instanceof Error)) {
     return false;
   }
+
+  const message = error.message.toLowerCase();
+  return (
+    message.includes("network request failed") ||
+    message.includes("fetch failed") ||
+    message.includes("load failed") ||
+    message.includes("unable to resolve host") ||
+    message.includes("could not connect") ||
+    message.includes("connection refused") ||
+    message.includes("connection abort") ||
+    message.includes("internet connection appears to be offline") ||
+    message.includes("timed out")
+  );
 }
 
-export async function checkReachability(): Promise<boolean> {
-  const wasReachable = isReachable;
-  isReachable = await probe();
+export async function serverFetch(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> {
+  try {
+    const response = await fetch(input, init);
 
-  if (wasReachable !== isReachable) {
-    notify();
+    // Any HTTP response proves we reached the server, even if the
+    // endpoint itself returned a 4xx/5xx application error.
+    setReachable(true);
+
+    return response;
+  } catch (error) {
+    if (isNetworkError(error)) {
+      setReachable(false);
+    }
+
+    throw error;
   }
-
-  return isReachable;
 }
 
 export function getIsReachable(): boolean {
@@ -48,52 +83,53 @@ export function onServerReachabilityChange(
   callback: (reachable: boolean) => void,
 ): () => void {
   listeners.push(callback);
+
   return () => {
-    const idx = listeners.indexOf(callback);
-    if (idx !== -1) listeners.splice(idx, 1);
+    const index = listeners.indexOf(callback);
+    if (index !== -1) {
+      listeners.splice(index, 1);
+    }
   };
-}
-
-// --- Polling + AppState lifecycle ---
-
-let pollTimer: ReturnType<typeof setTimeout> | null = null;
-
-function schedulePoll() {
-  if (pollTimer) clearTimeout(pollTimer);
-  const interval = isReachable ? REACHABLE_POLL_MS : UNREACHABLE_POLL_MS;
-  pollTimer = setTimeout(async () => {
-    await checkReachability();
-    schedulePoll();
-  }, interval);
 }
 
 export function startReachabilityMonitor(): () => void {
-  checkReachability().then(() => schedulePoll());
+  syncAppFocus(AppState.currentState);
+  void Network.getNetworkStateAsync().then(syncOnlineState);
 
-  const sub = AppState.addEventListener("change", (nextState) => {
-    if (nextState === "active") {
-      checkReachability();
-    }
+  const networkSubscription = Network.addNetworkStateListener(syncOnlineState);
+
+  const appStateSubscription = AppState.addEventListener(
+    "change",
+    (nextState) => {
+      syncAppFocus(nextState);
+
+      if (nextState === "active") {
+        void Network.getNetworkStateAsync().then(syncOnlineState);
+      }
+    },
+  );
+
+  const removeServerUrlListener = onServerUrlChange(() => {
+    setReachable(true);
+    void Network.getNetworkStateAsync().then(syncOnlineState);
   });
 
   return () => {
-    if (pollTimer) {
-      clearTimeout(pollTimer);
-      pollTimer = null;
-    }
-    sub.remove();
+    networkSubscription.remove();
+    appStateSubscription.remove();
+    removeServerUrlListener();
+    focusManager.setFocused(undefined);
+    onlineManager.setOnline(true);
   };
 }
 
-// --- React hook ---
-
 export function useServerReachability() {
-  const [reachable, setReachable] = useState(isReachable);
+  const [reachable, setReachableState] = useState(isReachable);
 
   useEffect(() => {
-    setReachable(isReachable);
-    return onServerReachabilityChange(setReachable);
+    setReachableState(isReachable);
+    return onServerReachabilityChange(setReachableState);
   }, []);
 
-  return { isReachable: reachable, retry: checkReachability };
+  return { isReachable: reachable };
 }
