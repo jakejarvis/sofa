@@ -1,6 +1,7 @@
 import type { Icon } from "@tabler/icons-react-native";
 import { View } from "react-native";
 import { useCSSVariable } from "uniwind";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 
 interface SectionHeaderProps {
@@ -19,8 +20,10 @@ export function SectionHeader({
 
   return (
     <View className="mb-3 flex-row items-center gap-2">
-      {IconComponent && <IconComponent size={20} color={resolvedColor} />}
-      <Text className="font-display text-[20px] text-foreground tracking-tight">
+      {IconComponent && (
+        <ScaledIcon icon={IconComponent} size={20} color={resolvedColor} />
+      )}
+      <Text className="font-display text-foreground text-xl tracking-tight">
         {title}
       </Text>
     </View>

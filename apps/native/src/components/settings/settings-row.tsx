@@ -3,6 +3,7 @@ import { IconChevronRight } from "@tabler/icons-react-native";
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 
 export function SettingsRow({
@@ -29,13 +30,14 @@ export function SettingsRow({
   const content = (
     <>
       {IconComponent && (
-        <IconComponent
+        <ScaledIcon
+          icon={IconComponent}
           size={18}
           color={destructive ? destructiveColor : mutedFgColor}
         />
       )}
       <Text
-        className={`flex-1 text-[15px] ${destructive ? "text-destructive" : "text-foreground"} ${IconComponent ? "ml-2" : ""}`}
+        className={`flex-1 text-base ${destructive ? "text-destructive" : "text-foreground"} ${IconComponent ? "ml-2" : ""}`}
       >
         {label}
       </Text>
@@ -43,14 +45,19 @@ export function SettingsRow({
       {!right && value ? (
         <Text
           selectable={!onPress}
-          className="mr-1 max-w-[180px] shrink text-right text-[14px] text-muted-foreground"
+          className="mr-1 max-w-[180px] shrink text-right text-muted-foreground text-sm"
           numberOfLines={2}
         >
           {value}
         </Text>
       ) : null}
       {!right && onPress && (
-        <IconChevronRight size={16} color={mutedFgColor} accessible={false} />
+        <ScaledIcon
+          icon={IconChevronRight}
+          size={16}
+          color={mutedFgColor}
+          accessible={false}
+        />
       )}
     </>
   );

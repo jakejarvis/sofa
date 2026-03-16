@@ -39,6 +39,7 @@ import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { Image } from "@/components/ui/image";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
@@ -305,7 +306,7 @@ export default function SettingsScreen() {
                     value={nameInput}
                     accessibilityLabel="Display name"
                     onChangeText={setNameInput}
-                    className="min-h-10 flex-1 border-primary border-b py-2 font-sans text-[15px] text-foreground"
+                    className="min-h-10 flex-1 border-primary border-b py-2 font-sans text-base text-foreground"
                     autoFocus
                   />
                   <Pressable
@@ -331,16 +332,16 @@ export default function SettingsScreen() {
                   </Text>
                 </Pressable>
               )}
-              <Text
-                selectable
-                className="mt-0.5 text-[13px] text-muted-foreground"
-              >
+              <Text selectable className="mt-0.5 text-muted-foreground text-sm">
                 {session?.user?.email}
               </Text>
             </View>
             {isAdmin && (
               <View className="rounded-full bg-primary/10 px-2 py-0.5">
-                <Text className="font-medium font-sans text-[10px] text-primary">
+                <Text
+                  maxFontSizeMultiplier={1.0}
+                  className="font-medium font-sans text-primary text-xs"
+                >
                   Admin
                 </Text>
               </View>
@@ -485,7 +486,7 @@ export default function SettingsScreen() {
             />
             {updateCheck.data?.updateCheck?.updateAvailable && (
               <View className="py-3.5">
-                <Text className="font-medium font-sans text-[13px] text-status-completed">
+                <Text className="font-medium font-sans text-sm text-status-completed">
                   Update available: {updateCheck.data.updateCheck.latestVersion}
                 </Text>
               </View>
@@ -501,11 +502,15 @@ export default function SettingsScreen() {
             onPress={() => Linking.openURL(`${serverUrl}/settings`)}
             className="flex-row items-center justify-center py-3.5 active:opacity-70"
           >
-            <IconWorld size={18} color={mutedFgColor} />
-            <Text className="ml-2 flex-1 text-[15px] text-foreground">
+            <ScaledIcon icon={IconWorld} size={18} color={mutedFgColor} />
+            <Text className="ml-2 flex-1 text-base text-foreground">
               Open in browser…
             </Text>
-            <IconArrowUpRight size={16} color={mutedFgColor} />
+            <ScaledIcon
+              icon={IconArrowUpRight}
+              size={16}
+              color={mutedFgColor}
+            />
           </Pressable>
         </SettingsSection>
       </Animated.View>
@@ -538,7 +543,7 @@ export default function SettingsScreen() {
           onPress={() => Linking.openURL("https://github.com/jakejarvis/sofa")}
           className="flex-row items-center gap-1.5 active:opacity-70"
         >
-          <IconBrandGithub size={14} color={mutedFgColor} />
+          <ScaledIcon icon={IconBrandGithub} size={14} color={mutedFgColor} />
           <Text className="text-muted-foreground text-xs">GitHub</Text>
         </Pressable>
       </Animated.View>
@@ -553,7 +558,10 @@ export default function SettingsScreen() {
           className="items-center gap-2 active:opacity-70"
         >
           <TmdbLogo height={12} />
-          <Text className="text-center text-[10px] text-muted-foreground leading-relaxed">
+          <Text
+            maxFontSizeMultiplier={1.0}
+            className="text-center text-muted-foreground text-xs leading-relaxed"
+          >
             This product uses the TMDB API but is not endorsed or certified by
             TMDB.
           </Text>

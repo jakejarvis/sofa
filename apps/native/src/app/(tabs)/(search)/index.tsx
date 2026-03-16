@@ -166,7 +166,7 @@ export default function SearchScreen() {
           entering={FadeIn.duration(300)}
           className="flex-1 items-center justify-center"
         >
-          <Text className="text-[15px] text-muted-foreground">
+          <Text className="text-base text-muted-foreground">
             No results for "{debouncedQuery}"
           </Text>
         </Animated.View>

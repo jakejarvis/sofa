@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Pressable, View } from "react-native";
 import { IntegrationCard } from "@/components/settings/integration-card";
 import { INTEGRATION_CONFIGS } from "@/components/settings/integration-configs";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
@@ -21,7 +22,7 @@ export function IntegrationsSection() {
         </View>
       ) : integrations.isError ? (
         <View className="items-center gap-2 py-4">
-          <Text className="text-[13px] text-muted-foreground">
+          <Text className="text-muted-foreground text-sm">
             Could not load integrations
           </Text>
           <Pressable
@@ -29,8 +30,12 @@ export function IntegrationsSection() {
             className="flex-row items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5"
             style={{ borderCurve: "continuous" }}
           >
-            <IconRefresh size={14} className="accent-primary" />
-            <Text className="font-medium font-sans text-[13px] text-primary">
+            <ScaledIcon
+              icon={IconRefresh}
+              size={14}
+              className="accent-primary"
+            />
+            <Text className="font-medium font-sans text-primary text-sm">
               Retry
             </Text>
           </Pressable>

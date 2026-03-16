@@ -37,7 +37,10 @@ export function HeaderAvatar() {
               />
             ) : (
               <View className="flex-1 items-center justify-center bg-primary/[0.08]">
-                <Text className="font-medium font-sans text-[13px] text-primary">
+                <Text
+                  maxFontSizeMultiplier={1.0}
+                  className="font-medium font-sans text-primary text-sm"
+                >
                   {user.name?.charAt(0)?.toUpperCase() ?? "?"}
                 </Text>
               </View>

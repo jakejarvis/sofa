@@ -20,6 +20,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
 import type { IntegrationConfig } from "@/components/settings/integration-configs";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
@@ -176,13 +177,13 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
         className="flex-row items-center justify-between p-3"
       >
         <View className="flex-row items-center gap-3">
-          <Icon
-            width={18}
-            height={18}
+          <ScaledIcon
+            icon={Icon}
+            size={18}
             color={connection ? primaryColor : mutedFgColor}
           />
           <View>
-            <Text className="font-medium font-sans text-[15px] text-foreground">
+            <Text className="font-medium font-sans text-base text-foreground">
               {label}
             </Text>
             <Text className="mt-0.5 text-muted-foreground text-xs">
@@ -194,7 +195,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
         </View>
 
         <Animated.View style={chevronStyle}>
-          <IconChevronDown size={18} color={mutedFgColor} />
+          <ScaledIcon icon={IconChevronDown} size={18} color={mutedFgColor} />
         </Animated.View>
       </Pressable>
 
@@ -208,12 +209,13 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
           {/* Requirement note */}
           {config.requirementNote && (
             <View className="mb-3 flex-row items-start gap-2 rounded-lg bg-primary/[0.06] px-3 py-2.5">
-              <IconInfoCircle
+              <ScaledIcon
+                icon={IconInfoCircle}
                 size={14}
                 color={primaryColor}
                 className="mt-px"
               />
-              <Text className="flex-1 text-[12px] text-foreground/80">
+              <Text className="flex-1 text-foreground/80 text-xs">
                 {config.requirementNote}
               </Text>
             </View>
@@ -241,7 +243,8 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                 </Text>
                 <View className="flex-row items-center rounded-lg bg-secondary/50 px-3 py-2.5">
                   <Text
-                    className="flex-1 font-mono text-[11px] text-muted-foreground"
+                    maxFontSizeMultiplier={1.0}
+                    className="flex-1 font-mono text-muted-foreground text-xs"
                     numberOfLines={1}
                   >
                     {url}
@@ -254,9 +257,13 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                     hitSlop={8}
                   >
                     {copied ? (
-                      <IconCheck size={16} color="#4ade80" />
+                      <ScaledIcon icon={IconCheck} size={16} color="#4ade80" />
                     ) : (
-                      <IconCopy size={16} color={mutedFgColor} />
+                      <ScaledIcon
+                        icon={IconCopy}
+                        size={16}
+                        color={mutedFgColor}
+                      />
                     )}
                   </Pressable>
                 </View>
@@ -269,8 +276,12 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                   disabled={regenerateMutation.isPending}
                   className="flex-1 flex-row items-center justify-center gap-1.5 rounded-lg bg-secondary py-2.5 active:opacity-80"
                 >
-                  <IconRefresh size={14} color={mutedFgColor} />
-                  <Text className="font-medium font-sans text-[13px] text-foreground">
+                  <ScaledIcon
+                    icon={IconRefresh}
+                    size={14}
+                    color={mutedFgColor}
+                  />
+                  <Text className="font-medium font-sans text-foreground text-sm">
                     Regenerate
                   </Text>
                 </Pressable>
@@ -278,8 +289,8 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                   onPress={handleDisconnect}
                   className="flex-1 flex-row items-center justify-center gap-1.5 rounded-lg bg-destructive/10 py-2.5 active:opacity-80"
                 >
-                  <IconTrash size={14} color="#ef4444" />
-                  <Text className="font-medium font-sans text-[13px] text-destructive">
+                  <ScaledIcon icon={IconTrash} size={14} color="#ef4444" />
+                  <Text className="font-medium font-sans text-destructive text-sm">
                     Disconnect
                   </Text>
                 </Pressable>
@@ -294,7 +305,11 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
               className="flex-row items-center gap-1.5"
             >
               <Animated.View style={setupChevronStyle}>
-                <IconChevronDown size={12} color={mutedFgColor} />
+                <ScaledIcon
+                  icon={IconChevronDown}
+                  size={12}
+                  color={mutedFgColor}
+                />
               </Animated.View>
               <Text className="text-muted-foreground text-xs">
                 Setup instructions

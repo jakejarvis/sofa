@@ -52,7 +52,7 @@ export const Input = forwardRef<
       accessibilityLabelledBy={ctxId}
       placeholderTextColorClassName="accent-muted-foreground/70"
       className={cn(
-        "min-h-12 rounded-[12px] border border-border bg-input px-3.5 py-3 font-sans text-[15px] text-foreground",
+        "min-h-12 rounded-[12px] border border-border bg-input px-3.5 py-3 font-sans text-base text-foreground",
         className,
       )}
       style={[{ borderCurve: "continuous" }, style]}
@@ -73,7 +73,7 @@ export function FieldError({
   return (
     <Text
       selectable
-      className={cn("text-[13px] text-destructive", className)}
+      className={cn("text-destructive text-sm", className)}
       {...props}
     >
       {children}

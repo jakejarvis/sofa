@@ -135,7 +135,7 @@ export function FilterableTitleRow({
 
       {!showLoading && items.length === 0 && selectedGenre !== null ? (
         <View className="items-center py-6">
-          <Text className="text-[13px] text-muted-foreground">
+          <Text className="text-muted-foreground text-sm">
             No titles found for this genre.
           </Text>
         </View>

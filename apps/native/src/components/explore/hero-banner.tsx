@@ -13,6 +13,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
 import { Image } from "@/components/ui/image";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
 import { toast } from "@/lib/toast";
@@ -119,7 +120,7 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
             <View className="mt-2 flex-row items-center gap-2">
               {item.voteAverage != null && item.voteAverage > 0 && (
                 <View className="flex-row items-center gap-1">
-                  <IconStarFilled size={12} color={primary} />
+                  <ScaledIcon icon={IconStarFilled} size={12} color={primary} />
                   <Text className="text-primary text-xs">
                     {item.voteAverage.toFixed(1)}
                   </Text>

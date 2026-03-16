@@ -43,14 +43,16 @@ export function CastCard({
         </View>
         <Text
           numberOfLines={1}
-          className="text-center font-medium font-sans text-[11px] text-foreground"
+          maxFontSizeMultiplier={1.2}
+          className="text-center font-medium font-sans text-foreground text-xs"
         >
           {person.name}
         </Text>
         {person.character ? (
           <Text
             numberOfLines={1}
-            className="text-center text-[10px] text-muted-foreground"
+            maxFontSizeMultiplier={1.0}
+            className="text-center text-muted-foreground text-xs"
           >
             {person.character}
           </Text>

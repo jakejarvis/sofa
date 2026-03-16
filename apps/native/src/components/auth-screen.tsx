@@ -49,7 +49,10 @@ export function AuthScreen({
           ) : (
             <SofaLogo size={48} />
           )}
-          <Text className="mt-1 font-display text-[32px] text-foreground">
+          <Text
+            maxFontSizeMultiplier={1.3}
+            className="mt-1 font-display text-3xl text-foreground"
+          >
             {title}
           </Text>
           {subtitle && (

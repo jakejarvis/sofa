@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Pressable, View } from "react-native";
 import Animated, { SlideInUp, SlideOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
 import { queryClient } from "@/lib/query-client";
@@ -60,17 +61,15 @@ export function ServerUnreachableBanner() {
 
   const content = (
     <>
-      <IconCloudOff size={16} color="white" />
-      <Text className="font-medium font-sans text-[13px] text-white">
+      <ScaledIcon icon={IconCloudOff} size={16} color="white" />
+      <Text className="font-medium font-sans text-sm text-white">
         Can't reach server
       </Text>
       <Pressable
         onPress={handleRetry}
         className="ml-1 rounded-md bg-white/20 px-2 py-0.5"
       >
-        <Text className="font-medium font-sans text-[12px] text-white">
-          Retry
-        </Text>
+        <Text className="font-medium font-sans text-white text-xs">Retry</Text>
       </Pressable>
     </>
   );

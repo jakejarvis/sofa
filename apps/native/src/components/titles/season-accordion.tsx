@@ -12,6 +12,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
 import { EpisodeRow } from "@/components/titles/episode-row";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
@@ -150,7 +151,7 @@ export function SeasonAccordion({
         className="flex-row items-center justify-between p-4"
       >
         <View className="flex-1">
-          <Text className="font-medium font-sans text-[15px] text-foreground">
+          <Text className="font-medium font-sans text-base text-foreground">
             {season.name ?? `Season ${season.seasonNumber}`}
           </Text>
           <Text className="mt-0.5 text-muted-foreground text-xs">
@@ -172,7 +173,7 @@ export function SeasonAccordion({
         </View>
 
         <Animated.View style={chevronStyle}>
-          <IconChevronDown size={18} color={mutedFgColor} />
+          <ScaledIcon icon={IconChevronDown} size={18} color={mutedFgColor} />
         </Animated.View>
       </Pressable>
 

@@ -3,6 +3,7 @@ import { memo } from "react";
 import { Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
 import { Image } from "@/components/ui/image";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 
@@ -80,13 +81,16 @@ export const SearchResultRow = memo(function SearchResultRow({
         <View className="flex-1">
           <Text
             numberOfLines={1}
-            className="font-medium font-sans text-[15px] text-foreground"
+            className="font-medium font-sans text-base text-foreground"
           >
             {item.title}
           </Text>
           <View className="mt-1 flex-row items-center gap-2">
             <View className="rounded-full bg-secondary px-2 py-0.5">
-              <Text className="text-[10px] text-muted-foreground">
+              <Text
+                maxFontSizeMultiplier={1.0}
+                className="text-muted-foreground text-xs"
+              >
                 {item.type === "movie"
                   ? "Movie"
                   : item.type === "tv"
@@ -113,9 +117,9 @@ export const SearchResultRow = memo(function SearchResultRow({
           className="ml-2 items-center justify-center self-stretch"
         >
           {isAdding ? (
-            <IconLoader size={22} color={primary} />
+            <ScaledIcon icon={IconLoader} size={22} color={primary} />
           ) : (
-            <IconPlus size={22} color={primary} />
+            <ScaledIcon icon={IconPlus} size={22} color={primary} />
           )}
         </Pressable>
       )}

@@ -6,6 +6,7 @@ import {
 } from "@tabler/icons-react-native";
 import { View } from "react-native";
 import { useCSSVariable } from "uniwind";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
@@ -44,9 +45,10 @@ export function StatusBadge({ status }: { status: TitleStatus }) {
     <View
       className={`flex-row items-center gap-1.5 rounded-full px-2.5 py-1 ${bgClasses[status]}`}
     >
-      <StatusIcon size={12} color={colorMap[status]} />
+      <ScaledIcon icon={StatusIcon} size={12} color={colorMap[status]} />
       <Text
-        className={`font-medium font-sans text-[11px] ${textClasses[status]}`}
+        maxFontSizeMultiplier={1.0}
+        className={`font-medium font-sans text-xs ${textClasses[status]}`}
       >
         {label}
       </Text>

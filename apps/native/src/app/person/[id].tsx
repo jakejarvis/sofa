@@ -24,6 +24,7 @@ import { useCSSVariable } from "uniwind";
 import { ExpandableText } from "@/components/ui/expandable-text";
 import { Image } from "@/components/ui/image";
 import { PosterCard } from "@/components/ui/poster-card";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
@@ -294,7 +295,7 @@ export default function PersonDetailScreen() {
           )}
         </View>
 
-        <Text className="mt-4 text-center font-display text-[28px] text-foreground">
+        <Text className="mt-4 text-center font-display text-3xl text-foreground">
           {person.name}
         </Text>
 
@@ -311,8 +312,12 @@ export default function PersonDetailScreen() {
           <View className="mt-3 items-center gap-1.5">
             {person.birthday ? (
               <View className="flex-row items-center gap-1.5">
-                <IconCalendar size={14} color={primaryColor} />
-                <Text selectable className="text-[13px] text-muted-foreground">
+                <ScaledIcon
+                  icon={IconCalendar}
+                  size={14}
+                  color={primaryColor}
+                />
+                <Text selectable className="text-muted-foreground text-sm">
                   {format(parseISO(person.birthday), "MMMM d, yyyy")}
                   {(() => {
                     const age = calculateAge(person.birthday, person.deathday);
@@ -325,8 +330,8 @@ export default function PersonDetailScreen() {
             ) : null}
             {person.placeOfBirth ? (
               <View className="flex-row items-center gap-1.5">
-                <IconMapPin size={14} color={primaryColor} />
-                <Text selectable className="text-[13px] text-muted-foreground">
+                <ScaledIcon icon={IconMapPin} size={14} color={primaryColor} />
+                <Text selectable className="text-muted-foreground text-sm">
                   {person.placeOfBirth}
                 </Text>
               </View>

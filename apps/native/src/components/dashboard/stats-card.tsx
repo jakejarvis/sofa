@@ -14,12 +14,12 @@ export function StatsCard({
       style={{ borderCurve: "continuous" }}
     >
       <Text
-        className="font-bold font-sans text-[24px] text-primary"
+        className="font-bold font-sans text-2xl text-primary"
         style={{ fontVariant: ["tabular-nums"] }}
       >
         {value ?? "—"}
       </Text>
-      <Text className="mt-0.5 text-[11px] text-muted-foreground">{label}</Text>
+      <Text className="mt-0.5 text-muted-foreground text-xs">{label}</Text>
     </View>
   );
 }

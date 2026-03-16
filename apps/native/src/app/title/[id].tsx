@@ -36,6 +36,7 @@ import {
   horizontalListStyle,
 } from "@/components/ui/horizontal-list-spacing";
 import { Image } from "@/components/ui/image";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
@@ -444,12 +445,15 @@ export default function TitleDetailScreen() {
               </Text>
               <View className="mt-1.5 flex-row flex-wrap items-center gap-2">
                 <View className="rounded-full bg-title-accent px-2 py-0.5">
-                  <Text className="font-medium font-sans text-[10px] text-title-accent-foreground">
+                  <Text
+                    maxFontSizeMultiplier={1.0}
+                    className="font-medium font-sans text-title-accent-foreground text-xs"
+                  >
                     {title.type === "movie" ? "Movie" : "TV"}
                   </Text>
                 </View>
                 {year ? (
-                  <Text className="text-[13px] text-white/70">{year}</Text>
+                  <Text className="text-sm text-white/70">{year}</Text>
                 ) : null}
                 {title.contentRating ? (
                   <Text className="text-white/50 text-xs">
@@ -458,7 +462,11 @@ export default function TitleDetailScreen() {
                 ) : null}
                 {title.voteAverage != null && title.voteAverage > 0 && (
                   <View className="flex-row items-center gap-0.5">
-                    <IconStarFilled size={12} color={titleAccent} />
+                    <ScaledIcon
+                      icon={IconStarFilled}
+                      size={12}
+                      color={titleAccent}
+                    />
                     <Text className="text-title-accent text-xs">
                       {title.voteAverage.toFixed(1)}
                     </Text>
@@ -483,9 +491,7 @@ export default function TitleDetailScreen() {
                   key={genre}
                   className="mr-2 rounded-full bg-secondary px-2.5 py-1"
                 >
-                  <Text className="text-[11px] text-muted-foreground">
-                    {genre}
-                  </Text>
+                  <Text className="text-muted-foreground text-xs">{genre}</Text>
                 </View>
               ))}
             </ScrollView>
@@ -527,7 +533,11 @@ export default function TitleDetailScreen() {
                   <Spinner size="sm" />
                 ) : (
                   <>
-                    <IconCheck size={16} color={titleAccentForeground} />
+                    <ScaledIcon
+                      icon={IconCheck}
+                      size={16}
+                      color={titleAccentForeground}
+                    />
                     <Text className="font-medium font-sans text-sm text-title-accent-foreground">
                       Mark Watched
                     </Text>
@@ -586,7 +596,8 @@ export default function TitleDetailScreen() {
                     />
                   )}
                   <Text
-                    className="mt-1 max-w-[60px] text-center text-[10px] text-muted-foreground"
+                    maxFontSizeMultiplier={1.0}
+                    className="mt-1 max-w-[60px] text-center text-muted-foreground text-xs"
                     numberOfLines={1}
                   >
                     {offer.providerName}
@@ -633,7 +644,7 @@ export default function TitleDetailScreen() {
         {hydrateMutation.isPending && (
           <View className="items-center py-6">
             <Spinner colorClassName="accent-title-accent" />
-            <Text className="mt-2 text-[13px] text-muted-foreground">
+            <Text className="mt-2 text-muted-foreground text-sm">
               Loading season data...
             </Text>
           </View>

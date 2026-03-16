@@ -32,11 +32,11 @@ export function EmptyState({
       <View accessible={false}>
         <IconComponent size={48} color={mutedForeground} />
       </View>
-      <Text className="mt-3 text-center font-medium font-sans text-[16px] text-foreground">
+      <Text className="mt-3 text-center font-medium font-sans text-base text-foreground">
         {title}
       </Text>
       {description && (
-        <Text className="mt-1 text-center text-[13px] text-muted-foreground">
+        <Text className="mt-1 text-center text-muted-foreground text-sm">
           {description}
         </Text>
       )}

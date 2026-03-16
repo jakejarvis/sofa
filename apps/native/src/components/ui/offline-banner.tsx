@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import Animated, { SlideInUp, SlideOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
 
@@ -52,8 +53,8 @@ export function OfflineBanner() {
       }}
     >
       <View className="mx-4 flex-row items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5">
-        <IconWifiOff size={16} color="white" />
-        <Text className="font-medium font-sans text-[13px] text-white">
+        <ScaledIcon icon={IconWifiOff} size={16} color="white" />
+        <Text className="font-medium font-sans text-sm text-white">
           No internet connection
         </Text>
       </View>

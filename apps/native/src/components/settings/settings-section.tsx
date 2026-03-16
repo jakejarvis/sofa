@@ -33,11 +33,14 @@ export function SettingsSection({
 
   return (
     <View className="mb-6">
-      <View className="mb-2 flex-row items-center gap-2">
+      <View className="flex-row items-center gap-2">
         <SectionHeader title={title} icon={icon} />
         {badge ? (
           <View className="mb-2.5 rounded-full bg-primary/10 px-2 py-0.5">
-            <Text className="font-medium font-sans text-[10px] text-primary">
+            <Text
+              maxFontSizeMultiplier={1.0}
+              className="font-medium font-sans text-primary text-xs"
+            >
               {badge}
             </Text>
           </View>

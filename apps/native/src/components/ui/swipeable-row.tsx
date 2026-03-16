@@ -7,6 +7,7 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import * as Haptics from "@/utils/haptics";
 
 const ACTION_WIDTH = 80;
@@ -26,7 +27,7 @@ function RightAction({ drag }: { drag: SharedValue<number> }) {
       style={{ width: ACTION_WIDTH }}
     >
       <Animated.View style={animatedStyle}>
-        <IconTrash size={22} color="#fff" />
+        <ScaledIcon icon={IconTrash} size={22} color="#fff" />
       </Animated.View>
     </View>
   );

@@ -4,7 +4,7 @@ import { cn } from "@/utils/cn";
 
 export function Text({
   className,
-  maxFontSizeMultiplier,
+  maxFontSizeMultiplier = 1.5,
   ...props
 }: TextProps & { className?: string }) {
   return (

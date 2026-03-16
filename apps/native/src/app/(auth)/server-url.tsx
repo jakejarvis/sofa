@@ -17,6 +17,7 @@ import Animated, {
 import { useCSSVariable } from "uniwind";
 import { AuthScreen } from "@/components/auth-screen";
 import { Button, ButtonLabel } from "@/components/ui/button";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import {
   getServerUrl,
@@ -172,7 +173,7 @@ export default function ServerUrlScreen() {
             returnKeyType="go"
             editable={!isDisabled}
             onSubmitEditing={handleConnect}
-            className="flex-1 py-3 font-mono text-[15px] text-foreground"
+            className="flex-1 py-3 font-mono text-base text-foreground"
           />
         </View>
       </Animated.View>
@@ -188,14 +189,18 @@ export default function ServerUrlScreen() {
               className="size-1.5 rounded-full bg-primary"
               style={dotAnimatedStyle}
             />
-            <Text className="text-[13px] text-muted-foreground">
+            <Text className="text-muted-foreground text-sm">
               Connecting to server...
             </Text>
           </View>
         ) : isSuccess ? (
           <View className="min-h-12 flex-row items-center justify-center gap-1.5 py-2">
-            <IconCircleCheck size={16} color={statusCompletedColor} />
-            <Text className="font-medium font-sans text-[13px] text-status-completed">
+            <ScaledIcon
+              icon={IconCircleCheck}
+              size={16}
+              color={statusCompletedColor}
+            />
+            <Text className="font-medium font-sans text-sm text-status-completed">
               Connected
             </Text>
           </View>
@@ -216,12 +221,13 @@ export default function ServerUrlScreen() {
             entering={FadeIn.duration(200)}
             className="flex-row items-start gap-2 px-1"
           >
-            <IconAlertCircle
+            <ScaledIcon
+              icon={IconAlertCircle}
               size={16}
               color={destructiveColor}
               style={{ marginTop: 1 }}
             />
-            <Text selectable className="flex-1 text-[13px] text-destructive">
+            <Text selectable className="flex-1 text-destructive text-sm">
               {ERROR_MESSAGES[connection.error]}
             </Text>
           </Animated.View>
@@ -236,8 +242,8 @@ export default function ServerUrlScreen() {
           onPress={() => Linking.openURL("https://sofa.watch")}
           className="flex-row items-center gap-1.5"
         >
-          <IconInfoCircle size={16} color={mutedFgColor} />
-          <Text className="font-medium font-sans text-[13px] text-primary">
+          <ScaledIcon icon={IconInfoCircle} size={16} color={mutedFgColor} />
+          <Text className="font-medium font-sans text-primary text-sm">
             Don't have a server?
           </Text>
         </Pressable>

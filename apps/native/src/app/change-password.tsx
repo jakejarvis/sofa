@@ -185,7 +185,7 @@ export default function ChangePasswordScreen() {
               className="flex-row items-center justify-between rounded-xl border border-border bg-input px-3.5 py-3"
               style={{ borderCurve: "continuous" }}
             >
-              <Text className="text-[15px] text-foreground">
+              <Text className="text-base text-foreground">
                 Sign out of other sessions
               </Text>
               <Switch

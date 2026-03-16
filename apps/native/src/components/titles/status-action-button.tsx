@@ -6,6 +6,7 @@ import {
 } from "@tabler/icons-react-native";
 import { Pressable } from "react-native";
 import { useCSSVariable } from "uniwind";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
 
@@ -62,7 +63,12 @@ export function StatusActionButton({
         accessibilityLabel="Add to watchlist"
         className="flex-row items-center gap-1.5 rounded-lg border border-title-accent/20 bg-title-accent/10 px-4 py-2"
       >
-        <IconPlus size={14} color={titleAccent} strokeWidth={2.5} />
+        <ScaledIcon
+          icon={IconPlus}
+          size={14}
+          color={titleAccent}
+          strokeWidth={2.5}
+        />
         <Text className="font-medium font-sans text-sm text-title-accent">
           Watchlist
         </Text>
@@ -84,7 +90,7 @@ export function StatusActionButton({
       accessibilityLabel={`${config.label}, double tap to remove`}
       className={`flex-row items-center gap-1.5 rounded-lg border px-4 py-2 ${config.bgClass}`}
     >
-      <config.Icon size={14} color={iconColor} />
+      <ScaledIcon icon={config.Icon} size={14} color={iconColor} />
       <Text className={`font-medium font-sans text-sm ${config.textClass}`}>
         {config.label}
       </Text>

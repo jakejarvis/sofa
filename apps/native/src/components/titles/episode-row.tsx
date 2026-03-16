@@ -3,6 +3,7 @@ import {
   IconCircleDashed,
 } from "@tabler/icons-react-native";
 import { Pressable, View } from "react-native";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 
 export function EpisodeRow({
@@ -35,9 +36,13 @@ export function EpisodeRow({
       style={{ borderBottomWidth: 0.5 }}
     >
       {isWatched ? (
-        <IconCircleCheckFilled size={22} color={accentColor} />
+        <ScaledIcon
+          icon={IconCircleCheckFilled}
+          size={22}
+          color={accentColor}
+        />
       ) : (
-        <IconCircleDashed size={22} color={mutedColor} />
+        <ScaledIcon icon={IconCircleDashed} size={22} color={mutedColor} />
       )}
       <View className="ml-3 flex-1">
         <Text
@@ -48,7 +53,7 @@ export function EpisodeRow({
           {episode.name ?? `Episode ${episode.episodeNumber}`}
         </Text>
         {episode.airDate ? (
-          <Text className="mt-0.5 text-[11px] text-muted-foreground">
+          <Text className="mt-0.5 text-muted-foreground text-xs">
             {episode.airDate}
           </Text>
         ) : null}

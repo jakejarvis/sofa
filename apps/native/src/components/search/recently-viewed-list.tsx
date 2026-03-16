@@ -76,7 +76,7 @@ export function RecentlyViewedList() {
         className="flex-1 items-center justify-center"
       >
         <IconSearch size={64} color={mutedForeground} />
-        <Text className="mt-3 text-[15px] text-muted-foreground">
+        <Text className="mt-3 text-base text-muted-foreground">
           Search for movies, shows, or people
         </Text>
       </Animated.View>
@@ -98,7 +98,7 @@ export function RecentlyViewedList() {
           >
             <View className="flex-row items-center gap-2">
               <IconHistory size={20} color={primaryColor} />
-              <Text className="font-display text-[20px] text-foreground tracking-tight">
+              <Text className="font-display text-foreground text-xl tracking-tight">
                 Recently Viewed
               </Text>
             </View>
@@ -107,7 +107,7 @@ export function RecentlyViewedList() {
               hitSlop={8}
               style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
             >
-              <Text className="text-[13px] text-primary">Clear</Text>
+              <Text className="text-primary text-sm">Clear</Text>
             </Pressable>
           </Animated.View>
         }

@@ -46,8 +46,38 @@
         "useSortedClasses": {
           "level": "error",
           "options": {
-            "attributes": ["classList"],
-            "functions": ["cn", "clsx", "cva"]
+            "attributes": [
+              "class",
+              "classList",
+              "className",
+              "headerClassName",
+              "contentContainerClassName",
+              "columnWrapperClassName",
+              "endFillColorClassName",
+              "imageClassName",
+              "tintColorClassName",
+              "ios_backgroundColorClassName",
+              "thumbColorClassName",
+              "trackColorOnClassName",
+              "trackColorOffClassName",
+              "selectionColorClassName",
+              "cursorColorClassName",
+              "underlineColorAndroidClassName",
+              "placeholderTextColorClassName",
+              "selectionHandleColorClassName",
+              "colorsClassName",
+              "progressBackgroundColorClassName",
+              "titleColorClassName",
+              "underlayColorClassName",
+              "colorClassName",
+              "backdropColorClassName",
+              "backgroundColorClassName",
+              "statusBarBackgroundColorClassName",
+              "drawerBackgroundColorClassName",
+              "ListFooterComponentClassName",
+              "ListHeaderComponentClassName"
+            ],
+            "functions": ["cn", "clsx", "cva", "useResolveClassNames"]
           }
         }
       }

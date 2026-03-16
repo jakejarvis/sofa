@@ -21,6 +21,7 @@ import Animated, {
 import { useCSSVariable } from "uniwind";
 import * as ContextMenu from "zeego/context-menu";
 import { Image } from "@/components/ui/image";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { client, orpc } from "@/lib/orpc";
@@ -156,7 +157,7 @@ export function PosterCard({
           />
         ) : (
           <View className="flex-1 items-center justify-center bg-secondary p-3">
-            <Text className="text-center font-display text-[13px] text-foreground/[0.44]">
+            <Text className="text-center font-display text-foreground/[0.44] text-sm">
               {title}
             </Text>
           </View>
@@ -207,7 +208,7 @@ export function PosterCard({
             />
           )}
           <Text
-            className="flex-1 font-medium font-sans text-[13px] text-foreground"
+            className="flex-1 font-medium font-sans text-foreground text-sm"
             numberOfLines={1}
           >
             {title}
@@ -215,17 +216,21 @@ export function PosterCard({
         </View>
         <View className="mt-1 flex-row items-center gap-1" accessible={false}>
           {type === "movie" ? (
-            <IconMovie size={12} color={primaryColor} />
+            <ScaledIcon icon={IconMovie} size={12} color={primaryColor} />
           ) : (
-            <IconDeviceTv size={12} color={primaryColor} />
+            <ScaledIcon icon={IconDeviceTv} size={12} color={primaryColor} />
           )}
           {year ? (
-            <Text className="text-[11px] text-muted-foreground">{year}</Text>
+            <Text className="text-muted-foreground text-xs">{year}</Text>
           ) : null}
           {voteAverage != null && voteAverage > 0 && (
             <View className="ml-auto flex-row items-center gap-1">
-              <IconStarFilled size={10} color={primaryColor} />
-              <Text className="text-[11px] text-primary">
+              <ScaledIcon
+                icon={IconStarFilled}
+                size={10}
+                color={primaryColor}
+              />
+              <Text className="text-primary text-xs">
                 {voteAverage.toFixed(1)}
               </Text>
             </View>

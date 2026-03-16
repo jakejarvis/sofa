@@ -12,7 +12,7 @@ export function useTabScreenOptions() {
     "font-display text-foreground",
   );
   const headerTitleStyle = useResolveClassNames(
-    "font-display text-lg text-foreground",
+    "font-display text-foreground text-lg",
   );
   const contentStyle = useResolveClassNames("bg-background");
 

@@ -41,7 +41,7 @@ export function ExpandableText({
       {/* Hidden text without numberOfLines to measure true line count */}
       <Text
         onTextLayout={onMeasureLayout}
-        className="pointer-events-none absolute text-[14px] leading-[22px] opacity-0"
+        className="pointer-events-none absolute text-sm leading-relaxed opacity-0"
       >
         {text}
       </Text>
@@ -49,7 +49,7 @@ export function ExpandableText({
       <Text
         selectable={Platform.OS === "ios"}
         numberOfLines={expanded ? undefined : maxLines}
-        className="text-[14px] text-foreground leading-[22px]"
+        className="text-foreground text-sm leading-relaxed"
       >
         {text}
       </Text>
@@ -61,7 +61,7 @@ export function ExpandableText({
           className="mt-1"
         >
           <Text
-            className="font-medium font-sans text-[13px] text-primary"
+            className="font-medium font-sans text-primary text-sm"
             style={actionColor ? { color: actionColor } : undefined}
           >
             {expanded ? "Show less" : "Show more"}
