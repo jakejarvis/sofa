@@ -1,20 +1,23 @@
+import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
-import react from "@vitejs/plugin-react";
+import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [
     devtools(),
-    tsconfigPaths(),
     tanstackRouter({ target: "react", autoCodeSplitting: true }),
-    react({
-      babel: { plugins: [["babel-plugin-react-compiler"]] },
+    react(),
+    babel({
+      presets: [reactCompilerPreset()],
     }),
     tailwindcss(),
   ],
+  resolve: {
+    tsconfigPaths: true,
+  },
   server: {
     port: 3000,
     proxy: {
