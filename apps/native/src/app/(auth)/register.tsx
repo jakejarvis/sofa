@@ -1,11 +1,12 @@
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
-import { Link, Stack } from "expo-router";
+import { Link } from "expo-router";
 import { useRef } from "react";
 import { Alert, Pressable, type TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { z } from "zod";
 import { AuthScreen } from "@/components/auth-screen";
+import { AuthStackHeader } from "@/components/navigation/auth-stack-header";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
@@ -90,7 +91,7 @@ export default function RegisterScreen() {
         title="Registration Closed"
         subtitle="New account creation is currently disabled."
       >
-        <Stack.Screen options={{ title: "Registration Closed" }} />
+        <AuthStackHeader title="Registration Closed" />
         <Animated.View entering={FadeInDown.duration(300).delay(200)}>
           <Link href="/(auth)/login" asChild>
             <Button className="mt-6 bg-primary">
@@ -106,7 +107,7 @@ export default function RegisterScreen() {
 
   return (
     <AuthScreen title="Create Account">
-      <Stack.Screen options={{ title: "Create Account" }} />
+      <AuthStackHeader title="Create Account" />
       <form.Subscribe
         selector={(state) => ({
           isSubmitting: state.isSubmitting,

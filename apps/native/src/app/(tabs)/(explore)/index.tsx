@@ -1,6 +1,5 @@
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react-native";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { Stack } from "expo-router";
 import { useCallback, useMemo } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
@@ -83,7 +82,6 @@ export default function ExploreScreen() {
         />
       }
     >
-      <Stack.Screen options={{ title: "Explore" }} />
       <View className="gap-8">
         {heroItem && (
           <Animated.View entering={FadeIn.duration(400)}>

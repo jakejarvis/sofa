@@ -14,7 +14,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
@@ -25,6 +25,7 @@ import {
   HorizontalPosterRow,
   type PosterRowItem,
 } from "@/components/dashboard/horizontal-poster-row";
+import { DetailStackHeader } from "@/components/navigation/detail-stack-header";
 import { CastCard } from "@/components/titles/cast-card";
 import { ContinueWatchingBanner } from "@/components/titles/continue-watching-banner";
 import { SeasonAccordion } from "@/components/titles/season-accordion";
@@ -284,15 +285,7 @@ export default function TitleDetailScreen() {
   if (detail.isPending) {
     return (
       <>
-        <Stack.Screen
-          options={{
-            title: "",
-            headerTransparent: true,
-            headerBlurEffect: "none",
-            headerTintColor: "white",
-            headerBackButtonDisplayMode: "minimal",
-          }}
-        />
+        <DetailStackHeader />
         <View className="flex-1 bg-background">
           {/* Hero skeleton */}
           <Skeleton width="100%" height={300} borderRadius={0} />
@@ -322,15 +315,7 @@ export default function TitleDetailScreen() {
   if (!title) {
     return (
       <>
-        <Stack.Screen
-          options={{
-            title: "",
-            headerTransparent: true,
-            headerBlurEffect: "none",
-            headerTintColor: "white",
-            headerBackButtonDisplayMode: "minimal",
-          }}
-        />
+        <DetailStackHeader />
         <View className="flex-1 items-center justify-center bg-background px-6">
           <IconMovie size={48} color={mutedForeground} />
           <Text className="mt-3 font-display text-foreground text-xl">
@@ -348,15 +333,7 @@ export default function TitleDetailScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: "",
-          headerTransparent: true,
-          headerBlurEffect: "none",
-          headerTintColor: "white",
-          headerBackButtonDisplayMode: "minimal",
-        }}
-      />
+      <DetailStackHeader title={title.title} />
       <ScrollView
         className="bg-background"
         contentInsetAdjustmentBehavior={
@@ -424,17 +401,19 @@ export default function TitleDetailScreen() {
 
           <View className="absolute right-0 bottom-0 left-0 flex-row items-end p-4">
             {title.posterPath && (
-              <View
-                className="mr-3 h-[150px] w-[100px] overflow-hidden rounded-lg"
-                style={[{ borderCurve: "continuous" }, posterShadowStyle]}
-              >
-                <Image
-                  source={{ uri: title.posterPath }}
-                  thumbHash={title.posterThumbHash}
-                  style={titleDetailStyles.posterImage}
-                  contentFit="cover"
-                />
-              </View>
+              <Link.AppleZoomTarget>
+                <View
+                  className="mr-3 h-[150px] w-[100px] overflow-hidden rounded-lg"
+                  style={[{ borderCurve: "continuous" }, posterShadowStyle]}
+                >
+                  <Image
+                    source={{ uri: title.posterPath }}
+                    thumbHash={title.posterThumbHash}
+                    style={titleDetailStyles.posterImage}
+                    contentFit="cover"
+                  />
+                </View>
+              </Link.AppleZoomTarget>
             )}
             <View className="flex-1 pb-1">
               <Text

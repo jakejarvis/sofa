@@ -12,6 +12,7 @@ import {
   browseLookupKey,
   getBrowsePosterThumbHashes,
 } from "./browse-thumbhashes";
+import { getBrowseTitleIds } from "./browse-title-ids";
 
 function requireTmdb() {
   if (!isTmdbConfigured()) {
@@ -49,18 +50,33 @@ export const trending = os.explore.trending
           voteAverage: (r.vote_average as number | undefined) ?? null,
         };
       });
-    const posterThumbHashes = getBrowsePosterThumbHashes(baseItems);
-    const items = baseItems.map((item) => ({
-      ...item,
-      posterThumbHash: posterThumbHashes.get(browseLookupKey(item)) ?? null,
-    }));
-
     const heroResult = results.find(
       (r) =>
         r.backdrop_path && (r.media_type === "movie" || r.media_type === "tv"),
     );
+    const titleIdsByLookup = getBrowseTitleIds([
+      ...baseItems.map((item) => ({ tmdbId: item.tmdbId, type: item.type })),
+      ...(heroResult
+        ? [
+            {
+              tmdbId: heroResult.id as number,
+              type: heroResult.media_type as "movie" | "tv",
+            },
+          ]
+        : []),
+    ]);
+    const posterThumbHashes = getBrowsePosterThumbHashes(baseItems);
+    const items = baseItems.map((item) => ({
+      ...item,
+      id: titleIdsByLookup[browseLookupKey(item)],
+      posterThumbHash: posterThumbHashes.get(browseLookupKey(item)) ?? null,
+    }));
+
     const hero = heroResult
       ? {
+          id: titleIdsByLookup[
+            `${heroResult.id as number}-${heroResult.media_type as "movie" | "tv"}`
+          ],
           tmdbId: heroResult.id as number,
           type: heroResult.media_type as "movie" | "tv",
           title:
@@ -111,9 +127,13 @@ export const popular = os.explore.popular
         firstAirDate: (r.first_air_date as string | undefined) ?? null,
         voteAverage: (r.vote_average as number | undefined) ?? null,
       }));
+    const titleIdsByLookup = getBrowseTitleIds(
+      baseItems.map((item) => ({ tmdbId: item.tmdbId, type: item.type })),
+    );
     const posterThumbHashes = getBrowsePosterThumbHashes(baseItems);
     const items = baseItems.map((item) => ({
       ...item,
+      id: titleIdsByLookup[browseLookupKey(item)],
       posterThumbHash: posterThumbHashes.get(browseLookupKey(item)) ?? null,
     }));
 

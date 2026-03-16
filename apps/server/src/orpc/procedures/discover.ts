@@ -12,6 +12,7 @@ import {
   browseLookupKey,
   getBrowsePosterThumbHashes,
 } from "./browse-thumbhashes";
+import { getBrowseTitleIds } from "./browse-title-ids";
 
 export const discover = os.discover
   .use(authed)
@@ -50,9 +51,13 @@ export const discover = os.discover
         firstAirDate: (r.first_air_date as string | undefined) ?? null,
         voteAverage: r.vote_average ?? null,
       }));
+    const titleIdsByLookup = getBrowseTitleIds(
+      baseItems.map((item) => ({ tmdbId: item.tmdbId, type: item.type })),
+    );
     const posterThumbHashes = getBrowsePosterThumbHashes(baseItems);
     const items = baseItems.map((item) => ({
       ...item,
+      id: titleIdsByLookup[browseLookupKey(item)],
       posterThumbHash: posterThumbHashes.get(browseLookupKey(item)) ?? null,
     }));
 

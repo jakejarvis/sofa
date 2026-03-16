@@ -28,10 +28,12 @@ export function FilterableTitleRow({
   icon: Icon;
   mediaType: "movie" | "tv";
   defaultItems: Array<{
+    id?: string;
     tmdbId: number;
     title: string;
     type: string;
     posterPath: string | null;
+    posterThumbHash?: string | null;
     releaseDate?: string | null;
     firstAirDate?: string | null;
     voteAverage?: number | null;

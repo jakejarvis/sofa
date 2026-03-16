@@ -1,6 +1,6 @@
 import { IconStarFilled } from "@tabler/icons-react-native";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -19,6 +19,7 @@ import { orpc } from "@/lib/orpc";
 import { toast } from "@/lib/toast";
 
 export interface HeroBannerItem {
+  id?: string;
   tmdbId: number;
   title: string;
   type: string;
@@ -72,8 +73,11 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
   ]
     .filter(Boolean)
     .join(", ");
+  const titleHref = item.id
+    ? (`/title/${item.id}` as `/title/${string}`)
+    : null;
 
-  return (
+  const bannerContent = (
     <GestureDetector gesture={tapGesture}>
       <Animated.View
         className="mx-4 overflow-hidden rounded-2xl"
@@ -87,7 +91,7 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
         ]}
       >
         <Pressable
-          onPress={handlePress}
+          onPress={titleHref ? undefined : handlePress}
           accessible
           accessibilityRole="button"
           accessibilityLabel={accessibilityLabel}
@@ -135,4 +139,15 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
       </Animated.View>
     </GestureDetector>
   );
+
+  if (titleHref) {
+    return (
+      <Link href={titleHref}>
+        <Link.Trigger>{bannerContent}</Link.Trigger>
+        <Link.Preview />
+      </Link>
+    );
+  }
+
+  return bannerContent;
 }

@@ -1,6 +1,5 @@
-import { Stack } from "expo-router";
-import { useTabScreenOptions } from "@/hooks/use-tab-screen-options";
+import { TabStack } from "@/components/navigation/tab-stack";
 
 export default function ExploreLayout() {
-  return <Stack screenOptions={useTabScreenOptions()} />;
+  return <TabStack title="Explore" />;
 }

@@ -142,17 +142,22 @@ export default function SearchScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <Stack.Screen
-        options={{
-          headerTransparent: false,
-          headerStyle: { backgroundColor: "#000" },
-          headerLargeStyle: { backgroundColor: "#000" },
-          headerSearchBarOptions: {
-            placeholder: "Search movies, shows, people...",
-            onChangeText: (e) => setQuery(e.nativeEvent.text),
-            hideWhenScrolling: false,
-          },
-        }}
+      <Stack.Header
+        transparent={false}
+        style={{ backgroundColor: "#000" }}
+        largeStyle={{ backgroundColor: "#000" }}
+      />
+      <Stack.Screen.Title>Search</Stack.Screen.Title>
+      <Stack.SearchBar
+        placeholder="Search movies, shows, people..."
+        onChangeText={(e) => setQuery(e.nativeEvent.text)}
+        onCancelButtonPress={() => setQuery("")}
+        onClose={() => setQuery("")}
+        hideWhenScrolling={false}
+        placement={process.env.EXPO_OS === "ios" ? "integrated" : undefined}
+        allowToolbarIntegration={
+          process.env.EXPO_OS === "ios" ? true : undefined
+        }
       />
 
       {debouncedQuery.length === 0 ? (

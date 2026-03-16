@@ -20,7 +20,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as Application from "expo-application";
 import * as ImagePicker from "expo-image-picker";
-import { Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   Alert,
@@ -218,8 +218,6 @@ export default function SettingsScreen() {
         />
       }
     >
-      <Stack.Screen options={{ title: "Settings" }} />
-
       {/* Account */}
       <Animated.View entering={FadeInDown.duration(300).delay(100)}>
         <SettingsSection title="Account" icon={IconUser}>

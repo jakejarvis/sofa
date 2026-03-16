@@ -67,7 +67,6 @@ export const unstable_settings = {
 const changePasswordOptions =
   process.env.EXPO_OS === "ios"
     ? {
-        title: "Change Password",
         headerShown: true,
         presentation: "formSheet" as const,
         sheetAllowedDetents: "fitToContents" as const,
@@ -77,7 +76,6 @@ const changePasswordOptions =
         headerBlurEffect: "none" as const,
       }
     : {
-        title: "Change Password",
         headerShown: true,
         presentation: "modal" as const,
         headerLargeTitle: false,
@@ -239,10 +237,6 @@ function AppContent() {
             dangerouslySingular
             options={{
               headerShown: true,
-              headerTransparent: true,
-              headerBlurEffect: "none",
-              headerTintColor: "white",
-              headerBackButtonDisplayMode: "minimal",
               animation: "slide_from_right",
             }}
           />
@@ -251,10 +245,6 @@ function AppContent() {
             dangerouslySingular
             options={{
               headerShown: true,
-              headerTransparent: true,
-              headerBlurEffect: "none",
-              headerTintColor: "white",
-              headerBackButtonDisplayMode: "minimal",
               animation: "slide_from_right",
             }}
           />

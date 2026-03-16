@@ -92,7 +92,7 @@ export default function ChangePasswordScreen() {
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
     >
-      <Stack.Screen options={{ title: "Change Password" }} />
+      <Stack.Screen.Title>Change Password</Stack.Screen.Title>
 
       <form.Subscribe
         selector={(state) => ({

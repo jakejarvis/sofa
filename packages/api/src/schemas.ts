@@ -451,6 +451,10 @@ export const PersonCreditSchema = z
 /** Reusable TMDB browse result (trending / popular / discover items) */
 export const TmdbBrowseItem = z
   .object({
+    id: z
+      .string()
+      .optional()
+      .describe("Internal title ID when the title already exists locally"),
     tmdbId: z.number().describe("TMDB numeric ID"),
     type: mediaType,
     title: z.string().describe("Display title"),
@@ -690,6 +694,10 @@ export const TrendingOutput = z
     items: z.array(TmdbBrowseItem).describe("Trending titles"),
     hero: z
       .object({
+        id: z
+          .string()
+          .optional()
+          .describe("Internal title ID when the title already exists locally"),
         tmdbId: z.number().describe("TMDB numeric ID"),
         type: mediaType,
         title: z.string().describe("Display title"),

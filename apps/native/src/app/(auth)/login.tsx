@@ -1,11 +1,12 @@
 import { useForm } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
-import { Link, Stack } from "expo-router";
+import { Link } from "expo-router";
 import { useRef } from "react";
 import { Alert, Pressable, type TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { z } from "zod";
 import { AuthScreen } from "@/components/auth-screen";
+import { AuthStackHeader } from "@/components/navigation/auth-stack-header";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
@@ -73,7 +74,7 @@ export default function LoginScreen() {
 
   return (
     <AuthScreen title="Sofa" subtitle="Sign in to continue">
-      <Stack.Screen options={{ title: "Sign In" }} />
+      <AuthStackHeader title="Sign In" />
       {showOidc && (
         <Animated.View
           entering={FadeInDown.duration(300).delay(100)}

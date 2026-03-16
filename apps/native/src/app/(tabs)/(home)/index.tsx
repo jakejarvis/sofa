@@ -5,7 +5,7 @@ import {
   IconThumbUp,
 } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
-import { Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -91,7 +91,6 @@ export default function DashboardScreen() {
         />
       }
     >
-      <Stack.Screen options={{ title: "Home" }} />
       <View className="gap-8">
         {/* Stats */}
         <Animated.View entering={FadeInDown.duration(300).delay(100)}>

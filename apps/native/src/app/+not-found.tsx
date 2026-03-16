@@ -12,7 +12,7 @@ export default function NotFoundScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: "Not Found" }} />
+      <Stack.Screen.Title>Not Found</Stack.Screen.Title>
       <Container>
         <View className="flex-1 items-center justify-center p-4">
           <Animated.View

@@ -10,7 +10,7 @@ import {
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { format } from "date-fns/format";
 import { parseISO } from "date-fns/parseISO";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
 import {
   ActivityIndicator,
@@ -21,6 +21,7 @@ import {
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
+import { DetailStackHeader } from "@/components/navigation/detail-stack-header";
 import { ExpandableText } from "@/components/ui/expandable-text";
 import { Image } from "@/components/ui/image";
 import { PosterCard } from "@/components/ui/poster-card";
@@ -164,15 +165,7 @@ export default function PersonDetailScreen() {
   if (isPending) {
     return (
       <>
-        <Stack.Screen
-          options={{
-            title: "",
-            headerTransparent: true,
-            headerBlurEffect: "none",
-            headerTintColor: "white",
-            headerBackButtonDisplayMode: "minimal",
-          }}
-        />
+        <DetailStackHeader />
         <View
           className="flex-1 items-center bg-background"
           style={{ paddingTop: headerHeight + 24 }}
@@ -207,15 +200,7 @@ export default function PersonDetailScreen() {
   if (isError && !data) {
     return (
       <>
-        <Stack.Screen
-          options={{
-            title: "",
-            headerTransparent: true,
-            headerBlurEffect: "none",
-            headerTintColor: "white",
-            headerBackButtonDisplayMode: "minimal",
-          }}
-        />
+        <DetailStackHeader />
         <View
           className="flex-1 items-center justify-center bg-background"
           style={{ paddingTop: insets.top }}
@@ -243,15 +228,7 @@ export default function PersonDetailScreen() {
   if (!person) {
     return (
       <>
-        <Stack.Screen
-          options={{
-            title: "",
-            headerTransparent: true,
-            headerBlurEffect: "none",
-            headerTintColor: "white",
-            headerBackButtonDisplayMode: "minimal",
-          }}
-        />
+        <DetailStackHeader />
         <View
           className="flex-1 items-center justify-center bg-background"
           style={{ paddingTop: insets.top }}
@@ -363,15 +340,7 @@ export default function PersonDetailScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: "",
-          headerTransparent: true,
-          headerBlurEffect: "none",
-          headerTintColor: "white",
-          headerBackButtonDisplayMode: "minimal",
-        }}
-      />
+      <DetailStackHeader title={person.name} />
       <View className="flex-1 bg-background">
         <FlashList
           data={filmography}

@@ -1,0 +1,101 @@
+import { Stack } from "expo-router";
+import type { ReactNode } from "react";
+import { useCSSVariable, useResolveClassNames } from "uniwind";
+import { HeaderAvatar } from "@/components/header-avatar";
+
+const hiddenScrollEdgeEffects = {
+  top: "hidden" as const,
+  bottom: "hidden" as const,
+  left: "hidden" as const,
+  right: "hidden" as const,
+};
+
+export function TabStack({
+  title,
+  children,
+}: {
+  title?: string;
+  children?: ReactNode;
+}) {
+  const contentStyle = useResolveClassNames("bg-background");
+  const tintColor = useCSSVariable("--color-primary") as string;
+  const backgroundColor = useCSSVariable("--color-background") as string;
+  const iosHeaderLargeTitleStyle = useResolveClassNames(
+    "font-display text-foreground",
+  );
+  const iosHeaderTitleStyle = useResolveClassNames(
+    "font-display text-foreground text-lg",
+  );
+  const androidHeaderTitleStyle = useResolveClassNames(
+    "font-sans font-semibold text-foreground text-lg",
+  );
+
+  if (process.env.EXPO_OS === "ios") {
+    return (
+      <Stack
+        screenOptions={{
+          contentStyle,
+          scrollEdgeEffects: hiddenScrollEdgeEffects,
+          unstable_headerRightItems: () => [
+            {
+              type: "custom" as const,
+              element: <HeaderAvatar />,
+              hidesSharedBackground: true,
+            },
+          ],
+        }}
+      >
+        {title ? (
+          <Stack.Screen name="index">
+            <Stack.Header
+              transparent
+              blurEffect="dark"
+              style={{ color: tintColor, shadowColor: "transparent" }}
+              largeStyle={{
+                backgroundColor: "transparent",
+                shadowColor: "transparent",
+              }}
+            />
+            <Stack.Screen.Title
+              large
+              style={iosHeaderTitleStyle as Record<string, unknown>}
+              largeStyle={iosHeaderLargeTitleStyle as Record<string, unknown>}
+            >
+              {title}
+            </Stack.Screen.Title>
+          </Stack.Screen>
+        ) : null}
+        {children}
+      </Stack>
+    );
+  }
+
+  return (
+    <Stack
+      screenOptions={{
+        contentStyle,
+        headerTitleAlign: "left",
+        headerRight: () => <HeaderAvatar />,
+      }}
+    >
+      {title ? (
+        <Stack.Screen name="index">
+          <Stack.Header
+            transparent={false}
+            style={{
+              backgroundColor,
+              color: tintColor,
+              shadowColor: "transparent",
+            }}
+          />
+          <Stack.Screen.Title
+            style={androidHeaderTitleStyle as Record<string, unknown>}
+          >
+            {title}
+          </Stack.Screen.Title>
+        </Stack.Screen>
+      ) : null}
+      {children}
+    </Stack>
+  );
+}

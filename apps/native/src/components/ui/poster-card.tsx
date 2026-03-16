@@ -8,6 +8,7 @@ import {
   IconPlus,
   IconStarFilled,
 } from "@tabler/icons-react-native";
+import { Link } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -272,19 +273,25 @@ export function PosterCard({
 
   // Cards with id: use context menu with navigation
   if (id) {
+    const titleHref = `/title/${id}` as `/title/${string}`;
+
     return (
       <ContextMenu.Root>
         <ContextMenu.Trigger>
           <GestureDetector gesture={pressGesture}>
             <Animated.View style={[animatedStyle, { width }]}>
               <View>
-                <Pressable
-                  onPress={handlePressAction}
-                  accessibilityRole="button"
-                  accessibilityLabel={cardAccessibilityLabel}
-                >
-                  {cardContent}
-                </Pressable>
+                <Link href={titleHref}>
+                  <Link.Trigger withAppleZoom>
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={cardAccessibilityLabel}
+                    >
+                      {cardContent}
+                    </Pressable>
+                  </Link.Trigger>
+                  <Link.Preview />
+                </Link>
                 {quickAddButton}
               </View>
             </Animated.View>

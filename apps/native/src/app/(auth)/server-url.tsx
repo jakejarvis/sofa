@@ -3,7 +3,7 @@ import {
   IconCircleCheck,
   IconInfoCircle,
 } from "@tabler/icons-react-native";
-import { Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Linking, Pressable, TextInput, View } from "react-native";
 import Animated, {
@@ -16,6 +16,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
 import { AuthScreen } from "@/components/auth-screen";
+import { AuthStackHeader } from "@/components/navigation/auth-stack-header";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
@@ -152,7 +153,7 @@ export default function ServerUrlScreen() {
       subtitle="Enter your Sofa server URL to get started"
       logoStyle={iconAnimatedStyle}
     >
-      <Stack.Screen options={{ title: "Server" }} />
+      <AuthStackHeader title="Server" />
       <Animated.View entering={FadeInDown.duration(300).delay(200)}>
         <View
           className="min-h-12 flex-row items-center rounded-[12px] border border-border bg-input px-3.5"
