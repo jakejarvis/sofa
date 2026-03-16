@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import type { NativeSyntheticEvent, TextLayoutEventData } from "react-native";
-import { Pressable, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 
 export function ExpandableText({
@@ -45,8 +45,9 @@ export function ExpandableText({
       >
         {text}
       </Text>
+      {/* selectable on Android uses EditText internally, which ignores numberOfLines and scrolls instead */}
       <Text
-        selectable
+        selectable={Platform.OS === "ios"}
         numberOfLines={expanded ? undefined : maxLines}
         className="text-[14px] text-foreground leading-[22px]"
       >

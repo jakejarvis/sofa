@@ -13,7 +13,7 @@ type TitleStatus = "watchlist" | "in_progress" | "completed";
 
 const statusConfig = {
   watchlist: {
-    label: "Watchlist",
+    label: "Watchlisted",
     Icon: IconBookmarkFilled,
     bgClass: "bg-title-accent/10 border-title-accent/20",
     textClass: "text-title-accent",
@@ -41,11 +41,10 @@ export function StatusActionButton({
   onStatusChange: (status: TitleStatus | null) => void;
   isPending: boolean;
 }) {
-  const [titleAccent, completedColor, watchlistColor] = useCSSVariable([
+  const [titleAccent, completedColor] = useCSSVariable([
     "--color-title-accent",
     "--color-status-completed",
-    "--color-status-watchlist",
-  ]) as [string, string, string];
+  ]) as [string, string];
 
   const config = currentStatus
     ? statusConfig[currentStatus as keyof typeof statusConfig]
@@ -72,11 +71,7 @@ export function StatusActionButton({
   }
 
   const iconColor =
-    currentStatus === "completed"
-      ? completedColor
-      : currentStatus === "watchlist"
-        ? watchlistColor
-        : titleAccent;
+    currentStatus === "completed" ? completedColor : titleAccent;
 
   return (
     <Pressable

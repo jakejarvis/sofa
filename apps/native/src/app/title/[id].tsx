@@ -285,7 +285,7 @@ export default function TitleDetailScreen() {
       <>
         <Stack.Screen
           options={{
-            title: "Title",
+            title: "",
             headerTransparent: true,
             headerBlurEffect: "none",
             headerTintColor: "white",
@@ -323,7 +323,7 @@ export default function TitleDetailScreen() {
       <>
         <Stack.Screen
           options={{
-            title: "Title",
+            title: "",
             headerTransparent: true,
             headerBlurEffect: "none",
             headerTintColor: "white",
@@ -349,7 +349,7 @@ export default function TitleDetailScreen() {
     <>
       <Stack.Screen
         options={{
-          title: title.title,
+          title: "",
           headerTransparent: true,
           headerBlurEffect: "none",
           headerTintColor: "white",

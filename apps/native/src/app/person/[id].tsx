@@ -165,7 +165,7 @@ export default function PersonDetailScreen() {
       <>
         <Stack.Screen
           options={{
-            title: "Person",
+            title: "",
             headerTransparent: true,
             headerBlurEffect: "none",
             headerTintColor: "white",
@@ -208,7 +208,7 @@ export default function PersonDetailScreen() {
       <>
         <Stack.Screen
           options={{
-            title: "Person",
+            title: "",
             headerTransparent: true,
             headerBlurEffect: "none",
             headerTintColor: "white",
@@ -244,7 +244,7 @@ export default function PersonDetailScreen() {
       <>
         <Stack.Screen
           options={{
-            title: "Person",
+            title: "",
             headerTransparent: true,
             headerBlurEffect: "none",
             headerTintColor: "white",
@@ -360,7 +360,7 @@ export default function PersonDetailScreen() {
     <>
       <Stack.Screen
         options={{
-          title: person.name,
+          title: "",
           headerTransparent: true,
           headerBlurEffect: "none",
           headerTintColor: "white",
