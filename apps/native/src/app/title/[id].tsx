@@ -30,6 +30,11 @@ import { ContinueWatchingBanner } from "@/components/titles/continue-watching-ba
 import { SeasonAccordion } from "@/components/titles/season-accordion";
 import { StatusActionButton } from "@/components/titles/status-action-button";
 import { ExpandableText } from "@/components/ui/expandable-text";
+import {
+  HorizontalListSeparator,
+  horizontalListContentStyle,
+  horizontalListStyle,
+} from "@/components/ui/horizontal-list-spacing";
 import { Image } from "@/components/ui/image";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -42,8 +47,6 @@ import { queryClient } from "@/lib/query-client";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
 import { toast } from "@/lib/toast";
 
-const castListContentStyle = { gap: 12, paddingHorizontal: 16 };
-const castListStyle = { overflow: "visible" as const };
 const titleGenresContentStyle = { paddingHorizontal: 16 };
 const titleAvailabilityContentStyle = { gap: 8, paddingHorizontal: 16 };
 const titleDetailStyles = StyleSheet.create({
@@ -655,8 +658,9 @@ export default function TitleDetailScreen() {
               data={cast}
               keyExtractor={(item, index) => `${item.id}-${index}`}
               renderItem={renderCastItem}
-              contentContainerStyle={castListContentStyle}
-              style={castListStyle}
+              ItemSeparatorComponent={HorizontalListSeparator}
+              contentContainerStyle={horizontalListContentStyle}
+              style={horizontalListStyle}
             />
           </Animated.View>
         )}

@@ -1,6 +1,11 @@
 import { FlashList } from "@shopify/flash-list";
 import { useCallback } from "react";
 
+import {
+  HorizontalListSeparator,
+  horizontalListContentStyle,
+  horizontalListStyle,
+} from "@/components/ui/horizontal-list-spacing";
 import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
 import { usePosterActions } from "@/hooks/use-poster-actions";
 
@@ -17,9 +22,6 @@ export interface PosterRowItem {
   userStatus?: "watchlist" | "in_progress" | "completed" | null;
   episodeProgress?: { watched: number; total: number } | null;
 }
-
-const listContentStyle = { gap: 12, paddingHorizontal: 16 };
-const listStyle = { overflow: "visible" as const };
 
 export function HorizontalPosterRow({
   items,
@@ -65,8 +67,9 @@ export function HorizontalPosterRow({
         data={[1, 2, 3, 4]}
         keyExtractor={(item) => String(item)}
         renderItem={() => <PosterCardSkeleton />}
-        contentContainerStyle={listContentStyle}
-        style={listStyle}
+        ItemSeparatorComponent={HorizontalListSeparator}
+        contentContainerStyle={horizontalListContentStyle}
+        style={horizontalListStyle}
       />
     );
   }
@@ -78,8 +81,9 @@ export function HorizontalPosterRow({
       data={items}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
-      contentContainerStyle={listContentStyle}
-      style={listStyle}
+      ItemSeparatorComponent={HorizontalListSeparator}
+      contentContainerStyle={horizontalListContentStyle}
+      style={horizontalListStyle}
     />
   );
 }

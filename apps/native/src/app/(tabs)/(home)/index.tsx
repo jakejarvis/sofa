@@ -14,14 +14,16 @@ import { ContinueWatchingCard } from "@/components/dashboard/continue-watching-c
 import { HorizontalPosterRow } from "@/components/dashboard/horizontal-poster-row";
 import { StatsCard } from "@/components/dashboard/stats-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import {
+  HorizontalListSeparator,
+  horizontalListContentStyle,
+  horizontalListStyle,
+} from "@/components/ui/horizontal-list-spacing";
 import { SectionHeader } from "@/components/ui/section-header";
 import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 
-const horizontalListStyle = { overflow: "visible" as const };
-const statsListContentStyle = { gap: 12, paddingHorizontal: 16 };
-const continueWatchingContentStyle = { gap: 12, paddingHorizontal: 16 };
 const dashboardContentContainerStyle = {
   paddingTop: 8,
   paddingBottom: 16,
@@ -99,7 +101,8 @@ export default function DashboardScreen() {
             data={statsData}
             keyExtractor={(item) => item.label}
             renderItem={renderStatItem}
-            contentContainerStyle={statsListContentStyle}
+            ItemSeparatorComponent={HorizontalListSeparator}
+            contentContainerStyle={horizontalListContentStyle}
             style={horizontalListStyle}
           />
         </Animated.View>
@@ -116,7 +119,8 @@ export default function DashboardScreen() {
               data={continueWatching.data?.items ?? []}
               keyExtractor={(item) => item.title.id}
               renderItem={renderContinueWatchingItem}
-              contentContainerStyle={continueWatchingContentStyle}
+              ItemSeparatorComponent={HorizontalListSeparator}
+              contentContainerStyle={horizontalListContentStyle}
               style={horizontalListStyle}
             />
           </Animated.View>
