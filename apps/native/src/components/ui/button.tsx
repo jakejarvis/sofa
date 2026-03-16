@@ -67,7 +67,7 @@ export function ButtonLabel({ style, className, ...props }: ButtonLabelProps) {
   return (
     <Text
       className={cn(
-        "text-center font-sans-medium text-[15px]",
+        "text-center font-medium font-sans text-[15px]",
         variant === "secondary"
           ? "text-secondary-foreground"
           : "text-primary-foreground",

@@ -28,7 +28,7 @@ export function GenreChip({
       className={`mr-2 rounded-full px-3 py-1.5 ${isSelected ? "bg-primary" : "bg-secondary"}`}
     >
       <Text
-        className={`font-sans-medium text-[12px] ${isSelected ? "text-primary-foreground" : "text-foreground"}`}
+        className={`font-medium font-sans text-[12px] ${isSelected ? "text-primary-foreground" : "text-foreground"}`}
       >
         {label}
       </Text>

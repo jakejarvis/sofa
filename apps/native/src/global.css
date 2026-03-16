@@ -3,12 +3,9 @@
 
 @theme {
   /* Fonts */
-  --font-sans: "DMSans-Regular";
-  --font-sans-medium: "DMSans-Medium";
-  --font-sans-semibold: "DMSans-SemiBold";
-  --font-sans-bold: "DMSans-Bold";
-  --font-display: "DMSerifDisplay-Regular";
-  --font-mono: "GeistMono-Regular";
+  --font-sans: "DM Sans";
+  --font-display: "DM Serif Display";
+  --font-mono: "Geist Mono";
 
   /* Sofa — dark cinema theme with warm amber accents */
   --color-background: oklch(0 0 0);

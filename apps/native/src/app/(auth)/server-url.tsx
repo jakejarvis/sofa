@@ -195,7 +195,7 @@ export default function ServerUrlScreen() {
         ) : isSuccess ? (
           <View className="min-h-12 flex-row items-center justify-center gap-1.5 py-2">
             <IconCircleCheck size={16} color={statusCompletedColor} />
-            <Text className="font-sans-medium text-[13px] text-status-completed">
+            <Text className="font-medium font-sans text-[13px] text-status-completed">
               Connected
             </Text>
           </View>
@@ -237,7 +237,7 @@ export default function ServerUrlScreen() {
           className="flex-row items-center gap-1.5"
         >
           <IconInfoCircle size={16} color={mutedFgColor} />
-          <Text className="font-sans-medium text-[13px] text-primary">
+          <Text className="font-medium font-sans text-[13px] text-primary">
             Don't have a server?
           </Text>
         </Pressable>

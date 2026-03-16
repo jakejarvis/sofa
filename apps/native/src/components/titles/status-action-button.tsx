@@ -63,7 +63,7 @@ export function StatusActionButton({
         className="flex-row items-center gap-1.5 rounded-lg border border-title-accent/20 bg-title-accent/10 px-4 py-2"
       >
         <IconPlus size={14} color={titleAccent} strokeWidth={2.5} />
-        <Text className="font-sans-medium text-sm text-title-accent">
+        <Text className="font-medium font-sans text-sm text-title-accent">
           Watchlist
         </Text>
       </Pressable>
@@ -85,7 +85,7 @@ export function StatusActionButton({
       className={`flex-row items-center gap-1.5 rounded-lg border px-4 py-2 ${config.bgClass}`}
     >
       <config.Icon size={14} color={iconColor} />
-      <Text className={`font-sans-medium text-sm ${config.textClass}`}>
+      <Text className={`font-medium font-sans text-sm ${config.textClass}`}>
         {config.label}
       </Text>
     </Pressable>

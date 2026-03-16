@@ -70,15 +70,15 @@ export function ContinueWatchingBanner({
           <View className="absolute right-3 bottom-2.5 left-3">
             <View className="flex-row items-center gap-1.5">
               <View className="h-1.5 w-1.5 rounded-full bg-title-accent" />
-              <Text className="font-sans-medium text-[10px] text-title-accent uppercase tracking-wider">
+              <Text className="font-medium font-sans text-[10px] text-title-accent uppercase tracking-wider">
                 Up next
               </Text>
             </View>
             <Text
               numberOfLines={1}
-              className="mt-0.5 font-sans-medium text-[13px] text-white"
+              className="mt-0.5 font-medium font-sans text-[13px] text-white"
             >
-              <Text className="font-sans-medium text-[11px] text-white/60">
+              <Text className="font-medium font-sans text-[11px] text-white/60">
                 S{nextEpisode.seasonNumber} E{nextEpisode.episodeNumber}
               </Text>
               {"  "}

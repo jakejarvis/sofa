@@ -61,14 +61,16 @@ export function ServerUnreachableBanner() {
   const content = (
     <>
       <IconCloudOff size={16} color="white" />
-      <Text className="font-sans-medium text-[13px] text-white">
+      <Text className="font-medium font-sans text-[13px] text-white">
         Can't reach server
       </Text>
       <Pressable
         onPress={handleRetry}
         className="ml-1 rounded-md bg-white/20 px-2 py-0.5"
       >
-        <Text className="font-sans-medium text-[12px] text-white">Retry</Text>
+        <Text className="font-medium font-sans text-[12px] text-white">
+          Retry
+        </Text>
       </Pressable>
     </>
   );

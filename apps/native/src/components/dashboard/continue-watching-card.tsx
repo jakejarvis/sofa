@@ -97,7 +97,7 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
                 <View className="absolute right-2.5 bottom-3 left-2.5">
                   <Text
                     numberOfLines={1}
-                    className="font-sans-medium text-[11px] text-white/80"
+                    className="font-medium font-sans text-[11px] text-white/80"
                   >
                     S{item.nextEpisode.seasonNumber} E
                     {item.nextEpisode.episodeNumber}
@@ -119,7 +119,7 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
             <View className="p-2.5">
               <Text
                 numberOfLines={1}
-                className="font-sans-medium text-[13px] text-foreground"
+                className="font-medium font-sans text-[13px] text-foreground"
               >
                 {item.title.title}
               </Text>

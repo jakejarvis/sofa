@@ -287,7 +287,7 @@ export default function SettingsScreen() {
                     </View>
                   ) : (
                     <View className="flex-1 items-center justify-center bg-primary/[0.08]">
-                      <Text className="font-sans-medium text-lg text-primary">
+                      <Text className="font-medium font-sans text-lg text-primary">
                         {session?.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
                       </Text>
                     </View>
@@ -326,7 +326,7 @@ export default function SettingsScreen() {
                 </View>
               ) : (
                 <Pressable onPress={() => setIsEditingName(true)}>
-                  <Text className="font-sans-medium text-base text-foreground">
+                  <Text className="font-medium font-sans text-base text-foreground">
                     {session?.user?.name}
                   </Text>
                 </Pressable>
@@ -340,7 +340,7 @@ export default function SettingsScreen() {
             </View>
             {isAdmin && (
               <View className="rounded-full bg-primary/10 px-2 py-0.5">
-                <Text className="font-sans-medium text-[10px] text-primary">
+                <Text className="font-medium font-sans text-[10px] text-primary">
                   Admin
                 </Text>
               </View>
@@ -485,7 +485,7 @@ export default function SettingsScreen() {
             />
             {updateCheck.data?.updateCheck?.updateAvailable && (
               <View className="py-3.5">
-                <Text className="font-sans-medium text-[13px] text-status-completed">
+                <Text className="font-medium font-sans text-[13px] text-status-completed">
                   Update available: {updateCheck.data.updateCheck.latestVersion}
                 </Text>
               </View>

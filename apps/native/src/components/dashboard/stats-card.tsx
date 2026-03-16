@@ -14,7 +14,7 @@ export function StatsCard({
       style={{ borderCurve: "continuous" }}
     >
       <Text
-        className="font-sans-bold text-[24px] text-primary"
+        className="font-bold font-sans text-[24px] text-primary"
         style={{ fontVariant: ["tabular-nums"] }}
       >
         {value ?? "—"}

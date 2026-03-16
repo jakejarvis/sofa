@@ -45,7 +45,9 @@ export function StatusBadge({ status }: { status: TitleStatus }) {
       className={`flex-row items-center gap-1.5 rounded-full px-2.5 py-1 ${bgClasses[status]}`}
     >
       <StatusIcon size={12} color={colorMap[status]} />
-      <Text className={`font-sans-medium text-[11px] ${textClasses[status]}`}>
+      <Text
+        className={`font-medium font-sans text-[11px] ${textClasses[status]}`}
+      >
         {label}
       </Text>
     </View>

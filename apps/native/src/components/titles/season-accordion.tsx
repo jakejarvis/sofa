@@ -150,7 +150,7 @@ export function SeasonAccordion({
         className="flex-row items-center justify-between p-4"
       >
         <View className="flex-1">
-          <Text className="font-sans-medium text-[15px] text-foreground">
+          <Text className="font-medium font-sans text-[15px] text-foreground">
             {season.name ?? `Season ${season.seasonNumber}`}
           </Text>
           <Text className="mt-0.5 text-muted-foreground text-xs">
@@ -186,7 +186,7 @@ export function SeasonAccordion({
               onPress={() => watchSeason.mutate({ id: season.id })}
               className="mx-4 mb-2 flex-row items-center justify-center rounded-lg bg-secondary py-2"
             >
-              <Text className="font-sans-medium text-title-accent text-xs">
+              <Text className="font-medium font-sans text-title-accent text-xs">
                 Mark All Watched
               </Text>
             </Pressable>

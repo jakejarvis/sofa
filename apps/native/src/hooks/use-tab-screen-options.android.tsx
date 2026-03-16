@@ -10,7 +10,7 @@ type ScreenOptions = NonNullable<
 export function useTabScreenOptions() {
   const backgroundColor = useCSSVariable("--color-background") as string;
   const headerTitleStyle = useResolveClassNames(
-    "font-sans-semibold text-lg text-foreground",
+    "font-sans font-semibold text-lg text-foreground",
   );
   const contentStyle = useResolveClassNames("bg-background");
 

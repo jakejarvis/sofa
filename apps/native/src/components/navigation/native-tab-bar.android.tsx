@@ -20,7 +20,9 @@ export function NativeTabBar() {
     }),
     [],
   );
-  const labelTextStyle = useResolveClassNames("font-sans-medium text-[11.5px]");
+  const labelTextStyle = useResolveClassNames(
+    "font-sans font-medium text-[11.5px]",
+  );
 
   return (
     <NativeTabs

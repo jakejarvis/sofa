@@ -40,66 +40,51 @@
         {
           "ios": {
             "fonts": [
-              "../../node_modules/@expo-google-fonts/dm-sans/400Regular/DMSans_400Regular.ttf",
-              "../../node_modules/@expo-google-fonts/dm-sans/500Medium/DMSans_500Medium.ttf",
-              "../../node_modules/@expo-google-fonts/dm-sans/600SemiBold/DMSans_600SemiBold.ttf",
-              "../../node_modules/@expo-google-fonts/dm-sans/700Bold/DMSans_700Bold.ttf",
-              "../../node_modules/@expo-google-fonts/dm-serif-display/400Regular/DMSerifDisplay_400Regular.ttf",
-              "../../node_modules/@expo-google-fonts/geist-mono/400Regular/GeistMono_400Regular.ttf"
+              "./assets/fonts/DM_Sans/DMSans-Regular.ttf",
+              "./assets/fonts/DM_Sans/DMSans-Medium.ttf",
+              "./assets/fonts/DM_Sans/DMSans-SemiBold.ttf",
+              "./assets/fonts/DM_Sans/DMSans-Bold.ttf",
+              "./assets/fonts/DM_Serif_Display/DMSerifDisplay-Regular.ttf",
+              "./assets/fonts/Geist_Mono/GeistMono-Regular.ttf"
             ]
           },
           "android": {
             "fonts": [
               {
-                "fontFamily": "DMSans-Regular",
+                "fontFamily": "DM Sans",
                 "fontDefinitions": [
                   {
-                    "path": "../../node_modules/@expo-google-fonts/dm-sans/400Regular/DMSans_400Regular.ttf",
+                    "path": "./assets/fonts/DM_Sans/DMSans-Regular.ttf",
                     "weight": 400
-                  }
-                ]
-              },
-              {
-                "fontFamily": "DMSans-Medium",
-                "fontDefinitions": [
+                  },
                   {
-                    "path": "../../node_modules/@expo-google-fonts/dm-sans/500Medium/DMSans_500Medium.ttf",
+                    "path": "./assets/fonts/DM_Sans/DMSans-Medium.ttf",
                     "weight": 500
-                  }
-                ]
-              },
-              {
-                "fontFamily": "DMSans-SemiBold",
-                "fontDefinitions": [
+                  },
                   {
-                    "path": "../../node_modules/@expo-google-fonts/dm-sans/600SemiBold/DMSans_600SemiBold.ttf",
+                    "path": "./assets/fonts/DM_Sans/DMSans-SemiBold.ttf",
                     "weight": 600
-                  }
-                ]
-              },
-              {
-                "fontFamily": "DMSans-Bold",
-                "fontDefinitions": [
+                  },
                   {
-                    "path": "../../node_modules/@expo-google-fonts/dm-sans/700Bold/DMSans_700Bold.ttf",
+                    "path": "./assets/fonts/DM_Sans/DMSans-Bold.ttf",
                     "weight": 700
                   }
                 ]
               },
               {
-                "fontFamily": "DMSerifDisplay-Regular",
+                "fontFamily": "DM Serif Display",
                 "fontDefinitions": [
                   {
-                    "path": "../../node_modules/@expo-google-fonts/dm-serif-display/400Regular/DMSerifDisplay_400Regular.ttf",
+                    "path": "./assets/fonts/DM_Serif_Display/DMSerifDisplay-Regular.ttf",
                     "weight": 400
                   }
                 ]
               },
               {
-                "fontFamily": "GeistMono-Regular",
+                "fontFamily": "Geist Mono",
                 "fontDefinitions": [
                   {
-                    "path": "../../node_modules/@expo-google-fonts/geist-mono/400Regular/GeistMono_400Regular.ttf",
+                    "path": "./assets/fonts/Geist_Mono/GeistMono-Regular.ttf",
                     "weight": 400
                   }
                 ]

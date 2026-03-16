@@ -15,9 +15,6 @@
   },
   "dependencies": {
     "@better-auth/expo": "catalog:",
-    "@expo-google-fonts/dm-sans": "0.4.2",
-    "@expo-google-fonts/dm-serif-display": "0.4.2",
-    "@expo-google-fonts/geist-mono": "0.4.1",
     "@expo/metro-runtime": "55.0.6",
     "@expo/ui": "55.0.2",
     "@orpc/client": "catalog:",

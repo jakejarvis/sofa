@@ -444,7 +444,7 @@ export default function TitleDetailScreen() {
               </Text>
               <View className="mt-1.5 flex-row flex-wrap items-center gap-2">
                 <View className="rounded-full bg-title-accent px-2 py-0.5">
-                  <Text className="font-sans-medium text-[10px] text-title-accent-foreground">
+                  <Text className="font-medium font-sans text-[10px] text-title-accent-foreground">
                     {title.type === "movie" ? "Movie" : "TV"}
                   </Text>
                 </View>
@@ -528,7 +528,7 @@ export default function TitleDetailScreen() {
                 ) : (
                   <>
                     <IconCheck size={16} color={titleAccentForeground} />
-                    <Text className="font-sans-medium text-sm text-title-accent-foreground">
+                    <Text className="font-medium font-sans text-sm text-title-accent-foreground">
                       Mark Watched
                     </Text>
                   </>

@@ -41,7 +41,7 @@ export function EpisodeRow({
       )}
       <View className="ml-3 flex-1">
         <Text
-          className={`font-sans-medium text-sm ${isWatched ? "text-muted-foreground" : "text-foreground"}`}
+          className={`font-medium font-sans text-sm ${isWatched ? "text-muted-foreground" : "text-foreground"}`}
           numberOfLines={1}
         >
           {episode.episodeNumber}.{" "}

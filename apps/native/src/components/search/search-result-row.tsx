@@ -80,7 +80,7 @@ export const SearchResultRow = memo(function SearchResultRow({
         <View className="flex-1">
           <Text
             numberOfLines={1}
-            className="font-sans-medium text-[15px] text-foreground"
+            className="font-medium font-sans text-[15px] text-foreground"
           >
             {item.title}
           </Text>

@@ -182,7 +182,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
             color={connection ? primaryColor : mutedFgColor}
           />
           <View>
-            <Text className="font-sans-medium text-[15px] text-foreground">
+            <Text className="font-medium font-sans text-[15px] text-foreground">
               {label}
             </Text>
             <Text className="mt-0.5 text-muted-foreground text-xs">
@@ -228,7 +228,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
               disabled={connectMutation.isPending}
               className="items-center rounded-lg bg-primary py-2.5 active:opacity-80"
             >
-              <Text className="font-sans-medium text-primary-foreground">
+              <Text className="font-medium font-sans text-primary-foreground">
                 {connectMutation.isPending ? "Connecting…" : `Connect ${label}`}
               </Text>
             </Pressable>
@@ -270,7 +270,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                   className="flex-1 flex-row items-center justify-center gap-1.5 rounded-lg bg-secondary py-2.5 active:opacity-80"
                 >
                   <IconRefresh size={14} color={mutedFgColor} />
-                  <Text className="font-sans-medium text-[13px] text-foreground">
+                  <Text className="font-medium font-sans text-[13px] text-foreground">
                     Regenerate
                   </Text>
                 </Pressable>
@@ -279,7 +279,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                   className="flex-1 flex-row items-center justify-center gap-1.5 rounded-lg bg-destructive/10 py-2.5 active:opacity-80"
                 >
                   <IconTrash size={14} color="#ef4444" />
-                  <Text className="font-sans-medium text-[13px] text-destructive">
+                  <Text className="font-medium font-sans text-[13px] text-destructive">
                     Disconnect
                   </Text>
                 </Pressable>

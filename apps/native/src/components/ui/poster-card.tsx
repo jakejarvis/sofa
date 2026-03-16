@@ -207,7 +207,7 @@ export function PosterCard({
             />
           )}
           <Text
-            className="flex-1 font-sans-medium text-[13px] text-foreground"
+            className="flex-1 font-medium font-sans text-[13px] text-foreground"
             numberOfLines={1}
           >
             {title}

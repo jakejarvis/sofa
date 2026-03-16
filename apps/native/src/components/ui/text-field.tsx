@@ -35,7 +35,7 @@ export function Label({
   return (
     <Text
       nativeID={nativeID ?? ctxId}
-      className={cn("font-sans-medium text-foreground text-sm", className)}
+      className={cn("font-medium font-sans text-foreground text-sm", className)}
       {...props}
     />
   );

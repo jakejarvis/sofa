@@ -30,7 +30,7 @@ export function IntegrationsSection() {
             style={{ borderCurve: "continuous" }}
           >
             <IconRefresh size={14} className="accent-primary" />
-            <Text className="font-sans-medium text-[13px] text-primary">
+            <Text className="font-medium font-sans text-[13px] text-primary">
               Retry
             </Text>
           </Pressable>

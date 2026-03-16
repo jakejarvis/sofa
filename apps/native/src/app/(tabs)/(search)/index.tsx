@@ -144,6 +144,9 @@ export default function SearchScreen() {
     <View className="flex-1 bg-background">
       <Stack.Screen
         options={{
+          headerTransparent: false,
+          headerStyle: { backgroundColor: "#000" },
+          headerLargeStyle: { backgroundColor: "#000" },
           headerSearchBarOptions: {
             placeholder: "Search movies, shows, people...",
             onChangeText: (e) => setQuery(e.nativeEvent.text),

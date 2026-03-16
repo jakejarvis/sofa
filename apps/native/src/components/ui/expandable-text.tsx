@@ -61,7 +61,7 @@ export function ExpandableText({
           className="mt-1"
         >
           <Text
-            className="font-sans-medium text-[13px] text-primary"
+            className="font-medium font-sans text-[13px] text-primary"
             style={actionColor ? { color: actionColor } : undefined}
           >
             {expanded ? "Show less" : "Show more"}
