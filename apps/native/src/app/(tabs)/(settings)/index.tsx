@@ -351,7 +351,7 @@ export default function SettingsScreen() {
             <SettingsRow
               label={hasPassword ? "Change password" : "Set password"}
               icon={IconLock}
-              onPress={() => push("/(tabs)/(settings)/change-password")}
+              onPress={() => push("/change-password")}
             />
           )}
 

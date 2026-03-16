@@ -64,6 +64,27 @@ export const unstable_settings = {
   initialRouteName: "(tabs)",
 };
 
+const changePasswordOptions =
+  process.env.EXPO_OS === "ios"
+    ? {
+        title: "Change Password",
+        headerShown: true,
+        presentation: "formSheet" as const,
+        sheetAllowedDetents: "fitToContents" as const,
+        sheetGrabberVisible: true,
+        headerLargeTitle: false,
+        headerTransparent: false,
+        headerBlurEffect: "none" as const,
+      }
+    : {
+        title: "Change Password",
+        headerShown: true,
+        presentation: "modal" as const,
+        headerLargeTitle: false,
+        headerTransparent: false,
+        headerBlurEffect: "none" as const,
+      };
+
 function AppContent() {
   const contentStyle = useResolveClassNames("bg-background");
 
@@ -209,6 +230,10 @@ function AppContent() {
 
         <Stack.Protected guard={!!session}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="change-password"
+            options={changePasswordOptions}
+          />
           <Stack.Screen
             name="title/[id]"
             dangerouslySingular
