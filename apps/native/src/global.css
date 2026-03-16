@@ -11,7 +11,7 @@
   --font-mono: "GeistMono-Regular";
 
   /* Sofa — dark cinema theme with warm amber accents */
-  --color-background: oklch(0.13 0.006 55);
+  --color-background: oklch(0 0 0);
   --color-foreground: oklch(0.93 0.015 80);
   --color-card: oklch(0.19 0.008 55);
   --color-card-foreground: oklch(0.93 0.015 80);

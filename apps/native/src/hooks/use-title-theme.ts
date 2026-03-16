@@ -19,7 +19,7 @@ export function useTitleTheme(palette: ColorPalette | null | undefined): void {
 
     const luminance = hexToRelativeLuminance(vibrant);
     const foreground =
-      luminance > 0.3 ? "oklch(0.13 0.006 55)" : "oklch(0.93 0.015 80)";
+      luminance > 0.3 ? "oklch(0 0 0)" : "oklch(0.93 0.015 80)";
 
     Uniwind.updateCSSVariables("dark", {
       "--color-title-accent": vibrant,
