@@ -1,4 +1,4 @@
 {
   "title": "Integrations",
-  "pages": ["plex", "jellyfin", "emby", "sonarr", "radarr"]
+  "pages": ["plex", "jellyfin", "emby", "sonarr", "radarr", "import"]
 }

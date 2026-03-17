@@ -11,6 +11,8 @@
     "./credits": "./src/credits.ts",
     "./discovery": "./src/discovery.ts",
     "./image-cache": "./src/image-cache.ts",
+    "./imports": "./src/imports/index.ts",
+    "./imports/parsers": "./src/imports/parsers.ts",
     "./lists": "./src/lists.ts",
     "./metadata": "./src/metadata.ts",
     "./person": "./src/person.ts",
@@ -35,6 +37,7 @@
     "@sofa/db": "workspace:*",
     "@sofa/logger": "workspace:*",
     "@sofa/tmdb": "workspace:*",
+    "adm-zip": "0.5.16",
     "date-fns": "catalog:",
     "node-vibrant": "4.0.4",
     "sharp": "0.34.5",
@@ -42,6 +45,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@types/adm-zip": "0.5.8",
     "@types/bun": "catalog:",
     "typescript": "catalog:"
   }

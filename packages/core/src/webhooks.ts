@@ -9,7 +9,7 @@ import {
   userMovieWatches,
 } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
-import { findByExternalId, searchTv } from "@sofa/tmdb/client";
+import { resolveMovieTmdbId, resolveShowTmdbId } from "./imports/resolve";
 import { getOrFetchTitleByTmdbId } from "./metadata";
 import { logEpisodeWatch, logMovieWatch } from "./tracking";
 
@@ -157,24 +157,6 @@ export function parseEmbyPayload(
 
 // ─── Title Resolution ───────────────────────────────────────────────
 
-async function resolveMovieTmdbId(event: WebhookEvent): Promise<number | null> {
-  if (event.tmdbId) return event.tmdbId;
-
-  if (event.imdbId) {
-    const result = await findByExternalId(event.imdbId, "imdb_id");
-    const movie = result.movie_results?.[0];
-    if (movie) return movie.id;
-  }
-
-  if (event.tvdbId) {
-    const result = await findByExternalId(event.tvdbId, "tvdb_id");
-    const movie = result.movie_results?.[0];
-    if (movie) return movie.id;
-  }
-
-  return null;
-}
-
 async function resolveEpisode(event: WebhookEvent): Promise<{
   showTmdbId: number;
   seasonNumber: number;
@@ -183,48 +165,15 @@ async function resolveEpisode(event: WebhookEvent): Promise<{
   const { seasonNumber, episodeNumber } = event;
   if (seasonNumber == null || episodeNumber == null) return null;
 
-  // Strategy 1: Use IMDB ID to find the episode and get show_id
-  if (event.imdbId) {
-    const result = await findByExternalId(event.imdbId, "imdb_id");
-    const ep = result.tv_episode_results?.[0];
-    if (ep) {
-      return { showTmdbId: ep.show_id, seasonNumber, episodeNumber };
-    }
-    // IMDB ID might reference the show itself
-    const show = result.tv_results?.[0];
-    if (show) {
-      return { showTmdbId: show.id, seasonNumber, episodeNumber };
-    }
-  }
+  const showTmdbId = await resolveShowTmdbId({
+    tmdbId: event.tmdbId,
+    imdbId: event.imdbId,
+    tvdbId: event.tvdbId,
+    title: event.showTitle,
+  });
 
-  // Strategy 2: Use TVDB ID
-  if (event.tvdbId) {
-    const result = await findByExternalId(event.tvdbId, "tvdb_id");
-    const ep = result.tv_episode_results?.[0];
-    if (ep) {
-      return { showTmdbId: ep.show_id, seasonNumber, episodeNumber };
-    }
-    const show = result.tv_results?.[0];
-    if (show) {
-      return { showTmdbId: show.id, seasonNumber, episodeNumber };
-    }
-  }
-
-  // Strategy 3: Use TMDB ID directly if it's the show ID
-  if (event.tmdbId) {
-    return { showTmdbId: event.tmdbId, seasonNumber, episodeNumber };
-  }
-
-  // Strategy 4: Search by show title
-  if (event.showTitle) {
-    const searchResult = await searchTv(event.showTitle);
-    const tvMatch = searchResult.results?.[0];
-    if (tvMatch) {
-      return { showTmdbId: tvMatch.id, seasonNumber, episodeNumber };
-    }
-  }
-
-  return null;
+  if (!showTmdbId) return null;
+  return { showTmdbId, seasonNumber, episodeNumber };
 }
 
 // ─── Deduplication ──────────────────────────────────────────────────
@@ -303,7 +252,15 @@ export async function processWebhook(
   log.info(`Received ${provider} webhook: ${event.mediaType} "${event.title}"`);
   try {
     if (event.mediaType === "movie") {
-      const tmdbId = await resolveMovieTmdbId(event);
+      const hasExternalId = event.tmdbId || event.imdbId || event.tvdbId;
+      const tmdbId = await resolveMovieTmdbId({
+        tmdbId: event.tmdbId,
+        imdbId: event.imdbId,
+        tvdbId: event.tvdbId,
+        // Only use title fallback when at least one external ID is present;
+        // title-only resolution without year is too unreliable for webhooks
+        title: hasExternalId ? event.title : undefined,
+      });
       if (!tmdbId) {
         log.warn(
           `Could not resolve TMDB ID for movie "${event.title}" from ${provider}`,

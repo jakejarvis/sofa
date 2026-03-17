@@ -1,4 +1,4 @@
-import { oc } from "@orpc/contract";
+import { eventIterator, oc } from "@orpc/contract";
 import { z } from "zod";
 import {
   AuthConfigOutput,
@@ -7,6 +7,7 @@ import {
   BackupsListOutput,
   BatchWatchInput,
   ContinueWatchingOutput,
+  CreateImportJobInput,
   CreateIntegrationInput,
   DashboardRecommendationsOutput,
   DashboardStatsOutput,
@@ -15,12 +16,17 @@ import {
   FilenameParam,
   GenresOutput,
   IdParam,
+  ImportJobEvent,
+  ImportJobSchema,
+  ImportPreviewSchema,
   IntegrationOutput,
   IntegrationsListOutput,
   LibraryOutput,
   MediaTypeParam,
   PageParam,
   PaginatedInput,
+  ParseFileInput,
+  ParsePayloadInput,
   PersonDetailOutput,
   PopularOutput,
   ProviderParam,
@@ -682,5 +688,78 @@ export const contract = {
       })
       .input(z.void())
       .output(z.void()),
+  },
+  imports: {
+    parseFile: oc
+      .route({
+        method: "POST",
+        path: "/imports/parse-file",
+        tags: ["Imports"],
+        summary: "Parse import file",
+        description:
+          "Upload and parse an export file from Trakt, Simkl, or Letterboxd. Returns a preview of items found without importing anything.",
+        successDescription: "Preview of importable items with counts",
+      })
+      .input(ParseFileInput)
+      .output(ImportPreviewSchema),
+    parsePayload: oc
+      .route({
+        method: "POST",
+        path: "/imports/parse-payload",
+        tags: ["Imports"],
+        summary: "Preview normalized import data",
+        description:
+          "Accept pre-normalized import data from the OAuth proxy and return a preview with item counts. No parsing is needed — data is already in NormalizedImport format.",
+        successDescription: "Preview of importable items with counts",
+      })
+      .input(ParsePayloadInput)
+      .output(ImportPreviewSchema),
+    createJob: oc
+      .route({
+        method: "POST",
+        path: "/imports/jobs",
+        tags: ["Imports"],
+        summary: "Create import job",
+        description:
+          "Create and start a background import job from previously parsed data.",
+        successDescription: "Created import job",
+      })
+      .input(CreateImportJobInput)
+      .output(ImportJobSchema),
+    getJob: oc
+      .route({
+        method: "GET",
+        path: "/imports/jobs/{id}",
+        tags: ["Imports"],
+        summary: "Get import job status",
+        description: "Get the current status and progress of an import job.",
+        successDescription: "Current job state",
+      })
+      .input(IdParam)
+      .output(ImportJobSchema),
+    cancelJob: oc
+      .route({
+        method: "POST",
+        path: "/imports/jobs/{id}/cancel",
+        tags: ["Imports"],
+        summary: "Cancel import job",
+        description:
+          "Cancel a pending or running import job. Already-imported items are not rolled back.",
+        successDescription: "Updated job state",
+      })
+      .input(IdParam)
+      .output(ImportJobSchema),
+    jobEvents: oc
+      .route({
+        method: "GET",
+        path: "/imports/jobs/{id}/events",
+        tags: ["Imports"],
+        summary: "Stream import job events",
+        description:
+          "SSE stream of import job progress events. Yields progress updates and a final complete event.",
+        successDescription: "Stream of job progress events",
+      })
+      .input(IdParam)
+      .output(eventIterator(ImportJobEvent)),
   },
 };

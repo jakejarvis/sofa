@@ -5,6 +5,7 @@ import * as dashboard from "./procedures/dashboard";
 import { discover } from "./procedures/discover";
 import * as episodes from "./procedures/episodes";
 import * as explore from "./procedures/explore";
+import * as imports from "./procedures/imports";
 import * as integrations from "./procedures/integrations";
 import * as people from "./procedures/people";
 import { search } from "./procedures/search";
@@ -85,6 +86,14 @@ export const implementedRouter = {
     updateName: account.updateName,
     uploadAvatar: account.uploadAvatar,
     removeAvatar: account.removeAvatar,
+  },
+  imports: {
+    parseFile: imports.parseFile,
+    parsePayload: imports.parsePayload,
+    createJob: imports.createJob,
+    getJob: imports.getJob,
+    cancelJob: imports.cancelJob,
+    jobEvents: imports.jobEvents,
   },
 };
 

@@ -64,7 +64,7 @@ All shared packages are JIT (raw TypeScript exports, no build step).
 - **`@sofa/server`** — Hono API server. Hosts oRPC procedures, Better Auth, webhook/image/backup routes, and cron jobs. Runs DB migrations on startup. Dev: port 3001. Prod: serves SPA static files too, port 3000.
 - **`@sofa/web`** — Vite SPA with TanStack Router (file-based routing). No SSR, no DB. All data via oRPC. Vite dev server proxies `/api/*` and `/rpc/*` to the API server.
 - **`@sofa/native`** — Expo Router app with 4-tab layout (Home, Explore, Search, Settings). UniWind for styling, `@better-auth/expo` with SecureStore for auth, oRPC client for API calls. Dark-only cinema theme matching web.
-- **`@sofa/public-api`** — Minimal Hono microservice deployed on Vercel. Two endpoints: `GET /v1/version` (latest release from GitHub) and `POST /v1/telemetry` (forwards instance stats to PostHog). Dev: port 3002.
+- **`@sofa/public-api`** — Minimal Hono microservice deployed on Vercel. Endpoints: `GET /v1/version` (latest release from GitHub), `POST /v1/telemetry` (forwards instance stats to PostHog), and OAuth device-code proxy for Trakt/Simkl imports (`/v1/import/:provider/device-code`, `/v1/import/:provider/poll`). Dev: port 3002.
 - **`sofa-docs`** — Fumadocs site (Next.js) with landing page, Markdown docs, and auto-generated OpenAPI API reference. Content lives in `docs/content/docs/`. API docs are generated from `docs/openapi.json` via `fumadocs-openapi`.
 
 ### Stack
@@ -87,7 +87,7 @@ Cross-package imports:
 - `@sofa/api/contract`, `@sofa/api/schemas` — Contract and Zod types
 - `@sofa/db/client`, `@sofa/db/schema`, `@sofa/db/helpers`, `@sofa/db/migrate`, `@sofa/db/test-utils`
 - `@sofa/tmdb/client`, `@sofa/tmdb/image`
-- `@sofa/core/metadata`, `@sofa/core/tracking`, etc.
+- `@sofa/core/metadata`, `@sofa/core/tracking`, `@sofa/core/imports`, etc.
 - `@sofa/auth/server`, `@sofa/auth/config`
 - `@sofa/config` — Path constants (`DATA_DIR`, `DATABASE_URL`, `CACHE_DIR`, `BACKUP_DIR`, `AVATAR_DIR`) and TMDB URLs
 - `@sofa/logger` — `createLogger(name)` for structured logging
@@ -109,7 +109,7 @@ Required: `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`.
 Optional:
 - `DATA_DIR` — Root for DB + cache (default `./data`). `DATABASE_URL` and `CACHE_DIR` derived from it but overridable.
 - `TMDB_API_BASE_URL`, `TMDB_IMAGE_BASE_URL` — Override TMDB endpoints.
-- `PUBLIC_API_URL` — Base URL for centralized public API (default: `https://public-api.sofa.watch`). Used for update checks.
+- `PUBLIC_API_URL` — Base URL for centralized public API (default: `https://public-api.sofa.watch`). Used for update checks and OAuth import proxy.
 - `IMAGE_CACHE_ENABLED` — Default `true`. Set `false` for direct TMDB CDN URLs.
 - `LOG_LEVEL` — `error`/`warn`/`info`/`debug` (default: `info`).
 - OIDC: `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_ISSUER_URL`, `OIDC_PROVIDER_NAME`, `OIDC_AUTO_REGISTER`, `DISABLE_PASSWORD_LOGIN`.

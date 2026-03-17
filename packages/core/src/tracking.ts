@@ -16,8 +16,9 @@ export function setTitleStatus(
   status: "watchlist" | "in_progress" | "completed",
   // biome-ignore lint/correctness/noUnusedFunctionParameters: kept for API consistency with callers
   source: "manual" | "import" | "plex" | "jellyfin" | "emby" = "manual",
+  addedAt?: Date,
 ) {
-  const now = new Date();
+  const now = addedAt ?? new Date();
   db.insert(userTitleStatus)
     .values({ userId, titleId, status, addedAt: now, updatedAt: now })
     .onConflictDoUpdate({
@@ -42,8 +43,9 @@ export function logMovieWatch(
   userId: string,
   titleId: string,
   source: "manual" | "import" | "plex" | "jellyfin" | "emby" = "manual",
+  watchedAt?: Date,
 ) {
-  const now = new Date();
+  const now = watchedAt ?? new Date();
   db.insert(userMovieWatches)
     .values({ userId, titleId, watchedAt: now, source })
     .run();
@@ -71,8 +73,9 @@ export function logEpisodeWatch(
   userId: string,
   episodeId: string,
   source: "manual" | "import" | "plex" | "jellyfin" | "emby" = "manual",
+  watchedAt?: Date,
 ) {
-  const now = new Date();
+  const now = watchedAt ?? new Date();
   db.insert(userEpisodeWatches)
     .values({ userId, episodeId, watchedAt: now, source })
     .run();
@@ -111,11 +114,12 @@ export function logEpisodeWatchBatch(
   userId: string,
   episodeIds: string[],
   source: "manual" | "import" | "plex" | "jellyfin" | "emby" = "manual",
+  watchedAt?: Date,
 ) {
   if (episodeIds.length === 0) return;
 
   db.transaction((tx) => {
-    const now = new Date();
+    const now = watchedAt ?? new Date();
 
     // Batch INSERT all watch records
     for (const episodeId of episodeIds) {
@@ -382,8 +386,9 @@ export function rateTitleStars(
   userId: string,
   titleId: string,
   ratingStars: number,
+  ratedAt?: Date,
 ) {
-  const now = new Date();
+  const now = ratedAt ?? new Date();
   if (ratingStars === 0) {
     db.delete(userRatings)
       .where(

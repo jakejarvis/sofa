@@ -16,6 +16,7 @@ Sofa is a self-hosted movie and TV tracker for nerds. Track what you've watched,
 - Search TMDB and explore trending movies and shows without leaving your own instance
 - Show streaming availability from TMDB's US provider data
 - Automatically log completed watches from Plex, Jellyfin, or Emby webhooks
+- Import existing watch history, ratings, and watchlists from Trakt, Simkl, or Letterboxd
 - Expose your watchlist as import lists for Sonarr and Radarr
 - Runs on SQLite with local image caching, built-in backups, and no external database requirement
 - Supports local accounts or OIDC SSO for private instances
