@@ -422,6 +422,15 @@ export function parseSimklPayload(data: {
       }
     }
 
+    if (
+      !item.seasons &&
+      (item.status === "completed" || item.status === "watching")
+    ) {
+      warnings.push(
+        `"${item.title}" is marked ${item.status} but has no episode data — episode watches were not imported.`,
+      );
+    }
+
     if (item.user_rating != null) {
       const converted = convertRating10to5(item.user_rating);
       if (converted != null) {
@@ -548,7 +557,7 @@ export async function parseLetterboxdExport(
     return parseCsv(text);
   }
 
-  // Track which movies we've already seen (for dedup across diary/watched)
+  // Track which movies we've already seen (for dedup between diary and watched.csv)
   const seenMovies = new Set<string>();
 
   // Parse diary.csv (watch history with dates and optional ratings)
@@ -558,9 +567,13 @@ export async function parseLetterboxdExport(
     if (!title) continue;
 
     const year = yearStr ? Number.parseInt(yearStr, 10) : undefined;
-    const key = `${title}::${year ?? ""}`;
+    const watchedOn = (row["Watched Date"] || row.WatchedDate) ?? "";
+    // Include date in key to preserve rewatches of the same movie
+    const key = `${title}::${year ?? ""}::${watchedOn}`;
     if (seenMovies.has(key)) continue;
     seenMovies.add(key);
+    // Also mark title+year as seen to dedup against watched.csv
+    seenMovies.add(`${title}::${year ?? ""}`);
 
     movies.push({
       title,

@@ -74,7 +74,7 @@ export const simkl: ImportProvider = {
       interval: number;
     };
     return {
-      device_code: data.device_code,
+      device_code: data.user_code, // Simkl checks PIN status by user_code, not device_code
       user_code: data.user_code,
       verification_url: data.verification_url || `${AUTH_BASE}/pin`,
       expires_in: data.expires_in,
@@ -109,8 +109,14 @@ export const simkl: ImportProvider = {
     // Fetch movies, shows, and anime in parallel
     const [moviesRes, showsRes, animeRes] = await Promise.all([
       fetch(`${API_BASE}/sync/all-items/movies`, { headers }),
-      fetch(`${API_BASE}/sync/all-items/shows`, { headers }),
-      fetch(`${API_BASE}/sync/all-items/anime`, { headers }),
+      fetch(
+        `${API_BASE}/sync/all-items/shows?extended=full&episode_watched_at=yes`,
+        { headers },
+      ),
+      fetch(
+        `${API_BASE}/sync/all-items/anime?extended=full&episode_watched_at=yes`,
+        { headers },
+      ),
     ]);
 
     const [moviesData, showsData, animeData] = await Promise.all([

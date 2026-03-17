@@ -55,7 +55,8 @@ export const trakt: ImportProvider = {
     if (res.status === 404) return { status: "expired" };
     if (res.status === 410) return { status: "expired" };
     if (res.status === 418) return { status: "denied" };
-    return { status: "expired" };
+    if (res.status === 429) return { status: "pending" };
+    return { status: "pending" };
   },
 
   async fetchUserData(accessToken, clientId): Promise<NormalizedImport> {
@@ -65,7 +66,9 @@ export const trakt: ImportProvider = {
     const [moviesRes, showsRes, watchlistRes, ratingsRes] = await Promise.all([
       fetch(`${API_BASE}/sync/history/movies?limit=10000`, { headers }),
       fetch(`${API_BASE}/sync/history/shows?limit=10000`, { headers }),
-      fetch(`${API_BASE}/sync/watchlist?extended=metadata`, { headers }),
+      fetch(`${API_BASE}/sync/watchlist?extended=metadata&limit=10000`, {
+        headers,
+      }),
       fetch(`${API_BASE}/sync/ratings`, { headers }),
     ]);
 

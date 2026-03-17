@@ -252,11 +252,14 @@ export async function processWebhook(
   log.info(`Received ${provider} webhook: ${event.mediaType} "${event.title}"`);
   try {
     if (event.mediaType === "movie") {
+      const hasExternalId = event.tmdbId || event.imdbId || event.tvdbId;
       const tmdbId = await resolveMovieTmdbId({
         tmdbId: event.tmdbId,
         imdbId: event.imdbId,
         tvdbId: event.tvdbId,
-        title: event.title,
+        // Only use title fallback when at least one external ID is present;
+        // title-only resolution without year is too unreliable for webhooks
+        title: hasExternalId ? event.title : undefined,
       });
       if (!tmdbId) {
         log.warn(

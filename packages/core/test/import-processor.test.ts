@@ -373,16 +373,18 @@ describe("processImportJob — failed resolution", () => {
       results: [],
     } as never);
 
-    const jobId = createJob(userId, payload);
-    await processImportJob(jobId);
+    try {
+      const jobId = createJob(userId, payload);
+      await processImportJob(jobId);
 
-    const job = readImportJob(jobId);
-    expect(job.status).toBe("success");
-    expect(job.failedCount).toBe(1);
-    expect(job.importedCount).toBe(0);
-    expect(job.errors.length).toBeGreaterThan(0);
-    expect(job.errors[0]).toContain("Could not resolve movie");
-
-    searchSpy.mockRestore();
+      const job = readImportJob(jobId);
+      expect(job.status).toBe("success");
+      expect(job.failedCount).toBe(1);
+      expect(job.importedCount).toBe(0);
+      expect(job.errors.length).toBeGreaterThan(0);
+      expect(job.errors[0]).toContain("Could not resolve movie");
+    } finally {
+      searchSpy.mockRestore();
+    }
   });
 });

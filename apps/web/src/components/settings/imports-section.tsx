@@ -274,9 +274,12 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         { signal: abort.signal },
       );
 
+      let receivedComplete = false;
+
       for await (const event of eventSource) {
         if (abort.signal.aborted) break;
         if (event.type === "complete") {
+          receivedComplete = true;
           setResult({
             imported: event.job.importedCount,
             skipped: event.job.skippedCount,
@@ -290,12 +293,47 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
               `Imported ${event.job.importedCount} items from ${config.label}`,
             );
           }
+        } else if (event.type === "timeout") {
+          receivedComplete = true;
+          toast.info(
+            "Import is still running in the background. Check back later.",
+          );
+          setStep("preview");
         } else {
           setProgress({
             current: event.job.processedItems,
             total: event.job.totalItems,
             message: event.job.currentMessage ?? "",
           });
+        }
+      }
+
+      // Stream ended without a complete/timeout event (e.g. connection dropped)
+      if (!receivedComplete && !abort.signal.aborted) {
+        try {
+          const finalJob = await client.imports.getJob({ id: job.id });
+          const isTerminal =
+            finalJob.status === "success" ||
+            finalJob.status === "error" ||
+            finalJob.status === "cancelled";
+          if (isTerminal) {
+            setResult({
+              imported: finalJob.importedCount,
+              skipped: finalJob.skippedCount,
+              failed: finalJob.failedCount,
+              errors: finalJob.errors,
+              warnings: finalJob.warnings,
+            });
+            setStep("done");
+          } else {
+            toast.info(
+              "Import is still running in the background. Check back later.",
+            );
+            setStep("preview");
+          }
+        } catch {
+          toast.error("Lost connection to import. Check status in settings.");
+          setStep("preview");
         }
       }
     } catch (err) {

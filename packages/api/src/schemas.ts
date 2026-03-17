@@ -1107,8 +1107,12 @@ export const ImportMovieSchema = z.object({
   imdbId: z.string().optional(),
   title: z.string(),
   year: z.number().optional(),
-  watchedAt: z.string().optional().describe("ISO 8601 timestamp"),
-  watchedOn: z.string().optional().describe("YYYY-MM-DD date-only"),
+  watchedAt: z
+    .string()
+    .datetime({ offset: true })
+    .optional()
+    .describe("ISO 8601 timestamp"),
+  watchedOn: z.string().date().optional().describe("YYYY-MM-DD date-only"),
 });
 
 export const ImportEpisodeSchema = z.object({
@@ -1117,10 +1121,10 @@ export const ImportEpisodeSchema = z.object({
   tvdbId: z.number().optional(),
   showTitle: z.string().optional(),
   year: z.number().optional(),
-  seasonNumber: z.number(),
-  episodeNumber: z.number(),
-  watchedAt: z.string().optional(),
-  watchedOn: z.string().optional(),
+  seasonNumber: z.number().int().min(0),
+  episodeNumber: z.number().int().min(1),
+  watchedAt: z.string().datetime({ offset: true }).optional(),
+  watchedOn: z.string().date().optional(),
 });
 
 export const ImportWatchlistItemSchema = z.object({
@@ -1140,8 +1144,8 @@ export const ImportRatingSchema = z.object({
   year: z.number().optional(),
   type: z.enum(["movie", "tv"]),
   rating: z.number().int().min(1).max(5).describe("Sofa 1-5 star rating"),
-  ratedAt: z.string().optional(),
-  ratedOn: z.string().optional(),
+  ratedAt: z.string().datetime({ offset: true }).optional(),
+  ratedOn: z.string().date().optional(),
 });
 
 export const NormalizedImportSchema = z.object({
@@ -1224,7 +1228,7 @@ export const CreateImportJobInput = z.object({
 });
 
 export const ImportJobEvent = z.object({
-  type: z.enum(["progress", "complete"]),
+  type: z.enum(["progress", "complete", "timeout"]),
   job: ImportJobSchema,
 });
 

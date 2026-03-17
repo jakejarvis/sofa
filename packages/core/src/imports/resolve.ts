@@ -161,10 +161,22 @@ export async function resolveShowTmdbId(
   if (ids.title) {
     await tmdbLimiter.acquire();
     const searchResult = await searchTv(ids.title);
-    const tvMatch = searchResult.results?.[0];
-    if (tvMatch) {
-      cache?.set(key, tvMatch.id);
-      return tvMatch.id;
+    const results = searchResult.results ?? [];
+    if (ids.year) {
+      const match = results.find((r) => {
+        const airYear = r.first_air_date
+          ? new Date(r.first_air_date).getFullYear()
+          : null;
+        return airYear === ids.year;
+      });
+      if (match) {
+        cache?.set(key, match.id);
+        return match.id;
+      }
+      // Year specified but no match — don't fall back to an arbitrary result
+    } else if (results[0]) {
+      cache?.set(key, results[0].id);
+      return results[0].id;
     }
   }
 

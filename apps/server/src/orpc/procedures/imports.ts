@@ -8,7 +8,7 @@ import {
   readImportJob,
 } from "@sofa/core/imports";
 import { db } from "@sofa/db/client";
-import { and, eq } from "@sofa/db/helpers";
+import { and, eq, inArray } from "@sofa/db/helpers";
 import { importJobs } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { os } from "../context";
@@ -111,7 +111,7 @@ export const createJob = os.imports.createJob
       .where(
         and(
           eq(importJobs.userId, context.user.id),
-          eq(importJobs.status, "running"),
+          inArray(importJobs.status, ["pending", "running"]),
         ),
       )
       .get();
@@ -186,7 +186,7 @@ export const jobEvents = os.imports.jobEvents
       if (isTerminal) return;
 
       if (Date.now() - startedAt > MAX_POLL_DURATION_MS) {
-        yield { type: "complete" as const, job };
+        yield { type: "timeout" as const, job };
         return;
       }
 

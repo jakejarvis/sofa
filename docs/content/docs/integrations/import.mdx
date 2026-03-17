@@ -64,8 +64,8 @@ When you confirm the import, Sofa creates a background job that:
 Imports are safe to re-run. Sofa checks for existing data before writing:
 
 - **Watches** — skipped if you already have a watch record for that movie or episode
-- **Watchlist** — upserted (added or updated)
-- **Ratings** — upserted (overwrites any existing rating for that title)
+- **Watchlist** — skipped if a status already exists for that title
+- **Ratings** — skipped if you already have a rating for that title
 
 ### Rating Conversion
 

@@ -340,7 +340,23 @@ async function processRating(
 
 export function readImportJob(jobId: string, userId?: string): ImportJob {
   const row = db
-    .select()
+    .select({
+      id: importJobs.id,
+      userId: importJobs.userId,
+      source: importJobs.source,
+      status: importJobs.status,
+      totalItems: importJobs.totalItems,
+      processedItems: importJobs.processedItems,
+      importedCount: importJobs.importedCount,
+      skippedCount: importJobs.skippedCount,
+      failedCount: importJobs.failedCount,
+      currentMessage: importJobs.currentMessage,
+      errors: importJobs.errors,
+      warnings: importJobs.warnings,
+      createdAt: importJobs.createdAt,
+      startedAt: importJobs.startedAt,
+      finishedAt: importJobs.finishedAt,
+    })
     .from(importJobs)
     .where(eq(importJobs.id, jobId))
     .get();

@@ -117,11 +117,15 @@ app.post(
     }),
   ),
   async (c) => {
-    const { rateLimited } = await checkRateLimit("import-device-code", {
-      request: c.req.raw,
-    });
-    if (rateLimited) {
-      return c.json({ error: "Rate limit exceeded" }, 429);
+    try {
+      const { rateLimited } = await checkRateLimit("import-device-code", {
+        request: c.req.raw,
+      });
+      if (rateLimited) {
+        return c.json({ error: "Rate limit exceeded" }, 429);
+      }
+    } catch {
+      // WAF rule not configured — allow request through
     }
 
     const { provider: providerName } = c.req.valid("param");
@@ -164,11 +168,15 @@ app.post(
     }),
   ),
   async (c) => {
-    const { rateLimited } = await checkRateLimit("import-poll", {
-      request: c.req.raw,
-    });
-    if (rateLimited) {
-      return c.json({ error: "Rate limit exceeded" }, 429);
+    try {
+      const { rateLimited } = await checkRateLimit("import-poll", {
+        request: c.req.raw,
+      });
+      if (rateLimited) {
+        return c.json({ error: "Rate limit exceeded" }, 429);
+      }
+    } catch {
+      // WAF rule not configured — allow request through
     }
 
     const { provider: providerName } = c.req.valid("param");
@@ -192,12 +200,21 @@ app.post(
       }
 
       // Fetch user data and return it inline
-      const data = await provider.fetchUserData(
-        result.accessToken,
-        config.clientId,
-      );
-
-      return c.json({ status: "authorized", data });
+      try {
+        const data = await provider.fetchUserData(
+          result.accessToken,
+          config.clientId,
+        );
+        return c.json({ status: "authorized", data });
+      } catch (e) {
+        // Token was obtained but data fetch failed — return authorized status
+        // with error so the client knows auth succeeded but can retry
+        return c.json({
+          status: "authorized",
+          data: null,
+          error: e instanceof Error ? e.message : "Failed to fetch user data",
+        });
+      }
     } catch (e) {
       return c.json(
         { error: e instanceof Error ? e.message : "Poll failed" },
