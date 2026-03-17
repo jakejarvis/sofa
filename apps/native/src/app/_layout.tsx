@@ -3,7 +3,7 @@ import { ThemeProvider } from "@react-navigation/native";
 import {
   persistQueryClientRestore,
   persistQueryClientSubscribe,
-} from "@tanstack/query-persist-client-core";
+} from "@tanstack/react-query-persist-client";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -286,6 +286,10 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
 
     // Restore the persisted cache from the active MMKV partition, then
     // subscribe so every subsequent cache update is written back.
+    // Clear the cache first so a scope change doesn't leave stale data
+    // from a previous partition if the async restore races.
+    queryClient.clear();
+
     let unsubscribe: (() => void) | undefined;
     let aborted = false;
 
