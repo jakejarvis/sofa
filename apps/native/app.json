@@ -23,18 +23,8 @@
       "package": "com.jakejarvis.sofa"
     },
     "plugins": [
-      [
-        "expo-router",
-        {
-          "root": "./src/app"
-        }
-      ],
-      [
-        "expo-secure-store",
-        {
-          "configureAndroidBackup": true
-        }
-      ],
+      "expo-router",
+      "expo-secure-store",
       [
         "expo-font",
         {
@@ -101,15 +91,15 @@
           "imageWidth": 200
         }
       ],
-      ["expo-system-ui"],
-      ["expo-web-browser"],
+      "expo-system-ui",
+      "expo-web-browser",
       [
         "expo-image-picker",
         {
           "microphonePermission": false
         }
       ],
-      ["expo-localization"],
+      "expo-localization",
       [
         "expo-tracking-transparency",
         {

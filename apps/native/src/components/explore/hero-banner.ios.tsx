@@ -13,6 +13,9 @@ import Animated, {
 import { useCSSVariable } from "uniwind";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
+import { client, orpc } from "@/lib/orpc";
+import { queryClient } from "@/lib/query-client";
+import { toast } from "@/lib/toast";
 
 export interface HeroBannerItem {
   id: string;
@@ -161,6 +164,22 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
             </Pressable>
           </Link.Trigger>
           <Link.Preview />
+          <Link.Menu>
+            <Link.MenuAction
+              title="Add to Watchlist"
+              icon="bookmark"
+              onPress={async () => {
+                await client.titles.quickAdd({ id: item.id });
+                toast.success(`Added "${item.title}" to watchlist`);
+                queryClient.invalidateQueries({
+                  queryKey: orpc.titles.key(),
+                });
+                queryClient.invalidateQueries({
+                  queryKey: orpc.dashboard.key(),
+                });
+              }}
+            />
+          </Link.Menu>
         </Link>
       </Animated.View>
     </GestureDetector>

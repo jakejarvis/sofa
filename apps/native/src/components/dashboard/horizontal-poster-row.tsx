@@ -29,8 +29,7 @@ export function HorizontalPosterRow({
   items: PosterRowItem[];
   isLoading?: boolean;
 }) {
-  const { handleQuickAdd, addingKey, failedKey, resetError } =
-    usePosterActions();
+  const { handleQuickAdd, addingKey } = usePosterActions();
   const keyExtractor = useCallback((item: PosterRowItem) => item.id, []);
   const renderItem = useCallback(
     ({ item }: { item: PosterRowItem }) => (
@@ -46,11 +45,9 @@ export function HorizontalPosterRow({
         episodeProgress={item.episodeProgress}
         onQuickAdd={handleQuickAdd}
         isAdding={addingKey === item.id}
-        failedKey={failedKey}
-        onQuickAddFailed={resetError}
       />
     ),
-    [addingKey, failedKey, handleQuickAdd, resetError],
+    [addingKey, handleQuickAdd],
   );
 
   if (isLoading) {

@@ -75,8 +75,7 @@ export default function PersonDetailScreen() {
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const primaryColor = useCSSVariable("--color-primary") as string;
 
-  const { handleQuickAdd, addingKey, failedKey, resetError } =
-    usePosterActions();
+  const { handleQuickAdd, addingKey } = usePosterActions();
 
   const {
     data,
@@ -144,19 +143,10 @@ export default function PersonDetailScreen() {
           width={columnWidth}
           onQuickAdd={handleQuickAdd}
           isAdding={addingKey === credit.titleId}
-          failedKey={failedKey}
-          onQuickAddFailed={resetError}
         />
       </View>
     ),
-    [
-      columnWidth,
-      userStatuses,
-      handleQuickAdd,
-      addingKey,
-      failedKey,
-      resetError,
-    ],
+    [columnWidth, userStatuses, handleQuickAdd, addingKey],
   );
 
   if (isPending) {

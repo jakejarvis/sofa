@@ -9,7 +9,7 @@ import {
   IconStarFilled,
 } from "@tabler/icons-react-native";
 import { Link } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -20,7 +20,6 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
-import * as ContextMenu from "zeego/context-menu";
 import { Image } from "@/components/ui/image";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,8 +43,6 @@ interface PosterCardProps {
   width?: number;
   onQuickAdd: (id: string) => void;
   isAdding?: boolean;
-  failedKey?: string | null;
-  onQuickAddFailed?: () => void;
 }
 
 export function PosterCard({
@@ -61,8 +58,6 @@ export function PosterCard({
   width = 140,
   onQuickAdd,
   isAdding,
-  failedKey,
-  onQuickAddFailed,
 }: PosterCardProps) {
   const primaryColor = useCSSVariable("--color-primary") as string;
   const watchlistColor = useCSSVariable("--color-status-watchlist") as string;
@@ -77,20 +72,6 @@ export function PosterCard({
 
   const reduceMotion = useReducedMotion();
   const pressed = useSharedValue(0);
-  const [localStatus, setLocalStatus] = useState<TitleStatus | null>(
-    userStatus ?? null,
-  );
-
-  useEffect(() => {
-    setLocalStatus(userStatus ?? null);
-  }, [userStatus]);
-
-  useEffect(() => {
-    if (failedKey === id) {
-      setLocalStatus(userStatus ?? null);
-      onQuickAddFailed?.();
-    }
-  }, [failedKey, id, userStatus, onQuickAddFailed]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -101,20 +82,19 @@ export function PosterCard({
   }));
 
   const handleQuickAddPress = useCallback(() => {
-    if (localStatus || isAdding) return;
-    setLocalStatus("watchlist");
+    if (userStatus || isAdding) return;
     onQuickAdd(id);
-  }, [localStatus, isAdding, onQuickAdd, id]);
+  }, [userStatus, isAdding, onQuickAdd, id]);
 
   const year = releaseDate?.slice(0, 4);
   const imageHeight = width * 1.5;
 
   const statusLabel =
-    localStatus === "completed"
+    userStatus === "completed"
       ? "completed"
-      : localStatus === "in_progress"
+      : userStatus === "in_progress"
         ? "watching"
-        : localStatus === "watchlist"
+        : userStatus === "watchlist"
           ? "on watchlist"
           : undefined;
   const cardAccessibilityLabel = [
@@ -129,7 +109,7 @@ export function PosterCard({
   const cardContent = (
     <View
       className={`overflow-hidden rounded-xl border bg-card ${
-        localStatus ? "border-primary/25" : "border-white/[0.06]"
+        userStatus ? "border-primary/25" : "border-white/[0.06]"
       }`}
       style={{ borderCurve: "continuous" }}
     >
@@ -153,15 +133,15 @@ export function PosterCard({
         )}
 
         {/* Status indicator */}
-        {localStatus && (
+        {userStatus && (
           <View
             accessible={false}
             className="absolute top-2 right-2 size-[30px] items-center justify-center rounded-full"
             style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
           >
-            {localStatus === "completed" ? (
+            {userStatus === "completed" ? (
               <IconCheckbox size={16} color="white" />
-            ) : localStatus === "in_progress" ? (
+            ) : userStatus === "in_progress" ? (
               <IconPlayerPlayFilled size={16} color="white" />
             ) : (
               <IconBookmarkFilled size={16} color="white" />
@@ -190,10 +170,10 @@ export function PosterCard({
       {/* Metadata */}
       <View className="px-2.5 pt-2 pb-2.5">
         <View className="flex-row items-center gap-1.5">
-          {localStatus && (
+          {userStatus && (
             <View
               className="size-1.5 rounded-full"
-              style={{ backgroundColor: statusColors[localStatus] }}
+              style={{ backgroundColor: statusColors[userStatus] }}
             />
           )}
           <Text
@@ -228,7 +208,7 @@ export function PosterCard({
       </View>
     </View>
   );
-  const quickAddButton = !localStatus ? (
+  const quickAddButton = !userStatus ? (
     <Pressable
       onPress={handleQuickAddPress}
       disabled={!!isAdding}
@@ -262,97 +242,89 @@ export function PosterCard({
   const titleHref = `/title/${id}` as `/title/${string}`;
 
   return (
-    <ContextMenu.Root>
-      <ContextMenu.Trigger>
-        <GestureDetector gesture={pressGesture}>
-          <Animated.View style={[animatedStyle, { width }]}>
-            <View>
-              <Link href={titleHref} asChild>
-                <Link.Trigger withAppleZoom>
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={cardAccessibilityLabel}
-                  >
-                    {cardContent}
-                  </Pressable>
-                </Link.Trigger>
-                <Link.Preview />
-              </Link>
-              {quickAddButton}
-            </View>
-          </Animated.View>
-        </GestureDetector>
-      </ContextMenu.Trigger>
-      <ContextMenu.Content>
-        {!localStatus && (
-          <ContextMenu.Item key="watchlist" onSelect={handleQuickAddPress}>
-            <ContextMenu.ItemIcon ios={{ name: "bookmark" }} />
-            <ContextMenu.ItemTitle>Add to Watchlist</ContextMenu.ItemTitle>
-          </ContextMenu.Item>
-        )}
-        {localStatus !== "in_progress" && (
-          <ContextMenu.Item
-            key="watching"
-            onSelect={async () => {
-              await client.titles.updateStatus({
-                id,
-                status: "in_progress",
-              });
-              toast.success("Marked as watching");
-              queryClient.invalidateQueries({
-                queryKey: orpc.titles.key(),
-              });
-              queryClient.invalidateQueries({
-                queryKey: orpc.dashboard.key(),
-              });
-            }}
-          >
-            <ContextMenu.ItemIcon ios={{ name: "play.fill" }} />
-            <ContextMenu.ItemTitle>Mark as Watching</ContextMenu.ItemTitle>
-          </ContextMenu.Item>
-        )}
-        {type === "movie" && (
-          <ContextMenu.Item
-            key="watched"
-            onSelect={async () => {
-              await client.titles.watchMovie({ id });
-              toast.success(
-                title ? `Marked "${title}" as watched` : "Marked as watched",
-              );
-              queryClient.invalidateQueries({
-                queryKey: orpc.titles.key(),
-              });
-              queryClient.invalidateQueries({
-                queryKey: orpc.dashboard.key(),
-              });
-            }}
-          >
-            <ContextMenu.ItemIcon ios={{ name: "checkmark.circle" }} />
-            <ContextMenu.ItemTitle>Mark as Watched</ContextMenu.ItemTitle>
-          </ContextMenu.Item>
-        )}
-        {localStatus && (
-          <ContextMenu.Item
-            key="remove"
-            destructive
-            onSelect={async () => {
-              await client.titles.updateStatus({ id, status: null });
-              setLocalStatus(null);
-              toast.success("Removed from library");
-              queryClient.invalidateQueries({
-                queryKey: orpc.titles.key(),
-              });
-              queryClient.invalidateQueries({
-                queryKey: orpc.dashboard.key(),
-              });
-            }}
-          >
-            <ContextMenu.ItemIcon ios={{ name: "trash" }} />
-            <ContextMenu.ItemTitle>Remove from Library</ContextMenu.ItemTitle>
-          </ContextMenu.Item>
-        )}
-      </ContextMenu.Content>
-    </ContextMenu.Root>
+    <GestureDetector gesture={pressGesture}>
+      <Animated.View style={[animatedStyle, { width }]}>
+        <View>
+          <Link href={titleHref} asChild>
+            <Link.Trigger withAppleZoom>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={cardAccessibilityLabel}
+              >
+                {cardContent}
+              </Pressable>
+            </Link.Trigger>
+            <Link.Preview />
+            <Link.Menu>
+              {!userStatus && (
+                <Link.MenuAction
+                  title="Add to Watchlist"
+                  icon="bookmark"
+                  onPress={handleQuickAddPress}
+                />
+              )}
+              {userStatus !== "in_progress" && (
+                <Link.MenuAction
+                  title="Mark as Watching"
+                  icon="play.fill"
+                  onPress={async () => {
+                    await client.titles.updateStatus({
+                      id,
+                      status: "in_progress",
+                    });
+                    toast.success("Marked as watching");
+                    queryClient.invalidateQueries({
+                      queryKey: orpc.titles.key(),
+                    });
+                    queryClient.invalidateQueries({
+                      queryKey: orpc.dashboard.key(),
+                    });
+                  }}
+                />
+              )}
+              {type === "movie" && (
+                <Link.MenuAction
+                  title="Mark as Watched"
+                  icon="checkmark.circle"
+                  onPress={async () => {
+                    await client.titles.watchMovie({ id });
+                    toast.success(
+                      title
+                        ? `Marked "${title}" as watched`
+                        : "Marked as watched",
+                    );
+                    queryClient.invalidateQueries({
+                      queryKey: orpc.titles.key(),
+                    });
+                    queryClient.invalidateQueries({
+                      queryKey: orpc.dashboard.key(),
+                    });
+                  }}
+                />
+              )}
+              {userStatus && (
+                <Link.MenuAction
+                  title="Remove from Library"
+                  icon="trash"
+                  destructive
+                  onPress={async () => {
+                    await client.titles.updateStatus({ id, status: null });
+                    toast.success("Removed from library");
+                    queryClient.invalidateQueries({
+                      queryKey: orpc.titles.key(),
+                    });
+                    queryClient.invalidateQueries({
+                      queryKey: orpc.dashboard.key(),
+                    });
+                  }}
+                />
+              )}
+            </Link.Menu>
+          </Link>
+          {quickAddButton}
+        </View>
+      </Animated.View>
+    </GestureDetector>
   );
 }
 

@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import { useCallback } from "react";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { toast } from "@/lib/toast";
@@ -25,26 +24,14 @@ export function usePosterActions() {
     }),
   );
 
-  const handleQuickAdd = useCallback(
-    (id: string) => {
-      quickAddMutation.mutate({ id });
-    },
-    [quickAddMutation.mutate],
-  );
+  const handleQuickAdd = (id: string) => {
+    quickAddMutation.mutate({ id });
+  };
 
   const addingKey =
     quickAddMutation.isPending && quickAddMutation.variables
       ? quickAddMutation.variables.id
       : null;
 
-  const failedKey =
-    quickAddMutation.isError && quickAddMutation.variables
-      ? quickAddMutation.variables.id
-      : null;
-
-  const resetError = useCallback(() => {
-    quickAddMutation.reset();
-  }, [quickAddMutation.reset]);
-
-  return { handleQuickAdd, addingKey, failedKey, resetError };
+  return { handleQuickAdd, addingKey };
 }
