@@ -1,24 +1,24 @@
-import { useForm } from "@tanstack/react-form";
+import { IconServer2 } from "@tabler/icons-react-native";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
-import { useRef } from "react";
-import { Alert, Pressable, type TextInput, View } from "react-native";
+import { useRef, useState } from "react";
+import { Pressable, type TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import { useCSSVariable } from "uniwind";
 import { z } from "zod";
 import { AuthScreen } from "@/components/auth-screen";
-import { AuthStackHeader } from "@/components/navigation/auth-stack-header";
 import { Button, ButtonLabel } from "@/components/ui/button";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import {
-  FieldError,
-  Input,
-  Label,
-  TextField,
-} from "@/components/ui/text-field";
+import { Input, Label, TextField } from "@/components/ui/text-field";
 import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
+import { getServerUrl, splitUrl } from "@/lib/server-url";
+import { toast } from "@/lib/toast";
+import { getFormErrors } from "@/utils/form-errors";
 import * as Haptics from "@/utils/haptics";
 
 const signInSchema = z.object({
@@ -30,37 +30,33 @@ const signInSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-function formatFormErrors(errors: unknown): string | null {
-  if (!errors) return null;
-  if (typeof errors === "string") return errors;
-  if (typeof errors === "object") {
-    const first = Object.values(errors as Record<string, { message: string }[]>)
-      .flat()
-      .find((e) => e.message);
-    if (first) return first.message;
-  }
-  return null;
-}
-
 export default function LoginScreen() {
   const passwordRef = useRef<TextInput>(null);
+  const [errorFields, setErrorFields] = useState<Set<string>>(new Set());
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   const authConfig = useQuery(orpc.system.authConfig.queryOptions());
 
   const form = useForm({
     defaultValues: { email: "", password: "" },
-    validators: { onSubmit: signInSchema },
-    onSubmit: async ({ value, formApi }) => {
+    onSubmit: async ({ value }) => {
+      const result = signInSchema.safeParse(value);
+      if (!result.success) {
+        const { message, fields } = getFormErrors(result.error);
+        setErrorFields(fields);
+        toast.error(message);
+        return;
+      }
+
       await authClient.signIn.email(
-        { email: value.email.trim(), password: value.password },
+        { email: result.data.email, password: result.data.password },
         {
           onError(error) {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            Alert.alert("Error", error.error?.message || "Failed to sign in");
+            toast.error(error.error?.message || "Failed to sign in");
           },
           onSuccess() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            formApi.reset();
+            setIsSignedIn(true);
             queryClient.invalidateQueries();
           },
         },
@@ -68,13 +64,30 @@ export default function LoginScreen() {
     },
   });
 
+  const isSubmitting = useStore(form.store, (s) => s.isSubmitting);
+  const busy = isSubmitting || isSignedIn;
+
+  const statusCompletedColor = useCSSVariable(
+    "--color-status-completed",
+  ) as string;
+  const serverHost = splitUrl(getServerUrl()).host;
+
   const showPasswordLogin = !authConfig.data?.passwordLoginDisabled;
   const showOidc = authConfig.data?.oidcEnabled;
   const showRegister = authConfig.data?.registrationOpen;
 
+  const clearFieldError = (name: string) => {
+    if (errorFields.has(name)) {
+      setErrorFields((prev) => {
+        const next = new Set(prev);
+        next.delete(name);
+        return next;
+      });
+    }
+  };
+
   return (
     <AuthScreen title="Sofa" subtitle="Sign in to continue">
-      <AuthStackHeader title="Sign In" />
       {showOidc && (
         <Animated.View
           entering={FadeInDown.duration(300).delay(100)}
@@ -106,108 +119,119 @@ export default function LoginScreen() {
       )}
 
       {showPasswordLogin && (
-        <form.Subscribe
-          selector={(state) => ({
-            isSubmitting: state.isSubmitting,
-            validationError: formatFormErrors(state.errorMap.onSubmit),
-          })}
-        >
-          {({ isSubmitting, validationError }) => (
-            <View className="gap-3">
-              {validationError && (
-                <FieldError isInvalid className="mb-1">
-                  {validationError}
-                </FieldError>
+        <View className="gap-3">
+          <Animated.View entering={FadeInDown.duration(300).delay(200)}>
+            <form.Field name="email">
+              {(field) => (
+                <TextField>
+                  <Label>Email</Label>
+                  <Input
+                    value={field.state.value}
+                    accessibilityLabel="Email"
+                    onBlur={field.handleBlur}
+                    onChangeText={(text) => {
+                      field.handleChange(text);
+                      clearFieldError("email");
+                    }}
+                    placeholder="wwhite@graymatter.biz"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    textContentType="emailAddress"
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                    onSubmitEditing={() => passwordRef.current?.focus()}
+                    className={
+                      errorFields.has("email")
+                        ? "border-destructive"
+                        : undefined
+                    }
+                  />
+                </TextField>
               )}
+            </form.Field>
+          </Animated.View>
 
-              <Animated.View entering={FadeInDown.duration(300).delay(200)}>
-                <form.Field name="email">
-                  {(field) => (
-                    <TextField>
-                      <Label>Email</Label>
-                      <Input
-                        value={field.state.value}
-                        accessibilityLabel="Email"
-                        onBlur={field.handleBlur}
-                        onChangeText={field.handleChange}
-                        placeholder="email@example.com"
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        autoComplete="email"
-                        textContentType="emailAddress"
-                        returnKeyType="next"
-                        blurOnSubmit={false}
-                        onSubmitEditing={() => passwordRef.current?.focus()}
-                      />
-                    </TextField>
-                  )}
-                </form.Field>
-              </Animated.View>
+          <Animated.View entering={FadeInDown.duration(300).delay(300)}>
+            <form.Field name="password">
+              {(field) => (
+                <TextField>
+                  <Label>Password</Label>
+                  <Input
+                    ref={passwordRef}
+                    value={field.state.value}
+                    accessibilityLabel="Password"
+                    onBlur={field.handleBlur}
+                    onChangeText={(text) => {
+                      field.handleChange(text);
+                      clearFieldError("password");
+                    }}
+                    placeholder="••••••••"
+                    secureTextEntry
+                    autoComplete="password"
+                    textContentType="password"
+                    returnKeyType="go"
+                    onSubmitEditing={form.handleSubmit}
+                    className={
+                      errorFields.has("password")
+                        ? "border-destructive"
+                        : undefined
+                    }
+                  />
+                </TextField>
+              )}
+            </form.Field>
+          </Animated.View>
 
-              <Animated.View entering={FadeInDown.duration(300).delay(300)}>
-                <form.Field name="password">
-                  {(field) => (
-                    <TextField>
-                      <Label>Password</Label>
-                      <Input
-                        ref={passwordRef}
-                        value={field.state.value}
-                        accessibilityLabel="Password"
-                        onBlur={field.handleBlur}
-                        onChangeText={field.handleChange}
-                        placeholder="••••••••"
-                        secureTextEntry
-                        autoComplete="password"
-                        textContentType="password"
-                        returnKeyType="go"
-                        onSubmitEditing={form.handleSubmit}
-                      />
-                    </TextField>
-                  )}
-                </form.Field>
-              </Animated.View>
+          <Animated.View entering={FadeInDown.duration(300).delay(400)}>
+            <Button
+              onPress={form.handleSubmit}
+              disabled={busy}
+              className="mt-2"
+            >
+              {busy ? (
+                <Spinner size="sm" />
+              ) : (
+                <ButtonLabel>Sign In</ButtonLabel>
+              )}
+            </Button>
+          </Animated.View>
 
-              <Animated.View entering={FadeInDown.duration(300).delay(400)}>
-                <Button
-                  onPress={form.handleSubmit}
-                  disabled={isSubmitting}
-                  className="mt-1 bg-primary"
-                >
-                  {isSubmitting ? (
-                    <Spinner size="sm" />
-                  ) : (
-                    <ButtonLabel>Sign In</ButtonLabel>
-                  )}
+          {showRegister && (
+            <Animated.View entering={FadeIn.duration(300).delay(500)}>
+              <Link href="/(auth)/register" asChild>
+                <Button disabled={busy} variant="secondary">
+                  <ButtonLabel>Create an account</ButtonLabel>
                 </Button>
-              </Animated.View>
-            </View>
+              </Link>
+            </Animated.View>
           )}
-        </form.Subscribe>
-      )}
 
-      {showRegister && (
-        <Animated.View
-          entering={FadeIn.duration(300).delay(500)}
-          className="mt-6 items-center"
-        >
-          <Link href="/(auth)/register" asChild>
-            <Pressable>
-              <Text className="text-primary text-sm">Create an account</Text>
-            </Pressable>
-          </Link>
-        </Animated.View>
+          <Animated.View
+            entering={FadeIn.duration(300).delay(500)}
+            className="mt-8 items-center"
+          >
+            <Link href="/(auth)/server-url" replace asChild>
+              <Pressable
+                disabled={busy}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: busy }}
+                className="flex-row items-center gap-1.5"
+              >
+                <ScaledIcon
+                  icon={IconServer2}
+                  size={14}
+                  color={statusCompletedColor}
+                />
+                <Text className="font-sans text-muted-foreground text-xs">
+                  Connected to <Text className="font-medium">{serverHost}</Text>
+                  . Tap to change.
+                </Text>
+              </Pressable>
+            </Link>
+          </Animated.View>
+        </View>
       )}
-
-      <Animated.View
-        entering={FadeIn.duration(300).delay(500)}
-        className="mt-4 items-center"
-      >
-        <Link href="/(auth)/server-url" asChild>
-          <Pressable>
-            <Text className="text-muted-foreground text-xs">Change server</Text>
-          </Pressable>
-        </Link>
-      </Animated.View>
     </AuthScreen>
   );
 }

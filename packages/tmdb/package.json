@@ -15,7 +15,6 @@
     "generate-schema": "bunx openapi-typescript https://developer.themoviedb.org/openapi/tmdb-api.json -o ./src/schema.d.ts"
   },
   "dependencies": {
-    "@sofa/db": "workspace:*",
     "@sofa/logger": "workspace:*",
     "openapi-fetch": "0.17.0"
   },

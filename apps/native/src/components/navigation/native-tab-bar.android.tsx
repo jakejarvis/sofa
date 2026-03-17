@@ -1,27 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
 import {
   NativeTabs,
   type NativeTabsProps,
 } from "expo-router/unstable-native-tabs";
 import { useMemo } from "react";
 import { useCSSVariable, useResolveClassNames } from "uniwind";
-import { authClient } from "@/lib/auth-client";
-import { orpc } from "@/lib/orpc";
 import * as Haptics from "@/utils/haptics";
 
-export function NativeTabBar() {
+export function NativeTabBar({
+  showSettingsBadge,
+}: {
+  showSettingsBadge: boolean;
+}) {
   const primaryColor = useCSSVariable("--color-primary") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
   const surfaceColor = useCSSVariable("--color-card") as string;
   const rippleColor = useCSSVariable("--color-secondary") as string;
-  const { data: session } = authClient.useSession();
-  const isAdmin = session?.user?.role === "admin";
-  const updateCheck = useQuery({
-    ...orpc.admin.updateCheck.queryOptions(),
-    enabled: isAdmin,
-    staleTime: 10 * 60 * 1000,
-  });
-  const showSettingsBadge = !!updateCheck.data?.updateCheck?.updateAvailable;
+  const labelTextStyle = useResolveClassNames("font-medium font-sans text-xs");
 
   const screenListeners = useMemo<NativeTabsProps["screenListeners"]>(
     () => ({
@@ -31,7 +25,6 @@ export function NativeTabBar() {
     }),
     [],
   );
-  const labelTextStyle = useResolveClassNames("font-medium font-sans text-xs");
 
   return (
     <NativeTabs
@@ -43,14 +36,8 @@ export function NativeTabBar() {
       }}
       indicatorColor="transparent"
       labelStyle={{
-        default: [
-          labelTextStyle as Record<string, unknown>,
-          { color: mutedFgColor },
-        ],
-        selected: [
-          labelTextStyle as Record<string, unknown>,
-          { color: primaryColor },
-        ],
+        default: [labelTextStyle, { color: mutedFgColor }],
+        selected: [labelTextStyle, { color: primaryColor }],
       }}
       labelVisibilityMode="labeled"
       rippleColor={rippleColor}

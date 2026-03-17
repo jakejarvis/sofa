@@ -25,7 +25,7 @@ import {
   HorizontalPosterRow,
   type PosterRowItem,
 } from "@/components/dashboard/horizontal-poster-row";
-import { DetailStackHeader } from "@/components/navigation/detail-stack-header";
+import { DetailStackHeader } from "@/components/navigation/modal-stack-header";
 import { CastCard } from "@/components/titles/cast-card";
 import { ContinueWatchingBanner } from "@/components/titles/continue-watching-banner";
 import { SeasonAccordion } from "@/components/titles/season-accordion";
@@ -306,334 +306,333 @@ export default function TitleDetailScreen() {
   const year = (title.releaseDate ?? title.firstAirDate)?.slice(0, 4);
 
   return (
-    <>
-      <DetailStackHeader title={title.title} />
-      <ScrollView
-        className="bg-background"
-        contentInsetAdjustmentBehavior={
-          useAutomaticInsets ? "automatic" : "never"
-        }
-        contentContainerStyle={titleScrollContentStyle}
+    <ScrollView
+      className="bg-background"
+      contentInsetAdjustmentBehavior={
+        useAutomaticInsets ? "automatic" : "never"
+      }
+      contentContainerStyle={titleScrollContentStyle}
+    >
+      <DetailStackHeader />
+
+      {/* Hero */}
+      <View className="h-[300px]" style={heroMarginStyle}>
+        {title.backdropPath && (
+          <Image
+            source={{ uri: title.backdropPath }}
+            thumbHash={title.backdropThumbHash}
+            style={titleDetailStyles.heroFill}
+            contentFit="cover"
+          />
+        )}
+        {/* Base darkening overlay */}
+        <View style={titleDetailStyles.heroBaseOverlay} />
+        {/* Colored tint from palette */}
+        {palette?.darkMuted && (
+          <View style={[titleDetailStyles.heroFill, darkMutedOverlayStyle]} />
+        )}
+        {palette?.vibrant && (
+          <View style={[titleDetailStyles.heroFill, vibrantOverlayStyle]} />
+        )}
+        {/* Bottom fade to background */}
+        <LinearGradient
+          colors={["transparent", "rgba(0,0,0,0.6)", "rgba(0,0,0,0.95)"]}
+          locations={[0, 0.5, 1]}
+          style={titleDetailStyles.heroGradient}
+        />
+
+        {title.trailerVideoKey && (
+          <Pressable
+            onPress={() =>
+              WebBrowser.openBrowserAsync(
+                `https://www.youtube.com/watch?v=${title.trailerVideoKey}`,
+              )
+            }
+            accessibilityRole="button"
+            accessibilityLabel={`Play trailer for ${title.title}`}
+            accessibilityHint="Opens the trailer in YouTube"
+            className="absolute inset-0 items-center justify-center"
+          >
+            {isLiquidGlassAvailable() ? (
+              <GlassView
+                glassEffectStyle="clear"
+                colorScheme="dark"
+                isInteractive={true}
+                style={titleDetailStyles.trailerGlass}
+              >
+                <IconPlayerPlay size={28} color="white" fill="white" />
+              </GlassView>
+            ) : (
+              <View
+                className="h-14 w-14 items-center justify-center rounded-full"
+                style={titleDetailStyles.trailerFallback}
+              >
+                <IconPlayerPlay size={28} color="white" fill="white" />
+              </View>
+            )}
+          </Pressable>
+        )}
+
+        <View className="absolute right-0 bottom-0 left-0 flex-row items-end p-4">
+          {title.posterPath && (
+            <Link.AppleZoomTarget>
+              <View
+                className="mr-3 h-[150px] w-[100px] overflow-hidden rounded-lg"
+                style={[{ borderCurve: "continuous" }, posterShadowStyle]}
+              >
+                <Image
+                  source={{ uri: title.posterPath }}
+                  thumbHash={title.posterThumbHash}
+                  style={titleDetailStyles.posterImage}
+                  contentFit="cover"
+                />
+              </View>
+            </Link.AppleZoomTarget>
+          )}
+          <View className="flex-1 pb-1">
+            <Text
+              className="font-display text-2xl text-white"
+              numberOfLines={2}
+            >
+              {title.title}
+            </Text>
+            <View className="mt-1.5 flex-row flex-wrap items-center gap-2">
+              <View className="rounded-full bg-title-accent px-2 py-0.5">
+                <Text
+                  maxFontSizeMultiplier={1.0}
+                  className="font-medium font-sans text-title-accent-foreground text-xs"
+                >
+                  {title.type === "movie" ? "Movie" : "TV"}
+                </Text>
+              </View>
+              {year ? (
+                <Text className="text-sm text-white/70">{year}</Text>
+              ) : null}
+              {title.contentRating ? (
+                <Text className="text-white/50 text-xs">
+                  {title.contentRating}
+                </Text>
+              ) : null}
+              {title.voteAverage != null && title.voteAverage > 0 && (
+                <View className="flex-row items-center gap-0.5">
+                  <ScaledIcon
+                    icon={IconStarFilled}
+                    size={12}
+                    color={titleAccent}
+                  />
+                  <Text className="text-title-accent text-xs">
+                    {title.voteAverage.toFixed(1)}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* Genres */}
+      {title.genres && title.genres.length > 0 && (
+        <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mt-3"
+            contentContainerStyle={titleGenresContentStyle}
+          >
+            {title.genres.map((genre: string) => (
+              <View
+                key={genre}
+                className="mr-2 rounded-full bg-secondary px-2.5 py-1"
+              >
+                <Text className="text-muted-foreground text-xs">{genre}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        </Animated.View>
+      )}
+
+      {/* Actions */}
+      <Animated.View
+        entering={FadeInDown.duration(300).delay(200)}
+        className="mt-4 px-4"
       >
-        {/* Hero */}
-        <View className="h-[300px]" style={heroMarginStyle}>
-          {title.backdropPath && (
-            <Image
-              source={{ uri: title.backdropPath }}
-              thumbHash={title.backdropThumbHash}
-              style={titleDetailStyles.heroFill}
-              contentFit="cover"
-            />
-          )}
-          {/* Base darkening overlay */}
-          <View style={titleDetailStyles.heroBaseOverlay} />
-          {/* Colored tint from palette */}
-          {palette?.darkMuted && (
-            <View style={[titleDetailStyles.heroFill, darkMutedOverlayStyle]} />
-          )}
-          {palette?.vibrant && (
-            <View style={[titleDetailStyles.heroFill, vibrantOverlayStyle]} />
-          )}
-          {/* Bottom fade to background */}
-          <LinearGradient
-            colors={["transparent", "rgba(0,0,0,0.6)", "rgba(0,0,0,0.95)"]}
-            locations={[0, 0.5, 1]}
-            style={titleDetailStyles.heroGradient}
+        <View className="flex-row flex-wrap items-center gap-3">
+          <StatusActionButton
+            currentStatus={userInfo.data?.status ?? null}
+            onStatusChange={(status) => {
+              if (status === "watchlist") {
+                quickAddMutation.mutate({ id });
+              } else {
+                updateStatus.mutate({ id, status: null });
+              }
+            }}
+            isPending={
+              updateStatus.isPending ||
+              quickAddMutation.isPending ||
+              watchMovie.isPending
+            }
           />
 
-          {title.trailerVideoKey && (
+          {title.type === "movie" && (
             <Pressable
-              onPress={() =>
-                WebBrowser.openBrowserAsync(
-                  `https://www.youtube.com/watch?v=${title.trailerVideoKey}`,
-                )
-              }
-              accessibilityRole="button"
-              accessibilityLabel={`Play trailer for ${title.title}`}
-              accessibilityHint="Opens the trailer in YouTube"
-              className="absolute inset-0 items-center justify-center"
+              onPress={() => watchMovie.mutate({ id })}
+              disabled={watchMovie.isPending}
+              className="flex-row items-center gap-1.5 rounded-lg bg-title-accent px-4 py-2"
             >
-              {isLiquidGlassAvailable() ? (
-                <GlassView
-                  glassEffectStyle="clear"
-                  colorScheme="dark"
-                  isInteractive={true}
-                  style={titleDetailStyles.trailerGlass}
-                >
-                  <IconPlayerPlay size={28} color="white" fill="white" />
-                </GlassView>
+              {watchMovie.isPending ? (
+                <Spinner size="sm" />
               ) : (
-                <View
-                  className="h-14 w-14 items-center justify-center rounded-full"
-                  style={titleDetailStyles.trailerFallback}
-                >
-                  <IconPlayerPlay size={28} color="white" fill="white" />
-                </View>
+                <>
+                  <ScaledIcon
+                    icon={IconCheck}
+                    size={16}
+                    color={titleAccentForeground}
+                  />
+                  <Text className="font-medium font-sans text-sm text-title-accent-foreground">
+                    Mark Watched
+                  </Text>
+                </>
               )}
             </Pressable>
           )}
 
-          <View className="absolute right-0 bottom-0 left-0 flex-row items-end p-4">
-            {title.posterPath && (
-              <Link.AppleZoomTarget>
-                <View
-                  className="mr-3 h-[150px] w-[100px] overflow-hidden rounded-lg"
-                  style={[{ borderCurve: "continuous" }, posterShadowStyle]}
-                >
-                  <Image
-                    source={{ uri: title.posterPath }}
-                    thumbHash={title.posterThumbHash}
-                    style={titleDetailStyles.posterImage}
-                    contentFit="cover"
-                  />
-                </View>
-              </Link.AppleZoomTarget>
-            )}
-            <View className="flex-1 pb-1">
-              <Text
-                className="font-display text-2xl text-white"
-                numberOfLines={2}
-              >
-                {title.title}
-              </Text>
-              <View className="mt-1.5 flex-row flex-wrap items-center gap-2">
-                <View className="rounded-full bg-title-accent px-2 py-0.5">
-                  <Text
-                    maxFontSizeMultiplier={1.0}
-                    className="font-medium font-sans text-title-accent-foreground text-xs"
-                  >
-                    {title.type === "movie" ? "Movie" : "TV"}
-                  </Text>
-                </View>
-                {year ? (
-                  <Text className="text-sm text-white/70">{year}</Text>
-                ) : null}
-                {title.contentRating ? (
-                  <Text className="text-white/50 text-xs">
-                    {title.contentRating}
-                  </Text>
-                ) : null}
-                {title.voteAverage != null && title.voteAverage > 0 && (
-                  <View className="flex-row items-center gap-0.5">
-                    <ScaledIcon
-                      icon={IconStarFilled}
-                      size={12}
-                      color={titleAccent}
-                    />
-                    <Text className="text-title-accent text-xs">
-                      {title.voteAverage.toFixed(1)}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </View>
-          </View>
+          <View className="h-6 w-px bg-border/50" />
+
+          <StarRating
+            rating={userInfo.data?.rating ?? 0}
+            onRate={(stars) => updateRating.mutate({ id, stars })}
+            accentColor={titleAccent}
+          />
         </View>
+      </Animated.View>
 
-        {/* Genres */}
-        {title.genres && title.genres.length > 0 && (
-          <Animated.View entering={FadeInDown.duration(300).delay(100)}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="mt-3"
-              contentContainerStyle={titleGenresContentStyle}
-            >
-              {title.genres.map((genre: string) => (
-                <View
-                  key={genre}
-                  className="mr-2 rounded-full bg-secondary px-2.5 py-1"
-                >
-                  <Text className="text-muted-foreground text-xs">{genre}</Text>
-                </View>
-              ))}
-            </ScrollView>
-          </Animated.View>
-        )}
-
-        {/* Actions */}
-        <Animated.View
-          entering={FadeInDown.duration(300).delay(200)}
-          className="mt-4 px-4"
-        >
-          <View className="flex-row flex-wrap items-center gap-3">
-            <StatusActionButton
-              currentStatus={userInfo.data?.status ?? null}
-              onStatusChange={(status) => {
-                if (status === "watchlist") {
-                  quickAddMutation.mutate({ id });
-                } else {
-                  updateStatus.mutate({ id, status: null });
-                }
-              }}
-              isPending={
-                updateStatus.isPending ||
-                quickAddMutation.isPending ||
-                watchMovie.isPending
-              }
-            />
-
-            {title.type === "movie" && (
-              <Pressable
-                onPress={() => watchMovie.mutate({ id })}
-                disabled={watchMovie.isPending}
-                className="flex-row items-center gap-1.5 rounded-lg bg-title-accent px-4 py-2"
-              >
-                {watchMovie.isPending ? (
-                  <Spinner size="sm" />
-                ) : (
-                  <>
-                    <ScaledIcon
-                      icon={IconCheck}
-                      size={16}
-                      color={titleAccentForeground}
-                    />
-                    <Text className="font-medium font-sans text-sm text-title-accent-foreground">
-                      Mark Watched
-                    </Text>
-                  </>
-                )}
-              </Pressable>
-            )}
-
-            <View className="h-6 w-px bg-border/50" />
-
-            <StarRating
-              rating={userInfo.data?.rating ?? 0}
-              onRate={(stars) => updateRating.mutate({ id, stars })}
-              accentColor={titleAccent}
-            />
+      {/* Overview */}
+      {title.overview ? (
+        <Animated.View entering={FadeIn.duration(300).delay(300)}>
+          <View className="mt-5 px-4">
+            <ExpandableText text={title.overview} actionColor={titleAccent} />
           </View>
         </Animated.View>
+      ) : null}
 
-        {/* Overview */}
-        {title.overview ? (
-          <Animated.View entering={FadeIn.duration(300).delay(300)}>
-            <View className="mt-5 px-4">
-              <ExpandableText text={title.overview} actionColor={titleAccent} />
-            </View>
-          </Animated.View>
-        ) : null}
-
-        {/* Availability */}
-        {availability.length > 0 && (
-          <Animated.View
-            entering={FadeInDown.duration(300).delay(400)}
-            className="mt-6"
-          >
-            <View className="px-4">
-              <SectionHeader
-                title="Where to Watch"
-                icon={providerIcon}
-                iconColor={titleAccent}
-              />
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={titleAvailabilityContentStyle}
-            >
-              {availability.map((offer) => (
-                <View
-                  key={`${offer.providerId}-${offer.offerType}`}
-                  className="items-center"
-                >
-                  {offer.logoPath && (
-                    <Image
-                      source={{ uri: offer.logoPath }}
-                      style={titleDetailStyles.providerLogo}
-                      contentFit="cover"
-                    />
-                  )}
-                  <Text
-                    maxFontSizeMultiplier={1.0}
-                    className="mt-1 max-w-[60px] text-center text-muted-foreground text-xs"
-                    numberOfLines={1}
-                  >
-                    {offer.providerName}
-                  </Text>
-                </View>
-              ))}
-            </ScrollView>
-          </Animated.View>
-        )}
-
-        {/* Continue Watching */}
-        {title.type === "tv" && (
-          <ContinueWatchingBanner
-            seasons={seasons}
-            watchedEpisodeIds={watchedEpisodeIds}
-            userStatus={userInfo.data?.status ?? null}
-            backdropPath={title.backdropPath}
-            backdropThumbHash={title.backdropThumbHash}
-          />
-        )}
-
-        {/* Seasons & Episodes */}
-        {title.type === "tv" && seasons.length > 0 && (
-          <Animated.View
-            entering={FadeInDown.duration(300).delay(400)}
-            className="mt-6 px-4"
-          >
+      {/* Availability */}
+      {availability.length > 0 && (
+        <Animated.View
+          entering={FadeInDown.duration(300).delay(400)}
+          className="mt-6"
+        >
+          <View className="px-4">
             <SectionHeader
-              title="Seasons"
-              icon={IconList}
+              title="Where to Watch"
+              icon={providerIcon}
               iconColor={titleAccent}
             />
-            {seasons.map((season) => (
-              <SeasonAccordion
-                key={season.id}
-                season={season}
-                episodes={season.episodes ?? []}
-                watchedEpisodeIds={watchedEpisodeIds}
-              />
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={titleAvailabilityContentStyle}
+          >
+            {availability.map((offer) => (
+              <View
+                key={`${offer.providerId}-${offer.offerType}`}
+                className="items-center"
+              >
+                {offer.logoPath && (
+                  <Image
+                    source={{ uri: offer.logoPath }}
+                    style={titleDetailStyles.providerLogo}
+                    contentFit="cover"
+                  />
+                )}
+                <Text
+                  maxFontSizeMultiplier={1.0}
+                  className="mt-1 max-w-[60px] text-center text-muted-foreground text-xs"
+                  numberOfLines={1}
+                >
+                  {offer.providerName}
+                </Text>
+              </View>
             ))}
-          </Animated.View>
-        )}
+          </ScrollView>
+        </Animated.View>
+      )}
 
-        {/* Cast */}
-        {cast.length > 0 && (
-          <Animated.View
-            entering={FadeInDown.duration(300).delay(500)}
-            className="mt-6"
-          >
-            <View className="px-4">
-              <SectionHeader
-                title="Cast"
-                icon={IconUsers}
-                iconColor={titleAccent}
-              />
-            </View>
-            <FlashList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={cast}
-              keyExtractor={(item, index) => `${item.id}-${index}`}
-              renderItem={renderCastItem}
-              ItemSeparatorComponent={HorizontalListSeparator}
-              contentContainerStyle={horizontalListContentStyle}
-              style={horizontalListStyle}
+      {/* Continue Watching */}
+      {title.type === "tv" && (
+        <ContinueWatchingBanner
+          seasons={seasons}
+          watchedEpisodeIds={watchedEpisodeIds}
+          userStatus={userInfo.data?.status ?? null}
+          backdropPath={title.backdropPath}
+          backdropThumbHash={title.backdropThumbHash}
+        />
+      )}
+
+      {/* Seasons & Episodes */}
+      {title.type === "tv" && seasons.length > 0 && (
+        <Animated.View
+          entering={FadeInDown.duration(300).delay(400)}
+          className="mt-6 px-4"
+        >
+          <SectionHeader
+            title="Seasons"
+            icon={IconList}
+            iconColor={titleAccent}
+          />
+          {seasons.map((season) => (
+            <SeasonAccordion
+              key={season.id}
+              season={season}
+              episodes={season.episodes ?? []}
+              watchedEpisodeIds={watchedEpisodeIds}
             />
-          </Animated.View>
-        )}
+          ))}
+        </Animated.View>
+      )}
 
-        {/* Recommendations */}
-        {recItems.length > 0 && (
-          <Animated.View
-            entering={FadeInDown.duration(300).delay(600)}
-            className="mt-6"
-          >
-            <View className="px-4">
-              <SectionHeader
-                title="More Like This"
-                icon={IconThumbUp}
-                iconColor={titleAccent}
-              />
-            </View>
-            <HorizontalPosterRow items={recItems} />
-          </Animated.View>
-        )}
-      </ScrollView>
-    </>
+      {/* Cast */}
+      {cast.length > 0 && (
+        <Animated.View
+          entering={FadeInDown.duration(300).delay(500)}
+          className="mt-6"
+        >
+          <View className="px-4">
+            <SectionHeader
+              title="Cast"
+              icon={IconUsers}
+              iconColor={titleAccent}
+            />
+          </View>
+          <FlashList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={cast}
+            keyExtractor={(item, index) => `${item.id}-${index}`}
+            renderItem={renderCastItem}
+            ItemSeparatorComponent={HorizontalListSeparator}
+            contentContainerStyle={horizontalListContentStyle}
+            style={horizontalListStyle}
+          />
+        </Animated.View>
+      )}
+
+      {/* Recommendations */}
+      {recItems.length > 0 && (
+        <Animated.View
+          entering={FadeInDown.duration(300).delay(600)}
+          className="mt-6"
+        >
+          <View className="px-4">
+            <SectionHeader
+              title="More Like This"
+              icon={IconThumbUp}
+              iconColor={titleAccent}
+            />
+          </View>
+          <HorizontalPosterRow items={recItems} />
+        </Animated.View>
+      )}
+    </ScrollView>
   );
 }

@@ -210,12 +210,9 @@ export default function SettingsScreen() {
       className="bg-background"
       contentContainerStyle={settingsContentContainerStyle}
       contentInsetAdjustmentBehavior="automatic"
+      scrollToOverflowEnabled
       refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColorClassName="accent-primary"
-        />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
       {/* Account */}
@@ -286,7 +283,7 @@ export default function SettingsScreen() {
                     </View>
                   ) : (
                     <View className="flex-1 items-center justify-center bg-primary/[0.08]">
-                      <Text className="font-medium font-sans text-lg text-primary">
+                      <Text className="font-display font-medium text-lg text-primary">
                         {session?.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
                       </Text>
                     </View>

@@ -3,13 +3,6 @@ import type { ReactNode } from "react";
 import { useCSSVariable, useResolveClassNames } from "uniwind";
 import { HeaderAvatar } from "@/components/header-avatar";
 
-const hiddenScrollEdgeEffects = {
-  top: "hidden" as const,
-  bottom: "hidden" as const,
-  left: "hidden" as const,
-  right: "hidden" as const,
-};
-
 export function TabStack({
   title,
   children,
@@ -35,7 +28,6 @@ export function TabStack({
       <Stack
         screenOptions={{
           contentStyle,
-          scrollEdgeEffects: hiddenScrollEdgeEffects,
           unstable_headerRightItems: () => [
             {
               type: "custom" as const,
@@ -49,7 +41,7 @@ export function TabStack({
           <Stack.Screen name="index">
             <Stack.Header
               transparent
-              blurEffect="dark"
+              blurEffect="systemChromeMaterialDark"
               style={{ color: tintColor, shadowColor: "transparent" }}
               largeStyle={{
                 backgroundColor: "transparent",

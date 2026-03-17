@@ -83,12 +83,9 @@ export default function DashboardScreen() {
       className="bg-background"
       contentContainerStyle={dashboardContentContainerStyle}
       contentInsetAdjustmentBehavior="automatic"
+      scrollToOverflowEnabled
       refreshControl={
-        <RefreshControl
-          refreshing={isRefreshing}
-          onRefresh={onRefresh}
-          tintColorClassName="accent-primary"
-        />
+        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
       }
     >
       <View className="gap-8">

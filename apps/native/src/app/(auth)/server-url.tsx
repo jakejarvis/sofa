@@ -5,7 +5,7 @@ import {
 } from "@tabler/icons-react-native";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Linking, Pressable, TextInput, View } from "react-native";
+import { Linking, Pressable, type TextInput, View } from "react-native";
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -16,10 +16,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
 import { AuthScreen } from "@/components/auth-screen";
-import { AuthStackHeader } from "@/components/navigation/auth-stack-header";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
+import { Input } from "@/components/ui/text-field";
 import {
   getServerUrl,
   hasStoredServerUrl,
@@ -153,30 +153,24 @@ export default function ServerUrlScreen() {
       subtitle="Enter your Sofa server URL to get started"
       logoStyle={iconAnimatedStyle}
     >
-      <AuthStackHeader title="Server" />
       <Animated.View entering={FadeInDown.duration(300).delay(200)}>
-        <View
-          className="min-h-12 flex-row items-center rounded-[12px] border border-border bg-input px-3.5"
-          style={{ borderCurve: "continuous" }}
-        >
-          <TextInput
-            ref={inputRef}
-            value={url}
-            accessibilityLabel="Server URL"
-            accessibilityHint="Enter the full URL for your Sofa server"
-            onChangeText={handleChangeText}
-            placeholder="https://sofa.example.com"
-            placeholderTextColorClassName="accent-muted-foreground/50"
-            keyboardType="url"
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="URL"
-            returnKeyType="go"
-            editable={!isDisabled}
-            onSubmitEditing={handleConnect}
-            className="flex-1 py-3 font-mono text-base text-foreground"
-          />
-        </View>
+        <Input
+          ref={inputRef}
+          value={url}
+          accessibilityLabel="Server URL"
+          accessibilityHint="Enter the full URL for your Sofa server"
+          onChangeText={handleChangeText}
+          placeholder="https://sofa.example.com"
+          placeholderTextColorClassName="accent-muted-foreground/50"
+          keyboardType="url"
+          autoCapitalize="none"
+          autoCorrect={false}
+          textContentType="URL"
+          returnKeyType="go"
+          editable={!isDisabled}
+          onSubmitEditing={handleConnect}
+          className="font-mono"
+        />
       </Animated.View>
 
       {/* Connect Button / Status */}

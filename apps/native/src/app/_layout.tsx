@@ -5,7 +5,12 @@ import {
   persistQueryClientRestore,
   persistQueryClientSubscribe,
 } from "@tanstack/react-query-persist-client";
-import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
+import {
+  Stack,
+  useGlobalSearchParams,
+  usePathname,
+  useRouter,
+} from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import {
@@ -17,6 +22,7 @@ import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";
 import { useEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { enableFreeze } from "react-native-screens";
 import { Uniwind, useResolveClassNames } from "uniwind";
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-banner";
@@ -45,6 +51,7 @@ import { sofaTheme } from "@/lib/theme";
 import { toast } from "@/lib/toast";
 
 SplashScreen.preventAutoHideAsync();
+enableFreeze(true);
 
 // Seed the session atom with cached data from SecureStore before React renders.
 // This allows the app to show cached data immediately when the server is
@@ -75,7 +82,7 @@ const changePasswordOptions =
         sheetAllowedDetents: "fitToContents" as const,
         sheetGrabberVisible: true,
         headerLargeTitle: false,
-        headerTransparent: false,
+        headerTransparent: true,
         headerBlurEffect: "none" as const,
       }
     : {
@@ -188,8 +195,17 @@ function AppContent() {
   }, [hasServerUrl]);
 
   // --- Session reconciliation: re-validate when server comes back ---
+  // Tracks whether the current session was seeded from cache and has NOT
+  // yet been confirmed by the server. Once confirmed (isRefetching becomes
+  // false while session still exists), this flips to false so that an
+  // explicit sign-out doesn't show a misleading "session expired" toast.
   const hadOptimisticSession = useRef(!!cachedSession);
   const prevSession = useRef(session);
+
+  const { isRefetching } = authClient.useSession();
+  if (hadOptimisticSession.current && session && !isRefetching) {
+    hadOptimisticSession.current = false;
+  }
 
   useEffect(() => {
     return onServerReachabilityChange((reachable) => {
@@ -201,17 +217,24 @@ function AppContent() {
     });
   }, []);
 
-  // If session was seeded from cache and then invalidated by the server,
-  // show a toast so the user knows why they were signed out.
+  const { replace } = useRouter();
+
+  // When session is lost (sign-out or server invalidation), explicitly
+  // navigate to auth. Stack.Protected handles screen availability, but
+  // enableFreeze can prevent the navigator from transitioning on its own.
   useEffect(() => {
-    if (prevSession.current && !session && hadOptimisticSession.current) {
-      toast.info("Session expired", {
-        description: "Please sign in again.",
-      });
-      hadOptimisticSession.current = false;
+    if (prevSession.current && !session) {
+      replace("/(auth)/login");
+
+      if (hadOptimisticSession.current) {
+        toast.info("Session expired", {
+          description: "Please sign in again.",
+        });
+        hadOptimisticSession.current = false;
+      }
     }
     prevSession.current = session;
-  }, [session]);
+  }, [session, replace]);
 
   return (
     <ThemeProvider value={sofaTheme}>
@@ -239,8 +262,7 @@ function AppContent() {
             name="title/[id]"
             dangerouslySingular
             options={{
-              headerShown: true,
-              animation: "slide_from_right",
+              presentation: "modal",
             }}
           />
           <Stack.Screen

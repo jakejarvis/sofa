@@ -21,7 +21,7 @@ import {
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
-import { DetailStackHeader } from "@/components/navigation/detail-stack-header";
+import { DetailStackHeader } from "@/components/navigation/modal-stack-header";
 import { ExpandableText } from "@/components/ui/expandable-text";
 import { Image } from "@/components/ui/image";
 import { PosterCard } from "@/components/ui/poster-card";
@@ -249,6 +249,8 @@ export default function PersonDetailScreen() {
 
   const listHeader = (
     <>
+      <DetailStackHeader />
+
       {/* Profile hero */}
       <Animated.View
         entering={FadeIn.duration(400)}
@@ -336,38 +338,35 @@ export default function PersonDetailScreen() {
   );
 
   return (
-    <>
-      <DetailStackHeader title={person.name} />
-      <View className="flex-1 bg-background">
-        <FlashList
-          data={filmography}
-          keyExtractor={(item) => item.titleId}
-          renderItem={renderFilmographyItem}
-          numColumns={filmographyColumns}
-          showsVerticalScrollIndicator={false}
-          contentInsetAdjustmentBehavior={
-            useAutomaticInsets ? "automatic" : "never"
+    <View className="flex-1 bg-background" collapsable={false}>
+      <FlashList
+        data={filmography}
+        keyExtractor={(item) => item.titleId}
+        renderItem={renderFilmographyItem}
+        numColumns={filmographyColumns}
+        showsVerticalScrollIndicator={false}
+        contentInsetAdjustmentBehavior={
+          useAutomaticInsets ? "automatic" : "never"
+        }
+        contentContainerStyle={{
+          paddingBottom: useAutomaticInsets ? 32 : insets.bottom + 32,
+          paddingHorizontal: FILMOGRAPHY_PADDING - FILMOGRAPHY_GUTTER,
+        }}
+        ListHeaderComponent={listHeader}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
           }
-          contentContainerStyle={{
-            paddingBottom: useAutomaticInsets ? 32 : insets.bottom + 32,
-            paddingHorizontal: FILMOGRAPHY_PADDING - FILMOGRAPHY_GUTTER,
-          }}
-          ListHeaderComponent={listHeader}
-          onEndReached={() => {
-            if (hasNextPage && !isFetchingNextPage) {
-              fetchNextPage();
-            }
-          }}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={
-            isFetchingNextPage ? (
-              <View className="items-center py-4">
-                <ActivityIndicator />
-              </View>
-            ) : null
-          }
-        />
-      </View>
-    </>
+        }}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View className="items-center py-4">
+              <ActivityIndicator />
+            </View>
+          ) : null
+        }
+      />
+    </View>
   );
 }

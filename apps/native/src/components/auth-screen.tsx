@@ -19,19 +19,15 @@ export function AuthScreen({
   logoStyle,
   children,
 }: AuthScreenProps) {
-  const useAutomaticInsets = process.env.EXPO_OS === "ios";
-
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       <ScrollView
-        contentInsetAdjustmentBehavior={
-          useAutomaticInsets ? "automatic" : "never"
-        }
+        contentInsetAdjustmentBehavior="never"
         contentContainerStyle={{
           flexGrow: 1,
           justifyContent: "center",
           paddingHorizontal: 24,
-          paddingTop: 24,
+          paddingTop: 42,
           paddingBottom: 24,
         }}
         keyboardShouldPersistTaps="handled"

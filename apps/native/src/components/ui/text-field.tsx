@@ -52,7 +52,7 @@ export const Input = forwardRef<
       accessibilityLabelledBy={ctxId}
       placeholderTextColorClassName="accent-muted-foreground/70"
       className={cn(
-        "min-h-12 rounded-[12px] border border-border bg-input px-3.5 py-3 font-sans text-base text-foreground",
+        "min-h-12 rounded-[12px] border border-border bg-input px-3.5 py-3 font-sans text-foreground text-sm",
         className,
       )}
       style={[{ borderCurve: "continuous" }, style]}

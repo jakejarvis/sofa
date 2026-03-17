@@ -42,7 +42,7 @@ function formatFormErrors(errors: unknown): string | null {
 }
 
 export default function ChangePasswordScreen() {
-  const router = useRouter();
+  const { back } = useRouter();
   const newPasswordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
   const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);
@@ -73,7 +73,7 @@ export default function ChangePasswordScreen() {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         toast.success("Password updated");
         formApi.reset();
-        router.back();
+        back();
       } catch {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Alert.alert("Error", "Something went wrong");

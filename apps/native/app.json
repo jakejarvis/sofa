@@ -102,6 +102,7 @@
         }
       ],
       ["expo-system-ui"],
+      ["expo-web-browser"],
       [
         "expo-image-picker",
         {

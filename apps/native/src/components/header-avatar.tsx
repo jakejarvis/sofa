@@ -9,7 +9,7 @@ import * as Haptics from "@/utils/haptics";
 
 export function HeaderAvatar() {
   const { data: session } = authClient.useSession();
-  const router = useRouter();
+  const { navigate } = useRouter();
 
   if (!session?.user) return null;
 
@@ -39,7 +39,7 @@ export function HeaderAvatar() {
               <View className="flex-1 items-center justify-center bg-primary/[0.08]">
                 <Text
                   maxFontSizeMultiplier={1.0}
-                  className="font-medium font-sans text-primary text-sm"
+                  className="font-display font-medium text-primary text-sm"
                 >
                   {user.name?.charAt(0)?.toUpperCase() ?? "?"}
                 </Text>
@@ -52,7 +52,7 @@ export function HeaderAvatar() {
       <DropdownMenu.Content>
         <DropdownMenu.Item
           key="settings"
-          onSelect={() => router.navigate("/(tabs)/(settings)")}
+          onSelect={() => navigate("/(tabs)/(settings)")}
         >
           <DropdownMenu.ItemIcon
             ios={{ name: "gear" }}

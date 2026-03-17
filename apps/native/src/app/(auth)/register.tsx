@@ -1,24 +1,21 @@
-import { useForm } from "@tanstack/react-form";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
-import { useRef } from "react";
-import { Alert, Pressable, type TextInput, View } from "react-native";
+import { useRef, useState } from "react";
+import { Pressable, type TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { z } from "zod";
 import { AuthScreen } from "@/components/auth-screen";
-import { AuthStackHeader } from "@/components/navigation/auth-stack-header";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
-import {
-  FieldError,
-  Input,
-  Label,
-  TextField,
-} from "@/components/ui/text-field";
+import { Input, Label, TextField } from "@/components/ui/text-field";
 import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
+import { getServerUrl, splitUrl } from "@/lib/server-url";
+import { toast } from "@/lib/toast";
+import { getFormErrors } from "@/utils/form-errors";
 import * as Haptics from "@/utils/haptics";
 
 const signUpSchema = z.object({
@@ -38,46 +35,39 @@ const signUpSchema = z.object({
     .min(8, "Use at least 8 characters"),
 });
 
-function formatFormErrors(errors: unknown): string | null {
-  if (!errors) return null;
-  if (typeof errors === "string") return errors;
-  if (typeof errors === "object") {
-    const first = Object.values(errors as Record<string, { message: string }[]>)
-      .flat()
-      .find((e) => e.message);
-    if (first) return first.message;
-  }
-  return null;
-}
-
 export default function RegisterScreen() {
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
+  const [errorFields, setErrorFields] = useState<Set<string>>(new Set());
+  const [isSignedUp, setIsSignedUp] = useState(false);
 
   const publicInfo = useQuery(orpc.system.publicInfo.queryOptions());
   const registrationOpen = publicInfo.data?.registrationOpen ?? false;
 
   const form = useForm({
     defaultValues: { name: "", email: "", password: "" },
-    validators: { onSubmit: signUpSchema },
-    onSubmit: async ({ value, formApi }) => {
+    onSubmit: async ({ value }) => {
+      const result = signUpSchema.safeParse(value);
+      if (!result.success) {
+        const { message, fields } = getFormErrors(result.error);
+        setErrorFields(fields);
+        toast.error(message);
+        return;
+      }
+
       await authClient.signUp.email(
         {
-          name: value.name.trim(),
-          email: value.email.trim(),
-          password: value.password,
+          name: result.data.name,
+          email: result.data.email,
+          password: result.data.password,
         },
         {
           onError(error) {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            Alert.alert(
-              "Error",
-              error.error?.message || "Failed to create account",
-            );
+            toast.error(error.error?.message || "Failed to create account");
           },
           onSuccess() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            formApi.reset();
+            setIsSignedUp(true);
             queryClient.invalidateQueries();
           },
         },
@@ -85,13 +75,27 @@ export default function RegisterScreen() {
     },
   });
 
+  const isSubmitting = useStore(form.store, (s) => s.isSubmitting);
+  const busy = isSubmitting || isSignedUp;
+
+  const serverHost = splitUrl(getServerUrl()).host;
+
+  const clearFieldError = (name: string) => {
+    if (errorFields.has(name)) {
+      setErrorFields((prev) => {
+        const next = new Set(prev);
+        next.delete(name);
+        return next;
+      });
+    }
+  };
+
   if (!registrationOpen && !publicInfo.isPending) {
     return (
       <AuthScreen
         title="Registration Closed"
         subtitle="New account creation is currently disabled."
       >
-        <AuthStackHeader title="Registration Closed" />
         <Animated.View entering={FadeInDown.duration(300).delay(200)}>
           <Link href="/(auth)/login" asChild>
             <Button className="mt-6 bg-primary">
@@ -106,115 +110,122 @@ export default function RegisterScreen() {
   }
 
   return (
-    <AuthScreen title="Create Account">
-      <AuthStackHeader title="Create Account" />
-      <form.Subscribe
-        selector={(state) => ({
-          isSubmitting: state.isSubmitting,
-          validationError: formatFormErrors(state.errorMap.onSubmit),
-        })}
-      >
-        {({ isSubmitting, validationError }) => (
-          <View className="gap-3">
-            {validationError && (
-              <FieldError isInvalid className="mb-1">
-                {validationError}
-              </FieldError>
+    <AuthScreen
+      title="Create Account"
+      subtitle={`Registering on ${serverHost}`}
+    >
+      <View className="gap-3">
+        <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+          <form.Field name="name">
+            {(field) => (
+              <TextField>
+                <Label>Name</Label>
+                <Input
+                  value={field.state.value}
+                  accessibilityLabel="Name"
+                  onBlur={field.handleBlur}
+                  onChangeText={(text) => {
+                    field.handleChange(text);
+                    clearFieldError("name");
+                  }}
+                  placeholder="Your name"
+                  autoComplete="name"
+                  textContentType="name"
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                  onSubmitEditing={() => emailRef.current?.focus()}
+                  className={
+                    errorFields.has("name") ? "border-destructive" : undefined
+                  }
+                />
+              </TextField>
             )}
+          </form.Field>
+        </Animated.View>
 
-            <Animated.View entering={FadeInDown.duration(300).delay(100)}>
-              <form.Field name="name">
-                {(field) => (
-                  <TextField>
-                    <Label>Name</Label>
-                    <Input
-                      value={field.state.value}
-                      accessibilityLabel="Name"
-                      onBlur={field.handleBlur}
-                      onChangeText={field.handleChange}
-                      placeholder="Your name"
-                      autoComplete="name"
-                      textContentType="name"
-                      returnKeyType="next"
-                      blurOnSubmit={false}
-                      onSubmitEditing={() => emailRef.current?.focus()}
-                    />
-                  </TextField>
-                )}
-              </form.Field>
-            </Animated.View>
+        <Animated.View entering={FadeInDown.duration(300).delay(200)}>
+          <form.Field name="email">
+            {(field) => (
+              <TextField>
+                <Label>Email</Label>
+                <Input
+                  ref={emailRef}
+                  value={field.state.value}
+                  accessibilityLabel="Email"
+                  onBlur={field.handleBlur}
+                  onChangeText={(text) => {
+                    field.handleChange(text);
+                    clearFieldError("email");
+                  }}
+                  placeholder="email@example.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  textContentType="emailAddress"
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                  onSubmitEditing={() => passwordRef.current?.focus()}
+                  className={
+                    errorFields.has("email") ? "border-destructive" : undefined
+                  }
+                />
+              </TextField>
+            )}
+          </form.Field>
+        </Animated.View>
 
-            <Animated.View entering={FadeInDown.duration(300).delay(200)}>
-              <form.Field name="email">
-                {(field) => (
-                  <TextField>
-                    <Label>Email</Label>
-                    <Input
-                      ref={emailRef}
-                      value={field.state.value}
-                      accessibilityLabel="Email"
-                      onBlur={field.handleBlur}
-                      onChangeText={field.handleChange}
-                      placeholder="email@example.com"
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      autoComplete="email"
-                      textContentType="emailAddress"
-                      returnKeyType="next"
-                      blurOnSubmit={false}
-                      onSubmitEditing={() => passwordRef.current?.focus()}
-                    />
-                  </TextField>
-                )}
-              </form.Field>
-            </Animated.View>
+        <Animated.View entering={FadeInDown.duration(300).delay(300)}>
+          <form.Field name="password">
+            {(field) => (
+              <TextField>
+                <Label>Password</Label>
+                <Input
+                  ref={passwordRef}
+                  value={field.state.value}
+                  accessibilityLabel="Password"
+                  onBlur={field.handleBlur}
+                  onChangeText={(text) => {
+                    field.handleChange(text);
+                    clearFieldError("password");
+                  }}
+                  placeholder="••••••••"
+                  secureTextEntry
+                  autoComplete="new-password"
+                  textContentType="newPassword"
+                  returnKeyType="go"
+                  onSubmitEditing={form.handleSubmit}
+                  className={
+                    errorFields.has("password")
+                      ? "border-destructive"
+                      : undefined
+                  }
+                />
+              </TextField>
+            )}
+          </form.Field>
+        </Animated.View>
 
-            <Animated.View entering={FadeInDown.duration(300).delay(300)}>
-              <form.Field name="password">
-                {(field) => (
-                  <TextField>
-                    <Label>Password</Label>
-                    <Input
-                      ref={passwordRef}
-                      value={field.state.value}
-                      accessibilityLabel="Password"
-                      onBlur={field.handleBlur}
-                      onChangeText={field.handleChange}
-                      placeholder="••••••••"
-                      secureTextEntry
-                      autoComplete="new-password"
-                      textContentType="newPassword"
-                      returnKeyType="go"
-                      onSubmitEditing={form.handleSubmit}
-                    />
-                  </TextField>
-                )}
-              </form.Field>
-            </Animated.View>
-
-            <Animated.View entering={FadeInDown.duration(300).delay(400)}>
-              <Button
-                onPress={form.handleSubmit}
-                disabled={isSubmitting}
-                className="mt-1 bg-primary"
-              >
-                {isSubmitting ? (
-                  <Spinner size="sm" />
-                ) : (
-                  <ButtonLabel>Create Account</ButtonLabel>
-                )}
-              </Button>
-            </Animated.View>
-          </View>
-        )}
-      </form.Subscribe>
+        <Animated.View entering={FadeInDown.duration(300).delay(400)}>
+          <Button
+            onPress={form.handleSubmit}
+            disabled={busy}
+            className="mt-1 bg-primary"
+          >
+            {busy ? (
+              <Spinner size="sm" />
+            ) : (
+              <ButtonLabel>Create Account</ButtonLabel>
+            )}
+          </Button>
+        </Animated.View>
+      </View>
 
       <Animated.View
         entering={FadeIn.duration(300).delay(500)}
         className="mt-6 items-center"
       >
         <Link href="/(auth)/login" asChild>
-          <Pressable>
+          <Pressable disabled={busy}>
             <Text className="text-primary text-sm">
               Already have an account? Sign in
             </Text>

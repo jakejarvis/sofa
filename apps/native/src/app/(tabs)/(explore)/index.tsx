@@ -74,12 +74,9 @@ export default function ExploreScreen() {
       className="bg-background"
       contentContainerStyle={exploreContentContainerStyle}
       contentInsetAdjustmentBehavior="automatic"
+      scrollToOverflowEnabled
       refreshControl={
-        <RefreshControl
-          refreshing={isRefreshing}
-          onRefresh={onRefresh}
-          tintColorClassName="accent-primary"
-        />
+        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
       }
     >
       <View className="gap-8">
