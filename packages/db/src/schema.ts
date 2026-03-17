@@ -486,6 +486,43 @@ export const cronRuns = sqliteTable(
   ],
 );
 
+// ─── Import Jobs ────────────────────────────────────────────────────
+
+export const importJobs = sqliteTable(
+  "importJobs",
+  {
+    id: uuidPk(),
+    userId: text("userId")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    source: text("source", {
+      enum: ["trakt", "simkl", "letterboxd"],
+    }).notNull(),
+    status: text("status", {
+      enum: ["pending", "running", "success", "error", "cancelled"],
+    }).notNull(),
+    payload: text("payload").notNull(),
+    importWatches: int("importWatches", { mode: "boolean" }).notNull(),
+    importWatchlist: int("importWatchlist", { mode: "boolean" }).notNull(),
+    importRatings: int("importRatings", { mode: "boolean" }).notNull(),
+    totalItems: int("totalItems").notNull().default(0),
+    processedItems: int("processedItems").notNull().default(0),
+    importedCount: int("importedCount").notNull().default(0),
+    skippedCount: int("skippedCount").notNull().default(0),
+    failedCount: int("failedCount").notNull().default(0),
+    currentMessage: text("currentMessage"),
+    errors: text("errors"),
+    warnings: text("warnings"),
+    createdAt: int("createdAt", { mode: "timestamp" }).notNull(),
+    startedAt: int("startedAt", { mode: "timestamp" }),
+    finishedAt: int("finishedAt", { mode: "timestamp" }),
+  },
+  (table) => [
+    index("importJobs_userId_createdAt").on(table.userId, table.createdAt),
+    index("importJobs_status").on(table.status),
+  ],
+);
+
 // ─── App Settings ───────────────────────────────────────────────────
 
 export const appSettings = sqliteTable("appSettings", {

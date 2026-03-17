@@ -4303,10 +4303,15 @@
                     "tmdbConfigured": {
                       "type": "boolean",
                       "description": "Whether a TMDB API token is configured"
+                    },
+                    "publicApiUrl": {
+                      "type": "string",
+                      "description": "Base URL of the centralized public API"
                     }
                   },
                   "required": [
-                    "tmdbConfigured"
+                    "tmdbConfigured",
+                    "publicApiUrl"
                   ],
                   "description": "Quick TMDB configuration check"
                 }
@@ -5719,6 +5724,1589 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/imports/parse-file": {
+      "post": {
+        "operationId": "imports.parseFile",
+        "summary": "Parse import file",
+        "description": "Upload and parse an export file from Trakt, Simkl, or Letterboxd. Returns a preview of items found without importing anything.",
+        "tags": [
+          "Imports"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "enum": [
+                      "trakt",
+                      "simkl",
+                      "letterboxd"
+                    ],
+                    "description": "External service to import from"
+                  },
+                  "file": {
+                    "type": "string",
+                    "contentMediaType": "*/*"
+                  }
+                },
+                "required": [
+                  "source",
+                  "file"
+                ]
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "enum": [
+                      "trakt",
+                      "simkl",
+                      "letterboxd"
+                    ],
+                    "description": "External service to import from"
+                  },
+                  "file": {
+                    "type": "string",
+                    "contentMediaType": "*/*"
+                  }
+                },
+                "required": [
+                  "source",
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preview of importable items with counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "source": {
+                          "enum": [
+                            "trakt",
+                            "simkl",
+                            "letterboxd"
+                          ],
+                          "description": "External service to import from"
+                        },
+                        "movies": {
+                          "type": "array",
+                          "maxItems": 50000,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "tmdbId": {
+                                "type": "number"
+                              },
+                              "imdbId": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "year": {
+                                "type": "number"
+                              },
+                              "watchedAt": {
+                                "type": "string",
+                                "description": "ISO 8601 timestamp"
+                              },
+                              "watchedOn": {
+                                "type": "string",
+                                "description": "YYYY-MM-DD date-only"
+                              }
+                            },
+                            "required": [
+                              "title"
+                            ]
+                          }
+                        },
+                        "episodes": {
+                          "type": "array",
+                          "maxItems": 50000,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "showTmdbId": {
+                                "type": "number"
+                              },
+                              "imdbId": {
+                                "type": "string"
+                              },
+                              "tvdbId": {
+                                "type": "number"
+                              },
+                              "showTitle": {
+                                "type": "string"
+                              },
+                              "year": {
+                                "type": "number"
+                              },
+                              "seasonNumber": {
+                                "type": "number"
+                              },
+                              "episodeNumber": {
+                                "type": "number"
+                              },
+                              "watchedAt": {
+                                "type": "string"
+                              },
+                              "watchedOn": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "seasonNumber",
+                              "episodeNumber"
+                            ]
+                          }
+                        },
+                        "watchlist": {
+                          "type": "array",
+                          "maxItems": 50000,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "tmdbId": {
+                                "type": "number"
+                              },
+                              "imdbId": {
+                                "type": "string"
+                              },
+                              "tvdbId": {
+                                "type": "number"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "year": {
+                                "type": "number"
+                              },
+                              "type": {
+                                "enum": [
+                                  "movie",
+                                  "tv"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "title",
+                              "type"
+                            ]
+                          }
+                        },
+                        "ratings": {
+                          "type": "array",
+                          "maxItems": 50000,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "tmdbId": {
+                                "type": "number"
+                              },
+                              "imdbId": {
+                                "type": "string"
+                              },
+                              "tvdbId": {
+                                "type": "number"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "year": {
+                                "type": "number"
+                              },
+                              "type": {
+                                "enum": [
+                                  "movie",
+                                  "tv"
+                                ]
+                              },
+                              "rating": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 5,
+                                "description": "Sofa 1-5 star rating"
+                              },
+                              "ratedAt": {
+                                "type": "string"
+                              },
+                              "ratedOn": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "title",
+                              "type",
+                              "rating"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "source",
+                        "movies",
+                        "episodes",
+                        "watchlist",
+                        "ratings"
+                      ]
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "stats": {
+                      "type": "object",
+                      "properties": {
+                        "movies": {
+                          "type": "number"
+                        },
+                        "episodes": {
+                          "type": "number"
+                        },
+                        "watchlist": {
+                          "type": "number"
+                        },
+                        "ratings": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "movies",
+                        "episodes",
+                        "watchlist",
+                        "ratings"
+                      ]
+                    },
+                    "diagnostics": {
+                      "type": "object",
+                      "properties": {
+                        "unresolved": {
+                          "type": "number"
+                        },
+                        "unsupported": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "unresolved",
+                        "unsupported"
+                      ]
+                    },
+                    "blockingErrors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "warnings",
+                    "stats"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/imports/parse-payload": {
+      "post": {
+        "operationId": "imports.parsePayload",
+        "summary": "Preview normalized import data",
+        "description": "Accept pre-normalized import data from the OAuth proxy and return a preview with item counts. No parsing is needed — data is already in NormalizedImport format.",
+        "tags": [
+          "Imports"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "source": {
+                        "enum": [
+                          "trakt",
+                          "simkl",
+                          "letterboxd"
+                        ],
+                        "description": "External service to import from"
+                      },
+                      "movies": {
+                        "type": "array",
+                        "maxItems": 50000,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tmdbId": {
+                              "type": "number"
+                            },
+                            "imdbId": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "year": {
+                              "type": "number"
+                            },
+                            "watchedAt": {
+                              "type": "string",
+                              "description": "ISO 8601 timestamp"
+                            },
+                            "watchedOn": {
+                              "type": "string",
+                              "description": "YYYY-MM-DD date-only"
+                            }
+                          },
+                          "required": [
+                            "title"
+                          ]
+                        }
+                      },
+                      "episodes": {
+                        "type": "array",
+                        "maxItems": 50000,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "showTmdbId": {
+                              "type": "number"
+                            },
+                            "imdbId": {
+                              "type": "string"
+                            },
+                            "tvdbId": {
+                              "type": "number"
+                            },
+                            "showTitle": {
+                              "type": "string"
+                            },
+                            "year": {
+                              "type": "number"
+                            },
+                            "seasonNumber": {
+                              "type": "number"
+                            },
+                            "episodeNumber": {
+                              "type": "number"
+                            },
+                            "watchedAt": {
+                              "type": "string"
+                            },
+                            "watchedOn": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "seasonNumber",
+                            "episodeNumber"
+                          ]
+                        }
+                      },
+                      "watchlist": {
+                        "type": "array",
+                        "maxItems": 50000,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tmdbId": {
+                              "type": "number"
+                            },
+                            "imdbId": {
+                              "type": "string"
+                            },
+                            "tvdbId": {
+                              "type": "number"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "year": {
+                              "type": "number"
+                            },
+                            "type": {
+                              "enum": [
+                                "movie",
+                                "tv"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "title",
+                            "type"
+                          ]
+                        }
+                      },
+                      "ratings": {
+                        "type": "array",
+                        "maxItems": 50000,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tmdbId": {
+                              "type": "number"
+                            },
+                            "imdbId": {
+                              "type": "string"
+                            },
+                            "tvdbId": {
+                              "type": "number"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "year": {
+                              "type": "number"
+                            },
+                            "type": {
+                              "enum": [
+                                "movie",
+                                "tv"
+                              ]
+                            },
+                            "rating": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 5,
+                              "description": "Sofa 1-5 star rating"
+                            },
+                            "ratedAt": {
+                              "type": "string"
+                            },
+                            "ratedOn": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "title",
+                            "type",
+                            "rating"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "source",
+                      "movies",
+                      "episodes",
+                      "watchlist",
+                      "ratings"
+                    ]
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preview of importable items with counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "source": {
+                          "enum": [
+                            "trakt",
+                            "simkl",
+                            "letterboxd"
+                          ],
+                          "description": "External service to import from"
+                        },
+                        "movies": {
+                          "type": "array",
+                          "maxItems": 50000,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "tmdbId": {
+                                "type": "number"
+                              },
+                              "imdbId": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "year": {
+                                "type": "number"
+                              },
+                              "watchedAt": {
+                                "type": "string",
+                                "description": "ISO 8601 timestamp"
+                              },
+                              "watchedOn": {
+                                "type": "string",
+                                "description": "YYYY-MM-DD date-only"
+                              }
+                            },
+                            "required": [
+                              "title"
+                            ]
+                          }
+                        },
+                        "episodes": {
+                          "type": "array",
+                          "maxItems": 50000,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "showTmdbId": {
+                                "type": "number"
+                              },
+                              "imdbId": {
+                                "type": "string"
+                              },
+                              "tvdbId": {
+                                "type": "number"
+                              },
+                              "showTitle": {
+                                "type": "string"
+                              },
+                              "year": {
+                                "type": "number"
+                              },
+                              "seasonNumber": {
+                                "type": "number"
+                              },
+                              "episodeNumber": {
+                                "type": "number"
+                              },
+                              "watchedAt": {
+                                "type": "string"
+                              },
+                              "watchedOn": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "seasonNumber",
+                              "episodeNumber"
+                            ]
+                          }
+                        },
+                        "watchlist": {
+                          "type": "array",
+                          "maxItems": 50000,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "tmdbId": {
+                                "type": "number"
+                              },
+                              "imdbId": {
+                                "type": "string"
+                              },
+                              "tvdbId": {
+                                "type": "number"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "year": {
+                                "type": "number"
+                              },
+                              "type": {
+                                "enum": [
+                                  "movie",
+                                  "tv"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "title",
+                              "type"
+                            ]
+                          }
+                        },
+                        "ratings": {
+                          "type": "array",
+                          "maxItems": 50000,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "tmdbId": {
+                                "type": "number"
+                              },
+                              "imdbId": {
+                                "type": "string"
+                              },
+                              "tvdbId": {
+                                "type": "number"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "year": {
+                                "type": "number"
+                              },
+                              "type": {
+                                "enum": [
+                                  "movie",
+                                  "tv"
+                                ]
+                              },
+                              "rating": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 5,
+                                "description": "Sofa 1-5 star rating"
+                              },
+                              "ratedAt": {
+                                "type": "string"
+                              },
+                              "ratedOn": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "title",
+                              "type",
+                              "rating"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "source",
+                        "movies",
+                        "episodes",
+                        "watchlist",
+                        "ratings"
+                      ]
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "stats": {
+                      "type": "object",
+                      "properties": {
+                        "movies": {
+                          "type": "number"
+                        },
+                        "episodes": {
+                          "type": "number"
+                        },
+                        "watchlist": {
+                          "type": "number"
+                        },
+                        "ratings": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "movies",
+                        "episodes",
+                        "watchlist",
+                        "ratings"
+                      ]
+                    },
+                    "diagnostics": {
+                      "type": "object",
+                      "properties": {
+                        "unresolved": {
+                          "type": "number"
+                        },
+                        "unsupported": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "unresolved",
+                        "unsupported"
+                      ]
+                    },
+                    "blockingErrors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "warnings",
+                    "stats"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/imports/jobs": {
+      "post": {
+        "operationId": "imports.createJob",
+        "summary": "Create import job",
+        "description": "Create and start a background import job from previously parsed data.",
+        "tags": [
+          "Imports"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "source": {
+                        "enum": [
+                          "trakt",
+                          "simkl",
+                          "letterboxd"
+                        ],
+                        "description": "External service to import from"
+                      },
+                      "movies": {
+                        "type": "array",
+                        "maxItems": 50000,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tmdbId": {
+                              "type": "number"
+                            },
+                            "imdbId": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "year": {
+                              "type": "number"
+                            },
+                            "watchedAt": {
+                              "type": "string",
+                              "description": "ISO 8601 timestamp"
+                            },
+                            "watchedOn": {
+                              "type": "string",
+                              "description": "YYYY-MM-DD date-only"
+                            }
+                          },
+                          "required": [
+                            "title"
+                          ]
+                        }
+                      },
+                      "episodes": {
+                        "type": "array",
+                        "maxItems": 50000,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "showTmdbId": {
+                              "type": "number"
+                            },
+                            "imdbId": {
+                              "type": "string"
+                            },
+                            "tvdbId": {
+                              "type": "number"
+                            },
+                            "showTitle": {
+                              "type": "string"
+                            },
+                            "year": {
+                              "type": "number"
+                            },
+                            "seasonNumber": {
+                              "type": "number"
+                            },
+                            "episodeNumber": {
+                              "type": "number"
+                            },
+                            "watchedAt": {
+                              "type": "string"
+                            },
+                            "watchedOn": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "seasonNumber",
+                            "episodeNumber"
+                          ]
+                        }
+                      },
+                      "watchlist": {
+                        "type": "array",
+                        "maxItems": 50000,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tmdbId": {
+                              "type": "number"
+                            },
+                            "imdbId": {
+                              "type": "string"
+                            },
+                            "tvdbId": {
+                              "type": "number"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "year": {
+                              "type": "number"
+                            },
+                            "type": {
+                              "enum": [
+                                "movie",
+                                "tv"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "title",
+                            "type"
+                          ]
+                        }
+                      },
+                      "ratings": {
+                        "type": "array",
+                        "maxItems": 50000,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tmdbId": {
+                              "type": "number"
+                            },
+                            "imdbId": {
+                              "type": "string"
+                            },
+                            "tvdbId": {
+                              "type": "number"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "year": {
+                              "type": "number"
+                            },
+                            "type": {
+                              "enum": [
+                                "movie",
+                                "tv"
+                              ]
+                            },
+                            "rating": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 5,
+                              "description": "Sofa 1-5 star rating"
+                            },
+                            "ratedAt": {
+                              "type": "string"
+                            },
+                            "ratedOn": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "title",
+                            "type",
+                            "rating"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "source",
+                      "movies",
+                      "episodes",
+                      "watchlist",
+                      "ratings"
+                    ]
+                  },
+                  "options": {
+                    "type": "object",
+                    "properties": {
+                      "importWatches": {
+                        "type": "boolean",
+                        "description": "Import movie and episode watch history"
+                      },
+                      "importWatchlist": {
+                        "type": "boolean",
+                        "description": "Import watchlist items"
+                      },
+                      "importRatings": {
+                        "type": "boolean",
+                        "description": "Import ratings"
+                      }
+                    },
+                    "required": [
+                      "importWatches",
+                      "importWatchlist",
+                      "importRatings"
+                    ]
+                  }
+                },
+                "required": [
+                  "data",
+                  "options"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created import job",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "enum": [
+                        "trakt",
+                        "simkl",
+                        "letterboxd"
+                      ],
+                      "description": "External service to import from"
+                    },
+                    "status": {
+                      "enum": [
+                        "pending",
+                        "running",
+                        "success",
+                        "error",
+                        "cancelled"
+                      ]
+                    },
+                    "totalItems": {
+                      "type": "number"
+                    },
+                    "processedItems": {
+                      "type": "number"
+                    },
+                    "importedCount": {
+                      "type": "number"
+                    },
+                    "skippedCount": {
+                      "type": "number"
+                    },
+                    "failedCount": {
+                      "type": "number"
+                    },
+                    "currentMessage": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "startedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "finishedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "source",
+                    "status",
+                    "totalItems",
+                    "processedItems",
+                    "importedCount",
+                    "skippedCount",
+                    "failedCount",
+                    "currentMessage",
+                    "errors",
+                    "warnings",
+                    "createdAt",
+                    "startedAt",
+                    "finishedAt"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/imports/jobs/{id}": {
+      "get": {
+        "operationId": "imports.getJob",
+        "summary": "Get import job status",
+        "description": "Get the current status and progress of an import job.",
+        "tags": [
+          "Imports"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Internal UUIDv7 identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current job state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "enum": [
+                        "trakt",
+                        "simkl",
+                        "letterboxd"
+                      ],
+                      "description": "External service to import from"
+                    },
+                    "status": {
+                      "enum": [
+                        "pending",
+                        "running",
+                        "success",
+                        "error",
+                        "cancelled"
+                      ]
+                    },
+                    "totalItems": {
+                      "type": "number"
+                    },
+                    "processedItems": {
+                      "type": "number"
+                    },
+                    "importedCount": {
+                      "type": "number"
+                    },
+                    "skippedCount": {
+                      "type": "number"
+                    },
+                    "failedCount": {
+                      "type": "number"
+                    },
+                    "currentMessage": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "startedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "finishedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "source",
+                    "status",
+                    "totalItems",
+                    "processedItems",
+                    "importedCount",
+                    "skippedCount",
+                    "failedCount",
+                    "currentMessage",
+                    "errors",
+                    "warnings",
+                    "createdAt",
+                    "startedAt",
+                    "finishedAt"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/imports/jobs/{id}/cancel": {
+      "post": {
+        "operationId": "imports.cancelJob",
+        "summary": "Cancel import job",
+        "description": "Cancel a pending or running import job. Already-imported items are not rolled back.",
+        "tags": [
+          "Imports"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Internal UUIDv7 identifier"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated job state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "enum": [
+                        "trakt",
+                        "simkl",
+                        "letterboxd"
+                      ],
+                      "description": "External service to import from"
+                    },
+                    "status": {
+                      "enum": [
+                        "pending",
+                        "running",
+                        "success",
+                        "error",
+                        "cancelled"
+                      ]
+                    },
+                    "totalItems": {
+                      "type": "number"
+                    },
+                    "processedItems": {
+                      "type": "number"
+                    },
+                    "importedCount": {
+                      "type": "number"
+                    },
+                    "skippedCount": {
+                      "type": "number"
+                    },
+                    "failedCount": {
+                      "type": "number"
+                    },
+                    "currentMessage": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "startedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "finishedAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "source",
+                    "status",
+                    "totalItems",
+                    "processedItems",
+                    "importedCount",
+                    "skippedCount",
+                    "failedCount",
+                    "currentMessage",
+                    "errors",
+                    "warnings",
+                    "createdAt",
+                    "startedAt",
+                    "finishedAt"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/imports/jobs/{id}/events": {
+      "get": {
+        "operationId": "imports.jobEvents",
+        "summary": "Stream import job events",
+        "description": "SSE stream of import job progress events. Yields progress updates and a final complete event.",
+        "tags": [
+          "Imports"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Internal UUIDv7 identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stream of job progress events",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "event": {
+                          "const": "message"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "enum": [
+                                "progress",
+                                "complete"
+                              ]
+                            },
+                            "job": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "source": {
+                                  "enum": [
+                                    "trakt",
+                                    "simkl",
+                                    "letterboxd"
+                                  ],
+                                  "description": "External service to import from"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "pending",
+                                    "running",
+                                    "success",
+                                    "error",
+                                    "cancelled"
+                                  ]
+                                },
+                                "totalItems": {
+                                  "type": "number"
+                                },
+                                "processedItems": {
+                                  "type": "number"
+                                },
+                                "importedCount": {
+                                  "type": "number"
+                                },
+                                "skippedCount": {
+                                  "type": "number"
+                                },
+                                "failedCount": {
+                                  "type": "number"
+                                },
+                                "currentMessage": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "errors": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "warnings": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "createdAt": {
+                                  "type": "string"
+                                },
+                                "startedAt": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "finishedAt": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "source",
+                                "status",
+                                "totalItems",
+                                "processedItems",
+                                "importedCount",
+                                "skippedCount",
+                                "failedCount",
+                                "currentMessage",
+                                "errors",
+                                "warnings",
+                                "createdAt",
+                                "startedAt",
+                                "finishedAt"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "job"
+                          ]
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "retry": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "event",
+                        "data"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "event": {
+                          "const": "done"
+                        },
+                        "data": {},
+                        "id": {
+                          "type": "string"
+                        },
+                        "retry": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "event"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "event": {
+                          "const": "error"
+                        },
+                        "data": {},
+                        "id": {
+                          "type": "string"
+                        },
+                        "retry": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "event"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [

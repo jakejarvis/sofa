@@ -1,0 +1,91 @@
+---
+title: Importing from Other Apps
+description: Transfer your library from Trakt, Simkl, or Letterboxd.
+---
+
+Sofa can import your existing watch history, watchlist, and ratings from other tracking services. This lets you switch to Sofa without losing your data.
+
+## Supported Services
+
+| Service | OAuth Connect | File Upload | Data Imported |
+|---|---|---|---|
+| **Trakt** | Yes | JSON export | Watches, watchlist, ratings |
+| **Simkl** | Yes | JSON export | Watches, watchlist, ratings, anime (as TV) |
+| **Letterboxd** | No | ZIP export | Watches, watchlist, ratings (movies only) |
+
+## Importing via OAuth (Trakt & Simkl)
+
+The fastest way to import. Sofa uses a device code flow — no passwords are shared.
+
+1. Go to **Settings → Import** and click **Connect** next to Trakt or Simkl
+2. A code is displayed — click the link to open the provider's website
+3. Enter the code and authorize Sofa
+4. Sofa fetches your library and shows a preview
+5. Choose which categories to import (watches, watchlist, ratings) and confirm
+
+The authorization token is used only for the one-time data fetch and is not stored.
+
+## Importing via File Upload
+
+For Letterboxd (which has no public API) or if you prefer not to use OAuth:
+
+### Letterboxd
+
+1. Go to [letterboxd.com/settings/data](https://letterboxd.com/settings/data/) and click **Export Your Data**
+2. Download the ZIP file
+3. In Sofa, go to **Settings → Import** and click **Upload** next to Letterboxd
+4. Select the ZIP file — Sofa reads `diary.csv`, `watched.csv`, `watchlist.csv`, and `ratings.csv`
+
+### Trakt & Simkl
+
+You can also upload a JSON export file instead of using OAuth. Export your data from the provider's account settings, then upload the file in Sofa.
+
+## Preview & Options
+
+Before importing, Sofa shows a preview of what was found:
+
+- **Item counts** — movies, episodes, watchlist items, and ratings detected in the export
+- **Category toggles** — choose which types of data to import (watches, watchlist, ratings)
+- **Warnings** — any issues found during parsing (e.g. missing files in a ZIP, unrecognized ratings)
+
+Items without external IDs (like Letterboxd exports, which only include title and year) are resolved via TMDB search. The preview notes how many items will need title-based matching, which may be less accurate for ambiguous titles.
+
+## How It Works
+
+When you confirm the import, Sofa creates a background job that:
+
+1. Resolves each item to a TMDB title using available IDs (TMDB, IMDB, TVDB) or title search
+2. Fetches metadata for any titles not already in your Sofa library
+3. Logs watches, sets watchlist status, and stores ratings using the original timestamps from the source
+4. Reports progress in real time — you can close the tab and come back; the import continues server-side
+
+### Deduplication
+
+Imports are safe to re-run. Sofa checks for existing data before writing:
+
+- **Watches** — skipped if you already have a watch record for that movie or episode
+- **Watchlist** — upserted (added or updated)
+- **Ratings** — upserted (overwrites any existing rating for that title)
+
+### Rating Conversion
+
+Different services use different rating scales. Sofa converts to its 1–5 star scale:
+
+| Source | Scale | Conversion |
+|---|---|---|
+| Trakt | 1–10 | `round(rating / 2)`, clamped to 1–5 |
+| Simkl | 1–10 | `round(rating / 2)`, clamped to 1–5 |
+| Letterboxd | 0.5–5 (half-stars) | `round(rating)`, clamped to 1–5 |
+
+### Timestamps
+
+Sofa preserves the original watch dates and rating dates from the source export. If the source only provides a date without a time (e.g. Letterboxd diary entries), the date is stored as-is.
+
+## Troubleshooting
+
+Check the import results summary for details on any failures:
+
+- **"Could not resolve movie/show"** — the title couldn't be matched to a TMDB entry. This is more common with Letterboxd imports (title-only matching) or obscure titles.
+- **"Season/episode not found"** — the show was found but the specific episode doesn't exist in TMDB's data. This can happen with recently aired episodes or special episodes.
+- **Large imports are slow** — imports with thousands of items may take several minutes due to TMDB rate limits. The progress bar shows real-time status.
+- **Import job disappeared** — if the server restarts mid-import, the job will show as failed. You can safely re-run the import; existing data won't be duplicated.

@@ -11,7 +11,12 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "hono": "4.12.8"
+    "@hono/zod-validator": "0.7.6",
+    "@sofa/api": "workspace:*",
+    "@sofa/core": "workspace:*",
+    "@vercel/firewall": "1.1.2",
+    "hono": "4.12.8",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/bun": "catalog:",

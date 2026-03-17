@@ -887,6 +887,7 @@ export const SystemStatusOutput = z
     tmdbConfigured: z
       .boolean()
       .describe("Whether a TMDB API token is configured"),
+    publicApiUrl: z.string().describe("Base URL of the centralized public API"),
   })
   .meta({ description: "Quick TMDB configuration check" });
 
@@ -1095,6 +1096,138 @@ export const AuthConfigOutput = z
     description: "Authentication provider configuration",
   });
 
+// ─── Imports ──────────────────────────────────────────────────
+
+export const ImportSourceEnum = z
+  .enum(["trakt", "simkl", "letterboxd"])
+  .describe("External service to import from");
+
+export const ImportMovieSchema = z.object({
+  tmdbId: z.number().optional(),
+  imdbId: z.string().optional(),
+  title: z.string(),
+  year: z.number().optional(),
+  watchedAt: z.string().optional().describe("ISO 8601 timestamp"),
+  watchedOn: z.string().optional().describe("YYYY-MM-DD date-only"),
+});
+
+export const ImportEpisodeSchema = z.object({
+  showTmdbId: z.number().optional(),
+  imdbId: z.string().optional(),
+  tvdbId: z.number().optional(),
+  showTitle: z.string().optional(),
+  year: z.number().optional(),
+  seasonNumber: z.number(),
+  episodeNumber: z.number(),
+  watchedAt: z.string().optional(),
+  watchedOn: z.string().optional(),
+});
+
+export const ImportWatchlistItemSchema = z.object({
+  tmdbId: z.number().optional(),
+  imdbId: z.string().optional(),
+  tvdbId: z.number().optional(),
+  title: z.string(),
+  year: z.number().optional(),
+  type: z.enum(["movie", "tv"]),
+});
+
+export const ImportRatingSchema = z.object({
+  tmdbId: z.number().optional(),
+  imdbId: z.string().optional(),
+  tvdbId: z.number().optional(),
+  title: z.string(),
+  year: z.number().optional(),
+  type: z.enum(["movie", "tv"]),
+  rating: z.number().int().min(1).max(5).describe("Sofa 1-5 star rating"),
+  ratedAt: z.string().optional(),
+  ratedOn: z.string().optional(),
+});
+
+export const NormalizedImportSchema = z.object({
+  source: ImportSourceEnum,
+  movies: z.array(ImportMovieSchema).max(50_000),
+  episodes: z.array(ImportEpisodeSchema).max(50_000),
+  watchlist: z.array(ImportWatchlistItemSchema).max(50_000),
+  ratings: z.array(ImportRatingSchema).max(50_000),
+});
+
+export const ImportOptionsSchema = z.object({
+  importWatches: z.boolean().describe("Import movie and episode watch history"),
+  importWatchlist: z.boolean().describe("Import watchlist items"),
+  importRatings: z.boolean().describe("Import ratings"),
+});
+
+export const ImportResultSchema = z.object({
+  imported: z.number().describe("Items successfully imported"),
+  skipped: z.number().describe("Items skipped (already exist)"),
+  failed: z.number().describe("Items that failed to import"),
+  errors: z.array(z.string()).describe("Error messages for failed items"),
+  warnings: z.array(z.string()).describe("Non-fatal warnings"),
+});
+
+export const ImportPreviewSchema = z.object({
+  data: NormalizedImportSchema,
+  warnings: z.array(z.string()),
+  stats: z.object({
+    movies: z.number(),
+    episodes: z.number(),
+    watchlist: z.number(),
+    ratings: z.number(),
+  }),
+  diagnostics: z
+    .object({
+      unresolved: z.number(),
+      unsupported: z.number(),
+    })
+    .optional(),
+  blockingErrors: z.array(z.string()).optional(),
+});
+
+export const ParseFileInput = z.object({
+  source: ImportSourceEnum,
+  file: z.file().max(100 * 1024 * 1024, "File too large (max 100 MB)"),
+});
+
+export const ParsePayloadInput = z.object({
+  data: NormalizedImportSchema,
+});
+
+export const ImportJobStatusEnum = z.enum([
+  "pending",
+  "running",
+  "success",
+  "error",
+  "cancelled",
+]);
+
+export const ImportJobSchema = z.object({
+  id: z.string(),
+  source: ImportSourceEnum,
+  status: ImportJobStatusEnum,
+  totalItems: z.number(),
+  processedItems: z.number(),
+  importedCount: z.number(),
+  skippedCount: z.number(),
+  failedCount: z.number(),
+  currentMessage: z.string().nullable(),
+  errors: z.array(z.string()),
+  warnings: z.array(z.string()),
+  createdAt: z.string(),
+  startedAt: z.string().nullable(),
+  finishedAt: z.string().nullable(),
+});
+
+export const CreateImportJobInput = z.object({
+  data: NormalizedImportSchema,
+  options: ImportOptionsSchema,
+});
+
+export const ImportJobEvent = z.object({
+  type: z.enum(["progress", "complete"]),
+  job: ImportJobSchema,
+});
+
 // ═══════════════════════════════════════════════════════════════
 // Inferred types — use these instead of hand-written interfaces
 // ═══════════════════════════════════════════════════════════════
@@ -1116,4 +1249,6 @@ export type Season = z.infer<typeof SeasonSchema>;
 export type SystemHealthData = z.infer<typeof SystemHealthSchema>;
 export type PaginationInfo = z.infer<typeof PaginationMeta>;
 export type TimePeriod = z.infer<typeof WatchHistoryInput>["period"];
+export type ImportJob = z.infer<typeof ImportJobSchema>;
+export type NormalizedImport = z.infer<typeof NormalizedImportSchema>;
 export type UpdateCheckResult = z.infer<typeof UpdateCheckResultSchema>;
