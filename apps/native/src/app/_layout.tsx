@@ -1,10 +1,10 @@
 import "@/global.css";
 import { ThemeProvider } from "@react-navigation/native";
+import { QueryClientProvider } from "@tanstack/react-query";
 import {
   persistQueryClientRestore,
   persistQueryClientSubscribe,
 } from "@tanstack/react-query-persist-client";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
