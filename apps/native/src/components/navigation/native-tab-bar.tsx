@@ -67,7 +67,10 @@ export function NativeTabBar() {
           name="(search)"
           role="search"
           disableTransparentOnScrollEdge
-        />
+        >
+          <NativeTabs.Trigger.Label>Search</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf="magnifyingglass" md="search" />
+        </NativeTabs.Trigger>
       </NativeTabs>
     </>
   );

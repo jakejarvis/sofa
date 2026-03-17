@@ -1,7 +1,10 @@
 import "@/global.css";
 import { ThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import {
+  persistQueryClientRestore,
+  persistQueryClientSubscribe,
+} from "@tanstack/react-query-persist-client";
 import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -255,33 +258,60 @@ function AppContent() {
 }
 
 /**
- * Wraps children with PersistQueryClientProvider when scoped storage is ready,
- * otherwise uses plain QueryClientProvider. The key prop forces a remount when
- * the scope changes, triggering a restore from the new MMKV instance.
+ * Always renders a single QueryClientProvider so the React tree is never torn
+ * down. Cache persistence is managed imperatively: when scoped storage becomes
+ * ready we restore from MMKV and subscribe to cache mutations; when the scope
+ * changes (different server/user) we unsubscribe, restore from the new
+ * partition, and re-subscribe.
  */
 function QueryProvider({ children }: { children: React.ReactNode }) {
-  // Re-render when scope changes so we switch between providers
   const [, setScopeVersion] = useState(0);
   const { data: session } = authClient.useSession();
   const instanceId = getCurrentInstanceId();
   const scopeReady = hasScopedStorage();
 
-  // When scope changes (via setStorageScope), force re-render
   useEffect(() => {
     return onStorageScopeChange(() => setScopeVersion((n) => n + 1));
   }, []);
 
-  if (scopeReady && instanceId && session?.user?.id) {
-    return (
-      <PersistQueryClientProvider
-        key={`${instanceId}_${session.user.id}`}
-        client={queryClient}
-        persistOptions={{ persister: queryPersister }}
-      >
-        {children}
-      </PersistQueryClientProvider>
-    );
-  }
+  const scopeKey =
+    scopeReady && instanceId && session?.user?.id
+      ? `${instanceId}_${session.user.id}`
+      : null;
+
+  const prevScopeKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const prev = prevScopeKeyRef.current;
+    prevScopeKeyRef.current = scopeKey;
+
+    // Only clear when switching away from an active scope (user switch/logout).
+    // Don't clear on initial activation (null → value) — preserve data
+    // from queries that started before the scope was ready.
+    // queryClient.clear() calls query.destroy() which silently cancels
+    // in-flight fetches without notifying observers, permanently stalling
+    // any queries that were mid-flight.
+    if (prev != null && prev !== scopeKey) {
+      queryClient.clear();
+    }
+
+    if (!scopeKey) return;
+
+    const options = { queryClient, persister: queryPersister };
+
+    let unsubscribe: (() => void) | undefined;
+    let aborted = false;
+
+    persistQueryClientRestore(options).then(() => {
+      if (aborted) return;
+      unsubscribe = persistQueryClientSubscribe(options);
+    });
+
+    return () => {
+      aborted = true;
+      unsubscribe?.();
+    };
+  }, [scopeKey]);
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

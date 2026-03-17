@@ -267,7 +267,7 @@ export function PosterCard({
         <GestureDetector gesture={pressGesture}>
           <Animated.View style={[animatedStyle, { width }]}>
             <View>
-              <Link href={titleHref}>
+              <Link href={titleHref} asChild>
                 <Link.Trigger withAppleZoom>
                   <Pressable
                     accessibilityRole="button"

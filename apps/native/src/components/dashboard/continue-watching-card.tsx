@@ -57,7 +57,7 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
     .join(", ");
 
   return (
-    <Link href={`/title/${item.title.id}` as `/title/${string}`}>
+    <Link href={`/title/${item.title.id}` as `/title/${string}`} asChild>
       <Link.Trigger withAppleZoom>
         <GestureDetector gesture={tapGesture}>
           <Animated.View
