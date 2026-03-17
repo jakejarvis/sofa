@@ -55,7 +55,6 @@ export const implementedRouter = {
     publicInfo: system.publicInfo,
     authConfig: system.authConfig,
     status: status.status,
-    health: status.health,
   },
   integrations: {
     list: integrations.list,
@@ -81,6 +80,7 @@ export const implementedRouter = {
     triggerJob: admin.triggerJob,
     purgeMetadataCache: admin.purgeMetadataCache,
     purgeImageCache: admin.purgeImageCache,
+    systemHealth: admin.systemHealth,
   },
   account: {
     updateName: account.updateName,

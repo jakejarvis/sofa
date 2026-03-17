@@ -406,23 +406,12 @@ export const contract = {
         method: "GET",
         path: "/system/status",
         tags: ["System"],
-        summary: "Get system status",
+        summary: "Get internal system config",
         description:
-          "Quick check of whether TMDB is configured. Does not require authentication.",
-        successDescription: "TMDB configuration status",
+          "Returns internal configuration such as the public API URL. Requires authentication.",
+        successDescription: "Internal system configuration",
       })
       .output(SystemStatusOutput),
-    health: oc
-      .route({
-        method: "GET",
-        path: "/system/health",
-        tags: ["System"],
-        summary: "Get system health report",
-        description:
-          "Comprehensive health check covering database, TMDB connectivity, cron jobs, image cache, backups, and environment. Admin only.",
-        successDescription: "Full system health report",
-      })
-      .output(SystemHealthOutput),
   },
   integrations: {
     list: oc
@@ -653,6 +642,17 @@ export const contract = {
       })
       .input(z.void())
       .output(PurgeImageCacheOutput),
+    systemHealth: oc
+      .route({
+        method: "GET",
+        path: "/admin/system-health",
+        tags: ["Admin"],
+        summary: "Get system health report",
+        description:
+          "Comprehensive health check covering database, TMDB connectivity, cron jobs, image cache, backups, and environment.",
+        successDescription: "Full system health report",
+      })
+      .output(SystemHealthOutput),
   },
   account: {
     updateName: oc

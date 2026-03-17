@@ -29,7 +29,7 @@ export function CacheSection() {
   const queryClient = useQueryClient();
 
   const invalidateHealth = () =>
-    queryClient.invalidateQueries({ queryKey: orpc.system.health.key() });
+    queryClient.invalidateQueries({ queryKey: orpc.admin.systemHealth.key() });
 
   const purgeMetadata = useMutation(
     orpc.admin.purgeMetadataCache.mutationOptions({

@@ -86,7 +86,7 @@ export default function SettingsScreen() {
     hasPassword && !(authConfig.data?.passwordLoginDisabled ?? true);
 
   const systemHealth = useQuery({
-    ...orpc.system.health.queryOptions(),
+    ...orpc.admin.systemHealth.queryOptions(),
     enabled: isAdmin,
   });
 

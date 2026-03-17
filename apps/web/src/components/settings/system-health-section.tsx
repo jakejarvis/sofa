@@ -130,11 +130,11 @@ function LiveTimeAgo({
 export function SystemHealthCards() {
   const queryClient = useQueryClient();
   const { data, isPending, isFetching } = useQuery(
-    orpc.system.health.queryOptions(),
+    orpc.admin.systemHealth.queryOptions(),
   );
   const isRefreshing = isFetching;
   const refresh = () =>
-    queryClient.invalidateQueries({ queryKey: orpc.system.health.key() });
+    queryClient.invalidateQueries({ queryKey: orpc.admin.systemHealth.key() });
 
   if (isPending || !data) return <SkeletonCards />;
 

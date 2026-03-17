@@ -4287,60 +4287,28 @@
     "/system/status": {
       "get": {
         "operationId": "system.status",
-        "summary": "Get system status",
-        "description": "Quick check of whether TMDB is configured. Does not require authentication.",
+        "summary": "Get internal system config",
+        "description": "Returns internal configuration such as the public API URL. Requires authentication.",
         "tags": [
           "System"
         ],
         "responses": {
           "200": {
-            "description": "TMDB configuration status",
+            "description": "Internal system configuration",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "tmdbConfigured": {
-                      "type": "boolean",
-                      "description": "Whether a TMDB API token is configured"
-                    },
                     "publicApiUrl": {
                       "type": "string",
                       "description": "Base URL of the centralized public API"
                     }
                   },
                   "required": [
-                    "tmdbConfigured",
                     "publicApiUrl"
                   ],
-                  "description": "Quick TMDB configuration check"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/system/health": {
-      "get": {
-        "operationId": "system.health",
-        "summary": "Get system health report",
-        "description": "Comprehensive health check covering database, TMDB connectivity, cron jobs, image cache, backups, and environment. Admin only.",
-        "tags": [
-          "System"
-        ],
-        "responses": {
-          "200": {
-            "description": "Full system health report",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SystemHealth"
+                  "description": "Internal system configuration for authenticated clients"
                 }
               }
             }
@@ -5620,6 +5588,33 @@
         ]
       }
     },
+    "/admin/system-health": {
+      "get": {
+        "operationId": "admin.systemHealth",
+        "summary": "Get system health report",
+        "description": "Comprehensive health check covering database, TMDB connectivity, cron jobs, image cache, backups, and environment.",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Full system health report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemHealth"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/account/name": {
       "put": {
         "operationId": "account.updateName",
@@ -5831,10 +5826,12 @@
                               },
                               "watchedAt": {
                                 "type": "string",
+                                "format": "date-time",
                                 "description": "ISO 8601 timestamp"
                               },
                               "watchedOn": {
                                 "type": "string",
+                                "format": "date",
                                 "description": "YYYY-MM-DD date-only"
                               }
                             },
@@ -5865,16 +5862,22 @@
                                 "type": "number"
                               },
                               "seasonNumber": {
-                                "type": "number"
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
                               },
                               "episodeNumber": {
-                                "type": "number"
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 9007199254740991
                               },
                               "watchedAt": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "date-time"
                               },
                               "watchedOn": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "date"
                               }
                             },
                             "required": [
@@ -5951,10 +5954,12 @@
                                 "description": "Sofa 1-5 star rating"
                               },
                               "ratedAt": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "date-time"
                               },
                               "ratedOn": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "date"
                               }
                             },
                             "required": [
@@ -6087,10 +6092,12 @@
                             },
                             "watchedAt": {
                               "type": "string",
+                              "format": "date-time",
                               "description": "ISO 8601 timestamp"
                             },
                             "watchedOn": {
                               "type": "string",
+                              "format": "date",
                               "description": "YYYY-MM-DD date-only"
                             }
                           },
@@ -6121,16 +6128,22 @@
                               "type": "number"
                             },
                             "seasonNumber": {
-                              "type": "number"
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 9007199254740991
                             },
                             "episodeNumber": {
-                              "type": "number"
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
                             },
                             "watchedAt": {
-                              "type": "string"
+                              "type": "string",
+                              "format": "date-time"
                             },
                             "watchedOn": {
-                              "type": "string"
+                              "type": "string",
+                              "format": "date"
                             }
                           },
                           "required": [
@@ -6207,10 +6220,12 @@
                               "description": "Sofa 1-5 star rating"
                             },
                             "ratedAt": {
-                              "type": "string"
+                              "type": "string",
+                              "format": "date-time"
                             },
                             "ratedOn": {
-                              "type": "string"
+                              "type": "string",
+                              "format": "date"
                             }
                           },
                           "required": [
@@ -6276,10 +6291,12 @@
                               },
                               "watchedAt": {
                                 "type": "string",
+                                "format": "date-time",
                                 "description": "ISO 8601 timestamp"
                               },
                               "watchedOn": {
                                 "type": "string",
+                                "format": "date",
                                 "description": "YYYY-MM-DD date-only"
                               }
                             },
@@ -6310,16 +6327,22 @@
                                 "type": "number"
                               },
                               "seasonNumber": {
-                                "type": "number"
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
                               },
                               "episodeNumber": {
-                                "type": "number"
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 9007199254740991
                               },
                               "watchedAt": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "date-time"
                               },
                               "watchedOn": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "date"
                               }
                             },
                             "required": [
@@ -6396,10 +6419,12 @@
                                 "description": "Sofa 1-5 star rating"
                               },
                               "ratedAt": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "date-time"
                               },
                               "ratedOn": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "date"
                               }
                             },
                             "required": [
@@ -6532,10 +6557,12 @@
                             },
                             "watchedAt": {
                               "type": "string",
+                              "format": "date-time",
                               "description": "ISO 8601 timestamp"
                             },
                             "watchedOn": {
                               "type": "string",
+                              "format": "date",
                               "description": "YYYY-MM-DD date-only"
                             }
                           },
@@ -6566,16 +6593,22 @@
                               "type": "number"
                             },
                             "seasonNumber": {
-                              "type": "number"
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 9007199254740991
                             },
                             "episodeNumber": {
-                              "type": "number"
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 9007199254740991
                             },
                             "watchedAt": {
-                              "type": "string"
+                              "type": "string",
+                              "format": "date-time"
                             },
                             "watchedOn": {
-                              "type": "string"
+                              "type": "string",
+                              "format": "date"
                             }
                           },
                           "required": [
@@ -6652,10 +6685,12 @@
                               "description": "Sofa 1-5 star rating"
                             },
                             "ratedAt": {
-                              "type": "string"
+                              "type": "string",
+                              "format": "date-time"
                             },
                             "ratedOn": {
-                              "type": "string"
+                              "type": "string",
+                              "format": "date"
                             }
                           },
                           "required": [
@@ -7145,7 +7180,8 @@
                             "type": {
                               "enum": [
                                 "progress",
-                                "complete"
+                                "complete",
+                                "timeout"
                               ]
                             },
                             "job": {

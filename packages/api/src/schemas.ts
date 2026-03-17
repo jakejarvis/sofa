@@ -884,12 +884,11 @@ export const SystemHealthSchema = z
 
 export const SystemStatusOutput = z
   .object({
-    tmdbConfigured: z
-      .boolean()
-      .describe("Whether a TMDB API token is configured"),
     publicApiUrl: z.string().describe("Base URL of the centralized public API"),
   })
-  .meta({ description: "Quick TMDB configuration check" });
+  .meta({
+    description: "Internal system configuration for authenticated clients",
+  });
 
 export const SystemHealthOutput = SystemHealthSchema;
 

@@ -13,6 +13,7 @@ import {
   purgeMetadataCache as purgeMetadataFn,
 } from "@sofa/core/cache";
 import { getSetting, setSetting } from "@sofa/core/settings";
+import { getSystemHealth } from "@sofa/core/system-health";
 import { isTelemetryEnabled } from "@sofa/core/telemetry";
 import {
   getCachedUpdateCheck,
@@ -173,3 +174,11 @@ export const purgeMetadataCache = os.admin.purgeMetadataCache
 export const purgeImageCache = os.admin.purgeImageCache
   .use(admin)
   .handler(async () => purgeImagesFn());
+
+// ─── System Health ───────────────────────────────────────────────
+
+export const systemHealth = os.admin.systemHealth
+  .use(admin)
+  .handler(async () => {
+    return await getSystemHealth();
+  });
