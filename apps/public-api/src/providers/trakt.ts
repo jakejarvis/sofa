@@ -75,6 +75,13 @@ export const trakt: ImportProvider = {
       fetch(`${API_BASE}/sync/ratings`, { headers }),
     ]);
 
+    // If all endpoints failed, throw so the caller gets a clear error
+    if (!moviesRes.ok && !showsRes.ok && !watchlistRes.ok && !ratingsRes.ok) {
+      throw new Error(
+        `Trakt API returned errors: movies ${moviesRes.status}, shows ${showsRes.status}, watchlist ${watchlistRes.status}, ratings ${ratingsRes.status}`,
+      );
+    }
+
     const [moviesData, showsData, watchlistData, ratingsData] =
       await Promise.all([
         moviesRes.ok ? moviesRes.json() : [],

@@ -48,11 +48,15 @@ interface SimklApiItem {
 function flattenSimklItems(items: SimklApiItem[], mediaKey: "movie" | "show") {
   return items.map((item) => {
     const media = item[mediaKey];
-    // Strip unwatched episodes from API response (they lack watched_at)
-    const filteredSeasons = item.seasons?.map((s) => ({
-      ...s,
-      episodes: s.episodes?.filter((ep) => ep.watched_at),
-    }));
+    // Strip unwatched episodes from API response (they lack watched_at),
+    // then drop seasons that end up empty so the parser's missing-episode
+    // warning still fires correctly.
+    const filteredSeasons = item.seasons
+      ?.map((s) => ({
+        ...s,
+        episodes: s.episodes?.filter((ep) => ep.watched_at),
+      }))
+      .filter((s) => s.episodes && s.episodes.length > 0);
     return {
       title: media?.title,
       year: media?.year,
@@ -126,6 +130,13 @@ export const simkl: ImportProvider = {
         { headers },
       ),
     ]);
+
+    // If all endpoints failed, throw so the caller gets a clear error
+    if (!moviesRes.ok && !showsRes.ok && !animeRes.ok) {
+      throw new Error(
+        `Simkl API returned errors: movies ${moviesRes.status}, shows ${showsRes.status}, anime ${animeRes.status}`,
+      );
+    }
 
     const [moviesData, showsData, animeData] = await Promise.all([
       moviesRes.ok
