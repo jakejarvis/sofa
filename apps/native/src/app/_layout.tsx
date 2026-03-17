@@ -287,12 +287,15 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
     // Restore the persisted cache from the active MMKV partition, then
     // subscribe so every subsequent cache update is written back.
     let unsubscribe: (() => void) | undefined;
+    let aborted = false;
 
     persistQueryClientRestore(options).then(() => {
+      if (aborted) return;
       unsubscribe = persistQueryClientSubscribe(options);
     });
 
     return () => {
+      aborted = true;
       unsubscribe?.();
     };
   }, [scopeKey]);
