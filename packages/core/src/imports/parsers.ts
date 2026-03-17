@@ -408,8 +408,6 @@ export function parseSimklPayload(data: {
         if (season.number == null) continue;
         for (const ep of season.episodes ?? []) {
           if (ep.number == null) continue;
-          // Skip episodes without a watched_at timestamp — they are unwatched
-          if (!ep.watched_at) continue;
           episodes.push({
             showTmdbId: tmdbId ?? undefined,
             imdbId: item.ids?.imdb,

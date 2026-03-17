@@ -56,6 +56,9 @@ export const trakt: ImportProvider = {
     if (res.status === 410) return { status: "expired" };
     if (res.status === 418) return { status: "denied" };
     if (res.status === 429) return { status: "pending" };
+    // 5xx: likely transient — keep polling
+    if (res.status >= 500) return { status: "pending" };
+    // Unknown 4xx: likely permanent — treat as expired
     return { status: "expired" };
   },
 

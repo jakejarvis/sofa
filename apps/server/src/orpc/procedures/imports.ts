@@ -105,10 +105,12 @@ export const createJob = os.imports.createJob
     }
 
     // Prevent concurrent imports per user.
-    // Stale threshold: if a job has been pending/running for over 10 minutes
-    // without progress, treat it as stale (e.g. server crashed mid-import).
-    const STALE_THRESHOLD_MS = 10 * 60 * 1000;
-    const staleAt = new Date(Date.now() - STALE_THRESHOLD_MS);
+    // Stale detection: pending jobs should start within minutes; running jobs
+    // can legitimately take a long time for large imports. Use different
+    // thresholds and reference the most relevant timestamp for each.
+    const PENDING_STALE_MS = 5 * 60 * 1000; // 5 minutes
+    const RUNNING_STALE_MS = 60 * 60 * 1000; // 1 hour
+    const now = Date.now();
     const existing = db
       .select()
       .from(importJobs)
@@ -120,12 +122,18 @@ export const createJob = os.imports.createJob
       )
       .get();
     if (existing) {
-      const jobAge = existing.createdAt.getTime();
-      if (jobAge < staleAt.getTime()) {
-        // Auto-cancel stale job so user isn't locked out
+      const isPending = existing.status === "pending";
+      const threshold = isPending ? PENDING_STALE_MS : RUNNING_STALE_MS;
+      const refTime = (
+        isPending
+          ? existing.createdAt
+          : (existing.startedAt ?? existing.createdAt)
+      ).getTime();
+      if (now - refTime > threshold) {
+        // Mark as cancelled so the worker loop also stops
         db.update(importJobs)
           .set({
-            status: "error",
+            status: "cancelled",
             finishedAt: new Date(),
             currentMessage: "Import timed out (stale job auto-cancelled)",
           })

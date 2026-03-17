@@ -202,11 +202,20 @@ app.post(
       }
 
       // Fetch user data and return it inline
-      const data = await provider.fetchUserData(
-        result.accessToken,
-        config.clientId,
-      );
-      return c.json({ status: "authorized", data });
+      try {
+        const data = await provider.fetchUserData(
+          result.accessToken,
+          config.clientId,
+        );
+        return c.json({ status: "authorized", data });
+      } catch (e) {
+        // Auth succeeded but data fetch failed. Return a distinct status so
+        // the client can show a meaningful error instead of polling forever.
+        return c.json({
+          status: "fetch_error",
+          error: e instanceof Error ? e.message : "Failed to fetch user data",
+        });
+      }
     } catch (e) {
       return c.json(
         { error: e instanceof Error ? e.message : "Poll failed" },

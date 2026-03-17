@@ -41,10 +41,18 @@ interface SimklApiItem {
   }[];
 }
 
-/** Flatten Simkl API response items into the shape parseSimklPayload expects. */
+/** Flatten Simkl API response items into the shape parseSimklPayload expects.
+ *  When fetched with `episode_watched_at=yes`, the API returns ALL episodes
+ *  in the seasons array — filter to only those with a `watched_at` timestamp
+ *  so unwatched episodes don't get imported as watched. */
 function flattenSimklItems(items: SimklApiItem[], mediaKey: "movie" | "show") {
   return items.map((item) => {
     const media = item[mediaKey];
+    // Strip unwatched episodes from API response (they lack watched_at)
+    const filteredSeasons = item.seasons?.map((s) => ({
+      ...s,
+      episodes: s.episodes?.filter((ep) => ep.watched_at),
+    }));
     return {
       title: media?.title,
       year: media?.year,
@@ -52,7 +60,7 @@ function flattenSimklItems(items: SimklApiItem[], mediaKey: "movie" | "show") {
       status: item.status,
       user_rating: item.user_rating,
       last_watched_at: item.last_watched_at,
-      seasons: item.seasons,
+      seasons: filteredSeasons,
     };
   });
 }

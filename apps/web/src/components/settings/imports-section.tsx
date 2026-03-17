@@ -429,6 +429,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         const data = (await res.json()) as {
           status: string;
           data?: Record<string, unknown>;
+          error?: string;
         };
 
         if (data.status === "authorized" && data.data) {
@@ -442,6 +443,13 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         } else if (data.status === "expired") {
           stopPolling();
           setOauthError("Device code expired. Please try again.");
+          setStep("choose");
+        } else if (data.status === "fetch_error") {
+          stopPolling();
+          setOauthError(
+            data.error ||
+              "Authorization succeeded but failed to fetch your library. Please try again.",
+          );
           setStep("choose");
         }
         // "pending" → keep polling
