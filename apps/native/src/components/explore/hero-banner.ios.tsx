@@ -1,7 +1,7 @@
 import { IconStarFilled } from "@tabler/icons-react-native";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { Link } from "expo-router";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   interpolate,
@@ -55,20 +55,20 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
   const titleHref = `/title/${item.id}` as `/title/${string}`;
 
   return (
-    <Link href={titleHref}>
-      <Link.Trigger>
-        <GestureDetector gesture={tapGesture}>
-          <Animated.View
-            className="mx-4 overflow-hidden rounded-2xl"
-            style={[
-              animatedStyle,
-              {
-                height: 220,
-                borderCurve: "continuous",
-              },
-            ]}
-          >
-            <View
+    <GestureDetector gesture={tapGesture}>
+      <Animated.View
+        className="mx-4 overflow-hidden rounded-2xl"
+        style={[
+          animatedStyle,
+          {
+            height: 220,
+            borderCurve: "continuous",
+          },
+        ]}
+      >
+        <Link href={titleHref} asChild>
+          <Link.Trigger>
+            <Pressable
               accessibilityRole="button"
               accessibilityLabel={accessibilityLabel}
               accessibilityHint="Opens title details"
@@ -158,11 +158,11 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
                   </View>
                 </>
               )}
-            </View>
-          </Animated.View>
-        </GestureDetector>
-      </Link.Trigger>
-      <Link.Preview />
-    </Link>
+            </Pressable>
+          </Link.Trigger>
+          <Link.Preview />
+        </Link>
+      </Animated.View>
+    </GestureDetector>
   );
 }

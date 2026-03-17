@@ -279,16 +279,25 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
       ? `${instanceId}_${session.user.id}`
       : null;
 
+  const prevScopeKeyRef = useRef<string | null>(null);
+
   useEffect(() => {
+    const prev = prevScopeKeyRef.current;
+    prevScopeKeyRef.current = scopeKey;
+
+    // Only clear when switching away from an active scope (user switch/logout).
+    // Don't clear on initial activation (null → value) — preserve data
+    // from queries that started before the scope was ready.
+    // queryClient.clear() calls query.destroy() which silently cancels
+    // in-flight fetches without notifying observers, permanently stalling
+    // any queries that were mid-flight.
+    if (prev != null && prev !== scopeKey) {
+      queryClient.clear();
+    }
+
     if (!scopeKey) return;
 
     const options = { queryClient, persister: queryPersister };
-
-    // Restore the persisted cache from the active MMKV partition, then
-    // subscribe so every subsequent cache update is written back.
-    // Clear the cache first so a scope change doesn't leave stale data
-    // from a previous partition if the async restore races.
-    queryClient.clear();
 
     let unsubscribe: (() => void) | undefined;
     let aborted = false;

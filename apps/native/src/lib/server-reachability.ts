@@ -28,7 +28,10 @@ function isDeviceOnline(state: Network.NetworkState): boolean {
 }
 
 function syncOnlineState(state: Network.NetworkState) {
-  onlineManager.setOnline(isDeviceOnline(state));
+  // Don't report offline if the server is confirmed reachable — expo-network
+  // can report isInternetReachable: false on iOS Simulator or certain
+  // network configs even when the server is actually accessible.
+  onlineManager.setOnline(isDeviceOnline(state) || isReachable);
 }
 
 function syncAppFocus(state: AppStateStatus) {
@@ -64,6 +67,12 @@ export async function serverFetch(
     // Any HTTP response proves we reached the server, even if the
     // endpoint itself returned a 4xx/5xx application error.
     setReachable(true);
+
+    // If React Query thinks we're offline but the server just responded,
+    // correct the online state so paused queries can resume.
+    if (!onlineManager.isOnline()) {
+      onlineManager.setOnline(true);
+    }
 
     return response;
   } catch (error) {
