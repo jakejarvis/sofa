@@ -124,8 +124,9 @@ app.post(
       if (rateLimited) {
         return c.json({ error: "Rate limit exceeded" }, 429);
       }
-    } catch {
-      // WAF rule not configured — allow request through
+    } catch (e) {
+      // Rate limiter error (e.g. WAF rule not configured) — fail open but log
+      console.warn("checkRateLimit error (import-device-code):", e);
     }
 
     const { provider: providerName } = c.req.valid("param");
@@ -175,8 +176,9 @@ app.post(
       if (rateLimited) {
         return c.json({ error: "Rate limit exceeded" }, 429);
       }
-    } catch {
-      // WAF rule not configured — allow request through
+    } catch (e) {
+      // Rate limiter error (e.g. WAF rule not configured) — fail open but log
+      console.warn("checkRateLimit error (import-poll):", e);
     }
 
     const { provider: providerName } = c.req.valid("param");
@@ -200,21 +202,11 @@ app.post(
       }
 
       // Fetch user data and return it inline
-      try {
-        const data = await provider.fetchUserData(
-          result.accessToken,
-          config.clientId,
-        );
-        return c.json({ status: "authorized", data });
-      } catch (e) {
-        // Token was obtained but data fetch failed — return authorized status
-        // with error so the client knows auth succeeded but can retry
-        return c.json({
-          status: "authorized",
-          data: null,
-          error: e instanceof Error ? e.message : "Failed to fetch user data",
-        });
-      }
+      const data = await provider.fetchUserData(
+        result.accessToken,
+        config.clientId,
+      );
+      return c.json({ status: "authorized", data });
     } catch (e) {
       return c.json(
         { error: e instanceof Error ? e.message : "Poll failed" },

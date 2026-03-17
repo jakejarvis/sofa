@@ -104,7 +104,11 @@ export const createJob = os.imports.createJob
       );
     }
 
-    // Prevent concurrent imports per user
+    // Prevent concurrent imports per user.
+    // Stale threshold: if a job has been pending/running for over 10 minutes
+    // without progress, treat it as stale (e.g. server crashed mid-import).
+    const STALE_THRESHOLD_MS = 10 * 60 * 1000;
+    const staleAt = new Date(Date.now() - STALE_THRESHOLD_MS);
     const existing = db
       .select()
       .from(importJobs)
@@ -116,7 +120,21 @@ export const createJob = os.imports.createJob
       )
       .get();
     if (existing) {
-      throw new Error("An import is already in progress");
+      const jobAge = existing.createdAt.getTime();
+      if (jobAge < staleAt.getTime()) {
+        // Auto-cancel stale job so user isn't locked out
+        db.update(importJobs)
+          .set({
+            status: "error",
+            finishedAt: new Date(),
+            currentMessage: "Import timed out (stale job auto-cancelled)",
+          })
+          .where(eq(importJobs.id, existing.id))
+          .run();
+        log.warn(`Auto-cancelled stale import job ${existing.id}`);
+      } else {
+        throw new Error("An import is already in progress");
+      }
     }
 
     const job = db

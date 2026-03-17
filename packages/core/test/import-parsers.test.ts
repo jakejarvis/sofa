@@ -507,12 +507,12 @@ describe("parseSimklPayload", () => {
           seasons: [
             {
               // missing number
-              episodes: [{ number: 1 }],
+              episodes: [{ number: 1, watched_at: "2024-01-01T00:00:00Z" }],
             },
             {
               number: 1,
               episodes: [
-                { number: 1 },
+                { number: 1, watched_at: "2024-01-01T00:00:00Z" },
                 {}, // missing episode number
               ],
             },

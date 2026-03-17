@@ -408,6 +408,8 @@ export function parseSimklPayload(data: {
         if (season.number == null) continue;
         for (const ep of season.episodes ?? []) {
           if (ep.number == null) continue;
+          // Skip episodes without a watched_at timestamp — they are unwatched
+          if (!ep.watched_at) continue;
           episodes.push({
             showTmdbId: tmdbId ?? undefined,
             imdbId: item.ids?.imdb,
@@ -423,7 +425,7 @@ export function parseSimklPayload(data: {
     }
 
     if (
-      !item.seasons &&
+      !item.seasons?.length &&
       (item.status === "completed" || item.status === "watching")
     ) {
       warnings.push(
@@ -578,7 +580,7 @@ export async function parseLetterboxdExport(
     movies.push({
       title,
       year: year && !Number.isNaN(year) ? year : undefined,
-      watchedOn: (row["Watched Date"] || row.WatchedDate) ?? undefined,
+      watchedOn: row["Watched Date"] || row.WatchedDate || undefined,
     });
   }
 
@@ -637,7 +639,7 @@ export async function parseLetterboxdExport(
       year: year && !Number.isNaN(year) ? year : undefined,
       type: "movie",
       rating: converted,
-      ratedOn: row.Date ?? undefined,
+      ratedOn: row.Date || undefined,
     });
   }
 

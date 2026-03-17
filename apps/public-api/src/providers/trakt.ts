@@ -56,7 +56,7 @@ export const trakt: ImportProvider = {
     if (res.status === 410) return { status: "expired" };
     if (res.status === 418) return { status: "denied" };
     if (res.status === 429) return { status: "pending" };
-    return { status: "pending" };
+    return { status: "expired" };
   },
 
   async fetchUserData(accessToken, clientId): Promise<NormalizedImport> {
