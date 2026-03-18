@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconChevronDown } from "@tabler/icons-react-native";
 import { useCallback, useEffect, useState } from "react";
@@ -127,9 +128,7 @@ export function SeasonAccordion({
             {season.name ?? t`Season ${season.seasonNumber}`}
           </Text>
           <Text className="mt-0.5 text-muted-foreground text-xs">
-            <Trans>
-              {watchedCount}/{episodes.length} episodes
-            </Trans>
+            {t`${watchedCount}/${episodes.length} ${plural(episodes.length, { one: "episode", other: "episodes" })}`}
           </Text>
         </View>
 

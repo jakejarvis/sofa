@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import type { ResolvedPerson } from "@sofa/api/schemas";
+import { formatDate } from "@sofa/i18n/format";
 import { IconCalendar, IconMapPin } from "@tabler/icons-react";
-import { format, parseISO } from "date-fns";
 
 import { ExpandableText } from "@/components/expandable-text";
 import { Badge } from "@/components/ui/badge";
@@ -85,7 +85,7 @@ export function PersonHero({ person }: PersonHeroProps) {
           {person.birthday && (
             <span className="flex items-center gap-1.5">
               <IconCalendar aria-hidden={true} className="size-3.5" />
-              {format(parseISO(person.birthday), "MMMM d, yyyy")}
+              {formatDate(person.birthday)}
               {age !== null && (
                 <span className="text-muted-foreground/60">
                   ({person.deathday ? t`died at ${age}` : t`age ${age}`})

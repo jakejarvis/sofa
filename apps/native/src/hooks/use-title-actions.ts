@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useMutation } from "@tanstack/react-query";
 import { orpc } from "@/lib/orpc";
@@ -89,7 +90,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
       onSuccess: (_data, input) => {
         const defaultMsg =
           input.stars > 0
-            ? t`Rated ${input.stars} star${input.stars > 1 ? "s" : ""}`
+            ? t`Rated ${input.stars} ${plural(input.stars, { one: "star", other: "stars" })}`
             : t`Rating removed`;
         toast.success(
           resolveToast(toastOverrides?.updateRating, defaultMsg, input),

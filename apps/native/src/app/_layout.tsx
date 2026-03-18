@@ -38,7 +38,7 @@ import { sofaTheme } from "@/lib/theme";
 SplashScreen.preventAutoHideAsync();
 enableFreeze(true);
 initialize();
-initLocale();
+const localeReady = initLocale();
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
@@ -66,6 +66,13 @@ const changePasswordOptions =
 function AppContent() {
   const contentStyle = useResolveClassNames("bg-background");
   const { session, isPending, hasServerUrl } = useServerConnection();
+
+  // --- Locale readiness (wait for async catalog load before showing UI) ---
+  const [isLocaleReady, setLocaleReady] = useState(false);
+
+  useEffect(() => {
+    localeReady.then(() => setLocaleReady(true));
+  }, []);
 
   // --- App Tracking Transparency (must resolve before screen tracking) ---
   const [trackingReady, setTrackingReady] = useState(false);
@@ -115,10 +122,10 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
-    if (!isPending || !hasServerUrl) {
+    if (isLocaleReady && (!isPending || !hasServerUrl)) {
       SplashScreen.hideAsync();
     }
-  }, [isPending, hasServerUrl]);
+  }, [isPending, hasServerUrl, isLocaleReady]);
 
   return (
     <ThemeProvider value={sofaTheme}>

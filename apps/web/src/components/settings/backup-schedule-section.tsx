@@ -1,8 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { BackupFrequency } from "@sofa/api/schemas";
+import { formatRelativeTime } from "@sofa/i18n/format";
 import { IconCalendarWeek } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -127,7 +128,7 @@ export function BackupScheduleSection() {
     dayOfWeek: number,
   ): string {
     const next = getNextBackupDate(frequency, time, dayOfWeek);
-    const distance = formatDistanceToNow(next, { addSuffix: true });
+    const distance = formatRelativeTime(next);
     return t`Next backup ${distance}`;
   }
 
@@ -240,36 +241,40 @@ export function BackupScheduleSection() {
                     suppressHydrationWarning
                   >
                     {formatNextBackup(frequency, time, dow)}.{" "}
-                    <Trans>Keeping</Trans>{" "}
-                    <Select
-                      value={String(maxRetention)}
-                      onValueChange={(v) => v && changeMaxRetention(Number(v))}
-                      modal={false}
-                    >
-                      <SelectTrigger className="!h-auto mr-0.5 ml-1.5 w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 underline decoration-muted-foreground/50 decoration-dotted underline-offset-4 shadow-none hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:decoration-foreground focus-visible:decoration-solid focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent">
-                        <SelectValue>
-                          {(value: string | null) =>
-                            value === "0"
-                              ? t`unlimited`
-                              : value
-                                ? t`last ${value}`
-                                : null
-                          }
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent
-                        align="start"
-                        alignItemWithTrigger={false}
-                        className="p-1"
+                    <Trans>
+                      Keeping{" "}
+                      <Select
+                        value={String(maxRetention)}
+                        onValueChange={(v) =>
+                          v && changeMaxRetention(Number(v))
+                        }
+                        modal={false}
                       >
-                        {[3, 5, 7, 14, 30, 0].map((n) => (
-                          <SelectItem key={n} value={String(n)}>
-                            {n === 0 ? t`unlimited` : t`last ${n}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>{" "}
-                    <Trans>backups.</Trans>
+                        <SelectTrigger className="!h-auto mr-0.5 ml-1.5 w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 underline decoration-muted-foreground/50 decoration-dotted underline-offset-4 shadow-none hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:decoration-foreground focus-visible:decoration-solid focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent">
+                          <SelectValue>
+                            {(value: string | null) =>
+                              value === "0"
+                                ? t`unlimited`
+                                : value
+                                  ? t`last ${value}`
+                                  : null
+                            }
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent
+                          align="start"
+                          alignItemWithTrigger={false}
+                          className="p-1"
+                        >
+                          {[3, 5, 7, 14, 30, 0].map((n) => (
+                            <SelectItem key={n} value={String(n)}>
+                              {n === 0 ? t`unlimited` : t`last ${n}`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>{" "}
+                      backups.
+                    </Trans>
                   </span>
                 ) : (
                   <Trans>

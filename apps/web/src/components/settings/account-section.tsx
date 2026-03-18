@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { formatDate } from "@sofa/i18n/format";
 import {
   IconAlertTriangle,
   IconCamera,
@@ -93,9 +94,10 @@ export function AccountSection({
     }
   }, [isEditingName]);
 
-  const memberSince = new Date(user.createdAt).toLocaleDateString(undefined, {
+  const memberSince = formatDate(user.createdAt, {
     year: "numeric",
     month: "long",
+    day: undefined,
   });
   const initial = displayName?.charAt(0).toUpperCase() ?? "?";
 
@@ -406,7 +408,7 @@ function ChangePasswordDialog() {
         revokeOtherSessions,
       });
       if (result.error) {
-        setError(result.error.message ?? t`Failed to change password`);
+        setError(t`Failed to change password`);
         return;
       }
       toast.success(t`Password updated`);

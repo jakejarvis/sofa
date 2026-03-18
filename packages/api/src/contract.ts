@@ -395,7 +395,10 @@ export const contract = {
     .input(DiscoverInput)
     .output(DiscoverOutput)
     .errors({
-      PRECONDITION_FAILED: { message: "TMDB API key is not configured" },
+      PRECONDITION_FAILED: {
+        message: "TMDB API key is not configured",
+        data: appErrorData(AppErrorCode.TMDB_NOT_CONFIGURED),
+      },
     }),
   system: {
     publicInfo: oc

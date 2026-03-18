@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { activateLocale } from "@sofa/i18n";
 import { LOCALE_INFO } from "@sofa/i18n/locales";
@@ -393,26 +394,33 @@ export default function SettingsScreen() {
               );
             }}
           />
-          <SettingsRow
-            label={t`Language`}
-            value={
-              LOCALE_INFO.find((l) => l.code === i18n.locale)?.nativeName ??
-              "English"
-            }
-            icon={IconLanguage}
-            onPress={() => {
-              Alert.alert(t`Language`, undefined, [
-                ...LOCALE_INFO.map((info) => ({
-                  text: `${info.nativeName}${info.code === i18n.locale ? " ✓" : ""}`,
-                  onPress: async () => {
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <SettingsRow
+                label={t`Language`}
+                value={
+                  LOCALE_INFO.find((l) => l.code === i18n.locale)?.nativeName ??
+                  "English"
+                }
+                icon={IconLanguage}
+              />
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              {LOCALE_INFO.map((info) => (
+                <DropdownMenu.Item
+                  key={info.code}
+                  onSelect={async () => {
                     await activateLocale(info.code);
                     setPersistedLocale(info.code);
-                  },
-                })),
-                { text: t`Cancel`, style: "cancel" as const },
-              ]);
-            }}
-          />
+                  }}
+                >
+                  <DropdownMenu.ItemTitle>
+                    {`${info.nativeName}${info.code === i18n.locale ? " ✓" : ""}`}
+                  </DropdownMenu.ItemTitle>
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
           <SettingsRow
             label={t`Anonymous usage reporting`}
             icon={IconChartBar}
@@ -453,7 +461,10 @@ export default function SettingsScreen() {
                   label={t`Database`}
                   value={
                     systemHealth.data?.database
-                      ? t`${systemHealth.data.database.titleCount} titles`
+                      ? plural(systemHealth.data.database.titleCount, {
+                          one: "# title",
+                          other: "# titles",
+                        })
                       : "—"
                   }
                   icon={IconDatabase}
@@ -469,7 +480,10 @@ export default function SettingsScreen() {
                   label={t`Image Cache`}
                   value={
                     systemHealth.data?.imageCache
-                      ? t`${systemHealth.data.imageCache.imageCount} images`
+                      ? plural(systemHealth.data.imageCache.imageCount, {
+                          one: "# image",
+                          other: "# images",
+                        })
                       : "—"
                   }
                   icon={IconPhoto}

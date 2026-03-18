@@ -97,12 +97,45 @@ function StatCard({
 const inlineTriggerClass =
   "h-auto w-auto gap-0.5 rounded-none border-0 bg-transparent py-1 px-0.5 -my-1 -mx-0.5 sm:p-0 sm:m-0 [font-size:inherit] [line-height:inherit] shadow-none underline decoration-dotted decoration-muted-foreground/50 underline-offset-4 hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:ring-0 focus-visible:decoration-solid focus-visible:decoration-foreground dark:bg-transparent dark:hover:bg-transparent";
 
+function PeriodSelect({
+  period,
+  onPeriodChange,
+  periodLabels,
+}: {
+  period: TimePeriod;
+  onPeriodChange: (period: TimePeriod) => void;
+  periodLabels: Record<TimePeriod, string>;
+}) {
+  return (
+    <Select
+      value={period}
+      onValueChange={(v) => v && onPeriodChange(v as TimePeriod)}
+      modal={false}
+    >
+      <SelectTrigger
+        className={`${inlineTriggerClass} text-foreground/80 uppercase`}
+      >
+        <SelectValue>
+          {(value: TimePeriod | null) => (value ? periodLabels[value] : null)}
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent align="start" alignItemWithTrigger={false} className="p-1">
+        {periods.map((p) => (
+          <SelectItem key={p} value={p}>
+            {periodLabels[p]}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
 function PeriodSelector({
-  noun,
+  type,
   period,
   onPeriodChange,
 }: {
-  noun: string;
+  type: "movies" | "episodes";
   period: TimePeriod;
   onPeriodChange: (period: TimePeriod) => void;
 }) {
@@ -114,33 +147,19 @@ function PeriodSelector({
     this_year: t`This Year`,
   };
 
+  const periodSelect = (
+    <PeriodSelect
+      period={period}
+      onPeriodChange={onPeriodChange}
+      periodLabels={periodLabels}
+    />
+  );
+
   return (
     <span className="inline-flex items-baseline gap-1">
-      {noun}{" "}
-      <Select
-        value={period}
-        onValueChange={(v) => v && onPeriodChange(v as TimePeriod)}
-        modal={false}
-      >
-        <SelectTrigger
-          className={`${inlineTriggerClass} text-foreground/80 uppercase`}
-        >
-          <SelectValue>
-            {(value: TimePeriod | null) => (value ? periodLabels[value] : null)}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent
-          align="start"
-          alignItemWithTrigger={false}
-          className="p-1"
-        >
-          {periods.map((p) => (
-            <SelectItem key={p} value={p}>
-              {periodLabels[p]}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {type === "movies"
+        ? t`Movies ${periodSelect}`
+        : t`Episodes ${periodSelect}`}
     </span>
   );
 }
@@ -178,7 +197,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         sparklineData={movieHistory}
         label={
           <PeriodSelector
-            noun={t`Movies`}
+            type="movies"
             period={moviePeriod}
             onPeriodChange={setMoviePeriod}
           />
@@ -193,7 +212,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         sparklineData={episodeHistory}
         label={
           <PeriodSelector
-            noun={t`Episodes`}
+            type="episodes"
             period={episodePeriod}
             onPeriodChange={setEpisodePeriod}
           />

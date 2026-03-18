@@ -27,9 +27,10 @@ export function setPersistedLocale(locale: SupportedLocale): void {
   globalStorage.set(LOCALE_STORAGE_KEY, locale);
 }
 
-export function initLocale(): void {
+export function initLocale(): Promise<void> {
   const locale = getPersistedLocale();
   if (locale !== "en") {
-    activateLocale(locale);
+    return activateLocale(locale);
   }
+  return Promise.resolve();
 }

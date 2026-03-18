@@ -33,7 +33,7 @@ export function EpisodeRow({
       onPress={onToggle}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: isWatched }}
-      accessibilityLabel={`Episode ${episode.episodeNumber}, ${episodeLabel}`}
+      accessibilityLabel={t`Episode ${episode.episodeNumber}, ${episodeLabel}`}
       className="flex-row items-center border-border border-b px-4 py-3"
       style={{ borderBottomWidth: 0.5 }}
     >

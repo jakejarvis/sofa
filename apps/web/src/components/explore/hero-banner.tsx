@@ -61,7 +61,7 @@ export function HeroBanner({
                     ) : (
                       <>
                         <IconDeviceTv aria-hidden className="size-3.5" />
-                        TV
+                        <Trans>TV</Trans>
                       </>
                     )}
                   </span>

@@ -3,7 +3,7 @@ import { IconRefresh, IconWebhook } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { Pressable, View } from "react-native";
 import { IntegrationCard } from "@/components/settings/integration-card";
-import { INTEGRATION_CONFIGS } from "@/components/settings/integration-configs";
+import { getIntegrationConfigs } from "@/components/settings/integration-configs";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Spinner } from "@/components/ui/spinner";
@@ -11,7 +11,8 @@ import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
 
 export function IntegrationsSection() {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
+  const configs = getIntegrationConfigs(i18n);
   const integrations = useQuery(orpc.integrations.list.queryOptions());
 
   return (
@@ -43,7 +44,7 @@ export function IntegrationsSection() {
           </Pressable>
         </View>
       ) : (
-        INTEGRATION_CONFIGS.map((config) => {
+        configs.map((config) => {
           const connection =
             integrations.data?.integrations?.find(
               (i) => i.provider === config.provider,

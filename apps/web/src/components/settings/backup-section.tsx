@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { BackupInfo } from "@sofa/api/schemas";
 import {
@@ -102,7 +103,7 @@ export function BackupSection() {
 
   const backupCountLabel =
     displayBackups.length > 0
-      ? t`${displayBackups.length} backup${displayBackups.length !== 1 ? "s" : ""} stored`
+      ? t`${displayBackups.length} ${plural(displayBackups.length, { one: "backup", other: "backups" })} stored`
       : t`No backups yet`;
 
   return (

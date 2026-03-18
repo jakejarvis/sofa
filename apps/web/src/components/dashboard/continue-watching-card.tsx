@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { IconPlayerPlay } from "@tabler/icons-react";
 
@@ -89,7 +90,7 @@ export function ContinueWatchingCard({
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium text-sm">{item.title.title}</p>
           <p className="text-muted-foreground text-xs">
-            {t`${item.watchedEpisodes}/${item.totalEpisodes} episodes`}
+            {t`${item.watchedEpisodes}/${item.totalEpisodes} ${plural(item.totalEpisodes, { one: "episode", other: "episodes" })}`}
           </p>
         </div>
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">

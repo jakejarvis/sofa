@@ -68,10 +68,7 @@ export default function ChangePasswordScreen() {
         });
         if (result.error) {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-          Alert.alert(
-            t`Error`,
-            result.error.message ?? t`Failed to change password`,
-          );
+          Alert.alert(t`Error`, t`Failed to change password`);
           return;
         }
 
