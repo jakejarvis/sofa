@@ -8,13 +8,11 @@ import {
   getUserTitleInfo,
   logMovieWatch,
   markAllEpisodesWatched,
+  quickAddTitle,
   rateTitleStars,
   removeTitleStatus,
   setTitleStatus,
 } from "@sofa/core/tracking";
-import { db } from "@sofa/db/client";
-import { and, eq } from "@sofa/db/helpers";
-import { titles, userTitleStatus } from "@sofa/db/schema";
 
 import { os } from "../context";
 import { authed } from "../middleware";
@@ -65,31 +63,16 @@ export const recommendations = os.titles.recommendations
   });
 
 export const quickAdd = os.titles.quickAdd.use(authed).handler(async ({ input, context }) => {
-  // Look up the title (it exists as a shell from browse/search import)
-  const title = db
-    .select({ id: titles.id, tmdbId: titles.tmdbId, type: titles.type })
-    .from(titles)
-    .where(eq(titles.id, input.id))
-    .get();
-  if (!title) {
+  const result = quickAddTitle(context.user.id, input.id);
+  if (!result) {
     throw new ORPCError("NOT_FOUND", {
       message: "Title not found",
       data: { code: AppErrorCode.TITLE_NOT_FOUND },
     });
   }
 
-  // Trigger full TMDB import if still a shell
-  getOrFetchTitleByTmdbId(title.tmdbId, title.type as "movie" | "tv").catch(() => {});
+  // Trigger full TMDB import if still a shell (fire-and-forget)
+  getOrFetchTitleByTmdbId(result.tmdbId, result.type as "movie" | "tv").catch(() => {});
 
-  const existing = db
-    .select()
-    .from(userTitleStatus)
-    .where(and(eq(userTitleStatus.userId, context.user.id), eq(userTitleStatus.titleId, title.id)))
-    .get();
-
-  if (!existing) {
-    setTitleStatus(context.user.id, title.id, "watchlist");
-  }
-
-  return { id: title.id, alreadyAdded: !!existing };
+  return { id: result.id, alreadyAdded: result.alreadyAdded };
 });

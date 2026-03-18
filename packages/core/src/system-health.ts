@@ -2,9 +2,8 @@ import { access, constants, readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { CACHE_DIR, DATA_DIR, DATABASE_URL, TMDB_API_BASE_URL } from "@sofa/config";
-import { db } from "@sofa/db/client";
-import { count, desc, eq } from "@sofa/db/helpers";
-import { cronRuns, episodes, titles, user } from "@sofa/db/schema";
+import { getLatestCronRun, getTableCounts } from "@sofa/db/queries/system-health";
+import type { cronRuns } from "@sofa/db/schema";
 
 import { listBackups } from "./backup";
 import { imageCacheEnabled } from "./image-cache";
@@ -77,16 +76,12 @@ function getDatabaseHealth(): SystemHealthData["database"] {
     walSizeBytes = Bun.file(`${DATABASE_URL}-wal`).size;
   } catch {}
 
-  const [titleCount] = db.select({ count: count() }).from(titles).all();
-  const [episodeCount] = db.select({ count: count() }).from(episodes).all();
-  const [userCount] = db.select({ count: count() }).from(user).all();
+  const counts = getTableCounts();
 
   return {
     dbSizeBytes,
     walSizeBytes,
-    titleCount: titleCount.count,
-    episodeCount: episodeCount.count,
-    userCount: userCount.count,
+    ...counts,
   };
 }
 
@@ -161,13 +156,7 @@ function getJobsHealth(): SystemHealthData["jobs"] {
   // Fetch only the latest cron run per job (index-optimized LIMIT 1 each)
   const latestByJob = new Map<string, typeof cronRuns.$inferSelect>();
   for (const jobName of JOB_NAMES) {
-    const latest = db
-      .select()
-      .from(cronRuns)
-      .where(eq(cronRuns.jobName, jobName))
-      .orderBy(desc(cronRuns.startedAt))
-      .limit(1)
-      .get();
+    const latest = getLatestCronRun(jobName);
     if (latest) latestByJob.set(jobName, latest);
   }
 

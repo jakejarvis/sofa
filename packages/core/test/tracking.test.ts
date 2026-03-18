@@ -1,13 +1,20 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 
-import { and, eq } from "@sofa/db/helpers";
 import {
   userEpisodeWatches,
   userMovieWatches,
   userRatings,
   userTitleStatus,
 } from "@sofa/db/schema";
-import { clearAllTables, insertTitle, insertTvShow, insertUser, testDb } from "@sofa/db/test-utils";
+import {
+  and,
+  clearAllTables,
+  eq,
+  insertTitle,
+  insertTvShow,
+  insertUser,
+  testDb,
+} from "@sofa/db/test-utils";
 
 import {
   getUserTitleInfo,

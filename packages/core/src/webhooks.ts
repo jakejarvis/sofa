@@ -1,13 +1,10 @@
-import { db } from "@sofa/db/client";
-import { and, eq, gte } from "@sofa/db/helpers";
+import { findEpisodeBySeasonAndNumber, findSeasonByTitleAndNumber } from "@sofa/db/queries/title";
 import {
-  episodes,
-  integrationEvents,
-  integrations,
-  seasons,
-  userEpisodeWatches,
-  userMovieWatches,
-} from "@sofa/db/schema";
+  getRecentEpisodeWatch,
+  getRecentMovieWatch,
+  insertIntegrationEvent,
+  updateIntegrationLastEvent,
+} from "@sofa/db/queries/webhooks";
 import { createLogger } from "@sofa/logger";
 
 import { resolveMovieTmdbId, resolveShowTmdbId } from "./imports/resolve";
@@ -173,33 +170,13 @@ async function resolveEpisode(event: WebhookEvent): Promise<{
 
 function isDuplicateMovieWatch(userId: string, titleId: string): boolean {
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-  const recent = db
-    .select()
-    .from(userMovieWatches)
-    .where(
-      and(
-        eq(userMovieWatches.userId, userId),
-        eq(userMovieWatches.titleId, titleId),
-        gte(userMovieWatches.watchedAt, fiveMinutesAgo),
-      ),
-    )
-    .get();
+  const recent = getRecentMovieWatch(userId, titleId, fiveMinutesAgo);
   return !!recent;
 }
 
 function isDuplicateEpisodeWatch(userId: string, episodeId: string): boolean {
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-  const recent = db
-    .select()
-    .from(userEpisodeWatches)
-    .where(
-      and(
-        eq(userEpisodeWatches.userId, userId),
-        eq(userEpisodeWatches.episodeId, episodeId),
-        gte(userEpisodeWatches.watchedAt, fiveMinutesAgo),
-      ),
-    )
-    .get();
+  const recent = getRecentEpisodeWatch(userId, episodeId, fiveMinutesAgo);
   return !!recent;
 }
 
@@ -211,27 +188,22 @@ function logEvent(
   status: "success" | "ignored" | "error",
   errorMessage?: string,
 ) {
-  db.insert(integrationEvents)
-    .values({
-      integrationId: connectionId,
-      eventType:
-        event?.provider === "plex"
-          ? "media.scrobble"
-          : event?.provider === "emby"
-            ? "playback.stop"
-            : "PlaybackStop",
-      mediaType: event?.mediaType ?? null,
-      mediaTitle: event?.title ?? null,
-      status,
-      errorMessage: errorMessage ?? null,
-      receivedAt: new Date(),
-    })
-    .run();
+  insertIntegrationEvent({
+    integrationId: connectionId,
+    eventType:
+      event?.provider === "plex"
+        ? "media.scrobble"
+        : event?.provider === "emby"
+          ? "playback.stop"
+          : "PlaybackStop",
+    mediaType: event?.mediaType ?? null,
+    mediaTitle: event?.title ?? null,
+    status,
+    errorMessage: errorMessage ?? null,
+    receivedAt: new Date(),
+  });
 
-  db.update(integrations)
-    .set({ lastEventAt: new Date() })
-    .where(eq(integrations.id, connectionId))
-    .run();
+  updateIntegrationLastEvent(connectionId);
 }
 
 // ─── Main Processing ────────────────────────────────────────────────
@@ -293,11 +265,7 @@ export async function processWebhook(
       }
 
       // Find the episode in our DB
-      const season = db
-        .select()
-        .from(seasons)
-        .where(and(eq(seasons.titleId, title.id), eq(seasons.seasonNumber, resolved.seasonNumber)))
-        .get();
+      const season = findSeasonByTitleAndNumber(title.id, resolved.seasonNumber);
 
       if (!season) {
         logEvent(connectionId, event, "error", `Season ${resolved.seasonNumber} not found`);
@@ -307,13 +275,7 @@ export async function processWebhook(
         };
       }
 
-      const episode = db
-        .select()
-        .from(episodes)
-        .where(
-          and(eq(episodes.seasonId, season.id), eq(episodes.episodeNumber, resolved.episodeNumber)),
-        )
-        .get();
+      const episode = findEpisodeBySeasonAndNumber(season.id, resolved.episodeNumber);
 
       if (!episode) {
         logEvent(

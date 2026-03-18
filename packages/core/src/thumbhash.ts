@@ -3,9 +3,13 @@ import path from "node:path";
 import sharp from "sharp";
 import { rgbaToThumbHash } from "thumbhash";
 
-import { db } from "@sofa/db/client";
-import { eq } from "@sofa/db/helpers";
-import { episodes, persons, seasons, titles } from "@sofa/db/schema";
+import {
+  updateEpisodeStillThumbHash,
+  updatePersonProfileThumbHash,
+  updateSeasonPosterThumbHash,
+  updateTitleBackdropThumbHash,
+  updateTitlePosterThumbHash,
+} from "@sofa/db/queries/thumbhash";
 import { createLogger } from "@sofa/logger";
 import type { ImageCategory } from "@sofa/tmdb/image";
 
@@ -48,7 +52,7 @@ export async function generateTitlePosterThumbHash(
   sourceBuffer?: Buffer | null,
 ): Promise<string | null> {
   const hash = posterPath ? await generateThumbHash(posterPath, "posters", sourceBuffer) : null;
-  db.update(titles).set({ posterThumbHash: hash }).where(eq(titles.id, titleId)).run();
+  updateTitlePosterThumbHash(titleId, hash);
   return hash;
 }
 
@@ -57,7 +61,7 @@ export async function generateTitleBackdropThumbHash(
   backdropPath: string | null,
 ): Promise<string | null> {
   const hash = backdropPath ? await generateThumbHash(backdropPath, "backdrops") : null;
-  db.update(titles).set({ backdropThumbHash: hash }).where(eq(titles.id, titleId)).run();
+  updateTitleBackdropThumbHash(titleId, hash);
   return hash;
 }
 
@@ -66,7 +70,7 @@ export async function generateSeasonThumbHash(
   posterPath: string | null,
 ): Promise<string | null> {
   const hash = posterPath ? await generateThumbHash(posterPath, "posters") : null;
-  db.update(seasons).set({ posterThumbHash: hash }).where(eq(seasons.id, seasonId)).run();
+  updateSeasonPosterThumbHash(seasonId, hash);
   return hash;
 }
 
@@ -75,7 +79,7 @@ export async function generateEpisodeThumbHash(
   stillPath: string | null,
 ): Promise<string | null> {
   const hash = stillPath ? await generateThumbHash(stillPath, "stills") : null;
-  db.update(episodes).set({ stillThumbHash: hash }).where(eq(episodes.id, episodeId)).run();
+  updateEpisodeStillThumbHash(episodeId, hash);
   return hash;
 }
 
@@ -84,6 +88,6 @@ export async function generatePersonThumbHash(
   profilePath: string | null,
 ): Promise<string | null> {
   const hash = profilePath ? await generateThumbHash(profilePath, "profiles") : null;
-  db.update(persons).set({ profileThumbHash: hash }).where(eq(persons.id, personId)).run();
+  updatePersonProfileThumbHash(personId, hash);
   return hash;
 }

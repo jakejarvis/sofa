@@ -4,6 +4,20 @@ import { refreshAvailability } from "@sofa/core/availability";
 import { createBackup, ensureBackupDir, pruneBackups } from "@sofa/core/backup";
 import { refreshCredits, syncCastProfileThumbHashes } from "@sofa/core/credits";
 import {
+  completeCronRun,
+  failCronRun,
+  getCastEntryForTitle,
+  getLibraryTitleIds,
+  getReturningTvShows,
+  getStaleAvailabilityTitles,
+  getStaleLibraryTitles,
+  getStaleNonLibraryTitlesForRefresh,
+  getThumbhashBackfillTitleIds,
+  getTitleByIdForCron,
+  getTitleIdsWithStaleSeasons,
+  startCronRun,
+} from "@sofa/core/cron";
+import {
   cacheEpisodeStills,
   cacheImagesForTitle,
   cacheProfilePhotos,
@@ -20,18 +34,6 @@ import { getSetting } from "@sofa/core/settings";
 import { performTelemetryReport } from "@sofa/core/telemetry";
 import { generateTitleBackdropThumbHash, generateTitlePosterThumbHash } from "@sofa/core/thumbhash";
 import { performUpdateCheck } from "@sofa/core/update-check";
-import { db } from "@sofa/db/client";
-import { and, eq, inArray, isNotNull, lt, or, sql } from "@sofa/db/helpers";
-import {
-  availabilityOffers,
-  cronRuns,
-  episodes,
-  persons,
-  seasons,
-  titleCast,
-  titles,
-  userTitleStatus,
-} from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getTvDetails } from "@sofa/tmdb/client";
 
@@ -57,30 +59,15 @@ function schedule(name: string, cron: string, handler: () => Promise<void>) {
     new Cron(cron, { name, protect: true }, async () => {
       log.info(`Running job: ${name}`);
       const startMs = performance.now();
-      const run = db
-        .insert(cronRuns)
-        .values({ jobName: name, status: "running", startedAt: new Date() })
-        .returning()
-        .get();
+      const run = startCronRun(name);
       try {
         await handler();
         const durationMs = Math.round(performance.now() - startMs);
-        db.update(cronRuns)
-          .set({ status: "success", finishedAt: new Date(), durationMs })
-          .where(eq(cronRuns.id, run.id))
-          .run();
+        completeCronRun(run.id, durationMs);
         log.info(`Completed job: ${name} (${durationMs}ms)`);
       } catch (err) {
         const durationMs = Math.round(performance.now() - startMs);
-        db.update(cronRuns)
-          .set({
-            status: "error",
-            finishedAt: new Date(),
-            durationMs,
-            errorMessage: err instanceof Error ? err.message : String(err),
-          })
-          .where(eq(cronRuns.id, run.id))
-          .run();
+        failCronRun(run.id, durationMs, err);
         log.error(`Job ${name} failed:`, err);
       }
     }),
@@ -108,71 +95,6 @@ export async function triggerJob(name: string): Promise<boolean> {
   return true;
 }
 
-function getLibraryTitleIds(): string[] {
-  const rows = db
-    .select({ titleId: userTitleStatus.titleId })
-    .from(userTitleStatus)
-    .groupBy(userTitleStatus.titleId)
-    .all();
-  return rows.map((r) => r.titleId);
-}
-
-function getThumbhashBackfillTitleIds(): string[] {
-  const titleIds = new Set(getLibraryTitleIds());
-
-  const addIds = (ids: string[]) => {
-    for (const id of ids) titleIds.add(id);
-  };
-
-  addIds(
-    db
-      .select({ id: titles.id })
-      .from(titles)
-      .where(
-        or(
-          and(isNotNull(titles.posterPath), sql`${titles.posterThumbHash} IS NULL`),
-          and(isNotNull(titles.backdropPath), sql`${titles.backdropThumbHash} IS NULL`),
-        ),
-      )
-      .all()
-      .map((row) => row.id),
-  );
-
-  addIds(
-    db
-      .select({ titleId: seasons.titleId })
-      .from(seasons)
-      .where(and(isNotNull(seasons.posterPath), sql`${seasons.posterThumbHash} IS NULL`))
-      .groupBy(seasons.titleId)
-      .all()
-      .map((row) => row.titleId),
-  );
-
-  addIds(
-    db
-      .select({ titleId: seasons.titleId })
-      .from(episodes)
-      .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
-      .where(and(isNotNull(episodes.stillPath), sql`${episodes.stillThumbHash} IS NULL`))
-      .groupBy(seasons.titleId)
-      .all()
-      .map((row) => row.titleId),
-  );
-
-  addIds(
-    db
-      .select({ titleId: titleCast.titleId })
-      .from(titleCast)
-      .innerJoin(persons, eq(titleCast.personId, persons.id))
-      .where(and(isNotNull(persons.profilePath), sql`${persons.profileThumbHash} IS NULL`))
-      .groupBy(titleCast.titleId)
-      .all()
-      .map((row) => row.titleId),
-  );
-
-  return [...titleIds];
-}
-
 // Refresh titles where lastFetchedAt is stale
 async function nightlyRefreshLibrary() {
   const libraryIds = getLibraryTitleIds();
@@ -181,11 +103,7 @@ async function nightlyRefreshLibrary() {
   const nonLibraryStale = new Date(Date.now() - 30 * DAY);
 
   // Library titles: 7 days
-  const staleLibrary = db
-    .select({ id: titles.id })
-    .from(titles)
-    .where(and(inArray(titles.id, libraryIds), lt(titles.lastFetchedAt, libraryStale)))
-    .all();
+  const staleLibrary = getStaleLibraryTitles(libraryIds, libraryStale);
 
   for (const { id } of staleLibrary) {
     await refreshTitle(id);
@@ -193,12 +111,7 @@ async function nightlyRefreshLibrary() {
   }
 
   // Non-library titles: 30 days
-  const nonLibrary = db
-    .select()
-    .from(titles)
-    .where(and(isNotNull(titles.lastFetchedAt), lt(titles.lastFetchedAt, nonLibraryStale)))
-    .limit(50)
-    .all();
+  const nonLibrary = getStaleNonLibraryTitlesForRefresh(nonLibraryStale, 50);
 
   for (const t of nonLibrary) {
     if (!libraryIds.includes(t.id)) {
@@ -214,33 +127,10 @@ async function refreshAvailabilityJob() {
   log.debug(`Checking availability for ${libraryIds.length} library titles`);
   const stale = new Date(Date.now() - DAY);
 
-  const titlesWithOffers = new Set(
-    db
-      .select({ titleId: availabilityOffers.titleId })
-      .from(availabilityOffers)
-      .where(inArray(availabilityOffers.titleId, libraryIds))
-      .groupBy(availabilityOffers.titleId)
-      .all()
-      .map((r) => r.titleId),
-  );
-
-  const titlesWithStaleOffers = new Set(
-    db
-      .select({ titleId: availabilityOffers.titleId })
-      .from(availabilityOffers)
-      .where(
-        and(
-          inArray(availabilityOffers.titleId, libraryIds),
-          lt(availabilityOffers.lastFetchedAt, stale),
-        ),
-      )
-      .groupBy(availabilityOffers.titleId)
-      .all()
-      .map((r) => r.titleId),
-  );
+  const { withOffers, withStaleOffers } = getStaleAvailabilityTitles(libraryIds, stale);
 
   for (const titleId of libraryIds) {
-    if (titlesWithStaleOffers.has(titleId) || !titlesWithOffers.has(titleId)) {
+    if (withStaleOffers.has(titleId) || !withOffers.has(titleId)) {
       await refreshAvailability(titleId);
       await Bun.sleep(RATE_LIMIT_MS);
     }
@@ -258,35 +148,14 @@ async function refreshRecommendationsJob() {
 }
 
 async function refreshTvChildrenJob() {
-  const returningStatuses = ["Returning Series", "In Production"];
   const stale = new Date(Date.now() - 7 * DAY);
 
-  const tvShows = db
-    .select()
-    .from(titles)
-    .where(
-      and(
-        eq(titles.type, "tv"),
-        isNotNull(titles.lastFetchedAt),
-        or(...returningStatuses.map((s) => eq(titles.status, s))),
-      ),
-    )
-    .all();
+  const tvShows = getReturningTvShows();
 
   log.debug(`Checking ${tvShows.length} returning TV shows for stale episodes`);
 
   const tvIds = tvShows.map((s) => s.id);
-  const titlesWithStaleSeasons = new Set(
-    tvIds.length > 0
-      ? db
-          .select({ titleId: seasons.titleId })
-          .from(seasons)
-          .where(and(inArray(seasons.titleId, tvIds), lt(seasons.lastFetchedAt, stale)))
-          .groupBy(seasons.titleId)
-          .all()
-          .map((r) => r.titleId)
-      : [],
-  );
+  const titlesWithStaleSeasons = getTitleIdsWithStaleSeasons(tvIds, stale);
 
   for (const show of tvShows) {
     if (titlesWithStaleSeasons.has(show.id)) {
@@ -304,7 +173,7 @@ async function cacheImagesJob() {
 
   for (const titleId of titleIds) {
     try {
-      const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+      const title = getTitleByIdForCron(titleId);
       if (!title) continue;
 
       // Phase 1: warm the image cache so thumbhash generation can read from disk
@@ -347,12 +216,7 @@ async function refreshCreditsJob() {
   const stale = new Date(Date.now() - 30 * DAY);
 
   for (const titleId of libraryIds) {
-    const castEntry = db
-      .select()
-      .from(titleCast)
-      .where(eq(titleCast.titleId, titleId))
-      .limit(1)
-      .get();
+    const castEntry = getCastEntryForTitle(titleId);
 
     const needsRefresh = !castEntry || (castEntry.lastFetchedAt && castEntry.lastFetchedAt < stale);
 

@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, spyOn, test } from "bun:test";
 
-import { eq } from "@sofa/db/helpers";
 import {
   importJobs,
   titles,
@@ -11,6 +10,7 @@ import {
 } from "@sofa/db/schema";
 import {
   clearAllTables,
+  eq,
   insertMovieWatch,
   insertTvShow,
   insertUser,

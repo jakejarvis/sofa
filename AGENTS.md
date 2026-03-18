@@ -47,8 +47,8 @@ couch-potato/
 │   ├── api/           # @sofa/api — oRPC contract + Zod schemas (shared, JIT)
 │   ├── auth/          # @sofa/auth — Better Auth server config (JIT)
 │   ├── config/        # @sofa/config — Path constants + TMDB URLs from env (JIT)
-│   ├── core/          # @sofa/core — Business logic services (JIT)
-│   ├── db/            # @sofa/db — Drizzle schema, client, migrations (JIT)
+│   ├── core/          # @sofa/core — Business logic services (JIT, DB-agnostic)
+│   ├── db/            # @sofa/db — Drizzle schema, client, queries, migrations (JIT)
 │   ├── logger/        # @sofa/logger — Pino-based structured logging (JIT)
 │   └── tmdb/          # @sofa/tmdb — TMDB API client + image URL helper (JIT)
 ├── .oxlintrc.json
@@ -87,7 +87,8 @@ Path aliases: `@/*` maps to `src/` in both `apps/web/` and `apps/native/`.
 Cross-package imports:
 
 - `@sofa/api/contract`, `@sofa/api/schemas` — Contract and Zod types
-- `@sofa/db/client`, `@sofa/db/schema`, `@sofa/db/helpers`, `@sofa/db/migrate`, `@sofa/db/test-utils`
+- `@sofa/db/queries/*` — Query layer (e.g., `@sofa/db/queries/tracking`, `@sofa/db/queries/metadata`)
+- `@sofa/db/client`, `@sofa/db/schema`, `@sofa/db/utils`, `@sofa/db/migrate`, `@sofa/db/test-utils`
 - `@sofa/tmdb/client`, `@sofa/tmdb/image`
 - `@sofa/core/metadata`, `@sofa/core/tracking`, `@sofa/core/imports`, etc.
 - `@sofa/auth/server`, `@sofa/auth/config`
@@ -95,6 +96,10 @@ Cross-package imports:
 - `@sofa/logger` — `createLogger(name)` for structured logging
 
 ### Key patterns
+
+**Layered architecture** — Strict separation: `apps/server/ → @sofa/core/* → @sofa/db/queries/* → @sofa/db/client`. Server procedures/routes call core services for all business logic. Core services call query functions for all DB access. Core must **never** import `@sofa/db/client` directly. Type-only imports from `@sofa/db/schema` are allowed in core (for `$inferInsert`/`$inferSelect`), but runtime imports are not.
+
+**Query layer** — All Drizzle ORM queries live in `packages/db/src/queries/`, organized by domain (tracking, metadata, discovery, etc.). Plain exported functions, transactions hidden as implementation details. Wildcard export: `"./queries/*": "./src/queries/*.ts"`.
 
 **oRPC queries** use `orpc.*.queryOptions()` with TanStack Query. **Mutations** use `client.*()` directly. **Route loaders** prefetch via `queryClient.ensureQueryData()`.
 

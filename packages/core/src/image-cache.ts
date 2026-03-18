@@ -2,9 +2,13 @@ import { mkdir, rename } from "node:fs/promises";
 import path from "node:path";
 
 import { CACHE_DIR, TMDB_IMAGE_BASE_URL } from "@sofa/config";
-import { db } from "@sofa/db/client";
-import { eq, inArray } from "@sofa/db/helpers";
-import { availabilityOffers, episodes, persons, seasons, titleCast, titles } from "@sofa/db/schema";
+import {
+  getAvailabilityLogosForTitle,
+  getCastProfilePathsForTitle,
+  getEpisodeStillsForTitle,
+  getSeasonPostersForTitle,
+  getTitleWithPaths,
+} from "@sofa/db/queries/image-cache";
 import { createLogger } from "@sofa/logger";
 import { IMAGE_CATEGORY_SIZES, type ImageCategory, tmdbCdnImageUrl } from "@sofa/tmdb/image";
 
@@ -129,7 +133,7 @@ export async function loadImageBuffer(
 }
 
 export async function cacheImagesForTitle(titleId: string) {
-  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+  const title = getTitleWithPaths(titleId);
   if (!title) return;
 
   // Collect all candidate images, then check cache in parallel
@@ -138,7 +142,7 @@ export async function cacheImagesForTitle(titleId: string) {
   if (title.backdropPath) candidates.push({ imgPath: title.backdropPath, category: "backdrops" });
 
   if (title.type === "tv") {
-    const allSeasons = db.select().from(seasons).where(eq(seasons.titleId, titleId)).all();
+    const allSeasons = getSeasonPostersForTitle(titleId);
     for (const s of allSeasons) {
       if (s.posterPath) candidates.push({ imgPath: s.posterPath, category: "posters" });
     }
@@ -164,12 +168,7 @@ export async function cacheImagesForTitle(titleId: string) {
 }
 
 export async function cacheEpisodeStills(titleId: string) {
-  const allSeasons = db.select().from(seasons).where(eq(seasons.titleId, titleId)).all();
-
-  const seasonIds = allSeasons.map((s) => s.id);
-  if (seasonIds.length === 0) return;
-
-  const allEps = db.select().from(episodes).where(inArray(episodes.seasonId, seasonIds)).all();
+  const allEps = getEpisodeStillsForTitle(titleId);
 
   const epsWithStills = allEps.filter(
     (ep): ep is typeof ep & { stillPath: string } => ep.stillPath != null,
@@ -189,11 +188,7 @@ export async function cacheEpisodeStills(titleId: string) {
 }
 
 export async function cacheProviderLogos(titleId: string) {
-  const offers = db
-    .select()
-    .from(availabilityOffers)
-    .where(eq(availabilityOffers.titleId, titleId))
-    .all();
+  const offers = getAvailabilityLogosForTitle(titleId);
 
   // Deduplicate and parallel cache checks
   const uniqueLogos = new Map<string, string>();
@@ -217,12 +212,7 @@ export async function cacheProviderLogos(titleId: string) {
 }
 
 export async function cacheProfilePhotos(titleId: string) {
-  const castRows = db
-    .select({ profilePath: persons.profilePath })
-    .from(titleCast)
-    .innerJoin(persons, eq(titleCast.personId, persons.id))
-    .where(eq(titleCast.titleId, titleId))
-    .all();
+  const castRows = getCastProfilePathsForTitle(titleId);
 
   // Deduplicate and parallel cache checks
   const uniqueProfiles = new Map<string, string>();

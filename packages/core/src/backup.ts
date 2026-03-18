@@ -4,9 +4,9 @@ import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { BACKUP_DIR, DATABASE_URL } from "@sofa/config";
-import { closeDatabase, db } from "@sofa/db/client";
-import { sql } from "@sofa/db/helpers";
+import { closeDatabase } from "@sofa/db/client";
 import { runMigrations } from "@sofa/db/migrate";
+import { vacuumInto } from "@sofa/db/utils";
 import { createLogger } from "@sofa/logger";
 
 function formatTimestamp(date: Date): string {
@@ -138,8 +138,7 @@ async function createBackupInternal(prefix: BackupPrefix): Promise<BackupInfo> {
   const filename = `${prefix}-${timestamp}.db`;
   const dest = path.join(BACKUP_DIR, filename);
 
-  // VACUUM INTO atomically creates a clean, self-contained copy (safe for WAL mode)
-  db.run(sql.raw(`VACUUM INTO '${dest.replace(/'/g, "''")}'`));
+  vacuumInto(dest);
 
   const s = await Bun.file(dest).stat();
   log.info(`Created backup: ${filename} (${s.size} bytes)`);

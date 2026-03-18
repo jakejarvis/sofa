@@ -1,15 +1,14 @@
 import { type ImportJob, NormalizedImportSchema } from "@sofa/api/schemas";
-import { db } from "@sofa/db/client";
-import { and, eq } from "@sofa/db/helpers";
 import {
-  episodes,
-  importJobs,
-  seasons,
-  userEpisodeWatches,
-  userMovieWatches,
-  userRatings,
-  userTitleStatus,
-} from "@sofa/db/schema";
+  getImportJob,
+  getImportJobStatus,
+  hasEpisodeWatch,
+  hasMovieWatch,
+  hasRating,
+  hasTitleStatus,
+  updateImportJobProgress,
+} from "@sofa/db/queries/imports";
+import { findEpisodeBySeasonAndNumber, findSeasonByTitleAndNumber } from "@sofa/db/queries/title";
 import { createLogger } from "@sofa/logger";
 
 import { getOrFetchTitleByTmdbId } from "../metadata";
@@ -46,44 +45,6 @@ export interface ImportResult {
   warnings: string[];
 }
 
-// ─── Deduplication ──────────────────────────────────────────────────
-
-function hasExistingMovieWatch(userId: string, titleId: string): boolean {
-  const existing = db
-    .select({ id: userMovieWatches.id })
-    .from(userMovieWatches)
-    .where(and(eq(userMovieWatches.userId, userId), eq(userMovieWatches.titleId, titleId)))
-    .get();
-  return !!existing;
-}
-
-function hasExistingEpisodeWatch(userId: string, episodeId: string): boolean {
-  const existing = db
-    .select({ id: userEpisodeWatches.id })
-    .from(userEpisodeWatches)
-    .where(and(eq(userEpisodeWatches.userId, userId), eq(userEpisodeWatches.episodeId, episodeId)))
-    .get();
-  return !!existing;
-}
-
-function hasExistingWatchlistStatus(userId: string, titleId: string): boolean {
-  const existing = db
-    .select({ status: userTitleStatus.status })
-    .from(userTitleStatus)
-    .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, titleId)))
-    .get();
-  return !!existing;
-}
-
-function hasExistingRating(userId: string, titleId: string): boolean {
-  const existing = db
-    .select({ ratingStars: userRatings.ratingStars })
-    .from(userRatings)
-    .where(and(eq(userRatings.userId, userId), eq(userRatings.titleId, titleId)))
-    .get();
-  return !!existing;
-}
-
 // ─── Item Processors ────────────────────────────────────────────────
 
 async function processMovie(
@@ -117,7 +78,7 @@ async function processMovie(
     return;
   }
 
-  if (hasExistingMovieWatch(userId, title.id)) {
+  if (hasMovieWatch(userId, title.id)) {
     result.skipped++;
     return;
   }
@@ -164,11 +125,7 @@ async function processEpisode(
   }
 
   // Find the specific episode in our DB
-  const season = db
-    .select()
-    .from(seasons)
-    .where(and(eq(seasons.titleId, title.id), eq(seasons.seasonNumber, ep.seasonNumber)))
-    .get();
+  const season = findSeasonByTitleAndNumber(title.id, ep.seasonNumber);
 
   if (!season) {
     result.failed++;
@@ -176,11 +133,7 @@ async function processEpisode(
     return;
   }
 
-  const episode = db
-    .select()
-    .from(episodes)
-    .where(and(eq(episodes.seasonId, season.id), eq(episodes.episodeNumber, ep.episodeNumber)))
-    .get();
+  const episode = findEpisodeBySeasonAndNumber(season.id, ep.episodeNumber);
 
   if (!episode) {
     result.failed++;
@@ -188,7 +141,7 @@ async function processEpisode(
     return;
   }
 
-  if (hasExistingEpisodeWatch(userId, episode.id)) {
+  if (hasEpisodeWatch(userId, episode.id)) {
     result.skipped++;
     return;
   }
@@ -235,7 +188,7 @@ async function processWatchlistItem(
     return;
   }
 
-  if (hasExistingWatchlistStatus(userId, title.id)) {
+  if (hasTitleStatus(userId, title.id)) {
     result.skipped++;
     return;
   }
@@ -277,7 +230,7 @@ async function processRating(
     return;
   }
 
-  if (hasExistingRating(userId, title.id)) {
+  if (hasRating(userId, title.id)) {
     result.skipped++;
     return;
   }
@@ -294,27 +247,7 @@ async function processRating(
 // ─── Read Job Helper ─────────────────────────────────────────────────
 
 export function readImportJob(jobId: string, userId?: string): ImportJob {
-  const row = db
-    .select({
-      id: importJobs.id,
-      userId: importJobs.userId,
-      source: importJobs.source,
-      status: importJobs.status,
-      totalItems: importJobs.totalItems,
-      processedItems: importJobs.processedItems,
-      importedCount: importJobs.importedCount,
-      skippedCount: importJobs.skippedCount,
-      failedCount: importJobs.failedCount,
-      currentMessage: importJobs.currentMessage,
-      errors: importJobs.errors,
-      warnings: importJobs.warnings,
-      createdAt: importJobs.createdAt,
-      startedAt: importJobs.startedAt,
-      finishedAt: importJobs.finishedAt,
-    })
-    .from(importJobs)
-    .where(eq(importJobs.id, jobId))
-    .get();
+  const row = getImportJob(jobId);
 
   if (!row) {
     throw new Error(`Import job ${jobId} not found`);
@@ -345,7 +278,7 @@ export function readImportJob(jobId: string, userId?: string): ImportJob {
 // ─── Job Processor ───────────────────────────────────────────────────
 
 export async function processImportJob(jobId: string): Promise<void> {
-  const row = db.select().from(importJobs).where(eq(importJobs.id, jobId)).get();
+  const row = getImportJob(jobId);
 
   if (!row) {
     throw new Error(`Import job ${jobId} not found`);
@@ -397,23 +330,21 @@ export async function processImportJob(jobId: string): Promise<void> {
 
     if (total === 0) {
       result.warnings.push("No items to import with the selected options.");
-      db.update(importJobs)
-        .set({
-          status: "success",
-          finishedAt: new Date(),
-          totalItems: 0,
-          warnings: JSON.stringify(result.warnings),
-        })
-        .where(eq(importJobs.id, jobId))
-        .run();
+      updateImportJobProgress(jobId, {
+        status: "success",
+        finishedAt: new Date(),
+        totalItems: 0,
+        warnings: JSON.stringify(result.warnings),
+      });
       return;
     }
 
     // Set status to running + totalItems atomically
-    db.update(importJobs)
-      .set({ status: "running", startedAt: new Date(), totalItems: total })
-      .where(eq(importJobs.id, jobId))
-      .run();
+    updateImportJobProgress(jobId, {
+      status: "running",
+      startedAt: new Date(),
+      totalItems: total,
+    });
 
     log.info(`Starting ${data.source} import job ${jobId} for user ${row.userId}: ${total} items`);
 
@@ -424,21 +355,14 @@ export async function processImportJob(jobId: string): Promise<void> {
     for (let i = 0; i < items.length; i++) {
       // Check for cancellation periodically
       if (i % progressInterval === 0) {
-        const currentStatus = db
-          .select({ status: importJobs.status })
-          .from(importJobs)
-          .where(eq(importJobs.id, jobId))
-          .get();
+        const currentStatus = getImportJobStatus(jobId);
         if (currentStatus?.status === "cancelled") {
-          db.update(importJobs)
-            .set({
-              finishedAt: new Date(),
-              errors: JSON.stringify(result.errors),
-              warnings: JSON.stringify(result.warnings),
-              currentMessage: "Import cancelled",
-            })
-            .where(eq(importJobs.id, jobId))
-            .run();
+          updateImportJobProgress(jobId, {
+            finishedAt: new Date(),
+            errors: JSON.stringify(result.errors),
+            warnings: JSON.stringify(result.warnings),
+            currentMessage: "Import cancelled",
+          });
           log.info(`Import job ${jobId} cancelled by user`);
           return;
         }
@@ -487,34 +411,28 @@ export async function processImportJob(jobId: string): Promise<void> {
               ? (currentItem.showTitle ?? "Unknown")
               : "Unknown";
 
-        db.update(importJobs)
-          .set({
-            processedItems: i + 1,
-            importedCount: result.imported,
-            skippedCount: result.skipped,
-            failedCount: result.failed,
-            currentMessage: label,
-          })
-          .where(eq(importJobs.id, jobId))
-          .run();
+        updateImportJobProgress(jobId, {
+          processedItems: i + 1,
+          importedCount: result.imported,
+          skippedCount: result.skipped,
+          failedCount: result.failed,
+          currentMessage: label,
+        });
       }
     }
 
     // Success
-    db.update(importJobs)
-      .set({
-        status: "success",
-        finishedAt: new Date(),
-        processedItems: total,
-        importedCount: result.imported,
-        skippedCount: result.skipped,
-        failedCount: result.failed,
-        errors: JSON.stringify(result.errors),
-        warnings: JSON.stringify(result.warnings),
-        currentMessage: "Import complete",
-      })
-      .where(eq(importJobs.id, jobId))
-      .run();
+    updateImportJobProgress(jobId, {
+      status: "success",
+      finishedAt: new Date(),
+      processedItems: total,
+      importedCount: result.imported,
+      skippedCount: result.skipped,
+      failedCount: result.failed,
+      errors: JSON.stringify(result.errors),
+      warnings: JSON.stringify(result.warnings),
+      currentMessage: "Import complete",
+    });
 
     log.info(
       `Import job ${jobId} complete: ${result.imported} imported, ${result.skipped} skipped, ${result.failed} failed`,
@@ -522,16 +440,13 @@ export async function processImportJob(jobId: string): Promise<void> {
   } catch (err) {
     // Fatal error
     result.errors.push(`Fatal: ${err instanceof Error ? err.message : String(err)}`);
-    db.update(importJobs)
-      .set({
-        status: "error",
-        finishedAt: new Date(),
-        errors: JSON.stringify(result.errors),
-        warnings: JSON.stringify(result.warnings),
-        currentMessage: "Import failed",
-      })
-      .where(eq(importJobs.id, jobId))
-      .run();
+    updateImportJobProgress(jobId, {
+      status: "error",
+      finishedAt: new Date(),
+      errors: JSON.stringify(result.errors),
+      warnings: JSON.stringify(result.warnings),
+      currentMessage: "Import failed",
+    });
 
     log.error(`Import job ${jobId} failed:`, err);
   }

@@ -1,7 +1,16 @@
 import type { PersonCredit, ResolvedPerson } from "@sofa/api/schemas";
-import { db } from "@sofa/db/client";
-import { eq, inArray } from "@sofa/db/helpers";
-import { personFilmography, persons, titles } from "@sofa/db/schema";
+import {
+  batchInsertShellTitlesTransaction,
+  ensureBrowsePersonsTransaction,
+  getPersonById,
+  getPersonByTmdbId,
+  getPersonFilmographyJoined,
+  insertPersonReturning,
+  replaceFilmographyTransaction,
+  updatePerson,
+} from "@sofa/db/queries/person";
+import { getExistingTitlesByTmdbIds } from "@sofa/db/queries/title";
+import type { personFilmography } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getPersonCombinedCredits, getPersonDetails } from "@sofa/tmdb/client";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
@@ -12,7 +21,10 @@ const log = createLogger("person");
 const FILMOGRAPHY_STALE_MS = 30 * 24 * 60 * 60 * 1000;
 
 async function ensureProfileThumbHash(
-  person: Pick<typeof persons.$inferSelect, "id" | "profilePath" | "profileThumbHash">,
+  person: Pick<
+    typeof import("@sofa/db/schema").persons.$inferSelect,
+    "id" | "profilePath" | "profileThumbHash"
+  >,
 ) {
   if (!person.profilePath) {
     if (person.profileThumbHash) {
@@ -29,28 +41,25 @@ async function ensureProfileThumbHash(
 }
 
 export async function getOrFetchPerson(personId: string): Promise<ResolvedPerson | null> {
-  const person = db.select().from(persons).where(eq(persons.id, personId)).get();
+  const person = getPersonById(personId);
   if (!person) return null;
 
   // Shell record — lazily hydrate from TMDB
   if (!person.lastFetchedAt) {
     try {
       const details = await getPersonDetails(person.tmdbId);
-      db.update(persons)
-        .set({
-          name: details.name || person.name,
-          biography: details.biography || null,
-          birthday: details.birthday,
-          deathday: details.deathday,
-          placeOfBirth: details.place_of_birth,
-          profilePath: details.profile_path,
-          knownForDepartment: details.known_for_department,
-          popularity: details.popularity,
-          imdbId: details.imdb_id,
-          lastFetchedAt: new Date(),
-        })
-        .where(eq(persons.id, personId))
-        .run();
+      updatePerson(personId, {
+        name: details.name || person.name,
+        biography: details.biography || null,
+        birthday: details.birthday,
+        deathday: details.deathday,
+        placeOfBirth: details.place_of_birth,
+        profilePath: details.profile_path,
+        knownForDepartment: details.known_for_department,
+        popularity: details.popularity,
+        imdbId: details.imdb_id,
+        lastFetchedAt: new Date(),
+      });
 
       const newProfilePath = details.profile_path ?? null;
       const pathChanged = newProfilePath !== person.profilePath;
@@ -102,7 +111,7 @@ export async function getOrFetchPerson(personId: string): Promise<ResolvedPerson
 }
 
 export async function getOrFetchPersonByTmdbId(tmdbId: number): Promise<ResolvedPerson | null> {
-  const existing = db.select().from(persons).where(eq(persons.tmdbId, tmdbId)).get();
+  const existing = getPersonByTmdbId(tmdbId);
 
   if (existing) {
     return getOrFetchPerson(existing.id);
@@ -111,26 +120,21 @@ export async function getOrFetchPersonByTmdbId(tmdbId: number): Promise<Resolved
   // Create from TMDB
   try {
     const details = await getPersonDetails(tmdbId);
-    const row = db
-      .insert(persons)
-      .values({
-        tmdbId,
-        name: details.name ?? "",
-        biography: details.biography || null,
-        birthday: details.birthday ?? null,
-        deathday: details.deathday ?? null,
-        placeOfBirth: details.place_of_birth ?? null,
-        profilePath: details.profile_path ?? null,
-        knownForDepartment: details.known_for_department ?? null,
-        popularity: details.popularity,
-        imdbId: details.imdb_id ?? null,
-        lastFetchedAt: new Date(),
-      })
-      .onConflictDoNothing()
-      .returning()
-      .get();
+    const row = insertPersonReturning({
+      tmdbId,
+      name: details.name ?? "",
+      biography: details.biography || null,
+      birthday: details.birthday ?? null,
+      deathday: details.deathday ?? null,
+      placeOfBirth: details.place_of_birth ?? null,
+      profilePath: details.profile_path ?? null,
+      knownForDepartment: details.known_for_department ?? null,
+      popularity: details.popularity,
+      imdbId: details.imdb_id ?? null,
+      lastFetchedAt: new Date(),
+    });
 
-    const person = row ?? db.select().from(persons).where(eq(persons.tmdbId, tmdbId)).get();
+    const person = row ?? getPersonByTmdbId(tmdbId);
     if (!person) return null;
 
     const profileThumbHash = await ensureProfileThumbHash(person);
@@ -155,26 +159,7 @@ export async function getOrFetchPersonByTmdbId(tmdbId: number): Promise<Resolved
 }
 
 export function getLocalFilmography(personId: string): PersonCredit[] {
-  const rows = db
-    .select({
-      titleId: titles.id,
-      tmdbId: titles.tmdbId,
-      type: titles.type,
-      title: titles.title,
-      posterPath: titles.posterPath,
-      posterThumbHash: titles.posterThumbHash,
-      releaseDate: titles.releaseDate,
-      firstAirDate: titles.firstAirDate,
-      voteAverage: titles.voteAverage,
-      character: personFilmography.character,
-      department: personFilmography.department,
-      job: personFilmography.job,
-    })
-    .from(personFilmography)
-    .innerJoin(titles, eq(personFilmography.titleId, titles.id))
-    .where(eq(personFilmography.personId, personId))
-    .orderBy(personFilmography.displayOrder)
-    .all();
+  const rows = getPersonFilmographyJoined(personId);
 
   return rows.map((r) => ({
     titleId: r.titleId,
@@ -192,7 +177,9 @@ export function getLocalFilmography(personId: string): PersonCredit[] {
   }));
 }
 
-async function syncPersonFilmography(person: Pick<typeof persons.$inferSelect, "id" | "tmdbId">) {
+async function syncPersonFilmography(
+  person: Pick<typeof import("@sofa/db/schema").persons.$inferSelect, "id" | "tmdbId">,
+) {
   const credits = await getPersonCombinedCredits(person.tmdbId);
 
   // Schema types combined credits as movie-only; TV entries also carry
@@ -214,58 +201,32 @@ async function syncPersonFilmography(person: Pick<typeof persons.$inferSelect, "
   const allEntries = [...validCast, ...validCrew];
   const tmdbIds = [...new Set(allEntries.map((c) => c.id))];
 
-  const existingTitles =
-    tmdbIds.length > 0
-      ? db
-          .select({ id: titles.id, tmdbId: titles.tmdbId })
-          .from(titles)
-          .where(inArray(titles.tmdbId, tmdbIds))
-          .all()
-      : [];
+  const existingTitles = getExistingTitlesByTmdbIds(tmdbIds);
   const titleIdMap = new Map<number, string>(
     existingTitles.map((title) => [title.tmdbId, title.id]),
   );
 
   const newEntries = allEntries.filter((entry) => !titleIdMap.has(entry.id));
   if (newEntries.length > 0) {
-    const insertedTmdbIds = new Set<number>();
-    db.transaction((tx) => {
-      for (const entry of newEntries) {
-        if (insertedTmdbIds.has(entry.id)) continue;
-        insertedTmdbIds.add(entry.id);
-        const row = tx
-          .insert(titles)
-          .values({
-            tmdbId: entry.id,
-            type: entry.media_type as "movie" | "tv",
-            title: entry.title ?? entry.name ?? "Unknown",
-            overview: entry.overview,
-            releaseDate: entry.release_date,
-            firstAirDate: entry.first_air_date,
-            posterPath: entry.poster_path,
-            backdropPath: entry.backdrop_path,
-            popularity: entry.popularity,
-            voteAverage: entry.vote_average,
-            voteCount: entry.vote_count,
-            lastFetchedAt: null,
-          })
-          .onConflictDoNothing()
-          .returning()
-          .get();
-        if (row) titleIdMap.set(entry.id, row.id);
-      }
-    });
+    const shellEntries = newEntries
+      .filter((entry, index, arr) => arr.findIndex((e) => e.id === entry.id) === index)
+      .map((entry) => ({
+        tmdbId: entry.id,
+        mediaType: entry.media_type as "movie" | "tv",
+        title: entry.title ?? entry.name ?? "Unknown",
+        overview: entry.overview,
+        releaseDate: entry.release_date,
+        firstAirDate: entry.first_air_date,
+        posterPath: entry.poster_path,
+        backdropPath: entry.backdrop_path,
+        popularity: entry.popularity,
+        voteAverage: entry.vote_average,
+        voteCount: entry.vote_count,
+      }));
 
-    const stillMissing = [...insertedTmdbIds].filter((tmdbId) => !titleIdMap.has(tmdbId));
-    if (stillMissing.length > 0) {
-      const fallbacks = db
-        .select({ id: titles.id, tmdbId: titles.tmdbId })
-        .from(titles)
-        .where(inArray(titles.tmdbId, stillMissing))
-        .all();
-      for (const fallback of fallbacks) {
-        titleIdMap.set(fallback.tmdbId, fallback.id);
-      }
+    const updatedMap = batchInsertShellTitlesTransaction(shellEntries, titleIdMap);
+    for (const [tmdbId, id] of updatedMap) {
+      titleIdMap.set(tmdbId, id);
     }
   }
 
@@ -303,22 +264,11 @@ async function syncPersonFilmography(person: Pick<typeof persons.$inferSelect, "
   }
 
   const now = new Date();
-  db.transaction((tx) => {
-    tx.delete(personFilmography).where(eq(personFilmography.personId, person.id)).run();
-
-    for (const row of nextRows) {
-      tx.insert(personFilmography).values(row).run();
-    }
-
-    tx.update(persons)
-      .set({ filmographyLastFetchedAt: now })
-      .where(eq(persons.id, person.id))
-      .run();
-  });
+  replaceFilmographyTransaction(person.id, nextRows, now);
 }
 
 export async function fetchFullFilmography(personId: string): Promise<PersonCredit[]> {
-  const person = db.select().from(persons).where(eq(persons.id, personId)).get();
+  const person = getPersonById(personId);
   if (!person) return [];
 
   const localFilmography = getLocalFilmography(personId);
@@ -362,63 +312,5 @@ interface BrowsePersonInput {
  * Returns a map of tmdbId → internal UUID.
  */
 export function ensureBrowsePersonsExist(items: BrowsePersonInput[]): Map<number, string> {
-  if (items.length === 0) return new Map();
-
-  const unique = new Map<number, BrowsePersonInput>();
-  for (const item of items) {
-    if (!unique.has(item.tmdbId)) unique.set(item.tmdbId, item);
-  }
-
-  const tmdbIds = [...unique.keys()];
-
-  const existing = db
-    .select({ id: persons.id, tmdbId: persons.tmdbId })
-    .from(persons)
-    .where(inArray(persons.tmdbId, tmdbIds))
-    .all();
-
-  const result = new Map<number, string>();
-  for (const row of existing) {
-    result.set(row.tmdbId, row.id);
-  }
-
-  const missing = tmdbIds.filter((id) => !result.has(id));
-  if (missing.length === 0) return result;
-
-  db.transaction((tx) => {
-    for (const tmdbId of missing) {
-      const item = unique.get(tmdbId);
-      if (!item) continue;
-      const row = tx
-        .insert(persons)
-        .values({
-          tmdbId: item.tmdbId,
-          name: item.name,
-          profilePath: item.profilePath,
-          knownForDepartment: item.knownForDepartment ?? null,
-          popularity: item.popularity ?? null,
-          lastFetchedAt: null,
-        })
-        .onConflictDoNothing()
-        .returning({ id: persons.id })
-        .get();
-      if (row) {
-        result.set(tmdbId, row.id);
-      }
-    }
-
-    const stillMissing = missing.filter((id) => !result.has(id));
-    if (stillMissing.length > 0) {
-      const fallbacks = tx
-        .select({ id: persons.id, tmdbId: persons.tmdbId })
-        .from(persons)
-        .where(inArray(persons.tmdbId, stillMissing))
-        .all();
-      for (const f of fallbacks) {
-        result.set(f.tmdbId, f.id);
-      }
-    }
-  });
-
-  return result;
+  return ensureBrowsePersonsTransaction(items);
 }

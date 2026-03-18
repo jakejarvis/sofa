@@ -1,8 +1,7 @@
 import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
 
-import { eq } from "@sofa/db/helpers";
 import { personFilmography, persons } from "@sofa/db/schema";
-import { clearAllTables, testDb } from "@sofa/db/test-utils";
+import { clearAllTables, eq, testDb } from "@sofa/db/test-utils";
 
 const TINY_PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+X2NDNwAAAABJRU5ErkJggg==",

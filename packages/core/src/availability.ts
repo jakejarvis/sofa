@@ -1,13 +1,16 @@
-import { db } from "@sofa/db/client";
-import { and, eq } from "@sofa/db/helpers";
-import { availabilityOffers, titles } from "@sofa/db/schema";
+import {
+  getAvailabilityOffers,
+  replaceAvailabilityTransaction,
+} from "@sofa/db/queries/availability";
+import { getTitleById } from "@sofa/db/queries/title";
+import type { availabilityOffers } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getWatchProviders } from "@sofa/tmdb/client";
 
 const log = createLogger("availability");
 
 export async function refreshAvailability(titleId: string) {
-  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+  const title = getTitleById(titleId);
   if (!title) return;
 
   const data = await getWatchProviders(title.tmdbId, title.type);
@@ -39,20 +42,12 @@ export async function refreshAvailability(titleId: string) {
     }
   }
 
-  db.transaction((tx) => {
-    tx.delete(availabilityOffers)
-      .where(and(eq(availabilityOffers.titleId, titleId), eq(availabilityOffers.region, "US")))
-      .run();
-
-    if (allOfferRows.length > 0) {
-      tx.insert(availabilityOffers).values(allOfferRows).onConflictDoNothing().run();
-    }
-  });
+  replaceAvailabilityTransaction(titleId, "US", allOfferRows);
 
   const total = offerTypes.reduce((n, t) => n + (us[t]?.length ?? 0), 0);
   log.debug(`Refreshed availability for title ${titleId}: ${total} offers`);
 }
 
 export function getAvailability(titleId: string) {
-  return db.select().from(availabilityOffers).where(eq(availabilityOffers.titleId, titleId)).all();
+  return getAvailabilityOffers(titleId);
 }

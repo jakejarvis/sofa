@@ -1,8 +1,6 @@
 import { Vibrant } from "node-vibrant/node";
 
-import { db } from "@sofa/db/client";
-import { eq } from "@sofa/db/helpers";
-import { titles } from "@sofa/db/schema";
+import { updateTitleColorPalette } from "@sofa/db/queries/colors";
 import { createLogger } from "@sofa/logger";
 
 import { loadImageBuffer } from "./image-cache";
@@ -24,7 +22,7 @@ export async function extractAndStoreColors(
   sourceBuffer?: Buffer | null,
 ): Promise<ColorPalette | null> {
   if (!posterPath) {
-    db.update(titles).set({ colorPalette: null }).where(eq(titles.id, titleId)).run();
+    updateTitleColorPalette(titleId, null);
     return null;
   }
 
@@ -44,10 +42,7 @@ export async function extractAndStoreColors(
       lightMuted: palette.LightMuted?.hex ?? null,
     };
 
-    db.update(titles)
-      .set({ colorPalette: JSON.stringify(colors) })
-      .where(eq(titles.id, titleId))
-      .run();
+    updateTitleColorPalette(titleId, JSON.stringify(colors));
 
     log.debug(`Extracted colors for title ${titleId}: colors=${JSON.stringify(colors)}`);
     return colors;

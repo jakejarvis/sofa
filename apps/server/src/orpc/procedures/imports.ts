@@ -4,15 +4,15 @@ import { AppErrorCode } from "@sofa/api/errors";
 import type { ParseResult } from "@sofa/core/imports";
 import {
   countUnresolved,
+  getActiveImportJobForUser,
+  insertImportJob,
   parseLetterboxdExport,
   parseSimklPayload,
   parseTraktPayload,
   processImportJob,
   readImportJob,
+  updateImportJobProgress,
 } from "@sofa/core/imports";
-import { db } from "@sofa/db/client";
-import { and, eq, inArray } from "@sofa/db/helpers";
-import { importJobs } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 
 import { os } from "../context";
@@ -100,34 +100,18 @@ export const createJob = os.imports.createJob.use(authed).handler(async ({ input
 
   // Prevent concurrent imports per user.
   // Auto-cancel stale *pending* jobs (server crashed before worker started).
-  // Running jobs are never auto-cancelled — there's no heartbeat to
-  // distinguish active work from a dead worker, and killing a healthy
-  // long-running import is worse than making the user manually cancel.
   const PENDING_STALE_MS = 5 * 60 * 1000; // 5 minutes
   const now = Date.now();
-  const existing = db
-    .select()
-    .from(importJobs)
-    .where(
-      and(
-        eq(importJobs.userId, context.user.id),
-        inArray(importJobs.status, ["pending", "running"]),
-      ),
-    )
-    .get();
+  const existing = getActiveImportJobForUser(context.user.id);
   if (existing) {
     const isPending = existing.status === "pending";
     const isStale = isPending && now - existing.createdAt.getTime() > PENDING_STALE_MS;
     if (isStale) {
-      // Mark as cancelled so the worker loop also stops if it starts late
-      db.update(importJobs)
-        .set({
-          status: "cancelled",
-          finishedAt: new Date(),
-          currentMessage: "Import timed out (stale job auto-cancelled)",
-        })
-        .where(eq(importJobs.id, existing.id))
-        .run();
+      updateImportJobProgress(existing.id, {
+        status: "cancelled",
+        finishedAt: new Date(),
+        currentMessage: "Import timed out (stale job auto-cancelled)",
+      });
       log.warn(`Auto-cancelled stale import job ${existing.id}`);
     } else {
       throw new ORPCError("CONFLICT", {
@@ -137,20 +121,16 @@ export const createJob = os.imports.createJob.use(authed).handler(async ({ input
     }
   }
 
-  const job = db
-    .insert(importJobs)
-    .values({
-      userId: context.user.id,
-      source: data.source,
-      status: "pending",
-      payload: JSON.stringify(data),
-      importWatches: options.importWatches,
-      importWatchlist: options.importWatchlist,
-      importRatings: options.importRatings,
-      createdAt: new Date(),
-    })
-    .returning()
-    .get();
+  const job = insertImportJob({
+    userId: context.user.id,
+    source: data.source,
+    status: "pending",
+    payload: JSON.stringify(data),
+    importWatches: options.importWatches,
+    importWatchlist: options.importWatchlist,
+    importRatings: options.importRatings,
+    createdAt: new Date(),
+  });
 
   // Fire-and-forget processing
   processImportJob(job.id).catch((err) => {
@@ -172,7 +152,7 @@ export const cancelJob = os.imports.cancelJob.use(authed).handler(({ input, cont
       data: { code: AppErrorCode.IMPORT_CANNOT_CANCEL },
     });
   }
-  db.update(importJobs).set({ status: "cancelled" }).where(eq(importJobs.id, input.id)).run();
+  updateImportJobProgress(input.id, { status: "cancelled" });
   return readImportJob(input.id);
 });
 

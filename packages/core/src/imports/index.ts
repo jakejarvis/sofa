@@ -18,4 +18,9 @@ export {
   processImportJob,
   readImportJob,
 } from "./processor";
+export {
+  getActiveImportJobForUser,
+  insertImportJob,
+  updateImportJobProgress,
+} from "@sofa/db/queries/imports";
 export { type ExternalIds, resolveMovieTmdbId, resolveShowTmdbId } from "./resolve";

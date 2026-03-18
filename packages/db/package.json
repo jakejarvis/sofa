@@ -5,10 +5,11 @@
   "type": "module",
   "exports": {
     "./client": "./src/client.ts",
-    "./schema": "./src/schema.ts",
-    "./helpers": "./src/helpers.ts",
     "./migrate": "./src/migrate.ts",
-    "./test-utils": "./src/test-utils.ts"
+    "./schema": "./src/schema.ts",
+    "./test-utils": "./src/test-utils.ts",
+    "./utils": "./src/utils.ts",
+    "./queries/*": "./src/queries/*.ts"
   },
   "scripts": {
     "lint": "oxlint",

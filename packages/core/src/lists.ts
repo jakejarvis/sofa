@@ -1,8 +1,11 @@
 import { z } from "zod";
 
-import { db } from "@sofa/db/client";
-import { and, eq, inArray } from "@sofa/db/helpers";
-import { integrations, titles, userTitleStatus } from "@sofa/db/schema";
+import {
+  batchUpdateTvdbIds,
+  getRadarrMovies,
+  getSonarrShows,
+  resolveListIntegration,
+} from "@sofa/db/queries/lists";
 import { createLogger } from "@sofa/logger";
 import { getTvExternalIds } from "@sofa/tmdb/client";
 
@@ -12,20 +15,7 @@ const log = createLogger("lists");
 export function resolveListToken(
   token: string,
 ): { userId: string; provider: "sonarr" | "radarr" } | null {
-  const row = db
-    .select({
-      userId: integrations.userId,
-      provider: integrations.provider,
-    })
-    .from(integrations)
-    .where(
-      and(
-        eq(integrations.token, token),
-        eq(integrations.type, "list"),
-        eq(integrations.enabled, true),
-      ),
-    )
-    .get();
+  const row = resolveListIntegration(token);
   if (!row) return null;
   return {
     userId: row.userId,
@@ -48,18 +38,7 @@ export function getRadarrList(
   userId: string,
   statuses: Status[] = ["watchlist"],
 ): { Id: number }[] {
-  const rows = db
-    .select({ tmdbId: titles.tmdbId })
-    .from(userTitleStatus)
-    .innerJoin(titles, eq(userTitleStatus.titleId, titles.id))
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(titles.type, "movie"),
-        inArray(userTitleStatus.status, statuses),
-      ),
-    )
-    .all();
+  const rows = getRadarrMovies(userId, statuses);
   return rows.map((r) => ({ Id: r.tmdbId }));
 }
 
@@ -69,23 +48,7 @@ export async function getSonarrList(
   userId: string,
   statuses: Status[] = ["watchlist"],
 ): Promise<{ TvdbId: number; Title: string }[]> {
-  const rows = db
-    .select({
-      id: titles.id,
-      tmdbId: titles.tmdbId,
-      tvdbId: titles.tvdbId,
-      title: titles.title,
-    })
-    .from(userTitleStatus)
-    .innerJoin(titles, eq(userTitleStatus.titleId, titles.id))
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(titles.type, "tv"),
-        inArray(userTitleStatus.status, statuses),
-      ),
-    )
-    .all();
+  const rows = getSonarrShows(userId, statuses);
 
   // Resolve missing TVDB IDs in parallel instead of sequentially
   const needsResolution = rows.filter((r) => r.tvdbId == null);
@@ -101,15 +64,15 @@ export async function getSonarrList(
         }
       }),
     );
-    // Batch update resolved IDs in a single transaction
-    db.transaction((tx) => {
-      for (const { row, tvdbId } of resolved) {
-        if (tvdbId != null) {
-          row.tvdbId = tvdbId;
-          tx.update(titles).set({ tvdbId }).where(eq(titles.id, row.id)).run();
-        }
+    // Batch update resolved IDs
+    const updates: { titleId: string; tvdbId: number }[] = [];
+    for (const { row, tvdbId } of resolved) {
+      if (tvdbId != null) {
+        row.tvdbId = tvdbId;
+        updates.push({ titleId: row.id, tvdbId });
       }
-    });
+    }
+    batchUpdateTvdbIds(updates);
   }
 
   return rows

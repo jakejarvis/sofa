@@ -1,7 +1,14 @@
 import type { CastMember } from "@sofa/api/schemas";
-import { db } from "@sofa/db/client";
-import { eq, inArray, sql } from "@sofa/db/helpers";
-import { persons, titleCast, titles } from "@sofa/db/schema";
+import {
+  batchUpsertPersonsTransaction,
+  batchUpsertTitleCast,
+  getCastForTitleJoined,
+  getExistingPersonsByTmdbIds,
+  getFallbackPersonsByTmdbIds,
+  getPersonsForTitleCast,
+} from "@sofa/db/queries/credits";
+import { getTitleById } from "@sofa/db/queries/title";
+import type { titleCast } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getMovieCredits, getTvAggregateCredits } from "@sofa/tmdb/client";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
@@ -38,68 +45,15 @@ function batchUpsertPersons(people: PersonData[]): Map<number, string> {
   const tmdbIds = uniquePeople.map((p) => p.tmdbId);
 
   // Batch prefetch existing persons (1 query)
-  const existing = db
-    .select({
-      id: persons.id,
-      tmdbId: persons.tmdbId,
-      name: persons.name,
-      profilePath: persons.profilePath,
-      profileThumbHash: persons.profileThumbHash,
-      popularity: persons.popularity,
-    })
-    .from(persons)
-    .where(inArray(persons.tmdbId, tmdbIds))
-    .all();
+  const existing = getExistingPersonsByTmdbIds(tmdbIds);
   const existingMap = new Map(existing.map((p) => [p.tmdbId, p]));
-  const idMap = new Map<number, string>(existing.map((p) => [p.tmdbId, p.id]));
 
-  db.transaction((tx) => {
-    for (const p of uniquePeople) {
-      const existingPerson = existingMap.get(p.tmdbId);
-      if (existingPerson) {
-        const nextPopularity = p.popularity ?? null;
-        const pathChanged = existingPerson.profilePath !== p.profilePath;
-        const needsUpdate =
-          existingPerson.name !== p.name ||
-          pathChanged ||
-          existingPerson.popularity !== nextPopularity;
-        if (!needsUpdate) continue;
-
-        tx.update(persons)
-          .set({
-            name: p.name,
-            profilePath: p.profilePath,
-            popularity: nextPopularity,
-            profileThumbHash: pathChanged ? null : existingPerson.profileThumbHash,
-          })
-          .where(eq(persons.id, existingPerson.id))
-          .run();
-        continue;
-      }
-
-      const row = tx
-        .insert(persons)
-        .values({
-          tmdbId: p.tmdbId,
-          name: p.name,
-          profilePath: p.profilePath,
-          popularity: p.popularity ?? null,
-        })
-        .onConflictDoNothing()
-        .returning()
-        .get();
-      if (row) idMap.set(p.tmdbId, row.id);
-    }
-  });
+  const idMap = batchUpsertPersonsTransaction(uniquePeople, existingMap);
 
   // One fallback query for any concurrent inserts that conflicted
   const stillMissing = uniquePeople.filter((p) => !idMap.has(p.tmdbId)).map((p) => p.tmdbId);
   if (stillMissing.length > 0) {
-    const fallbacks = db
-      .select({ id: persons.id, tmdbId: persons.tmdbId })
-      .from(persons)
-      .where(inArray(persons.tmdbId, stillMissing))
-      .all();
+    const fallbacks = getFallbackPersonsByTmdbIds(stillMissing);
     for (const f of fallbacks) idMap.set(f.tmdbId, f.id);
   }
 
@@ -115,16 +69,7 @@ export async function syncCastProfileThumbHashes(
     await cacheProfilePhotos(titleId);
   }
 
-  const personRows = db
-    .select({
-      id: persons.id,
-      profilePath: persons.profilePath,
-      profileThumbHash: persons.profileThumbHash,
-    })
-    .from(titleCast)
-    .innerJoin(persons, eq(titleCast.personId, persons.id))
-    .where(eq(titleCast.titleId, titleId))
-    .all();
+  const personRows = getPersonsForTitleCast(titleId);
 
   const allowedIds = personIds ? new Set(personIds) : null;
   const uniqueRows = new Map(personRows.map((p) => [p.id, p]));
@@ -137,7 +82,7 @@ export async function syncCastProfileThumbHashes(
 }
 
 export async function refreshCredits(titleId: string) {
-  const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
+  const title = getTitleById(titleId);
   if (!title) return;
 
   log.debug(`Refreshing credits for "${title.title}" (${title.type})`);
@@ -211,25 +156,7 @@ export async function refreshCredits(titleId: string) {
         });
         crewOrder++;
       }
-      if (allCastRows.length > 0) {
-        db.insert(titleCast)
-          .values(allCastRows)
-          .onConflictDoUpdate({
-            target: [
-              titleCast.titleId,
-              titleCast.personId,
-              titleCast.department,
-              titleCast.character,
-            ],
-            set: {
-              job: sql`excluded.job`,
-              displayOrder: sql`excluded.displayOrder`,
-              episodeCount: sql`excluded.episodeCount`,
-              lastFetchedAt: sql`excluded.lastFetchedAt`,
-            },
-          })
-          .run();
-      }
+      batchUpsertTitleCast(allCastRows);
     } else {
       const credits = await getTvAggregateCredits(title.tmdbId);
       const tvCast = credits.cast ?? [];
@@ -309,25 +236,7 @@ export async function refreshCredits(titleId: string) {
         });
         crewOrder++;
       }
-      if (allCastRows.length > 0) {
-        db.insert(titleCast)
-          .values(allCastRows)
-          .onConflictDoUpdate({
-            target: [
-              titleCast.titleId,
-              titleCast.personId,
-              titleCast.department,
-              titleCast.character,
-            ],
-            set: {
-              job: sql`excluded.job`,
-              displayOrder: sql`excluded.displayOrder`,
-              episodeCount: sql`excluded.episodeCount`,
-              lastFetchedAt: sql`excluded.lastFetchedAt`,
-            },
-          })
-          .run();
-      }
+      batchUpsertTitleCast(allCastRows);
     }
 
     log.debug(`Credits refreshed for "${title.title}"`);
@@ -341,25 +250,7 @@ export async function refreshCredits(titleId: string) {
 }
 
 export function getCastForTitle(titleId: string): CastMember[] {
-  const rows = db
-    .select({
-      id: titleCast.id,
-      personId: titleCast.personId,
-      name: persons.name,
-      character: titleCast.character,
-      department: titleCast.department,
-      job: titleCast.job,
-      displayOrder: titleCast.displayOrder,
-      episodeCount: titleCast.episodeCount,
-      profilePath: persons.profilePath,
-      profileThumbHash: persons.profileThumbHash,
-      tmdbId: persons.tmdbId,
-    })
-    .from(titleCast)
-    .innerJoin(persons, eq(titleCast.personId, persons.id))
-    .where(eq(titleCast.titleId, titleId))
-    .orderBy(titleCast.displayOrder)
-    .all();
+  const rows = getCastForTitleJoined(titleId);
 
   return rows.map((r) =>
     Object.assign(r, { profilePath: tmdbImageUrl(r.profilePath, "profiles") }),

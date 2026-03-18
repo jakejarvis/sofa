@@ -1,6 +1,4 @@
-import { db } from "@sofa/db/client";
-import { count } from "@sofa/db/helpers";
-import { titles } from "@sofa/db/schema";
+import { getTitleCount } from "@sofa/db/queries/title";
 import { createLogger } from "@sofa/logger";
 
 import { imageCacheEnabled } from "./image-cache";
@@ -30,11 +28,6 @@ function bucketTitles(n: number): string {
   if (n <= 200) return "51-200";
   if (n <= 500) return "201-500";
   return "501+";
-}
-
-function getTitleCount(): number {
-  const result = db.select({ count: count() }).from(titles).get();
-  return result?.count ?? 0;
 }
 
 export async function performTelemetryReport(): Promise<void> {

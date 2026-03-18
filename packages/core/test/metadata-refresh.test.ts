@@ -1,8 +1,7 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 
-import { eq } from "@sofa/db/helpers";
 import { episodes, seasons, titles } from "@sofa/db/schema";
-import { clearAllTables, insertTitle, testDb } from "@sofa/db/test-utils";
+import { clearAllTables, eq, insertTitle, testDb } from "@sofa/db/test-utils";
 
 interface MockSeasonEpisode {
   episode_number: number;
