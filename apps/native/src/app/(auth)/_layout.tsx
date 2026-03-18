@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import { useResolveClassNames } from "uniwind";
-import { hasStoredServerUrl } from "@/lib/server-url";
+import { hasStoredServerUrl } from "@/lib/server";
 
 export const unstable_settings = {
   initialRouteName:

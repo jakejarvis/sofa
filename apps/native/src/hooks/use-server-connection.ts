@@ -1,45 +1,24 @@
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-
-import { authClient, rebuildAuthClient } from "@/lib/auth-client";
-import { getCachedSession } from "@/lib/cached-session";
 import {
   clearStorageScope,
   hasScopedStorage,
   setStorageScope,
 } from "@/lib/mmkv";
+import { queryClient } from "@/lib/query-client";
 import {
-  onServerReachabilityChange,
-  startReachabilityMonitor,
-} from "@/lib/server-reachability";
-import {
+  authClient,
+  clearCachedSessionSeeded,
   ensureInstanceId,
   getCurrentInstanceId,
   hasStoredServerUrl,
+  onServerReachabilityChange,
   onServerUrlChange,
-} from "@/lib/server-url";
+  rebuildAuthClient,
+  startReachabilityMonitor,
+  wasCachedSessionSeeded,
+} from "@/lib/server";
 import { toast } from "@/lib/toast";
-
-let _cachedSessionSeeded = false;
-
-/**
- * Seed the Better Auth session atom from SecureStore before React renders.
- * Call at module scope in the root layout, before any component renders.
- */
-export function seedSessionFromCache(): void {
-  const cached = getCachedSession();
-  if (cached) {
-    _cachedSessionSeeded = true;
-    const sessionAtom = authClient.$store.atoms.session;
-    sessionAtom.set({
-      data: cached,
-      error: null,
-      isPending: false,
-      isRefetching: true,
-      refetch: sessionAtom.get().refetch,
-    });
-  }
-}
 
 /**
  * Manages the full server connection lifecycle:
@@ -54,7 +33,14 @@ export function useServerConnection() {
   // Force re-render when server URL changes so useSession()
   // re-subscribes to the rebuilt authClient's session atom.
   const [, setUrlVersion] = useState(0);
-  useEffect(() => onServerUrlChange(() => setUrlVersion((n) => n + 1)), []);
+  useEffect(
+    () =>
+      onServerUrlChange(() => {
+        queryClient.clear();
+        setUrlVersion((n) => n + 1);
+      }),
+    [],
+  );
 
   const { data: session, isPending, isRefetching } = authClient.useSession();
   const hasServerUrl =
@@ -112,7 +98,7 @@ export function useServerConnection() {
   // Track whether the session was seeded from cache and hasn't yet been
   // confirmed by the server. Once confirmed, flip to false so explicit
   // sign-outs don't show a misleading "session expired" toast.
-  const hadOptimisticSession = useRef(_cachedSessionSeeded);
+  const hadOptimisticSession = useRef(wasCachedSessionSeeded());
   const prevSession = useRef(session);
 
   if (hadOptimisticSession.current && session && !isRefetching) {
@@ -132,7 +118,7 @@ export function useServerConnection() {
         toast.info("Session expired", {
           description: "Please sign in again.",
         });
-        hadOptimisticSession.current = false;
+        clearCachedSessionSeeded();
       }
     }
     prevSession.current = session;

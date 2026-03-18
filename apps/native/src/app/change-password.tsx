@@ -15,7 +15,7 @@ import {
   Label,
   TextField,
 } from "@/components/ui/text-field";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/server";
 import { toast } from "@/lib/toast";
 import * as Haptics from "@/utils/haptics";
 

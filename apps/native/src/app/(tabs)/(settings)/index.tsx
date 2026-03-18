@@ -43,11 +43,10 @@ import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
-import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/lib/orpc";
 import { isAnalyticsEnabled, setAnalyticsEnabled } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
-import { getServerUrl } from "@/lib/server-url";
+import { authClient, getServerUrl } from "@/lib/server";
 import { toast } from "@/lib/toast";
 
 const settingsContentContainerStyle = {

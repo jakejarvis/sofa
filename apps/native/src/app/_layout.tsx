@@ -21,24 +21,20 @@ import { enableFreeze } from "react-native-screens";
 import { Uniwind, useResolveClassNames } from "uniwind";
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-banner";
-import { authClient } from "@/lib/auth-client";
-import {
-  hasScopedStorage,
-  onStorageScopeChange,
-  queryPersister,
-} from "@/lib/mmkv";
+import { useServerConnection } from "@/hooks/use-server-connection";
 import { applyTrackingTransparency, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
-import { getCurrentInstanceId } from "@/lib/server-url";
-import { sofaTheme } from "@/lib/theme";
 import {
-  seedSessionFromCache,
-  useServerConnection,
-} from "@/lib/use-server-connection";
+  getScopeKey,
+  initialize,
+  onStorageScopeChange,
+  queryPersister,
+} from "@/lib/server";
+import { sofaTheme } from "@/lib/theme";
 
 SplashScreen.preventAutoHideAsync();
 enableFreeze(true);
-seedSessionFromCache();
+initialize();
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
@@ -171,18 +167,12 @@ function AppContent() {
  */
 function QueryProvider({ children }: { children: React.ReactNode }) {
   const [, setScopeVersion] = useState(0);
-  const { data: session } = authClient.useSession();
-  const instanceId = getCurrentInstanceId();
-  const scopeReady = hasScopedStorage();
 
   useEffect(() => {
     return onStorageScopeChange(() => setScopeVersion((n) => n + 1));
   }, []);
 
-  const scopeKey =
-    scopeReady && instanceId && session?.user?.id
-      ? `${instanceId}_${session.user.id}`
-      : null;
+  const scopeKey = getScopeKey();
 
   const prevScopeKeyRef = useRef<string | null>(null);
 

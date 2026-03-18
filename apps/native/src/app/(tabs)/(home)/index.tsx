@@ -20,9 +20,9 @@ import {
   horizontalListStyle,
 } from "@/components/ui/horizontal-list-spacing";
 import { SectionHeader } from "@/components/ui/section-header";
-import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
+import { authClient } from "@/lib/server";
 
 const dashboardContentContainerStyle = {
   paddingTop: 8,

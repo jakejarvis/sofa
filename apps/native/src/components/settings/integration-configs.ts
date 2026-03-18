@@ -7,7 +7,7 @@ import {
   RadarrIcon,
   SonarrIcon,
 } from "@/components/settings/icons";
-import { getServerUrl } from "@/lib/server-url";
+import { getServerUrl } from "@/lib/server";
 
 export interface IntegrationConfig {
   provider: "plex" | "jellyfin" | "emby" | "sonarr" | "radarr";

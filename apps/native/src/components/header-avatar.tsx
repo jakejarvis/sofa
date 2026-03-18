@@ -3,8 +3,8 @@ import { Alert, Pressable, View } from "react-native";
 import * as DropdownMenu from "zeego/dropdown-menu";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
-import { authClient } from "@/lib/auth-client";
 import { queryClient } from "@/lib/query-client";
+import { authClient } from "@/lib/server";
 import * as Haptics from "@/utils/haptics";
 
 export function HeaderAvatar() {

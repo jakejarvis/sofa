@@ -7,9 +7,8 @@ import Animated, { SlideInUp, SlideOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
-import { authClient } from "@/lib/auth-client";
 import { queryClient } from "@/lib/query-client";
-import { useServerReachability } from "@/lib/server-reachability";
+import { authClient, useServerReachability } from "@/lib/server";
 import * as Haptics from "@/utils/haptics";
 
 export function ServerUnreachableBanner() {

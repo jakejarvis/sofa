@@ -22,13 +22,9 @@ import { Text } from "@/components/ui/text";
 import { Input } from "@/components/ui/text-field";
 import {
   getServerUrl,
-  hasStoredServerUrl,
-  normalizeUrl,
-  registerServer,
-  setServerUrl,
+  serverManager,
   type ValidationError,
-  validateServerUrl,
-} from "@/lib/server-url";
+} from "@/lib/server";
 import * as Haptics from "@/utils/haptics";
 
 type ConnectionState =
@@ -54,7 +50,7 @@ export default function ServerUrlScreen() {
   const successTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [url, setUrl] = useState(() =>
-    hasStoredServerUrl() ? getServerUrl() : "",
+    serverManager.hasStoredServerUrl() ? getServerUrl() : "",
   );
   const [connection, setConnection] = useState<ConnectionState>({
     phase: "idle",
@@ -106,7 +102,7 @@ export default function ServerUrlScreen() {
     const trimmed = url.trim().replace(/\/+$/, "");
     if (!trimmed) return;
 
-    const fullUrl = normalizeUrl(trimmed);
+    const fullUrl = serverManager.normalizeUrl(trimmed);
 
     try {
       new URL(fullUrl);
@@ -117,13 +113,12 @@ export default function ServerUrlScreen() {
     }
     setConnection({ phase: "connecting" });
 
-    const result = await validateServerUrl(fullUrl);
+    const result = await serverManager.validateServerUrl(fullUrl);
 
     if (result.status === "success") {
       setConnection({ phase: "success" });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      registerServer(fullUrl, result.instanceId);
-      setServerUrl(fullUrl);
+      serverManager.connectToServer(fullUrl, result.instanceId);
       successTimeout.current = setTimeout(() => {
         replace("/(auth)/login");
       }, 800);
@@ -139,7 +134,7 @@ export default function ServerUrlScreen() {
   const isValidUrl = (() => {
     if (!trimmedUrl) return false;
     try {
-      new URL(normalizeUrl(trimmedUrl));
+      new URL(serverManager.normalizeUrl(trimmedUrl));
       return true;
     } catch {
       return false;

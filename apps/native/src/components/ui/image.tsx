@@ -1,6 +1,6 @@
 import { Image as ExpoImage, type ImageProps } from "expo-image";
 import { useResolveClassNames } from "uniwind";
-import { resolveUrl } from "@/lib/server-url";
+import { resolveUrl } from "@/lib/server";
 
 export function Image({
   source,

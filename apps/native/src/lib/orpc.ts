@@ -4,9 +4,7 @@ import type { ContractRouterClient } from "@orpc/contract";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { contract } from "@sofa/api/contract";
 
-import { authClient } from "@/lib/auth-client";
-import { serverFetch } from "@/lib/server-reachability";
-import { getServerUrl } from "@/lib/server-url";
+import { authClient, getServerUrl, serverFetch } from "@/lib/server";
 
 export const link = new RPCLink({
   url: () => `${getServerUrl()}/rpc`,

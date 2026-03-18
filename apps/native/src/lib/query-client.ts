@@ -1,7 +1,7 @@
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 
 import { posthog } from "@/lib/posthog";
-import { getIsReachable, isNetworkError } from "@/lib/server-reachability";
+import { getIsReachable, isNetworkError } from "@/lib/server";
 import { toast } from "@/lib/toast";
 
 const ONE_DAY_MS = 1000 * 60 * 60 * 24;

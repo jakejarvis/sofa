@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { NativeTabBar } from "@/components/navigation/native-tab-bar";
-import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/lib/orpc";
+import { authClient } from "@/lib/server";
 
 export default function TabLayout() {
   const { data: session } = authClient.useSession();
