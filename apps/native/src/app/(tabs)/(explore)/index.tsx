@@ -83,7 +83,9 @@ export default function ExploreScreen() {
     >
       <View className="gap-8">
         {heroItem && (
-          <Animated.View entering={FadeIn.duration(400)}>
+          <Animated.View
+            entering={FadeIn.duration(400).withInitialValues({ opacity: 0.01 })}
+          >
             <HeroBanner item={heroItem} />
           </Animated.View>
         )}

@@ -24,7 +24,6 @@
       "@lingui/metro-transformer": "5.9.3",
       "@lingui/react": "5.9.3",
       "@lingui/vite-plugin": "5.9.3",
-      "date-fns": "4.1.0",
       "react": "19.2.0",
       "react-dom": "19.2.0",
       "tailwind-merge": "3.5.0",

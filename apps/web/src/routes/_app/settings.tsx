@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import {
   IconAlertTriangle,
   IconDatabaseExport,
+  IconDeviceDesktopCog,
   IconServer2,
   IconShieldLock,
 } from "@tabler/icons-react";
@@ -37,7 +38,7 @@ function SettingsPage() {
         <footer className="border-border/50 border-t pt-6 pb-2 text-center text-muted-foreground text-xs">
           <p>
             <a
-              href={`https://github.com/${GITHUB_REPO}`}
+              href="https://sofa.watch"
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-primary/80 transition-colors hover:text-primary"
@@ -80,10 +81,6 @@ function SettingsPage() {
         </footer>
       }
     >
-      <Card>
-        <LanguageSection />
-      </Card>
-
       <AccountSection
         user={{
           name: session.user.name,
@@ -93,6 +90,20 @@ function SettingsPage() {
           role: session.user.role ?? undefined,
         }}
       />
+
+      {/* App Settings */}
+      <div>
+        <div className="mb-3 flex items-center gap-2">
+          <IconDeviceDesktopCog
+            aria-hidden={true}
+            className="size-4 text-muted-foreground"
+          />
+          <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+            <Trans>App Settings</Trans>
+          </h2>
+        </div>
+        <LanguageSection />
+      </div>
 
       <IntegrationsSection />
 

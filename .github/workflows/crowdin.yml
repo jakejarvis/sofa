@@ -57,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Compile catalogs
-        run: cd packages/i18n && bun run compile
+        run: bun run i18n:compile
 
       - name: Commit compiled catalogs
         run: |

@@ -1,5 +1,10 @@
 import { i18n } from "./index";
 
+/** Whether a string looks like a date-only value (no time component). */
+function isDateOnly(value: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
 function toDate(date: Date | string): Date {
   return typeof date === "string" ? new Date(date) : date;
 }
@@ -8,10 +13,15 @@ export function formatDate(
   date: Date | string,
   options?: Intl.DateTimeFormatOptions,
 ): string {
+  // Date-only ISO strings (e.g. "1990-05-15") are parsed as UTC midnight.
+  // Format in UTC so users west of UTC don't see the previous day.
+  const useUTC =
+    typeof date === "string" && isDateOnly(date) && !options?.timeZone;
   return new Intl.DateTimeFormat(i18n.locale, {
     year: "numeric",
     month: "long",
     day: "numeric",
+    ...(useUTC ? { timeZone: "UTC" } : {}),
     ...options,
   }).format(toDate(date));
 }
@@ -32,10 +42,9 @@ export function formatRelativeTime(date: Date | string): string {
   const absMin = Math.abs(Math.round(diffMs / 60_000));
   const absHour = Math.abs(Math.round(diffMs / 3_600_000));
   const absDay = Math.abs(Math.round(diffMs / 86_400_000));
-
-  const rtf = new Intl.RelativeTimeFormat(i18n.locale, { numeric: "auto" });
   const sign = diffMs < 0 ? -1 : 1;
 
+  const rtf = new Intl.RelativeTimeFormat(i18n.locale, { numeric: "auto" });
   if (absSec < 60) return rtf.format(sign * absSec, "second");
   if (absMin < 60) return rtf.format(sign * absMin, "minute");
   if (absHour < 24) return rtf.format(sign * absHour, "hour");

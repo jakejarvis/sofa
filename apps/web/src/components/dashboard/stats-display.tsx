@@ -1,4 +1,4 @@
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import type {
   DashboardStats,
   HistoryBucket,
@@ -147,19 +147,14 @@ function PeriodSelector({
     this_year: t`This Year`,
   };
 
-  const periodSelect = (
-    <PeriodSelect
-      period={period}
-      onPeriodChange={onPeriodChange}
-      periodLabels={periodLabels}
-    />
-  );
-
   return (
     <span className="inline-flex items-baseline gap-1">
-      {type === "movies"
-        ? t`Movies ${periodSelect}`
-        : t`Episodes ${periodSelect}`}
+      {type === "movies" ? <Trans>Movies</Trans> : <Trans>Episodes</Trans>}
+      <PeriodSelect
+        period={period}
+        onPeriodChange={onPeriodChange}
+        periodLabels={periodLabels}
+      />
     </span>
   );
 }

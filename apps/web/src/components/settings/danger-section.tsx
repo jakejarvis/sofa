@@ -98,9 +98,7 @@ export function CacheSection() {
             {/* Purge metadata */}
             <AlertDialog>
               <AlertDialogTrigger
-                render={
-                  <Button variant="outline" size="sm" disabled={disabled} />
-                }
+                render={<Button variant="outline" disabled={disabled} />}
               >
                 {purgeMetadata.isPending ? (
                   <Spinner className="size-3" />
@@ -143,9 +141,7 @@ export function CacheSection() {
             {/* Purge images */}
             <AlertDialog>
               <AlertDialogTrigger
-                render={
-                  <Button variant="outline" size="sm" disabled={disabled} />
-                }
+                render={<Button variant="outline" disabled={disabled} />}
               >
                 {purgeImages.isPending ? (
                   <Spinner className="size-3" />
@@ -187,9 +183,7 @@ export function CacheSection() {
             {/* Purge all */}
             <AlertDialog>
               <AlertDialogTrigger
-                render={
-                  <Button variant="destructive" size="sm" disabled={disabled} />
-                }
+                render={<Button variant="destructive" disabled={disabled} />}
               >
                 {purgeAll.isPending ? (
                   <Spinner className="size-3" />

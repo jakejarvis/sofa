@@ -19,12 +19,12 @@ msgid "...and {0} more"
 msgstr ""
 
 #. placeholder {0}: systemHealth.data.imageCache.imageCount
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:483
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:479
 msgid "{0, plural, one {# image} other {# images}}"
 msgstr ""
 
 #. placeholder {0}: systemHealth.data.database.titleCount
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:464
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:463
 msgid "{0, plural, one {# title} other {# titles}}"
 msgstr ""
 
@@ -143,7 +143,7 @@ msgstr ""
 #~ msgid "{watchedCount}/{0} episodes"
 #~ msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:226
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:231
 #: apps/web/src/components/settings/account-section.tsx:175
 msgid "Account"
 msgstr ""
@@ -190,9 +190,9 @@ msgstr ""
 msgid "Added to watchlist"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:348
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:452
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:503
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:353
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:451
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:496
 #: apps/web/src/components/nav-bar.tsx:235
 #: apps/web/src/components/settings/account-section.tsx:335
 msgid "Admin"
@@ -228,11 +228,11 @@ msgstr ""
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:425
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:424
 msgid "Anonymous usage reporting"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:373
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:378
 msgid "Application"
 msgstr ""
 
@@ -240,8 +240,8 @@ msgstr ""
 msgid "Are you sure you want to disconnect {label}? The current URL will stop working."
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:201
-#: apps/native/src/components/header-avatar.tsx:72
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:206
+#: apps/native/src/components/header-avatar.tsx:70
 msgid "Are you sure you want to sign out?"
 msgstr ""
 
@@ -316,10 +316,10 @@ msgstr ""
 msgid "Can't reach server"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:202
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:327
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:383
-#: apps/native/src/components/header-avatar.tsx:73
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:207
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:332
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:388
+#: apps/native/src/components/header-avatar.tsx:71
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx:63
 #: apps/native/src/components/search/recently-viewed-list.tsx:37
 #: apps/native/src/components/settings/integration-card.tsx:138
@@ -357,7 +357,7 @@ msgstr ""
 msgid "Caught up — marked {0} {1, plural, one {episode} other {episodes}} as watched"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:356
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:361
 #: apps/web/src/components/settings/account-section.tsx:427
 #: apps/web/src/components/settings/account-section.tsx:432
 msgid "Change password"
@@ -367,11 +367,11 @@ msgstr ""
 msgid "Change Password"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:262
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:267
 msgid "Change Photo"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:380
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:385
 msgid "Change Server"
 msgstr ""
 
@@ -379,7 +379,7 @@ msgstr ""
 msgid "Check configuration"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:517
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:510
 msgid "Check for updates"
 msgstr ""
 
@@ -439,7 +439,7 @@ msgid "Close"
 msgstr ""
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx:63
-#: apps/web/src/components/dashboard/stats-display.tsx:235
+#: apps/web/src/components/dashboard/stats-display.tsx:230
 #: apps/web/src/components/title-card.tsx:77
 #: apps/web/src/components/titles/status-button.tsx:30
 msgid "Completed"
@@ -478,7 +478,7 @@ msgid "Connect with {0}"
 msgstr ""
 
 #: apps/native/src/app/(auth)/server-url.tsx:197
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:475
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:471
 #: apps/web/src/components/settings/system-health-section.tsx:256
 msgid "Connected"
 msgstr ""
@@ -503,7 +503,7 @@ msgstr ""
 msgid "Connecting…"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:385
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:390
 msgid "Continue"
 msgstr ""
 
@@ -573,7 +573,7 @@ msgstr ""
 msgid "Dashboard"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:461
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:460
 #: apps/web/src/components/settings/system-health-section.tsx:229
 msgid "Database"
 msgstr ""
@@ -729,14 +729,15 @@ msgstr ""
 msgid "Episode watched"
 msgstr ""
 
+#: apps/web/src/components/dashboard/stats-display.tsx:152
 #: apps/web/src/components/settings/imports-section.tsx:780
 #: apps/web/src/components/titles/title-seasons.tsx:102
 msgid "Episodes"
 msgstr ""
 
 #: apps/web/src/components/dashboard/stats-display.tsx:162
-msgid "Episodes {periodSelect}"
-msgstr ""
+#~ msgid "Episodes {periodSelect}"
+#~ msgstr ""
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx:61
 msgid "Episodes this week"
@@ -866,7 +867,7 @@ msgstr ""
 msgid "Failed to remove from library"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:129
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:134
 #: apps/web/src/components/settings/account-section.tsx:134
 msgid "Failed to remove profile picture"
 msgstr ""
@@ -894,7 +895,7 @@ msgstr ""
 msgid "Failed to unmark some episodes"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:107
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:112
 msgid "Failed to update name"
 msgstr ""
 
@@ -904,7 +905,7 @@ msgstr ""
 msgid "Failed to update rating"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:167
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:172
 #: apps/web/src/components/settings/registration-section.tsx:44
 msgid "Failed to update registration setting"
 msgstr ""
@@ -921,7 +922,7 @@ msgstr ""
 msgid "Failed to update scheduled backup setting"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:186
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:191
 #: apps/web/src/components/settings/update-check-section.tsx:43
 msgid "Failed to update setting"
 msgstr ""
@@ -933,7 +934,7 @@ msgstr ""
 msgid "Failed to update status"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:118
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:123
 msgid "Failed to upload avatar"
 msgstr ""
 
@@ -1014,7 +1015,7 @@ msgstr ""
 msgid "Image cache"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:480
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:476
 msgid "Image Cache"
 msgstr ""
 
@@ -1074,7 +1075,7 @@ msgstr ""
 msgid "In library"
 msgstr ""
 
-#: apps/web/src/components/dashboard/stats-display.tsx:227
+#: apps/web/src/components/dashboard/stats-display.tsx:222
 msgid "In Library"
 msgstr ""
 
@@ -1119,7 +1120,8 @@ msgstr ""
 msgid "Keyboard Shortcuts"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:400
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:403
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:411
 #: apps/web/src/components/settings/language-section.tsx:26
 msgid "Language"
 msgstr ""
@@ -1239,7 +1241,7 @@ msgstr ""
 msgid "More Like This"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:545
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:538
 msgid "More Settings"
 msgstr ""
 
@@ -1251,14 +1253,15 @@ msgstr ""
 msgid "Movie"
 msgstr ""
 
+#: apps/web/src/components/dashboard/stats-display.tsx:152
 #: apps/web/src/components/people/filmography-grid.tsx:59
 #: apps/web/src/components/settings/imports-section.tsx:779
 msgid "Movies"
 msgstr ""
 
 #: apps/web/src/components/dashboard/stats-display.tsx:161
-msgid "Movies {periodSelect}"
-msgstr ""
+#~ msgid "Movies {periodSelect}"
+#~ msgstr ""
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx:60
 msgid "Movies this month"
@@ -1269,7 +1272,7 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:102
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:107
 #: apps/web/src/components/settings/account-section.tsx:80
 msgid "Name updated"
 msgstr ""
@@ -1378,7 +1381,7 @@ msgstr ""
 msgid "Open Emby, go to Settings > Webhooks"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:552
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:545
 msgid "Open in browser…"
 msgstr ""
 
@@ -1398,7 +1401,7 @@ msgstr ""
 msgid "Open Radarr, go to Settings > Import Lists"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:506
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:499
 #: apps/web/src/components/settings/registration-section.tsx:58
 msgid "Open registration"
 msgstr ""
@@ -1470,12 +1473,12 @@ msgstr ""
 msgid "Play trailer"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(explore)/index.tsx:105
+#: apps/native/src/app/(tabs)/(explore)/index.tsx:107
 #: apps/web/src/components/explore/explore-client.tsx:126
 msgid "Popular Movies"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(explore)/index.tsx:118
+#: apps/native/src/app/(tabs)/(explore)/index.tsx:120
 #: apps/web/src/components/explore/explore-client.tsx:136
 msgid "Popular TV Shows"
 msgstr ""
@@ -1488,12 +1491,12 @@ msgstr ""
 msgid "Producer"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:125
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:130
 #: apps/web/src/components/settings/account-section.tsx:130
 msgid "Profile picture removed"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:114
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:119
 #: apps/web/src/components/settings/account-section.tsx:108
 msgid "Profile picture updated"
 msgstr ""
@@ -1651,7 +1654,7 @@ msgstr ""
 msgid "Registering on {serverHost}"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:162
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:167
 #: apps/web/src/components/settings/registration-section.tsx:41
 msgid "Registration closed"
 msgstr ""
@@ -1661,7 +1664,7 @@ msgstr ""
 msgid "Registration Closed"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:162
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:167
 #: apps/web/src/components/settings/registration-section.tsx:41
 msgid "Registration opened"
 msgstr ""
@@ -1679,7 +1682,7 @@ msgstr ""
 msgid "Remove from Library"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:272
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:277
 msgid "Remove Photo"
 msgstr ""
 
@@ -1765,7 +1768,7 @@ msgstr ""
 msgid "Saturday"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:317
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:322
 msgid "Save"
 msgstr ""
 
@@ -1840,7 +1843,7 @@ msgstr ""
 msgid "Seasons"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:501
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:494
 #: apps/web/src/routes/_app/settings.tsx:129
 msgid "Security"
 msgstr ""
@@ -1853,15 +1856,15 @@ msgstr ""
 msgid "Server"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:450
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:449
 msgid "Server Health"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:375
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:380
 msgid "Server URL"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:356
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:361
 msgid "Set password"
 msgstr ""
 
@@ -1872,7 +1875,7 @@ msgstr ""
 msgid "Set your preferred quality profile and root folder"
 msgstr ""
 
-#: apps/native/src/components/header-avatar.tsx:64
+#: apps/native/src/components/header-avatar.tsx:63
 #: apps/web/src/components/nav-bar.tsx:250
 #: apps/web/src/components/nav-bar.tsx:292
 #: apps/web/src/components/settings/settings-shell.tsx:36
@@ -1925,17 +1928,17 @@ msgstr ""
 msgid "Sign in with {0}"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:363
-#: apps/native/src/components/header-avatar.tsx:90
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:368
+#: apps/native/src/components/header-avatar.tsx:87
 #: apps/web/src/components/nav-bar.tsx:262
 #: apps/web/src/components/settings/account-section.tsx:354
 msgid "Sign out"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:201
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:204
-#: apps/native/src/components/header-avatar.tsx:72
-#: apps/native/src/components/header-avatar.tsx:75
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:206
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:209
+#: apps/native/src/components/header-avatar.tsx:70
+#: apps/native/src/components/header-avatar.tsx:73
 msgid "Sign Out"
 msgstr ""
 
@@ -2047,7 +2050,7 @@ msgstr ""
 msgid "This page was left on the cutting room floor. It may have been moved, removed, or never made it past the screenplay."
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:610
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:603
 #: apps/web/src/routes/_app/settings.tsx:74
 #: apps/web/src/routes/setup.tsx:187
 msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
@@ -2147,7 +2150,7 @@ msgstr ""
 msgid "Trending today"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(explore)/index.tsx:93
+#: apps/native/src/app/(tabs)/(explore)/index.tsx:95
 #: apps/web/src/components/explore/explore-client.tsx:112
 msgid "Trending Today"
 msgstr ""
@@ -2216,7 +2219,7 @@ msgid "Up next"
 msgstr ""
 
 #. placeholder {0}: updateCheck.data.updateCheck.latestVersion
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:532
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:525
 msgid "Update available: {0}"
 msgstr ""
 
@@ -2224,12 +2227,12 @@ msgstr ""
 msgid "Update check"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:180
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:185
 #: apps/web/src/components/settings/update-check-section.tsx:40
 msgid "Update checks disabled"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:180
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:185
 #: apps/web/src/components/settings/update-check-section.tsx:40
 msgid "Update checks enabled"
 msgstr ""
@@ -2368,7 +2371,7 @@ msgstr ""
 msgid "Writer"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:381
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:386
 msgid "You'll be signed out to change the server URL."
 msgstr ""
 

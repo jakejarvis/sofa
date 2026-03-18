@@ -1,4 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { Alert, Pressable, View } from "react-native";
 import * as DropdownMenu from "zeego/dropdown-menu";
@@ -60,9 +60,7 @@ export function HeaderAvatar() {
             ios={{ name: "gear" }}
             androidIconName="ic_menu_preferences"
           />
-          <DropdownMenu.ItemTitle>
-            <Trans>Settings</Trans>
-          </DropdownMenu.ItemTitle>
+          <DropdownMenu.ItemTitle>{t`Settings`}</DropdownMenu.ItemTitle>
         </DropdownMenu.Item>
 
         <DropdownMenu.Item
@@ -86,9 +84,7 @@ export function HeaderAvatar() {
             ios={{ name: "rectangle.portrait.and.arrow.right" }}
             androidIconName="ic_menu_close_clear_cancel"
           />
-          <DropdownMenu.ItemTitle>
-            <Trans>Sign out</Trans>
-          </DropdownMenu.ItemTitle>
+          <DropdownMenu.ItemTitle>{t`Sign out`}</DropdownMenu.ItemTitle>
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu.Root>

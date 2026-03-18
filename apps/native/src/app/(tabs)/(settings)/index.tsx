@@ -1,6 +1,6 @@
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { activateLocale } from "@sofa/i18n";
+import { activateLocale, type SupportedLocale } from "@sofa/i18n";
 import { LOCALE_INFO } from "@sofa/i18n/locales";
 import {
   IconArrowUpRight,
@@ -45,6 +45,7 @@ import { SettingsSection } from "@/components/settings/settings-section";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { Image } from "@/components/ui/image";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
+import { SelectModal } from "@/components/ui/select-modal";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
@@ -72,7 +73,11 @@ export default function SettingsScreen() {
     if (!isEditingName && session?.user?.name) setNameInput(session.user.name);
   }, [session?.user?.name, isEditingName]);
 
+  const [languageModalOpen, setLanguageModalOpen] = useState(false);
+  const languageLabel =
+    LOCALE_INFO.find((o) => o.code === i18n.locale)?.nativeName ?? i18n.locale;
   const [analyticsEnabled, setAnalyticsToggle] = useState(isAnalyticsEnabled);
+
   const isAdmin = session?.user?.role === "admin";
   const serverUrl = getServerUrl();
 
@@ -394,33 +399,28 @@ export default function SettingsScreen() {
               );
             }}
           />
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger>
-              <SettingsRow
-                label={t`Language`}
-                value={
-                  LOCALE_INFO.find((l) => l.code === i18n.locale)?.nativeName ??
-                  "English"
-                }
-                icon={IconLanguage}
-              />
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content>
-              {LOCALE_INFO.map((info) => (
-                <DropdownMenu.Item
-                  key={info.code}
-                  onSelect={async () => {
-                    await activateLocale(info.code);
-                    setPersistedLocale(info.code);
-                  }}
-                >
-                  <DropdownMenu.ItemTitle>
-                    {`${info.nativeName}${info.code === i18n.locale ? " ✓" : ""}`}
-                  </DropdownMenu.ItemTitle>
-                </DropdownMenu.Item>
-              ))}
-            </DropdownMenu.Content>
-          </DropdownMenu.Root>
+          <SettingsRow
+            label={t`Language`}
+            value={languageLabel}
+            icon={IconLanguage}
+            onPress={() => setLanguageModalOpen(true)}
+          />
+          <SelectModal
+            open={languageModalOpen}
+            onOpenChange={setLanguageModalOpen}
+            label={t`Language`}
+            icon={IconLanguage}
+            selection={i18n.locale}
+            options={LOCALE_INFO.map((info) => ({
+              value: info.code,
+              label: info.nativeName,
+            }))}
+            onSelect={(locale) => {
+              setPersistedLocale(locale as SupportedLocale);
+              activateLocale(locale as SupportedLocale);
+              setLanguageModalOpen(false);
+            }}
+          />
           <SettingsRow
             label={t`Anonymous usage reporting`}
             icon={IconChartBar}
@@ -461,10 +461,7 @@ export default function SettingsScreen() {
                   label={t`Database`}
                   value={
                     systemHealth.data?.database
-                      ? plural(systemHealth.data.database.titleCount, {
-                          one: "# title",
-                          other: "# titles",
-                        })
+                      ? t`${plural(systemHealth.data.database.titleCount, { one: "# title", other: "# titles" })}`
                       : "—"
                   }
                   icon={IconDatabase}
@@ -480,10 +477,7 @@ export default function SettingsScreen() {
                   label={t`Image Cache`}
                   value={
                     systemHealth.data?.imageCache
-                      ? plural(systemHealth.data.imageCache.imageCount, {
-                          one: "# image",
-                          other: "# images",
-                        })
+                      ? t`${plural(systemHealth.data.imageCache.imageCount, { one: "# image", other: "# images" })}`
                       : "—"
                   }
                   icon={IconPhoto}

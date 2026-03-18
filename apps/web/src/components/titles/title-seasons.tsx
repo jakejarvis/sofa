@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import type { Season } from "@sofa/api/schemas";
+import { formatShortDate } from "@sofa/i18n/format";
 import {
   IconCheck,
   IconChecks,
@@ -7,7 +8,6 @@ import {
   IconChevronUp,
   IconDeviceTvOld,
 } from "@tabler/icons-react";
-import { format, parseISO } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 
 import { useEffect, useMemo, useState } from "react";
@@ -341,9 +341,7 @@ export function TitleSeasons({
                                 </span>
                               </p>
                               <p className="text-muted-foreground text-xs">
-                                {ep.airDate
-                                  ? format(parseISO(ep.airDate), "MMM d, yyyy")
-                                  : ""}
+                                {ep.airDate ? formatShortDate(ep.airDate) : ""}
                                 {ep.airDate && ep.runtimeMinutes ? " · " : ""}
                                 {ep.runtimeMinutes
                                   ? `${ep.runtimeMinutes}m`

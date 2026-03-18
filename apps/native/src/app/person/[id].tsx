@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
+import { formatDate } from "@sofa/i18n/format";
 import {
   IconAlertTriangle,
   IconCalendar,
@@ -9,8 +10,6 @@ import {
   IconUser,
 } from "@tabler/icons-react-native";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { format } from "date-fns/format";
-import { parseISO } from "date-fns/parseISO";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
 import {
@@ -301,7 +300,7 @@ export default function PersonDetailScreen() {
                   color={primaryColor}
                 />
                 <Text selectable className="text-muted-foreground text-sm">
-                  {format(parseISO(person.birthday), "MMMM d, yyyy")}
+                  {formatDate(person.birthday)}
                   {(() => {
                     const age = calculateAge(person.birthday, person.deathday);
                     return person.deathday

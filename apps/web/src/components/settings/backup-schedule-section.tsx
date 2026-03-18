@@ -1,9 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { BackupFrequency } from "@sofa/api/schemas";
-import { formatRelativeTime } from "@sofa/i18n/format";
+import { formatDate, formatRelativeTime } from "@sofa/i18n/format";
 import { IconCalendarWeek } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -400,7 +399,7 @@ export function BackupScheduleSection() {
                           <SelectValue>
                             {(value: string | null) =>
                               value
-                                ? format(
+                                ? formatDate(
                                     new Date(
                                       2000,
                                       0,
@@ -408,7 +407,13 @@ export function BackupScheduleSection() {
                                       Number(value.split(":")[0]),
                                       0,
                                     ),
-                                    "h:mm a",
+                                    {
+                                      hour: "numeric",
+                                      minute: "2-digit",
+                                      year: undefined,
+                                      month: undefined,
+                                      day: undefined,
+                                    },
                                   )
                                 : null
                             }
@@ -423,7 +428,13 @@ export function BackupScheduleSection() {
                             const val = `${String(h).padStart(2, "0")}:00`;
                             return (
                               <SelectItem key={h} value={val}>
-                                {format(new Date(2000, 0, 1, h, 0), "h:mm a")}
+                                {formatDate(new Date(2000, 0, 1, h, 0), {
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                  year: undefined,
+                                  month: undefined,
+                                  day: undefined,
+                                })}
                               </SelectItem>
                             );
                           })}

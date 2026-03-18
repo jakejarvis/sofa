@@ -2,6 +2,11 @@ import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import type { BackupInfo } from "@sofa/api/schemas";
 import {
+  formatBytes as formatBytesI18n,
+  formatDate,
+  formatRelativeTime,
+} from "@sofa/i18n/format";
+import {
   IconClock,
   IconCloudDownload,
   IconDatabaseExport,
@@ -11,7 +16,6 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { format, formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -36,14 +40,13 @@ import {
 } from "@/components/ui/tooltip";
 import { orpc } from "@/lib/orpc/client";
 
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 function formatBackupDate(dateStr: string): string {
-  return format(new Date(dateStr), "MMM d, h:mm a");
+  return formatDate(dateStr, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 export function BackupSection() {
@@ -185,15 +188,13 @@ export function BackupSection() {
                           {formatBackupDate(backup.createdAt)}
                         </span>
                         <span className="text-[11px] text-muted-foreground">
-                          {formatBytes(backup.sizeBytes)}
+                          {formatBytesI18n(backup.sizeBytes)}
                         </span>
                         <span
                           className="text-[11px] text-muted-foreground/50"
                           suppressHydrationWarning
                         >
-                          {formatDistanceToNow(new Date(backup.createdAt), {
-                            addSuffix: true,
-                          })}
+                          {formatRelativeTime(backup.createdAt)}
                         </span>
                       </div>
                     </div>

@@ -14,6 +14,18 @@ config.transformer = {
 config.resolver = {
   ...config.resolver,
   sourceExts: [...config.resolver.sourceExts, "po", "pot"],
+  // Use pre-compiled ICU message parser for smaller bundles
+  // https://formatjs.github.io/docs/guides/react-native-hermes
+  resolveRequest(context, moduleName, platform) {
+    if (moduleName === "@formatjs/icu-messageformat-parser") {
+      return context.resolveRequest(
+        context,
+        "@formatjs/icu-messageformat-parser/no-parser",
+        platform,
+      );
+    }
+    return context.resolveRequest(context, moduleName, platform);
+  },
 };
 
 module.exports = withUniwindConfig(wrapWithReanimatedMetroConfig(config), {

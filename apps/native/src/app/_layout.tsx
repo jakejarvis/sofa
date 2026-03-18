@@ -1,3 +1,4 @@
+import "@/lib/intl-polyfills";
 import "@/global.css";
 import { I18nProvider } from "@lingui/react";
 import { ThemeProvider } from "@react-navigation/native";
@@ -19,6 +20,7 @@ import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";
 import { useEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableFreeze } from "react-native-screens";
 import { Uniwind, useResolveClassNames } from "uniwind";
 import { OfflineBanner } from "@/components/ui/offline-banner";
@@ -71,7 +73,9 @@ function AppContent() {
   const [isLocaleReady, setLocaleReady] = useState(false);
 
   useEffect(() => {
-    localeReady.then(() => setLocaleReady(true));
+    localeReady
+      .then(() => setLocaleReady(true))
+      .catch(() => setLocaleReady(true));
   }, []);
 
   // --- App Tracking Transparency (must resolve before screen tracking) ---
@@ -228,11 +232,13 @@ export default function RootLayout() {
   const inner = (
     <I18nProvider i18n={i18n}>
       <QueryProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <KeyboardProvider>
-            <AppContent />
-          </KeyboardProvider>
-        </GestureHandlerRootView>
+        <SafeAreaProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <KeyboardProvider>
+              <AppContent />
+            </KeyboardProvider>
+          </GestureHandlerRootView>
+        </SafeAreaProvider>
       </QueryProvider>
     </I18nProvider>
   );

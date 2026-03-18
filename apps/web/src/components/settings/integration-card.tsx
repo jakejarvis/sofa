@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { formatRelativeTime } from "@sofa/i18n/format";
 import {
   IconBook2,
   IconCheck,
@@ -9,7 +10,6 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
-import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import type { ComponentType, ReactNode } from "react";
 import { useState } from "react";
@@ -326,13 +326,13 @@ export function IntegrationCard({
 /** Status line for webhook integrations (shows last event time). */
 export function webhookStatus(lastEventAt: string | null): string {
   return lastEventAt
-    ? `Last event ${formatDistanceToNow(new Date(lastEventAt), { addSuffix: true })}`
+    ? `Last event ${formatRelativeTime(lastEventAt)}`
     : "Ready \u2014 nothing received yet";
 }
 
 /** Status line for list integrations (shows last event time). */
 export function listStatus(lastEventAt: string | null): string {
   return lastEventAt
-    ? `Last polled ${formatDistanceToNow(new Date(lastEventAt), { addSuffix: true })}`
+    ? `Last polled ${formatRelativeTime(lastEventAt)}`
     : "Ready \u2014 not polled yet";
 }
