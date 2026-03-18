@@ -6,4 +6,7 @@ preserve_hierarchy: true
 files:
   - source: /packages/i18n/src/po/en.po
     translation: /packages/i18n/src/po/%two_letters_code%.po
-    type: po
+    languages_mapping:
+      two_letters_code:
+        es-ES: es
+        pt-PT: pt
