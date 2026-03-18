@@ -1,15 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
-import type { UpdateCheckResult } from "@sofa/api/schemas";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { toast } from "sonner";
+
 import { updateToastDismissedVersionAtom } from "@/lib/atoms/update-check";
+import type { UpdateCheckResult } from "@sofa/api/schemas";
 
 export function UpdateToast({ data }: { data: UpdateCheckResult | null }) {
   const { t } = useLingui();
-  const [dismissedVersion, setDismissedVersion] = useAtom(
-    updateToastDismissedVersionAtom,
-  );
+  const [dismissedVersion, setDismissedVersion] = useAtom(updateToastDismissedVersionAtom);
 
   useEffect(() => {
     if (!data?.updateAvailable) return;

@@ -1,8 +1,4 @@
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export function GenreCollapse({ genres }: { genres: string[] }) {
   if (genres.length === 0) return null;
@@ -18,17 +14,14 @@ export function GenreCollapse({ genres }: { genres: string[] }) {
           openOnHover
           delay={0}
           closeDelay={300}
-          className="cursor-default text-muted-foreground/70 transition-colors hover:text-muted-foreground"
+          className="text-muted-foreground/70 hover:text-muted-foreground cursor-default transition-colors"
           aria-label={`${remaining.length} more genre${remaining.length > 1 ? "s" : ""}`}
         >
           +{remaining.length}
         </PopoverTrigger>
-        <PopoverContent className="flex w-auto min-w-28 max-w-48 flex-col gap-0 p-1">
+        <PopoverContent className="flex w-auto max-w-48 min-w-28 flex-col gap-0 p-1">
           {remaining.map((genre) => (
-            <span
-              key={genre}
-              className="px-2 py-1 text-[13px] text-popover-foreground"
-            >
+            <span key={genre} className="text-popover-foreground px-2 py-1 text-[13px]">
               {genre}
             </span>
           ))}

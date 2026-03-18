@@ -8,6 +8,7 @@ import { Pressable, type TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
 import { z } from "zod";
+
 import { AuthScreen } from "@/components/auth-screen";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
@@ -22,11 +23,7 @@ import { getFormErrors } from "@/utils/form-errors";
 import * as Haptics from "@/utils/haptics";
 
 const signInSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, "Email is required")
-    .email("Enter a valid email address"),
+  email: z.string().trim().min(1, "Email is required").email("Enter a valid email address"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -68,9 +65,7 @@ export default function LoginScreen() {
   const isSubmitting = useStore(form.store, (s) => s.isSubmitting);
   const busy = isSubmitting || isSignedIn;
 
-  const statusCompletedColor = useCSSVariable(
-    "--color-status-completed",
-  ) as string;
+  const statusCompletedColor = useCSSVariable("--color-status-completed") as string;
   const serverHost = splitUrl(getServerUrl()).host;
 
   const showPasswordLogin = !authConfig.data?.passwordLoginDisabled;
@@ -90,10 +85,7 @@ export default function LoginScreen() {
   return (
     <AuthScreen title="Sofa" subtitle={t`Sign in to continue`}>
       {showOidc && (
-        <Animated.View
-          entering={FadeInDown.duration(300).delay(100)}
-          className="mb-4"
-        >
+        <Animated.View entering={FadeInDown.duration(300).delay(100)} className="mb-4">
           <Button
             onPress={() => {
               authClient.signIn.oauth2({
@@ -105,19 +97,17 @@ export default function LoginScreen() {
             className="w-full"
           >
             <ButtonLabel>
-              <Trans>
-                Sign in with {authConfig.data?.oidcProviderName ?? "SSO"}
-              </Trans>
+              <Trans>Sign in with {authConfig.data?.oidcProviderName ?? "SSO"}</Trans>
             </ButtonLabel>
           </Button>
 
           {showPasswordLogin && (
             <View className="my-4 flex-row items-center">
-              <View className="h-px flex-1 bg-border" />
-              <Text className="px-3 text-muted-foreground text-xs">
+              <View className="bg-border h-px flex-1" />
+              <Text className="text-muted-foreground px-3 text-xs">
                 <Trans>OR</Trans>
               </Text>
-              <View className="h-px flex-1 bg-border" />
+              <View className="bg-border h-px flex-1" />
             </View>
           )}
         </Animated.View>
@@ -148,11 +138,7 @@ export default function LoginScreen() {
                     returnKeyType="next"
                     blurOnSubmit={false}
                     onSubmitEditing={() => passwordRef.current?.focus()}
-                    className={
-                      errorFields.has("email")
-                        ? "border-destructive"
-                        : undefined
-                    }
+                    className={errorFields.has("email") ? "border-destructive" : undefined}
                   />
                 </TextField>
               )}
@@ -181,11 +167,7 @@ export default function LoginScreen() {
                     textContentType="password"
                     returnKeyType="go"
                     onSubmitEditing={form.handleSubmit}
-                    className={
-                      errorFields.has("password")
-                        ? "border-destructive"
-                        : undefined
-                    }
+                    className={errorFields.has("password") ? "border-destructive" : undefined}
                   />
                 </TextField>
               )}
@@ -193,11 +175,7 @@ export default function LoginScreen() {
           </Animated.View>
 
           <Animated.View entering={FadeInDown.duration(300).delay(400)}>
-            <Button
-              onPress={form.handleSubmit}
-              disabled={busy}
-              className="mt-2"
-            >
+            <Button onPress={form.handleSubmit} disabled={busy} className="mt-2">
               {busy ? (
                 <Spinner size="sm" />
               ) : (
@@ -220,10 +198,7 @@ export default function LoginScreen() {
             </Animated.View>
           )}
 
-          <Animated.View
-            entering={FadeIn.duration(300).delay(500)}
-            className="mt-8 items-center"
-          >
+          <Animated.View entering={FadeIn.duration(300).delay(500)} className="mt-8 items-center">
             <Link href="/(auth)/server-url" replace asChild>
               <Pressable
                 disabled={busy}
@@ -231,16 +206,10 @@ export default function LoginScreen() {
                 accessibilityState={{ disabled: busy }}
                 className="flex-row items-center gap-1.5"
               >
-                <ScaledIcon
-                  icon={IconServer2}
-                  size={14}
-                  color={statusCompletedColor}
-                />
-                <Text className="font-sans text-muted-foreground text-xs">
+                <ScaledIcon icon={IconServer2} size={14} color={statusCompletedColor} />
+                <Text className="text-muted-foreground font-sans text-xs">
                   <Trans>
-                    Connected to{" "}
-                    <Text className="font-medium">{serverHost}</Text>. Tap to
-                    change.
+                    Connected to <Text className="font-medium">{serverHost}</Text>. Tap to change.
                   </Trans>
                 </Text>
               </Pressable>

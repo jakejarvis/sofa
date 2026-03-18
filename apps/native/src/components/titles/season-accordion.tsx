@@ -12,6 +12,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
+
 import { EpisodeRow } from "@/components/titles/episode-row";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
@@ -42,9 +43,7 @@ export function SeasonAccordion({
   const reduceMotion = useReducedMotion();
   const [expanded, setExpanded] = useState(false);
   const chevronRotation = useSharedValue(0);
-  const watchedCount = episodes.filter((e) =>
-    watchedEpisodeIds.has(e.id),
-  ).length;
+  const watchedCount = episodes.filter((e) => watchedEpisodeIds.has(e.id)).length;
   const progress = episodes.length > 0 ? watchedCount / episodes.length : 0;
 
   // Progressive rendering: show first batch immediately, defer rest
@@ -67,11 +66,7 @@ export function SeasonAccordion({
 
   useEffect(() => {
     chevronRotation.set(
-      reduceMotion
-        ? expanded
-          ? 180
-          : 0
-        : withTiming(expanded ? 180 : 0, { duration: 200 }),
+      reduceMotion ? (expanded ? 180 : 0) : withTiming(expanded ? 180 : 0, { duration: 200 }),
     );
   }, [expanded, chevronRotation, reduceMotion]);
 
@@ -83,15 +78,11 @@ export function SeasonAccordion({
     toasts: {
       watchEpisode: ({ id: epId }) => {
         const ep = episodes.find((e) => e.id === epId);
-        return ep
-          ? `Watched S${season.seasonNumber} E${ep.episodeNumber}`
-          : "Episode watched";
+        return ep ? `Watched S${season.seasonNumber} E${ep.episodeNumber}` : "Episode watched";
       },
       unwatchEpisode: ({ id: epId }) => {
         const ep = episodes.find((e) => e.id === epId);
-        return ep
-          ? `Unwatched S${season.seasonNumber} E${ep.episodeNumber}`
-          : "Episode unwatched";
+        return ep ? `Unwatched S${season.seasonNumber} E${ep.episodeNumber}` : "Episode unwatched";
       },
       watchSeason: `Watched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
     },
@@ -110,7 +101,7 @@ export function SeasonAccordion({
 
   return (
     <View
-      className="mb-2 overflow-hidden rounded-xl border bg-card"
+      className="bg-card mb-2 overflow-hidden rounded-xl border"
       style={{
         borderColor: "rgba(255,255,255,0.06)",
         borderCurve: "continuous",
@@ -124,10 +115,10 @@ export function SeasonAccordion({
         className="flex-row items-center justify-between p-4"
       >
         <View className="flex-1">
-          <Text className="font-medium font-sans text-base text-foreground">
+          <Text className="text-foreground font-sans text-base font-medium">
             {season.name ?? t`Season ${season.seasonNumber}`}
           </Text>
-          <Text className="mt-0.5 text-muted-foreground text-xs">
+          <Text className="text-muted-foreground mt-0.5 text-xs">
             {t`${watchedCount}/${episodes.length} ${plural(episodes.length, { one: "episode", other: "episodes" })}`}
           </Text>
         </View>
@@ -151,16 +142,13 @@ export function SeasonAccordion({
       </Pressable>
 
       {expanded && (
-        <Animated.View
-          entering={FadeIn.duration(200)}
-          exiting={FadeOut.duration(150)}
-        >
+        <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(150)}>
           {watchedCount < episodes.length && (
             <Pressable
               onPress={() => watchSeason.mutate({ id: season.id })}
-              className="mx-4 mb-2 flex-row items-center justify-center rounded-lg bg-secondary py-2"
+              className="bg-secondary mx-4 mb-2 flex-row items-center justify-center rounded-lg py-2"
             >
-              <Text className="font-medium font-sans text-title-accent text-xs">
+              <Text className="text-title-accent font-sans text-xs font-medium">
                 <Trans>Mark All Watched</Trans>
               </Text>
             </Pressable>

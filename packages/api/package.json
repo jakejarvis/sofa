@@ -10,8 +10,9 @@
     "./utils": "./src/utils.ts"
   },
   "scripts": {
-    "lint": "biome check",
-    "format": "biome format --write",
+    "lint": "oxlint",
+    "format": "oxfmt --config ../../.oxfmtrc.json",
+    "format:check": "oxfmt --check --config ../../.oxfmtrc.json",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {

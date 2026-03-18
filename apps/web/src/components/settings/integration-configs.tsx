@@ -1,13 +1,9 @@
 import { Trans } from "@lingui/react/macro";
 import { IconExternalLink, IconInfoCircle } from "@tabler/icons-react";
+
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  EmbyIcon,
-  JellyfinIcon,
-  PlexIcon,
-  RadarrIcon,
-  SonarrIcon,
-} from "./icons";
+
+import { EmbyIcon, JellyfinIcon, PlexIcon, RadarrIcon, SonarrIcon } from "./icons";
 import type { IntegrationConfig } from "./integration-card";
 import { listStatus, webhookStatus } from "./integration-card";
 
@@ -18,11 +14,9 @@ function origin() {
 /** Reusable alert banner for integrations that require a subscription. */
 function RequirementAlert({ children }: { children: React.ReactNode }) {
   return (
-    <Alert className="gap-0 border-primary/20 bg-primary/5 [&>svg]:text-primary">
+    <Alert className="border-primary/20 bg-primary/5 [&>svg]:text-primary gap-0">
       <IconInfoCircle aria-hidden={true} className="inline-block size-3.5" />
-      <AlertDescription className="text-foreground/80">
-        {children}
-      </AlertDescription>
+      <AlertDescription className="text-foreground/80">{children}</AlertDescription>
     </Alert>
   );
 }
@@ -44,7 +38,7 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
             href="https://www.plex.tv/plex-pass/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+            className="text-foreground inline-flex items-center gap-0.5 font-medium underline-offset-2 hover:underline"
           >
             Plex Pass
             <IconExternalLink
@@ -65,7 +59,7 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
               href="https://app.plex.tv/desktop/#!/settings/webhooks"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+              className="text-foreground inline-flex items-center gap-0.5 font-medium underline-offset-2 hover:underline"
             >
               Settings &gt; Webhooks
               <IconExternalLink
@@ -77,15 +71,13 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
         </li>
         <li>
           <Trans>
-            Click{" "}
-            <span className="font-medium text-foreground">Add Webhook</span> and
-            paste the URL above
+            Click <span className="text-foreground font-medium">Add Webhook</span> and paste the URL
+            above
           </Trans>
         </li>
         <li>
           <Trans>
-            Sofa will automatically log movies and episodes when you finish
-            watching them
+            Sofa will automatically log movies and episodes when you finish watching them
           </Trans>
         </li>
       </>
@@ -108,7 +100,7 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
               href="https://github.com/jellyfin/jellyfin-plugin-webhook/tree/master"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+              className="text-foreground inline-flex items-center gap-0.5 font-medium underline-offset-2 hover:underline"
             >
               Webhook plugin
               <IconExternalLink
@@ -122,31 +114,24 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
         <li>
           <Trans>
             Go to{" "}
-            <span className="font-medium text-foreground">
-              Dashboard &gt; Plugins &gt; Webhook
-            </span>
+            <span className="text-foreground font-medium">Dashboard &gt; Plugins &gt; Webhook</span>
           </Trans>
         </li>
         <li>
           <Trans>
-            Add a{" "}
-            <span className="font-medium text-foreground">
-              Generic Destination
-            </span>{" "}
-            and paste the URL above
+            Add a <span className="text-foreground font-medium">Generic Destination</span> and paste
+            the URL above
           </Trans>
         </li>
         <li>
           <Trans>
-            Enable the{" "}
-            <span className="font-medium text-foreground">Playback Stop</span>{" "}
+            Enable the <span className="text-foreground font-medium">Playback Stop</span>{" "}
             notification type
           </Trans>
         </li>
         <li>
           <Trans>
-            Sofa will automatically log movies and episodes when you finish
-            watching them
+            Sofa will automatically log movies and episodes when you finish watching them
           </Trans>
         </li>
       </>
@@ -163,16 +148,13 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
     alert: (
       <RequirementAlert>
         <Trans>
-          Requires{" "}
-          <span className="font-medium text-foreground">
-            Emby Server 4.7.9+
-          </span>{" "}
-          and an active{" "}
+          Requires <span className="text-foreground font-medium">Emby Server 4.7.9+</span> and an
+          active{" "}
           <a
             href="https://emby.media/premiere.html"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+            className="text-foreground inline-flex items-center gap-0.5 font-medium underline-offset-2 hover:underline"
           >
             Emby Premiere
             <IconExternalLink
@@ -189,9 +171,7 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
         <li>
           <Trans>
             Open Emby, go to{" "}
-            <span className="font-medium text-foreground">
-              Settings &gt; Webhooks
-            </span>
+            <span className="text-foreground font-medium">Settings &gt; Webhooks</span>
           </Trans>
         </li>
         <li>
@@ -199,15 +179,12 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
         </li>
         <li>
           <Trans>
-            Enable the{" "}
-            <span className="font-medium text-foreground">Playback</span> event
-            category
+            Enable the <span className="text-foreground font-medium">Playback</span> event category
           </Trans>
         </li>
         <li>
           <Trans>
-            Sofa will automatically log movies and episodes when you finish
-            watching them
+            Sofa will automatically log movies and episodes when you finish watching them
           </Trans>
         </li>
       </>
@@ -228,16 +205,13 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
         <li>
           <Trans>
             Open Sonarr, go to{" "}
-            <span className="font-medium text-foreground">
-              Settings &gt; Import Lists
-            </span>
+            <span className="text-foreground font-medium">Settings &gt; Import Lists</span>
           </Trans>
         </li>
         <li>
           <Trans>
-            Click <span className="font-medium text-foreground">+</span> and
-            select{" "}
-            <span className="font-medium text-foreground">Custom Lists</span>
+            Click <span className="text-foreground font-medium">+</span> and select{" "}
+            <span className="text-foreground font-medium">Custom Lists</span>
           </Trans>
         </li>
         <li>
@@ -248,8 +222,8 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
         </li>
         <li>
           <Trans>
-            Titles on your Sofa watchlist will be automatically added for
-            download when Sonarr polls this list (every 6 hours by default)
+            Titles on your Sofa watchlist will be automatically added for download when Sonarr polls
+            this list (every 6 hours by default)
           </Trans>
         </li>
       </>
@@ -268,16 +242,13 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
         <li>
           <Trans>
             Open Radarr, go to{" "}
-            <span className="font-medium text-foreground">
-              Settings &gt; Import Lists
-            </span>
+            <span className="text-foreground font-medium">Settings &gt; Import Lists</span>
           </Trans>
         </li>
         <li>
           <Trans>
-            Click <span className="font-medium text-foreground">+</span> and
-            select{" "}
-            <span className="font-medium text-foreground">Custom Lists</span>
+            Click <span className="text-foreground font-medium">+</span> and select{" "}
+            <span className="text-foreground font-medium">Custom Lists</span>
           </Trans>
         </li>
         <li>
@@ -288,8 +259,8 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
         </li>
         <li>
           <Trans>
-            Titles on your Sofa watchlist will be automatically added for
-            download when Radarr polls this list (every 12 hours by default)
+            Titles on your Sofa watchlist will be automatically added for download when Radarr polls
+            this list (every 12 hours by default)
           </Trans>
         </li>
       </>

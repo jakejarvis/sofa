@@ -1,17 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
 import { IconPlayerPlay } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
+
 import { orpc } from "@/lib/orpc/client";
-import {
-  ContinueWatchingList,
-  ContinueWatchingSectionSkeleton,
-} from "./continue-watching-list";
+
+import { ContinueWatchingList, ContinueWatchingSectionSkeleton } from "./continue-watching-list";
 import { FeedSection } from "./feed-section";
 
 export function ContinueWatchingSection() {
-  const { data, isPending } = useQuery(
-    orpc.dashboard.continueWatching.queryOptions(),
-  );
+  const { data, isPending } = useQuery(orpc.dashboard.continueWatching.queryOptions());
 
   const { t } = useLingui();
 
@@ -23,7 +20,7 @@ export function ContinueWatchingSection() {
   return (
     <FeedSection
       title={t`Continue Watching`}
-      icon={<IconPlayerPlay className="size-5 text-primary" />}
+      icon={<IconPlayerPlay className="text-primary size-5" />}
     >
       <ContinueWatchingList items={items} />
     </FeedSection>

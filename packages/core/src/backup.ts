@@ -2,6 +2,7 @@ import { Database } from "bun:sqlite";
 import { renameSync, unlinkSync } from "node:fs";
 import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
+
 import { BACKUP_DIR, DATABASE_URL } from "@sofa/config";
 import { closeDatabase, db } from "@sofa/db/client";
 import { sql } from "@sofa/db/helpers";
@@ -16,10 +17,8 @@ function formatTimestamp(date: Date): string {
 const log = createLogger("backup");
 
 const MANUAL_PATTERN = /^sofa-manual-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
-const SCHEDULED_PATTERN =
-  /^sofa-scheduled-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
-const PRE_RESTORE_PATTERN =
-  /^pre-restore-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
+const SCHEDULED_PATTERN = /^sofa-scheduled-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
+const PRE_RESTORE_PATTERN = /^pre-restore-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
 
 export type BackupSource = "manual" | "scheduled" | "pre-restore";
 type BackupPrefix = "sofa-manual" | "sofa-scheduled" | "pre-restore";
@@ -104,10 +103,7 @@ function validateBackupDatabase(filePath: string): void {
     const integrityRows = testDb.query("PRAGMA integrity_check").all() as {
       integrity_check: string;
     }[];
-    if (
-      integrityRows.length === 0 ||
-      integrityRows.some((row) => row.integrity_check !== "ok")
-    ) {
+    if (integrityRows.length === 0 || integrityRows.some((row) => row.integrity_check !== "ok")) {
       throw new Error("Database integrity check failed");
     }
 
@@ -116,15 +112,13 @@ function validateBackupDatabase(filePath: string): void {
       throw new Error("Database foreign key check failed");
     }
 
-    const tableRows = testDb
-      .query("SELECT name FROM sqlite_master WHERE type='table'")
-      .all() as { name: string }[];
+    const tableRows = testDb.query("SELECT name FROM sqlite_master WHERE type='table'").all() as {
+      name: string;
+    }[];
     const tableSet = new Set(tableRows.map((row) => row.name));
     const missing = REQUIRED_TABLES.filter((table) => !tableSet.has(table));
     if (missing.length > 0) {
-      throw new Error(
-        `Invalid backup: missing required tables (${missing.join(", ")})`,
-      );
+      throw new Error(`Invalid backup: missing required tables (${missing.join(", ")})`);
     }
   } finally {
     testDb.close();
@@ -134,9 +128,7 @@ function validateBackupDatabase(filePath: string): void {
 /** @internal */
 export function isValidBackupFilename(filename: string): boolean {
   const base = path.basename(filename);
-  return (
-    base === filename && !filename.includes("..") && isKnownBackup(filename)
-  );
+  return base === filename && !filename.includes("..") && isKnownBackup(filename);
 }
 
 async function createBackupInternal(prefix: BackupPrefix): Promise<BackupInfo> {
@@ -160,9 +152,7 @@ async function createBackupInternal(prefix: BackupPrefix): Promise<BackupInfo> {
   };
 }
 
-export async function createBackup(
-  prefix: BackupPrefix = "sofa-manual",
-): Promise<BackupInfo> {
+export async function createBackup(prefix: BackupPrefix = "sofa-manual"): Promise<BackupInfo> {
   return withBackupLock(async () => createBackupInternal(prefix));
 }
 
@@ -182,9 +172,7 @@ export async function listBackups(): Promise<BackupInfo[]> {
     });
   }
 
-  return results.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
+  return results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 async function deleteBackupInternal(filename: string): Promise<void> {
@@ -218,9 +206,7 @@ export async function readBackupFile(filename: string): Promise<Buffer | null> {
   return Buffer.from(await Bun.file(filePath).arrayBuffer());
 }
 
-export async function restoreFromBackup(
-  source: Buffer | string,
-): Promise<void> {
+export async function restoreFromBackup(source: Buffer | string): Promise<void> {
   await withBackupLock(async () => {
     await ensureBackupDir();
 
@@ -228,10 +214,7 @@ export async function restoreFromBackup(
     await mkdir(dbDir, { recursive: true });
 
     const timestamp = formatTimestamp(new Date());
-    const tempPath = path.join(
-      dbDir,
-      `.restore-temp-${timestamp}-${crypto.randomUUID()}.db`,
-    );
+    const tempPath = path.join(dbDir, `.restore-temp-${timestamp}-${crypto.randomUUID()}.db`);
 
     try {
       if (typeof source === "string") {
@@ -263,9 +246,7 @@ export async function restoreFromBackup(
 
 export async function pruneBackups(maxKeep: number): Promise<void> {
   await withBackupLock(async () => {
-    const backups = (await listBackups()).filter((b) =>
-      SCHEDULED_PATTERN.test(b.filename),
-    );
+    const backups = (await listBackups()).filter((b) => SCHEDULED_PATTERN.test(b.filename));
 
     if (maxKeep === 0 || backups.length <= maxKeep) return;
 

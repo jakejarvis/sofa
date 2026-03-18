@@ -1,5 +1,6 @@
 import { eventIterator, oc } from "@orpc/contract";
 import { z } from "zod";
+
 import { AppErrorCode, appErrorData } from "./errors";
 import {
   AuthConfigOutput,
@@ -73,8 +74,7 @@ export const contract = {
         summary: "Get title details",
         description:
           "Fetch full title metadata including seasons, cast, and streaming availability. Imports from TMDB on first access if not yet cached locally.",
-        successDescription:
-          "Full title with seasons, cast, and availability offers",
+        successDescription: "Full title with seasons, cast, and availability offers",
       })
       .input(IdParam)
       .output(TitleDetailOutput)
@@ -101,8 +101,7 @@ export const contract = {
         path: "/titles/{id}/rating",
         tags: ["Titles"],
         summary: "Rate a title",
-        description:
-          "Set a 0-5 star rating for a title. Use 0 to clear the rating.",
+        description: "Set a 0-5 star rating for a title. Use 0 to clear the rating.",
       })
       .input(UpdateRatingInput)
       .output(z.void()),
@@ -112,8 +111,7 @@ export const contract = {
         path: "/titles/{id}/watch",
         tags: ["Titles"],
         summary: "Mark movie as watched",
-        description:
-          "Log a watch event for a movie. Automatically sets status to completed.",
+        description: "Log a watch event for a movie. Automatically sets status to completed.",
       })
       .input(IdParam)
       .output(z.void()),
@@ -136,8 +134,7 @@ export const contract = {
         summary: "Get user's title info",
         description:
           "Fetch the current user's tracking status, rating, and watched episode IDs for a title.",
-        successDescription:
-          "User's status, rating, and list of watched episode IDs",
+        successDescription: "User's status, rating, and list of watched episode IDs",
       })
       .input(IdParam)
       .output(UserInfoOutput),
@@ -161,8 +158,7 @@ export const contract = {
         summary: "Quick add title to library",
         description:
           "Add a title to the user's watchlist and trigger a full TMDB import if needed. If the title already exists in the user's library, returns alreadyAdded: true.",
-        successDescription:
-          "Title ID and whether it was already in the library",
+        successDescription: "Title ID and whether it was already in the library",
       })
       .input(IdParam)
       .output(QuickAddOutput)
@@ -213,8 +209,7 @@ export const contract = {
         path: "/seasons/{id}/watch",
         tags: ["Seasons"],
         summary: "Mark season watched",
-        description:
-          "Mark all episodes in a season as watched in a single operation.",
+        description: "Mark all episodes in a season as watched in a single operation.",
       })
       .input(IdParam)
       .output(z.void()),
@@ -224,8 +219,7 @@ export const contract = {
         path: "/seasons/{id}/unwatch",
         tags: ["Seasons"],
         summary: "Mark season unwatched",
-        description:
-          "Remove all watch records for episodes in a season in a single operation.",
+        description: "Remove all watch records for episodes in a season in a single operation.",
       })
       .input(IdParam)
       .output(z.void()),
@@ -271,8 +265,7 @@ export const contract = {
         summary: "Get continue watching list",
         description:
           "Fetch TV shows the user is currently watching, with the next unwatched episode and progress for each.",
-        successDescription:
-          "In-progress shows with next episode and watch progress",
+        successDescription: "In-progress shows with next episode and watch progress",
       })
       .output(ContinueWatchingOutput),
     library: oc
@@ -281,8 +274,7 @@ export const contract = {
         path: "/dashboard/library",
         tags: ["Dashboard"],
         summary: "Get user library",
-        description:
-          "Fetch paginated titles in the user's library with their tracking statuses.",
+        description: "Fetch paginated titles in the user's library with their tracking statuses.",
         successDescription: "Paginated library items with user statuses",
       })
       .input(PaginatedInput)
@@ -465,8 +457,7 @@ export const contract = {
         path: "/integrations/{provider}",
         tags: ["Integrations"],
         summary: "Delete integration",
-        description:
-          "Remove a media server integration and all its event history.",
+        description: "Remove a media server integration and all its event history.",
       })
       .input(ProviderParam)
       .output(z.void()),
@@ -497,8 +488,7 @@ export const contract = {
           path: "/admin/backups",
           tags: ["Admin"],
           summary: "List backups",
-          description:
-            "Fetch all database backups with their sizes and creation times.",
+          description: "Fetch all database backups with their sizes and creation times.",
           successDescription: "Available backups",
         })
         .output(BackupsListOutput),
@@ -557,8 +547,7 @@ export const contract = {
           path: "/admin/backups/schedule",
           tags: ["Admin"],
           summary: "Get backup schedule",
-          description:
-            "Fetch the current automated backup schedule configuration.",
+          description: "Fetch the current automated backup schedule configuration.",
           successDescription: "Backup schedule settings",
         })
         .output(BackupScheduleOutput),
@@ -580,8 +569,7 @@ export const contract = {
         path: "/admin/registration",
         tags: ["Admin"],
         summary: "Get registration status",
-        description:
-          "Check whether new user registration is currently open or closed.",
+        description: "Check whether new user registration is currently open or closed.",
         successDescription: "Registration open/closed state",
       })
       .output(RegistrationOutput),
@@ -612,8 +600,7 @@ export const contract = {
         path: "/admin/update-check",
         tags: ["Admin"],
         summary: "Toggle update checks",
-        description:
-          "Enable or disable automatic update checks against the public API.",
+        description: "Enable or disable automatic update checks against the public API.",
       })
       .input(ToggleUpdateCheckInput)
       .output(z.void()),
@@ -644,8 +631,7 @@ export const contract = {
         path: "/admin/jobs/trigger",
         tags: ["Admin"],
         summary: "Trigger cron job",
-        description:
-          "Manually trigger a background cron job by name. The job runs asynchronously.",
+        description: "Manually trigger a background cron job by name. The job runs asynchronously.",
       })
       .input(TriggerJobInput)
       .output(TriggerJobOutput)
@@ -720,8 +706,7 @@ export const contract = {
         path: "/account/avatar",
         tags: ["Account"],
         summary: "Remove avatar",
-        description:
-          "Delete the current user's profile avatar, reverting to the default.",
+        description: "Delete the current user's profile avatar, reverting to the default.",
       })
       .input(z.void())
       .output(z.void()),
@@ -763,8 +748,7 @@ export const contract = {
         path: "/imports/jobs",
         tags: ["Imports"],
         summary: "Create import job",
-        description:
-          "Create and start a background import job from previously parsed data.",
+        description: "Create and start a background import job from previously parsed data.",
         successDescription: "Created import job",
       })
       .input(CreateImportJobInput)

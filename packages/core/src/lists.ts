@@ -1,9 +1,10 @@
+import { z } from "zod";
+
 import { db } from "@sofa/db/client";
 import { and, eq, inArray } from "@sofa/db/helpers";
 import { integrations, titles, userTitleStatus } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getTvExternalIds } from "@sofa/tmdb/client";
-import { z } from "zod";
 
 const log = createLogger("lists");
 
@@ -38,9 +39,7 @@ type Status = z.infer<typeof statusSchema>;
 /** Parse a comma-separated status query param into validated statuses. */
 export function parseStatusParam(param: string | null): Status[] {
   if (!param) return ["watchlist"];
-  const parsed = param
-    .split(",")
-    .filter((s) => statusSchema.safeParse(s).success) as Status[];
+  const parsed = param.split(",").filter((s) => statusSchema.safeParse(s).success) as Status[];
   return parsed.length > 0 ? parsed : ["watchlist"];
 }
 

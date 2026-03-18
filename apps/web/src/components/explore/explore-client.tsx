@@ -2,8 +2,10 @@ import { useLingui } from "@lingui/react/macro";
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
+
 import { FilterableTitleRow } from "./filterable-title-row";
 import { HeroBanner } from "./hero-banner";
 import { TitleRow } from "./title-row";
@@ -20,11 +22,7 @@ function ExploreSkeletons() {
           </div>
           <div className="flex gap-4 overflow-hidden">
             {Array.from({ length: 8 }).map((_, j) => (
-              <div
-                // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton
-                key={j}
-                className="w-[140px] shrink-0 sm:w-[160px]"
-              >
+              <div key={j} className="w-[140px] shrink-0 sm:w-[160px]">
                 <Skeleton className="aspect-[2/3] w-full rounded-xl" />
               </div>
             ))}
@@ -35,9 +33,7 @@ function ExploreSkeletons() {
   );
 }
 
-function mergeMaps<T>(
-  ...maps: (Record<string, T> | undefined)[]
-): Record<string, T> {
+function mergeMaps<T>(...maps: (Record<string, T> | undefined)[]): Record<string, T> {
   return Object.assign({}, ...maps.filter(Boolean));
 }
 
@@ -110,9 +106,7 @@ export function ExploreClient() {
       <div>
         <TitleRow
           heading={t`Trending Today`}
-          icon={
-            <IconFlame aria-hidden={true} className="size-5 text-primary" />
-          }
+          icon={<IconFlame aria-hidden={true} className="text-primary size-5" />}
           items={trendingItems}
           userStatuses={userStatuses}
           episodeProgress={episodeProgress}
@@ -124,7 +118,7 @@ export function ExploreClient() {
 
       <FilterableTitleRow
         heading={t`Popular Movies`}
-        icon={<IconMovie aria-hidden={true} className="size-5 text-primary" />}
+        icon={<IconMovie aria-hidden={true} className="text-primary size-5" />}
         mediaType="movie"
         defaultItems={(popularMoviesData?.items ?? []).slice(0, 20)}
         genres={movieGenreData?.genres ?? []}
@@ -134,9 +128,7 @@ export function ExploreClient() {
 
       <FilterableTitleRow
         heading={t`Popular TV Shows`}
-        icon={
-          <IconDeviceTv aria-hidden={true} className="size-5 text-primary" />
-        }
+        icon={<IconDeviceTv aria-hidden={true} className="text-primary size-5" />}
         mediaType="tv"
         defaultItems={(popularTvData?.items ?? []).slice(0, 20)}
         genres={tvGenreData?.genres ?? []}

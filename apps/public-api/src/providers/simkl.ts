@@ -1,18 +1,11 @@
 import { parseSimklPayload } from "@sofa/core/imports/parsers";
-import type {
-  DeviceCodeResponse,
-  ImportProvider,
-  NormalizedImport,
-  PollResult,
-} from "./types";
+
+import type { DeviceCodeResponse, ImportProvider, NormalizedImport, PollResult } from "./types";
 
 const API_BASE = "https://api.simkl.com";
 const AUTH_BASE = "https://simkl.com";
 
-function simklHeaders(
-  clientId: string,
-  token?: string,
-): Record<string, string> {
+function simklHeaders(clientId: string, token?: string): Record<string, string> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     "simkl-api-key": clientId,
@@ -121,14 +114,8 @@ export const simkl: ImportProvider = {
     // Fetch movies, shows, and anime in parallel
     const [moviesRes, showsRes, animeRes] = await Promise.all([
       fetch(`${API_BASE}/sync/all-items/movies`, { headers }),
-      fetch(
-        `${API_BASE}/sync/all-items/shows?extended=full&episode_watched_at=yes`,
-        { headers },
-      ),
-      fetch(
-        `${API_BASE}/sync/all-items/anime?extended=full&episode_watched_at=yes`,
-        { headers },
-      ),
+      fetch(`${API_BASE}/sync/all-items/shows?extended=full&episode_watched_at=yes`, { headers }),
+      fetch(`${API_BASE}/sync/all-items/anime?extended=full&episode_watched_at=yes`, { headers }),
     ]);
 
     // If all endpoints failed, throw so the caller gets a clear error
@@ -139,15 +126,9 @@ export const simkl: ImportProvider = {
     }
 
     const [moviesData, showsData, animeData] = await Promise.all([
-      moviesRes.ok
-        ? (moviesRes.json() as Promise<SimklApiItem[]>)
-        : ([] as SimklApiItem[]),
-      showsRes.ok
-        ? (showsRes.json() as Promise<SimklApiItem[]>)
-        : ([] as SimklApiItem[]),
-      animeRes.ok
-        ? (animeRes.json() as Promise<SimklApiItem[]>)
-        : ([] as SimklApiItem[]),
+      moviesRes.ok ? (moviesRes.json() as Promise<SimklApiItem[]>) : ([] as SimklApiItem[]),
+      showsRes.ok ? (showsRes.json() as Promise<SimklApiItem[]>) : ([] as SimklApiItem[]),
+      animeRes.ok ? (animeRes.json() as Promise<SimklApiItem[]>) : ([] as SimklApiItem[]),
     ]);
 
     // Flatten API's nested movie/show objects into the flat format

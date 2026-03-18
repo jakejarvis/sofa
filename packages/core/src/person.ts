@@ -5,16 +5,14 @@ import { personFilmography, persons, titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getPersonCombinedCredits, getPersonDetails } from "@sofa/tmdb/client";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
+
 import { generatePersonThumbHash } from "./thumbhash";
 
 const log = createLogger("person");
 const FILMOGRAPHY_STALE_MS = 30 * 24 * 60 * 60 * 1000;
 
 async function ensureProfileThumbHash(
-  person: Pick<
-    typeof persons.$inferSelect,
-    "id" | "profilePath" | "profileThumbHash"
-  >,
+  person: Pick<typeof persons.$inferSelect, "id" | "profilePath" | "profileThumbHash">,
 ) {
   if (!person.profilePath) {
     if (person.profileThumbHash) {
@@ -30,14 +28,8 @@ async function ensureProfileThumbHash(
   return (await generatePersonThumbHash(person.id, person.profilePath)) ?? null;
 }
 
-export async function getOrFetchPerson(
-  personId: string,
-): Promise<ResolvedPerson | null> {
-  const person = db
-    .select()
-    .from(persons)
-    .where(eq(persons.id, personId))
-    .get();
+export async function getOrFetchPerson(personId: string): Promise<ResolvedPerson | null> {
+  const person = db.select().from(persons).where(eq(persons.id, personId)).get();
   if (!person) return null;
 
   // Shell record — lazily hydrate from TMDB
@@ -109,14 +101,8 @@ export async function getOrFetchPerson(
   };
 }
 
-export async function getOrFetchPersonByTmdbId(
-  tmdbId: number,
-): Promise<ResolvedPerson | null> {
-  const existing = db
-    .select()
-    .from(persons)
-    .where(eq(persons.tmdbId, tmdbId))
-    .get();
+export async function getOrFetchPersonByTmdbId(tmdbId: number): Promise<ResolvedPerson | null> {
+  const existing = db.select().from(persons).where(eq(persons.tmdbId, tmdbId)).get();
 
   if (existing) {
     return getOrFetchPerson(existing.id);
@@ -144,8 +130,7 @@ export async function getOrFetchPersonByTmdbId(
       .returning()
       .get();
 
-    const person =
-      row ?? db.select().from(persons).where(eq(persons.tmdbId, tmdbId)).get();
+    const person = row ?? db.select().from(persons).where(eq(persons.tmdbId, tmdbId)).get();
     if (!person) return null;
 
     const profileThumbHash = await ensureProfileThumbHash(person);
@@ -207,9 +192,7 @@ export function getLocalFilmography(personId: string): PersonCredit[] {
   }));
 }
 
-async function syncPersonFilmography(
-  person: Pick<typeof persons.$inferSelect, "id" | "tmdbId">,
-) {
+async function syncPersonFilmography(person: Pick<typeof persons.$inferSelect, "id" | "tmdbId">) {
   const credits = await getPersonCombinedCredits(person.tmdbId);
 
   // Schema types combined credits as movie-only; TV entries also carry
@@ -273,9 +256,7 @@ async function syncPersonFilmography(
       }
     });
 
-    const stillMissing = [...insertedTmdbIds].filter(
-      (tmdbId) => !titleIdMap.has(tmdbId),
-    );
+    const stillMissing = [...insertedTmdbIds].filter((tmdbId) => !titleIdMap.has(tmdbId));
     if (stillMissing.length > 0) {
       const fallbacks = db
         .select({ id: titles.id, tmdbId: titles.tmdbId })
@@ -323,9 +304,7 @@ async function syncPersonFilmography(
 
   const now = new Date();
   db.transaction((tx) => {
-    tx.delete(personFilmography)
-      .where(eq(personFilmography.personId, person.id))
-      .run();
+    tx.delete(personFilmography).where(eq(personFilmography.personId, person.id)).run();
 
     for (const row of nextRows) {
       tx.insert(personFilmography).values(row).run();
@@ -338,21 +317,14 @@ async function syncPersonFilmography(
   });
 }
 
-export async function fetchFullFilmography(
-  personId: string,
-): Promise<PersonCredit[]> {
-  const person = db
-    .select()
-    .from(persons)
-    .where(eq(persons.id, personId))
-    .get();
+export async function fetchFullFilmography(personId: string): Promise<PersonCredit[]> {
+  const person = db.select().from(persons).where(eq(persons.id, personId)).get();
   if (!person) return [];
 
   const localFilmography = getLocalFilmography(personId);
   const isFresh =
     person.filmographyLastFetchedAt &&
-    person.filmographyLastFetchedAt.getTime() >
-      Date.now() - FILMOGRAPHY_STALE_MS;
+    person.filmographyLastFetchedAt.getTime() > Date.now() - FILMOGRAPHY_STALE_MS;
 
   if (isFresh) {
     return localFilmography;
@@ -389,9 +361,7 @@ interface BrowsePersonInput {
  * Inserts shell persons (`lastFetchedAt = null`) for new tmdbIds.
  * Returns a map of tmdbId → internal UUID.
  */
-export function ensureBrowsePersonsExist(
-  items: BrowsePersonInput[],
-): Map<number, string> {
+export function ensureBrowsePersonsExist(items: BrowsePersonInput[]): Map<number, string> {
   if (items.length === 0) return new Map();
 
   const unique = new Map<number, BrowsePersonInput>();

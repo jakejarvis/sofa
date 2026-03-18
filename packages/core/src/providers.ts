@@ -110,10 +110,7 @@ const providerRegistry: ReadonlyMap<number, ProviderConfig> = new Map(
   Object.entries(providers).map(([id, config]) => [Number(id), config]),
 );
 
-export function generateProviderUrl(
-  providerId: number,
-  titleName: string,
-): string | null {
+export function generateProviderUrl(providerId: number, titleName: string): string | null {
   const config = providerRegistry.get(providerId);
   if (!config) return null;
   return config.searchUrl.replace("{title}", encodeURIComponent(titleName));

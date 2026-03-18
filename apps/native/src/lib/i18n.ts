@@ -1,9 +1,7 @@
-import {
-  activateLocale,
-  SUPPORTED_LOCALES,
-  type SupportedLocale,
-} from "@sofa/i18n";
 import * as Localization from "expo-localization";
+
+import { activateLocale, SUPPORTED_LOCALES, type SupportedLocale } from "@sofa/i18n";
+
 import { globalStorage } from "./mmkv";
 
 const LOCALE_STORAGE_KEY = "sofa:locale";

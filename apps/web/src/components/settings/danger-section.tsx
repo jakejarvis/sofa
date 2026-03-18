@@ -3,6 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { IconDatabase, IconPhoto, IconTrash } from "@tabler/icons-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,8 +23,7 @@ import { client, orpc } from "@/lib/orpc/client";
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 * 1024 * 1024)
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
 }
 
@@ -61,10 +61,7 @@ export function CacheSection() {
 
   const purgeAll = useMutation({
     mutationFn: () =>
-      Promise.all([
-        client.admin.purgeMetadataCache(),
-        client.admin.purgeImageCache(),
-      ]),
+      Promise.all([client.admin.purgeMetadataCache(), client.admin.purgeImageCache()]),
     onSuccess: ([metaResult, imageResult]) => {
       const freed = formatBytes(imageResult.freedBytes);
       toast.success(
@@ -75,31 +72,26 @@ export function CacheSection() {
     onError: () => toast.error(t`Failed to purge caches`),
   });
 
-  const disabled =
-    purgeMetadata.isPending || purgeImages.isPending || purgeAll.isPending;
+  const disabled = purgeMetadata.isPending || purgeImages.isPending || purgeAll.isPending;
 
   return (
     <CardContent>
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-          <IconTrash aria-hidden={true} className="size-4 text-primary" />
+        <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+          <IconTrash aria-hidden={true} className="text-primary size-4" />
         </div>
         <div className="flex-1">
           <CardTitle>
             <Trans>Cache management</Trans>
           </CardTitle>
           <CardDescription>
-            <Trans>
-              Free up disk space by clearing cached metadata and images
-            </Trans>
+            <Trans>Free up disk space by clearing cached metadata and images</Trans>
           </CardDescription>
 
           <div className="mt-4 flex flex-wrap gap-2">
             {/* Purge metadata */}
             <AlertDialog>
-              <AlertDialogTrigger
-                render={<Button variant="outline" disabled={disabled} />}
-              >
+              <AlertDialogTrigger render={<Button variant="outline" disabled={disabled} />}>
                 {purgeMetadata.isPending ? (
                   <Spinner className="size-3" />
                 ) : (
@@ -118,9 +110,9 @@ export function CacheSection() {
                   </AlertDialogTitle>
                   <AlertDialogDescription>
                     <Trans>
-                      This will delete un-enriched stub titles that aren't in
-                      any user's library and clean up orphaned person records.
-                      Deleted titles will be re-imported if accessed again.
+                      This will delete un-enriched stub titles that aren't in any user's library and
+                      clean up orphaned person records. Deleted titles will be re-imported if
+                      accessed again.
                     </Trans>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
@@ -128,10 +120,7 @@ export function CacheSection() {
                   <AlertDialogCancel>
                     <Trans>Cancel</Trans>
                   </AlertDialogCancel>
-                  <AlertDialogAction
-                    variant="destructive"
-                    onClick={() => purgeMetadata.mutate()}
-                  >
+                  <AlertDialogAction variant="destructive" onClick={() => purgeMetadata.mutate()}>
                     <Trans>Purge metadata</Trans>
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -140,19 +129,13 @@ export function CacheSection() {
 
             {/* Purge images */}
             <AlertDialog>
-              <AlertDialogTrigger
-                render={<Button variant="outline" disabled={disabled} />}
-              >
+              <AlertDialogTrigger render={<Button variant="outline" disabled={disabled} />}>
                 {purgeImages.isPending ? (
                   <Spinner className="size-3" />
                 ) : (
                   <IconPhoto aria-hidden={true} />
                 )}
-                {purgeImages.isPending ? (
-                  <Trans>Purging...</Trans>
-                ) : (
-                  <Trans>Purge images</Trans>
-                )}
+                {purgeImages.isPending ? <Trans>Purging...</Trans> : <Trans>Purge images</Trans>}
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -161,8 +144,8 @@ export function CacheSection() {
                   </AlertDialogTitle>
                   <AlertDialogDescription>
                     <Trans>
-                      This will delete all cached TMDB images from disk. Images
-                      will be re-downloaded automatically as needed.
+                      This will delete all cached TMDB images from disk. Images will be
+                      re-downloaded automatically as needed.
                     </Trans>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
@@ -170,10 +153,7 @@ export function CacheSection() {
                   <AlertDialogCancel>
                     <Trans>Cancel</Trans>
                   </AlertDialogCancel>
-                  <AlertDialogAction
-                    variant="destructive"
-                    onClick={() => purgeImages.mutate()}
-                  >
+                  <AlertDialogAction variant="destructive" onClick={() => purgeImages.mutate()}>
                     <Trans>Purge images</Trans>
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -182,19 +162,13 @@ export function CacheSection() {
 
             {/* Purge all */}
             <AlertDialog>
-              <AlertDialogTrigger
-                render={<Button variant="destructive" disabled={disabled} />}
-              >
+              <AlertDialogTrigger render={<Button variant="destructive" disabled={disabled} />}>
                 {purgeAll.isPending ? (
                   <Spinner className="size-3" />
                 ) : (
                   <IconTrash aria-hidden={true} />
                 )}
-                {purgeAll.isPending ? (
-                  <Trans>Purging...</Trans>
-                ) : (
-                  <Trans>Purge all</Trans>
-                )}
+                {purgeAll.isPending ? <Trans>Purging...</Trans> : <Trans>Purge all</Trans>}
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -203,9 +177,8 @@ export function CacheSection() {
                   </AlertDialogTitle>
                   <AlertDialogDescription>
                     <Trans>
-                      This will delete all un-enriched stub titles and all
-                      cached images from disk. Everything will be re-imported
-                      and re-downloaded as needed.
+                      This will delete all un-enriched stub titles and all cached images from disk.
+                      Everything will be re-imported and re-downloaded as needed.
                     </Trans>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
@@ -213,10 +186,7 @@ export function CacheSection() {
                   <AlertDialogCancel>
                     <Trans>Cancel</Trans>
                   </AlertDialogCancel>
-                  <AlertDialogAction
-                    variant="destructive"
-                    onClick={() => purgeAll.mutate()}
-                  >
+                  <AlertDialogAction variant="destructive" onClick={() => purgeAll.mutate()}>
                     <Trans>Purge all</Trans>
                   </AlertDialogAction>
                 </AlertDialogFooter>

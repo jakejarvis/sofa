@@ -12,6 +12,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
@@ -24,6 +29,9 @@ jobs:
 
       - name: Lint
         run: bunx turbo run lint
+
+      - name: Format check
+        run: bunx turbo run format:check
 
       - name: Type check
         run: bunx turbo run check-types

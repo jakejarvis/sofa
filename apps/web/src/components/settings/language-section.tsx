@@ -1,20 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { activateLocale, type SupportedLocale } from "@sofa/i18n";
-import { LOCALE_INFO } from "@sofa/i18n/locales";
 import { IconCheck, IconChevronDown, IconLanguage } from "@tabler/icons-react";
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { setPersistedLocale } from "@/lib/i18n";
+import { activateLocale, type SupportedLocale } from "@sofa/i18n";
+import { LOCALE_INFO } from "@sofa/i18n/locales";
 
 export function LanguageSection() {
   const { t, i18n } = useLingui();
@@ -34,21 +26,19 @@ export function LanguageSection() {
         <CardContent className={open ? "pb-4" : ""}>
           <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                <IconLanguage className="size-4 text-primary" />
+              <div className="bg-primary/10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+                <IconLanguage className="text-primary size-4" />
               </div>
               <div className="text-left">
                 <CardTitle>
                   <Trans>Language</Trans>
                 </CardTitle>
-                <CardDescription>
-                  {currentInfo?.nativeName ?? "English"}
-                </CardDescription>
+                <CardDescription>{currentInfo?.nativeName ?? "English"}</CardDescription>
               </div>
             </div>
             <IconChevronDown
               aria-hidden={true}
-              className={`size-4 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+              className={`text-muted-foreground size-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
             />
           </CollapsibleTrigger>
         </CardContent>
@@ -70,15 +60,11 @@ export function LanguageSection() {
                   aria-pressed={currentLocale === info.code}
                 >
                   <div className="min-w-0">
-                    <div className="truncate font-medium">
-                      {info.nativeName}
-                    </div>
-                    <div className="truncate text-muted-foreground text-xs">
-                      {info.name}
-                    </div>
+                    <div className="truncate font-medium">{info.nativeName}</div>
+                    <div className="text-muted-foreground truncate text-xs">{info.name}</div>
                   </div>
                   {currentLocale === info.code && (
-                    <IconCheck className="ml-auto size-4 shrink-0 text-primary" />
+                    <IconCheck className="text-primary ml-auto size-4 shrink-0" />
                   )}
                 </button>
               ))}

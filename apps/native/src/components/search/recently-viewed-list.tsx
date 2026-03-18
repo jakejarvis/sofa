@@ -5,12 +5,10 @@ import { useCallback } from "react";
 import { Alert, Pressable, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
+
 import { RecentlyViewedRow } from "@/components/search/recently-viewed-row";
 import { Text } from "@/components/ui/text";
-import {
-  type RecentlyViewedItem,
-  useRecentlyViewed,
-} from "@/lib/recently-viewed";
+import { type RecentlyViewedItem, useRecentlyViewed } from "@/lib/recently-viewed";
 import * as Haptics from "@/utils/haptics";
 
 export function RecentlyViewedList() {
@@ -30,18 +28,14 @@ export function RecentlyViewedList() {
 
   const handleClear = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert(
-      t`Clear Recently Viewed?`,
-      t`This will remove all items from your history.`,
-      [
-        { text: t`Cancel`, style: "cancel" },
-        {
-          text: t`Clear`,
-          style: "destructive",
-          onPress: () => clearAll(),
-        },
-      ],
-    );
+    Alert.alert(t`Clear Recently Viewed?`, t`This will remove all items from your history.`, [
+      { text: t`Cancel`, style: "cancel" },
+      {
+        text: t`Clear`,
+        style: "destructive",
+        onPress: () => clearAll(),
+      },
+    ]);
   }, [clearAll, t]);
 
   const renderItem = useCallback(
@@ -55,12 +49,9 @@ export function RecentlyViewedList() {
 
   if (items.length === 0) {
     return (
-      <Animated.View
-        entering={FadeIn.duration(400)}
-        className="flex-1 items-center justify-center"
-      >
+      <Animated.View entering={FadeIn.duration(400)} className="flex-1 items-center justify-center">
         <IconSearch size={64} color={mutedForeground} />
-        <Text className="mt-3 text-base text-muted-foreground">
+        <Text className="text-muted-foreground mt-3 text-base">
           <Trans>Search for movies, shows, or people</Trans>
         </Text>
       </Animated.View>

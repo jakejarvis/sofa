@@ -7,8 +7,9 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "biome check",
-    "format": "biome format --write",
+    "lint": "oxlint",
+    "format": "oxfmt --config ../../.oxfmtrc.json",
+    "format:check": "oxfmt --check --config ../../.oxfmtrc.json",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
@@ -21,7 +22,7 @@
     "@orpc/contract": "catalog:",
     "@orpc/tanstack-query": "catalog:",
     "@player.style/sutro": "0.2.1",
-    "@rolldown/plugin-babel": "0.2.1",
+    "@rolldown/plugin-babel": "0.2.2",
     "@sofa/api": "workspace:*",
     "@sofa/i18n": "workspace:*",
     "@tabler/icons-react": "3.40.0",
@@ -48,7 +49,7 @@
   "devDependencies": {
     "@lingui/babel-plugin-lingui-macro": "catalog:",
     "@lingui/vite-plugin": "catalog:",
-    "@tailwindcss/vite": "0.0.0-insiders.f302fce",
+    "@tailwindcss/vite": "4.2.2",
     "@tanstack/devtools-vite": "0.6.0",
     "@tanstack/react-devtools": "0.10.0",
     "@tanstack/react-query-devtools": "5.91.3",

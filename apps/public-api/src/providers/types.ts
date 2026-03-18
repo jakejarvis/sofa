@@ -17,17 +17,7 @@ export type PollResult =
   | { status: "denied" };
 
 export interface ImportProvider {
-  getDeviceCode(
-    clientId: string,
-    clientSecret: string,
-  ): Promise<DeviceCodeResponse>;
-  pollForToken(
-    clientId: string,
-    clientSecret: string,
-    deviceCode: string,
-  ): Promise<PollResult>;
-  fetchUserData(
-    accessToken: string,
-    clientId: string,
-  ): Promise<NormalizedImport>;
+  getDeviceCode(clientId: string, clientSecret: string): Promise<DeviceCodeResponse>;
+  pollForToken(clientId: string, clientSecret: string, deviceCode: string): Promise<PollResult>;
+  fetchUserData(accessToken: string, clientId: string): Promise<NormalizedImport>;
 }

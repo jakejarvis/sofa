@@ -1,9 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  IconAlertCircle,
-  IconCircleCheck,
-  IconInfoCircle,
-} from "@tabler/icons-react-native";
+import { IconAlertCircle, IconCircleCheck, IconInfoCircle } from "@tabler/icons-react-native";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Linking, Pressable, type TextInput, View } from "react-native";
@@ -16,16 +12,13 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
+
 import { AuthScreen } from "@/components/auth-screen";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { Input } from "@/components/ui/text-field";
-import {
-  getServerUrl,
-  serverManager,
-  type ValidationError,
-} from "@/lib/server";
+import { getServerUrl, serverManager, type ValidationError } from "@/lib/server";
 import * as Haptics from "@/utils/haptics";
 
 type ConnectionState =
@@ -52,16 +45,12 @@ export default function ServerUrlScreen() {
   const inputRef = useRef<TextInput>(null);
   const successTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [url, setUrl] = useState(() =>
-    serverManager.hasStoredServerUrl() ? getServerUrl() : "",
-  );
+  const [url, setUrl] = useState(() => (serverManager.hasStoredServerUrl() ? getServerUrl() : ""));
   const [connection, setConnection] = useState<ConnectionState>({
     phase: "idle",
   });
 
-  const statusCompletedColor = useCSSVariable(
-    "--color-status-completed",
-  ) as string;
+  const statusCompletedColor = useCSSVariable("--color-status-completed") as string;
   const destructiveColor = useCSSVariable("--color-destructive") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
@@ -172,37 +161,23 @@ export default function ServerUrlScreen() {
       </Animated.View>
 
       {/* Connect Button / Status */}
-      <Animated.View
-        entering={FadeInDown.duration(300).delay(300)}
-        className="mt-4"
-      >
+      <Animated.View entering={FadeInDown.duration(300).delay(300)} className="mt-4">
         {isConnecting ? (
           <View className="min-h-12 flex-row items-center justify-center gap-2 py-2">
-            <Animated.View
-              className="size-1.5 rounded-full bg-primary"
-              style={dotAnimatedStyle}
-            />
+            <Animated.View className="bg-primary size-1.5 rounded-full" style={dotAnimatedStyle} />
             <Text className="text-muted-foreground text-sm">
               <Trans>Connecting to server...</Trans>
             </Text>
           </View>
         ) : isSuccess ? (
           <View className="min-h-12 flex-row items-center justify-center gap-1.5 py-2">
-            <ScaledIcon
-              icon={IconCircleCheck}
-              size={16}
-              color={statusCompletedColor}
-            />
-            <Text className="font-medium font-sans text-sm text-status-completed">
+            <ScaledIcon icon={IconCircleCheck} size={16} color={statusCompletedColor} />
+            <Text className="text-status-completed font-sans text-sm font-medium">
               <Trans>Connected</Trans>
             </Text>
           </View>
         ) : (
-          <Button
-            onPress={handleConnect}
-            disabled={!isValidUrl}
-            className="bg-primary"
-          >
+          <Button onPress={handleConnect} disabled={!isValidUrl} className="bg-primary">
             <ButtonLabel>
               <Trans>Connect</Trans>
             </ButtonLabel>
@@ -222,7 +197,7 @@ export default function ServerUrlScreen() {
               color={destructiveColor}
               style={{ marginTop: 1 }}
             />
-            <Text selectable className="flex-1 text-destructive text-sm">
+            <Text selectable className="text-destructive flex-1 text-sm">
               {getErrorMessages(t)[connection.error]}
             </Text>
           </Animated.View>
@@ -238,7 +213,7 @@ export default function ServerUrlScreen() {
           className="flex-row items-center gap-1.5"
         >
           <ScaledIcon icon={IconInfoCircle} size={16} color={mutedFgColor} />
-          <Text className="font-medium font-sans text-primary text-sm">
+          <Text className="text-primary font-sans text-sm font-medium">
             <Trans>Don't have a server?</Trans>
           </Text>
         </Pressable>

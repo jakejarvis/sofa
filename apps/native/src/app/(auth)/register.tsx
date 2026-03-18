@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { Pressable, type TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { z } from "zod";
+
 import { AuthScreen } from "@/components/auth-screen";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -19,20 +20,9 @@ import { getFormErrors } from "@/utils/form-errors";
 import * as Haptics from "@/utils/haptics";
 
 const signUpSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, "Name is required")
-    .min(2, "Name must be at least 2 characters"),
-  email: z
-    .string()
-    .trim()
-    .min(1, "Email is required")
-    .email("Enter a valid email address"),
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .min(8, "Use at least 8 characters"),
+  name: z.string().trim().min(1, "Name is required").min(2, "Name must be at least 2 characters"),
+  email: z.string().trim().min(1, "Email is required").email("Enter a valid email address"),
+  password: z.string().min(1, "Password is required").min(8, "Use at least 8 characters"),
 });
 
 export default function RegisterScreen() {
@@ -99,7 +89,7 @@ export default function RegisterScreen() {
       >
         <Animated.View entering={FadeInDown.duration(300).delay(200)}>
           <Link href="/(auth)/login" asChild>
-            <Button className="mt-6 bg-primary">
+            <Button className="bg-primary mt-6">
               <ButtonLabel className="text-primary-foreground">
                 <Trans>Back to Login</Trans>
               </ButtonLabel>
@@ -111,10 +101,7 @@ export default function RegisterScreen() {
   }
 
   return (
-    <AuthScreen
-      title={t`Create Account`}
-      subtitle={t`Registering on ${serverHost}`}
-    >
+    <AuthScreen title={t`Create Account`} subtitle={t`Registering on ${serverHost}`}>
       <View className="gap-3">
         <Animated.View entering={FadeInDown.duration(300).delay(100)}>
           <form.Field name="name">
@@ -137,9 +124,7 @@ export default function RegisterScreen() {
                   returnKeyType="next"
                   blurOnSubmit={false}
                   onSubmitEditing={() => emailRef.current?.focus()}
-                  className={
-                    errorFields.has("name") ? "border-destructive" : undefined
-                  }
+                  className={errorFields.has("name") ? "border-destructive" : undefined}
                 />
               </TextField>
             )}
@@ -170,9 +155,7 @@ export default function RegisterScreen() {
                   returnKeyType="next"
                   blurOnSubmit={false}
                   onSubmitEditing={() => passwordRef.current?.focus()}
-                  className={
-                    errorFields.has("email") ? "border-destructive" : undefined
-                  }
+                  className={errorFields.has("email") ? "border-destructive" : undefined}
                 />
               </TextField>
             )}
@@ -201,11 +184,7 @@ export default function RegisterScreen() {
                   textContentType="newPassword"
                   returnKeyType="go"
                   onSubmitEditing={form.handleSubmit}
-                  className={
-                    errorFields.has("password")
-                      ? "border-destructive"
-                      : undefined
-                  }
+                  className={errorFields.has("password") ? "border-destructive" : undefined}
                 />
               </TextField>
             )}
@@ -213,11 +192,7 @@ export default function RegisterScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.duration(300).delay(400)}>
-          <Button
-            onPress={form.handleSubmit}
-            disabled={busy}
-            className="mt-1 bg-primary"
-          >
+          <Button onPress={form.handleSubmit} disabled={busy} className="bg-primary mt-1">
             {busy ? (
               <Spinner size="sm" />
             ) : (
@@ -229,10 +204,7 @@ export default function RegisterScreen() {
         </Animated.View>
       </View>
 
-      <Animated.View
-        entering={FadeIn.duration(300).delay(500)}
-        className="mt-6 items-center"
-      >
+      <Animated.View entering={FadeIn.duration(300).delay(500)} className="mt-6 items-center">
         <Link href="/(auth)/login" asChild>
           <Pressable disabled={busy}>
             <Text className="text-primary text-sm">

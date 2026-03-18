@@ -1,11 +1,4 @@
-import {
-  index,
-  int,
-  real,
-  sqliteTable,
-  text,
-  uniqueIndex,
-} from "drizzle-orm/sqlite-core";
+import { index, int, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 // Helper for UUID primary keys
 const uuidPk = () =>
@@ -19,9 +12,7 @@ export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  emailVerified: int("emailVerified", { mode: "boolean" })
-    .notNull()
-    .default(false),
+  emailVerified: int("emailVerified", { mode: "boolean" }).notNull().default(false),
   image: text("image"),
   role: text("role").default("user"),
   banned: int("banned", { mode: "boolean" }).default(false),
@@ -130,11 +121,7 @@ export const titles = sqliteTable(
     index("titles_type_releaseDate").on(table.type, table.releaseDate),
     index("titles_type_firstAirDate").on(table.type, table.firstAirDate),
     index("titles_lastFetchedAt").on(table.lastFetchedAt),
-    index("titles_type_status_lastFetchedAt").on(
-      table.type,
-      table.status,
-      table.lastFetchedAt,
-    ),
+    index("titles_type_status_lastFetchedAt").on(table.type, table.status, table.lastFetchedAt),
   ],
 );
 
@@ -153,12 +140,7 @@ export const seasons = sqliteTable(
     airDate: text("airDate"),
     lastFetchedAt: int("lastFetchedAt", { mode: "timestamp" }),
   },
-  (table) => [
-    uniqueIndex("seasons_titleId_seasonNumber").on(
-      table.titleId,
-      table.seasonNumber,
-    ),
-  ],
+  (table) => [uniqueIndex("seasons_titleId_seasonNumber").on(table.titleId, table.seasonNumber)],
 );
 
 export const episodes = sqliteTable(
@@ -177,10 +159,7 @@ export const episodes = sqliteTable(
     runtimeMinutes: int("runtimeMinutes"),
   },
   (table) => [
-    uniqueIndex("episodes_seasonId_episodeNumber").on(
-      table.seasonId,
-      table.episodeNumber,
-    ),
+    uniqueIndex("episodes_seasonId_episodeNumber").on(table.seasonId, table.episodeNumber),
   ],
 );
 
@@ -200,10 +179,7 @@ export const userTitleStatus = sqliteTable(
     updatedAt: int("updatedAt", { mode: "timestamp" }).notNull(),
   },
   (table) => [
-    uniqueIndex("userTitleStatus_userId_titleId").on(
-      table.userId,
-      table.titleId,
-    ),
+    uniqueIndex("userTitleStatus_userId_titleId").on(table.userId, table.titleId),
     index("userTitleStatus_userId_status").on(table.userId, table.status),
   ],
 );
@@ -226,10 +202,7 @@ export const userMovieWatches = sqliteTable(
       .default("manual"),
   },
   (table) => [
-    index("userMovieWatches_userId_watchedAt").on(
-      table.userId,
-      table.watchedAt,
-    ),
+    index("userMovieWatches_userId_watchedAt").on(table.userId, table.watchedAt),
     index("userMovieWatches_titleId").on(table.titleId),
     index("userMovieWatches_userId_titleId").on(table.userId, table.titleId),
   ],
@@ -253,15 +226,9 @@ export const userEpisodeWatches = sqliteTable(
       .default("manual"),
   },
   (table) => [
-    index("userEpisodeWatches_userId_watchedAt").on(
-      table.userId,
-      table.watchedAt,
-    ),
+    index("userEpisodeWatches_userId_watchedAt").on(table.userId, table.watchedAt),
     index("userEpisodeWatches_episodeId").on(table.episodeId),
-    index("userEpisodeWatches_userId_episodeId").on(
-      table.userId,
-      table.episodeId,
-    ),
+    index("userEpisodeWatches_userId_episodeId").on(table.userId, table.episodeId),
   ],
 );
 
@@ -277,9 +244,7 @@ export const userRatings = sqliteTable(
     ratingStars: int("ratingStars").notNull(),
     ratedAt: int("ratedAt", { mode: "timestamp" }).notNull(),
   },
-  (table) => [
-    uniqueIndex("userRatings_userId_titleId").on(table.userId, table.titleId),
-  ],
+  (table) => [uniqueIndex("userRatings_userId_titleId").on(table.userId, table.titleId)],
 );
 
 export const availabilityOffers = sqliteTable(
@@ -385,10 +350,7 @@ export const titleCast = sqliteTable(
       table.department,
       table.character,
     ),
-    index("titleCast_titleId_displayOrder").on(
-      table.titleId,
-      table.displayOrder,
-    ),
+    index("titleCast_titleId_displayOrder").on(table.titleId, table.displayOrder),
     index("titleCast_personId").on(table.personId),
   ],
 );
@@ -409,10 +371,7 @@ export const personFilmography = sqliteTable(
     displayOrder: int("displayOrder").notNull().default(0),
   },
   (table) => [
-    index("personFilmography_personId_displayOrder").on(
-      table.personId,
-      table.displayOrder,
-    ),
+    index("personFilmography_personId_displayOrder").on(table.personId, table.displayOrder),
     index("personFilmography_titleId").on(table.titleId),
   ],
 );
@@ -434,10 +393,7 @@ export const integrations = sqliteTable(
     lastEventAt: int("lastEventAt", { mode: "timestamp" }),
   },
   (table) => [
-    uniqueIndex("integrations_userId_provider").on(
-      table.userId,
-      table.provider,
-    ),
+    uniqueIndex("integrations_userId_provider").on(table.userId, table.provider),
     uniqueIndex("integrations_token").on(table.token),
   ],
 );
@@ -459,10 +415,7 @@ export const integrationEvents = sqliteTable(
     receivedAt: int("receivedAt", { mode: "timestamp" }).notNull(),
   },
   (table) => [
-    index("integrationEvents_integrationId_receivedAt").on(
-      table.integrationId,
-      table.receivedAt,
-    ),
+    index("integrationEvents_integrationId_receivedAt").on(table.integrationId, table.receivedAt),
   ],
 );
 
@@ -481,9 +434,7 @@ export const cronRuns = sqliteTable(
     durationMs: int("durationMs"),
     errorMessage: text("errorMessage"),
   },
-  (table) => [
-    index("cronRuns_jobName_startedAt").on(table.jobName, table.startedAt),
-  ],
+  (table) => [index("cronRuns_jobName_startedAt").on(table.jobName, table.startedAt)],
 );
 
 // ─── Import Jobs ────────────────────────────────────────────────────

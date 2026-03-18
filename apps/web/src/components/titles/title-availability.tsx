@@ -1,16 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { AvailabilityOffer } from "@sofa/api/schemas";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import type { AvailabilityOffer } from "@sofa/api/schemas";
 
 const MAX_VISIBLE = 4;
 
@@ -31,13 +23,10 @@ function ProviderBadge({
       <TooltipTrigger
         {...(watchUrl
           ? {
-              render: (
-                // biome-ignore lint/a11y/useAnchorContent: content is provided conditionally below
-                <a href={watchUrl} target="_blank" rel="noopener noreferrer" />
-              ),
+              render: <a href={watchUrl} target="_blank" rel="noopener noreferrer" />,
             }
           : {})}
-        className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border/30 bg-card motion-safe:transition-transform motion-safe:hover:scale-105${watchUrl ? "" : "cursor-default"}`}
+        className={`border-border/30 bg-card flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border motion-safe:transition-transform motion-safe:hover:scale-105${watchUrl ? "" : "cursor-default"}`}
       >
         {logoPath ? (
           <img
@@ -50,12 +39,10 @@ function ProviderBadge({
             className="h-full w-full object-cover"
           />
         ) : (
-          <span className="font-medium text-[8px] text-muted-foreground">
-            {name.slice(0, 2)}
-          </span>
+          <span className="text-muted-foreground text-[8px] font-medium">{name.slice(0, 2)}</span>
         )}
       </TooltipTrigger>
-      <TooltipContent className="bg-popover px-2 py-1 font-medium text-[10px] text-popover-foreground shadow-md [&>:last-child]:hidden">
+      <TooltipContent className="bg-popover text-popover-foreground px-2 py-1 text-[10px] font-medium shadow-md [&>:last-child]:hidden">
         {watchUrl ? t`Watch on ${name}` : name}
       </TooltipContent>
     </Tooltip>
@@ -64,7 +51,7 @@ function ProviderBadge({
 
 function OverflowProviderIcon({ offer }: { offer: AvailabilityOffer }) {
   return (
-    <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border/20 bg-card">
+    <div className="border-border/20 bg-card flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border">
       {offer.logoPath ? (
         <img
           src={offer.logoPath}
@@ -76,7 +63,7 @@ function OverflowProviderIcon({ offer }: { offer: AvailabilityOffer }) {
           className="h-7 w-7 object-cover"
         />
       ) : (
-        <span className="font-medium text-[7px] text-muted-foreground">
+        <span className="text-muted-foreground text-[7px] font-medium">
           {offer.providerName.slice(0, 2)}
         </span>
       )}
@@ -91,11 +78,11 @@ function OverflowBadge({ offers }: { offers: AvailabilityOffer[] }) {
         openOnHover
         delay={0}
         closeDelay={300}
-        className="flex h-10 w-10 cursor-default items-center justify-center rounded-lg border border-border/30 bg-card font-semibold text-muted-foreground text-xs motion-safe:transition-transform motion-safe:hover:scale-105"
+        className="border-border/30 bg-card text-muted-foreground flex h-10 w-10 cursor-default items-center justify-center rounded-lg border text-xs font-semibold motion-safe:transition-transform motion-safe:hover:scale-105"
       >
         +{offers.length}
       </PopoverTrigger>
-      <PopoverContent className="flex w-auto max-w-64 flex-col gap-0 divide-y divide-border/30 p-0.5">
+      <PopoverContent className="divide-border/30 flex w-auto max-w-64 flex-col gap-0 divide-y p-0.5">
         {offers.map((offer) =>
           offer.watchUrl ? (
             <a
@@ -103,22 +90,15 @@ function OverflowBadge({ offers }: { offers: AvailabilityOffer[] }) {
               href={offer.watchUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2.5 px-2 py-1.5 hover:bg-muted/50"
+              className="hover:bg-muted/50 flex items-center gap-2.5 px-2 py-1.5"
             >
               <OverflowProviderIcon offer={offer} />
-              <span className="truncate text-popover-foreground text-xs">
-                {offer.providerName}
-              </span>
+              <span className="text-popover-foreground truncate text-xs">{offer.providerName}</span>
             </a>
           ) : (
-            <div
-              key={offer.providerId}
-              className="flex items-center gap-2.5 px-2 py-1.5"
-            >
+            <div key={offer.providerId} className="flex items-center gap-2.5 px-2 py-1.5">
               <OverflowProviderIcon offer={offer} />
-              <span className="truncate text-popover-foreground text-xs">
-                {offer.providerName}
-              </span>
+              <span className="text-popover-foreground truncate text-xs">{offer.providerName}</span>
             </div>
           ),
         )}
@@ -127,11 +107,7 @@ function OverflowBadge({ offers }: { offers: AvailabilityOffer[] }) {
   );
 }
 
-export function TitleAvailability({
-  availability,
-}: {
-  availability: AvailabilityOffer[];
-}) {
+export function TitleAvailability({ availability }: { availability: AvailabilityOffer[] }) {
   const { t } = useLingui();
   const offerLabels: Record<string, string> = {
     flatrate: t`Stream`,
@@ -150,7 +126,7 @@ export function TitleAvailability({
 
   return (
     <div className="space-y-2 pt-1">
-      <h2 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
+      <h2 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
         <Trans>Where to Watch</Trans>
       </h2>
       <div className="flex flex-wrap gap-4">
@@ -160,7 +136,7 @@ export function TitleAvailability({
 
           return (
             <div key={type} className="space-y-1.5">
-              <span className="font-medium text-[10px] text-muted-foreground/60 uppercase tracking-wider">
+              <span className="text-muted-foreground/60 text-[10px] font-medium tracking-wider uppercase">
                 {offerLabels[type] ?? type}
               </span>
               <div className="flex gap-1.5">

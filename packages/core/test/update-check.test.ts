@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+
 import { isNewerVersion } from "../src/update-check";
 
 describe("isNewerVersion", () => {

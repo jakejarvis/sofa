@@ -1,6 +1,7 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useMutation } from "@tanstack/react-query";
+
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { invalidateTitleQueries } from "@/lib/title-actions";
@@ -40,9 +41,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   const quickAdd = useMutation(
     orpc.titles.quickAdd.mutationOptions({
       onSuccess: (_data, input) => {
-        toast.success(
-          resolveToast(toastOverrides?.quickAdd, t`Added to watchlist`, input),
-        );
+        toast.success(resolveToast(toastOverrides?.quickAdd, t`Added to watchlist`, input));
         invalidateTitleQueries();
       },
       onError: () => {
@@ -64,9 +63,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
         const defaultMsg = input.status
           ? (statusMessages[input.status] ?? t`Status updated`)
           : t`Removed from library`;
-        toast.success(
-          resolveToast(toastOverrides?.updateStatus, defaultMsg, input),
-        );
+        toast.success(resolveToast(toastOverrides?.updateStatus, defaultMsg, input));
         invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to update status`),
@@ -76,9 +73,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   const watchMovie = useMutation(
     orpc.titles.watchMovie.mutationOptions({
       onSuccess: (_data, input) => {
-        toast.success(
-          resolveToast(toastOverrides?.watchMovie, t`Marked as watched`, input),
-        );
+        toast.success(resolveToast(toastOverrides?.watchMovie, t`Marked as watched`, input));
         invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to mark as watched`),
@@ -92,9 +87,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
           input.stars > 0
             ? t`Rated ${input.stars} ${plural(input.stars, { one: "star", other: "stars" })}`
             : t`Rating removed`;
-        toast.success(
-          resolveToast(toastOverrides?.updateRating, defaultMsg, input),
-        );
+        toast.success(resolveToast(toastOverrides?.updateRating, defaultMsg, input));
         // Rating only invalidates title queries, not dashboard
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
       },
@@ -105,9 +98,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   const watchEpisode = useMutation(
     orpc.episodes.watch.mutationOptions({
       onSuccess: (_data, input) => {
-        toast.success(
-          resolveToast(toastOverrides?.watchEpisode, t`Episode watched`, input),
-        );
+        toast.success(resolveToast(toastOverrides?.watchEpisode, t`Episode watched`, input));
         invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to mark episode`),
@@ -117,13 +108,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   const unwatchEpisode = useMutation(
     orpc.episodes.unwatch.mutationOptions({
       onSuccess: (_data, input) => {
-        toast.success(
-          resolveToast(
-            toastOverrides?.unwatchEpisode,
-            t`Episode unwatched`,
-            input,
-          ),
-        );
+        toast.success(resolveToast(toastOverrides?.unwatchEpisode, t`Episode unwatched`, input));
         invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to unmark episode`),
@@ -133,9 +118,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   const watchSeason = useMutation(
     orpc.seasons.watch.mutationOptions({
       onSuccess: (_data, input) => {
-        toast.success(
-          resolveToast(toastOverrides?.watchSeason, t`Season watched`, input),
-        );
+        toast.success(resolveToast(toastOverrides?.watchSeason, t`Season watched`, input));
         invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to mark some episodes`),

@@ -20,6 +20,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
+
 import type { IntegrationConfig } from "@/components/settings/integration-configs";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
@@ -40,12 +41,7 @@ interface IntegrationCardProps {
 
 export function IntegrationCard({ config, connection }: IntegrationCardProps) {
   const { provider, label } = config;
-  const providerInput = provider as
-    | "plex"
-    | "jellyfin"
-    | "emby"
-    | "sonarr"
-    | "radarr";
+  const providerInput = provider as "plex" | "jellyfin" | "emby" | "sonarr" | "radarr";
 
   const { t } = useLingui();
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
@@ -61,21 +57,13 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
 
   useEffect(() => {
     chevronRotation.set(
-      reduceMotion
-        ? expanded
-          ? 180
-          : 0
-        : withTiming(expanded ? 180 : 0, { duration: 200 }),
+      reduceMotion ? (expanded ? 180 : 0) : withTiming(expanded ? 180 : 0, { duration: 200 }),
     );
   }, [expanded, chevronRotation, reduceMotion]);
 
   useEffect(() => {
     setupChevronRotation.set(
-      reduceMotion
-        ? setupOpen
-          ? 180
-          : 0
-        : withTiming(setupOpen ? 180 : 0, { duration: 200 }),
+      reduceMotion ? (setupOpen ? 180 : 0) : withTiming(setupOpen ? 180 : 0, { duration: 200 }),
     );
   }, [setupOpen, setupChevronRotation, reduceMotion]);
 
@@ -164,7 +152,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
 
   return (
     <View
-      className="mb-2 overflow-hidden rounded-xl border bg-card"
+      className="bg-card mb-2 overflow-hidden rounded-xl border"
       style={{
         borderColor: "rgba(255,255,255,0.06)",
         borderCurve: "continuous",
@@ -179,19 +167,11 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
         className="flex-row items-center justify-between p-3"
       >
         <View className="flex-row items-center gap-3">
-          <ScaledIcon
-            icon={Icon}
-            size={18}
-            color={connection ? primaryColor : mutedFgColor}
-          />
+          <ScaledIcon icon={Icon} size={18} color={connection ? primaryColor : mutedFgColor} />
           <View>
-            <Text className="font-medium font-sans text-base text-foreground">
-              {label}
-            </Text>
-            <Text className="mt-0.5 text-muted-foreground text-xs">
-              {connection
-                ? config.connectedStatus(connection.lastEventAt)
-                : t`Not configured`}
+            <Text className="text-foreground font-sans text-base font-medium">{label}</Text>
+            <Text className="text-muted-foreground mt-0.5 text-xs">
+              {connection ? config.connectedStatus(connection.lastEventAt) : t`Not configured`}
             </Text>
           </View>
         </View>
@@ -206,49 +186,36 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
         <Animated.View
           entering={FadeIn.duration(200)}
           exiting={FadeOut.duration(150)}
-          className="border-white/[0.06] border-t px-4 pt-3 pb-4"
+          className="border-t border-white/[0.06] px-4 pt-3 pb-4"
         >
           {/* Requirement note */}
           {config.requirementNote && (
-            <View className="mb-3 flex-row items-start gap-2 rounded-lg bg-primary/[0.06] px-3 py-2.5">
-              <ScaledIcon
-                icon={IconInfoCircle}
-                size={14}
-                color={primaryColor}
-                className="mt-px"
-              />
-              <Text className="flex-1 text-foreground/80 text-xs">
-                {config.requirementNote}
-              </Text>
+            <View className="bg-primary/[0.06] mb-3 flex-row items-start gap-2 rounded-lg px-3 py-2.5">
+              <ScaledIcon icon={IconInfoCircle} size={14} color={primaryColor} className="mt-px" />
+              <Text className="text-foreground/80 flex-1 text-xs">{config.requirementNote}</Text>
             </View>
           )}
 
           {!connection ? (
             /* Connect button */
             <Pressable
-              onPress={() =>
-                connectMutation.mutate({ provider: providerInput })
-              }
+              onPress={() => connectMutation.mutate({ provider: providerInput })}
               disabled={connectMutation.isPending}
-              className="items-center rounded-lg bg-primary py-2.5 active:opacity-80"
+              className="bg-primary items-center rounded-lg py-2.5 active:opacity-80"
             >
-              <Text className="font-medium font-sans text-primary-foreground">
-                {connectMutation.isPending
-                  ? t`Connecting…`
-                  : t`Connect ${label}`}
+              <Text className="text-primary-foreground font-sans font-medium">
+                {connectMutation.isPending ? t`Connecting…` : t`Connect ${label}`}
               </Text>
             </Pressable>
           ) : (
             <View className="gap-3">
               {/* URL display */}
               <View>
-                <Text className="mb-1.5 text-muted-foreground text-xs">
-                  {config.urlLabel}
-                </Text>
-                <View className="flex-row items-center rounded-lg bg-secondary/50 px-3 py-2.5">
+                <Text className="text-muted-foreground mb-1.5 text-xs">{config.urlLabel}</Text>
+                <View className="bg-secondary/50 flex-row items-center rounded-lg px-3 py-2.5">
                   <Text
                     maxFontSizeMultiplier={1.0}
-                    className="flex-1 font-mono text-muted-foreground text-xs"
+                    className="text-muted-foreground flex-1 font-mono text-xs"
                     numberOfLines={1}
                   >
                     {url}
@@ -263,11 +230,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                     {copied ? (
                       <ScaledIcon icon={IconCheck} size={16} color="#4ade80" />
                     ) : (
-                      <ScaledIcon
-                        icon={IconCopy}
-                        size={16}
-                        color={mutedFgColor}
-                      />
+                      <ScaledIcon icon={IconCopy} size={16} color={mutedFgColor} />
                     )}
                   </Pressable>
                 </View>
@@ -278,23 +241,19 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                 <Pressable
                   onPress={handleRegenerate}
                   disabled={regenerateMutation.isPending}
-                  className="flex-1 flex-row items-center justify-center gap-1.5 rounded-lg bg-secondary py-2.5 active:opacity-80"
+                  className="bg-secondary flex-1 flex-row items-center justify-center gap-1.5 rounded-lg py-2.5 active:opacity-80"
                 >
-                  <ScaledIcon
-                    icon={IconRefresh}
-                    size={14}
-                    color={mutedFgColor}
-                  />
-                  <Text className="font-medium font-sans text-foreground text-sm">
+                  <ScaledIcon icon={IconRefresh} size={14} color={mutedFgColor} />
+                  <Text className="text-foreground font-sans text-sm font-medium">
                     <Trans>Regenerate</Trans>
                   </Text>
                 </Pressable>
                 <Pressable
                   onPress={handleDisconnect}
-                  className="flex-1 flex-row items-center justify-center gap-1.5 rounded-lg bg-destructive/10 py-2.5 active:opacity-80"
+                  className="bg-destructive/10 flex-1 flex-row items-center justify-center gap-1.5 rounded-lg py-2.5 active:opacity-80"
                 >
                   <ScaledIcon icon={IconTrash} size={14} color="#ef4444" />
-                  <Text className="font-medium font-sans text-destructive text-sm">
+                  <Text className="text-destructive font-sans text-sm font-medium">
                     <Trans>Disconnect</Trans>
                   </Text>
                 </Pressable>
@@ -304,16 +263,9 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
 
           {/* Setup instructions (nested accordion) */}
           <View className="mt-3">
-            <Pressable
-              onPress={toggleSetup}
-              className="flex-row items-center gap-1.5"
-            >
+            <Pressable onPress={toggleSetup} className="flex-row items-center gap-1.5">
               <Animated.View style={setupChevronStyle}>
-                <ScaledIcon
-                  icon={IconChevronDown}
-                  size={12}
-                  color={mutedFgColor}
-                />
+                <ScaledIcon icon={IconChevronDown} size={12} color={mutedFgColor} />
               </Animated.View>
               <Text className="text-muted-foreground text-xs">
                 <Trans>Setup instructions</Trans>
@@ -324,14 +276,12 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
               <Animated.View
                 entering={FadeIn.duration(200)}
                 exiting={FadeOut.duration(150)}
-                className="mt-2 rounded-lg border border-white/[0.04] bg-secondary/30 px-3 py-2.5"
+                className="bg-secondary/30 mt-2 rounded-lg border border-white/[0.04] px-3 py-2.5"
               >
                 {config.setupSteps.map((step, i) => (
                   <View key={step} className="flex-row py-1">
-                    <Text className="w-5 text-muted-foreground text-xs">
-                      {i + 1}.
-                    </Text>
-                    <Text className="flex-1 text-muted-foreground text-xs leading-[18px]">
+                    <Text className="text-muted-foreground w-5 text-xs">{i + 1}.</Text>
+                    <Text className="text-muted-foreground flex-1 text-xs leading-[18px]">
                       {step}
                     </Text>
                   </View>

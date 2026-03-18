@@ -31,10 +31,7 @@ export interface Logger {
   debug(msg: string, ...args: unknown[]): void;
 }
 
-function wrapLevel(
-  child: pino.Logger,
-  lvl: "error" | "warn" | "info" | "debug",
-) {
+function wrapLevel(child: pino.Logger, lvl: "error" | "warn" | "info" | "debug") {
   return (msg: string, ...args: unknown[]) => {
     if (args.length === 0) {
       child[lvl](msg);

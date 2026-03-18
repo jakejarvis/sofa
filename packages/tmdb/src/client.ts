@@ -1,5 +1,7 @@
-import { createLogger } from "@sofa/logger";
 import createClient, { type Middleware } from "openapi-fetch";
+
+import { createLogger } from "@sofa/logger";
+
 import type { operations, paths } from "./schema";
 
 const log = createLogger("tmdb");
@@ -17,9 +19,7 @@ type OpResponse<K extends keyof operations> = operations[K] extends {
 
 // Search
 export type TmdbSearchResponse = OpResponse<"search-multi">;
-export type TmdbSearchResult = NonNullable<
-  TmdbSearchResponse["results"]
->[number];
+export type TmdbSearchResult = NonNullable<TmdbSearchResponse["results"]>[number];
 
 // Movie details — augmented with append_to_response data
 export type TmdbMovieDetails = OpResponse<"movie-details"> & {
@@ -60,9 +60,7 @@ export interface TmdbWatchProviderResponse {
 
 // Recommendations — movie-recommendations is Record<string, never> in schema,
 // so we base on tv-series-recommendations and add movie fields TMDB returns.
-type TvRecResult = NonNullable<
-  OpResponse<"tv-series-recommendations">["results"]
->[number];
+type TvRecResult = NonNullable<OpResponse<"tv-series-recommendations">["results"]>[number];
 export type TmdbRecommendationResponse = Omit<
   OpResponse<"tv-series-recommendations">,
   "results"
@@ -75,10 +73,7 @@ export type TmdbRecommendationResponse = Omit<
 };
 
 // Find — schema types tv_results and tv_episode_results as unknown[]
-export type TmdbFindResult = Omit<
-  OpResponse<"find-by-id">,
-  "tv_results" | "tv_episode_results"
-> & {
+export type TmdbFindResult = Omit<OpResponse<"find-by-id">, "tv_results" | "tv_episode_results"> & {
   tv_results?: TmdbSearchResult[];
   tv_episode_results?: {
     id: number;
@@ -90,20 +85,13 @@ export type TmdbFindResult = Omit<
 };
 
 // Videos
-export type TmdbVideo = NonNullable<
-  OpResponse<"movie-videos">["results"]
->[number];
+export type TmdbVideo = NonNullable<OpResponse<"movie-videos">["results"]>[number];
 
 // Genres
-export type TmdbGenre = NonNullable<
-  OpResponse<"genre-movie-list">["genres"]
->[number];
+export type TmdbGenre = NonNullable<OpResponse<"genre-movie-list">["genres"]>[number];
 
 // Person — schema types deathday as unknown
-export type TmdbPersonDetails = Omit<
-  OpResponse<"person-details">,
-  "deathday"
-> & {
+export type TmdbPersonDetails = Omit<OpResponse<"person-details">, "deathday"> & {
   deathday?: string | null;
 };
 
@@ -156,9 +144,7 @@ const loggingMiddleware: Middleware = {
     const start = requestTimings.get(request);
     const elapsed = start ? Math.round(performance.now() - start) : 0;
     if (!response.ok) {
-      log.warn(
-        `${request.url} -> ${response.status} ${response.statusText} (${elapsed}ms)`,
-      );
+      log.warn(`${request.url} -> ${response.status} ${response.statusText} (${elapsed}ms)`);
     } else {
       log.debug(`${request.url} -> ${response.status} (${elapsed}ms)`);
     }
@@ -229,16 +215,12 @@ export async function getTvExternalIds(tmdbId: number) {
 }
 
 export async function getTvSeasonDetails(tmdbId: number, seasonNumber: number) {
-  const { data, error } = await client.GET(
-    "/3/tv/{series_id}/season/{season_number}",
-    {
-      params: {
-        path: { series_id: tmdbId, season_number: seasonNumber },
-      },
+  const { data, error } = await client.GET("/3/tv/{series_id}/season/{season_number}", {
+    params: {
+      path: { series_id: tmdbId, season_number: seasonNumber },
     },
-  );
-  if (error)
-    throw new Error(`TMDB API error: tv/${tmdbId}/season/${seasonNumber}`);
+  });
+  if (error) throw new Error(`TMDB API error: tv/${tmdbId}/season/${seasonNumber}`);
   return data;
 }
 
@@ -246,18 +228,15 @@ export async function getTvSeasonDetails(tmdbId: number, seasonNumber: number) {
 
 export async function getWatchProviders(tmdbId: number, type: "movie" | "tv") {
   if (type === "movie") {
-    const { data, error } = await client.GET(
-      "/3/movie/{movie_id}/watch/providers",
-      { params: { path: { movie_id: tmdbId } } },
-    );
-    if (error)
-      throw new Error(`TMDB API error: movie/${tmdbId}/watch/providers`);
+    const { data, error } = await client.GET("/3/movie/{movie_id}/watch/providers", {
+      params: { path: { movie_id: tmdbId } },
+    });
+    if (error) throw new Error(`TMDB API error: movie/${tmdbId}/watch/providers`);
     return data as TmdbWatchProviderResponse;
   }
-  const { data, error } = await client.GET(
-    "/3/tv/{series_id}/watch/providers",
-    { params: { path: { series_id: tmdbId } } },
-  );
+  const { data, error } = await client.GET("/3/tv/{series_id}/watch/providers", {
+    params: { path: { series_id: tmdbId } },
+  });
   if (error) throw new Error(`TMDB API error: tv/${tmdbId}/watch/providers`);
   return data as TmdbWatchProviderResponse;
 }
@@ -266,18 +245,15 @@ export async function getWatchProviders(tmdbId: number, type: "movie" | "tv") {
 
 export async function getRecommendations(tmdbId: number, type: "movie" | "tv") {
   if (type === "movie") {
-    const { data, error } = await client.GET(
-      "/3/movie/{movie_id}/recommendations",
-      { params: { path: { movie_id: tmdbId } } },
-    );
-    if (error)
-      throw new Error(`TMDB API error: movie/${tmdbId}/recommendations`);
+    const { data, error } = await client.GET("/3/movie/{movie_id}/recommendations", {
+      params: { path: { movie_id: tmdbId } },
+    });
+    if (error) throw new Error(`TMDB API error: movie/${tmdbId}/recommendations`);
     return data as TmdbRecommendationResponse;
   }
-  const { data, error } = await client.GET(
-    "/3/tv/{series_id}/recommendations",
-    { params: { path: { series_id: tmdbId } } },
-  );
+  const { data, error } = await client.GET("/3/tv/{series_id}/recommendations", {
+    params: { path: { series_id: tmdbId } },
+  });
   if (error) throw new Error(`TMDB API error: tv/${tmdbId}/recommendations`);
   return data as TmdbRecommendationResponse;
 }
@@ -309,10 +285,9 @@ export async function getTrending(
   const query = { page } as Record<string, unknown>;
 
   if (mediaType === "movie") {
-    const { data, error } = await client.GET(
-      "/3/trending/movie/{time_window}",
-      { params: { path: { time_window: timeWindow }, query } },
-    );
+    const { data, error } = await client.GET("/3/trending/movie/{time_window}", {
+      params: { path: { time_window: timeWindow }, query },
+    });
     if (error) throw new Error("TMDB API error: trending/movie");
     return data;
   }
@@ -360,11 +335,7 @@ export async function getGenres(type: "movie" | "tv") {
 
 // ─── Discover ───────────────────────────────────────────────────────
 
-export async function discover(
-  type: "movie" | "tv",
-  params: Record<string, string>,
-  page = 1,
-) {
+export async function discover(type: "movie" | "tv", params: Record<string, string>, page = 1) {
   // Discover accepts many dynamic filter params (with_genres, vote_count.gte, etc.)
   // that aren't individually typed in the schema, so widen to Record<string, unknown>.
   if (type === "movie") {
@@ -400,10 +371,7 @@ export async function getVideos(tmdbId: number, type: "movie" | "tv") {
 
 // ─── Find by External ID ───────────────────────────────────────────
 
-export async function findByExternalId(
-  externalId: string,
-  source: "imdb_id" | "tvdb_id",
-) {
+export async function findByExternalId(externalId: string, source: "imdb_id" | "tvdb_id") {
   const { data, error } = await client.GET("/3/find/{external_id}", {
     params: {
       path: { external_id: externalId },
@@ -425,10 +393,9 @@ export async function getMovieCredits(tmdbId: number) {
 }
 
 export async function getTvAggregateCredits(tmdbId: number) {
-  const { data, error } = await client.GET(
-    "/3/tv/{series_id}/aggregate_credits",
-    { params: { path: { series_id: tmdbId } } },
-  );
+  const { data, error } = await client.GET("/3/tv/{series_id}/aggregate_credits", {
+    params: { path: { series_id: tmdbId } },
+  });
   if (error) throw new Error(`TMDB API error: tv/${tmdbId}/aggregate_credits`);
   return data;
 }
@@ -447,8 +414,7 @@ export async function getPersonCombinedCredits(tmdbId: number) {
     // Schema incorrectly types person_id as string here (number everywhere else)
     { params: { path: { person_id: String(tmdbId) } } },
   );
-  if (error)
-    throw new Error(`TMDB API error: person/${tmdbId}/combined_credits`);
+  if (error) throw new Error(`TMDB API error: person/${tmdbId}/combined_credits`);
   return data;
 }
 

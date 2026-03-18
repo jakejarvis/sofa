@@ -2,17 +2,12 @@ import { db } from "@sofa/db/client";
 import { count } from "@sofa/db/helpers";
 import { titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
+
 import { imageCacheEnabled } from "./image-cache";
-import {
-  getInstanceId,
-  getSetting,
-  getUserCount,
-  setSetting,
-} from "./settings";
+import { getInstanceId, getSetting, getUserCount, setSetting } from "./settings";
 
 const APP_VERSION = process.env.APP_VERSION || "0.0.0";
-const PUBLIC_API_URL =
-  process.env.PUBLIC_API_URL || "https://public-api.sofa.watch";
+const PUBLIC_API_URL = process.env.PUBLIC_API_URL || "https://public-api.sofa.watch";
 const REPORT_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 const log = createLogger("telemetry");

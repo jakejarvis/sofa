@@ -6,8 +6,8 @@
 # Root commands (via Turborepo)
 bun run dev              # Start API server + Vite dev server
 bun run build            # Production build (both apps)
-bun run lint             # Biome lint check
-bun run format           # Biome format (auto-fix)
+bun run lint             # Oxlint lint check
+bun run format           # Oxfmt format (auto-fix)
 bun run check-types      # TypeScript type check
 bun run test             # Run tests
 bun run generate:openapi # Regenerate OpenAPI spec + docs API pages (run after contract/schema changes)
@@ -51,8 +51,9 @@ couch-potato/
 │   ├── db/            # @sofa/db — Drizzle schema, client, migrations (JIT)
 │   ├── logger/        # @sofa/logger — Pino-based structured logging (JIT)
 │   └── tmdb/          # @sofa/tmdb — TMDB API client + image URL helper (JIT)
+├── .oxlintrc.json
+├── .oxfmtrc.json
 ├── turbo.json
-├── biome.json
 ├── Dockerfile
 └── package.json
 ```
@@ -76,7 +77,7 @@ All shared packages are JIT (raw TypeScript exports, no build step).
 - **Auth**: Better Auth with Drizzle adapter — email/password + optional OIDC/SSO
 - **Monorepo**: Turborepo with Bun workspaces
 - **Docs**: Fumadocs (Next.js), fumadocs-openapi for API reference
-- **Linting**: Biome (2-space indent, organized imports)
+- **Linting**: Oxlint + Oxfmt (2-space indent, organized imports, Tailwind class sorting)
 - **External API**: TMDB (The Movie Database)
 
 ### Package imports
@@ -84,6 +85,7 @@ All shared packages are JIT (raw TypeScript exports, no build step).
 Path aliases: `@/*` maps to `src/` in both `apps/web/` and `apps/native/`.
 
 Cross-package imports:
+
 - `@sofa/api/contract`, `@sofa/api/schemas` — Contract and Zod types
 - `@sofa/db/client`, `@sofa/db/schema`, `@sofa/db/helpers`, `@sofa/db/migrate`, `@sofa/db/test-utils`
 - `@sofa/tmdb/client`, `@sofa/tmdb/image`
@@ -107,6 +109,7 @@ Cross-package imports:
 Required: `TMDB_API_READ_ACCESS_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`.
 
 Optional:
+
 - `DATA_DIR` — Root for DB + cache (default `./data`). `DATABASE_URL` and `CACHE_DIR` derived from it but overridable.
 - `TMDB_API_BASE_URL`, `TMDB_IMAGE_BASE_URL` — Override TMDB endpoints.
 - `PUBLIC_API_URL` — Base URL for centralized public API (default: `https://public-api.sofa.watch`). Used for update checks and OAuth import proxy.

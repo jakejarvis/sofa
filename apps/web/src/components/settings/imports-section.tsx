@@ -1,16 +1,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { NormalizedImport } from "@sofa/api/schemas";
 import { IconCloudUpload, IconFileImport, IconLink } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -26,6 +21,7 @@ import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { getErrorMessage } from "@/lib/error-messages";
 import { client, orpc } from "@/lib/orpc/client";
+import type { NormalizedImport } from "@sofa/api/schemas";
 
 // ─── Source Configs ──────────────────────────────────────────
 
@@ -105,7 +101,7 @@ const SOURCES: SourceConfig[] = [
     label: "Trakt",
     description: "Connect your Trakt account or upload a JSON export.",
     accept: ".json",
-    icon: <TraktLogo className="size-4 text-primary" />,
+    icon: <TraktLogo className="text-primary size-4" />,
     supportsOAuth: true,
   },
   {
@@ -113,7 +109,7 @@ const SOURCES: SourceConfig[] = [
     label: "Simkl",
     description: "Connect your Simkl account or upload a JSON export.",
     accept: ".json",
-    icon: <SimklLogo className="size-4 text-primary" />,
+    icon: <SimklLogo className="text-primary size-4" />,
     supportsOAuth: true,
   },
   {
@@ -121,7 +117,7 @@ const SOURCES: SourceConfig[] = [
     label: "Letterboxd",
     description: "Upload the ZIP export from your Letterboxd account settings.",
     accept: ".zip",
-    icon: <LetterboxdLogo className="size-4 text-primary" />,
+    icon: <LetterboxdLogo className="text-primary size-4" />,
     supportsOAuth: false,
   },
 ];
@@ -174,8 +170,8 @@ export function ImportsSection() {
   return (
     <div>
       <div className="mb-3 flex items-center gap-2">
-        <IconFileImport aria-hidden className="size-4 text-muted-foreground" />
-        <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+        <IconFileImport aria-hidden className="text-muted-foreground size-4" />
+        <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
           <Trans>Import</Trans>
         </h2>
       </div>
@@ -193,13 +189,10 @@ export function ImportsSection() {
 function ImportSourceCard({ config }: { config: SourceConfig }) {
   const { t } = useLingui();
   const { data: systemStatus } = useQuery(orpc.system.status.queryOptions());
-  const publicApiUrl =
-    systemStatus?.publicApiUrl ?? "https://public-api.sofa.watch";
+  const publicApiUrl = systemStatus?.publicApiUrl ?? "https://public-api.sofa.watch";
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [step, setStep] = useState<DialogStep>(
-    config.supportsOAuth ? "choose" : "preview",
-  );
+  const [step, setStep] = useState<DialogStep>(config.supportsOAuth ? "choose" : "preview");
   const [preview, setPreview] = useState<ImportPreview | null>(null);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [options, setOptions] = useState({
@@ -268,10 +261,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         options,
       });
 
-      const eventSource = await client.imports.jobEvents(
-        { id: job.id },
-        { signal: abort.signal },
-      );
+      const eventSource = await client.imports.jobEvents({ id: job.id }, { signal: abort.signal });
 
       let receivedComplete = false;
 
@@ -288,15 +278,11 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
           });
           setStep("done");
           if (event.job.importedCount > 0) {
-            toast.success(
-              t`Imported ${event.job.importedCount} items from ${config.label}`,
-            );
+            toast.success(t`Imported ${event.job.importedCount} items from ${config.label}`);
           }
         } else if (event.type === "timeout") {
           receivedComplete = true;
-          toast.info(
-            t`Import is still running in the background. Check back later.`,
-          );
+          toast.info(t`Import is still running in the background. Check back later.`);
           setStep("preview");
         } else {
           setProgress({
@@ -325,9 +311,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
             });
             setStep("done");
           } else {
-            toast.info(
-              t`Import is still running in the background. Check back later.`,
-            );
+            toast.info(t`Import is still running in the background. Check back later.`);
             setStep("preview");
           }
         } catch {
@@ -377,15 +361,13 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
     setStep("device-code");
 
     try {
-      const res = await fetch(
-        `${publicApiUrl}/v1/import/${config.source}/device-code`,
-        { method: "POST" },
-      );
+      const res = await fetch(`${publicApiUrl}/v1/import/${config.source}/device-code`, {
+        method: "POST",
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(
-          (err as { error?: string }).error ??
-            t`Failed to start ${config.label} connection`,
+          (err as { error?: string }).error ?? t`Failed to start ${config.label} connection`,
         );
       }
       const data = (await res.json()) as DeviceCodeInfo;
@@ -415,14 +397,11 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
       }
 
       try {
-        const res = await fetch(
-          `${publicApiUrl}/v1/import/${config.source}/poll`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ device_code: code.device_code }),
-          },
-        );
+        const res = await fetch(`${publicApiUrl}/v1/import/${config.source}/poll`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ device_code: code.device_code }),
+        });
         if (!res.ok) return;
 
         const data = (await res.json()) as {
@@ -468,7 +447,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
       <CardContent>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+            <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
               {config.icon}
             </div>
             <div>
@@ -526,11 +505,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
             />
           )}
           {step === "device-code" && (
-            <DeviceCodeStep
-              source={config.label}
-              deviceCode={deviceCode}
-              onCancel={handleClose}
-            />
+            <DeviceCodeStep source={config.label} deviceCode={deviceCode} onCancel={handleClose} />
           )}
           {step === "fetching" && <FetchingStep source={config.label} />}
           {step === "preview" && preview && (
@@ -543,15 +518,9 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
               onCancel={handleClose}
             />
           )}
-          {step === "importing" && (
-            <ImportingStep source={config.label} progress={progress} />
-          )}
+          {step === "importing" && <ImportingStep source={config.label} progress={progress} />}
           {step === "done" && result && (
-            <DoneStep
-              source={config.label}
-              result={result}
-              onClose={handleClose}
-            />
+            <DoneStep source={config.label} result={result} onClose={handleClose} />
           )}
         </DialogContent>
       </Dialog>
@@ -590,35 +559,32 @@ function ChooseStep({
 
       <div className="space-y-3 py-2">
         {oauthError && (
-          <div className="rounded-lg bg-destructive/10 p-3">
+          <div className="bg-destructive/10 rounded-lg p-3">
             <p className="text-destructive text-sm">{oauthError}</p>
           </div>
         )}
 
         <button
           type="button"
-          className="flex w-full items-center gap-3 rounded-lg border border-border/50 p-4 text-left transition-colors hover:bg-muted/50"
+          className="border-border/50 hover:bg-muted/50 flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors"
           onClick={onConnect}
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <IconLink aria-hidden className="size-5 text-primary" />
+          <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+            <IconLink aria-hidden className="text-primary size-5" />
           </div>
           <div>
-            <p className="font-medium text-sm">
+            <p className="text-sm font-medium">
               <Trans>Connect with {config.label}</Trans>
             </p>
             <p className="text-muted-foreground text-xs">
-              <Trans>
-                Authorize Sofa to read your {config.label} library. No password
-                shared.
-              </Trans>
+              <Trans>Authorize Sofa to read your {config.label} library. No password shared.</Trans>
             </p>
           </div>
         </button>
 
         <button
           type="button"
-          className="flex w-full items-center gap-3 rounded-lg border border-border/50 p-4 text-left transition-colors hover:bg-muted/50"
+          className="border-border/50 hover:bg-muted/50 flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors"
           onClick={() => {
             onCancel();
             // Small delay so the dialog closes before file picker opens
@@ -626,11 +592,11 @@ function ChooseStep({
           }}
           disabled={isParsing}
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <IconCloudUpload aria-hidden className="size-5 text-primary" />
+          <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+            <IconCloudUpload aria-hidden className="text-primary size-5" />
           </div>
           <div>
-            <p className="font-medium text-sm">
+            <p className="text-sm font-medium">
               <Trans>Upload export file</Trans>
             </p>
             <p className="text-muted-foreground text-xs">
@@ -665,9 +631,7 @@ function DeviceCodeStep({
           <Trans>Connect to {source}</Trans>
         </DialogTitle>
         <DialogDescription>
-          <Trans>
-            Enter the code below on {source}'s website to authorize Sofa.
-          </Trans>
+          <Trans>Enter the code below on {source}'s website to authorize Sofa.</Trans>
         </DialogDescription>
       </DialogHeader>
 
@@ -677,7 +641,7 @@ function DeviceCodeStep({
             <p className="text-muted-foreground text-sm">
               <Trans>Your code:</Trans>
             </p>
-            <p className="rounded-lg bg-muted px-6 py-3 font-bold font-mono text-2xl tracking-widest">
+            <p className="bg-muted rounded-lg px-6 py-3 font-mono text-2xl font-bold tracking-widest">
               {deviceCode.user_code}
             </p>
           </div>
@@ -687,14 +651,14 @@ function DeviceCodeStep({
               href={deviceCode.verification_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 font-medium text-primary text-sm underline-offset-4 hover:underline"
+              className="text-primary inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 hover:underline"
             >
               <IconLink aria-hidden className="size-4" />
               <Trans>Open {source} to enter code</Trans>
             </a>
           </div>
 
-          <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
+          <div className="text-muted-foreground flex items-center justify-center gap-2 text-xs">
             <Spinner className="size-3" />
             <Trans>Waiting for authorization...</Trans>
           </div>
@@ -728,9 +692,7 @@ function FetchingStep({ source }: { source: string }) {
       <div className="flex flex-col items-center gap-3 py-8">
         <Spinner className="size-8" />
         <p className="text-muted-foreground text-sm">
-          <Trans>
-            Retrieving your watch history, watchlist, and ratings...
-          </Trans>
+          <Trans>Retrieving your watch history, watchlist, and ratings...</Trans>
         </p>
       </div>
     </>
@@ -783,18 +745,18 @@ function PreviewStep({
         </div>
 
         {preview.diagnostics && preview.diagnostics.unresolved > 0 && (
-          <div className="rounded-lg bg-muted/50 p-3">
+          <div className="bg-muted/50 rounded-lg p-3">
             <p className="text-muted-foreground text-xs">
               <Trans>
-                {preview.diagnostics.unresolved} items have no external IDs and
-                will be resolved by title search, which may be less accurate.
+                {preview.diagnostics.unresolved} items have no external IDs and will be resolved by
+                title search, which may be less accurate.
               </Trans>
             </p>
           </div>
         )}
 
         <div className="space-y-2">
-          <p className="font-medium text-sm">
+          <p className="text-sm font-medium">
             <Trans>Import options</Trans>
           </p>
           <OptionCheckbox
@@ -819,12 +781,11 @@ function PreviewStep({
 
         {warnings.length > 0 && (
           <div className="rounded-lg bg-yellow-500/10 p-3">
-            <p className="mb-1 font-medium text-xs text-yellow-600">
+            <p className="mb-1 text-xs font-medium text-yellow-600">
               <Trans>Warnings</Trans>
             </p>
             <ul className="space-y-0.5 text-xs text-yellow-600/80">
               {warnings.map((w, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: static display list
                 <li key={i}>{w}</li>
               ))}
             </ul>
@@ -852,9 +813,7 @@ function ImportingStep({
   progress: { current: number; total: number; message: string } | null;
 }) {
   const pct =
-    progress && progress.total > 0
-      ? Math.round((progress.current / progress.total) * 100)
-      : null;
+    progress && progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : null;
 
   return (
     <>
@@ -864,8 +823,7 @@ function ImportingStep({
         </DialogTitle>
         <DialogDescription>
           <Trans>
-            This may take a few minutes for large libraries. Please don't close
-            this tab.
+            This may take a few minutes for large libraries. Please don't close this tab.
           </Trans>
         </DialogDescription>
       </DialogHeader>
@@ -874,10 +832,10 @@ function ImportingStep({
         <div className="flex flex-col items-center gap-1 text-center">
           {progress ? (
             <>
-              <p className="font-medium text-sm">
+              <p className="text-sm font-medium">
                 {progress.current} / {progress.total}
               </p>
-              <p className="max-w-[300px] truncate text-muted-foreground text-xs">
+              <p className="text-muted-foreground max-w-[300px] truncate text-xs">
                 {progress.message}
               </p>
             </>
@@ -924,13 +882,12 @@ function DoneStep({
         </div>
 
         {result.errors.length > 0 && (
-          <div className="max-h-40 overflow-y-auto rounded-lg bg-destructive/10 p-3">
-            <p className="mb-1 font-medium text-destructive text-xs">
+          <div className="bg-destructive/10 max-h-40 overflow-y-auto rounded-lg p-3">
+            <p className="text-destructive mb-1 text-xs font-medium">
               <Trans>Errors ({result.errors.length})</Trans>
             </p>
-            <ul className="space-y-0.5 text-destructive/80 text-xs">
+            <ul className="text-destructive/80 space-y-0.5 text-xs">
               {result.errors.slice(0, 50).map((e, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: static display list
                 <li key={i}>{e}</li>
               ))}
               {result.errors.length > 50 && (
@@ -944,12 +901,11 @@ function DoneStep({
 
         {result.warnings.length > 0 && (
           <div className="max-h-32 overflow-y-auto rounded-lg bg-yellow-500/10 p-3">
-            <p className="mb-1 font-medium text-xs text-yellow-600">
+            <p className="mb-1 text-xs font-medium text-yellow-600">
               <Trans>Warnings ({result.warnings.length})</Trans>
             </p>
             <ul className="space-y-0.5 text-xs text-yellow-600/80">
               {result.warnings.slice(0, 20).map((w, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: static display list
                 <li key={i}>{w}</li>
               ))}
             </ul>
@@ -970,9 +926,9 @@ function DoneStep({
 
 function StatBadge({ label, count }: { label: string; count: number }) {
   return (
-    <div className="rounded-lg bg-muted/50 p-2.5 text-center">
-      <p className="font-semibold text-lg leading-none">{count}</p>
-      <p className="mt-1 text-muted-foreground text-xs">{label}</p>
+    <div className="bg-muted/50 rounded-lg p-2.5 text-center">
+      <p className="text-lg leading-none font-semibold">{count}</p>
+      <p className="text-muted-foreground mt-1 text-xs">{label}</p>
     </div>
   );
 }

@@ -1,11 +1,5 @@
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { BackupInfo } from "@sofa/api/schemas";
-import {
-  formatBytes as formatBytesI18n,
-  formatDate,
-  formatRelativeTime,
-} from "@sofa/i18n/format";
 import {
   IconClock,
   IconCloudDownload,
@@ -19,6 +13,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,12 +28,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { orpc } from "@/lib/orpc/client";
+import type { BackupInfo } from "@sofa/api/schemas";
+import { formatBytes as formatBytesI18n, formatDate, formatRelativeTime } from "@sofa/i18n/format";
 
 function formatBackupDate(dateStr: string): string {
   return formatDate(dateStr, {
@@ -86,9 +79,7 @@ export function BackupSection() {
     orpc.admin.backups.delete.mutationOptions({
       onMutate: ({ filename }) => {
         const previous = displayBackups;
-        setBackups(
-          displayBackups.filter((b: BackupInfo) => b.filename !== filename),
-        );
+        setBackups(displayBackups.filter((b: BackupInfo) => b.filename !== filename));
         return { previous };
       },
       onSuccess: () => toast.success(t`Backup deleted`),
@@ -100,9 +91,7 @@ export function BackupSection() {
   );
 
   const creating = createMutation.isPending;
-  const deleting = deleteMutation.isPending
-    ? (deleteMutation.variables?.filename ?? null)
-    : null;
+  const deleting = deleteMutation.isPending ? (deleteMutation.variables?.filename ?? null) : null;
 
   const backupCountLabel =
     displayBackups.length > 0
@@ -115,11 +104,8 @@ export function BackupSection() {
       <CardContent>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconDatabaseExport
-                aria-hidden={true}
-                className="size-4 text-primary"
-              />
+            <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+              <IconDatabaseExport aria-hidden={true} className="text-primary size-4" />
             </div>
             <div>
               <CardTitle>
@@ -129,11 +115,7 @@ export function BackupSection() {
             </div>
           </div>
           <Button onClick={() => createMutation.mutate()} disabled={creating}>
-            {creating ? (
-              <Spinner className="size-3" />
-            ) : (
-              <IconPlus aria-hidden={true} />
-            )}
+            {creating ? <Spinner className="size-3" /> : <IconPlus aria-hidden={true} />}
             {creating ? <Trans>Creating…</Trans> : <Trans>New backup</Trans>}
           </Button>
         </div>
@@ -153,25 +135,19 @@ export function BackupSection() {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="group flex items-center gap-3 rounded-md px-2.5 py-1.5 transition-colors hover:bg-muted/40">
+                  <div className="group hover:bg-muted/40 flex items-center gap-3 rounded-md px-2.5 py-1.5 transition-colors">
                     <Tooltip>
                       <TooltipTrigger
                         render={
-                          <span className="flex shrink-0 items-center text-muted-foreground" />
+                          <span className="text-muted-foreground flex shrink-0 items-center" />
                         }
                       >
                         {backup.source === "scheduled" ? (
                           <IconClock aria-hidden={true} className="size-3.5" />
                         ) : backup.source === "pre-restore" ? (
-                          <IconShieldCheck
-                            aria-hidden={true}
-                            className="size-3.5"
-                          />
+                          <IconShieldCheck aria-hidden={true} className="size-3.5" />
                         ) : (
-                          <IconPointer
-                            aria-hidden={true}
-                            className="size-3.5"
-                          />
+                          <IconPointer aria-hidden={true} className="size-3.5" />
                         )}
                       </TooltipTrigger>
                       <TooltipContent>
@@ -184,14 +160,14 @@ export function BackupSection() {
                     </Tooltip>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-2">
-                        <span className="font-medium text-foreground text-xs">
+                        <span className="text-foreground text-xs font-medium">
                           {formatBackupDate(backup.createdAt)}
                         </span>
-                        <span className="text-[11px] text-muted-foreground">
+                        <span className="text-muted-foreground text-[11px]">
                           {formatBytesI18n(backup.sizeBytes)}
                         </span>
                         <span
-                          className="text-[11px] text-muted-foreground/50"
+                          className="text-muted-foreground/50 text-[11px]"
                           suppressHydrationWarning
                         >
                           {formatRelativeTime(backup.createdAt)}
@@ -240,11 +216,7 @@ export function BackupSection() {
                               />
                             }
                           >
-                            {deleting === backup.filename ? (
-                              <Spinner />
-                            ) : (
-                              <IconTrash />
-                            )}
+                            {deleting === backup.filename ? <Spinner /> : <IconTrash />}
                           </AlertDialogTrigger>
                           <TooltipContent>
                             <Trans>Delete</Trans>
@@ -258,10 +230,8 @@ export function BackupSection() {
                             <AlertDialogDescription>
                               <Trans>
                                 This will permanently delete the backup from{" "}
-                                <strong>
-                                  {formatBackupDate(backup.createdAt)}
-                                </strong>
-                                . This cannot be undone.
+                                <strong>{formatBackupDate(backup.createdAt)}</strong>. This cannot
+                                be undone.
                               </Trans>
                             </AlertDialogDescription>
                           </AlertDialogHeader>

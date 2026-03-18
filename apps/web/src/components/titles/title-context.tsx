@@ -1,8 +1,9 @@
-import type { Season } from "@sofa/api/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, use } from "react";
+
 import { useSession } from "@/lib/auth/client";
 import { orpc } from "@/lib/orpc/client";
+import type { Season } from "@sofa/api/schemas";
 
 interface TitleContextValue {
   titleId: string;
@@ -18,8 +19,7 @@ export const TitleContext = createContext<TitleContextValue | null>(null);
 
 export function useTitleContext() {
   const ctx = use(TitleContext);
-  if (!ctx)
-    throw new Error("useTitleContext must be used within TitleProvider");
+  if (!ctx) throw new Error("useTitleContext must be used within TitleProvider");
   return ctx;
 }
 

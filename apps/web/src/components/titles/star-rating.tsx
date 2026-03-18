@@ -37,9 +37,7 @@ export function StarRating({ value, onChange }: StarRatingProps) {
             className="p-0.5"
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.9 }}
-            animate={
-              filled && star === value ? { scale: [1, 1.25, 1] } : { scale: 1 }
-            }
+            animate={filled && star === value ? { scale: [1, 1.25, 1] } : { scale: 1 }}
             transition={
               filled && star === value
                 ? { type: "tween", duration: 0.3, ease: "easeInOut" }
@@ -47,9 +45,9 @@ export function StarRating({ value, onChange }: StarRatingProps) {
             }
           >
             {filled ? (
-              <IconStarFilled className="size-4.5 text-primary" />
+              <IconStarFilled className="text-primary size-4.5" />
             ) : (
-              <IconStar className="size-4.5 text-muted-foreground/30" />
+              <IconStar className="text-muted-foreground/30 size-4.5" />
             )}
           </motion.button>
         );

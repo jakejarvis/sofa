@@ -1,12 +1,6 @@
-export type ImageCategory =
-  | "posters"
-  | "backdrops"
-  | "stills"
-  | "logos"
-  | "profiles";
+export type ImageCategory = "posters" | "backdrops" | "stills" | "logos" | "profiles";
 
-const IMAGE_BASE_URL =
-  process.env.TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p";
+const IMAGE_BASE_URL = process.env.TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p";
 
 export const IMAGE_CATEGORY_SIZES: Record<ImageCategory, string> = {
   posters: "w500",
@@ -26,11 +20,7 @@ export function tmdbCdnImageUrl(
   return `${IMAGE_BASE_URL}/${size}${path}`;
 }
 
-export function tmdbImageUrl(
-  path: string | null,
-  category: ImageCategory,
-  sizeOverride?: string,
-) {
+export function tmdbImageUrl(path: string | null, category: ImageCategory, sizeOverride?: string) {
   if (!path) return null;
 
   if (process.env.IMAGE_CACHE_ENABLED === "false") {

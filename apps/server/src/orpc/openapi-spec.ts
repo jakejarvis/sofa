@@ -1,8 +1,6 @@
-import {
-  OpenAPIGenerator,
-  type OpenAPIGeneratorGenerateOptions,
-} from "@orpc/openapi";
+import { OpenAPIGenerator, type OpenAPIGeneratorGenerateOptions } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
+
 import {
   BackupSchema,
   CastMemberSchema,
@@ -18,6 +16,7 @@ import {
   SystemHealthSchema,
   TmdbBrowseItem,
 } from "@sofa/api/schemas";
+
 import { implementedRouter } from "./router";
 
 export const schemaConverters = [new ZodToJsonSchemaConverter()];
@@ -43,16 +42,7 @@ const generator = new OpenAPIGenerator({
   schemaConverters,
 });
 
-const httpMethods = [
-  "get",
-  "put",
-  "post",
-  "delete",
-  "options",
-  "head",
-  "patch",
-  "trace",
-] as const;
+const httpMethods = ["get", "put", "post", "delete", "options", "head", "patch", "trace"] as const;
 
 type OpenApiSpec = Awaited<ReturnType<OpenAPIGenerator["generate"]>>;
 
@@ -102,14 +92,10 @@ function normalizeSchema(schema: unknown): unknown {
 
   if (isRecord(normalized.properties)) {
     const nextProperties = Object.fromEntries(
-      Object.entries(normalized.properties).flatMap(
-        ([name, propertySchema]) => {
-          const nextPropertySchema = normalizeSchema(propertySchema);
-          return nextPropertySchema === undefined
-            ? []
-            : [[name, nextPropertySchema]];
-        },
-      ),
+      Object.entries(normalized.properties).flatMap(([name, propertySchema]) => {
+        const nextPropertySchema = normalizeSchema(propertySchema);
+        return nextPropertySchema === undefined ? [] : [[name, nextPropertySchema]];
+      }),
     );
 
     if (Object.keys(nextProperties).length > 0) {
@@ -121,8 +107,7 @@ function normalizeSchema(schema: unknown): unknown {
     if (Array.isArray(normalized.required)) {
       const propertyNames = new Set(Object.keys(nextProperties));
       const nextRequired = normalized.required.filter(
-        (name): name is string =>
-          typeof name === "string" && propertyNames.has(name),
+        (name): name is string => typeof name === "string" && propertyNames.has(name),
       );
 
       if (nextRequired.length > 0) {
@@ -143,9 +128,7 @@ function normalizeSchema(schema: unknown): unknown {
   }
 
   if (isRecord(normalized.additionalProperties)) {
-    const nextAdditionalProperties = normalizeSchema(
-      normalized.additionalProperties,
-    );
+    const nextAdditionalProperties = normalizeSchema(normalized.additionalProperties);
 
     if (nextAdditionalProperties === undefined) {
       delete normalized.additionalProperties;
@@ -190,8 +173,7 @@ export function normalizeOpenApiSpec<T extends OpenApiSpec>(spec: T): T {
         const nextContent = normalizeContent(operation.requestBody.content);
 
         if (nextContent) {
-          operation.requestBody.content =
-            nextContent as typeof operation.requestBody.content;
+          operation.requestBody.content = nextContent as typeof operation.requestBody.content;
         } else {
           delete operation.requestBody;
         }

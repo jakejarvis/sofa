@@ -1,8 +1,10 @@
 import { ORPCError } from "@orpc/server";
+
 import { AppErrorCode } from "@sofa/api/errors";
 import { db } from "@sofa/db/client";
 import { and, desc, eq } from "@sofa/db/helpers";
 import { integrationEvents, integrations } from "@sofa/db/schema";
+
 import { os } from "../context";
 import { authed } from "../middleware";
 
@@ -13,9 +15,7 @@ function integrationTypeFor(provider: string): "webhook" | "list" {
 }
 
 function generateToken() {
-  return Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString(
-    "hex",
-  );
+  return Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("hex");
 }
 
 function serializeIntegration(row: {
@@ -41,10 +41,7 @@ export const list = os.integrations.list.use(authed).handler(({ context }) => {
     .where(eq(integrations.userId, context.user.id))
     .all();
 
-  const eventsByIntegration = new Map<
-    string,
-    (typeof integrationEvents.$inferSelect)[]
-  >();
+  const eventsByIntegration = new Map<string, (typeof integrationEvents.$inferSelect)[]>();
   for (const integration of userIntegrations) {
     const events = db
       .select()
@@ -74,58 +71,48 @@ export const list = os.integrations.list.use(authed).handler(({ context }) => {
   return { integrations: result };
 });
 
-export const create = os.integrations.create
-  .use(authed)
-  .handler(({ input, context }) => {
-    const existing = db
-      .select()
-      .from(integrations)
-      .where(
-        and(
-          eq(integrations.userId, context.user.id),
-          eq(integrations.provider, input.provider),
-        ),
-      )
-      .get();
+export const create = os.integrations.create.use(authed).handler(({ input, context }) => {
+  const existing = db
+    .select()
+    .from(integrations)
+    .where(and(eq(integrations.userId, context.user.id), eq(integrations.provider, input.provider)))
+    .get();
 
-    if (existing) {
-      if (input.enabled !== undefined) {
-        const row = db
-          .update(integrations)
-          .set({ enabled: input.enabled })
-          .where(eq(integrations.id, existing.id))
-          .returning()
-          .get();
-        return serializeIntegration(row);
-      }
-      return serializeIntegration(existing);
+  if (existing) {
+    if (input.enabled !== undefined) {
+      const row = db
+        .update(integrations)
+        .set({ enabled: input.enabled })
+        .where(eq(integrations.id, existing.id))
+        .returning()
+        .get();
+      return serializeIntegration(row);
     }
+    return serializeIntegration(existing);
+  }
 
-    const row = db
-      .insert(integrations)
-      .values({
-        userId: context.user.id,
-        provider: input.provider,
-        type: integrationTypeFor(input.provider),
-        token: generateToken(),
-        enabled: input.enabled ?? true,
-        createdAt: new Date(),
-      })
-      .returning()
-      .get();
+  const row = db
+    .insert(integrations)
+    .values({
+      userId: context.user.id,
+      provider: input.provider,
+      type: integrationTypeFor(input.provider),
+      token: generateToken(),
+      enabled: input.enabled ?? true,
+      createdAt: new Date(),
+    })
+    .returning()
+    .get();
 
-    return serializeIntegration(row);
-  });
+  return serializeIntegration(row);
+});
 
 export const deleteIntegration = os.integrations.delete
   .use(authed)
   .handler(({ input, context }) => {
     db.delete(integrations)
       .where(
-        and(
-          eq(integrations.userId, context.user.id),
-          eq(integrations.provider, input.provider),
-        ),
+        and(eq(integrations.userId, context.user.id), eq(integrations.provider, input.provider)),
       )
       .run();
   });
@@ -137,10 +124,7 @@ export const regenerateToken = os.integrations.regenerateToken
       .update(integrations)
       .set({ token: generateToken() })
       .where(
-        and(
-          eq(integrations.userId, context.user.id),
-          eq(integrations.provider, input.provider),
-        ),
+        and(eq(integrations.userId, context.user.id), eq(integrations.provider, input.provider)),
       )
       .returning()
       .get();

@@ -1,6 +1,7 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import type { ReactNode } from "react";
+
 import { messages } from "./po/en";
 
 i18n.load("en", messages);

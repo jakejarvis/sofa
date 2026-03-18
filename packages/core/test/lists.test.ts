@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
+
 import {
   clearAllTables,
   insertIntegration,
@@ -6,12 +7,8 @@ import {
   insertTitle,
   insertUser,
 } from "@sofa/db/test-utils";
-import {
-  getRadarrList,
-  getSonarrList,
-  parseStatusParam,
-  resolveListToken,
-} from "../src/lists";
+
+import { getRadarrList, getSonarrList, parseStatusParam, resolveListToken } from "../src/lists";
 
 // Mock getTvExternalIds for lazy resolution tests
 const mockGetTvExternalIds = mock(
@@ -63,17 +60,11 @@ describe("parseStatusParam", () => {
   });
 
   test("parses comma-separated statuses", () => {
-    expect(parseStatusParam("watchlist,in_progress")).toEqual([
-      "watchlist",
-      "in_progress",
-    ]);
+    expect(parseStatusParam("watchlist,in_progress")).toEqual(["watchlist", "in_progress"]);
   });
 
   test("filters invalid statuses", () => {
-    expect(parseStatusParam("watchlist,invalid,completed")).toEqual([
-      "watchlist",
-      "completed",
-    ]);
+    expect(parseStatusParam("watchlist,invalid,completed")).toEqual(["watchlist", "completed"]);
   });
 
   test("defaults to watchlist when all invalid", () => {

@@ -1,12 +1,12 @@
 import { createLogger } from "@sofa/logger";
+
 import { getSetting, setSetting } from "./settings";
 
 const APP_VERSION = process.env.APP_VERSION || "0.0.0";
 
 const log = createLogger("update-check");
 
-const PUBLIC_API_URL =
-  process.env.PUBLIC_API_URL || "https://public-api.sofa.watch";
+const PUBLIC_API_URL = process.env.PUBLIC_API_URL || "https://public-api.sofa.watch";
 const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 export interface UpdateCheckResult {
@@ -39,9 +39,7 @@ export function getCachedUpdateCheck(): UpdateCheckResult {
   const lastCheckedAt = getSetting("updateCheckLastCheckedAt");
 
   return {
-    updateAvailable: latestVersion
-      ? isNewerVersion(latestVersion, APP_VERSION)
-      : false,
+    updateAvailable: latestVersion ? isNewerVersion(latestVersion, APP_VERSION) : false,
     currentVersion: APP_VERSION,
     latestVersion,
     releaseUrl,
@@ -83,9 +81,7 @@ export async function performUpdateCheck(): Promise<UpdateCheckResult> {
     setSetting("updateCheckReleaseUrl", data.releaseUrl);
     setSetting("updateCheckLastCheckedAt", new Date().toISOString());
 
-    log.info(
-      `Update check complete: current=${APP_VERSION}, latest=${version}`,
-    );
+    log.info(`Update check complete: current=${APP_VERSION}, latest=${version}`);
 
     return {
       updateAvailable: isNewerVersion(version, APP_VERSION),

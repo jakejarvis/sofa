@@ -1,5 +1,6 @@
-import { formatRelativeTime } from "@sofa/i18n/format";
 import { useSyncExternalStore } from "react";
+
+import { formatRelativeTime } from "@sofa/i18n/format";
 
 // Shared ticker — one interval regardless of how many components subscribe
 const TICK_MS = 30_000;
@@ -34,10 +35,7 @@ function toTimestamp(date: string | Date | null | undefined): number | null {
   return Number.isFinite(t) ? t : null;
 }
 
-export function useTimeAgo(
-  date: string | Date | null | undefined,
-  { fallback = "" } = {},
-): string {
+export function useTimeAgo(date: string | Date | null | undefined, { fallback = "" } = {}): string {
   useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   const ts = toTimestamp(date);
   if (ts === null) return fallback;

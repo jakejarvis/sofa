@@ -48,12 +48,7 @@ export function getWatchCount(
   const [row] = db
     .select({ count: sql<number>`count(*)` })
     .from(watchTable)
-    .where(
-      and(
-        eq(watchTable.userId, userId),
-        sql`${watchTable.watchedAt} >= ${timestamp}`,
-      ),
-    )
+    .where(and(eq(watchTable.userId, userId), sql`${watchTable.watchedAt} >= ${timestamp}`))
     .all();
   return row?.count ?? 0;
 }
@@ -121,22 +116,14 @@ export function getWatchHistory(
 
   const rows = db
     .select({
-      bucket:
-        sql<string>`strftime(${fmt}, ${watchTable.watchedAt}, 'unixepoch', 'localtime')`.as(
-          "bucket",
-        ),
+      bucket: sql<string>`strftime(${fmt}, ${watchTable.watchedAt}, 'unixepoch', 'localtime')`.as(
+        "bucket",
+      ),
       count: sql<number>`count(*)`.as("cnt"),
     })
     .from(watchTable)
-    .where(
-      and(
-        eq(watchTable.userId, userId),
-        sql`${watchTable.watchedAt} >= ${startTs}`,
-      ),
-    )
-    .groupBy(
-      sql`strftime(${fmt}, ${watchTable.watchedAt}, 'unixepoch', 'localtime')`,
-    )
+    .where(and(eq(watchTable.userId, userId), sql`${watchTable.watchedAt} >= ${startTs}`))
+    .groupBy(sql`strftime(${fmt}, ${watchTable.watchedAt}, 'unixepoch', 'localtime')`)
     .all();
 
   const countMap = new Map(rows.map((r) => [r.bucket, r.count]));
@@ -194,9 +181,7 @@ export interface ContinueWatchingItem {
   watchedEpisodes: number;
 }
 
-export function getContinueWatchingFeed(
-  userId: string,
-): ContinueWatchingItem[] {
+export function getContinueWatchingFeed(userId: string): ContinueWatchingItem[] {
   // Get in-progress TV shows
   const inProgress = db
     .select({
@@ -204,12 +189,7 @@ export function getContinueWatchingFeed(
       updatedAt: userTitleStatus.updatedAt,
     })
     .from(userTitleStatus)
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(userTitleStatus.status, "in_progress"),
-      ),
-    )
+    .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.status, "in_progress")))
     .all();
 
   if (inProgress.length === 0) return [];
@@ -359,8 +339,7 @@ export function getContinueWatchingFeed(
   return items;
 }
 
-// biome-ignore lint/correctness/noUnusedFunctionParameters: days reserved for future date filtering
-export function getNewAvailableFeed(userId: string, days = 14) {
+export function getNewAvailableFeed(userId: string, _days = 14) {
   // Get titles the user has in any status that have availability offers
   // and recent release/air dates
   const results = db
@@ -380,10 +359,7 @@ export function getNewAvailableFeed(userId: string, days = 14) {
     .from(titles)
     .innerJoin(
       userTitleStatus,
-      and(
-        eq(userTitleStatus.titleId, titles.id),
-        eq(userTitleStatus.userId, userId),
-      ),
+      and(eq(userTitleStatus.titleId, titles.id), eq(userTitleStatus.userId, userId)),
     )
     .where(
       sql`EXISTS (SELECT 1 FROM ${availabilityOffers} WHERE ${availabilityOffers.titleId} = ${titles.id})`,
@@ -447,21 +423,14 @@ export function getRecommendationsFeed(userId: string) {
   const userCompletedOrRated = db
     .select({ titleId: userTitleStatus.titleId })
     .from(userTitleStatus)
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(userTitleStatus.status, "completed"),
-      ),
-    )
+    .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.status, "completed")))
     .all()
     .map((r) => r.titleId);
 
   const ratedIds = db
     .select({ titleId: userRatings.titleId })
     .from(userRatings)
-    .where(
-      and(eq(userRatings.userId, userId), sql`${userRatings.ratingStars} >= 4`),
-    )
+    .where(and(eq(userRatings.userId, userId), sql`${userRatings.ratingStars} >= 4`))
     .all()
     .map((r) => r.titleId);
 
@@ -504,19 +473,13 @@ export function getRecommendationsFeed(userId: string) {
     }
   }
 
-  const sorted = [...recs.values()]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 20);
+  const sorted = [...recs.values()].sort((a, b) => b.score - a.score).slice(0, 20);
 
   if (sorted.length === 0) return [];
 
   // Batch fetch all recommended titles (1 query)
   const recTitleIds = sorted.map((r) => r.titleId);
-  const recTitles = db
-    .select()
-    .from(titles)
-    .where(inArray(titles.id, recTitleIds))
-    .all();
+  const recTitles = db.select().from(titles).where(inArray(titles.id, recTitleIds)).all();
   const recTitleMap = new Map(recTitles.map((t) => [t.id, t]));
 
   return sorted.map((r) => recTitleMap.get(r.titleId)).filter(Boolean);
@@ -544,8 +507,7 @@ export function getRecommendationsForTitle(titleId: string) {
     tmdb_similar: 1,
   } as const;
   const orderedRecs = [...recs].sort(
-    (a, b) =>
-      a.rank - b.rank || sourcePriority[a.source] - sourcePriority[b.source],
+    (a, b) => a.rank - b.rank || sourcePriority[a.source] - sourcePriority[b.source],
   );
 
   const seenRecommendedTitleIds = new Set<string>();
@@ -559,11 +521,7 @@ export function getRecommendationsForTitle(titleId: string) {
 
   // Batch fetch all recommended titles (1 query)
   const recTitleIds = uniqueRecs.map((r) => r.recommendedTitleId);
-  const recTitles = db
-    .select()
-    .from(titles)
-    .where(inArray(titles.id, recTitleIds))
-    .all();
+  const recTitles = db.select().from(titles).where(inArray(titles.id, recTitleIds)).all();
   const recTitleMap = new Map(recTitles.map((t) => [t.id, t]));
 
   return uniqueRecs

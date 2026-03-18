@@ -4190,13 +4190,24 @@
                           "type": "string",
                           "default": "TMDB API key is not configured"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TMDB_NOT_CONFIGURED"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {

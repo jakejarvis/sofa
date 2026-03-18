@@ -1,5 +1,4 @@
 import { Trans } from "@lingui/react/macro";
-import type { ColorPalette, ResolvedTitle } from "@sofa/api/schemas";
 import {
   IconCalendarEvent,
   IconCircleCheck,
@@ -15,6 +14,8 @@ import type { ReactNode } from "react";
 import { ExpandableText } from "@/components/expandable-text";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { thumbHashToUrl } from "@/lib/thumbhash";
+import type { ColorPalette, ResolvedTitle } from "@sofa/api/schemas";
+
 import { GenreCollapse } from "./genre-collapse";
 import { TrailerDialog } from "./trailer-dialog";
 
@@ -55,10 +56,10 @@ export function TitleHero({
             decoding="async"
             className="absolute inset-0 h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-transparent" />
-          <div className="absolute inset-0 bg-background/15" />
+          <div className="from-background via-background/70 to-background/30 absolute inset-0 bg-gradient-to-t" />
+          <div className="from-background/90 via-background/40 absolute inset-0 bg-gradient-to-r to-transparent" />
+          <div className="from-background/50 absolute inset-0 bg-gradient-to-b via-transparent to-transparent" />
+          <div className="bg-background/15 absolute inset-0" />
           {palette?.darkMuted && (
             <div
               className="absolute inset-0 opacity-40 mix-blend-multiply"
@@ -99,7 +100,7 @@ export function TitleHero({
         {title.posterPath && (
           <div className="shrink-0 self-center md:self-start">
             <div
-              className="overflow-hidden rounded-xl shadow-2xl ring-1 ring-foreground/5 transition-shadow duration-500 md:rounded-2xl"
+              className="ring-foreground/5 overflow-hidden rounded-xl shadow-2xl ring-1 transition-shadow duration-500 md:rounded-2xl"
               style={{
                 boxShadow: palette?.darkVibrant
                   ? `0 25px 60px -12px ${palette.darkVibrant}50, 0 12px 28px -8px rgba(0,0,0,0.5)`
@@ -127,28 +128,22 @@ export function TitleHero({
 
         <div className="flex-1 space-y-5">
           <div className="space-y-1.5">
-            <h1 className="text-balance font-display text-2xl tracking-tight md:text-5xl">
+            <h1 className="font-display text-2xl tracking-tight text-balance md:text-5xl">
               {title.title}
             </h1>
             {/* Desktop: single row with dot separators */}
-            <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2 text-muted-foreground text-sm md:gap-x-5">
-              <div className="inline-flex cursor-default items-center justify-center gap-1.5 rounded bg-primary/10 px-1 py-1 font-medium text-primary text-xs md:px-1.5">
+            <div className="text-muted-foreground flex flex-wrap items-center gap-x-3.5 gap-y-2 text-sm md:gap-x-5">
+              <div className="bg-primary/10 text-primary inline-flex cursor-default items-center justify-center gap-1.5 rounded px-1 py-1 text-xs font-medium md:px-1.5">
                 {title.type === "movie" ? (
                   <>
-                    <IconMovie
-                      aria-hidden
-                      className="size-3.5 translate-y-[-0.5px]"
-                    />
+                    <IconMovie aria-hidden className="size-3.5 translate-y-[-0.5px]" />
                     <span className="hidden md:inline">
                       <Trans>Movie</Trans>
                     </span>
                   </>
                 ) : (
                   <>
-                    <IconDeviceTv
-                      aria-hidden
-                      className="size-3.5 translate-y-[-0.5px]"
-                    />
+                    <IconDeviceTv aria-hidden className="size-3.5 translate-y-[-0.5px]" />
                     <span className="hidden md:inline">
                       <Trans>TV</Trans>
                     </span>
@@ -156,25 +151,21 @@ export function TitleHero({
                 )}
               </div>
               {title.contentRating && (
-                <div className="inline-flex border border-muted-foreground/50 px-1.5 font-medium text-[13px]">
+                <div className="border-muted-foreground/50 inline-flex border px-1.5 text-[13px] font-medium">
                   {title.contentRating}
                 </div>
               )}
               {year && <span>{year}</span>}
-              {title.genres.length > 0 && (
-                <GenreCollapse genres={title.genres} />
-              )}
+              {title.genres.length > 0 && <GenreCollapse genres={title.genres} />}
               {title.voteAverage != null && title.voteAverage > 0 && (
-                <span className="inline-flex items-center gap-1 text-primary">
+                <span className="text-primary inline-flex items-center gap-1">
                   <IconStarFilled className="size-3.5 translate-y-[-0.5px]" />
                   {title.voteAverage.toFixed(1)}
                 </span>
               )}
               {title.status &&
                 !(title.type === "movie" && title.status === "Released") &&
-                !(
-                  title.type === "tv" && title.status === "Returning Series"
-                ) && (
+                !(title.type === "tv" && title.status === "Returning Series") && (
                   <span className="inline-flex items-center gap-1">
                     <StatusIcon status={title.status} />
                     {title.status}

@@ -1,11 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
-import type { ResolvedPerson } from "@sofa/api/schemas";
-import { formatDate } from "@sofa/i18n/format";
 import { IconCalendar, IconMapPin } from "@tabler/icons-react";
 
 import { ExpandableText } from "@/components/expandable-text";
 import { Badge } from "@/components/ui/badge";
 import { thumbHashToUrl } from "@/lib/thumbhash";
+import type { ResolvedPerson } from "@sofa/api/schemas";
+import { formatDate } from "@sofa/i18n/format";
 
 interface PersonHeroProps {
   person: ResolvedPerson;
@@ -24,12 +24,10 @@ function calculateAge(birthday: string, deathday?: string | null): number {
 
 export function PersonHero({ person }: PersonHeroProps) {
   const { t } = useLingui();
-  const age = person.birthday
-    ? calculateAge(person.birthday, person.deathday)
-    : null;
+  const age = person.birthday ? calculateAge(person.birthday, person.deathday) : null;
 
   return (
-    <div className="flex animate-stagger-item flex-col gap-6 sm:flex-row sm:gap-8">
+    <div className="animate-stagger-item flex flex-col gap-6 sm:flex-row sm:gap-8">
       <div
         className="size-40 shrink-0 self-center overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10 sm:size-56 sm:self-start"
         style={
@@ -52,8 +50,8 @@ export function PersonHero({ person }: PersonHeroProps) {
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-            <span className="font-display text-5xl text-muted-foreground/40">
+          <div className="from-muted to-muted/50 flex h-full w-full items-center justify-center bg-gradient-to-br">
+            <span className="font-display text-muted-foreground/40 text-5xl">
               {person.name.charAt(0)}
             </span>
           </div>
@@ -61,12 +59,12 @@ export function PersonHero({ person }: PersonHeroProps) {
       </div>
 
       <div className="min-w-0 flex-1 space-y-3">
-        <h1 className="text-balance font-display text-3xl tracking-tight sm:text-5xl">
+        <h1 className="font-display text-3xl tracking-tight text-balance sm:text-5xl">
           {person.name}
         </h1>
 
         {person.knownForDepartment && (
-          <Badge className="border-0 bg-primary/10 px-2.5 font-semibold text-primary uppercase tracking-wider">
+          <Badge className="bg-primary/10 text-primary border-0 px-2.5 font-semibold tracking-wider uppercase">
             {person.knownForDepartment === "Acting"
               ? t`Actor`
               : person.knownForDepartment === "Directing"
@@ -81,7 +79,7 @@ export function PersonHero({ person }: PersonHeroProps) {
           </Badge>
         )}
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground text-sm">
+        <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
           {person.birthday && (
             <span className="flex items-center gap-1.5">
               <IconCalendar aria-hidden={true} className="size-3.5" />

@@ -17,32 +17,18 @@ export const MediaTypeParam = z.object({
   type: z.enum(["movie", "tv"]).describe("Media type filter"),
 });
 export const TrendingTypeParam = z.object({
-  type: z
-    .enum(["all", "movie", "tv"])
-    .describe("Trending category: all, movie, or tv"),
+  type: z.enum(["all", "movie", "tv"]).describe("Trending category: all, movie, or tv"),
 });
 // ─── Pagination ──────────────────────────────────────────────
 
 /** Page param for TMDB-backed endpoints (fixed ~20 items/page from TMDB) */
 export const PageParam = z.object({
-  page: z
-    .number()
-    .int()
-    .min(1)
-    .max(500)
-    .default(1)
-    .describe("Page number (1-indexed)"),
+  page: z.number().int().min(1).max(500).default(1).describe("Page number (1-indexed)"),
 });
 
 /** Page + limit for locally-paginated endpoints */
 export const PaginatedInput = z.object({
-  page: z
-    .number()
-    .int()
-    .min(1)
-    .max(500)
-    .default(1)
-    .describe("Page number (1-indexed)"),
+  page: z.number().int().min(1).max(500).default(1).describe("Page number (1-indexed)"),
   limit: z
     .number()
     .int()
@@ -75,21 +61,13 @@ export const UpdateStatusInput = z
 export const UpdateRatingInput = z
   .object({
     id: z.string().min(1).describe("Title ID"),
-    stars: z
-      .number()
-      .int()
-      .min(0)
-      .max(5)
-      .describe("Star rating from 0 (clear) to 5"),
+    stars: z.number().int().min(0).max(5).describe("Star rating from 0 (clear) to 5"),
   })
   .meta({ description: "Set or clear a star rating for a title" });
 
 export const BatchWatchInput = z
   .object({
-    episodeIds: z
-      .array(z.string())
-      .min(1)
-      .describe("List of episode IDs to mark as watched"),
+    episodeIds: z.array(z.string()).min(1).describe("List of episode IDs to mark as watched"),
   })
   .meta({ description: "Batch of episode IDs to mark as watched" });
 
@@ -118,9 +96,7 @@ export const DiscoverInput = z
 
 export const WatchHistoryInput = z
   .object({
-    type: z
-      .enum(["movie", "episode"])
-      .describe("What to count: movie watches or episode watches"),
+    type: z.enum(["movie", "episode"]).describe("What to count: movie watches or episode watches"),
     period: z
       .enum(["today", "this_week", "this_month", "this_year"])
       .describe("Time range for the histogram"),
@@ -150,9 +126,7 @@ export const ToggleUpdateCheckInput = z.object({
   enabled: z.boolean().describe("Whether automatic update checks are enabled"),
 });
 export const ToggleTelemetryInput = z.object({
-  enabled: z
-    .boolean()
-    .describe("Whether anonymous telemetry reporting is enabled"),
+  enabled: z.boolean().describe("Whether anonymous telemetry reporting is enabled"),
 });
 export const TelemetryOutput = z
   .object({
@@ -160,9 +134,7 @@ export const TelemetryOutput = z
     lastReportedAt: z
       .string()
       .nullable()
-      .describe(
-        "ISO 8601 timestamp of the last telemetry report, or null if never sent",
-      ),
+      .describe("ISO 8601 timestamp of the last telemetry report, or null if never sent"),
   })
   .meta({ description: "Telemetry configuration and last report time" });
 
@@ -184,16 +156,11 @@ export const TriggerJobInput = z
   })
   .meta({ description: "Specify which background job to trigger manually" });
 
-const backupFrequency = z
-  .enum(["6h", "12h", "1d", "7d"])
-  .describe("Backup interval");
+const backupFrequency = z.enum(["6h", "12h", "1d", "7d"]).describe("Backup interval");
 
 export const UpdateScheduleInput = z
   .object({
-    enabled: z
-      .boolean()
-      .optional()
-      .describe("Enable or disable scheduled backups"),
+    enabled: z.boolean().optional().describe("Enable or disable scheduled backups"),
     frequency: backupFrequency.optional(),
     time: z
       .string()
@@ -221,9 +188,7 @@ export const UpdateScheduleInput = z
         message: "Max backups must be between 1 and 30, or 0 for unlimited",
       })
       .optional()
-      .describe(
-        "Maximum number of backups to keep (0 = unlimited, 1-30 otherwise)",
-      ),
+      .describe("Maximum number of backups to keep (0 = unlimited, 1-30 otherwise)"),
   })
   .meta({
     description: "Partial update to the automated backup schedule",
@@ -246,9 +211,7 @@ export const UploadAvatarOutput = z.object({
 
 // ─── Backup inputs ─────────────────────────────────────────────
 
-export const RestoreBackupInput = z
-  .file()
-  .max(100 * 1024 * 1024, "File too large (max 100 MB)");
+export const RestoreBackupInput = z.file().max(100 * 1024 * 1024, "File too large (max 100 MB)");
 
 // ═══════════════════════════════════════════════════════════════
 // Output schemas
@@ -268,8 +231,7 @@ export const ColorPaletteSchema = z
     lightMuted: z.string().nullable(),
   })
   .meta({
-    description:
-      "Extracted color palette from the title poster image (CSS hex values)",
+    description: "Extracted color palette from the title poster image (CSS hex values)",
   });
 
 export const EpisodeSchema = z
@@ -284,10 +246,7 @@ export const EpisodeSchema = z
       .nullable()
       .describe("ThumbHash blur placeholder for the still image"),
     airDate: z.string().nullable().describe("Original air date (ISO 8601)"),
-    runtimeMinutes: z
-      .number()
-      .nullable()
-      .describe("Episode runtime in minutes"),
+    runtimeMinutes: z.number().nullable().describe("Episode runtime in minutes"),
   })
   .meta({ description: "A single TV episode" });
 
@@ -305,13 +264,8 @@ export const AvailabilityOfferSchema = z
     providerId: z.number().describe("JustWatch provider ID"),
     providerName: z.string().describe("Display name (e.g. Netflix, Hulu)"),
     logoPath: z.string().nullable().describe("Provider logo image path"),
-    offerType: z
-      .string()
-      .describe("Offer type: flatrate, rent, buy, free, ads"),
-    watchUrl: z
-      .string()
-      .nullable()
-      .describe("Direct link to watch on this provider"),
+    offerType: z.string().describe("Offer type: flatrate, rent, buy, free, ads"),
+    watchUrl: z.string().nullable().describe("Direct link to watch on this provider"),
   })
   .meta({ description: "A streaming availability offer from a provider" });
 
@@ -320,17 +274,11 @@ export const CastMemberSchema = z
     id: z.string().describe("Credit ID"),
     personId: z.string().describe("Internal person ID"),
     name: z.string().describe("Person's name"),
-    character: z
-      .string()
-      .nullable()
-      .describe("Character name (for acting credits)"),
+    character: z.string().nullable().describe("Character name (for acting credits)"),
     department: z.string().describe("Department (e.g. Acting, Directing)"),
     job: z.string().nullable().describe("Job title (for crew credits)"),
     displayOrder: z.number().describe("Sort order in the credits list"),
-    episodeCount: z
-      .number()
-      .nullable()
-      .describe("Number of episodes (TV only)"),
+    episodeCount: z.number().nullable().describe("Number of episodes (TV only)"),
     profilePath: z.string().nullable().describe("Profile photo image path"),
     profileThumbHash: z
       .string()
@@ -348,19 +296,10 @@ export const ResolvedTitleSchema = z
     title: z.string().describe("Display title (localized)"),
     originalTitle: z.string().nullable().describe("Original language title"),
     overview: z.string().nullable().describe("Plot synopsis"),
-    releaseDate: z
-      .string()
-      .nullable()
-      .describe("Theatrical release date (movies, ISO 8601)"),
-    firstAirDate: z
-      .string()
-      .nullable()
-      .describe("First air date (TV shows, ISO 8601)"),
+    releaseDate: z.string().nullable().describe("Theatrical release date (movies, ISO 8601)"),
+    firstAirDate: z.string().nullable().describe("First air date (TV shows, ISO 8601)"),
     posterPath: z.string().nullable().describe("Poster image path"),
-    posterThumbHash: z
-      .string()
-      .nullable()
-      .describe("ThumbHash blur placeholder for the poster"),
+    posterThumbHash: z.string().nullable().describe("ThumbHash blur placeholder for the poster"),
     backdropPath: z.string().nullable().describe("Backdrop image path"),
     backdropThumbHash: z
       .string()
@@ -369,29 +308,14 @@ export const ResolvedTitleSchema = z
     popularity: z.number().nullable().describe("TMDB popularity score"),
     voteAverage: z.number().nullable().describe("Average user rating (0-10)"),
     voteCount: z.number().nullable().describe("Total number of votes"),
-    status: z
-      .string()
-      .nullable()
-      .describe("Production status (e.g. Released, Returning Series)"),
-    contentRating: z
-      .string()
-      .nullable()
-      .describe("Content rating (e.g. PG-13, TV-MA)"),
+    status: z.string().nullable().describe("Production status (e.g. Released, Returning Series)"),
+    contentRating: z.string().nullable().describe("Content rating (e.g. PG-13, TV-MA)"),
     imdbId: z.string().nullable().describe("IMDb title ID (e.g. tt0137523)"),
     tvdbId: z.number().nullable().describe("TVDB ID (TV shows only)"),
-    originalLanguage: z
-      .string()
-      .nullable()
-      .describe("Original language ISO 639-1 code (e.g. en)"),
-    runtimeMinutes: z
-      .number()
-      .nullable()
-      .describe("Runtime in minutes (movies only)"),
+    originalLanguage: z.string().nullable().describe("Original language ISO 639-1 code (e.g. en)"),
+    runtimeMinutes: z.number().nullable().describe("Runtime in minutes (movies only)"),
     colorPalette: ColorPaletteSchema.nullable(),
-    trailerVideoKey: z
-      .string()
-      .nullable()
-      .describe("YouTube video key for the trailer"),
+    trailerVideoKey: z.string().nullable().describe("YouTube video key for the trailer"),
     genres: z.array(z.string()).describe("Genre names"),
   })
   .meta({ description: "A fully resolved movie or TV show from TMDB" });
@@ -425,17 +349,11 @@ export const PersonCreditSchema = z
     type: mediaType,
     title: z.string().describe("Title name"),
     posterPath: z.string().nullable().describe("Poster image path"),
-    posterThumbHash: z
-      .string()
-      .nullable()
-      .describe("ThumbHash blur placeholder for the poster"),
+    posterThumbHash: z.string().nullable().describe("ThumbHash blur placeholder for the poster"),
     releaseDate: z.string().nullable().describe("Release date (ISO 8601)"),
     firstAirDate: z.string().nullable().describe("First air date (ISO 8601)"),
     voteAverage: z.number().nullable().describe("Average rating (0-10)"),
-    character: z
-      .string()
-      .nullable()
-      .describe("Character name (for acting credits)"),
+    character: z.string().nullable().describe("Character name (for acting credits)"),
     department: z.string().describe("Department (e.g. Acting, Directing)"),
     job: z.string().nullable().describe("Job title (for crew credits)"),
   })
@@ -449,10 +367,7 @@ export const TmdbBrowseItem = z
     type: mediaType,
     title: z.string().describe("Display title"),
     posterPath: z.string().nullable().describe("Poster image path"),
-    posterThumbHash: z
-      .string()
-      .nullable()
-      .describe("ThumbHash blur placeholder for the poster"),
+    posterThumbHash: z.string().nullable().describe("ThumbHash blur placeholder for the poster"),
     releaseDate: z.string().nullable().describe("Release date (ISO 8601)"),
     firstAirDate: z.string().nullable().describe("First air date (ISO 8601)"),
     voteAverage: z.number().nullable().describe("Average rating (0-10)"),
@@ -469,10 +384,7 @@ export const RecommendationItemSchema = z
     type: mediaType,
     title: z.string().describe("Display title"),
     posterPath: z.string().nullable().describe("Poster image path"),
-    posterThumbHash: z
-      .string()
-      .nullable()
-      .describe("ThumbHash blur placeholder for the poster"),
+    posterThumbHash: z.string().nullable().describe("ThumbHash blur placeholder for the poster"),
     releaseDate: z.string().nullable().describe("Release date (ISO 8601)"),
     firstAirDate: z.string().nullable().describe("First air date (ISO 8601)"),
     voteAverage: z.number().nullable().describe("Average rating (0-10)"),
@@ -495,8 +407,7 @@ const BrowseOutput = z
   })
   .merge(PaginationMeta)
   .meta({
-    description:
-      "Browse results with user tracking statuses and episode progress",
+    description: "Browse results with user tracking statuses and episode progress",
   });
 
 // ─── Title outputs ─────────────────────────────────────────────
@@ -505,14 +416,11 @@ export const TitleDetailOutput = z
   .object({
     title: ResolvedTitleSchema,
     seasons: z.array(SeasonSchema).describe("TV seasons (empty for movies)"),
-    availability: z
-      .array(AvailabilityOfferSchema)
-      .describe("Streaming availability offers"),
+    availability: z.array(AvailabilityOfferSchema).describe("Streaming availability offers"),
     cast: z.array(CastMemberSchema).describe("Cast and crew credits"),
   })
   .meta({
-    description:
-      "Full title details with seasons, cast, and streaming availability",
+    description: "Full title details with seasons, cast, and streaming availability",
   });
 
 export const UserInfoOutput = z
@@ -521,13 +429,8 @@ export const UserInfoOutput = z
       .enum(["watchlist", "in_progress", "completed"])
       .nullable()
       .describe("User's tracking status, or null if not in library"),
-    rating: z
-      .number()
-      .nullable()
-      .describe("User's star rating (0-5), or null if unrated"),
-    episodeWatches: z
-      .array(z.string())
-      .describe("IDs of episodes the user has watched"),
+    rating: z.number().nullable().describe("User's star rating (0-5), or null if unrated"),
+    episodeWatches: z.array(z.string()).describe("IDs of episodes the user has watched"),
   })
   .meta({
     description: "The current user's tracking info for a title",
@@ -547,27 +450,20 @@ export const TitleRecommendationsOutput = z
 export const PersonDetailOutput = z
   .object({
     person: PersonSchema,
-    filmography: z
-      .array(PersonCreditSchema)
-      .describe("Credits for this person (paginated)"),
+    filmography: z.array(PersonCreditSchema).describe("Credits for this person (paginated)"),
     userStatuses: userStatusMap,
   })
   .merge(PaginationMeta)
   .meta({
-    description:
-      "Person profile with paginated filmography and user's statuses for their titles",
+    description: "Person profile with paginated filmography and user's statuses for their titles",
   });
 
 // ─── Dashboard outputs ─────────────────────────────────────────
 
 export const DashboardStatsOutput = z
   .object({
-    moviesThisMonth: z
-      .number()
-      .describe("Movies watched in the current calendar month"),
-    episodesThisWeek: z
-      .number()
-      .describe("Episodes watched in the current calendar week"),
+    moviesThisMonth: z.number().describe("Movies watched in the current calendar month"),
+    episodesThisWeek: z.number().describe("Episodes watched in the current calendar week"),
     librarySize: z.number().describe("Total titles in the user's library"),
     completed: z.number().describe("Total titles with completed status"),
   })
@@ -592,10 +488,7 @@ export const ContinueWatchingOutput = z
               seasonNumber: z.number().describe("Season number"),
               episodeNumber: z.number().describe("Episode number"),
               name: z.string().nullable().describe("Episode title"),
-              stillPath: z
-                .string()
-                .nullable()
-                .describe("Episode still image path"),
+              stillPath: z.string().nullable().describe("Episode still image path"),
               stillThumbHash: z
                 .string()
                 .nullable()
@@ -603,17 +496,14 @@ export const ContinueWatchingOutput = z
             })
             .nullable()
             .describe("Next unwatched episode, or null if all caught up"),
-          totalEpisodes: z
-            .number()
-            .describe("Total episodes across all seasons"),
+          totalEpisodes: z.number().describe("Total episodes across all seasons"),
           watchedEpisodes: z.number().describe("Episodes the user has watched"),
         })
         .meta({ description: "An in-progress show with watch progress" }),
     ),
   })
   .meta({
-    description:
-      "TV shows the user is currently watching with next episode info",
+    description: "TV shows the user is currently watching with next episode info",
   });
 
 export const LibraryOutput = z
@@ -630,14 +520,8 @@ export const LibraryOutput = z
             .string()
             .nullable()
             .describe("ThumbHash blur placeholder for the poster"),
-          releaseDate: z
-            .string()
-            .nullable()
-            .describe("Release date (ISO 8601)"),
-          firstAirDate: z
-            .string()
-            .nullable()
-            .describe("First air date (ISO 8601)"),
+          releaseDate: z.string().nullable().describe("Release date (ISO 8601)"),
+          firstAirDate: z.string().nullable().describe("First air date (ISO 8601)"),
           voteAverage: z.number().nullable().describe("Average rating (0-10)"),
           userStatus: z
             .enum(["watchlist", "in_progress", "completed"])
@@ -706,34 +590,17 @@ export const SearchOutput = z
           id: z
             .string()
             .optional()
-            .describe(
-              "Internal title ID (present for movie/tv results, absent for people)",
-            ),
+            .describe("Internal title ID (present for movie/tv results, absent for people)"),
           tmdbId: z.number().describe("TMDB numeric ID"),
           type: z.enum(["movie", "tv", "person"]).describe("Result type"),
           title: z.string().describe("Title or person name"),
-          overview: z
-            .string()
-            .nullable()
-            .describe("Plot summary or null for people"),
-          posterPath: z
-            .string()
-            .nullable()
-            .describe("Poster image path (movies/TV)"),
-          profilePath: z
-            .string()
-            .nullable()
-            .describe("Profile photo path (people)"),
-          releaseDate: z
-            .string()
-            .nullable()
-            .describe("Release date (ISO 8601)"),
+          overview: z.string().nullable().describe("Plot summary or null for people"),
+          posterPath: z.string().nullable().describe("Poster image path (movies/TV)"),
+          profilePath: z.string().nullable().describe("Profile photo path (people)"),
+          releaseDate: z.string().nullable().describe("Release date (ISO 8601)"),
           popularity: z.number().nullable().describe("TMDB popularity score"),
           voteAverage: z.number().nullable().describe("Average rating (0-10)"),
-          knownForDepartment: z
-            .string()
-            .nullable()
-            .describe("Primary department (people only)"),
+          knownForDepartment: z.string().nullable().describe("Primary department (people only)"),
           knownFor: z
             .array(z.string())
             .nullable()
@@ -761,9 +628,7 @@ export const HistoryBucketSchema = z
 export const WatchHistoryOutput = z
   .object({
     count: z.number().describe("Total watches in the selected period"),
-    history: z
-      .array(HistoryBucketSchema)
-      .describe("Watch counts bucketed by time period"),
+    history: z.array(HistoryBucketSchema).describe("Watch counts bucketed by time period"),
   })
   .meta({ description: "Watch history with time-bucketed counts" });
 
@@ -772,27 +637,16 @@ export const WatchHistoryOutput = z
 export const JobSchema = z
   .object({
     jobName: z.string().describe("Cron job identifier"),
-    cronPattern: z
-      .string()
-      .nullable()
-      .describe("Cron expression (e.g. 0 2 * * *)"),
+    cronPattern: z.string().nullable().describe("Cron expression (e.g. 0 2 * * *)"),
     nextRunAt: z.string().nullable().describe("Next scheduled run (ISO 8601)"),
     lastRunAt: z.string().nullable().describe("Last run start time (ISO 8601)"),
-    lastDurationMs: z
-      .number()
-      .nullable()
-      .describe("Duration of last run in milliseconds"),
+    lastDurationMs: z.number().nullable().describe("Duration of last run in milliseconds"),
     lastStatus: z
       .enum(["running", "success", "error"])
       .nullable()
       .describe("Outcome of the last run"),
-    lastError: z
-      .string()
-      .nullable()
-      .describe("Error message from the last failed run"),
-    isCurrentlyRunning: z
-      .boolean()
-      .describe("Whether the job is currently executing"),
+    lastError: z.string().nullable().describe("Error message from the last failed run"),
+    isCurrentlyRunning: z.boolean().describe("Whether the job is currently executing"),
     disabled: z.boolean().describe("Whether the job is disabled"),
   })
   .meta({ description: "Status of a background cron job" });
@@ -813,14 +667,8 @@ export const SystemHealthSchema = z
         connected: z.boolean().describe("Whether TMDB API is reachable"),
         tokenValid: z.boolean().describe("Whether the API token is valid"),
         tokenConfigured: z.boolean().describe("Whether a token is set"),
-        responseTimeMs: z
-          .number()
-          .nullable()
-          .describe("TMDB API response time in milliseconds"),
-        error: z
-          .string()
-          .nullable()
-          .describe("Error message if connectivity check failed"),
+        responseTimeMs: z.number().nullable().describe("TMDB API response time in milliseconds"),
+        error: z.string().nullable().describe("Error message if connectivity check failed"),
       })
       .meta({ description: "TMDB API connectivity status" }),
     jobs: z.array(JobSchema).describe("Status of all cron jobs"),
@@ -842,14 +690,8 @@ export const SystemHealthSchema = z
       .meta({ description: "Image cache statistics" }),
     backups: z
       .object({
-        lastBackupAt: z
-          .string()
-          .nullable()
-          .describe("Last backup timestamp (ISO 8601)"),
-        lastBackupAgeHours: z
-          .number()
-          .nullable()
-          .describe("Hours since the last backup"),
+        lastBackupAt: z.string().nullable().describe("Last backup timestamp (ISO 8601)"),
+        lastBackupAgeHours: z.number().nullable().describe("Hours since the last backup"),
         backupCount: z.number().describe("Total backup files"),
         totalSizeBytes: z.number().describe("Total size of all backups"),
       })
@@ -857,25 +699,18 @@ export const SystemHealthSchema = z
     environment: z
       .object({
         dataDir: z.string().describe("Configured data directory path"),
-        dataDirWritable: z
-          .boolean()
-          .describe("Whether the data directory is writable"),
+        dataDirWritable: z.boolean().describe("Whether the data directory is writable"),
         envVars: z
           .array(
             z.object({
               name: z.string().describe("Environment variable name"),
-              value: z
-                .string()
-                .nullable()
-                .describe("Current value (sensitive values are masked)"),
+              value: z.string().nullable().describe("Current value (sensitive values are masked)"),
             }),
           )
           .describe("Relevant environment variable statuses"),
       })
       .meta({ description: "Server environment information" }),
-    checkedAt: z
-      .string()
-      .describe("When this health check was performed (ISO 8601)"),
+    checkedAt: z.string().describe("When this health check was performed (ISO 8601)"),
   })
   .meta({
     description:
@@ -900,18 +735,11 @@ export const IntegrationSchema = z
     provider: z.string().describe("Provider name (plex, jellyfin, etc.)"),
     type: z
       .enum(["webhook", "list"])
-      .describe(
-        "Integration type: webhook (Plex/Jellyfin/Emby) or list (Sonarr/Radarr)",
-      ),
+      .describe("Integration type: webhook (Plex/Jellyfin/Emby) or list (Sonarr/Radarr)"),
     token: z.string().describe("Webhook authentication token"),
     enabled: z.boolean().describe("Whether the integration is active"),
-    lastEventAt: z
-      .string()
-      .nullable()
-      .describe("Last received event timestamp (ISO 8601)"),
-    createdAt: z
-      .string()
-      .describe("When the integration was created (ISO 8601)"),
+    lastEventAt: z.string().nullable().describe("Last received event timestamp (ISO 8601)"),
+    createdAt: z.string().describe("When the integration was created (ISO 8601)"),
   })
   .meta({ description: "A media server integration configuration" });
 
@@ -921,9 +749,7 @@ export const IntegrationEventSchema = z
     eventType: z.string().nullable().describe("Webhook event type"),
     mediaType: z.string().nullable().describe("Media type from the event"),
     mediaTitle: z.string().nullable().describe("Title from the event"),
-    status: z
-      .enum(["success", "ignored", "error"])
-      .describe("Event processing outcome"),
+    status: z.enum(["success", "ignored", "error"]).describe("Event processing outcome"),
     receivedAt: z.string().describe("When the event was received (ISO 8601)"),
   })
   .meta({ description: "A webhook or sync event from a media server" });
@@ -953,9 +779,7 @@ export const BackupSchema = z
     createdAt: z.string().describe("When the backup was created (ISO 8601)"),
     source: z
       .enum(["manual", "scheduled", "pre-restore"])
-      .describe(
-        "How the backup was created: manual, scheduled, or automatic pre-restore",
-      ),
+      .describe("How the backup was created: manual, scheduled, or automatic pre-restore"),
   })
   .meta({ description: "A database backup file" });
 
@@ -970,14 +794,10 @@ export const BackupCreateOutput = BackupSchema;
 export const BackupScheduleOutput = z
   .object({
     enabled: z.boolean().describe("Whether scheduled backups are enabled"),
-    maxRetention: z
-      .number()
-      .describe("Maximum backups to keep (0 = unlimited)"),
+    maxRetention: z.number().describe("Maximum backups to keep (0 = unlimited)"),
     frequency: backupFrequency,
     time: z.string().describe("Scheduled time (HH:MM, 24-hour format)"),
-    dayOfWeek: z
-      .number()
-      .describe("Day of week for weekly backups (0 = Sunday)"),
+    dayOfWeek: z.number().describe("Day of week for weekly backups (0 = Sunday)"),
   })
   .meta({ description: "Automated backup schedule configuration" });
 
@@ -989,30 +809,20 @@ export const RegistrationOutput = z
 
 const UpdateCheckResultSchema = z
   .object({
-    updateAvailable: z
-      .boolean()
-      .describe("Whether a newer version is available"),
+    updateAvailable: z.boolean().describe("Whether a newer version is available"),
     currentVersion: z.string().describe("Currently running version"),
     latestVersion: z
       .string()
       .nullable()
       .describe("Latest available version, or null if check failed"),
-    releaseUrl: z
-      .string()
-      .nullable()
-      .describe("URL to the latest release page"),
-    lastCheckedAt: z
-      .string()
-      .nullable()
-      .describe("When the last check was performed (ISO 8601)"),
+    releaseUrl: z.string().nullable().describe("URL to the latest release page"),
+    lastCheckedAt: z.string().nullable().describe("When the last check was performed (ISO 8601)"),
   })
   .meta({ description: "Result of an update availability check" });
 
 export const UpdateCheckOutput = z
   .object({
-    enabled: z
-      .boolean()
-      .describe("Whether automatic update checks are enabled"),
+    enabled: z.boolean().describe("Whether automatic update checks are enabled"),
     updateCheck: UpdateCheckResultSchema.nullable().describe(
       "Latest check result, or null if checks are disabled or never ran",
     ),
@@ -1025,12 +835,8 @@ export const TriggerJobOutput = z.object({
 
 export const PurgeMetadataCacheOutput = z
   .object({
-    deletedTitles: z
-      .number()
-      .describe("Number of un-enriched stub titles deleted"),
-    deletedPersons: z
-      .number()
-      .describe("Number of orphaned person records deleted"),
+    deletedTitles: z.number().describe("Number of un-enriched stub titles deleted"),
+    deletedPersons: z.number().describe("Number of orphaned person records deleted"),
   })
   .meta({
     description: "Result of purging un-enriched metadata from the database",
@@ -1038,9 +844,7 @@ export const PurgeMetadataCacheOutput = z
 
 export const PurgeImageCacheOutput = z
   .object({
-    deletedFiles: z
-      .number()
-      .describe("Number of image files deleted from disk"),
+    deletedFiles: z.number().describe("Number of image files deleted from disk"),
     freedBytes: z.number().describe("Total bytes freed from disk"),
   })
   .meta({ description: "Result of purging the image cache from disk" });
@@ -1050,9 +854,7 @@ export const PurgeImageCacheOutput = z
 export const QuickAddOutput = z
   .object({
     id: z.string().describe("Internal title ID"),
-    alreadyAdded: z
-      .boolean()
-      .describe("True if the title was already in the user's library"),
+    alreadyAdded: z.boolean().describe("True if the title was already in the user's library"),
   })
   .meta({
     description: "Result of a quick-add operation",
@@ -1065,12 +867,8 @@ export const PublicInfoOutput = z
     instanceId: z.string().describe("Unique instance identifier"),
     tmdbConfigured: z.boolean().describe("Whether TMDB API is configured"),
     userCount: z.number().describe("Number of registered users"),
-    registrationOpen: z
-      .boolean()
-      .describe("Whether new user registration is open"),
-    posterUrls: z
-      .array(z.string())
-      .describe("Poster image URLs for the login screen collage"),
+    registrationOpen: z.boolean().describe("Whether new user registration is open"),
+    posterUrls: z.array(z.string()).describe("Poster image URLs for the login screen collage"),
   })
   .meta({
     description: "Public instance information shown on the login/setup screen",
@@ -1083,12 +881,8 @@ export const AuthConfigOutput = z
       .string()
       .nullable()
       .describe("Display name of the OIDC provider (e.g. Authelia, Keycloak)"),
-    passwordLoginDisabled: z
-      .boolean()
-      .describe("Whether password-based login is disabled"),
-    registrationOpen: z
-      .boolean()
-      .describe("Whether new user registration is open"),
+    passwordLoginDisabled: z.boolean().describe("Whether password-based login is disabled"),
+    registrationOpen: z.boolean().describe("Whether new user registration is open"),
     userCount: z.number().describe("Number of registered users"),
   })
   .meta({
@@ -1106,11 +900,7 @@ export const ImportMovieSchema = z.object({
   imdbId: z.string().optional(),
   title: z.string(),
   year: z.number().optional(),
-  watchedAt: z
-    .string()
-    .datetime({ offset: true })
-    .optional()
-    .describe("ISO 8601 timestamp"),
+  watchedAt: z.string().datetime({ offset: true }).optional().describe("ISO 8601 timestamp"),
   watchedOn: z.string().date().optional().describe("YYYY-MM-DD date-only"),
 });
 
@@ -1196,13 +986,7 @@ export const ParsePayloadInput = z.object({
   data: NormalizedImportSchema,
 });
 
-export const ImportJobStatusEnum = z.enum([
-  "pending",
-  "running",
-  "success",
-  "error",
-  "cancelled",
-]);
+export const ImportJobStatusEnum = z.enum(["pending", "running", "success", "error", "cancelled"]);
 
 export const ImportJobSchema = z.object({
   id: z.string(),

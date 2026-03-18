@@ -1,17 +1,10 @@
 import { parseTraktPayload } from "@sofa/core/imports/parsers";
-import type {
-  DeviceCodeResponse,
-  ImportProvider,
-  NormalizedImport,
-  PollResult,
-} from "./types";
+
+import type { DeviceCodeResponse, ImportProvider, NormalizedImport, PollResult } from "./types";
 
 const API_BASE = "https://api.trakt.tv";
 
-function traktHeaders(
-  clientId: string,
-  token?: string,
-): Record<string, string> {
+function traktHeaders(clientId: string, token?: string): Record<string, string> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     "trakt-api-version": "2",
@@ -82,13 +75,12 @@ export const trakt: ImportProvider = {
       );
     }
 
-    const [moviesData, showsData, watchlistData, ratingsData] =
-      await Promise.all([
-        moviesRes.ok ? moviesRes.json() : [],
-        showsRes.ok ? showsRes.json() : [],
-        watchlistRes.ok ? watchlistRes.json() : [],
-        ratingsRes.ok ? ratingsRes.json() : [],
-      ]);
+    const [moviesData, showsData, watchlistData, ratingsData] = await Promise.all([
+      moviesRes.ok ? moviesRes.json() : [],
+      showsRes.ok ? showsRes.json() : [],
+      watchlistRes.ok ? watchlistRes.json() : [],
+      ratingsRes.ok ? ratingsRes.json() : [],
+    ]);
 
     // Restructure API response into the format parseTraktPayload expects.
     // The Trakt API returns the same item shapes as the JSON export format.

@@ -25,23 +25,13 @@ export default function ExploreScreen() {
         lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
     }),
   );
-  const popularMovies = useQuery(
-    orpc.explore.popular.queryOptions({ input: { type: "movie" } }),
-  );
-  const popularTv = useQuery(
-    orpc.explore.popular.queryOptions({ input: { type: "tv" } }),
-  );
-  const movieGenres = useQuery(
-    orpc.explore.genres.queryOptions({ input: { type: "movie" } }),
-  );
-  const tvGenres = useQuery(
-    orpc.explore.genres.queryOptions({ input: { type: "tv" } }),
-  );
+  const popularMovies = useQuery(orpc.explore.popular.queryOptions({ input: { type: "movie" } }));
+  const popularTv = useQuery(orpc.explore.popular.queryOptions({ input: { type: "tv" } }));
+  const movieGenres = useQuery(orpc.explore.genres.queryOptions({ input: { type: "movie" } }));
+  const tvGenres = useQuery(orpc.explore.genres.queryOptions({ input: { type: "tv" } }));
 
   const isRefreshing =
-    trending.isRefetching ||
-    popularMovies.isRefetching ||
-    popularTv.isRefetching;
+    trending.isRefetching || popularMovies.isRefetching || popularTv.isRefetching;
 
   const onRefresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: orpc.explore.key() });
@@ -56,18 +46,18 @@ export default function ExploreScreen() {
   );
   const trendingStatuses = useMemo(
     () =>
-      Object.assign(
-        {},
-        ...(trending.data?.pages.map((p) => p.userStatuses) ?? []),
-      ) as Record<string, "watchlist" | "in_progress" | "completed">,
+      Object.assign({}, ...(trending.data?.pages.map((p) => p.userStatuses) ?? [])) as Record<
+        string,
+        "watchlist" | "in_progress" | "completed"
+      >,
     [trending.data?.pages],
   );
   const trendingProgress = useMemo(
     () =>
-      Object.assign(
-        {},
-        ...(trending.data?.pages.map((p) => p.episodeProgress) ?? []),
-      ) as Record<string, { watched: number; total: number }>,
+      Object.assign({}, ...(trending.data?.pages.map((p) => p.episodeProgress) ?? [])) as Record<
+        string,
+        { watched: number; total: number }
+      >,
     [trending.data?.pages],
   );
 
@@ -77,15 +67,11 @@ export default function ExploreScreen() {
       contentContainerStyle={exploreContentContainerStyle}
       contentInsetAdjustmentBehavior="automatic"
       scrollToOverflowEnabled
-      refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
     >
       <View className="gap-8">
         {heroItem && (
-          <Animated.View
-            entering={FadeIn.duration(400).withInitialValues({ opacity: 0.01 })}
-          >
+          <Animated.View entering={FadeIn.duration(400).withInitialValues({ opacity: 0.01 })}>
             <HeroBanner item={heroItem} />
           </Animated.View>
         )}

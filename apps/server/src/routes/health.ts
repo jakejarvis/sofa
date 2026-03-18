@@ -1,6 +1,7 @@
+import { Hono } from "hono";
+
 import { getInstanceId } from "@sofa/core/settings";
 import { createLogger } from "@sofa/logger";
-import { Hono } from "hono";
 
 const log = createLogger("health");
 

@@ -3,6 +3,7 @@ import { IconWorldUpload } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
+
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
@@ -10,17 +11,12 @@ import { orpc } from "@/lib/orpc/client";
 
 export function UpdateCheckSection() {
   const { t } = useLingui();
-  const { data, isPending: isLoading } = useQuery(
-    orpc.admin.updateCheck.queryOptions(),
-  );
+  const { data, isPending: isLoading } = useQuery(orpc.admin.updateCheck.queryOptions());
   const [localEnabled, setLocalEnabled] = useState<boolean | null>(null);
   const currentEnabled = localEnabled ?? data?.enabled ?? true;
-  const [optimisticEnabled, setOptimisticEnabled] =
-    useOptimistic(currentEnabled);
+  const [optimisticEnabled, setOptimisticEnabled] = useOptimistic(currentEnabled);
   const [isPending, startTransition] = useTransition();
-  const toggleMutation = useMutation(
-    orpc.admin.toggleUpdateCheck.mutationOptions(),
-  );
+  const toggleMutation = useMutation(orpc.admin.toggleUpdateCheck.mutationOptions());
 
   if (isLoading) {
     return (
@@ -36,9 +32,7 @@ export function UpdateCheckSection() {
       try {
         await toggleMutation.mutateAsync({ enabled: checked });
         setLocalEnabled(checked);
-        toast.success(
-          checked ? t`Update checks enabled` : t`Update checks disabled`,
-        );
+        toast.success(checked ? t`Update checks enabled` : t`Update checks disabled`);
       } catch {
         toast.error(t`Failed to update setting`);
       }
@@ -49,11 +43,8 @@ export function UpdateCheckSection() {
     <CardContent>
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <IconWorldUpload
-              aria-hidden={true}
-              className="size-4 text-primary"
-            />
+          <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+            <IconWorldUpload aria-hidden={true} className="text-primary size-4" />
           </div>
           <div>
             <CardTitle>

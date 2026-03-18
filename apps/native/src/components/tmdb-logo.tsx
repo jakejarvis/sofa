@@ -5,12 +5,7 @@ export function TmdbLogo({ height = 12 }: { height?: number }) {
   const width = height * aspectRatio;
 
   return (
-    <Svg
-      viewBox="0 0 190.24 81.52"
-      width={width}
-      height={height}
-      accessibilityLabel="TMDB"
-    >
+    <Svg viewBox="0 0 190.24 81.52" width={width} height={height} accessibilityLabel="TMDB">
       <Defs>
         <LinearGradient
           id="tmdb-grad"

@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
 import { memo, useMemo } from "react";
 import { Pressable } from "react-native";
+
 import { RecentlyViewedRowContent } from "@/components/search/recently-viewed-row-content";
 import { SwipeableRow } from "@/components/ui/swipeable-row";
 import type { RecentlyViewedItem } from "@/lib/recently-viewed";

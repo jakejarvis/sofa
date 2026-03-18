@@ -1,14 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
 import { IconThumbUp } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
+
 import { orpc } from "@/lib/orpc/client";
+
 import { FeedSection } from "./feed-section";
 import { TitleGrid, TitleGridSectionSkeleton } from "./title-grid";
 
 export function RecommendationsSection() {
-  const { data, isPending } = useQuery(
-    orpc.dashboard.recommendations.queryOptions(),
-  );
+  const { data, isPending } = useQuery(orpc.dashboard.recommendations.queryOptions());
 
   const { t } = useLingui();
 
@@ -20,7 +20,7 @@ export function RecommendationsSection() {
   return (
     <FeedSection
       title={t`Recommended for You`}
-      icon={<IconThumbUp className="size-5 text-primary" />}
+      icon={<IconThumbUp className="text-primary size-5" />}
     >
       <TitleGrid items={items} />
     </FeedSection>

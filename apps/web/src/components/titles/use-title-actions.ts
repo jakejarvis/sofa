@@ -1,10 +1,12 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import type { Season } from "@sofa/api/schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { toast } from "sonner";
+
 import { orpc } from "@/lib/orpc/client";
+import type { Season } from "@sofa/api/schemas";
+
 import { useTitleContext } from "./title-context";
 
 type UserInfo = {
@@ -38,26 +40,14 @@ export function useTitleActions() {
     [queryClient, userInfoKey],
   );
 
-  const batchWatchMutation = useMutation(
-    orpc.episodes.batchWatch.mutationOptions(),
-  );
-  const updateStatusMutation = useMutation(
-    orpc.titles.updateStatus.mutationOptions(),
-  );
-  const updateRatingMutation = useMutation(
-    orpc.titles.updateRating.mutationOptions(),
-  );
-  const watchMovieMutation = useMutation(
-    orpc.titles.watchMovie.mutationOptions(),
-  );
-  const unwatchEpMutation = useMutation(
-    orpc.episodes.unwatch.mutationOptions(),
-  );
+  const batchWatchMutation = useMutation(orpc.episodes.batchWatch.mutationOptions());
+  const updateStatusMutation = useMutation(orpc.titles.updateStatus.mutationOptions());
+  const updateRatingMutation = useMutation(orpc.titles.updateRating.mutationOptions());
+  const watchMovieMutation = useMutation(orpc.titles.watchMovie.mutationOptions());
+  const unwatchEpMutation = useMutation(orpc.episodes.unwatch.mutationOptions());
   const watchEpMutation = useMutation(orpc.episodes.watch.mutationOptions());
   const watchSeasonMutation = useMutation(orpc.seasons.watch.mutationOptions());
-  const unwatchSeasonMutation = useMutation(
-    orpc.seasons.unwatch.mutationOptions(),
-  );
+  const unwatchSeasonMutation = useMutation(orpc.seasons.unwatch.mutationOptions());
   const watchAllMutation = useMutation(orpc.titles.watchAll.mutationOptions());
 
   const catchUp = useCallback(
@@ -98,10 +88,7 @@ export function useTitleActions() {
       const prevStatus = getUserInfo().status;
       setUserInfo((old) => ({
         ...old,
-        status:
-          status === "watchlist"
-            ? "in_progress"
-            : (status as UserInfo["status"]),
+        status: status === "watchlist" ? "in_progress" : (status as UserInfo["status"]),
       }));
       try {
         await updateStatusMutation.mutateAsync({
@@ -152,12 +139,7 @@ export function useTitleActions() {
   }, [getUserInfo, setUserInfo, titleId, titleName, watchMovieMutation, t]);
 
   const handleWatchEpisode = useCallback(
-    async (
-      episodeId: string,
-      seasonNum: number,
-      epNum: number,
-      isWatched: boolean,
-    ) => {
+    async (episodeId: string, seasonNum: number, epNum: number, isWatched: boolean) => {
       setWatchingEp(episodeId);
 
       if (isWatched) {
@@ -191,10 +173,7 @@ export function useTitleActions() {
         setUserInfo((old) => ({
           ...old,
           episodeWatches: newWatches,
-          status:
-            old.status === null || old.status === "watchlist"
-              ? "in_progress"
-              : old.status,
+          status: old.status === null || old.status === "watchlist" ? "in_progress" : old.status,
         }));
 
         try {
@@ -331,9 +310,7 @@ export function useTitleActions() {
 
       try {
         await unwatchSeasonMutation.mutateAsync({ id: season.id });
-        toast.success(
-          t`Unwatched all of ${season.name ?? t`Season ${season.seasonNumber}`}`,
-        );
+        toast.success(t`Unwatched all of ${season.name ?? t`Season ${season.seasonNumber}`}`);
       } catch {
         setUserInfo((old) => ({
           ...old,

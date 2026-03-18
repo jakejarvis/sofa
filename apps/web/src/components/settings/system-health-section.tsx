@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { CronJobName, SystemHealthData } from "@sofa/api/schemas";
 import {
   IconActivity,
   IconAlertTriangle,
@@ -11,14 +10,10 @@ import {
 } from "@tabler/icons-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
 import { StatusDot } from "@/components/status-dot";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -29,13 +24,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTimeAgo } from "@/hooks/use-time-ago";
 import { orpc } from "@/lib/orpc/client";
+import type { CronJobName, SystemHealthData } from "@sofa/api/schemas";
 
 /** Convert a cron pattern to a short human-readable string */
 function cronToHuman(pattern: string): string {
@@ -74,8 +66,7 @@ function cronToHuman(pattern: string): string {
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 * 1024 * 1024)
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
 }
 
@@ -89,7 +80,7 @@ export function SkeletonCards() {
   return (
     <div className="space-y-3">
       {["status", "jobs", "storage"].map((s) => (
-        <Card key={s} className="border-l-2 border-l-primary/30">
+        <Card key={s} className="border-l-primary/30 border-l-2">
           <CardContent>
             <div className="flex items-start gap-3">
               <Skeleton className="mt-0.5 h-8 w-8 rounded-lg" />
@@ -120,12 +111,9 @@ function LiveTimeAgo({
 /** Hydrates system health state and renders the 3 cards */
 export function SystemHealthCards() {
   const queryClient = useQueryClient();
-  const { data, isPending, isFetching } = useQuery(
-    orpc.admin.systemHealth.queryOptions(),
-  );
+  const { data, isPending, isFetching } = useQuery(orpc.admin.systemHealth.queryOptions());
   const isRefreshing = isFetching;
-  const refresh = () =>
-    queryClient.invalidateQueries({ queryKey: orpc.admin.systemHealth.key() });
+  const refresh = () => queryClient.invalidateQueries({ queryKey: orpc.admin.systemHealth.key() });
 
   if (isPending || !data) return <SkeletonCards />;
 
@@ -139,11 +127,7 @@ export function SystemHealthCards() {
         isRefreshing={isRefreshing}
         onRefresh={refresh}
       />
-      <BackgroundJobsCard
-        jobs={data.jobs}
-        isRefreshing={isRefreshing}
-        onRefresh={refresh}
-      />
+      <BackgroundJobsCard jobs={data.jobs} isRefreshing={isRefreshing} onRefresh={refresh} />
       <StorageCard
         imageCache={data.imageCache}
         backups={data.backups}
@@ -197,15 +181,12 @@ function SystemStatusCard({
   onRefresh: () => void;
 }) {
   return (
-    <Card className="border-l-2 border-l-primary/30">
+    <Card className="border-l-primary/30 border-l-2">
       <CardContent>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconActivity
-                aria-hidden={true}
-                className="size-4 text-primary"
-              />
+            <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+              <IconActivity aria-hidden={true} className="text-primary size-4" />
             </div>
             <div>
               <CardTitle>
@@ -225,13 +206,12 @@ function SystemStatusCard({
       {/* Database */}
       <CardContent className="border-border/30 border-t pt-4">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
+          <span className="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase">
             <Trans>Database</Trans>
           </span>
-          <span className="font-mono text-[11px] text-muted-foreground">
+          <span className="text-muted-foreground font-mono text-[11px]">
             {formatBytes(database.dbSizeBytes)}
-            {database.walSizeBytes > 0 &&
-              ` + ${formatBytes(database.walSizeBytes)} WAL`}
+            {database.walSizeBytes > 0 && ` + ${formatBytes(database.walSizeBytes)} WAL`}
           </span>
         </div>
       </CardContent>
@@ -239,7 +219,7 @@ function SystemStatusCard({
       {/* TMDB */}
       <CardContent className="border-border/30 border-t pt-4">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
+          <span className="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase">
             TMDB API
           </span>
           {!tmdb.tokenConfigured ? (
@@ -255,7 +235,7 @@ function SystemStatusCard({
               <span className="text-muted-foreground text-xs">
                 <Trans>Connected</Trans>
               </span>
-              <span className="font-mono text-[11px] text-muted-foreground/80">
+              <span className="text-muted-foreground/80 font-mono text-[11px]">
                 {tmdb.responseTimeMs}ms
               </span>
             </>
@@ -273,9 +253,7 @@ function SystemStatusCard({
                 <Trans>Unreachable</Trans>
               </span>
               {tmdb.error && (
-                <span className="text-[11px] text-muted-foreground/50">
-                  {tmdb.error}
-                </span>
+                <span className="text-muted-foreground/50 text-[11px]">{tmdb.error}</span>
               )}
             </>
           )}
@@ -285,15 +263,12 @@ function SystemStatusCard({
       {/* Environment */}
       <CardContent className="border-border/30 border-t pt-4">
         <div className="space-y-2">
-          <span className="inline-flex items-center gap-1.5 font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
+          <span className="text-muted-foreground/70 inline-flex items-center gap-1.5 text-[11px] font-medium tracking-wider uppercase">
             <Trans>Environment</Trans>
             {environment.dataDirWritable ? (
               <IconCheck aria-hidden={true} className="size-3 text-green-500" />
             ) : (
-              <IconAlertTriangle
-                aria-hidden={true}
-                className="size-3 text-destructive"
-              />
+              <IconAlertTriangle aria-hidden={true} className="text-destructive size-3" />
             )}
           </span>
           <div className="space-y-1">
@@ -305,9 +280,7 @@ function SystemStatusCard({
                   className="flex items-baseline gap-[1px] font-mono text-[11px] leading-relaxed"
                 >
                   <span className="text-muted-foreground/60">{env.name}=</span>
-                  <span className="break-all text-muted-foreground">
-                    {env.value}
-                  </span>
+                  <span className="text-muted-foreground break-all">{env.value}</span>
                 </div>
               ))}
           </div>
@@ -344,9 +317,7 @@ function BackgroundJobsCard({
         setTimeout(onRefresh, 1500);
       },
       onError: (err) => {
-        toast.error(
-          err instanceof Error ? err.message : t`Failed to trigger job`,
-        );
+        toast.error(err instanceof Error ? err.message : t`Failed to trigger job`);
       },
     }),
   );
@@ -362,20 +333,15 @@ function BackgroundJobsCard({
     return new Date(a.nextRunAt).getTime() - new Date(b.nextRunAt).getTime();
   });
   const activeJobs = jobs.filter((j) => !j.disabled);
-  const healthyCount = activeJobs.filter(
-    (j) => j.lastStatus === "success",
-  ).length;
+  const healthyCount = activeJobs.filter((j) => j.lastStatus === "success").length;
 
   return (
-    <Card className="border-l-2 border-l-primary/30">
+    <Card className="border-l-primary/30 border-l-2">
       <CardContent>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconCalendarCheck
-                aria-hidden={true}
-                className="size-4 text-primary"
-              />
+            <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+              <IconCalendarCheck aria-hidden={true} className="text-primary size-4" />
             </div>
             <div>
               <CardTitle>
@@ -395,19 +361,19 @@ function BackgroundJobsCard({
         <Table>
           <TableHeader>
             <TableRow className="border-b-border/30 hover:bg-transparent">
-              <TableHead className="h-8 pl-5 font-medium text-[10px] text-muted-foreground uppercase tracking-wider">
+              <TableHead className="text-muted-foreground h-8 pl-5 text-[10px] font-medium tracking-wider uppercase">
                 <Trans>Job</Trans>
               </TableHead>
-              <TableHead className="h-8 font-medium text-[10px] text-muted-foreground uppercase tracking-wider">
+              <TableHead className="text-muted-foreground h-8 text-[10px] font-medium tracking-wider uppercase">
                 <Trans>Schedule</Trans>
               </TableHead>
-              <TableHead className="h-8 font-medium text-[10px] text-muted-foreground uppercase tracking-wider">
+              <TableHead className="text-muted-foreground h-8 text-[10px] font-medium tracking-wider uppercase">
                 <Trans>Last run</Trans>
               </TableHead>
-              <TableHead className="h-8 font-medium text-[10px] text-muted-foreground uppercase tracking-wider">
+              <TableHead className="text-muted-foreground h-8 text-[10px] font-medium tracking-wider uppercase">
                 <Trans>Next run</Trans>
               </TableHead>
-              <TableHead className="h-8 pr-5 text-right font-medium text-[10px] text-muted-foreground uppercase tracking-wider">
+              <TableHead className="text-muted-foreground h-8 pr-5 text-right text-[10px] font-medium tracking-wider uppercase">
                 <span className="sr-only">
                   <Trans>Actions</Trans>
                 </span>
@@ -420,10 +386,7 @@ function BackgroundJobsCard({
               const isRunning = job.isCurrentlyRunning || isTriggering;
 
               return (
-                <TableRow
-                  key={job.jobName}
-                  className="border-b-border/20 hover:bg-muted/30"
-                >
+                <TableRow key={job.jobName} className="border-b-border/20 hover:bg-muted/30">
                   {/* Job name + status */}
                   <TableCell className="pl-5">
                     <div className="flex items-center gap-2">
@@ -436,10 +399,7 @@ function BackgroundJobsCard({
                       ) : job.lastStatus === "success" ? (
                         <StatusDot status="ok" label={t`Last run succeeded`} />
                       ) : (
-                        <StatusDot
-                          status="error"
-                          label={job.lastError ?? t`Last run failed`}
-                        />
+                        <StatusDot status="error" label={job.lastError ?? t`Last run failed`} />
                       )}
                       <span className="text-muted-foreground text-xs">
                         {JOB_LABELS[job.jobName] ?? job.jobName}
@@ -461,9 +421,7 @@ function BackgroundJobsCard({
                         </TooltipContent>
                       </Tooltip>
                     ) : (
-                      <span className="text-muted-foreground/50 text-xs">
-                        —
-                      </span>
+                      <span className="text-muted-foreground/50 text-xs">—</span>
                     )}
                   </TableCell>
 
@@ -479,20 +437,17 @@ function BackgroundJobsCard({
                             >
                               <LiveTimeAgo date={job.lastRunAt} />
                             </span>
-                            {job.lastDurationMs !== null &&
-                              job.lastDurationMs > 0 && (
-                                <span className="font-mono text-[10px] text-muted-foreground/50">
-                                  {formatDuration(job.lastDurationMs)}
-                                </span>
-                              )}
+                            {job.lastDurationMs !== null && job.lastDurationMs > 0 && (
+                              <span className="text-muted-foreground/50 font-mono text-[10px]">
+                                {formatDuration(job.lastDurationMs)}
+                              </span>
+                            )}
                           </div>
                         </TooltipTrigger>
                         <TooltipContent>
                           {new Date(job.lastRunAt).toLocaleString()}
                           {job.lastError && (
-                            <div className="mt-1 text-destructive">
-                              {job.lastError}
-                            </div>
+                            <div className="text-destructive mt-1">{job.lastError}</div>
                           )}
                         </TooltipContent>
                       </Tooltip>
@@ -515,14 +470,10 @@ function BackgroundJobsCard({
                             <LiveTimeAgo date={job.nextRunAt} />
                           </span>
                         </TooltipTrigger>
-                        <TooltipContent>
-                          {new Date(job.nextRunAt).toLocaleString()}
-                        </TooltipContent>
+                        <TooltipContent>{new Date(job.nextRunAt).toLocaleString()}</TooltipContent>
                       </Tooltip>
                     ) : (
-                      <span className="text-muted-foreground/50 text-xs">
-                        —
-                      </span>
+                      <span className="text-muted-foreground/50 text-xs">—</span>
                     )}
                   </TableCell>
 
@@ -550,7 +501,7 @@ function BackgroundJobsCard({
                         ) : (
                           <IconPlayerPlay
                             aria-hidden={true}
-                            className="size-3 text-muted-foreground/70"
+                            className="text-muted-foreground/70 size-3"
                           />
                         )}
                       </TooltipTrigger>
@@ -580,15 +531,12 @@ function StorageCard({
 }) {
   const { t } = useLingui();
   return (
-    <Card className="border-l-2 border-l-primary/30">
+    <Card className="border-l-primary/30 border-l-2">
       <CardContent>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconDatabase
-                aria-hidden={true}
-                className="size-4 text-primary"
-              />
+            <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+              <IconDatabase aria-hidden={true} className="text-primary size-4" />
             </div>
             <div>
               <CardTitle>
@@ -606,28 +554,28 @@ function StorageCard({
       {/* Image cache */}
       <CardContent className="border-border/30 border-t pt-4">
         <div className="flex items-center justify-between">
-          <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
+          <span className="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase">
             <Trans>Image cache</Trans>
           </span>
           {imageCache.enabled ? (
-            <span className="font-mono text-[11px] text-muted-foreground/50">
+            <span className="text-muted-foreground/50 font-mono text-[11px]">
               {formatBytes(imageCache.totalSizeBytes)}
             </span>
           ) : null}
         </div>
         {imageCache.enabled ? (
           <>
-            <p className="mt-1 text-muted-foreground text-xs">
+            <p className="text-muted-foreground mt-1 text-xs">
               {t`${imageCache.imageCount.toLocaleString()} cached images`}
             </p>
-            <p className="mt-0.5 text-[10px] text-muted-foreground/50 leading-relaxed">
+            <p className="text-muted-foreground/50 mt-0.5 text-[10px] leading-relaxed">
               {Object.entries(imageCache.categories)
                 .map(([name, cat]) => `${name} ${cat.count}`)
                 .join(" · ")}
             </p>
           </>
         ) : (
-          <p className="mt-1 flex items-center gap-1.5 text-muted-foreground/50 text-xs">
+          <p className="text-muted-foreground/50 mt-1 flex items-center gap-1.5 text-xs">
             <StatusDot status="inactive" />
             <Trans>Disabled</Trans>
           </p>
@@ -637,27 +585,24 @@ function StorageCard({
       {/* Backup summary */}
       <CardContent className="border-border/30 border-t pt-4">
         <div className="flex items-center justify-between">
-          <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
+          <span className="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase">
             <Trans>Backups</Trans>
           </span>
           {backups.backupCount > 0 && (
-            <span className="font-mono text-[11px] text-muted-foreground/50">
+            <span className="text-muted-foreground/50 font-mono text-[11px]">
               {formatBytes(backups.totalSizeBytes)}
             </span>
           )}
         </div>
         {backups.backupCount > 0 ? (
-          <p
-            className="mt-1 text-muted-foreground text-xs"
-            suppressHydrationWarning
-          >
+          <p className="text-muted-foreground mt-1 text-xs" suppressHydrationWarning>
             <Trans>
               {backups.backupCount} backups · last{" "}
               <LiveTimeAgo date={backups.lastBackupAt} fallback={t`unknown`} />
             </Trans>
           </p>
         ) : (
-          <p className="mt-1 flex items-center gap-1.5 text-muted-foreground/50 text-xs">
+          <p className="text-muted-foreground/50 mt-1 flex items-center gap-1.5 text-xs">
             <StatusDot status="inactive" />
             <Trans>No backups yet</Trans>
           </p>

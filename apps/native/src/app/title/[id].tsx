@@ -22,6 +22,7 @@ import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
+
 import {
   HorizontalPosterRow,
   type PosterRowItem,
@@ -102,12 +103,8 @@ export default function TitleDetailScreen() {
   ]) as [string, string, string];
 
   const detail = useQuery(orpc.titles.detail.queryOptions({ input: { id } }));
-  const userInfo = useQuery(
-    orpc.titles.userInfo.queryOptions({ input: { id } }),
-  );
-  const recommendations = useQuery(
-    orpc.titles.recommendations.queryOptions({ input: { id } }),
-  );
+  const userInfo = useQuery(orpc.titles.userInfo.queryOptions({ input: { id } }));
+  const recommendations = useQuery(orpc.titles.recommendations.queryOptions({ input: { id } }));
 
   const {
     updateStatus,
@@ -116,24 +113,19 @@ export default function TitleDetailScreen() {
     quickAdd: quickAddMutation,
   } = useTitleActions({
     toasts: {
-      watchMovie: () =>
-        title?.title
-          ? `Marked "${title.title}" as watched`
-          : "Marked as watched",
+      watchMovie: () => (title?.title ? `Marked "${title.title}" as watched` : "Marked as watched"),
     },
   });
 
   const title = detail.data?.title;
   const palette = title?.colorPalette ?? null;
   useTitleTheme(palette);
-  const providerIcon =
-    process.env.EXPO_OS === "ios" ? IconBrandAppstore : IconBrandGooglePlay;
+  const providerIcon = process.env.EXPO_OS === "ios" ? IconBrandAppstore : IconBrandGooglePlay;
 
   const titleName = title?.title;
   const titleType = title?.type;
   const titlePosterPath = title?.posterPath ?? null;
-  const titleYear =
-    (title?.releaseDate ?? title?.firstAirDate)?.slice(0, 4) ?? null;
+  const titleYear = (title?.releaseDate ?? title?.firstAirDate)?.slice(0, 4) ?? null;
 
   useEffect(() => {
     if (titleName && titleType) {
@@ -166,9 +158,7 @@ export default function TitleDetailScreen() {
         releaseDate: item.releaseDate,
         firstAirDate: item.firstAirDate,
         voteAverage: item.voteAverage,
-        userStatus: item.id
-          ? (recommendations.data?.userStatuses?.[item.id] ?? null)
-          : null,
+        userStatus: item.id ? (recommendations.data?.userStatuses?.[item.id] ?? null) : null,
       })),
     [recommendations.data],
   );
@@ -188,17 +178,11 @@ export default function TitleDetailScreen() {
     [useAutomaticInsets, headerHeight],
   );
   const darkMutedOverlayStyle = useMemo(
-    () =>
-      palette?.darkMuted
-        ? { backgroundColor: palette.darkMuted, opacity: 0.2 }
-        : undefined,
+    () => (palette?.darkMuted ? { backgroundColor: palette.darkMuted, opacity: 0.2 } : undefined),
     [palette?.darkMuted],
   );
   const vibrantOverlayStyle = useMemo(
-    () =>
-      palette?.vibrant
-        ? { backgroundColor: palette.vibrant, opacity: 0.06 }
-        : undefined,
+    () => (palette?.vibrant ? { backgroundColor: palette.vibrant, opacity: 0.06 } : undefined),
     [palette?.vibrant],
   );
   const posterShadowStyle = useMemo(
@@ -215,7 +199,7 @@ export default function TitleDetailScreen() {
     return (
       <>
         <DetailStackHeader />
-        <View className="flex-1 bg-background">
+        <View className="bg-background flex-1">
           {/* Hero skeleton */}
           <Skeleton width="100%" height={300} borderRadius={0} />
           {/* Genre chips skeleton */}
@@ -245,9 +229,9 @@ export default function TitleDetailScreen() {
     return (
       <>
         <DetailStackHeader />
-        <View className="flex-1 items-center justify-center bg-background px-6">
+        <View className="bg-background flex-1 items-center justify-center px-6">
           <IconMovie size={48} color={mutedForeground} />
-          <Text className="mt-3 font-display text-foreground text-xl">
+          <Text className="font-display text-foreground mt-3 text-xl">
             <Trans>Title not found</Trans>
           </Text>
           <Pressable onPress={() => back()} className="mt-4">
@@ -265,9 +249,7 @@ export default function TitleDetailScreen() {
   return (
     <ScrollView
       className="bg-background"
-      contentInsetAdjustmentBehavior={
-        useAutomaticInsets ? "automatic" : "never"
-      }
+      contentInsetAdjustmentBehavior={useAutomaticInsets ? "automatic" : "never"}
       contentContainerStyle={titleScrollContentStyle}
     >
       <DetailStackHeader />
@@ -285,12 +267,8 @@ export default function TitleDetailScreen() {
         {/* Base darkening overlay */}
         <View style={titleDetailStyles.heroBaseOverlay} />
         {/* Colored tint from palette */}
-        {palette?.darkMuted && (
-          <View style={[titleDetailStyles.heroFill, darkMutedOverlayStyle]} />
-        )}
-        {palette?.vibrant && (
-          <View style={[titleDetailStyles.heroFill, vibrantOverlayStyle]} />
-        )}
+        {palette?.darkMuted && <View style={[titleDetailStyles.heroFill, darkMutedOverlayStyle]} />}
+        {palette?.vibrant && <View style={[titleDetailStyles.heroFill, vibrantOverlayStyle]} />}
         {/* Bottom fade to background */}
         <LinearGradient
           colors={["transparent", "rgba(0,0,0,0.6)", "rgba(0,0,0,0.95)"]}
@@ -347,39 +325,26 @@ export default function TitleDetailScreen() {
             </Link.AppleZoomTarget>
           )}
           <View className="flex-1 pb-1">
-            <Text
-              className="font-display text-2xl text-white"
-              numberOfLines={2}
-            >
+            <Text className="font-display text-2xl text-white" numberOfLines={2}>
               {title.title}
             </Text>
             <View className="mt-1.5 flex-row flex-wrap items-center gap-2">
-              <View className="rounded-full bg-title-accent px-2 py-0.5">
+              <View className="bg-title-accent rounded-full px-2 py-0.5">
                 <Text
                   maxFontSizeMultiplier={1.0}
-                  className="font-medium font-sans text-title-accent-foreground text-xs"
+                  className="text-title-accent-foreground font-sans text-xs font-medium"
                 >
                   {title.type === "movie" ? t`Movie` : t`TV`}
                 </Text>
               </View>
-              {year ? (
-                <Text className="text-sm text-white/70">{year}</Text>
-              ) : null}
+              {year ? <Text className="text-sm text-white/70">{year}</Text> : null}
               {title.contentRating ? (
-                <Text className="text-white/50 text-xs">
-                  {title.contentRating}
-                </Text>
+                <Text className="text-xs text-white/50">{title.contentRating}</Text>
               ) : null}
               {title.voteAverage != null && title.voteAverage > 0 && (
                 <View className="flex-row items-center gap-0.5">
-                  <ScaledIcon
-                    icon={IconStarFilled}
-                    size={12}
-                    color={titleAccent}
-                  />
-                  <Text className="text-title-accent text-xs">
-                    {title.voteAverage.toFixed(1)}
-                  </Text>
+                  <ScaledIcon icon={IconStarFilled} size={12} color={titleAccent} />
+                  <Text className="text-title-accent text-xs">{title.voteAverage.toFixed(1)}</Text>
                 </View>
               )}
             </View>
@@ -397,10 +362,7 @@ export default function TitleDetailScreen() {
             contentContainerStyle={titleGenresContentStyle}
           >
             {title.genres.map((genre: string) => (
-              <View
-                key={genre}
-                className="mr-2 rounded-full bg-secondary px-2.5 py-1"
-              >
+              <View key={genre} className="bg-secondary mr-2 rounded-full px-2.5 py-1">
                 <Text className="text-muted-foreground text-xs">{genre}</Text>
               </View>
             ))}
@@ -409,10 +371,7 @@ export default function TitleDetailScreen() {
       )}
 
       {/* Actions */}
-      <Animated.View
-        entering={FadeInDown.duration(300).delay(200)}
-        className="mt-4 px-4"
-      >
+      <Animated.View entering={FadeInDown.duration(300).delay(200)} className="mt-4 px-4">
         <View className="flex-row flex-wrap items-center gap-3">
           <StatusActionButton
             currentStatus={userInfo.data?.status ?? null}
@@ -423,29 +382,21 @@ export default function TitleDetailScreen() {
                 updateStatus.mutate({ id, status: null });
               }
             }}
-            isPending={
-              updateStatus.isPending ||
-              quickAddMutation.isPending ||
-              watchMovie.isPending
-            }
+            isPending={updateStatus.isPending || quickAddMutation.isPending || watchMovie.isPending}
           />
 
           {title.type === "movie" && (
             <Pressable
               onPress={() => watchMovie.mutate({ id })}
               disabled={watchMovie.isPending}
-              className="flex-row items-center gap-1.5 rounded-lg bg-title-accent px-4 py-2"
+              className="bg-title-accent flex-row items-center gap-1.5 rounded-lg px-4 py-2"
             >
               {watchMovie.isPending ? (
                 <Spinner size="sm" />
               ) : (
                 <>
-                  <ScaledIcon
-                    icon={IconCheck}
-                    size={16}
-                    color={titleAccentForeground}
-                  />
-                  <Text className="font-medium font-sans text-sm text-title-accent-foreground">
+                  <ScaledIcon icon={IconCheck} size={16} color={titleAccentForeground} />
+                  <Text className="text-title-accent-foreground font-sans text-sm font-medium">
                     <Trans>Mark Watched</Trans>
                   </Text>
                 </>
@@ -453,7 +404,7 @@ export default function TitleDetailScreen() {
             </Pressable>
           )}
 
-          <View className="h-6 w-px bg-border/50" />
+          <View className="bg-border/50 h-6 w-px" />
 
           <StarRating
             rating={userInfo.data?.rating ?? 0}
@@ -474,16 +425,9 @@ export default function TitleDetailScreen() {
 
       {/* Availability */}
       {availability.length > 0 && (
-        <Animated.View
-          entering={FadeInDown.duration(300).delay(400)}
-          className="mt-6"
-        >
+        <Animated.View entering={FadeInDown.duration(300).delay(400)} className="mt-6">
           <View className="px-4">
-            <SectionHeader
-              title={t`Where to Watch`}
-              icon={providerIcon}
-              iconColor={titleAccent}
-            />
+            <SectionHeader title={t`Where to Watch`} icon={providerIcon} iconColor={titleAccent} />
           </View>
           <ScrollView
             horizontal
@@ -491,10 +435,7 @@ export default function TitleDetailScreen() {
             contentContainerStyle={titleAvailabilityContentStyle}
           >
             {availability.map((offer) => (
-              <View
-                key={`${offer.providerId}-${offer.offerType}`}
-                className="items-center"
-              >
+              <View key={`${offer.providerId}-${offer.offerType}`} className="items-center">
                 {offer.logoPath && (
                   <Image
                     source={{ uri: offer.logoPath }}
@@ -504,7 +445,7 @@ export default function TitleDetailScreen() {
                 )}
                 <Text
                   maxFontSizeMultiplier={1.0}
-                  className="mt-1 max-w-[60px] text-center text-muted-foreground text-xs"
+                  className="text-muted-foreground mt-1 max-w-[60px] text-center text-xs"
                   numberOfLines={1}
                 >
                   {offer.providerName}
@@ -528,15 +469,8 @@ export default function TitleDetailScreen() {
 
       {/* Seasons & Episodes */}
       {title.type === "tv" && seasons.length > 0 && (
-        <Animated.View
-          entering={FadeInDown.duration(300).delay(400)}
-          className="mt-6 px-4"
-        >
-          <SectionHeader
-            title={t`Seasons`}
-            icon={IconList}
-            iconColor={titleAccent}
-          />
+        <Animated.View entering={FadeInDown.duration(300).delay(400)} className="mt-6 px-4">
+          <SectionHeader title={t`Seasons`} icon={IconList} iconColor={titleAccent} />
           {seasons.map((season) => (
             <SeasonAccordion
               key={season.id}
@@ -550,16 +484,9 @@ export default function TitleDetailScreen() {
 
       {/* Cast */}
       {cast.length > 0 && (
-        <Animated.View
-          entering={FadeInDown.duration(300).delay(500)}
-          className="mt-6"
-        >
+        <Animated.View entering={FadeInDown.duration(300).delay(500)} className="mt-6">
           <View className="px-4">
-            <SectionHeader
-              title={t`Cast`}
-              icon={IconUsers}
-              iconColor={titleAccent}
-            />
+            <SectionHeader title={t`Cast`} icon={IconUsers} iconColor={titleAccent} />
           </View>
           <FlashList
             horizontal
@@ -576,16 +503,9 @@ export default function TitleDetailScreen() {
 
       {/* Recommendations */}
       {recItems.length > 0 && (
-        <Animated.View
-          entering={FadeInDown.duration(300).delay(600)}
-          className="mt-6"
-        >
+        <Animated.View entering={FadeInDown.duration(300).delay(600)} className="mt-6">
           <View className="px-4">
-            <SectionHeader
-              title={t`More Like This`}
-              icon={IconThumbUp}
-              iconColor={titleAccent}
-            />
+            <SectionHeader title={t`More Like This`} icon={IconThumbUp} iconColor={titleAccent} />
           </View>
           <HorizontalPosterRow items={recItems} />
         </Animated.View>

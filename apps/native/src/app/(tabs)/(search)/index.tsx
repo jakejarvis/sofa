@@ -5,11 +5,9 @@ import { Stack } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
+
 import { RecentlyViewedList } from "@/components/search/recently-viewed-list";
-import {
-  type SearchResultItem,
-  SearchResultRow,
-} from "@/components/search/search-result-row";
+import { type SearchResultItem, SearchResultRow } from "@/components/search/search-result-row";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -58,28 +56,19 @@ export default function SearchScreen() {
     [searchResults.data?.pages],
   );
 
-  const addingId = quickAddMutation.isPending
-    ? (quickAddMutation.variables?.id ?? null)
-    : null;
+  const addingId = quickAddMutation.isPending ? (quickAddMutation.variables?.id ?? null) : null;
 
   const renderItem = useCallback(
     ({ item }: { item: SearchResultItem }) => (
-      <SearchResultRow
-        item={item}
-        onQuickAdd={handleQuickAdd}
-        isAdding={addingId === item.id}
-      />
+      <SearchResultRow item={item} onQuickAdd={handleQuickAdd} isAdding={addingId === item.id} />
     ),
     [handleQuickAdd, addingId],
   );
 
-  const keyExtractor = useCallback(
-    (item: SearchResultItem) => `${item.type}-${item.id}`,
-    [],
-  );
+  const keyExtractor = useCallback((item: SearchResultItem) => `${item.type}-${item.id}`, []);
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="bg-background flex-1">
       <Stack.Header
         transparent={false}
         style={{ backgroundColor: "#000" }}
@@ -93,9 +82,7 @@ export default function SearchScreen() {
         onClose={() => setQuery("")}
         hideWhenScrolling={false}
         placement={process.env.EXPO_OS === "ios" ? "integrated" : undefined}
-        allowToolbarIntegration={
-          process.env.EXPO_OS === "ios" ? true : undefined
-        }
+        allowToolbarIntegration={process.env.EXPO_OS === "ios" ? true : undefined}
       />
 
       {debouncedQuery.length === 0 ? (
@@ -109,7 +96,7 @@ export default function SearchScreen() {
           entering={FadeIn.duration(300)}
           className="flex-1 items-center justify-center"
         >
-          <Text className="text-base text-muted-foreground">
+          <Text className="text-muted-foreground text-base">
             <Trans>No results for "{debouncedQuery}"</Trans>
           </Text>
         </Animated.View>
@@ -121,10 +108,7 @@ export default function SearchScreen() {
           keyboardShouldPersistTaps="handled"
           contentInsetAdjustmentBehavior="automatic"
           onEndReached={() => {
-            if (
-              searchResults.hasNextPage &&
-              !searchResults.isFetchingNextPage
-            ) {
+            if (searchResults.hasNextPage && !searchResults.isFetchingNextPage) {
               searchResults.fetchNextPage();
             }
           }}

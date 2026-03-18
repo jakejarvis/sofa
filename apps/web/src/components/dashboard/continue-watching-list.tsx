@@ -1,13 +1,11 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  ContinueWatchingCard,
-  type ContinueWatchingItemProps,
-} from "./continue-watching-card";
+
+import { ContinueWatchingCard, type ContinueWatchingItemProps } from "./continue-watching-card";
 
 function ContinueWatchingSkeleton() {
   return (
-    <div className="w-64 shrink-0 overflow-hidden rounded-xl bg-card/50 ring-1 ring-white/[0.06] sm:w-72">
+    <div className="bg-card/50 w-64 shrink-0 overflow-hidden rounded-xl ring-1 ring-white/[0.06] sm:w-72">
       <Skeleton className="aspect-video w-full rounded-none" />
       <div className="flex items-center gap-3 p-3">
         <div className="min-w-0 flex-1 space-y-2">
@@ -37,11 +35,7 @@ export function ContinueWatchingSectionSkeleton() {
   );
 }
 
-export function ContinueWatchingList({
-  items,
-}: {
-  items: ContinueWatchingItemProps[];
-}) {
+export function ContinueWatchingList({ items }: { items: ContinueWatchingItemProps[] }) {
   return (
     <ScrollArea
       scrollFade

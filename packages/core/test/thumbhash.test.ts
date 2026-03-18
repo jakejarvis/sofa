@@ -1,12 +1,5 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  mock,
-  spyOn,
-  test,
-} from "bun:test";
+import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
+
 import { eq } from "@sofa/db/helpers";
 import { episodes, seasons, titles } from "@sofa/db/schema";
 import { clearAllTables, testDb } from "@sofa/db/test-utils";
@@ -52,14 +45,8 @@ describe("thumbhash generation", () => {
   });
 
   test("clears a stale episode thumbhash when regeneration fails", async () => {
-    testDb
-      .insert(titles)
-      .values({ id: "tv-1", tmdbId: 100, type: "tv", title: "Show" })
-      .run();
-    testDb
-      .insert(seasons)
-      .values({ id: "season-1", titleId: "tv-1", seasonNumber: 1 })
-      .run();
+    testDb.insert(titles).values({ id: "tv-1", tmdbId: 100, type: "tv", title: "Show" }).run();
+    testDb.insert(seasons).values({ id: "season-1", titleId: "tv-1", seasonNumber: 1 }).run();
     testDb
       .insert(episodes)
       .values({
@@ -74,11 +61,7 @@ describe("thumbhash generation", () => {
     nextBuffer = null;
     const hash = await generateEpisodeThumbHash("ep-1", "/new-still.png");
 
-    const episode = testDb
-      .select()
-      .from(episodes)
-      .where(eq(episodes.id, "ep-1"))
-      .get();
+    const episode = testDb.select().from(episodes).where(eq(episodes.id, "ep-1")).get();
 
     expect(hash).toBeNull();
     expect(episode?.stillThumbHash).toBeNull();

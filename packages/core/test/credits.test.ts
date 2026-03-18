@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+
 import { persons, titleCast } from "@sofa/db/schema";
 import { clearAllTables, insertTitle, testDb } from "@sofa/db/test-utils";
 
@@ -8,12 +9,7 @@ beforeEach(() => {
   clearAllTables();
 });
 
-function insertPerson(
-  id: string,
-  tmdbId: number,
-  name: string,
-  profilePath: string | null = null,
-) {
+function insertPerson(id: string, tmdbId: number, name: string, profilePath: string | null = null) {
   testDb.insert(persons).values({ id, tmdbId, name, profilePath }).run();
   return id;
 }

@@ -9,14 +9,10 @@ function toDate(date: Date | string): Date {
   return typeof date === "string" ? new Date(date) : date;
 }
 
-export function formatDate(
-  date: Date | string,
-  options?: Intl.DateTimeFormatOptions,
-): string {
+export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOptions): string {
   // Date-only ISO strings (e.g. "1990-05-15") are parsed as UTC midnight.
   // Format in UTC so users west of UTC don't see the previous day.
-  const useUTC =
-    typeof date === "string" && isDateOnly(date) && !options?.timeZone;
+  const useUTC = typeof date === "string" && isDateOnly(date) && !options?.timeZone;
   return new Intl.DateTimeFormat(i18n.locale, {
     year: "numeric",
     month: "long",
@@ -53,10 +49,7 @@ export function formatRelativeTime(date: Date | string): string {
   return rtf.format(sign * Math.round(absDay / 365), "year");
 }
 
-export function formatNumber(
-  n: number,
-  options?: Intl.NumberFormatOptions,
-): string {
+export function formatNumber(n: number, options?: Intl.NumberFormatOptions): string {
   return new Intl.NumberFormat(i18n.locale, options).format(n);
 }
 

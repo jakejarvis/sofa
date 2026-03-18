@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { IconExternalLink, IconKey } from "@tabler/icons-react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+
 import { CopyButton } from "@/components/setup/copy-button";
 import { RefreshButton } from "@/components/setup/refresh-button";
 import { TmdbLogo } from "@/components/tmdb-logo";
@@ -17,12 +18,12 @@ const steps = [
           href="https://www.themoviedb.org/signup"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 font-medium text-primary underline decoration-primary/30 underline-offset-2 transition-colors hover:decoration-primary"
+          className="text-primary decoration-primary/30 hover:decoration-primary inline-flex items-center gap-1 font-medium underline underline-offset-2 transition-colors"
         >
           themoviedb.org
           <IconExternalLink
             aria-hidden={true}
-            className="size-3.5 translate-y-[-1px] text-muted-foreground"
+            className="text-muted-foreground size-3.5 translate-y-[-1px]"
           />
         </a>{" "}
         and sign up for a free account.
@@ -39,28 +40,24 @@ const steps = [
           href="https://www.themoviedb.org/settings/api"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 font-medium text-primary underline decoration-primary/30 underline-offset-2 transition-colors hover:decoration-primary"
+          className="text-primary decoration-primary/30 hover:decoration-primary inline-flex items-center gap-1 font-medium underline underline-offset-2 transition-colors"
         >
           Settings &rarr; API
           <IconExternalLink
             aria-hidden={true}
-            className="size-3.5 translate-y-[-1px] text-muted-foreground"
+            className="text-muted-foreground size-3.5 translate-y-[-1px]"
           />
         </a>{" "}
-        and request an API key. Choose &ldquo;Developer&rdquo; when asked. You
-        need the{" "}
-        <span className="font-mono text-primary text-xs">
-          API Read Access Token
-        </span>{" "}
-        (the long one).
+        and request an API key. Choose &ldquo;Developer&rdquo; when asked. You need the{" "}
+        <span className="text-primary font-mono text-xs">API Read Access Token</span> (the long
+        one).
       </>
     ),
   },
   {
     number: "3",
     title: "Add it to your environment",
-    description:
-      "Set the TMDB_API_READ_ACCESS_TOKEN environment variable and restart Sofa.",
+    description: "Set the TMDB_API_READ_ACCESS_TOKEN environment variable and restart Sofa.",
   },
 ];
 
@@ -93,29 +90,29 @@ function SetupPage() {
     <div className="mx-auto my-10 max-w-2xl space-y-10">
       {/* Header */}
       <div className="space-y-3">
-        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 font-medium text-primary text-xs">
+        <div className="border-primary/20 bg-primary/5 text-primary inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
           <IconKey aria-hidden={true} className="size-3.5" />
           <Trans>Setup required</Trans>
         </div>
-        <h1 className="text-balance font-display text-3xl tracking-tight sm:text-4xl">
+        <h1 className="font-display text-3xl tracking-tight text-balance sm:text-4xl">
           <Trans>Connect to TMDB</Trans>
         </h1>
-        <p className="max-w-lg text-muted-foreground leading-relaxed">
+        <p className="text-muted-foreground max-w-lg leading-relaxed">
           Sofa uses{" "}
           <a
             href="https://www.themoviedb.org/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 font-medium text-primary underline decoration-primary/30 underline-offset-2 transition-colors hover:decoration-primary"
+            className="text-primary decoration-primary/30 hover:decoration-primary inline-flex items-center gap-1 font-medium underline underline-offset-2 transition-colors"
           >
             The Movie Database
             <IconExternalLink
               aria-hidden={true}
-              className="size-3.5 translate-y-[-1px] text-muted-foreground"
+              className="text-muted-foreground size-3.5 translate-y-[-1px]"
             />
           </a>{" "}
-          for movie & TV metadata, posters, and streaming availability.
-          You&apos;ll need a free API key to get started.
+          for movie & TV metadata, posters, and streaming availability. You&apos;ll need a free API
+          key to get started.
         </p>
       </div>
 
@@ -124,15 +121,13 @@ function SetupPage() {
         {steps.map((step, i) => (
           <div key={step.number} className="flex gap-4">
             <div className="flex shrink-0 items-start pt-0.5">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 font-mono font-semibold text-primary text-sm">
+              <span className="bg-primary/10 text-primary flex h-7 w-7 items-center justify-center rounded-full font-mono text-sm font-semibold">
                 {step.number}
               </span>
             </div>
             <div className="space-y-1 overflow-x-auto">
               <h2 className="font-medium">{step.title}</h2>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                {step.description}
-              </p>
+              <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
 
               {/* Show env snippets for step 3 */}
               {i === 2 && (
@@ -140,15 +135,15 @@ function SetupPage() {
                   {envSnippets.map((snippet) => (
                     <div
                       key={snippet.label}
-                      className="group relative rounded-lg border border-border/50 bg-card/60"
+                      className="group border-border/50 bg-card/60 relative rounded-lg border"
                     >
-                      <div className="flex items-center justify-between border-border/30 border-b px-3 py-1.5">
-                        <span className="font-medium text-[11px] text-muted-foreground uppercase tracking-wider">
+                      <div className="border-border/30 flex items-center justify-between border-b px-3 py-1.5">
+                        <span className="text-muted-foreground text-[11px] font-medium tracking-wider uppercase">
                           {snippet.label}
                         </span>
                         <CopyButton code={snippet.code} />
                       </div>
-                      <pre className="overflow-x-auto p-3 font-mono text-foreground/80 text-sm">
+                      <pre className="text-foreground/80 overflow-x-auto p-3 font-mono text-sm">
                         {snippet.code}
                       </pre>
                     </div>
@@ -161,12 +156,10 @@ function SetupPage() {
       </div>
 
       {/* Status check */}
-      <div className="rounded-xl border border-border/50 bg-card/40 p-5">
+      <div className="border-border/50 bg-card/40 rounded-xl border p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-0.5">
-            <p className="font-medium text-sm">
-              After setting the key and restarting:
-            </p>
+            <p className="text-sm font-medium">After setting the key and restarting:</p>
             <p className="text-muted-foreground text-xs">
               Click the button to verify your configuration
             </p>
@@ -183,11 +176,8 @@ function SetupPage() {
         >
           <TmdbLogo className="h-3" />
         </a>
-        <p className="text-[10px] text-muted-foreground leading-relaxed">
-          <Trans>
-            This product uses the TMDB API but is not endorsed or certified by
-            TMDB.
-          </Trans>
+        <p className="text-muted-foreground text-[10px] leading-relaxed">
+          <Trans>This product uses the TMDB API but is not endorsed or certified by TMDB.</Trans>
         </p>
       </div>
     </div>

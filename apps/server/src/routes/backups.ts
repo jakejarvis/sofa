@@ -1,7 +1,9 @@
 import path from "node:path";
+
+import { Hono } from "hono";
+
 import { auth } from "@sofa/auth/server";
 import { getBackupPath } from "@sofa/core/backup";
-import { Hono } from "hono";
 
 const app = new Hono();
 

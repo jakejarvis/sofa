@@ -1,6 +1,4 @@
 import { Trans } from "@lingui/react/macro";
-import type { Season } from "@sofa/api/schemas";
-import { formatShortDate } from "@sofa/i18n/format";
 import {
   IconCheck,
   IconChecks,
@@ -9,8 +7,8 @@ import {
   IconDeviceTvOld,
 } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
-
 import { useEffect, useMemo, useState } from "react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +23,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { Season } from "@sofa/api/schemas";
+import { formatShortDate } from "@sofa/i18n/format";
+
 import { useTitleContext, useTitleUserInfo } from "./title-context";
 import { useTitleActions } from "./use-title-actions";
 
@@ -37,10 +38,7 @@ export function SeasonsSkeleton() {
       </div>
       <div className="space-y-2">
         {["s1", "s2", "s3"].map((id) => (
-          <div
-            key={id}
-            className="overflow-hidden rounded-xl border border-border/50 bg-card/50"
-          >
+          <div key={id} className="border-border/50 bg-card/50 overflow-hidden rounded-xl border">
             <div className="flex items-center justify-between p-4">
               <Skeleton className="h-4 w-24" />
               <div className="flex items-center gap-3">
@@ -72,12 +70,8 @@ export function TitleSeasons({
   }, [streamedSeasons, setSeasons]);
 
   const watchedSet = useMemo(() => new Set(episodeWatches), [episodeWatches]);
-  const {
-    handleWatchEpisode,
-    handleMarkSeason,
-    handleUnmarkSeason,
-    handleMarkAllWatched,
-  } = useTitleActions();
+  const { handleWatchEpisode, handleMarkSeason, handleUnmarkSeason, handleMarkAllWatched } =
+    useTitleActions();
   const seasonProgress = useMemo(() => {
     const map = new Map<string, number>();
     for (const season of seasons) {
@@ -97,7 +91,7 @@ export function TitleSeasons({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <IconDeviceTvOld aria-hidden={true} className="size-5 text-primary" />
+          <IconDeviceTvOld aria-hidden={true} className="text-primary size-5" />
           <h2 className="font-display text-2xl tracking-tight">
             <Trans>Episodes</Trans>
           </h2>
@@ -109,7 +103,7 @@ export function TitleSeasons({
                 <Button
                   variant="ghost"
                   size="xs"
-                  className="text-muted-foreground uppercase tracking-wider"
+                  className="text-muted-foreground tracking-wider uppercase"
                 >
                   <IconChecks aria-hidden={true} className="size-3.5" />
                   <Trans>Mark All Watched</Trans>
@@ -123,8 +117,8 @@ export function TitleSeasons({
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   <Trans>
-                    This will mark every episode of this show as watched. You
-                    can undo this later by unmarking individual seasons.
+                    This will mark every episode of this show as watched. You can undo this later by
+                    unmarking individual seasons.
                   </Trans>
                 </AlertDialogDescription>
               </AlertDialogHeader>
@@ -150,28 +144,24 @@ export function TitleSeasons({
           const isOpen = openSeason === season.seasonNumber;
           const watchedCount = seasonProgress.get(season.id) ?? 0;
           const totalCount = season.episodes.length;
-          const progressPercent =
-            totalCount > 0 ? (watchedCount / totalCount) * 100 : 0;
+          const progressPercent = totalCount > 0 ? (watchedCount / totalCount) * 100 : 0;
 
           return (
             <div
               key={season.id}
-              className="overflow-hidden rounded-xl border border-border/50 bg-card/50"
+              className="border-border/50 bg-card/50 overflow-hidden rounded-xl border"
             >
-              {/* biome-ignore lint/a11y/useSemanticElements: contains nested buttons */}
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() =>
-                  setOpenSeason(isOpen ? null : season.seasonNumber)
-                }
+                onClick={() => setOpenSeason(isOpen ? null : season.seasonNumber)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     setOpenSeason(isOpen ? null : season.seasonNumber);
                   }
                 }}
-                className="group/season flex w-full cursor-pointer items-center justify-between p-4 text-left transition-colors hover:bg-accent/50"
+                className="group/season hover:bg-accent/50 flex w-full cursor-pointer items-center justify-between p-4 text-left transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <span className="font-medium">
@@ -192,12 +182,9 @@ export function TitleSeasons({
                         e.stopPropagation();
                         handleMarkSeason(season);
                       }}
-                      className="text-primary uppercase tracking-wider hover:bg-primary/10 hover:text-primary sm:hidden sm:w-24 sm:group-hover/season:block"
+                      className="text-primary hover:bg-primary/10 hover:text-primary tracking-wider uppercase sm:hidden sm:w-24 sm:group-hover/season:block"
                     >
-                      <IconChecks
-                        aria-hidden={true}
-                        className="size-3.5 sm:hidden"
-                      />
+                      <IconChecks aria-hidden={true} className="size-3.5 sm:hidden" />
                       <span className="hidden sm:inline">
                         <Trans>Watch all</Trans>
                       </span>
@@ -211,32 +198,23 @@ export function TitleSeasons({
                         e.stopPropagation();
                         handleUnmarkSeason(season);
                       }}
-                      className="text-muted-foreground uppercase tracking-wider hover:bg-destructive/10 hover:text-destructive sm:hidden sm:w-24 sm:group-hover/season:block"
+                      className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive tracking-wider uppercase sm:hidden sm:w-24 sm:group-hover/season:block"
                     >
-                      <IconChecks
-                        aria-hidden={true}
-                        className="size-3.5 sm:hidden"
-                      />
+                      <IconChecks aria-hidden={true} className="size-3.5 sm:hidden" />
                       <span className="hidden sm:inline">
                         <Trans>Unwatch all</Trans>
                       </span>
                     </Button>
                   )}
                   {totalCount > 0 && (
-                    <span className="font-mono text-muted-foreground text-xs tabular-nums">
+                    <span className="text-muted-foreground font-mono text-xs tabular-nums">
                       {watchedCount}/{totalCount}
                     </span>
                   )}
                   {isOpen ? (
-                    <IconChevronUp
-                      aria-hidden={true}
-                      className="size-4 text-muted-foreground"
-                    />
+                    <IconChevronUp aria-hidden={true} className="text-muted-foreground size-4" />
                   ) : (
-                    <IconChevronDown
-                      aria-hidden={true}
-                      className="size-4 text-muted-foreground"
-                    />
+                    <IconChevronDown aria-hidden={true} className="text-muted-foreground size-4" />
                   )}
                 </div>
               </div>
@@ -252,7 +230,7 @@ export function TitleSeasons({
                       stiffness: 300,
                       damping: 30,
                     }}
-                    className="overflow-hidden border-border/50 border-t"
+                    className="border-border/50 overflow-hidden border-t"
                   >
                     {season.episodes.map((ep) => {
                       const isWatched = watchedSet.has(ep.id);
@@ -264,7 +242,7 @@ export function TitleSeasons({
                         >
                           {/* Mobile: still banner above episode info */}
                           {stillPath && (
-                            <div className="relative aspect-video w-full overflow-hidden bg-muted sm:hidden">
+                            <div className="bg-muted relative aspect-video w-full overflow-hidden sm:hidden">
                               <img
                                 src={stillPath}
                                 alt={ep.name ?? ""}
@@ -315,7 +293,7 @@ export function TitleSeasons({
                             </button>
                             {/* Desktop: inline thumbnail */}
                             {stillPath && (
-                              <div className="hidden h-14 w-24 shrink-0 overflow-hidden rounded-md bg-muted sm:block">
+                              <div className="bg-muted hidden h-14 w-24 shrink-0 overflow-hidden rounded-md sm:block">
                                 <img
                                   src={stillPath}
                                   alt={ep.name ?? ""}
@@ -331,7 +309,7 @@ export function TitleSeasons({
                               <p className="text-sm">
                                 {/* Episode number shown inline on desktop, or mobile without still */}
                                 <span
-                                  className={`font-mono text-muted-foreground text-xs ${stillPath ? "hidden sm:inline" : ""}`}
+                                  className={`text-muted-foreground font-mono text-xs ${stillPath ? "hidden sm:inline" : ""}`}
                                 >
                                   E{String(ep.episodeNumber).padStart(2, "0")}
                                 </span>
@@ -343,12 +321,10 @@ export function TitleSeasons({
                               <p className="text-muted-foreground text-xs">
                                 {ep.airDate ? formatShortDate(ep.airDate) : ""}
                                 {ep.airDate && ep.runtimeMinutes ? " · " : ""}
-                                {ep.runtimeMinutes
-                                  ? `${ep.runtimeMinutes}m`
-                                  : ""}
+                                {ep.runtimeMinutes ? `${ep.runtimeMinutes}m` : ""}
                               </p>
                               {ep.overview && (
-                                <p className="mt-1 line-clamp-2 text-muted-foreground/70 text-xs leading-relaxed">
+                                <p className="text-muted-foreground/70 mt-1 line-clamp-2 text-xs leading-relaxed">
                                   {ep.overview}
                                 </p>
                               )}

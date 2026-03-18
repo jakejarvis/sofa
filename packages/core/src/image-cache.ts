@@ -1,22 +1,12 @@
 import { mkdir, rename } from "node:fs/promises";
 import path from "node:path";
+
 import { CACHE_DIR, TMDB_IMAGE_BASE_URL } from "@sofa/config";
 import { db } from "@sofa/db/client";
 import { eq, inArray } from "@sofa/db/helpers";
-import {
-  availabilityOffers,
-  episodes,
-  persons,
-  seasons,
-  titleCast,
-  titles,
-} from "@sofa/db/schema";
+import { availabilityOffers, episodes, persons, seasons, titleCast, titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
-import {
-  IMAGE_CATEGORY_SIZES,
-  type ImageCategory,
-  tmdbCdnImageUrl,
-} from "@sofa/tmdb/image";
+import { IMAGE_CATEGORY_SIZES, type ImageCategory, tmdbCdnImageUrl } from "@sofa/tmdb/image";
 
 const log = createLogger("image-cache");
 
@@ -32,17 +22,11 @@ export async function ensureImageDirs() {
   }
 }
 
-export async function isImageCached(
-  category: ImageCategory,
-  filename: string,
-): Promise<boolean> {
+export async function isImageCached(category: ImageCategory, filename: string): Promise<boolean> {
   return Bun.file(getLocalImagePath(category, filename)).exists();
 }
 
-export function getLocalImagePath(
-  category: ImageCategory,
-  filename: string,
-): string {
+export function getLocalImagePath(category: ImageCategory, filename: string): string {
   return path.join(CACHE_DIR, category, path.basename(filename));
 }
 
@@ -60,8 +44,7 @@ async function fetchRemoteImage(
   tmdbPath: string,
   category: ImageCategory,
 ): Promise<{ buffer: Buffer; contentType: string } | null> {
-  const url =
-    tmdbCdnImageUrl(tmdbPath, category) ?? `${TMDB_IMAGE_BASE_URL}${tmdbPath}`;
+  const url = tmdbCdnImageUrl(tmdbPath, category) ?? `${TMDB_IMAGE_BASE_URL}${tmdbPath}`;
 
   const res = await globalThis.fetch(url);
   if (!res.ok) {
@@ -109,11 +92,7 @@ export async function fetchAndMaybeCache(
     log.debug(`Cache hit: ${category}/${filename}`);
     const ext = path.extname(filename).toLowerCase();
     const contentType =
-      ext === ".png"
-        ? "image/png"
-        : ext === ".webp"
-          ? "image/webp"
-          : "image/jpeg";
+      ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
     return { buffer: cached, contentType };
   }
 
@@ -155,20 +134,13 @@ export async function cacheImagesForTitle(titleId: string) {
 
   // Collect all candidate images, then check cache in parallel
   const candidates: { imgPath: string; category: ImageCategory }[] = [];
-  if (title.posterPath)
-    candidates.push({ imgPath: title.posterPath, category: "posters" });
-  if (title.backdropPath)
-    candidates.push({ imgPath: title.backdropPath, category: "backdrops" });
+  if (title.posterPath) candidates.push({ imgPath: title.posterPath, category: "posters" });
+  if (title.backdropPath) candidates.push({ imgPath: title.backdropPath, category: "backdrops" });
 
   if (title.type === "tv") {
-    const allSeasons = db
-      .select()
-      .from(seasons)
-      .where(eq(seasons.titleId, titleId))
-      .all();
+    const allSeasons = db.select().from(seasons).where(eq(seasons.titleId, titleId)).all();
     for (const s of allSeasons) {
-      if (s.posterPath)
-        candidates.push({ imgPath: s.posterPath, category: "posters" });
+      if (s.posterPath) candidates.push({ imgPath: s.posterPath, category: "posters" });
     }
   }
 
@@ -191,20 +163,12 @@ export async function cacheImagesForTitle(titleId: string) {
 }
 
 export async function cacheEpisodeStills(titleId: string) {
-  const allSeasons = db
-    .select()
-    .from(seasons)
-    .where(eq(seasons.titleId, titleId))
-    .all();
+  const allSeasons = db.select().from(seasons).where(eq(seasons.titleId, titleId)).all();
 
   const seasonIds = allSeasons.map((s) => s.id);
   if (seasonIds.length === 0) return;
 
-  const allEps = db
-    .select()
-    .from(episodes)
-    .where(inArray(episodes.seasonId, seasonIds))
-    .all();
+  const allEps = db.select().from(episodes).where(inArray(episodes.seasonId, seasonIds)).all();
 
   const epsWithStills = allEps.filter(
     (ep): ep is typeof ep & { stillPath: string } => ep.stillPath != null,
@@ -264,8 +228,7 @@ export async function cacheProfilePhotos(titleId: string) {
   for (const row of castRows) {
     if (row.profilePath) {
       const basename = path.basename(row.profilePath);
-      if (!uniqueProfiles.has(basename))
-        uniqueProfiles.set(basename, row.profilePath);
+      if (!uniqueProfiles.has(basename)) uniqueProfiles.set(basename, row.profilePath);
     }
   }
   const checks = await Promise.all(

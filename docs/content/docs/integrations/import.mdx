@@ -7,11 +7,11 @@ Sofa can import your existing watch history, watchlist, and ratings from other t
 
 ## Supported Services
 
-| Service | OAuth Connect | File Upload | Data Imported |
-|---|---|---|---|
-| **Trakt** | Yes | JSON export | Watches, watchlist, ratings |
-| **Simkl** | Yes | JSON export | Watches, watchlist, ratings, anime (as TV) |
-| **Letterboxd** | No | ZIP export | Watches, watchlist, ratings (movies only) |
+| Service        | OAuth Connect | File Upload | Data Imported                              |
+| -------------- | ------------- | ----------- | ------------------------------------------ |
+| **Trakt**      | Yes           | JSON export | Watches, watchlist, ratings                |
+| **Simkl**      | Yes           | JSON export | Watches, watchlist, ratings, anime (as TV) |
+| **Letterboxd** | No            | ZIP export  | Watches, watchlist, ratings (movies only)  |
 
 ## Importing via OAuth (Trakt & Simkl)
 
@@ -71,11 +71,11 @@ Imports are safe to re-run. Sofa checks for existing data before writing:
 
 Different services use different rating scales. Sofa converts to its 1–5 star scale:
 
-| Source | Scale | Conversion |
-|---|---|---|
-| Trakt | 1–10 | `round(rating / 2)`, clamped to 1–5 |
-| Simkl | 1–10 | `round(rating / 2)`, clamped to 1–5 |
-| Letterboxd | 0.5–5 (half-stars) | `round(rating)`, clamped to 1–5 |
+| Source     | Scale              | Conversion                          |
+| ---------- | ------------------ | ----------------------------------- |
+| Trakt      | 1–10               | `round(rating / 2)`, clamped to 1–5 |
+| Simkl      | 1–10               | `round(rating / 2)`, clamped to 1–5 |
+| Letterboxd | 0.5–5 (half-stars) | `round(rating)`, clamped to 1–5     |
 
 ### Timestamps
 

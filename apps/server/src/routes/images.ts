@@ -1,15 +1,11 @@
 import path from "node:path";
-import { fetchAndMaybeCache, imageCacheEnabled } from "@sofa/core/image-cache";
+
 import { Hono } from "hono";
 import { z } from "zod";
 
-const categorySchema = z.enum([
-  "posters",
-  "backdrops",
-  "stills",
-  "logos",
-  "profiles",
-]);
+import { fetchAndMaybeCache, imageCacheEnabled } from "@sofa/core/image-cache";
+
+const categorySchema = z.enum(["posters", "backdrops", "stills", "logos", "profiles"]);
 
 const app = new Hono();
 

@@ -7,6 +7,7 @@ import {
   IconShieldLock,
 } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
+
 import { AccountSection } from "@/components/settings/account-section";
 import { BackupRestoreSection } from "@/components/settings/backup-restore-section";
 import { BackupScheduleSection } from "@/components/settings/backup-schedule-section";
@@ -35,13 +36,13 @@ function SettingsPage() {
   return (
     <SettingsShell
       footer={
-        <footer className="border-border/50 border-t pt-6 pb-2 text-center text-muted-foreground text-xs">
+        <footer className="border-border/50 text-muted-foreground border-t pt-6 pb-2 text-center text-xs">
           <p>
             <a
               href="https://sofa.watch"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-primary/80 transition-colors hover:text-primary"
+              className="text-primary/80 hover:text-primary font-medium transition-colors"
             >
               Sofa
             </a>{" "}
@@ -54,7 +55,7 @@ function SettingsPage() {
                   href={`https://github.com/${GITHUB_REPO}/commit/${__GIT_COMMIT_SHA__}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono transition-colors hover:text-primary"
+                  className="hover:text-primary font-mono transition-colors"
                 >
                   {__GIT_COMMIT_SHA__}
                 </a>
@@ -71,10 +72,9 @@ function SettingsPage() {
             >
               <TmdbLogo className="h-3" />
             </a>
-            <p className="text-[10px] text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground text-[10px] leading-relaxed">
               <Trans>
-                This product uses the TMDB API but is not endorsed or certified
-                by TMDB.
+                This product uses the TMDB API but is not endorsed or certified by TMDB.
               </Trans>
             </p>
           </div>
@@ -94,11 +94,8 @@ function SettingsPage() {
       {/* App Settings */}
       <div>
         <div className="mb-3 flex items-center gap-2">
-          <IconDeviceDesktopCog
-            aria-hidden={true}
-            className="size-4 text-muted-foreground"
-          />
-          <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+          <IconDeviceDesktopCog aria-hidden={true} className="text-muted-foreground size-4" />
+          <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
             <Trans>App Settings</Trans>
           </h2>
         </div>
@@ -113,14 +110,11 @@ function SettingsPage() {
       {isAdmin && (
         <div>
           <div className="mb-3 flex items-center gap-2">
-            <IconServer2
-              aria-hidden={true}
-              className="size-4 text-muted-foreground"
-            />
-            <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+            <IconServer2 aria-hidden={true} className="text-muted-foreground size-4" />
+            <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               <Trans>Server</Trans>
             </h2>
-            <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
+            <span className="bg-primary/10 text-primary rounded-md px-1.5 py-0.5 text-[10px] font-medium">
               <Trans>Admin only</Trans>
             </span>
           </div>
@@ -132,22 +126,19 @@ function SettingsPage() {
       {isAdmin && (
         <div>
           <div className="mb-3 flex items-center gap-2">
-            <IconShieldLock
-              aria-hidden={true}
-              className="size-4 text-muted-foreground"
-            />
-            <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+            <IconShieldLock aria-hidden={true} className="text-muted-foreground size-4" />
+            <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               <Trans>Security</Trans>
             </h2>
-            <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
+            <span className="bg-primary/10 text-primary rounded-md px-1.5 py-0.5 text-[10px] font-medium">
               Admin only
             </span>
           </div>
           <div className="space-y-3">
-            <Card className="border-l-2 border-l-primary/30">
+            <Card className="border-l-primary/30 border-l-2">
               <RegistrationSection />
             </Card>
-            <Card className="border-l-2 border-l-primary/30">
+            <Card className="border-l-primary/30 border-l-2">
               <UpdateCheckSection />
             </Card>
           </div>
@@ -158,25 +149,22 @@ function SettingsPage() {
       {isAdmin && (
         <div>
           <div className="mb-3 flex items-center gap-2">
-            <IconDatabaseExport
-              aria-hidden={true}
-              className="size-4 text-muted-foreground"
-            />
-            <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+            <IconDatabaseExport aria-hidden={true} className="text-muted-foreground size-4" />
+            <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               <Trans>Backups</Trans>
             </h2>
-            <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
+            <span className="bg-primary/10 text-primary rounded-md px-1.5 py-0.5 text-[10px] font-medium">
               Admin only
             </span>
           </div>
           <div className="space-y-3">
-            <Card className="border-l-2 border-l-primary/30">
+            <Card className="border-l-primary/30 border-l-2">
               <BackupSection />
             </Card>
-            <Card className="border-l-2 border-l-primary/30">
+            <Card className="border-l-primary/30 border-l-2">
               <BackupScheduleSection />
             </Card>
-            <Card className="border-l-2 border-l-primary/30">
+            <Card className="border-l-primary/30 border-l-2">
               <BackupRestoreSection />
             </Card>
           </div>
@@ -187,18 +175,15 @@ function SettingsPage() {
       {isAdmin && (
         <div>
           <div className="mb-3 flex items-center gap-2">
-            <IconAlertTriangle
-              aria-hidden={true}
-              className="size-4 text-destructive"
-            />
-            <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+            <IconAlertTriangle aria-hidden={true} className="text-destructive size-4" />
+            <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               <Trans>Danger Zone</Trans>
             </h2>
-            <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
+            <span className="bg-primary/10 text-primary rounded-md px-1.5 py-0.5 text-[10px] font-medium">
               Admin only
             </span>
           </div>
-          <Card className="border-l-2 border-l-primary/30">
+          <Card className="border-l-primary/30 border-l-2">
             <CacheSection />
           </Card>
         </div>

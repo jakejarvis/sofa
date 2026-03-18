@@ -1,7 +1,9 @@
 import { mkdir, rename } from "node:fs/promises";
 import path from "node:path";
+
 import { auth } from "@sofa/auth/server";
 import { AVATAR_DIR } from "@sofa/config";
+
 import { os } from "../context";
 import { authed } from "../middleware";
 
@@ -12,14 +14,12 @@ const MIME_TO_EXT: Record<string, string> = {
   "image/gif": "gif",
 };
 
-export const updateName = os.account.updateName
-  .use(authed)
-  .handler(async ({ input, context }) => {
-    await auth.api.updateUser({
-      body: { name: input.name },
-      headers: context.headers,
-    });
+export const updateName = os.account.updateName.use(authed).handler(async ({ input, context }) => {
+  await auth.api.updateUser({
+    body: { name: input.name },
+    headers: context.headers,
   });
+});
 
 export const uploadAvatar = os.account.uploadAvatar
   .use(authed)
@@ -53,16 +53,14 @@ export const uploadAvatar = os.account.uploadAvatar
     return { imageUrl };
   });
 
-export const removeAvatar = os.account.removeAvatar
-  .use(authed)
-  .handler(async ({ context }) => {
-    const glob = new Bun.Glob(`${context.user.id}.*`);
-    const matches = await Array.fromAsync(glob.scan(AVATAR_DIR));
-    for (const match of matches) {
-      await Bun.file(path.join(AVATAR_DIR, match)).delete();
-    }
-    await auth.api.updateUser({
-      body: { image: "" },
-      headers: context.headers,
-    });
+export const removeAvatar = os.account.removeAvatar.use(authed).handler(async ({ context }) => {
+  const glob = new Bun.Glob(`${context.user.id}.*`);
+  const matches = await Array.fromAsync(glob.scan(AVATAR_DIR));
+  for (const match of matches) {
+    await Bun.file(path.join(AVATAR_DIR, match)).delete();
+  }
+  await auth.api.updateUser({
+    body: { image: "" },
+    headers: context.headers,
   });
+});

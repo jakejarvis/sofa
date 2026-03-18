@@ -17,7 +17,8 @@ There is currently no way to transfer the admin role to another user.
 Toggle user registration open or closed in **Settings → Security → Open Registration**.
 
 <Callout type="info">
-Registration is always open when no users exist — this is how the initial admin account is created. After the first account is registered, it closes automatically.
+  Registration is always open when no users exist — this is how the initial admin account is
+  created. After the first account is registered, it closes automatically.
 </Callout>
 
 When registration is closed, new users cannot create accounts unless they authenticate via [OIDC/SSO](/docs/configuration#oidc--sso) with `OIDC_AUTO_REGISTER` enabled.
@@ -58,12 +59,12 @@ Click **Create backup** to generate an immediate database backup. Each backup is
 
 Enable scheduled backups with the toggle and configure:
 
-| Setting | Default | Options |
-|---|---|---|
-| Frequency | Every day | `6h`, `12h`, `1d`, `7d` |
-| Time | 02:00 | Any `HH:MM` (UTC) |
-| Day of week | Sunday | For weekly backups only |
-| Retention | 7 | Max number of scheduled backups to keep |
+| Setting     | Default   | Options                                 |
+| ----------- | --------- | --------------------------------------- |
+| Frequency   | Every day | `6h`, `12h`, `1d`, `7d`                 |
+| Time        | 02:00     | Any `HH:MM` (UTC)                       |
+| Day of week | Sunday    | For weekly backups only                 |
+| Retention   | 7         | Max number of scheduled backups to keep |
 
 Old backups beyond the retention count are automatically pruned. Scheduled backups are named `sofa-scheduled-*.db`.
 
@@ -76,7 +77,8 @@ Upload a backup file or select one from the existing backup list to restore. Bef
 3. After the database is replaced, **migrations run automatically** to bring older backups up to the current schema.
 
 <Callout type="warn">
-Restoring a backup replaces the entire database. All data since the backup was created will be lost. The pre-restore snapshot lets you undo the restore if something goes wrong.
+  Restoring a backup replaces the entire database. All data since the backup was created will be
+  lost. The pre-restore snapshot lets you undo the restore if something goes wrong.
 </Callout>
 
 ## Background Jobs

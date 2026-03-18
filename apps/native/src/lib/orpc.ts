@@ -2,9 +2,9 @@ import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { ContractRouterClient } from "@orpc/contract";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
-import type { contract } from "@sofa/api/contract";
 
 import { authClient, getServerUrl, serverFetch } from "@/lib/server";
+import type { contract } from "@sofa/api/contract";
 
 export const link = new RPCLink({
   url: () => `${getServerUrl()}/rpc`,
@@ -26,7 +26,6 @@ export const link = new RPCLink({
   },
 });
 
-export const client: ContractRouterClient<typeof contract> =
-  createORPCClient(link);
+export const client: ContractRouterClient<typeof contract> = createORPCClient(link);
 
 export const orpc = createTanstackQueryUtils(client);

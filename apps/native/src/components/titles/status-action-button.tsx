@@ -7,6 +7,7 @@ import {
 } from "@tabler/icons-react-native";
 import { Pressable } from "react-native";
 import { useCSSVariable } from "uniwind";
+
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
@@ -70,15 +71,10 @@ export function StatusActionButton({
         disabled={isPending}
         accessibilityRole="button"
         accessibilityLabel={t`Add to watchlist`}
-        className="flex-row items-center gap-1.5 rounded-lg border border-title-accent/20 bg-title-accent/10 px-4 py-2"
+        className="border-title-accent/20 bg-title-accent/10 flex-row items-center gap-1.5 rounded-lg border px-4 py-2"
       >
-        <ScaledIcon
-          icon={IconPlus}
-          size={14}
-          color={titleAccent}
-          strokeWidth={2.5}
-        />
-        <Text className="font-medium font-sans text-sm text-title-accent">
+        <ScaledIcon icon={IconPlus} size={14} color={titleAccent} strokeWidth={2.5} />
+        <Text className="text-title-accent font-sans text-sm font-medium">
           <Trans>Watchlist</Trans>
         </Text>
       </Pressable>
@@ -87,8 +83,7 @@ export function StatusActionButton({
 
   const StatusIcon = STATUS_ICONS[currentStatus];
   const styles = STATUS_STYLES[currentStatus];
-  const iconColor =
-    currentStatus === "completed" ? completedColor : titleAccent;
+  const iconColor = currentStatus === "completed" ? completedColor : titleAccent;
 
   return (
     <Pressable
@@ -102,7 +97,7 @@ export function StatusActionButton({
       className={`flex-row items-center gap-1.5 rounded-lg border px-4 py-2 ${styles.bgClass}`}
     >
       <ScaledIcon icon={StatusIcon} size={14} color={iconColor} />
-      <Text className={`font-medium font-sans text-sm ${styles.textClass}`}>
+      <Text className={`font-sans text-sm font-medium ${styles.textClass}`}>
         <StatusLabel status={currentStatus} />
       </Text>
     </Pressable>

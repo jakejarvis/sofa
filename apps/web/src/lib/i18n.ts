@@ -1,8 +1,4 @@
-import {
-  activateLocale,
-  SUPPORTED_LOCALES,
-  type SupportedLocale,
-} from "@sofa/i18n";
+import { activateLocale, SUPPORTED_LOCALES, type SupportedLocale } from "@sofa/i18n";
 
 const LOCALE_STORAGE_KEY = "sofa:locale";
 

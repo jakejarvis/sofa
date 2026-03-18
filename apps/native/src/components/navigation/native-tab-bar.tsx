@@ -2,11 +2,7 @@ import * as Haptics from "expo-haptics";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { useCSSVariable } from "uniwind";
 
-export function NativeTabBar({
-  showSettingsBadge,
-}: {
-  showSettingsBadge: boolean;
-}) {
+export function NativeTabBar({ showSettingsBadge }: { showSettingsBadge: boolean }) {
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
   const primaryColor = useCSSVariable("--color-primary") as string;
 
@@ -37,15 +33,9 @@ export function NativeTabBar({
       <NativeTabs.Trigger name="(settings)" disableTransparentOnScrollEdge>
         <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="gear" md="settings" />
-        {showSettingsBadge ? (
-          <NativeTabs.Trigger.Badge>!</NativeTabs.Trigger.Badge>
-        ) : null}
+        {showSettingsBadge ? <NativeTabs.Trigger.Badge>!</NativeTabs.Trigger.Badge> : null}
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger
-        name="(search)"
-        role="search"
-        disableTransparentOnScrollEdge
-      >
+      <NativeTabs.Trigger name="(search)" role="search" disableTransparentOnScrollEdge>
         <NativeTabs.Trigger.Label>Search</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="magnifyingglass" md="search" />
       </NativeTabs.Trigger>

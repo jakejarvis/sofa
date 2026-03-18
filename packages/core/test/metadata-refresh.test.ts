@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
+
 import { eq } from "@sofa/db/helpers";
 import { episodes, seasons, titles } from "@sofa/db/schema";
 import { clearAllTables, insertTitle, testDb } from "@sofa/db/test-utils";
@@ -52,10 +53,7 @@ mock.module("@sofa/tmdb/client", () => ({
   getVideos: async () => ({ results: [] }),
 }));
 
-import {
-  refreshTvChildren,
-  updateTitleWithArtInvalidation,
-} from "../src/metadata";
+import { refreshTvChildren, updateTitleWithArtInvalidation } from "../src/metadata";
 
 beforeEach(() => {
   clearAllTables();
@@ -104,16 +102,8 @@ describe("refreshTvChildren", () => {
 
     await refreshTvChildren("tv-1", 10, 1);
 
-    const season = testDb
-      .select()
-      .from(seasons)
-      .where(eq(seasons.id, "season-1"))
-      .get();
-    const episode = testDb
-      .select()
-      .from(episodes)
-      .where(eq(episodes.id, "episode-1"))
-      .get();
+    const season = testDb.select().from(seasons).where(eq(seasons.id, "season-1")).get();
+    const episode = testDb.select().from(episodes).where(eq(episodes.id, "episode-1")).get();
 
     expect(season?.posterPath).toBe("/new-season.png");
     expect(season?.posterThumbHash).toBeNull();
@@ -160,11 +150,7 @@ describe("refreshTvChildren", () => {
 
     await refreshTvChildren("tv-1", 10, 1);
 
-    const episode = testDb
-      .select()
-      .from(episodes)
-      .where(eq(episodes.id, "episode-1"))
-      .get();
+    const episode = testDb.select().from(episodes).where(eq(episodes.id, "episode-1")).get();
 
     expect(episode?.stillPath).toBeNull();
     expect(episode?.stillThumbHash).toBeNull();
@@ -189,11 +175,7 @@ describe("updateTitleWithArtInvalidation", () => {
       })
       .run();
 
-    const existing = testDb
-      .select()
-      .from(titles)
-      .where(eq(titles.id, "movie-1"))
-      .get();
+    const existing = testDb.select().from(titles).where(eq(titles.id, "movie-1")).get();
 
     expect(existing).not.toBeUndefined();
     if (!existing) {
@@ -205,11 +187,7 @@ describe("updateTitleWithArtInvalidation", () => {
       backdropPath: "/new-backdrop.png",
     });
 
-    const title = testDb
-      .select()
-      .from(titles)
-      .where(eq(titles.id, "movie-1"))
-      .get();
+    const title = testDb.select().from(titles).where(eq(titles.id, "movie-1")).get();
 
     expect(title?.posterPath).toBe("/new-poster.png");
     expect(title?.backdropPath).toBe("/new-backdrop.png");

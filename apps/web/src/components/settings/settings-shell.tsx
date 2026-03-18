@@ -12,13 +12,7 @@ const sectionVariants = {
   },
 };
 
-export function SettingsShell({
-  children,
-  footer,
-}: {
-  children: ReactNode;
-  footer?: ReactNode;
-}) {
+export function SettingsShell({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
   return (
     <motion.div
       className="mx-auto max-w-2xl space-y-8"
@@ -31,12 +25,12 @@ export function SettingsShell({
     >
       <motion.div variants={sectionVariants}>
         <div className="flex items-center gap-2">
-          <IconSettings aria-hidden={true} className="size-5 text-primary" />
-          <h1 className="text-balance font-display text-3xl tracking-tight">
+          <IconSettings aria-hidden={true} className="text-primary size-5" />
+          <h1 className="font-display text-3xl tracking-tight text-balance">
             <Trans>Settings</Trans>
           </h1>
         </div>
-        <p className="mt-1 text-muted-foreground text-sm">
+        <p className="text-muted-foreground mt-1 text-sm">
           <Trans>Manage your account and preferences</Trans>
         </p>
       </motion.div>

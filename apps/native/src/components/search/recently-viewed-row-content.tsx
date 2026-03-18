@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { IconDeviceTv, IconMovie, IconUser } from "@tabler/icons-react-native";
 import { View } from "react-native";
 import { useCSSVariable } from "uniwind";
+
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 import type { RecentlyViewedItem } from "@/lib/recently-viewed";
@@ -12,9 +13,7 @@ const TypeIcon = {
   person: IconUser,
 } as const;
 
-function getTypeLabel(
-  t: (strings: TemplateStringsArray, ...values: unknown[]) => string,
-) {
+function getTypeLabel(t: (strings: TemplateStringsArray, ...values: unknown[]) => string) {
   return {
     movie: t`Movie`,
     tv: t`TV`,
@@ -22,11 +21,7 @@ function getTypeLabel(
   } as const;
 }
 
-export function RecentlyViewedRowContent({
-  item,
-}: {
-  item: RecentlyViewedItem;
-}) {
+export function RecentlyViewedRowContent({ item }: { item: RecentlyViewedItem }) {
   const { t } = useLingui();
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const Icon = TypeIcon[item.type];
@@ -34,7 +29,7 @@ export function RecentlyViewedRowContent({
   return (
     <View className="flex-row items-center">
       <View
-        className="mr-3 overflow-hidden bg-secondary"
+        className="bg-secondary mr-3 overflow-hidden"
         style={{
           width: 48,
           height: item.type === "person" ? 48 : 72,
@@ -57,25 +52,17 @@ export function RecentlyViewedRowContent({
         )}
       </View>
       <View className="flex-1">
-        <Text
-          numberOfLines={1}
-          className="font-medium font-sans text-base text-foreground"
-        >
+        <Text numberOfLines={1} className="text-foreground font-sans text-base font-medium">
           {item.title}
         </Text>
         <View className="mt-1 flex-row items-center gap-2">
-          <View className="rounded-full bg-secondary px-2 py-0.5">
-            <Text
-              maxFontSizeMultiplier={1.0}
-              className="text-muted-foreground text-xs"
-            >
+          <View className="bg-secondary rounded-full px-2 py-0.5">
+            <Text maxFontSizeMultiplier={1.0} className="text-muted-foreground text-xs">
               {getTypeLabel(t)[item.type]}
             </Text>
           </View>
           {item.subtitle ? (
-            <Text className="text-muted-foreground text-xs">
-              {item.subtitle}
-            </Text>
+            <Text className="text-muted-foreground text-xs">{item.subtitle}</Text>
           ) : null}
         </View>
       </View>

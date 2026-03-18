@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { skipToken, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
+
 import { TitleCard, TitleCardSkeleton } from "@/components/title-card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -74,27 +75,25 @@ export function FilterableTitleRow({
   );
   const discoverStatuses = useMemo(
     () =>
-      Object.assign(
-        {},
-        ...(discoverData?.pages.map((p) => p.userStatuses) ?? []),
-      ) as Record<string, TitleStatus>,
+      Object.assign({}, ...(discoverData?.pages.map((p) => p.userStatuses) ?? [])) as Record<
+        string,
+        TitleStatus
+      >,
     [discoverData?.pages],
   );
   const discoverProgress = useMemo(
     () =>
-      Object.assign(
-        {},
-        ...(discoverData?.pages.map((p) => p.episodeProgress) ?? []),
-      ) as Record<string, { watched: number; total: number }>,
+      Object.assign({}, ...(discoverData?.pages.map((p) => p.episodeProgress) ?? [])) as Record<
+        string,
+        { watched: number; total: number }
+      >,
     [discoverData?.pages],
   );
 
   const isLoading = selectedGenre !== null && isPending;
   const items = selectedGenre === null ? defaultItems : discoverItems;
-  const userStatuses =
-    selectedGenre === null ? initialStatuses : discoverStatuses;
-  const episodeProgress =
-    selectedGenre === null ? initialProgress : discoverProgress;
+  const userStatuses = selectedGenre === null ? initialStatuses : discoverStatuses;
+  const episodeProgress = selectedGenre === null ? initialProgress : discoverProgress;
 
   function toggleGenre(genreId: number) {
     setSelectedGenre(genreId === selectedGenre ? null : genreId);
@@ -104,9 +103,7 @@ export function FilterableTitleRow({
     <section className="space-y-4">
       <div className="flex items-center gap-2">
         {icon}
-        <h2 className="text-balance font-display text-xl tracking-tight">
-          {heading}
-        </h2>
+        <h2 className="font-display text-xl tracking-tight text-balance">{heading}</h2>
       </div>
 
       {/* Genre chips */}
@@ -134,11 +131,7 @@ export function FilterableTitleRow({
       {isLoading && (
         <div className="-mx-4 flex gap-4 overflow-hidden px-4 sm:-mx-0 sm:px-0">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
-              key={`skel-${i}`}
-              className="w-[140px] shrink-0 sm:w-[160px]"
-            >
+            <div key={`skel-${i}`} className="w-[140px] shrink-0 sm:w-[160px]">
               <TitleCardSkeleton />
             </div>
           ))}
@@ -147,7 +140,7 @@ export function FilterableTitleRow({
 
       {/* Empty state */}
       {!isLoading && selectedGenre !== null && items.length === 0 && (
-        <p className="py-8 text-center text-muted-foreground text-sm">
+        <p className="text-muted-foreground py-8 text-center text-sm">
           <Trans>No titles found for this genre.</Trans>
         </p>
       )}
@@ -199,7 +192,7 @@ export function FilterableTitleRow({
             ))}
             {isFetchingNextPage && (
               <div className="flex shrink-0 items-center px-4">
-                <div className="size-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <div className="border-primary size-5 animate-spin rounded-full border-2 border-t-transparent" />
               </div>
             )}
           </div>

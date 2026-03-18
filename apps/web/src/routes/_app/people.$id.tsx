@@ -1,9 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  PersonDetailClient,
-  PersonDetailSkeleton,
-} from "@/components/people/person-detail-client";
+
+import { PersonDetailClient, PersonDetailSkeleton } from "@/components/people/person-detail-client";
 import { orpc } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_app/people/$id")({
@@ -39,32 +37,32 @@ function PersonNotFound() {
   return (
     <div className="flex flex-col items-center gap-6 py-24 text-center">
       <h1
-        className="animate-stagger-item font-display text-[6rem] text-foreground/[0.06] leading-[0.85] tracking-tight sm:text-[8rem]"
+        className="animate-stagger-item font-display text-foreground/[0.06] text-[6rem] leading-[0.85] tracking-tight sm:text-[8rem]"
         style={{ "--stagger-index": 0 } as React.CSSProperties}
       >
         404
       </h1>
       <div
-        className="-mt-4 animate-stagger-item space-y-2"
+        className="animate-stagger-item -mt-4 space-y-2"
         style={{ "--stagger-index": 1 } as React.CSSProperties}
       >
         <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
           <Trans>Person not found</Trans>
         </h2>
-        <p className="mx-auto max-w-sm text-muted-foreground text-sm leading-relaxed">
+        <p className="text-muted-foreground mx-auto max-w-sm text-sm leading-relaxed">
           <Trans>
-            The person you&apos;re looking for doesn&apos;t exist or may have
-            been removed from the database.
+            The person you&apos;re looking for doesn&apos;t exist or may have been removed from the
+            database.
           </Trans>
         </p>
       </div>
       <div
-        className="flex animate-stagger-item items-center gap-3"
+        className="animate-stagger-item flex items-center gap-3"
         style={{ "--stagger-index": 2 } as React.CSSProperties}
       >
         <Link
           to="/explore"
-          className="group relative inline-flex h-10 items-center justify-center overflow-hidden rounded-lg bg-primary px-5 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-lg hover:shadow-primary/20"
+          className="group bg-primary text-primary-foreground hover:shadow-primary/20 relative inline-flex h-10 items-center justify-center overflow-hidden rounded-lg px-5 text-sm font-medium transition-shadow hover:shadow-lg"
         >
           <span className="relative z-10">
             <Trans>Explore titles</Trans>
@@ -73,7 +71,7 @@ function PersonNotFound() {
         </Link>
         <Link
           to="/dashboard"
-          className="inline-flex h-10 items-center justify-center rounded-lg border border-border px-5 font-medium text-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
+          className="border-border hover:border-primary/40 hover:bg-primary/5 inline-flex h-10 items-center justify-center rounded-lg border px-5 text-sm font-medium transition-colors"
         >
           <Trans>Dashboard</Trans>
         </Link>

@@ -46,8 +46,7 @@ interface CachedSessionData {
 const SERVER_URL_KEY = "sofa_server_url";
 const SERVERS_MAP_KEY = "sofa_servers";
 const CURRENT_INSTANCE_KEY = "sofa_current_instance_id";
-const DEFAULT_URL =
-  process.env.EXPO_PUBLIC_SERVER_URL ?? "https://sofa.example.com";
+const DEFAULT_URL = process.env.EXPO_PUBLIC_SERVER_URL ?? "https://sofa.example.com";
 
 // ---------------------------------------------------------------------------
 // URL helpers
@@ -131,9 +130,7 @@ export async function ensureInstanceId(): Promise<string | null> {
   const existing = getCurrentInstanceId();
   if (existing) return existing;
 
-  const serverUrl = hasStoredServerUrl()
-    ? getServerUrl()
-    : process.env.EXPO_PUBLIC_SERVER_URL;
+  const serverUrl = hasStoredServerUrl() ? getServerUrl() : process.env.EXPO_PUBLIC_SERVER_URL;
   if (!serverUrl) return null;
 
   try {
@@ -142,8 +139,7 @@ export async function ensureInstanceId(): Promise<string | null> {
     });
     if (!res.ok) return null;
     const data = await res.json();
-    const instanceId =
-      typeof data.instanceId === "string" ? data.instanceId : null;
+    const instanceId = typeof data.instanceId === "string" ? data.instanceId : null;
     if (instanceId) {
       registerServer(serverUrl, instanceId);
       return instanceId;
@@ -158,9 +154,7 @@ export async function ensureInstanceId(): Promise<string | null> {
 // Validation
 // ---------------------------------------------------------------------------
 
-export async function validateServerUrl(
-  url: string,
-): Promise<ValidationResult> {
+export async function validateServerUrl(url: string): Promise<ValidationResult> {
   const normalized = normalizeUrl(url);
 
   if (!normalized || !normalized.includes("://")) {
@@ -194,8 +188,7 @@ export async function validateServerUrl(
         return { status: "error", error: "not_sofa_server" };
       }
 
-      const instanceId =
-        typeof data.instanceId === "string" ? data.instanceId : null;
+      const instanceId = typeof data.instanceId === "string" ? data.instanceId : null;
       if (!instanceId) {
         return { status: "error", error: "not_sofa_server" };
       }
@@ -205,10 +198,7 @@ export async function validateServerUrl(
       return { status: "error", error: "not_sofa_server" };
     }
   } catch (err) {
-    if (
-      err instanceof Error &&
-      (err.name === "TimeoutError" || err.name === "AbortError")
-    ) {
+    if (err instanceof Error && (err.name === "TimeoutError" || err.name === "AbortError")) {
       return { status: "error", error: "timeout" };
     }
     return { status: "error", error: "network_unreachable" };
@@ -262,10 +252,7 @@ export function isNetworkError(error: unknown): error is Error {
   );
 }
 
-export async function serverFetch(
-  input: RequestInfo | URL,
-  init?: RequestInit,
-): Promise<Response> {
+export async function serverFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   try {
     const response = await fetch(input, init);
     setReachable(true);
@@ -285,9 +272,7 @@ export function getIsReachable(): boolean {
   return isReachable;
 }
 
-export function onServerReachabilityChange(
-  callback: (reachable: boolean) => void,
-): () => void {
+export function onServerReachabilityChange(callback: (reachable: boolean) => void): () => void {
   reachabilityListeners.push(callback);
   return () => {
     const index = reachabilityListeners.indexOf(callback);
@@ -301,15 +286,12 @@ export function startReachabilityMonitor(): () => void {
 
   const networkSubscription = Network.addNetworkStateListener(syncOnlineState);
 
-  const appStateSubscription = AppState.addEventListener(
-    "change",
-    (nextState) => {
-      syncAppFocus(nextState);
-      if (nextState === "active") {
-        void Network.getNetworkStateAsync().then(syncOnlineState);
-      }
-    },
-  );
+  const appStateSubscription = AppState.addEventListener("change", (nextState) => {
+    syncAppFocus(nextState);
+    if (nextState === "active") {
+      void Network.getNetworkStateAsync().then(syncOnlineState);
+    }
+  });
 
   const removeServerUrlListener = onServerUrlChange(() => {
     setReachable(true);

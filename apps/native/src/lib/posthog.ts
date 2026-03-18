@@ -81,10 +81,7 @@ export function applyTrackingTransparency(granted: boolean): boolean {
   // writes to ANALYTICS_ENABLED_KEY from being misidentified as legacy.
   if (!globalStorage.getBoolean(ATT_MIGRATED_KEY)) {
     globalStorage.set(ATT_MIGRATED_KEY, true);
-    if (
-      globalStorage.getBoolean(ANALYTICS_ENABLED_KEY) !== undefined &&
-      !hasExplicitPreference()
-    ) {
+    if (globalStorage.getBoolean(ANALYTICS_ENABLED_KEY) !== undefined && !hasExplicitPreference()) {
       globalStorage.set(ANALYTICS_EXPLICIT_KEY, true);
     }
   }

@@ -22,12 +22,8 @@ function show(
 }
 
 export const toast = {
-  success: (message: string, options?: ToastOptions) =>
-    show("done", "success", message, options),
-  error: (message: string, options?: ToastOptions) =>
-    show("error", "error", message, options),
-  info: (message: string, options?: ToastOptions) =>
-    show("none", "none", message, options),
-  warning: (message: string, options?: ToastOptions) =>
-    show("none", "warning", message, options),
+  success: (message: string, options?: ToastOptions) => show("done", "success", message, options),
+  error: (message: string, options?: ToastOptions) => show("error", "error", message, options),
+  info: (message: string, options?: ToastOptions) => show("none", "none", message, options),
+  warning: (message: string, options?: ToastOptions) => show("none", "warning", message, options),
 };

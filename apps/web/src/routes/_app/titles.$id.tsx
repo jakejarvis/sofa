@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute, Link } from "@tanstack/react-router";
+
 import { TitleActions } from "@/components/titles/title-actions";
 import { TitleAvailability } from "@/components/titles/title-availability";
 import { TitleCast } from "@/components/titles/title-cast";
@@ -20,9 +21,7 @@ export const Route = createFileRoute("/_app/titles/$id")({
         orpc.titles.detail.queryOptions({ input: { id: params.id } }),
       ),
       context.queryClient
-        .ensureQueryData(
-          orpc.titles.userInfo.queryOptions({ input: { id: params.id } }),
-        )
+        .ensureQueryData(orpc.titles.userInfo.queryOptions({ input: { id: params.id } }))
         .catch(() => null),
     ]);
     return { ...titleResult, userInfo };
@@ -56,11 +55,7 @@ function TitleDetailPage() {
         titleName={title.title}
         seasons={seasons}
       >
-        <TitleHero
-          title={title}
-          trailerVideoKey={title.trailerVideoKey}
-          actions={<TitleActions />}
-        >
+        <TitleHero title={title} trailerVideoKey={title.trailerVideoKey} actions={<TitleActions />}>
           <TitleAvailability availability={availability} />
         </TitleHero>
 
@@ -114,14 +109,12 @@ function TitleErrorComponent() {
       <h1 className="font-display text-2xl tracking-tight sm:text-3xl">
         <Trans>Failed to load title</Trans>
       </h1>
-      <p className="mx-auto max-w-sm text-muted-foreground text-sm leading-relaxed">
-        <Trans>
-          Something went wrong while loading this title. Please try again.
-        </Trans>
+      <p className="text-muted-foreground mx-auto max-w-sm text-sm leading-relaxed">
+        <Trans>Something went wrong while loading this title. Please try again.</Trans>
       </p>
       <Link
         to="/dashboard"
-        className="inline-flex h-10 items-center justify-center rounded-lg border border-border px-5 font-medium text-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
+        className="border-border hover:border-primary/40 hover:bg-primary/5 inline-flex h-10 items-center justify-center rounded-lg border px-5 text-sm font-medium transition-colors"
       >
         <Trans>Dashboard</Trans>
       </Link>
@@ -133,32 +126,32 @@ function TitleNotFound() {
   return (
     <div className="flex flex-col items-center gap-6 py-24 text-center">
       <h1
-        className="animate-stagger-item font-display text-[6rem] text-foreground/[0.06] leading-[0.85] tracking-tight sm:text-[8rem]"
+        className="animate-stagger-item font-display text-foreground/[0.06] text-[6rem] leading-[0.85] tracking-tight sm:text-[8rem]"
         style={{ "--stagger-index": 0 } as React.CSSProperties}
       >
         404
       </h1>
       <div
-        className="-mt-4 animate-stagger-item space-y-2"
+        className="animate-stagger-item -mt-4 space-y-2"
         style={{ "--stagger-index": 1 } as React.CSSProperties}
       >
         <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
           <Trans>Title not found</Trans>
         </h2>
-        <p className="mx-auto max-w-sm text-muted-foreground text-sm leading-relaxed">
+        <p className="text-muted-foreground mx-auto max-w-sm text-sm leading-relaxed">
           <Trans>
-            The title you&apos;re looking for doesn&apos;t exist or may have
-            been removed from the database.
+            The title you&apos;re looking for doesn&apos;t exist or may have been removed from the
+            database.
           </Trans>
         </p>
       </div>
       <div
-        className="flex animate-stagger-item items-center gap-3"
+        className="animate-stagger-item flex items-center gap-3"
         style={{ "--stagger-index": 2 } as React.CSSProperties}
       >
         <Link
           to="/explore"
-          className="group relative inline-flex h-10 items-center justify-center overflow-hidden rounded-lg bg-primary px-5 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-lg hover:shadow-primary/20"
+          className="group bg-primary text-primary-foreground hover:shadow-primary/20 relative inline-flex h-10 items-center justify-center overflow-hidden rounded-lg px-5 text-sm font-medium transition-shadow hover:shadow-lg"
         >
           <span className="relative z-10">
             <Trans>Explore titles</Trans>
@@ -167,7 +160,7 @@ function TitleNotFound() {
         </Link>
         <Link
           to="/dashboard"
-          className="inline-flex h-10 items-center justify-center rounded-lg border border-border px-5 font-medium text-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
+          className="border-border hover:border-primary/40 hover:bg-primary/5 inline-flex h-10 items-center justify-center rounded-lg border px-5 text-sm font-medium transition-colors"
         >
           <Trans>Dashboard</Trans>
         </Link>

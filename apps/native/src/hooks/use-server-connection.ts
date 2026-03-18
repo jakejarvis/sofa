@@ -1,10 +1,7 @@
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import {
-  clearStorageScope,
-  hasScopedStorage,
-  setStorageScope,
-} from "@/lib/mmkv";
+
+import { clearStorageScope, hasScopedStorage, setStorageScope } from "@/lib/mmkv";
 import { queryClient } from "@/lib/query-client";
 import {
   authClient,
@@ -43,8 +40,7 @@ export function useServerConnection() {
   );
 
   const { data: session, isPending, isRefetching } = authClient.useSession();
-  const hasServerUrl =
-    !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
+  const hasServerUrl = !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
 
   // --- Instance ID resolution ---
   const [instanceId, setInstanceId] = useState(getCurrentInstanceId);
@@ -61,10 +57,7 @@ export function useServerConnection() {
   }, [instanceId, hasServerUrl]);
 
   // Re-sync instanceId when server URL changes
-  useEffect(
-    () => onServerUrlChange(() => setInstanceId(getCurrentInstanceId())),
-    [],
-  );
+  useEffect(() => onServerUrlChange(() => setInstanceId(getCurrentInstanceId())), []);
 
   // --- Scoped storage (per instance + user) ---
   const userId = session?.user?.id;

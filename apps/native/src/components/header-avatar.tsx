@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { Alert, Pressable, View } from "react-native";
 import * as DropdownMenu from "zeego/dropdown-menu";
+
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 import { queryClient } from "@/lib/query-client";
@@ -26,10 +27,7 @@ export function HeaderAvatar() {
           accessibilityLabel="User menu"
           hitSlop={8}
         >
-          <View
-            className="size-8 overflow-hidden rounded-full"
-            accessible={false}
-          >
+          <View className="size-8 overflow-hidden rounded-full" accessible={false}>
             {user.image ? (
               <Image
                 source={{ uri: user.image }}
@@ -38,10 +36,10 @@ export function HeaderAvatar() {
                 accessible={false}
               />
             ) : (
-              <View className="flex-1 items-center justify-center bg-primary/[0.08]">
+              <View className="bg-primary/[0.08] flex-1 items-center justify-center">
                 <Text
                   maxFontSizeMultiplier={1.0}
-                  className="font-display font-medium text-primary text-sm"
+                  className="font-display text-primary text-sm font-medium"
                 >
                   {user.name?.charAt(0)?.toUpperCase() ?? "?"}
                 </Text>
@@ -52,14 +50,8 @@ export function HeaderAvatar() {
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Content>
-        <DropdownMenu.Item
-          key="settings"
-          onSelect={() => navigate("/(tabs)/(settings)")}
-        >
-          <DropdownMenu.ItemIcon
-            ios={{ name: "gear" }}
-            androidIconName="ic_menu_preferences"
-          />
+        <DropdownMenu.Item key="settings" onSelect={() => navigate("/(tabs)/(settings)")}>
+          <DropdownMenu.ItemIcon ios={{ name: "gear" }} androidIconName="ic_menu_preferences" />
           <DropdownMenu.ItemTitle>{t`Settings`}</DropdownMenu.ItemTitle>
         </DropdownMenu.Item>
 

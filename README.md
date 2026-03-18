@@ -82,20 +82,20 @@ Set `BETTER_AUTH_URL` to the real external URL of your instance. This especially
 
 ## Configuration
 
-| Variable | Required | Notes |
-| --- | --- | --- |
-| `TMDB_API_READ_ACCESS_TOKEN` | Yes | TMDB metadata and discovery |
-| `BETTER_AUTH_SECRET` | Yes | Session and auth secret |
-| `BETTER_AUTH_URL` | Yes | Public base URL of the app |
-| `DATA_DIR` | No | Root data directory. Defaults to `/data` in the container |
-| `IMAGE_CACHE_ENABLED` | No | Defaults to enabled. Set to `false` to use TMDB images directly instead of caching them locally |
-| `LOG_LEVEL` | No | `error`, `warn`, `info`, or `debug` |
-| `OIDC_CLIENT_ID` | No | Enable OIDC when set with the matching secret and issuer |
-| `OIDC_CLIENT_SECRET` | No | OIDC client secret |
-| `OIDC_ISSUER_URL` | No | OIDC issuer URL |
-| `OIDC_PROVIDER_NAME` | No | Login button label. Defaults to `SSO` |
-| `OIDC_AUTO_REGISTER` | No | Defaults to `true` |
-| `DISABLE_PASSWORD_LOGIN` | No | Set to `true` to hide email/password login when OIDC is configured |
+| Variable                     | Required | Notes                                                                                           |
+| ---------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `TMDB_API_READ_ACCESS_TOKEN` | Yes      | TMDB metadata and discovery                                                                     |
+| `BETTER_AUTH_SECRET`         | Yes      | Session and auth secret                                                                         |
+| `BETTER_AUTH_URL`            | Yes      | Public base URL of the app                                                                      |
+| `DATA_DIR`                   | No       | Root data directory. Defaults to `/data` in the container                                       |
+| `IMAGE_CACHE_ENABLED`        | No       | Defaults to enabled. Set to `false` to use TMDB images directly instead of caching them locally |
+| `LOG_LEVEL`                  | No       | `error`, `warn`, `info`, or `debug`                                                             |
+| `OIDC_CLIENT_ID`             | No       | Enable OIDC when set with the matching secret and issuer                                        |
+| `OIDC_CLIENT_SECRET`         | No       | OIDC client secret                                                                              |
+| `OIDC_ISSUER_URL`            | No       | OIDC issuer URL                                                                                 |
+| `OIDC_PROVIDER_NAME`         | No       | Login button label. Defaults to `SSO`                                                           |
+| `OIDC_AUTO_REGISTER`         | No       | Defaults to `true`                                                                              |
+| `DISABLE_PASSWORD_LOGIN`     | No       | Set to `true` to hide email/password login when OIDC is configured                              |
 
 See [`.env.example`](./.env.example) for the full list.
 

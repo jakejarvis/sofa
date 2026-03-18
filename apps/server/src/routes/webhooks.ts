@@ -1,3 +1,5 @@
+import { Hono } from "hono";
+
 import type { WebhookEvent } from "@sofa/core/webhooks";
 import {
   parseEmbyPayload,
@@ -9,7 +11,6 @@ import { db } from "@sofa/db/client";
 import { eq } from "@sofa/db/helpers";
 import { integrations } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
-import { Hono } from "hono";
 
 const log = createLogger("webhooks");
 
@@ -19,11 +20,7 @@ app.post("/:token", async (c) => {
   const token = c.req.param("token");
 
   // Look up connection by token — this IS the auth
-  const connection = db
-    .select()
-    .from(integrations)
-    .where(eq(integrations.token, token))
-    .get();
+  const connection = db.select().from(integrations).where(eq(integrations.token, token)).get();
 
   if (!connection || !connection.enabled) {
     // Always return 200 to avoid retry storms from media servers

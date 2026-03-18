@@ -1,10 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { CastMember } from "@sofa/api/schemas";
 import { IconUser, IconUsers } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { thumbHashToUrl } from "@/lib/thumbhash";
+import type { CastMember } from "@sofa/api/schemas";
 
 interface CastCarouselProps {
   actors: CastMember[];
@@ -16,7 +16,7 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
-        <IconUsers aria-hidden={true} className="size-5 text-primary" />
+        <IconUsers aria-hidden={true} className="text-primary size-5" />
         <h2 className="font-display text-xl tracking-tight">
           <Trans>Cast</Trans>
         </h2>
@@ -37,7 +37,7 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
                     className="group flex flex-col items-center gap-2"
                   >
                     <div
-                      className="size-20 overflow-hidden rounded-full ring-1 ring-white/10 transition-all group-hover:ring-primary/25 sm:size-24"
+                      className="group-hover:ring-primary/25 size-20 overflow-hidden rounded-full ring-1 ring-white/10 transition-all sm:size-24"
                       style={
                         member.profileThumbHash
                           ? {
@@ -58,25 +58,23 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
                           className="h-full w-full object-cover motion-safe:transition-transform motion-safe:group-hover:scale-105"
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+                        <div className="from-muted to-muted/50 flex h-full w-full items-center justify-center bg-gradient-to-br">
                           <IconUser
                             aria-hidden={true}
-                            className="size-8 text-muted-foreground/50"
+                            className="text-muted-foreground/50 size-8"
                           />
                         </div>
                       )}
                     </div>
                     <div className="w-full text-center">
-                      <p className="truncate font-medium text-xs">
-                        {member.name}
-                      </p>
+                      <p className="truncate text-xs font-medium">{member.name}</p>
                       {member.character && (
-                        <p className="truncate text-[10px] text-muted-foreground">
+                        <p className="text-muted-foreground truncate text-[10px]">
                           {member.character}
                         </p>
                       )}
                       {titleType === "tv" && member.episodeCount && (
-                        <p className="text-[10px] text-muted-foreground/70">
+                        <p className="text-muted-foreground/70 text-[10px]">
                           {t`${member.episodeCount} ep${member.episodeCount !== 1 ? "s" : ""}`}
                         </p>
                       )}

@@ -9,7 +9,7 @@ icon: Settings
 These three environment variables must be set for Sofa to start:
 
 | Variable | Description | Example |
-|---|---|---|
+| --- | --- | --- |
 | `TMDB_API_READ_ACCESS_TOKEN` | TMDB API authentication token | [Get one here](https://www.themoviedb.org/settings/api) |
 | `BETTER_AUTH_SECRET` | Session encryption secret (min 32 chars) | `openssl rand -base64 32` |
 | `BETTER_AUTH_URL` | Public URL of your instance | `https://sofa.example.com` |
@@ -18,11 +18,11 @@ These three environment variables must be set for Sofa to start:
 
 ## Data & Storage
 
-| Variable | Default | Description |
-|---|---|---|
-| `DATA_DIR` | `/data` (Docker) or `./data` (dev) | Root directory for all persistent data |
-| `DATABASE_URL` | `${DATA_DIR}/sqlite.db` | SQLite database file path |
-| `CACHE_DIR` | `${DATA_DIR}/images` | Image cache directory |
+| Variable       | Default                            | Description                            |
+| -------------- | ---------------------------------- | -------------------------------------- |
+| `DATA_DIR`     | `/data` (Docker) or `./data` (dev) | Root directory for all persistent data |
+| `DATABASE_URL` | `${DATA_DIR}/sqlite.db`            | SQLite database file path              |
+| `CACHE_DIR`    | `${DATA_DIR}/images`               | Image cache directory                  |
 
 `DATABASE_URL` and `CACHE_DIR` are derived from `DATA_DIR` by default but can be overridden independently.
 
@@ -30,9 +30,9 @@ The database uses SQLite with WAL (Write-Ahead Logging) mode for concurrent read
 
 ## Image Caching
 
-| Variable | Default | Description |
-|---|---|---|
-| `IMAGE_CACHE_ENABLED` | `true` | Cache TMDB images locally |
+| Variable              | Default | Description               |
+| --------------------- | ------- | ------------------------- |
+| `IMAGE_CACHE_ENABLED` | `true`  | Cache TMDB images locally |
 
 When enabled, Sofa downloads poster, backdrop, and other images from TMDB and serves them from disk. This improves load times and reduces external requests but uses disk space.
 
@@ -51,9 +51,9 @@ Set `IMAGE_CACHE_ENABLED=false` to serve images directly from TMDB's CDN instead
 
 ## Logging
 
-| Variable | Default | Options |
-|---|---|---|
-| `LOG_LEVEL` | `info` | `error`, `warn`, `info`, `debug`, `trace` |
+| Variable    | Default | Options                                   |
+| ----------- | ------- | ----------------------------------------- |
+| `LOG_LEVEL` | `info`  | `error`, `warn`, `info`, `debug`, `trace` |
 
 Sofa uses structured JSON logging via [Pino](https://getpino.io/). Set to `debug` for troubleshooting.
 
@@ -61,13 +61,13 @@ Sofa uses structured JSON logging via [Pino](https://getpino.io/). Set to `debug
 
 Sofa supports any OpenID Connect provider (Authentik, Keycloak, Authelia, Google Workspace, etc.). OIDC is enabled when all three of `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, and `OIDC_ISSUER_URL` are set.
 
-| Variable | Default | Description |
-|---|---|---|
-| `OIDC_CLIENT_ID` | — | Client ID from your identity provider |
-| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider |
-| `OIDC_ISSUER_URL` | — | Issuer discovery URL |
-| `OIDC_PROVIDER_NAME` | `SSO` | Label shown on the login button |
-| `OIDC_AUTO_REGISTER` | `true` | Auto-create accounts on first OIDC login |
+| Variable                 | Default | Description                                  |
+| ------------------------ | ------- | -------------------------------------------- |
+| `OIDC_CLIENT_ID`         | —       | Client ID from your identity provider        |
+| `OIDC_CLIENT_SECRET`     | —       | Client secret from your identity provider    |
+| `OIDC_ISSUER_URL`        | —       | Issuer discovery URL                         |
+| `OIDC_PROVIDER_NAME`     | `SSO`   | Label shown on the login button              |
+| `OIDC_AUTO_REGISTER`     | `true`  | Auto-create accounts on first OIDC login     |
 | `DISABLE_PASSWORD_LOGIN` | `false` | Hide the email/password form (requires OIDC) |
 
 ### Callback URL
@@ -120,7 +120,7 @@ When OIDC is enabled, account linking is active by default. If a user logs in vi
 `OIDC_AUTO_REGISTER` and `DISABLE_PASSWORD_LOGIN` interact to control how users can access your instance:
 
 | `OIDC_AUTO_REGISTER` | `DISABLE_PASSWORD_LOGIN` | Behavior |
-|---|---|---|
+| --- | --- | --- |
 | `true` (default) | `false` (default) | Both login methods available. New OIDC users get accounts created automatically. |
 | `true` | `true` | OIDC only. Accounts are auto-created on first login. Password form is hidden. |
 | `false` | `false` | Both login methods available. OIDC users must have a pre-existing account with a matching email. |
@@ -128,19 +128,19 @@ When OIDC is enabled, account linking is active by default. If a user logs in vi
 
 ## TMDB Overrides
 
-| Variable | Default | Description |
-|---|---|---|
-| `TMDB_API_BASE_URL` | `https://api.themoviedb.org/3` | Override TMDB API endpoint |
-| `TMDB_IMAGE_BASE_URL` | `https://image.tmdb.org/t/p` | Override TMDB image CDN |
+| Variable              | Default                        | Description                |
+| --------------------- | ------------------------------ | -------------------------- |
+| `TMDB_API_BASE_URL`   | `https://api.themoviedb.org/3` | Override TMDB API endpoint |
+| `TMDB_IMAGE_BASE_URL` | `https://image.tmdb.org/t/p`   | Override TMDB image CDN    |
 
 These are only needed if you're proxying TMDB requests or using an alternative endpoint.
 
 ## Network
 
-| Variable | Default | Description |
-|---|---|---|
-| `CORS_ORIGIN` | `http://localhost:3000` | Allowed CORS origin |
-| `PORT` | `3000` | Server listening port |
+| Variable      | Default                 | Description           |
+| ------------- | ----------------------- | --------------------- |
+| `CORS_ORIGIN` | `http://localhost:3000` | Allowed CORS origin   |
+| `PORT`        | `3000`                  | Server listening port |
 
 Set `CORS_ORIGIN` to your public URL when using a reverse proxy.
 
@@ -148,8 +148,8 @@ Set `CORS_ORIGIN` to your public URL when using a reverse proxy.
 
 Sofa checks for new versions every 6 hours by contacting the public API.
 
-| Variable | Default | Description |
-|---|---|---|
+| Variable         | Default                         | Description                 |
+| ---------------- | ------------------------------- | --------------------------- |
 | `PUBLIC_API_URL` | `https://public-api.sofa.watch` | Endpoint for version checks |
 
 Update checks can be disabled in **Settings → Admin → Update Checks**. When a new version is available, a notification appears in the admin settings.
@@ -162,12 +162,12 @@ Sofa includes opt-in anonymous telemetry. It is **disabled by default**. See the
 
 Automatic backups can be enabled in **Settings → Admin → Backups**. Configuration options:
 
-| Setting | Default | Options |
-|---|---|---|
-| Frequency | Every day | `6h`, `12h`, `1d`, `7d` |
-| Time | 02:00 | Any `HH:MM` |
-| Day of week | Sunday | (for weekly backups) |
-| Retention | 7 | Number of scheduled backups to keep |
+| Setting     | Default   | Options                             |
+| ----------- | --------- | ----------------------------------- |
+| Frequency   | Every day | `6h`, `12h`, `1d`, `7d`             |
+| Time        | 02:00     | Any `HH:MM`                         |
+| Day of week | Sunday    | (for weekly backups)                |
+| Retention   | 7         | Number of scheduled backups to keep |
 
 Backups are SQLite database dumps stored in the `backups/` directory inside `DATA_DIR`. Old backups beyond the retention count are automatically deleted.
 
@@ -175,15 +175,15 @@ Backups are SQLite database dumps stored in the `backups/` directory inside `DAT
 
 Sofa runs several background jobs automatically:
 
-| Job | Schedule | Description |
-|---|---|---|
-| Library refresh | Daily at 3:00 AM | Refreshes metadata for tracked titles |
-| Streaming availability | Every 6 hours | Updates where titles are available to stream |
-| Recommendations | Every 12 hours | Refreshes personalized recommendations |
-| New episodes | Every 12 hours | Checks for new episodes of tracked TV shows |
-| Image caching | Twice daily | Caches images for tracked titles |
-| Credits refresh | Daily at 2:00 AM | Updates cast and crew information |
-| Update check | Every 6 hours | Checks for new Sofa versions |
-| Telemetry | Daily at 12:30 AM | Sends anonymized usage data (if enabled) |
+| Job                    | Schedule          | Description                                  |
+| ---------------------- | ----------------- | -------------------------------------------- |
+| Library refresh        | Daily at 3:00 AM  | Refreshes metadata for tracked titles        |
+| Streaming availability | Every 6 hours     | Updates where titles are available to stream |
+| Recommendations        | Every 12 hours    | Refreshes personalized recommendations       |
+| New episodes           | Every 12 hours    | Checks for new episodes of tracked TV shows  |
+| Image caching          | Twice daily       | Caches images for tracked titles             |
+| Credits refresh        | Daily at 2:00 AM  | Updates cast and crew information            |
+| Update check           | Every 6 hours     | Checks for new Sofa versions                 |
+| Telemetry              | Daily at 12:30 AM | Sends anonymized usage data (if enabled)     |
 
 All schedules are in UTC. TMDB API calls are rate-limited with a 300ms delay between requests per title to stay within API limits.

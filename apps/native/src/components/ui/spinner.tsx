@@ -8,10 +8,6 @@ interface SpinnerProps extends Omit<ActivityIndicatorProps, "size" | "color"> {
 
 export function Spinner({ size = "default", ...props }: SpinnerProps) {
   return (
-    <ActivityIndicator
-      size={SIZES[size]}
-      colorClassName="accent-primary-foreground"
-      {...props}
-    />
+    <ActivityIndicator size={SIZES[size]} colorClassName="accent-primary-foreground" {...props} />
   );
 }

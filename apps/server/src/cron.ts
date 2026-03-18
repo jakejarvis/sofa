@@ -1,3 +1,5 @@
+import { Cron } from "croner";
+
 import { refreshAvailability } from "@sofa/core/availability";
 import { createBackup, ensureBackupDir, pruneBackups } from "@sofa/core/backup";
 import { refreshCredits, syncCastProfileThumbHashes } from "@sofa/core/credits";
@@ -16,10 +18,7 @@ import {
 } from "@sofa/core/metadata";
 import { getSetting } from "@sofa/core/settings";
 import { performTelemetryReport } from "@sofa/core/telemetry";
-import {
-  generateTitleBackdropThumbHash,
-  generateTitlePosterThumbHash,
-} from "@sofa/core/thumbhash";
+import { generateTitleBackdropThumbHash, generateTitlePosterThumbHash } from "@sofa/core/thumbhash";
 import { performUpdateCheck } from "@sofa/core/update-check";
 import { db } from "@sofa/db/client";
 import { and, eq, inArray, isNotNull, lt, or, sql } from "@sofa/db/helpers";
@@ -35,7 +34,6 @@ import {
 } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getTvDetails } from "@sofa/tmdb/client";
-import { Cron } from "croner";
 
 export type BackupFrequency = "6h" | "12h" | "1d" | "7d";
 
@@ -132,14 +130,8 @@ function getThumbhashBackfillTitleIds(): string[] {
       .from(titles)
       .where(
         or(
-          and(
-            isNotNull(titles.posterPath),
-            sql`${titles.posterThumbHash} IS NULL`,
-          ),
-          and(
-            isNotNull(titles.backdropPath),
-            sql`${titles.backdropThumbHash} IS NULL`,
-          ),
+          and(isNotNull(titles.posterPath), sql`${titles.posterThumbHash} IS NULL`),
+          and(isNotNull(titles.backdropPath), sql`${titles.backdropThumbHash} IS NULL`),
         ),
       )
       .all()
@@ -150,12 +142,7 @@ function getThumbhashBackfillTitleIds(): string[] {
     db
       .select({ titleId: seasons.titleId })
       .from(seasons)
-      .where(
-        and(
-          isNotNull(seasons.posterPath),
-          sql`${seasons.posterThumbHash} IS NULL`,
-        ),
-      )
+      .where(and(isNotNull(seasons.posterPath), sql`${seasons.posterThumbHash} IS NULL`))
       .groupBy(seasons.titleId)
       .all()
       .map((row) => row.titleId),
@@ -166,12 +153,7 @@ function getThumbhashBackfillTitleIds(): string[] {
       .select({ titleId: seasons.titleId })
       .from(episodes)
       .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
-      .where(
-        and(
-          isNotNull(episodes.stillPath),
-          sql`${episodes.stillThumbHash} IS NULL`,
-        ),
-      )
+      .where(and(isNotNull(episodes.stillPath), sql`${episodes.stillThumbHash} IS NULL`))
       .groupBy(seasons.titleId)
       .all()
       .map((row) => row.titleId),
@@ -182,12 +164,7 @@ function getThumbhashBackfillTitleIds(): string[] {
       .select({ titleId: titleCast.titleId })
       .from(titleCast)
       .innerJoin(persons, eq(titleCast.personId, persons.id))
-      .where(
-        and(
-          isNotNull(persons.profilePath),
-          sql`${persons.profileThumbHash} IS NULL`,
-        ),
-      )
+      .where(and(isNotNull(persons.profilePath), sql`${persons.profileThumbHash} IS NULL`))
       .groupBy(titleCast.titleId)
       .all()
       .map((row) => row.titleId),
@@ -207,12 +184,7 @@ async function nightlyRefreshLibrary() {
   const staleLibrary = db
     .select({ id: titles.id })
     .from(titles)
-    .where(
-      and(
-        inArray(titles.id, libraryIds),
-        lt(titles.lastFetchedAt, libraryStale),
-      ),
-    )
+    .where(and(inArray(titles.id, libraryIds), lt(titles.lastFetchedAt, libraryStale)))
     .all();
 
   for (const { id } of staleLibrary) {
@@ -224,12 +196,7 @@ async function nightlyRefreshLibrary() {
   const nonLibrary = db
     .select()
     .from(titles)
-    .where(
-      and(
-        isNotNull(titles.lastFetchedAt),
-        lt(titles.lastFetchedAt, nonLibraryStale),
-      ),
-    )
+    .where(and(isNotNull(titles.lastFetchedAt), lt(titles.lastFetchedAt, nonLibraryStale)))
     .limit(50)
     .all();
 
@@ -282,9 +249,7 @@ async function refreshAvailabilityJob() {
 
 async function refreshRecommendationsJob() {
   const libraryIds = getLibraryTitleIds();
-  log.debug(
-    `Refreshing recommendations for ${libraryIds.length} library titles`,
-  );
+  log.debug(`Refreshing recommendations for ${libraryIds.length} library titles`);
 
   for (const titleId of libraryIds) {
     await refreshRecommendations(titleId);
@@ -316,12 +281,7 @@ async function refreshTvChildrenJob() {
       ? db
           .select({ titleId: seasons.titleId })
           .from(seasons)
-          .where(
-            and(
-              inArray(seasons.titleId, tvIds),
-              lt(seasons.lastFetchedAt, stale),
-            ),
-          )
+          .where(and(inArray(seasons.titleId, tvIds), lt(seasons.lastFetchedAt, stale)))
           .groupBy(seasons.titleId)
           .all()
           .map((r) => r.titleId)
@@ -340,17 +300,11 @@ async function refreshTvChildrenJob() {
 
 async function cacheImagesJob() {
   const titleIds = getThumbhashBackfillTitleIds();
-  log.debug(
-    `Caching images for ${titleIds.length} titles needing art backfill`,
-  );
+  log.debug(`Caching images for ${titleIds.length} titles needing art backfill`);
 
   for (const titleId of titleIds) {
     try {
-      const title = db
-        .select()
-        .from(titles)
-        .where(eq(titles.id, titleId))
-        .get();
+      const title = db.select().from(titles).where(eq(titles.id, titleId)).get();
       if (!title) continue;
 
       // Phase 1: warm the image cache so thumbhash generation can read from disk
@@ -370,18 +324,14 @@ async function cacheImagesJob() {
         hashTasks.push(generateTitlePosterThumbHash(titleId, title.posterPath));
       }
       if (!title.backdropThumbHash && title.backdropPath) {
-        hashTasks.push(
-          generateTitleBackdropThumbHash(titleId, title.backdropPath),
-        );
+        hashTasks.push(generateTitleBackdropThumbHash(titleId, title.backdropPath));
       }
 
       if (title.type === "tv") {
         hashTasks.push(syncTvChildArt(titleId, { warmCache: false }));
       }
 
-      hashTasks.push(
-        syncCastProfileThumbHashes(titleId, undefined, { warmCache: false }),
-      );
+      hashTasks.push(syncCastProfileThumbHashes(titleId, undefined, { warmCache: false }));
 
       await Promise.all(hashTasks);
     } catch (err) {
@@ -404,9 +354,7 @@ async function refreshCreditsJob() {
       .limit(1)
       .get();
 
-    const needsRefresh =
-      !castEntry ||
-      (castEntry.lastFetchedAt && castEntry.lastFetchedAt < stale);
+    const needsRefresh = !castEntry || (castEntry.lastFetchedAt && castEntry.lastFetchedAt < stale);
 
     if (needsRefresh) {
       await refreshCredits(titleId);
@@ -453,8 +401,7 @@ export function buildBackupCron(
 }
 
 function getBackupCronFromSettings(): string {
-  const frequency = (getSetting("backupScheduleFrequency") ??
-    "1d") as BackupFrequency;
+  const frequency = (getSetting("backupScheduleFrequency") ?? "1d") as BackupFrequency;
   const time = getSetting("backupScheduleTime") ?? "02:00";
   const dayOfWeek = Number.parseInt(getSetting("backupScheduleDow") ?? "0", 10);
   return buildBackupCron(frequency, time, dayOfWeek);

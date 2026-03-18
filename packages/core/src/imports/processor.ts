@@ -11,19 +11,11 @@ import {
   userTitleStatus,
 } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
+
 import { getOrFetchTitleByTmdbId } from "../metadata";
-import {
-  logEpisodeWatch,
-  logMovieWatch,
-  rateTitleStars,
-  setTitleStatus,
-} from "../tracking";
-import type {
-  ImportEpisode,
-  ImportMovie,
-  ImportRating,
-  ImportWatchlistItem,
-} from "./parsers";
+import { logEpisodeWatch, logMovieWatch, rateTitleStars, setTitleStatus } from "../tracking";
+
+import type { ImportEpisode, ImportMovie, ImportRating, ImportWatchlistItem } from "./parsers";
 import { resolveMovieTmdbId, resolveShowTmdbId } from "./resolve";
 
 const log = createLogger("imports");
@@ -60,12 +52,7 @@ function hasExistingMovieWatch(userId: string, titleId: string): boolean {
   const existing = db
     .select({ id: userMovieWatches.id })
     .from(userMovieWatches)
-    .where(
-      and(
-        eq(userMovieWatches.userId, userId),
-        eq(userMovieWatches.titleId, titleId),
-      ),
-    )
+    .where(and(eq(userMovieWatches.userId, userId), eq(userMovieWatches.titleId, titleId)))
     .get();
   return !!existing;
 }
@@ -74,12 +61,7 @@ function hasExistingEpisodeWatch(userId: string, episodeId: string): boolean {
   const existing = db
     .select({ id: userEpisodeWatches.id })
     .from(userEpisodeWatches)
-    .where(
-      and(
-        eq(userEpisodeWatches.userId, userId),
-        eq(userEpisodeWatches.episodeId, episodeId),
-      ),
-    )
+    .where(and(eq(userEpisodeWatches.userId, userId), eq(userEpisodeWatches.episodeId, episodeId)))
     .get();
   return !!existing;
 }
@@ -88,12 +70,7 @@ function hasExistingWatchlistStatus(userId: string, titleId: string): boolean {
   const existing = db
     .select({ status: userTitleStatus.status })
     .from(userTitleStatus)
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(userTitleStatus.titleId, titleId),
-      ),
-    )
+    .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, titleId)))
     .get();
   return !!existing;
 }
@@ -102,9 +79,7 @@ function hasExistingRating(userId: string, titleId: string): boolean {
   const existing = db
     .select({ ratingStars: userRatings.ratingStars })
     .from(userRatings)
-    .where(
-      and(eq(userRatings.userId, userId), eq(userRatings.titleId, titleId)),
-    )
+    .where(and(eq(userRatings.userId, userId), eq(userRatings.titleId, titleId)))
     .get();
   return !!existing;
 }
@@ -192,38 +167,24 @@ async function processEpisode(
   const season = db
     .select()
     .from(seasons)
-    .where(
-      and(
-        eq(seasons.titleId, title.id),
-        eq(seasons.seasonNumber, ep.seasonNumber),
-      ),
-    )
+    .where(and(eq(seasons.titleId, title.id), eq(seasons.seasonNumber, ep.seasonNumber)))
     .get();
 
   if (!season) {
     result.failed++;
-    result.errors.push(
-      `Season ${ep.seasonNumber} not found for "${title.title}"`,
-    );
+    result.errors.push(`Season ${ep.seasonNumber} not found for "${title.title}"`);
     return;
   }
 
   const episode = db
     .select()
     .from(episodes)
-    .where(
-      and(
-        eq(episodes.seasonId, season.id),
-        eq(episodes.episodeNumber, ep.episodeNumber),
-      ),
-    )
+    .where(and(eq(episodes.seasonId, season.id), eq(episodes.episodeNumber, ep.episodeNumber)))
     .get();
 
   if (!episode) {
     result.failed++;
-    result.errors.push(
-      `S${ep.seasonNumber}E${ep.episodeNumber} not found for "${title.title}"`,
-    );
+    result.errors.push(`S${ep.seasonNumber}E${ep.episodeNumber} not found for "${title.title}"`);
     return;
   }
 
@@ -247,8 +208,7 @@ async function processWatchlistItem(
   result: ImportResult,
   cache?: Map<string, number | null>,
 ): Promise<void> {
-  const resolveFn =
-    item.type === "movie" ? resolveMovieTmdbId : resolveShowTmdbId;
+  const resolveFn = item.type === "movie" ? resolveMovieTmdbId : resolveShowTmdbId;
   const tmdbId = await resolveFn(
     {
       tmdbId: item.tmdbId,
@@ -271,9 +231,7 @@ async function processWatchlistItem(
   const title = await getOrFetchTitleByTmdbId(tmdbId, item.type);
   if (!title) {
     result.failed++;
-    result.errors.push(
-      `Failed to fetch metadata for ${item.type} TMDB ${tmdbId}`,
-    );
+    result.errors.push(`Failed to fetch metadata for ${item.type} TMDB ${tmdbId}`);
     return;
   }
 
@@ -292,8 +250,7 @@ async function processRating(
   result: ImportResult,
   cache?: Map<string, number | null>,
 ): Promise<void> {
-  const resolveFn =
-    item.type === "movie" ? resolveMovieTmdbId : resolveShowTmdbId;
+  const resolveFn = item.type === "movie" ? resolveMovieTmdbId : resolveShowTmdbId;
   const tmdbId = await resolveFn(
     {
       tmdbId: item.tmdbId,
@@ -316,9 +273,7 @@ async function processRating(
   const title = await getOrFetchTitleByTmdbId(tmdbId, item.type);
   if (!title) {
     result.failed++;
-    result.errors.push(
-      `Failed to fetch metadata for ${item.type} TMDB ${tmdbId}`,
-    );
+    result.errors.push(`Failed to fetch metadata for ${item.type} TMDB ${tmdbId}`);
     return;
   }
 
@@ -390,11 +345,7 @@ export function readImportJob(jobId: string, userId?: string): ImportJob {
 // ─── Job Processor ───────────────────────────────────────────────────
 
 export async function processImportJob(jobId: string): Promise<void> {
-  const row = db
-    .select()
-    .from(importJobs)
-    .where(eq(importJobs.id, jobId))
-    .get();
+  const row = db.select().from(importJobs).where(eq(importJobs.id, jobId)).get();
 
   if (!row) {
     throw new Error(`Import job ${jobId} not found`);
@@ -408,9 +359,7 @@ export async function processImportJob(jobId: string): Promise<void> {
   }
   const parsed = NormalizedImportSchema.safeParse(rawPayload);
   if (!parsed.success) {
-    throw new Error(
-      `Import job ${jobId} has malformed payload: ${parsed.error.message}`,
-    );
+    throw new Error(`Import job ${jobId} has malformed payload: ${parsed.error.message}`);
   }
   const data = parsed.data;
   const result: ImportResult = {
@@ -466,9 +415,7 @@ export async function processImportJob(jobId: string): Promise<void> {
       .where(eq(importJobs.id, jobId))
       .run();
 
-    log.info(
-      `Starting ${data.source} import job ${jobId} for user ${row.userId}: ${total} items`,
-    );
+    log.info(`Starting ${data.source} import job ${jobId} for user ${row.userId}: ${total} items`);
 
     // Shared resolution cache for the entire import job
     const resolveCache = new Map<string, number | null>();
@@ -501,20 +448,10 @@ export async function processImportJob(jobId: string): Promise<void> {
       try {
         switch (item.type) {
           case "movie":
-            await processMovie(
-              row.userId,
-              data.movies[item.index],
-              result,
-              resolveCache,
-            );
+            await processMovie(row.userId, data.movies[item.index], result, resolveCache);
             break;
           case "episode":
-            await processEpisode(
-              row.userId,
-              data.episodes[item.index],
-              result,
-              resolveCache,
-            );
+            await processEpisode(row.userId, data.episodes[item.index], result, resolveCache);
             break;
           case "watchlist":
             await processWatchlistItem(
@@ -525,26 +462,16 @@ export async function processImportJob(jobId: string): Promise<void> {
             );
             break;
           case "rating":
-            await processRating(
-              row.userId,
-              data.ratings[item.index],
-              result,
-              resolveCache,
-            );
+            await processRating(row.userId, data.ratings[item.index], result, resolveCache);
             break;
         }
       } catch (err) {
         result.failed++;
-        result.errors.push(
-          `Unexpected error: ${err instanceof Error ? err.message : String(err)}`,
-        );
+        result.errors.push(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
       }
 
       // Update DB progress periodically
-      if (
-        i % progressInterval === progressInterval - 1 ||
-        i === items.length - 1
-      ) {
+      if (i % progressInterval === progressInterval - 1 || i === items.length - 1) {
         const currentItem =
           item.type === "movie"
             ? data.movies[item.index]
@@ -594,9 +521,7 @@ export async function processImportJob(jobId: string): Promise<void> {
     );
   } catch (err) {
     // Fatal error
-    result.errors.push(
-      `Fatal: ${err instanceof Error ? err.message : String(err)}`,
-    );
+    result.errors.push(`Fatal: ${err instanceof Error ? err.message : String(err)}`);
     db.update(importJobs)
       .set({
         status: "error",

@@ -1,5 +1,6 @@
 import { readdir, stat, unlink } from "node:fs/promises";
 import path from "node:path";
+
 import { CACHE_DIR } from "@sofa/config";
 import { db } from "@sofa/db/client";
 import { inArray, isNull, notInArray } from "@sofa/db/helpers";
@@ -40,9 +41,7 @@ export function purgeMetadataCache(): {
         .map((r) => r.titleId),
     );
 
-    const toDelete = shellTitles
-      .map((t) => t.id)
-      .filter((id) => !libraryTitleIds.has(id));
+    const toDelete = shellTitles.map((t) => t.id).filter((id) => !libraryTitleIds.has(id));
 
     if (toDelete.length === 0) {
       log.info("All un-enriched titles are in user libraries, skipping");
@@ -72,10 +71,7 @@ function purgeOrphanedPersons(): number {
     .select({ id: persons.id })
     .from(persons)
     .where(
-      notInArray(
-        persons.id,
-        db.selectDistinct({ personId: titleCast.personId }).from(titleCast),
-      ),
+      notInArray(persons.id, db.selectDistinct({ personId: titleCast.personId }).from(titleCast)),
     )
     .all();
 
@@ -93,13 +89,7 @@ function purgeOrphanedPersons(): number {
 }
 
 /** Image cache subdirectories to scan */
-const IMAGE_CATEGORIES = [
-  "posters",
-  "backdrops",
-  "stills",
-  "logos",
-  "profiles",
-] as const;
+const IMAGE_CATEGORIES = ["posters", "backdrops", "stills", "logos", "profiles"] as const;
 
 /**
  * Delete all cached images from disk.

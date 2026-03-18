@@ -1,5 +1,6 @@
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 import Link from "next/link";
+
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { baseOptions } from "@/lib/layout.shared";
 
@@ -7,8 +8,8 @@ export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <HomeLayout {...baseOptions()}>
       {children}
-      <footer className="border-t border-fd-border px-6 py-8">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 text-center text-xs text-fd-muted-foreground">
+      <footer className="border-fd-border border-t px-6 py-8">
+        <div className="text-fd-muted-foreground mx-auto flex max-w-5xl flex-col items-center gap-4 text-center text-xs">
           <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
             <a
               href="https://github.com/jakejarvis/sofa"
@@ -36,9 +37,8 @@ export default function Layout({ children }: LayoutProps<"/">) {
             >
               <TmdbLogo className="h-3" />
             </a>
-            <p className="max-w-md text-fd-muted-foreground/80">
-              This product uses the TMDB API but is not endorsed or certified by
-              TMDB.
+            <p className="text-fd-muted-foreground/80 max-w-md">
+              This product uses the TMDB API but is not endorsed or certified by TMDB.
             </p>
           </div>
         </div>

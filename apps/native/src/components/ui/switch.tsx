@@ -24,13 +24,7 @@ export function Switch({
       disabled={disabled}
       accessibilityLabel={accessibilityLabel}
       ios_backgroundColor={secondaryColor}
-      thumbColor={
-        process.env.EXPO_OS === "ios"
-          ? undefined
-          : value
-            ? "#fff"
-            : mutedFgColor
-      }
+      thumbColor={process.env.EXPO_OS === "ios" ? undefined : value ? "#fff" : mutedFgColor}
       trackColor={{ false: secondaryColor, true: primaryColor }}
       style={{
         transform: [{ scaleX: switchScale }, { scaleY: switchScale }],

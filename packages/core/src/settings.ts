@@ -3,11 +3,7 @@ import { count, eq } from "@sofa/db/helpers";
 import { appSettings, user } from "@sofa/db/schema";
 
 export function getSetting(key: string): string | null {
-  const row = db
-    .select()
-    .from(appSettings)
-    .where(eq(appSettings.key, key))
-    .get();
+  const row = db.select().from(appSettings).where(eq(appSettings.key, key)).get();
   return row?.value ?? null;
 }
 

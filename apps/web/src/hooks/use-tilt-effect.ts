@@ -34,8 +34,7 @@ export function useTiltEffect(config: TiltConfig = {}) {
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const finePointer = window.matchMedia("(pointer: fine)");
-    const update = () =>
-      setDisabled(reducedMotion.matches || !finePointer.matches);
+    const update = () => setDisabled(reducedMotion.matches || !finePointer.matches);
     update();
     reducedMotion.addEventListener("change", update);
     finePointer.addEventListener("change", update);
@@ -51,16 +50,8 @@ export function useTiltEffect(config: TiltConfig = {}) {
   const isHovered = useMotionValue(0);
 
   // Rotation (mouse left -> tilt right for natural feel)
-  const rawRotateY = useTransform(
-    mouseX,
-    [0, 1],
-    [opts.maxTilt, -opts.maxTilt],
-  );
-  const rawRotateX = useTransform(
-    mouseY,
-    [0, 1],
-    [-opts.maxTilt, opts.maxTilt],
-  );
+  const rawRotateY = useTransform(mouseX, [0, 1], [opts.maxTilt, -opts.maxTilt]);
+  const rawRotateX = useTransform(mouseY, [0, 1], [-opts.maxTilt, opts.maxTilt]);
   const rawScale = useTransform(isHovered, [0, 1], [1, opts.scale]);
 
   // Springs
@@ -82,11 +73,7 @@ export function useTiltEffect(config: TiltConfig = {}) {
   // Glare
   const glareX = useTransform(mouseX, [0, 1], [0, 100]);
   const glareY = useTransform(mouseY, [0, 1], [0, 100]);
-  const glareOpacity = useTransform(
-    hoverSpring,
-    [0, 1],
-    [0, opts.glareMaxOpacity],
-  );
+  const glareOpacity = useTransform(hoverSpring, [0, 1], [0, opts.glareMaxOpacity]);
   const glareBackground = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.25) 0%, transparent 60%)`;
 
   function onMouseMove(e: React.MouseEvent) {

@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { IconRefresh, IconWebhook } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { Pressable, View } from "react-native";
+
 import { IntegrationCard } from "@/components/settings/integration-card";
 import { getIntegrationConfigs } from "@/components/settings/integration-configs";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
@@ -30,15 +31,11 @@ export function IntegrationsSection() {
           </Text>
           <Pressable
             onPress={() => integrations.refetch()}
-            className="flex-row items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5"
+            className="bg-secondary flex-row items-center gap-1.5 rounded-lg px-3 py-1.5"
             style={{ borderCurve: "continuous" }}
           >
-            <ScaledIcon
-              icon={IconRefresh}
-              size={14}
-              className="accent-primary"
-            />
-            <Text className="font-medium font-sans text-primary text-sm">
+            <ScaledIcon icon={IconRefresh} size={14} className="accent-primary" />
+            <Text className="text-primary font-sans text-sm font-medium">
               <Trans>Retry</Trans>
             </Text>
           </Pressable>
@@ -46,16 +43,8 @@ export function IntegrationsSection() {
       ) : (
         configs.map((config) => {
           const connection =
-            integrations.data?.integrations?.find(
-              (i) => i.provider === config.provider,
-            ) ?? null;
-          return (
-            <IntegrationCard
-              key={config.provider}
-              config={config}
-              connection={connection}
-            />
-          );
+            integrations.data?.integrations?.find((i) => i.provider === config.provider) ?? null;
+          return <IntegrationCard key={config.provider} config={config} connection={connection} />;
         })
       )}
     </View>

@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
+
 import * as tmdbClient from "@sofa/tmdb/client";
+
 import { resolveMovieTmdbId, resolveShowTmdbId } from "../src/imports/resolve";
 
 // The TMDB client functions (findByExternalId, searchMovies, searchTv) are
@@ -56,25 +58,23 @@ describe("resolveMovieTmdbId", () => {
 
   test("IMDB returns no movie, falls back to TVDB", async () => {
     let callIndex = 0;
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockImplementation(
-      async () => {
-        callIndex++;
-        if (callIndex === 1) {
-          // IMDB lookup — no results
-          return {
-            movie_results: [],
-            tv_results: [],
-            tv_episode_results: [],
-          } as never;
-        }
-        // TVDB lookup — has result
+    findSpy = spyOn(tmdbClient, "findByExternalId").mockImplementation(async () => {
+      callIndex++;
+      if (callIndex === 1) {
+        // IMDB lookup — no results
         return {
-          movie_results: [{ id: 789 }],
+          movie_results: [],
           tv_results: [],
           tv_episode_results: [],
         } as never;
-      },
-    );
+      }
+      // TVDB lookup — has result
+      return {
+        movie_results: [{ id: 789 }],
+        tv_results: [],
+        tv_episode_results: [],
+      } as never;
+    });
 
     const result = await resolveMovieTmdbId({
       imdbId: "tt0000001",

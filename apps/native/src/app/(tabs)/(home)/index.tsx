@@ -1,10 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { FlashList } from "@shopify/flash-list";
-import {
-  IconBooks,
-  IconPlayerPlay,
-  IconThumbUp,
-} from "@tabler/icons-react-native";
+import { IconBooks, IconPlayerPlay, IconThumbUp } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
@@ -36,16 +32,11 @@ export default function DashboardScreen() {
   authClient.useSession();
 
   const stats = useQuery(orpc.dashboard.stats.queryOptions());
-  const continueWatching = useQuery(
-    orpc.dashboard.continueWatching.queryOptions(),
-  );
+  const continueWatching = useQuery(orpc.dashboard.continueWatching.queryOptions());
   const library = useQuery(orpc.dashboard.library.queryOptions({ input: {} }));
-  const recommendations = useQuery(
-    orpc.dashboard.recommendations.queryOptions(),
-  );
+  const recommendations = useQuery(orpc.dashboard.recommendations.queryOptions());
 
-  const isRefreshing =
-    stats.isRefetching || continueWatching.isRefetching || library.isRefetching;
+  const isRefreshing = stats.isRefetching || continueWatching.isRefetching || library.isRefetching;
 
   const onRefresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
@@ -72,11 +63,9 @@ export default function DashboardScreen() {
     [],
   );
   const renderContinueWatchingItem = useCallback(
-    ({
-      item,
-    }: {
-      item: NonNullable<typeof continueWatching.data>["items"][number];
-    }) => <ContinueWatchingCard item={item} />,
+    ({ item }: { item: NonNullable<typeof continueWatching.data>["items"][number] }) => (
+      <ContinueWatchingCard item={item} />
+    ),
     [],
   );
 
@@ -86,9 +75,7 @@ export default function DashboardScreen() {
       contentContainerStyle={dashboardContentContainerStyle}
       contentInsetAdjustmentBehavior="automatic"
       scrollToOverflowEnabled
-      refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
     >
       <View className="gap-8">
         {/* Stats */}
@@ -109,10 +96,7 @@ export default function DashboardScreen() {
         {hasContinueWatching && (
           <Animated.View entering={FadeInDown.duration(300).delay(200)}>
             <View className="px-4">
-              <SectionHeader
-                title={t`Continue Watching`}
-                icon={IconPlayerPlay}
-              />
+              <SectionHeader title={t`Continue Watching`} icon={IconPlayerPlay} />
             </View>
             <FlashList
               horizontal
@@ -150,10 +134,7 @@ export default function DashboardScreen() {
         {hasRecommendations && (
           <Animated.View entering={FadeInDown.duration(300).delay(400)}>
             <View className="px-4">
-              <SectionHeader
-                title={t`Recommended for You`}
-                icon={IconThumbUp}
-              />
+              <SectionHeader title={t`Recommended for You`} icon={IconThumbUp} />
             </View>
             <HorizontalPosterRow
               items={recommendations.data?.items ?? []}

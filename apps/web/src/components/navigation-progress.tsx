@@ -134,7 +134,6 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   // Finish on route change — routeKey is intentionally a dep to trigger on navigation
   const routeKey = pathname + (searchStr ?? "");
   const firstRenderRef = useRef(true);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: routeKey drives re-runs on route change
   useEffect(() => {
     if (firstRenderRef.current) {
       firstRenderRef.current = false;
@@ -174,7 +173,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         style={{ opacity: visible ? 1 : 0 }}
       >
         <div
-          className={`h-full origin-left bg-primary motion-safe:[box-shadow:0_0_8px_var(--color-primary)] ${progress === 0 ? "" : "motion-safe:transition-transform motion-safe:duration-150 motion-safe:ease-out"}`}
+          className={`bg-primary h-full origin-left motion-safe:[box-shadow:0_0_8px_var(--color-primary)] ${progress === 0 ? "" : "motion-safe:transition-transform motion-safe:duration-150 motion-safe:ease-out"}`}
           style={{ transform: `scaleX(${clamp(progress, 0, 100) / 100})` }}
         />
       </div>

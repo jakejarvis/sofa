@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/client";
+
 import type { AppErrorCode } from "@sofa/api/errors";
 
 export function getAppErrorCode(error: unknown): AppErrorCode | null {

@@ -1,4 +1,5 @@
 import type { CastMember } from "@sofa/api/schemas";
+
 import { CastCarousel } from "./cast-carousel";
 
 interface TitleCastProps {

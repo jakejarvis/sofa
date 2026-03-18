@@ -30,13 +30,8 @@ export function HorizontalPosterRow({
   isLoading?: boolean;
 }) {
   const { quickAdd } = useTitleActions();
-  const handleQuickAdd = useCallback(
-    (id: string) => quickAdd.mutate({ id }),
-    [quickAdd],
-  );
-  const addingKey = quickAdd.isPending
-    ? (quickAdd.variables?.id ?? null)
-    : null;
+  const handleQuickAdd = useCallback((id: string) => quickAdd.mutate({ id }), [quickAdd]);
+  const addingKey = quickAdd.isPending ? (quickAdd.variables?.id ?? null) : null;
   const keyExtractor = useCallback((item: PosterRowItem) => item.id, []);
   const renderItem = useCallback(
     ({ item }: { item: PosterRowItem }) => (

@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "proseWrap": "never",
+  "sortImports": {
+    "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+    "internalPattern": ["@/", "@sofa/", "collections/"],
+    "newlinesBetween": true,
+    "order": "asc"
+  },
+  "sortTailwindcss": {
+    "attributes": ["classList"],
+    "functions": ["cn", "clsx", "cva"]
+  },
+  "ignorePatterns": [
+    "node_modules",
+    ".next",
+    "dist",
+    "build",
+    ".source",
+    "public/openapi.json",
+    "content/docs/api/**/*.mdx"
+  ]
+}

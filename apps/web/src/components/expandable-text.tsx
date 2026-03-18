@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
+
 import { cn } from "@/lib/utils";
 
 interface ExpandableTextProps {
@@ -35,7 +36,7 @@ export function ExpandableText({
       <p
         ref={ref}
         className={cn(
-          "break-words text-muted-foreground leading-relaxed",
+          "text-muted-foreground leading-relaxed break-words",
           !expanded && clampClass,
           textClassName,
         )}
@@ -46,7 +47,7 @@ export function ExpandableText({
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="mt-1 font-medium text-primary text-xs transition-colors hover:text-primary/80"
+          className="text-primary hover:text-primary/80 mt-1 text-xs font-medium transition-colors"
         >
           {expanded ? <Trans>Show less</Trans> : <Trans>Read more</Trans>}
         </button>

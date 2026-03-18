@@ -1,11 +1,8 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+
 import { clearAllTables, insertUser } from "@sofa/db/test-utils";
-import {
-  getSetting,
-  getUserCount,
-  isRegistrationOpen,
-  setSetting,
-} from "../src/settings";
+
+import { getSetting, getUserCount, isRegistrationOpen, setSetting } from "../src/settings";
 
 beforeEach(() => {
   clearAllTables();

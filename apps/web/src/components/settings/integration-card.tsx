@@ -1,7 +1,5 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { i18n } from "@sofa/i18n";
-import { formatRelativeTime } from "@sofa/i18n/format";
 import {
   IconBook2,
   IconCheck,
@@ -16,18 +14,10 @@ import { AnimatePresence, motion } from "motion/react";
 import type { ComponentType, ReactNode } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   InputGroup,
   InputGroupAddon,
@@ -35,12 +25,10 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { orpc } from "@/lib/orpc/client";
+import { i18n } from "@sofa/i18n";
+import { formatRelativeTime } from "@sofa/i18n/format";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -92,12 +80,7 @@ export function IntegrationCard({
 }) {
   const { t } = useLingui();
   const { provider, label } = config;
-  const providerInput = provider as
-    | "plex"
-    | "jellyfin"
-    | "emby"
-    | "sonarr"
-    | "radarr";
+  const providerInput = provider as "plex" | "jellyfin" | "emby" | "sonarr" | "radarr";
 
   const connectMutation = useMutation(
     orpc.integrations.create.mutationOptions({
@@ -131,9 +114,7 @@ export function IntegrationCard({
     orpc.integrations.regenerateToken.mutationOptions({
       onSuccess: (result) => {
         setConnections((prev) =>
-          prev.map((c) =>
-            c.provider === provider ? { ...c, token: result.token } : c,
-          ),
+          prev.map((c) => (c.provider === provider ? { ...c, token: result.token } : c)),
         );
         toast.success(t`${label} URL regenerated`);
       },
@@ -148,9 +129,7 @@ export function IntegrationCard({
   const connecting = connectMutation.isPending;
 
   const url =
-    connection && typeof window !== "undefined"
-      ? config.buildUrl(connection.token)
-      : null;
+    connection && typeof window !== "undefined" ? config.buildUrl(connection.token) : null;
 
   async function handleCopy() {
     if (!url) return;
@@ -165,43 +144,35 @@ export function IntegrationCard({
         <CardContent className={cardOpen ? "pb-4" : ""}>
           <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                <Icon className="size-4 text-primary" />
+              <div className="bg-primary/10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+                <Icon className="text-primary size-4" />
               </div>
               <div className="text-left">
                 <CardTitle>{config.label}</CardTitle>
                 <CardDescription>
-                  {connection
-                    ? config.connectedStatus(connection.lastEventAt)
-                    : t`Not configured`}
+                  {connection ? config.connectedStatus(connection.lastEventAt) : t`Not configured`}
                 </CardDescription>
               </div>
             </div>
             <IconChevronDown
               aria-hidden={true}
-              className={`size-4 text-muted-foreground transition-transform duration-200 ${cardOpen ? "rotate-180" : ""}`}
+              className={`text-muted-foreground size-4 transition-transform duration-200 ${cardOpen ? "rotate-180" : ""}`}
             />
           </CollapsibleTrigger>
         </CardContent>
 
         <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
-          <CardContent className="space-y-3 border-border/30 border-t pt-4">
+          <CardContent className="border-border/30 space-y-3 border-t pt-4">
             {config.alert}
 
             {!connection ? (
               <Button
-                onClick={() =>
-                  connectMutation.mutate({ provider: providerInput })
-                }
+                onClick={() => connectMutation.mutate({ provider: providerInput })}
                 disabled={connecting}
                 size="lg"
                 className="w-full"
               >
-                {connecting ? (
-                  <Trans>Connecting...</Trans>
-                ) : (
-                  <Trans>Connect {config.label}</Trans>
-                )}
+                {connecting ? <Trans>Connecting...</Trans> : <Trans>Connect {config.label}</Trans>}
               </Button>
             ) : (
               <AnimatePresence>
@@ -215,7 +186,7 @@ export function IntegrationCard({
                     <div>
                       <Label
                         htmlFor={`${config.provider}-url`}
-                        className="mb-1 text-muted-foreground"
+                        className="text-muted-foreground mb-1"
                       >
                         {config.urlLabel}
                       </Label>
@@ -224,23 +195,14 @@ export function IntegrationCard({
                           id={`${config.provider}-url`}
                           readOnly
                           value={url}
-                          className="font-mono text-[10px] text-muted-foreground"
+                          className="text-muted-foreground font-mono text-[10px]"
                         />
                         <InputGroupAddon align="inline-end">
                           <Tooltip>
                             <TooltipTrigger
-                              render={
-                                <InputGroupButton
-                                  size="icon-xs"
-                                  onClick={handleCopy}
-                                />
-                              }
+                              render={<InputGroupButton size="icon-xs" onClick={handleCopy} />}
                             >
-                              {copied ? (
-                                <IconCheck className="text-green-400" />
-                              ) : (
-                                <IconCopy />
-                              )}
+                              {copied ? <IconCheck className="text-green-400" /> : <IconCopy />}
                             </TooltipTrigger>
                             <TooltipContent>
                               <Trans>Copy URL</Trans>
@@ -266,9 +228,7 @@ export function IntegrationCard({
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() =>
-                          deleteMutation.mutate({ provider: providerInput })
-                        }
+                        onClick={() => deleteMutation.mutate({ provider: providerInput })}
                       >
                         <IconTrash />
                         <Trans>Disconnect</Trans>
@@ -280,7 +240,7 @@ export function IntegrationCard({
             )}
 
             <Collapsible open={setupOpen} onOpenChange={setSetupOpen}>
-              <CollapsibleTrigger className="flex w-full items-center gap-1.5 rounded-md py-1 text-muted-foreground text-xs transition-colors hover:text-foreground">
+              <CollapsibleTrigger className="text-muted-foreground hover:text-foreground flex w-full items-center gap-1.5 rounded-md py-1 text-xs transition-colors">
                 <IconChevronDown
                   aria-hidden={true}
                   className={`size-3 transition-transform ${setupOpen ? "rotate-0" : "-rotate-90"}`}
@@ -288,10 +248,8 @@ export function IntegrationCard({
                 <Trans>Setup instructions</Trans>
               </CollapsibleTrigger>
               <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
-                <div className="mt-2 rounded-lg border border-border/50 bg-muted/30 p-3 text-muted-foreground text-xs leading-relaxed">
-                  <ol className="list-inside list-decimal space-y-1.5">
-                    {config.setupSteps}
-                  </ol>
+                <div className="border-border/50 bg-muted/30 text-muted-foreground mt-2 rounded-lg border p-3 text-xs leading-relaxed">
+                  <ol className="list-inside list-decimal space-y-1.5">{config.setupSteps}</ol>
                   {config.docsUrl && (
                     <p className="mt-2 -ml-0.5">
                       <IconBook2
@@ -303,7 +261,7 @@ export function IntegrationCard({
                         href={config.docsUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+                        className="text-foreground inline-flex items-center gap-0.5 font-medium underline-offset-2 hover:underline"
                       >
                         <Trans>Open docs</Trans>{" "}
                         <IconExternalLink

@@ -5,6 +5,7 @@ import { persons, titleCast, titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getMovieCredits, getTvAggregateCredits } from "@sofa/tmdb/client";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
+
 import { cacheProfilePhotos, imageCacheEnabled } from "./image-cache";
 import { generatePersonThumbHash } from "./thumbhash";
 
@@ -69,9 +70,7 @@ function batchUpsertPersons(people: PersonData[]): Map<number, string> {
             name: p.name,
             profilePath: p.profilePath,
             popularity: nextPopularity,
-            profileThumbHash: pathChanged
-              ? null
-              : existingPerson.profileThumbHash,
+            profileThumbHash: pathChanged ? null : existingPerson.profileThumbHash,
           })
           .where(eq(persons.id, existingPerson.id))
           .run();
@@ -94,9 +93,7 @@ function batchUpsertPersons(people: PersonData[]): Map<number, string> {
   });
 
   // One fallback query for any concurrent inserts that conflicted
-  const stillMissing = uniquePeople
-    .filter((p) => !idMap.has(p.tmdbId))
-    .map((p) => p.tmdbId);
+  const stillMissing = uniquePeople.filter((p) => !idMap.has(p.tmdbId)).map((p) => p.tmdbId);
   if (stillMissing.length > 0) {
     const fallbacks = db
       .select({ id: persons.id, tmdbId: persons.tmdbId })

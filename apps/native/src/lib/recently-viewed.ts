@@ -1,9 +1,6 @@
 import { useSyncExternalStore } from "react";
-import {
-  hasScopedStorage,
-  onStorageScopeChange,
-  scopedStorage,
-} from "@/lib/mmkv";
+
+import { hasScopedStorage, onStorageScopeChange, scopedStorage } from "@/lib/mmkv";
 
 const STORAGE_KEY = "recently_viewed";
 const MAX_ITEMS = 50;
@@ -60,10 +57,7 @@ onStorageScopeChange(() => {
 
 export function addRecentlyViewed(item: Omit<RecentlyViewedItem, "viewedAt">) {
   const filtered = items.filter((i) => i.id !== item.id);
-  const next = [{ ...item, viewedAt: Date.now() }, ...filtered].slice(
-    0,
-    MAX_ITEMS,
-  );
+  const next = [{ ...item, viewedAt: Date.now() }, ...filtered].slice(0, MAX_ITEMS);
   persist(next);
 }
 

@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useCallback, useRef, useState } from "react";
 import type { NativeSyntheticEvent, TextLayoutEventData } from "react-native";
 import { Platform, Pressable, View } from "react-native";
+
 import { Text } from "@/components/ui/text";
 
 export function ExpandableText({
@@ -63,7 +64,7 @@ export function ExpandableText({
           className="mt-1"
         >
           <Text
-            className="font-medium font-sans text-primary text-sm"
+            className="text-primary font-sans text-sm font-medium"
             style={actionColor ? { color: actionColor } : undefined}
           >
             {expanded ? t`Show less` : t`Show more`}

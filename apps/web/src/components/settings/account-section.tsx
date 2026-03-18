@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { formatDate } from "@sofa/i18n/format";
 import {
   IconAlertTriangle,
   IconCamera,
@@ -16,16 +15,12 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -39,14 +34,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { authClient, signOut } from "@/lib/auth/client";
 import { getErrorMessage } from "@/lib/error-messages";
 import { orpc } from "@/lib/orpc/client";
+import { formatDate } from "@sofa/i18n/format";
 
 export function AccountSection({
   user,
@@ -135,8 +127,7 @@ export function AccountSection({
       },
     }),
   );
-  const isAvatarPending =
-    uploadAvatarMutation.isPending || removeAvatarMutation.isPending;
+  const isAvatarPending = uploadAvatarMutation.isPending || removeAvatarMutation.isPending;
 
   function handleRemoveAvatar() {
     removeAvatarMutation.mutate();
@@ -170,8 +161,8 @@ export function AccountSection({
   return (
     <div>
       <div className="mb-3 flex items-center gap-2">
-        <IconUser aria-hidden={true} className="size-4 text-muted-foreground" />
-        <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+        <IconUser aria-hidden={true} className="text-muted-foreground size-4" />
+        <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
           <Trans>Account</Trans>
         </h2>
       </div>
@@ -183,29 +174,18 @@ export function AccountSection({
               render={
                 <button
                   type="button"
-                  onClick={
-                    avatarUrl
-                      ? handleRemoveAvatar
-                      : () => fileInputRef.current?.click()
-                  }
+                  onClick={avatarUrl ? handleRemoveAvatar : () => fileInputRef.current?.click()}
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
                   disabled={isAvatarPending}
                 />
               }
-              className="relative shrink-0 cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              aria-label={
-                avatarUrl
-                  ? t`Remove profile picture`
-                  : t`Upload profile picture`
-              }
+              className="focus-visible:ring-ring focus-visible:ring-offset-background relative shrink-0 cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              aria-label={avatarUrl ? t`Remove profile picture` : t`Upload profile picture`}
             >
               <Avatar className="size-12 overflow-hidden">
-                <AvatarImage
-                  src={isAvatarPending ? undefined : avatarUrl}
-                  alt={displayName}
-                />
-                <AvatarFallback className="bg-primary/10 font-display text-lg text-primary">
+                <AvatarImage src={isAvatarPending ? undefined : avatarUrl} alt={displayName} />
+                <AvatarFallback className="bg-primary/10 font-display text-primary text-lg">
                   {initial}
                 </AvatarFallback>
               </Avatar>
@@ -217,10 +197,8 @@ export function AccountSection({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.15 }}
-                    className={`absolute inset-0 flex items-center justify-center rounded-full text-foreground/70 backdrop-blur-sm ${
-                      avatarUrl && !isAvatarPending
-                        ? "bg-destructive/40"
-                        : "bg-black/50"
+                    className={`text-foreground/70 absolute inset-0 flex items-center justify-center rounded-full backdrop-blur-sm ${
+                      avatarUrl && !isAvatarPending ? "bg-destructive/40" : "bg-black/50"
                     }`}
                   >
                     {isAvatarPending ? (
@@ -235,11 +213,7 @@ export function AccountSection({
               </AnimatePresence>
             </TooltipTrigger>
             <TooltipContent>
-              {avatarUrl ? (
-                <Trans>Remove picture</Trans>
-              ) : (
-                <Trans>Upload picture</Trans>
-              )}
+              {avatarUrl ? <Trans>Remove picture</Trans> : <Trans>Upload picture</Trans>}
             </TooltipContent>
           </Tooltip>
 
@@ -265,7 +239,7 @@ export function AccountSection({
                   >
                     <div className="relative inline-grid items-center">
                       <span
-                        className="invisible col-start-1 row-start-1 whitespace-pre font-medium text-sm"
+                        className="invisible col-start-1 row-start-1 text-sm font-medium whitespace-pre"
                         aria-hidden="true"
                       >
                         {editValue || " "}
@@ -279,11 +253,11 @@ export function AccountSection({
                         onBlur={handleNameSave}
                         disabled={isNamePending}
                         maxLength={100}
-                        className="col-start-1 row-start-1 min-w-4 border-0 border-primary/40 border-b border-dashed bg-transparent font-medium text-sm outline-none transition-colors focus:border-primary"
+                        className="border-primary/40 focus:border-primary col-start-1 row-start-1 min-w-4 border-0 border-b border-dashed bg-transparent text-sm font-medium transition-colors outline-none"
                       />
                     </div>
                     {isNamePending ? (
-                      <Spinner className="size-3.5 shrink-0 text-muted-foreground" />
+                      <Spinner className="text-muted-foreground size-3.5 shrink-0" />
                     ) : (
                       <>
                         <button
@@ -292,7 +266,7 @@ export function AccountSection({
                             e.preventDefault();
                             handleNameSave();
                           }}
-                          className="shrink-0 rounded-md p-0.5 text-muted-foreground transition-colors hover:text-primary"
+                          className="text-muted-foreground hover:text-primary shrink-0 rounded-md p-0.5 transition-colors"
                           aria-label={t`Save name`}
                         >
                           <IconCheck className="size-3.5" />
@@ -303,7 +277,7 @@ export function AccountSection({
                             e.preventDefault();
                             handleNameCancel();
                           }}
-                          className="shrink-0 rounded-md p-0.5 text-muted-foreground transition-colors hover:text-destructive"
+                          className="text-muted-foreground hover:text-destructive shrink-0 rounded-md p-0.5 transition-colors"
                           aria-label={t`Cancel editing`}
                         >
                           <IconX className="size-3.5" />
@@ -320,10 +294,10 @@ export function AccountSection({
                     transition={{ duration: 0.1 }}
                     type="button"
                     onClick={() => setIsEditingName(true)}
-                    className="group/name inline-flex items-center gap-1.5 rounded-md px-0 text-left transition-colors hover:text-primary"
+                    className="group/name hover:text-primary inline-flex items-center gap-1.5 rounded-md px-0 text-left transition-colors"
                   >
                     {displayName}
-                    <IconPencil className="size-3 text-transparent transition-colors group-hover/name:text-muted-foreground" />
+                    <IconPencil className="group-hover/name:text-muted-foreground size-3 text-transparent transition-colors" />
                   </motion.button>
                 )}
               </AnimatePresence>
@@ -331,12 +305,12 @@ export function AccountSection({
             <CardDescription>
               {user.email}
               {user.role === "admin" && (
-                <Badge className="ml-1.5 rounded-md border-0 bg-primary/10 align-middle text-primary">
+                <Badge className="bg-primary/10 text-primary ml-1.5 rounded-md border-0 align-middle">
                   <Trans>Admin</Trans>
                 </Badge>
               )}
             </CardDescription>
-            <p className="mt-0.5 text-muted-foreground/60 text-xs">
+            <p className="text-muted-foreground/60 mt-0.5 text-xs">
               <Trans>Member since {memberSince}</Trans>
             </p>
           </div>
@@ -490,9 +464,7 @@ function ChangePasswordDialog() {
             <Checkbox
               id="revoke-sessions"
               checked={revokeOtherSessions}
-              onCheckedChange={(checked) =>
-                setRevokeOtherSessions(checked === true)
-              }
+              onCheckedChange={(checked) => setRevokeOtherSessions(checked === true)}
               disabled={isSubmitting}
             />
             <Label htmlFor="revoke-sessions" className="cursor-pointer">

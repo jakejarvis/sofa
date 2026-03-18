@@ -1,15 +1,12 @@
 import { ORPCError } from "@orpc/server";
+
 import { AppErrorCode } from "@sofa/api/errors";
 import { ensureBrowseTitlesExist } from "@sofa/core/metadata";
 import { ensureBrowsePersonsExist } from "@sofa/core/person";
-import {
-  searchMovies,
-  searchMulti,
-  searchPerson,
-  searchTv,
-} from "@sofa/tmdb/client";
+import { searchMovies, searchMulti, searchPerson, searchTv } from "@sofa/tmdb/client";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
+
 import { os } from "../context";
 import { authed } from "../middleware";
 
@@ -105,8 +102,7 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
         };
       }
 
-      const mediaType =
-        r.media_type === "movie" || r.media_type === "tv" ? r.media_type : type;
+      const mediaType = r.media_type === "movie" || r.media_type === "tv" ? r.media_type : type;
       if (!mediaType) return null;
 
       return {

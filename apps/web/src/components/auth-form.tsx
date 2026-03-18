@@ -3,6 +3,7 @@ import { IconKey } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+
 import { SofaLogo } from "@/components/sofa-logo";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -93,24 +94,20 @@ export function AuthForm({
   return (
     <div className="relative mx-auto w-full max-w-sm">
       {/* Subtle glow behind card */}
-      <div className="absolute -inset-4 rounded-2xl bg-primary/3 blur-2xl" />
+      <div className="bg-primary/3 absolute -inset-4 rounded-2xl blur-2xl" />
 
       <motion.div
-        className="relative space-y-8 rounded-xl border border-border/50 bg-card/80 p-8 backdrop-blur-sm"
+        className="border-border/50 bg-card/80 relative space-y-8 rounded-xl border p-8 backdrop-blur-sm"
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring" as const, stiffness: 200, damping: 20 }}
       >
         <div className="space-y-2 text-center">
-          <Link to="/" className="inline-flex justify-center text-primary">
+          <Link to="/" className="text-primary inline-flex justify-center">
             <SofaLogo className="size-9" />
           </Link>
-          <h1 className="text-balance font-medium text-lg">
-            {isRegister ? (
-              <Trans>Create your account</Trans>
-            ) : (
-              <Trans>Welcome back</Trans>
-            )}
+          <h1 className="text-lg font-medium text-balance">
+            {isRegister ? <Trans>Create your account</Trans> : <Trans>Welcome back</Trans>}
           </h1>
           <p className="text-muted-foreground text-sm">
             {isRegister ? (
@@ -136,15 +133,13 @@ export function AuthForm({
                 variant="outline"
                 onClick={handleOidcLogin}
                 disabled={oidcLoading}
-                className="h-11 w-full gap-2 rounded-lg border-border/50 bg-background/50 text-sm hover:bg-accent hover:text-foreground"
+                className="border-border/50 bg-background/50 hover:bg-accent hover:text-foreground h-11 w-full gap-2 rounded-lg text-sm"
               >
                 <IconKey aria-hidden={true} className="size-4" />
                 {oidcLoading ? (
                   <Trans>Redirecting…</Trans>
                 ) : (
-                  <Trans>
-                    Sign in with {authConfig?.oidcProviderName || "SSO"}
-                  </Trans>
+                  <Trans>Sign in with {authConfig?.oidcProviderName || "SSO"}</Trans>
                 )}
               </Button>
             </motion.div>
@@ -153,11 +148,11 @@ export function AuthForm({
 
         {showOidc && showPasswordForm && (
           <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-border/50" />
+            <div className="bg-border/50 h-px flex-1" />
             <span className="text-muted-foreground text-xs">
               <Trans>or</Trans>
             </span>
-            <div className="h-px flex-1 bg-border/50" />
+            <div className="bg-border/50 h-px flex-1" />
           </div>
         )}
 
@@ -174,10 +169,7 @@ export function AuthForm({
           >
             {isRegister && (
               <motion.div variants={fieldVariants} className="space-y-1.5">
-                <Label
-                  htmlFor="name"
-                  className="text-muted-foreground uppercase tracking-wider"
-                >
+                <Label htmlFor="name" className="text-muted-foreground tracking-wider uppercase">
                   <Trans>Name</Trans>
                 </Label>
                 <Input
@@ -194,10 +186,7 @@ export function AuthForm({
             )}
 
             <motion.div variants={fieldVariants} className="space-y-1.5">
-              <Label
-                htmlFor="email"
-                className="text-muted-foreground uppercase tracking-wider"
-              >
+              <Label htmlFor="email" className="text-muted-foreground tracking-wider uppercase">
                 <Trans>Email</Trans>
               </Label>
               <Input
@@ -214,10 +203,7 @@ export function AuthForm({
             </motion.div>
 
             <motion.div variants={fieldVariants} className="space-y-1.5">
-              <Label
-                htmlFor="password"
-                className="text-muted-foreground uppercase tracking-wider"
-              >
+              <Label htmlFor="password" className="text-muted-foreground tracking-wider uppercase">
                 <Trans>Password</Trans>
               </Label>
               <Input
@@ -225,9 +211,7 @@ export function AuthForm({
                 type="password"
                 required
                 minLength={8}
-                autoComplete={
-                  mode === "login" ? "current-password" : "new-password"
-                }
+                autoComplete={mode === "login" ? "current-password" : "new-password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={authInputClass}
@@ -239,7 +223,7 @@ export function AuthForm({
               <Button
                 type="submit"
                 disabled={loading}
-                className="h-11 w-full rounded-lg text-sm hover:shadow-lg hover:shadow-primary/20"
+                className="hover:shadow-primary/20 h-11 w-full rounded-lg text-sm hover:shadow-lg"
               >
                 {loading ? (
                   <Trans>Loading…</Trans>
@@ -262,40 +246,37 @@ export function AuthForm({
               className="overflow-hidden"
             >
               <Alert variant="destructive" className="bg-destructive/10">
-                <AlertDescription className="text-destructive text-sm">
-                  {error}
-                </AlertDescription>
+                <AlertDescription className="text-destructive text-sm">{error}</AlertDescription>
               </Alert>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {showPasswordForm &&
-          (isRegister || authConfig?.registrationOpen !== false) && (
-            <p className="text-center text-muted-foreground text-sm">
-              {isRegister ? (
-                <>
-                  <Trans>Already have an account?</Trans>{" "}
-                  <Link
-                    to="/login"
-                    className="font-medium text-primary transition-colors hover:text-primary/80"
-                  >
-                    <Trans>Sign in</Trans>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Trans>Don&apos;t have an account?</Trans>{" "}
-                  <Link
-                    to="/register"
-                    className="font-medium text-primary transition-colors hover:text-primary/80"
-                  >
-                    <Trans>Register</Trans>
-                  </Link>
-                </>
-              )}
-            </p>
-          )}
+        {showPasswordForm && (isRegister || authConfig?.registrationOpen !== false) && (
+          <p className="text-muted-foreground text-center text-sm">
+            {isRegister ? (
+              <>
+                <Trans>Already have an account?</Trans>{" "}
+                <Link
+                  to="/login"
+                  className="text-primary hover:text-primary/80 font-medium transition-colors"
+                >
+                  <Trans>Sign in</Trans>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Trans>Don&apos;t have an account?</Trans>{" "}
+                <Link
+                  to="/register"
+                  className="text-primary hover:text-primary/80 font-medium transition-colors"
+                >
+                  <Trans>Register</Trans>
+                </Link>
+              </>
+            )}
+          </p>
+        )}
       </motion.div>
     </div>
   );

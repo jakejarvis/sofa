@@ -2,7 +2,6 @@ import "@/lib/intl-polyfills";
 import "@/global.css";
 import { I18nProvider } from "@lingui/react";
 import { ThemeProvider } from "@react-navigation/native";
-import { i18n } from "@sofa/i18n";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
   persistQueryClientRestore,
@@ -23,19 +22,16 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableFreeze } from "react-native-screens";
 import { Uniwind, useResolveClassNames } from "uniwind";
+
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-banner";
 import { useServerConnection } from "@/hooks/use-server-connection";
 import { initLocale } from "@/lib/i18n";
 import { applyTrackingTransparency, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
-import {
-  getScopeKey,
-  initialize,
-  onStorageScopeChange,
-  queryPersister,
-} from "@/lib/server";
+import { getScopeKey, initialize, onStorageScopeChange, queryPersister } from "@/lib/server";
 import { sofaTheme } from "@/lib/theme";
+import { i18n } from "@sofa/i18n";
 
 SplashScreen.preventAutoHideAsync();
 enableFreeze(true);
@@ -73,9 +69,7 @@ function AppContent() {
   const [isLocaleReady, setLocaleReady] = useState(false);
 
   useEffect(() => {
-    localeReady
-      .then(() => setLocaleReady(true))
-      .catch(() => setLocaleReady(true));
+    localeReady.then(() => setLocaleReady(true)).catch(() => setLocaleReady(true));
   }, []);
 
   // --- App Tracking Transparency (must resolve before screen tracking) ---
@@ -149,10 +143,7 @@ function AppContent() {
 
         <Stack.Protected guard={!!session}>
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen
-            name="change-password"
-            options={changePasswordOptions}
-          />
+          <Stack.Screen name="change-password" options={changePasswordOptions} />
           <Stack.Screen
             name="title/[id]"
             dangerouslySingular
@@ -223,9 +214,7 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
     };
   }, [scopeKey]);
 
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
 
 export default function RootLayout() {

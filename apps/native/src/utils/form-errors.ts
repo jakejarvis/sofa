@@ -8,10 +8,7 @@ export function getFormErrors(error: ZodError): {
   message: string;
   fields: Set<string>;
 } {
-  const fieldErrors = error.flatten().fieldErrors as Record<
-    string,
-    string[] | undefined
-  >;
+  const fieldErrors = error.flatten().fieldErrors as Record<string, string[] | undefined>;
   const fields = new Set<string>();
   let message = "";
 

@@ -1,14 +1,11 @@
 import { access, constants, readdir } from "node:fs/promises";
 import path from "node:path";
-import {
-  CACHE_DIR,
-  DATA_DIR,
-  DATABASE_URL,
-  TMDB_API_BASE_URL,
-} from "@sofa/config";
+
+import { CACHE_DIR, DATA_DIR, DATABASE_URL, TMDB_API_BASE_URL } from "@sofa/config";
 import { db } from "@sofa/db/client";
 import { count, desc, eq } from "@sofa/db/helpers";
 import { cronRuns, episodes, titles, user } from "@sofa/db/schema";
+
 import { listBackups } from "./backup";
 import { imageCacheEnabled } from "./image-cache";
 import { getSetting } from "./settings";
@@ -186,18 +183,14 @@ function getJobsHealth(): SystemHealthData["jobs"] {
     }
 
     const disabled =
-      (jobName === "scheduledBackup" &&
-        getSetting("scheduledBackups") !== "true") ||
+      (jobName === "scheduledBackup" && getSetting("scheduledBackups") !== "true") ||
       (jobName === "updateCheck" && !isUpdateCheckEnabled());
 
     return {
       jobName,
       cronPattern: disabled ? null : (schedule?.pattern ?? null),
       nextRunAt: disabled ? null : (schedule?.nextRunAt ?? null),
-      lastRunAt:
-        latest?.finishedAt?.toISOString() ??
-        latest?.startedAt?.toISOString() ??
-        null,
+      lastRunAt: latest?.finishedAt?.toISOString() ?? latest?.startedAt?.toISOString() ?? null,
       lastDurationMs,
       lastStatus: (latest?.status as "running" | "success" | "error") ?? null,
       lastError: latest?.errorMessage ?? null,
@@ -223,9 +216,7 @@ async function getImageCacheHealth(): Promise<SystemHealthData["imageCache"]> {
       const dir = path.join(CACHE_DIR, category);
       try {
         const files = await readdir(dir);
-        const sizes = await Promise.all(
-          files.map((file) => Bun.file(path.join(dir, file)).size),
-        );
+        const sizes = await Promise.all(files.map((file) => Bun.file(path.join(dir, file)).size));
         const sizeBytes = sizes.reduce((sum, s) => sum + s, 0);
         categories[category] = { count: files.length, sizeBytes };
         totalSizeBytes += sizeBytes;
@@ -246,9 +237,7 @@ async function getBackupsHealth(): Promise<SystemHealthData["backups"]> {
     const lastBackup = backups[0] ?? null;
     const lastBackupAt = lastBackup?.createdAt ?? null;
     const lastBackupAgeHours = lastBackupAt
-      ? Math.round(
-          (Date.now() - new Date(lastBackupAt).getTime()) / (1000 * 60 * 60),
-        )
+      ? Math.round((Date.now() - new Date(lastBackupAt).getTime()) / (1000 * 60 * 60))
       : null;
 
     return {
@@ -267,9 +256,7 @@ async function getBackupsHealth(): Promise<SystemHealthData["backups"]> {
   }
 }
 
-async function getEnvironmentHealth(): Promise<
-  SystemHealthData["environment"]
-> {
+async function getEnvironmentHealth(): Promise<SystemHealthData["environment"]> {
   const resolvedDataDir = path.resolve(DATA_DIR);
   let dataDirWritable = false;
   try {

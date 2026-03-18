@@ -1,7 +1,7 @@
 import type { I18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import { formatRelativeTime } from "@sofa/i18n/format";
 import type { SvgProps } from "react-native-svg";
+
 import {
   EmbyIcon,
   JellyfinIcon,
@@ -10,6 +10,7 @@ import {
   SonarrIcon,
 } from "@/components/settings/icons";
 import { getServerUrl } from "@/lib/server";
+import { formatRelativeTime } from "@sofa/i18n/format";
 
 export interface IntegrationConfig {
   provider: "plex" | "jellyfin" | "emby" | "sonarr" | "radarr";
@@ -53,9 +54,7 @@ export function getIntegrationConfigs(i18n: I18n): IntegrationConfig[] {
       setupSteps: [
         i18n._(msg`Open Plex, go to Settings > Webhooks`),
         i18n._(msg`Click "Add Webhook" and paste the URL above`),
-        i18n._(
-          msg`Sofa will automatically log movies and episodes when you finish watching them`,
-        ),
+        i18n._(msg`Sofa will automatically log movies and episodes when you finish watching them`),
       ],
     },
     {
@@ -71,9 +70,7 @@ export function getIntegrationConfigs(i18n: I18n): IntegrationConfig[] {
         i18n._(msg`Go to Dashboard > Plugins > Webhook`),
         i18n._(msg`Add a "Generic Destination" and paste the URL above`),
         i18n._(msg`Enable the "Playback Stop" notification type`),
-        i18n._(
-          msg`Sofa will automatically log movies and episodes when you finish watching them`,
-        ),
+        i18n._(msg`Sofa will automatically log movies and episodes when you finish watching them`),
       ],
     },
     {
@@ -91,9 +88,7 @@ export function getIntegrationConfigs(i18n: I18n): IntegrationConfig[] {
         i18n._(msg`Open Emby, go to Settings > Webhooks`),
         i18n._(msg`Add a new webhook and paste the URL above`),
         i18n._(msg`Enable the "Playback" event category`),
-        i18n._(
-          msg`Sofa will automatically log movies and episodes when you finish watching them`,
-        ),
+        i18n._(msg`Sofa will automatically log movies and episodes when you finish watching them`),
       ],
     },
     {

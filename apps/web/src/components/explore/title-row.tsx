@@ -1,4 +1,5 @@
 import { useRef } from "react";
+
 import { TitleCard } from "@/components/title-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { hasReachedHorizontalEnd } from "@/hooks/use-infinite-scroll";
@@ -43,9 +44,7 @@ export function TitleRow({
     <section className="space-y-4">
       <div className="flex items-center gap-2">
         {icon}
-        <h2 className="text-balance font-display text-xl tracking-tight">
-          {heading}
-        </h2>
+        <h2 className="font-display text-xl tracking-tight text-balance">{heading}</h2>
       </div>
       <ScrollArea
         scrollFade
@@ -91,7 +90,7 @@ export function TitleRow({
           ))}
           {isFetchingNextPage && (
             <div className="flex shrink-0 items-center px-4">
-              <div className="size-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              <div className="border-primary size-5 animate-spin rounded-full border-2 border-t-transparent" />
             </div>
           )}
         </div>

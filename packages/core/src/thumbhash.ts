@@ -1,11 +1,14 @@
 import path from "node:path";
+
+import sharp from "sharp";
+import { rgbaToThumbHash } from "thumbhash";
+
 import { db } from "@sofa/db/client";
 import { eq } from "@sofa/db/helpers";
 import { episodes, persons, seasons, titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import type { ImageCategory } from "@sofa/tmdb/image";
-import sharp from "sharp";
-import { rgbaToThumbHash } from "thumbhash";
+
 import { loadImageBuffer } from "./image-cache";
 
 const log = createLogger("thumbhash");
@@ -21,9 +24,7 @@ export async function generateThumbHash(
 ): Promise<string | null> {
   const filename = path.basename(imagePath);
   const source =
-    sourceBuffer === undefined
-      ? await loadImageBuffer(imagePath, category)
-      : sourceBuffer;
+    sourceBuffer === undefined ? await loadImageBuffer(imagePath, category) : sourceBuffer;
   if (!source) return null;
 
   try {
@@ -46,13 +47,8 @@ export async function generateTitlePosterThumbHash(
   posterPath: string | null,
   sourceBuffer?: Buffer | null,
 ): Promise<string | null> {
-  const hash = posterPath
-    ? await generateThumbHash(posterPath, "posters", sourceBuffer)
-    : null;
-  db.update(titles)
-    .set({ posterThumbHash: hash })
-    .where(eq(titles.id, titleId))
-    .run();
+  const hash = posterPath ? await generateThumbHash(posterPath, "posters", sourceBuffer) : null;
+  db.update(titles).set({ posterThumbHash: hash }).where(eq(titles.id, titleId)).run();
   return hash;
 }
 
@@ -60,13 +56,8 @@ export async function generateTitleBackdropThumbHash(
   titleId: string,
   backdropPath: string | null,
 ): Promise<string | null> {
-  const hash = backdropPath
-    ? await generateThumbHash(backdropPath, "backdrops")
-    : null;
-  db.update(titles)
-    .set({ backdropThumbHash: hash })
-    .where(eq(titles.id, titleId))
-    .run();
+  const hash = backdropPath ? await generateThumbHash(backdropPath, "backdrops") : null;
+  db.update(titles).set({ backdropThumbHash: hash }).where(eq(titles.id, titleId)).run();
   return hash;
 }
 
@@ -74,13 +65,8 @@ export async function generateSeasonThumbHash(
   seasonId: string,
   posterPath: string | null,
 ): Promise<string | null> {
-  const hash = posterPath
-    ? await generateThumbHash(posterPath, "posters")
-    : null;
-  db.update(seasons)
-    .set({ posterThumbHash: hash })
-    .where(eq(seasons.id, seasonId))
-    .run();
+  const hash = posterPath ? await generateThumbHash(posterPath, "posters") : null;
+  db.update(seasons).set({ posterThumbHash: hash }).where(eq(seasons.id, seasonId)).run();
   return hash;
 }
 
@@ -89,10 +75,7 @@ export async function generateEpisodeThumbHash(
   stillPath: string | null,
 ): Promise<string | null> {
   const hash = stillPath ? await generateThumbHash(stillPath, "stills") : null;
-  db.update(episodes)
-    .set({ stillThumbHash: hash })
-    .where(eq(episodes.id, episodeId))
-    .run();
+  db.update(episodes).set({ stillThumbHash: hash }).where(eq(episodes.id, episodeId)).run();
   return hash;
 }
 
@@ -100,12 +83,7 @@ export async function generatePersonThumbHash(
   personId: string,
   profilePath: string | null,
 ): Promise<string | null> {
-  const hash = profilePath
-    ? await generateThumbHash(profilePath, "profiles")
-    : null;
-  db.update(persons)
-    .set({ profileThumbHash: hash })
-    .where(eq(persons.id, personId))
-    .run();
+  const hash = profilePath ? await generateThumbHash(profilePath, "profiles") : null;
+  db.update(persons).set({ profileThumbHash: hash }).where(eq(persons.id, personId)).run();
   return hash;
 }

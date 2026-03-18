@@ -41,19 +41,11 @@ export async function refreshAvailability(titleId: string) {
 
   db.transaction((tx) => {
     tx.delete(availabilityOffers)
-      .where(
-        and(
-          eq(availabilityOffers.titleId, titleId),
-          eq(availabilityOffers.region, "US"),
-        ),
-      )
+      .where(and(eq(availabilityOffers.titleId, titleId), eq(availabilityOffers.region, "US")))
       .run();
 
     if (allOfferRows.length > 0) {
-      tx.insert(availabilityOffers)
-        .values(allOfferRows)
-        .onConflictDoNothing()
-        .run();
+      tx.insert(availabilityOffers).values(allOfferRows).onConflictDoNothing().run();
     }
   });
 
@@ -62,9 +54,5 @@ export async function refreshAvailability(titleId: string) {
 }
 
 export function getAvailability(titleId: string) {
-  return db
-    .select()
-    .from(availabilityOffers)
-    .where(eq(availabilityOffers.titleId, titleId))
-    .all();
+  return db.select().from(availabilityOffers).where(eq(availabilityOffers.titleId, titleId)).all();
 }

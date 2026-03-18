@@ -1,17 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type {
-  DashboardStats,
-  HistoryBucket,
-  TimePeriod,
-} from "@sofa/api/schemas";
-import {
-  IconCheck,
-  IconLibrary,
-  IconMovie,
-  IconPlayerPlay,
-} from "@tabler/icons-react";
+import { IconCheck, IconLibrary, IconMovie, IconPlayerPlay } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+
 import {
   Select,
   SelectContent,
@@ -21,11 +12,13 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
+import type { DashboardStats, HistoryBucket, TimePeriod } from "@sofa/api/schemas";
+
 import { Sparkline } from "./sparkline";
 
 function StatCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl border border-border/30 bg-card/50 p-4">
+    <div className="border-border/30 bg-card/50 overflow-hidden rounded-xl border p-4">
       <div className="flex items-center gap-2">
         <Skeleton className="h-6 w-6 rounded-md" />
         <Skeleton className="h-3 w-16" />
@@ -70,23 +63,21 @@ function StatCard({
 }: StatCardProps) {
   return (
     <div
-      className="relative animate-stagger-item overflow-hidden rounded-xl border border-border/30 bg-card/50 p-4"
+      className="animate-stagger-item border-border/30 bg-card/50 relative overflow-hidden rounded-xl border p-4"
       style={{ "--stagger-index": index } as React.CSSProperties}
     >
       {sparklineData && <Sparkline data={sparklineData} color={color} />}
       <div className="relative z-10 flex items-center gap-2">
-        <div
-          className={`flex h-6 w-6 items-center justify-center rounded-md ${bgColor}`}
-        >
+        <div className={`flex h-6 w-6 items-center justify-center rounded-md ${bgColor}`}>
           <Icon aria-hidden={true} className={`size-[13px] ${color}`} />
         </div>
-        <span className="font-medium text-[10px] text-muted-foreground uppercase tracking-wider">
+        <span className="text-muted-foreground text-[10px] font-medium tracking-wider uppercase">
           {label}
         </span>
       </div>
       <p
         suppressHydrationWarning
-        className={`relative z-10 mt-2 font-display text-2xl tabular-nums tracking-tight ${color} motion-safe:transition-opacity motion-safe:duration-300`}
+        className={`font-display relative z-10 mt-2 text-2xl tracking-tight tabular-nums ${color} motion-safe:transition-opacity motion-safe:duration-300`}
       >
         {value}
       </p>
@@ -112,9 +103,7 @@ function PeriodSelect({
       onValueChange={(v) => v && onPeriodChange(v as TimePeriod)}
       modal={false}
     >
-      <SelectTrigger
-        className={`${inlineTriggerClass} text-foreground/80 uppercase`}
-      >
+      <SelectTrigger className={`${inlineTriggerClass} text-foreground/80 uppercase`}>
         <SelectValue>
           {(value: TimePeriod | null) => (value ? periodLabels[value] : null)}
         </SelectValue>
@@ -158,11 +147,7 @@ function PeriodSelector({
 
   return (
     <span className="inline-flex items-baseline gap-1">
-      {type === "movies" ? (
-        <Trans>Movies {select}</Trans>
-      ) : (
-        <Trans>Episodes {select}</Trans>
-      )}
+      {type === "movies" ? <Trans>Movies {select}</Trans> : <Trans>Episodes {select}</Trans>}
     </span>
   );
 }
@@ -199,11 +184,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         index={0}
         sparklineData={movieHistory}
         label={
-          <PeriodSelector
-            type="movies"
-            period={moviePeriod}
-            onPeriodChange={setMoviePeriod}
-          />
+          <PeriodSelector type="movies" period={moviePeriod} onPeriodChange={setMoviePeriod} />
         }
       />
       <StatCard

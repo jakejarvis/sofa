@@ -1,10 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import {
-  IconCheck,
-  IconPlayerPlayFilled,
-  IconPlus,
-  IconX,
-} from "@tabler/icons-react";
+import { IconCheck, IconPlayerPlayFilled, IconPlus, IconX } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "motion/react";
 
 interface StatusButtonProps {
@@ -35,8 +30,7 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
     },
   } as const;
 
-  const config =
-    statusConfig[currentStatus as keyof typeof statusConfig] ?? null;
+  const config = statusConfig[currentStatus as keyof typeof statusConfig] ?? null;
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -49,7 +43,7 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.15 }}
-          className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary/10 px-4 font-medium text-primary text-sm ring-1 ring-primary/20 transition-all hover:bg-primary/15 hover:ring-primary/30 active:scale-[0.97]"
+          className="bg-primary/10 text-primary ring-primary/20 hover:bg-primary/15 hover:ring-primary/30 inline-flex h-9 items-center gap-2 rounded-lg px-4 text-sm font-medium ring-1 transition-all active:scale-[0.97]"
         >
           <IconPlus aria-hidden={true} className="size-3.5" strokeWidth={2.5} />
           {t`Watchlist`}
@@ -64,7 +58,7 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
           exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.15 }}
           title={t`Remove from library`}
-          className={`group inline-flex h-9 items-center gap-2 rounded-lg px-4 font-medium text-sm ring-1 transition-all active:scale-[0.97] ${config.class} ${config.bgClass} ${config.borderClass} hover:!bg-destructive/10 hover:!text-destructive hover:!ring-destructive/30`}
+          className={`group inline-flex h-9 items-center gap-2 rounded-lg px-4 text-sm font-medium ring-1 transition-all active:scale-[0.97] ${config.class} ${config.bgClass} ${config.borderClass} hover:!bg-destructive/10 hover:!text-destructive hover:!ring-destructive/30`}
         >
           <span className="grid [&>svg]:col-start-1 [&>svg]:row-start-1">
             <config.icon
@@ -73,13 +67,11 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
             />
             <IconX
               aria-hidden={true}
-              className="size-3.5 text-destructive opacity-0 transition-opacity group-hover:opacity-100"
+              className="text-destructive size-3.5 opacity-0 transition-opacity group-hover:opacity-100"
             />
           </span>
           <span className="grid [&>span]:col-start-1 [&>span]:row-start-1">
-            <span className="transition-opacity group-hover:opacity-0">
-              {config.label}
-            </span>
+            <span className="transition-opacity group-hover:opacity-0">{config.label}</span>
             <span className="opacity-0 transition-opacity group-hover:opacity-100">
               {t`Remove`}
             </span>

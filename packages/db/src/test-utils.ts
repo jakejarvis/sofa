@@ -1,6 +1,8 @@
 import { Database } from "bun:sqlite";
+
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+
 import * as schema from "./schema";
 
 const {
@@ -28,9 +30,7 @@ export function applyMigrations() {
 
 export function clearAllTables() {
   const tables = testClient
-    .query(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '__drizzle%'",
-    )
+    .query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '__drizzle%'")
     .all() as { name: string }[];
   testClient.run("PRAGMA foreign_keys = OFF");
   for (const { name } of tables) {
@@ -79,20 +79,12 @@ export function insertTitle(
   return id;
 }
 
-export function insertTvShow(
-  titleId = "tv-1",
-  tmdbId = 99999,
-  seasonCount = 1,
-  epsPerSeason = 3,
-) {
+export function insertTvShow(titleId = "tv-1", tmdbId = 99999, seasonCount = 1, epsPerSeason = 3) {
   insertTitle({ id: titleId, tmdbId, type: "tv", title: "Test Show" });
   const episodeIds: string[] = [];
   for (let s = 1; s <= seasonCount; s++) {
     const seasonId = `${titleId}-s${s}`;
-    testDb
-      .insert(seasons)
-      .values({ id: seasonId, titleId, seasonNumber: s })
-      .run();
+    testDb.insert(seasons).values({ id: seasonId, titleId, seasonNumber: s }).run();
     for (let e = 1; e <= epsPerSeason; e++) {
       const epId = `${titleId}-s${s}e${e}`;
       testDb
@@ -110,11 +102,7 @@ export function insertTvShow(
   return { titleId, episodeIds };
 }
 
-export function insertMovieWatch(
-  userId: string,
-  titleId: string,
-  watchedAt?: Date,
-) {
+export function insertMovieWatch(userId: string, titleId: string, watchedAt?: Date) {
   testDb
     .insert(userMovieWatches)
     .values({
@@ -126,11 +114,7 @@ export function insertMovieWatch(
     .run();
 }
 
-export function insertEpisodeWatch(
-  userId: string,
-  episodeId: string,
-  watchedAt?: Date,
-) {
+export function insertEpisodeWatch(userId: string, episodeId: string, watchedAt?: Date) {
   testDb
     .insert(userEpisodeWatches)
     .values({
@@ -147,22 +131,15 @@ export function insertStatus(
   titleId: string,
   status: "watchlist" | "in_progress" | "completed",
 ) {
-  const now = new Date();
+  const timestamp = new Date();
   testDb
     .insert(userTitleStatus)
-    .values({ userId, titleId, status, addedAt: now, updatedAt: now })
+    .values({ userId, titleId, status, addedAt: timestamp, updatedAt: timestamp })
     .run();
 }
 
-export function insertRating(
-  userId: string,
-  titleId: string,
-  ratingStars: number,
-) {
-  testDb
-    .insert(userRatings)
-    .values({ userId, titleId, ratingStars, ratedAt: new Date() })
-    .run();
+export function insertRating(userId: string, titleId: string, ratingStars: number) {
+  testDb.insert(userRatings).values({ userId, titleId, ratingStars, ratedAt: new Date() }).run();
 }
 
 export function insertAvailabilityOffer(
@@ -184,13 +161,8 @@ export function insertAvailabilityOffer(
     .run();
 }
 
-export function insertIntegration(
-  userId: string,
-  provider: string,
-  token = "test-token",
-) {
-  const type =
-    provider === "sonarr" || provider === "radarr" ? "list" : "webhook";
+export function insertIntegration(userId: string, provider: string, token = "test-token") {
+  const type = provider === "sonarr" || provider === "radarr" ? "list" : "webhook";
   return testDb
     .insert(integrations)
     .values({

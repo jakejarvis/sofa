@@ -11,10 +11,7 @@ export function PlexIcon(props: SVGProps<SVGSVGElement>) {
       {...props}
     >
       {/* Icon from CoreUI Brands by creativeLabs Łukasz Holeczek - https://creativecommons.org/publicdomain/zero/1.0/ */}
-      <path
-        fill="currentColor"
-        d="M15.527 0H6.24l10.239 16L6.24 32h9.287L25.76 16z"
-      />
+      <path fill="currentColor" d="M15.527 0H6.24l10.239 16L6.24 32h9.287L25.76 16z" />
     </svg>
   );
 }

@@ -1,8 +1,8 @@
 {
   "recommendations": [
-    "biomejs.biome",
     "bradlc.vscode-tailwindcss",
     "expo.vscode-expo-tools",
+    "oxc.oxc-vscode",
     "vercel.turbo-vsc",
     "vitest.explorer"
   ]

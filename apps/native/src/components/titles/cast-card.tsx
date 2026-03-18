@@ -1,5 +1,6 @@
 import { Link } from "expo-router";
 import { Pressable, View } from "react-native";
+
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 
@@ -31,7 +32,7 @@ export function CastCard({
         style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
       >
         <View className="w-20 items-center">
-          <View className="mb-2 h-16 w-16 overflow-hidden rounded-full bg-secondary">
+          <View className="bg-secondary mb-2 h-16 w-16 overflow-hidden rounded-full">
             {person.profilePath && (
               <Image
                 source={{ uri: person.profilePath }}
@@ -46,7 +47,7 @@ export function CastCard({
           <Text
             numberOfLines={1}
             maxFontSizeMultiplier={1.2}
-            className="text-center font-medium font-sans text-foreground text-xs"
+            className="text-foreground text-center font-sans text-xs font-medium"
           >
             {person.name}
           </Text>
@@ -54,7 +55,7 @@ export function CastCard({
             <Text
               numberOfLines={1}
               maxFontSizeMultiplier={1.0}
-              className="text-center text-muted-foreground text-xs"
+              className="text-muted-foreground text-center text-xs"
             >
               {person.character}
             </Text>

@@ -14,8 +14,7 @@ export function setTitleStatus(
   userId: string,
   titleId: string,
   status: "watchlist" | "in_progress" | "completed",
-  // biome-ignore lint/correctness/noUnusedFunctionParameters: kept for API consistency with callers
-  source: "manual" | "import" | "plex" | "jellyfin" | "emby" = "manual",
+  _source: "manual" | "import" | "plex" | "jellyfin" | "emby" = "manual",
   addedAt?: Date,
 ) {
   const now = addedAt ?? new Date();
@@ -30,12 +29,7 @@ export function setTitleStatus(
 
 export function removeTitleStatus(userId: string, titleId: string) {
   db.delete(userTitleStatus)
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(userTitleStatus.titleId, titleId),
-      ),
-    )
+    .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, titleId)))
     .run();
 }
 
@@ -46,20 +40,13 @@ export function logMovieWatch(
   watchedAt?: Date,
 ) {
   const now = watchedAt ?? new Date();
-  db.insert(userMovieWatches)
-    .values({ userId, titleId, watchedAt: now, source })
-    .run();
+  db.insert(userMovieWatches).values({ userId, titleId, watchedAt: now, source }).run();
 
   // Auto-set status to completed
   const existing = db
     .select()
     .from(userTitleStatus)
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(userTitleStatus.titleId, titleId),
-      ),
-    )
+    .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, titleId)))
     .get();
 
   if (!existing) {
@@ -76,9 +63,7 @@ export function logEpisodeWatch(
   watchedAt?: Date,
 ) {
   const now = watchedAt ?? new Date();
-  db.insert(userEpisodeWatches)
-    .values({ userId, episodeId, watchedAt: now, source })
-    .run();
+  db.insert(userEpisodeWatches).values({ userId, episodeId, watchedAt: now, source }).run();
 
   // Find the title for this episode (single JOIN instead of 2 queries)
   const row = db
@@ -94,12 +79,7 @@ export function logEpisodeWatch(
   const existing = db
     .select()
     .from(userTitleStatus)
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(userTitleStatus.titleId, titleId),
-      ),
-    )
+    .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, titleId)))
     .get();
 
   if (!existing || existing.status === "watchlist") {
@@ -123,25 +103,15 @@ export function logEpisodeWatchBatch(
 
     // Batch INSERT all watch records
     for (const episodeId of episodeIds) {
-      tx.insert(userEpisodeWatches)
-        .values({ userId, episodeId, watchedAt: now, source })
-        .run();
+      tx.insert(userEpisodeWatches).values({ userId, episodeId, watchedAt: now, source }).run();
     }
 
     // Resolve episode → season → title hierarchy with batch queries
-    const eps = tx
-      .select()
-      .from(episodes)
-      .where(inArray(episodes.id, episodeIds))
-      .all();
+    const eps = tx.select().from(episodes).where(inArray(episodes.id, episodeIds)).all();
     if (eps.length === 0) return;
 
     const seasonIds = [...new Set(eps.map((e) => e.seasonId))];
-    const seasonRows = tx
-      .select()
-      .from(seasons)
-      .where(inArray(seasons.id, seasonIds))
-      .all();
+    const seasonRows = tx.select().from(seasons).where(inArray(seasons.id, seasonIds)).all();
     if (seasonRows.length === 0) return;
 
     const { titleId } = seasonRows[0];
@@ -150,12 +120,7 @@ export function logEpisodeWatchBatch(
     const existing = tx
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, userId),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, titleId)))
       .get();
 
     if (!existing || existing.status === "watchlist") {
@@ -176,19 +141,11 @@ export function logEpisodeWatchBatch(
     }
 
     // Check completion once (not per-episode)
-    const allSeasons = tx
-      .select()
-      .from(seasons)
-      .where(eq(seasons.titleId, titleId))
-      .all();
+    const allSeasons = tx.select().from(seasons).where(eq(seasons.titleId, titleId)).all();
     if (allSeasons.length === 0) return;
 
     const allSeasonIds = allSeasons.map((s) => s.id);
-    const allEps = tx
-      .select()
-      .from(episodes)
-      .where(inArray(episodes.seasonId, allSeasonIds))
-      .all();
+    const allEps = tx.select().from(episodes).where(inArray(episodes.seasonId, allSeasonIds)).all();
     const totalEpisodes = allEps.length;
     if (totalEpisodes === 0) return;
 
@@ -199,10 +156,7 @@ export function logEpisodeWatchBatch(
       })
       .from(userEpisodeWatches)
       .where(
-        and(
-          eq(userEpisodeWatches.userId, userId),
-          inArray(userEpisodeWatches.episodeId, allEpIds),
-        ),
+        and(eq(userEpisodeWatches.userId, userId), inArray(userEpisodeWatches.episodeId, allEpIds)),
       )
       .all();
 
@@ -291,12 +245,7 @@ function checkAllEpisodesWatched(userId: string, titleId: string) {
       count: sql<number>`count(distinct ${userEpisodeWatches.episodeId})`,
     })
     .from(userEpisodeWatches)
-    .where(
-      and(
-        eq(userEpisodeWatches.userId, userId),
-        inArray(userEpisodeWatches.episodeId, epIds),
-      ),
-    )
+    .where(and(eq(userEpisodeWatches.userId, userId), inArray(userEpisodeWatches.episodeId, epIds)))
     .all();
 
   if (watchCount.count >= totalEpisodes) {
@@ -306,12 +255,7 @@ function checkAllEpisodesWatched(userId: string, titleId: string) {
 
 export function unwatchEpisode(userId: string, episodeId: string) {
   db.delete(userEpisodeWatches)
-    .where(
-      and(
-        eq(userEpisodeWatches.userId, userId),
-        eq(userEpisodeWatches.episodeId, episodeId),
-      ),
-    )
+    .where(and(eq(userEpisodeWatches.userId, userId), eq(userEpisodeWatches.episodeId, episodeId)))
     .run();
 
   // Find parent title and downgrade from completed to in_progress
@@ -326,12 +270,7 @@ export function unwatchEpisode(userId: string, episodeId: string) {
   const existing = db
     .select()
     .from(userTitleStatus)
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(userTitleStatus.titleId, row.titleId),
-      ),
-    )
+    .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, row.titleId)))
     .get();
 
   if (existing?.status === "completed") {
@@ -340,41 +279,25 @@ export function unwatchEpisode(userId: string, episodeId: string) {
 }
 
 export function unwatchSeason(userId: string, seasonId: string) {
-  const seasonEps = db
-    .select()
-    .from(episodes)
-    .where(eq(episodes.seasonId, seasonId))
-    .all();
+  const seasonEps = db.select().from(episodes).where(eq(episodes.seasonId, seasonId)).all();
 
   const epIds = seasonEps.map((ep) => ep.id);
   if (epIds.length > 0) {
     db.delete(userEpisodeWatches)
       .where(
-        and(
-          eq(userEpisodeWatches.userId, userId),
-          inArray(userEpisodeWatches.episodeId, epIds),
-        ),
+        and(eq(userEpisodeWatches.userId, userId), inArray(userEpisodeWatches.episodeId, epIds)),
       )
       .run();
   }
 
   // Find parent title and downgrade from completed to in_progress
-  const season = db
-    .select()
-    .from(seasons)
-    .where(eq(seasons.id, seasonId))
-    .get();
+  const season = db.select().from(seasons).where(eq(seasons.id, seasonId)).get();
   if (!season) return;
 
   const existing = db
     .select()
     .from(userTitleStatus)
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(userTitleStatus.titleId, season.titleId),
-      ),
-    )
+    .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, season.titleId)))
     .get();
 
   if (existing?.status === "completed") {
@@ -391,9 +314,7 @@ export function rateTitleStars(
   const now = ratedAt ?? new Date();
   if (ratingStars === 0) {
     db.delete(userRatings)
-      .where(
-        and(eq(userRatings.userId, userId), eq(userRatings.titleId, titleId)),
-      )
+      .where(and(eq(userRatings.userId, userId), eq(userRatings.titleId, titleId)))
       .run();
     return;
   }
@@ -418,20 +339,12 @@ export function getUserStatusesByTitleIds(
       status: userTitleStatus.status,
     })
     .from(userTitleStatus)
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        inArray(userTitleStatus.titleId, titleIds),
-      ),
-    )
+    .where(and(eq(userTitleStatus.userId, userId), inArray(userTitleStatus.titleId, titleIds)))
     .all();
 
   const result: Record<string, "watchlist" | "in_progress" | "completed"> = {};
   for (const row of rows) {
-    result[row.titleId] = row.status as
-      | "watchlist"
-      | "in_progress"
-      | "completed";
+    result[row.titleId] = row.status as "watchlist" | "in_progress" | "completed";
   }
   return result;
 }
@@ -445,9 +358,7 @@ export function getEpisodeProgressByTitleIds(
   const rows = db
     .select({
       titleId: titles.id,
-      totalEpisodes: sql<number>`count(distinct ${episodes.id})`.as(
-        "totalEpisodes",
-      ),
+      totalEpisodes: sql<number>`count(distinct ${episodes.id})`.as("totalEpisodes"),
       watchedEpisodes:
         sql<number>`count(distinct case when ${userEpisodeWatches.id} is not null then ${episodes.id} end)`.as(
           "watchedEpisodes",
@@ -458,10 +369,7 @@ export function getEpisodeProgressByTitleIds(
     .innerJoin(episodes, eq(episodes.seasonId, seasons.id))
     .leftJoin(
       userEpisodeWatches,
-      and(
-        eq(userEpisodeWatches.episodeId, episodes.id),
-        eq(userEpisodeWatches.userId, userId),
-      ),
+      and(eq(userEpisodeWatches.episodeId, episodes.id), eq(userEpisodeWatches.userId, userId)),
     )
     .where(and(inArray(titles.id, titleIds), eq(titles.type, "tv")))
     .groupBy(titles.id)
@@ -483,20 +391,13 @@ export function getUserTitleInfo(userId: string, titleId: string) {
   const status = db
     .select()
     .from(userTitleStatus)
-    .where(
-      and(
-        eq(userTitleStatus.userId, userId),
-        eq(userTitleStatus.titleId, titleId),
-      ),
-    )
+    .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, titleId)))
     .get();
 
   const rating = db
     .select()
     .from(userRatings)
-    .where(
-      and(eq(userRatings.userId, userId), eq(userRatings.titleId, titleId)),
-    )
+    .where(and(eq(userRatings.userId, userId), eq(userRatings.titleId, titleId)))
     .get();
 
   // Single JOIN instead of seasons → episodes chain (2 queries → 1)

@@ -6,6 +6,12 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "lint": "oxlint",
+    "format": "oxfmt --config ../../.oxfmtrc.json",
+    "format:check": "oxfmt --check --config ../../.oxfmtrc.json",
+    "check-types": "tsc --noEmit"
+  },
   "devDependencies": {
     "@types/bun": "catalog:",
     "typescript": "catalog:"

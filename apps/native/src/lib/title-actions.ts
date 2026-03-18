@@ -1,8 +1,9 @@
 import { msg, plural } from "@lingui/core/macro";
-import { i18n } from "@sofa/i18n";
+
 import { client, orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { toast } from "@/lib/toast";
+import { i18n } from "@sofa/i18n";
 
 /** Invalidate title + dashboard queries. Used by most title mutations. */
 export function invalidateTitleQueries() {
@@ -59,9 +60,7 @@ export const titleActions = {
     try {
       await client.titles.watchMovie({ id });
       toast.success(
-        titleName
-          ? i18n._(msg`Marked "${titleName}" as watched`)
-          : i18n._(msg`Marked as watched`),
+        titleName ? i18n._(msg`Marked "${titleName}" as watched`) : i18n._(msg`Marked as watched`),
       );
       invalidateTitleQueries();
     } catch {
@@ -84,9 +83,7 @@ export const titleActions = {
       await client.titles.updateRating({ id, stars });
       toast.success(
         stars > 0
-          ? i18n._(
-              msg`Rated ${plural(stars, { one: "# star", other: "# stars" })}`,
-            )
+          ? i18n._(msg`Rated ${plural(stars, { one: "# star", other: "# stars" })}`)
           : i18n._(msg`Rating removed`),
       );
       queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
@@ -119,9 +116,7 @@ export const titleActions = {
     try {
       await client.seasons.watch({ id });
       toast.success(
-        seasonName
-          ? i18n._(msg`Watched all of ${seasonName}`)
-          : i18n._(msg`Season watched`),
+        seasonName ? i18n._(msg`Watched all of ${seasonName}`) : i18n._(msg`Season watched`),
       );
       invalidateTitleQueries();
     } catch {

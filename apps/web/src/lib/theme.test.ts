@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+
 import { getThemeCssProperties, hexToRelativeLuminance } from "./theme";
 
 describe("hexToRelativeLuminance", () => {
@@ -60,9 +61,7 @@ describe("getTitleThemeStyle", () => {
       lightMuted: null,
     });
     expect(style["--primary" as keyof typeof style]).toBe("#1a1a2e");
-    expect(style["--primary-foreground" as keyof typeof style]).toBe(
-      "oklch(0.93 0.015 80)",
-    );
+    expect(style["--primary-foreground" as keyof typeof style]).toBe("oklch(0.93 0.015 80)");
   });
 
   test("bright color produces dark foreground", () => {
@@ -75,9 +74,7 @@ describe("getTitleThemeStyle", () => {
       lightMuted: null,
     });
     expect(style["--primary" as keyof typeof style]).toBe("#ffff00");
-    expect(style["--primary-foreground" as keyof typeof style]).toBe(
-      "oklch(0.13 0.006 55)",
-    );
+    expect(style["--primary-foreground" as keyof typeof style]).toBe("oklch(0.13 0.006 55)");
   });
 
   test("sets all expected CSS custom properties", () => {

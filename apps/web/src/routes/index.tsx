@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+
 import { LandingPage } from "@/components/landing-page";
 import { authClient } from "@/lib/auth/client";
 import { client } from "@/lib/orpc/client";

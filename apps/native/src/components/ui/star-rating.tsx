@@ -1,6 +1,7 @@
 import { IconStar, IconStarFilled } from "@tabler/icons-react-native";
 import { Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
+
 import * as Haptics from "@/utils/haptics";
 
 interface StarRatingProps {

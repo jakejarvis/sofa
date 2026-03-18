@@ -1,0 +1,54 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "sortImports": {
+    "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+    "internalPattern": ["@/", "@sofa/"],
+    "newlinesBetween": true,
+    "order": "asc"
+  },
+  "sortTailwindcss": {
+    "attributes": [
+      "classList",
+      "headerClassName",
+      "contentContainerClassName",
+      "columnWrapperClassName",
+      "endFillColorClassName",
+      "imageClassName",
+      "tintColorClassName",
+      "ios_backgroundColorClassName",
+      "thumbColorClassName",
+      "trackColorOnClassName",
+      "trackColorOffClassName",
+      "selectionColorClassName",
+      "cursorColorClassName",
+      "underlineColorAndroidClassName",
+      "placeholderTextColorClassName",
+      "selectionHandleColorClassName",
+      "colorsClassName",
+      "progressBackgroundColorClassName",
+      "titleColorClassName",
+      "underlayColorClassName",
+      "colorClassName",
+      "backdropColorClassName",
+      "backgroundColorClassName",
+      "statusBarBackgroundColorClassName",
+      "drawerBackgroundColorClassName",
+      "ListFooterComponentClassName",
+      "ListHeaderComponentClassName"
+    ],
+    "functions": ["cn", "clsx", "cva", "useResolveClassNames"]
+  },
+  "ignorePatterns": [
+    "node_modules",
+    "dist",
+    "build",
+    "packages/db/drizzle",
+    "packages/i18n/src/po/*.ts",
+    "packages/tmdb/src/schema.d.ts",
+    "**/routeTree.gen.ts",
+    "apps/native/.expo/types/**/*.ts",
+    "apps/native/expo-env.d.ts",
+    "apps/native/uniwind-types.d.ts",
+    "docs"
+  ]
+}

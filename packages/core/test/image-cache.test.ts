@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
+
 import { loadImageBuffer } from "../src/image-cache";
 
 beforeEach(() => {

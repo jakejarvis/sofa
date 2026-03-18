@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+
 import { personFilmography, persons } from "@sofa/db/schema";
 import { clearAllTables, insertTitle, testDb } from "@sofa/db/test-utils";
+
 import { getLocalFilmography } from "../src/person";
 
 beforeEach(() => {
@@ -45,10 +47,7 @@ describe("getLocalFilmography", () => {
 
     const filmography = getLocalFilmography("p1");
     expect(filmography).toHaveLength(2);
-    expect(filmography.map((f) => f.title).sort()).toEqual([
-      "Movie One",
-      "Movie Two",
-    ]);
+    expect(filmography.map((f) => f.title).sort()).toEqual(["Movie One", "Movie Two"]);
   });
 
   test("includes crew roles", () => {

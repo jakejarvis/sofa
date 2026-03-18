@@ -3,6 +3,7 @@ import { Modal, Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
 
 import { Text } from "@/components/ui/text";
+
 import { ScaledIcon } from "./scaled-icon";
 
 export interface SelectModalOption {
@@ -51,34 +52,30 @@ export function SelectModal({
         onPress={() => onOpenChange(false)}
       >
         <Pressable
-          className="mx-8 w-full max-w-sm overflow-hidden rounded-2xl bg-card"
+          className="bg-card mx-8 w-full max-w-sm overflow-hidden rounded-2xl"
           onPress={(e) => e.stopPropagation()}
         >
-          <View className="flex-row items-center border-border/50 border-b px-5 py-4">
+          <View className="border-border/50 flex-row items-center border-b px-5 py-4">
             {Icon && <ScaledIcon icon={Icon} size={20} color={mutedFgColor} />}
-            <Text className="ml-1.5 font-medium text-base text-foreground">
-              {label}
-            </Text>
+            <Text className="text-foreground ml-1.5 text-base font-medium">{label}</Text>
           </View>
           {options.map((option) => {
             const isSelected = option.value === selection;
             return (
               <Pressable
                 key={option.value}
-                className="flex-row items-center px-5 py-3.5 active:bg-primary/5"
+                className="active:bg-primary/5 flex-row items-center px-5 py-3.5"
                 onPress={() => {
                   onOpenChange(false);
                   onSelect(option.value);
                 }}
               >
                 <Text
-                  className={`flex-1 text-base ${isSelected ? "font-medium text-primary" : "text-foreground"}`}
+                  className={`flex-1 text-base ${isSelected ? "text-primary font-medium" : "text-foreground"}`}
                 >
                   {option.label}
                 </Text>
-                {isSelected && (
-                  <IconCheck size={18} color={primaryColor} strokeWidth={2} />
-                )}
+                {isSelected && <IconCheck size={18} color={primaryColor} strokeWidth={2} />}
               </Pressable>
             );
           })}

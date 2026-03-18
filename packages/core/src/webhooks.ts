@@ -9,6 +9,7 @@ import {
   userMovieWatches,
 } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
+
 import { resolveMovieTmdbId, resolveShowTmdbId } from "./imports/resolve";
 import { getOrFetchTitleByTmdbId } from "./metadata";
 import { logEpisodeWatch, logMovieWatch } from "./tracking";
@@ -65,9 +66,7 @@ export function parsePlexPayload(formData: FormData): WebhookEvent | null {
   if (!isMovie && !isEpisode) return null;
 
   // Extract external IDs from Guid array
-  const guids = (metadata.Guid ?? metadata.guid) as
-    | { id: string }[]
-    | undefined;
+  const guids = (metadata.Guid ?? metadata.guid) as { id: string }[] | undefined;
   let tmdbId: number | undefined;
   let imdbId: string | undefined;
   let tvdbId: string | undefined;
@@ -90,15 +89,11 @@ export function parsePlexPayload(formData: FormData): WebhookEvent | null {
     tvdbId,
     seasonNumber: toOptionalInt(metadata.parentIndex),
     episodeNumber: toOptionalInt(metadata.index),
-    showTitle: (metadata.grandparentTitle ?? metadata.parentTitle) as
-      | string
-      | undefined,
+    showTitle: (metadata.grandparentTitle ?? metadata.parentTitle) as string | undefined,
   };
 }
 
-export function parseJellyfinPayload(
-  body: Record<string, unknown>,
-): WebhookEvent | null {
+export function parseJellyfinPayload(body: Record<string, unknown>): WebhookEvent | null {
   const notifType = body.NotificationType as string | undefined;
   if (notifType !== "PlaybackStop") return null;
   if (body.PlayedToCompletion !== true) return null;
@@ -123,9 +118,7 @@ export function parseJellyfinPayload(
   };
 }
 
-export function parseEmbyPayload(
-  body: Record<string, unknown>,
-): WebhookEvent | null {
+export function parseEmbyPayload(body: Record<string, unknown>): WebhookEvent | null {
   // Emby sends "playback.stop" or "PlaybackStop" depending on webhook plugin version
   const event = body.Event as string | undefined;
   if (event !== "playback.stop" && event !== "PlaybackStop") return null;
@@ -262,15 +255,8 @@ export async function processWebhook(
         title: hasExternalId ? event.title : undefined,
       });
       if (!tmdbId) {
-        log.warn(
-          `Could not resolve TMDB ID for movie "${event.title}" from ${provider}`,
-        );
-        logEvent(
-          connectionId,
-          event,
-          "error",
-          "Could not resolve TMDB ID for movie",
-        );
+        log.warn(`Could not resolve TMDB ID for movie "${event.title}" from ${provider}`);
+        logEvent(connectionId, event, "error", "Could not resolve TMDB ID for movie");
         return { status: "error", message: "Could not resolve TMDB ID" };
       }
 
@@ -282,12 +268,7 @@ export async function processWebhook(
 
       if (isDuplicateMovieWatch(userId, title.id)) {
         log.debug(`Duplicate movie watch ignored: "${event.title}"`);
-        logEvent(
-          connectionId,
-          event,
-          "ignored",
-          "Duplicate watch within 5 minutes",
-        );
+        logEvent(connectionId, event, "ignored", "Duplicate watch within 5 minutes");
         return { status: "ignored", message: "Duplicate watch" };
       }
 
@@ -315,21 +296,11 @@ export async function processWebhook(
       const season = db
         .select()
         .from(seasons)
-        .where(
-          and(
-            eq(seasons.titleId, title.id),
-            eq(seasons.seasonNumber, resolved.seasonNumber),
-          ),
-        )
+        .where(and(eq(seasons.titleId, title.id), eq(seasons.seasonNumber, resolved.seasonNumber)))
         .get();
 
       if (!season) {
-        logEvent(
-          connectionId,
-          event,
-          "error",
-          `Season ${resolved.seasonNumber} not found`,
-        );
+        logEvent(connectionId, event, "error", `Season ${resolved.seasonNumber} not found`);
         return {
           status: "error",
           message: `Season ${resolved.seasonNumber} not found`,
@@ -340,10 +311,7 @@ export async function processWebhook(
         .select()
         .from(episodes)
         .where(
-          and(
-            eq(episodes.seasonId, season.id),
-            eq(episodes.episodeNumber, resolved.episodeNumber),
-          ),
+          and(eq(episodes.seasonId, season.id), eq(episodes.episodeNumber, resolved.episodeNumber)),
         )
         .get();
 
@@ -362,12 +330,7 @@ export async function processWebhook(
 
       if (isDuplicateEpisodeWatch(userId, episode.id)) {
         log.debug(`Duplicate episode watch ignored: "${event.title}"`);
-        logEvent(
-          connectionId,
-          event,
-          "ignored",
-          "Duplicate watch within 5 minutes",
-        );
+        logEvent(connectionId, event, "ignored", "Duplicate watch within 5 minutes");
         return { status: "ignored", message: "Duplicate watch" };
       }
 
@@ -379,12 +342,7 @@ export async function processWebhook(
       return { status: "success", message: `Logged watch for ${event.title}` };
     }
 
-    logEvent(
-      connectionId,
-      event,
-      "ignored",
-      `Unsupported media type: ${event.mediaType}`,
-    );
+    logEvent(connectionId, event, "ignored", `Unsupported media type: ${event.mediaType}`);
     return { status: "ignored", message: "Unsupported media type" };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

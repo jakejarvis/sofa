@@ -1,5 +1,7 @@
-import type { Season } from "@sofa/api/schemas";
 import { useState } from "react";
+
+import type { Season } from "@sofa/api/schemas";
+
 import { TitleContext } from "./title-context";
 
 export function TitleProvider({

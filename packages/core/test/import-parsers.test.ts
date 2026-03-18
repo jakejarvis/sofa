@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
+
 import AdmZip from "adm-zip";
+
 import {
   type ParseResult,
   parseLetterboxdExport,
@@ -747,9 +749,7 @@ describe("parseLetterboxdExport", () => {
 
     expect(result.data.movies).toHaveLength(1);
     // Should have warnings for missing watched.csv, watchlist.csv, ratings.csv
-    const missingWarnings = result.warnings.filter((w) =>
-      w.includes("not found in export"),
-    );
+    const missingWarnings = result.warnings.filter((w) => w.includes("not found in export"));
     expect(missingWarnings).toHaveLength(3);
     expect(missingWarnings.some((w) => w.includes("watched.csv"))).toBe(true);
     expect(missingWarnings.some((w) => w.includes("watchlist.csv"))).toBe(true);
@@ -779,8 +779,7 @@ describe("parseLetterboxdExport", () => {
     const zip = createLetterboxdZip({
       "diary.csv":
         "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date\n2024-01-15,Inception,2010,https://boxd.it/123,,false,,2024-01-14",
-      "watched.csv":
-        "Date,Name,Year,Letterboxd URI\n2024-01-10,Inception,2010,https://boxd.it/123",
+      "watched.csv": "Date,Name,Year,Letterboxd URI\n2024-01-10,Inception,2010,https://boxd.it/123",
       "watchlist.csv": "Date,Name,Year,Letterboxd URI",
       "ratings.csv": "Date,Name,Year,Letterboxd URI,Rating",
     });
@@ -795,8 +794,7 @@ describe("parseLetterboxdExport", () => {
   describe("rating conversion (Letterboxd 0.5-5 to 1-5)", () => {
     async function rateLetterboxd(rating: number) {
       const zip = createLetterboxdZip({
-        "diary.csv":
-          "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date",
+        "diary.csv": "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date",
         "watched.csv": "Date,Name,Year,Letterboxd URI",
         "watchlist.csv": "Date,Name,Year,Letterboxd URI",
         "ratings.csv": `Date,Name,Year,Letterboxd URI,Rating\n2024-01-15,Test,2020,https://boxd.it/1,${rating}`,
@@ -857,21 +855,17 @@ describe("parseLetterboxdExport", () => {
     test("skips rating 0 with warning", async () => {
       const result = await rateLetterboxd(0);
       expect(result.data.ratings).toHaveLength(0);
-      expect(
-        result.warnings.some((w) =>
-          w.includes("Skipped invalid Letterboxd rating"),
-        ),
-      ).toBe(true);
+      expect(result.warnings.some((w) => w.includes("Skipped invalid Letterboxd rating"))).toBe(
+        true,
+      );
     });
 
     test("skips rating 6 with warning", async () => {
       const result = await rateLetterboxd(6);
       expect(result.data.ratings).toHaveLength(0);
-      expect(
-        result.warnings.some((w) =>
-          w.includes("Skipped invalid Letterboxd rating"),
-        ),
-      ).toBe(true);
+      expect(result.warnings.some((w) => w.includes("Skipped invalid Letterboxd rating"))).toBe(
+        true,
+      );
     });
   });
 
@@ -940,9 +934,7 @@ describe("parseLetterboxdExport", () => {
     const result = await parseLetterboxdExport(invalidBlob);
 
     expect(result.data.movies).toHaveLength(0);
-    expect(result.warnings.some((w) => w.includes("Failed to read ZIP"))).toBe(
-      true,
-    );
+    expect(result.warnings.some((w) => w.includes("Failed to read ZIP"))).toBe(true);
   });
 
   test("handles CSV files nested in a subdirectory", async () => {
@@ -980,8 +972,7 @@ describe("parseLetterboxdExport", () => {
       "diary.csv":
         "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date\n2024-01-15,Movie A,2020,https://boxd.it/1,,false,,2024-01-14\n2024-01-16,Movie B,2021,https://boxd.it/2,,false,,2024-01-15",
       "watched.csv": "Date,Name,Year,Letterboxd URI",
-      "watchlist.csv":
-        "Date,Name,Year,Letterboxd URI\n2024-01-20,Movie C,2022,https://boxd.it/3",
+      "watchlist.csv": "Date,Name,Year,Letterboxd URI\n2024-01-20,Movie C,2022,https://boxd.it/3",
       "ratings.csv":
         "Date,Name,Year,Letterboxd URI,Rating\n2024-01-15,Movie A,2020,https://boxd.it/1,4",
     });
@@ -994,8 +985,7 @@ describe("parseLetterboxdExport", () => {
 
   test("ratings.csv with missing rating column skips the row", async () => {
     const zip = createLetterboxdZip({
-      "diary.csv":
-        "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date",
+      "diary.csv": "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date",
       "watched.csv": "Date,Name,Year,Letterboxd URI",
       "watchlist.csv": "Date,Name,Year,Letterboxd URI",
       "ratings.csv":
@@ -1009,8 +999,7 @@ describe("parseLetterboxdExport", () => {
 
   test("multiple movies in watched.csv are all parsed", async () => {
     const zip = createLetterboxdZip({
-      "diary.csv":
-        "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date",
+      "diary.csv": "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date",
       "watched.csv":
         "Date,Name,Year,Letterboxd URI\n2024-01-10,Movie A,2020,https://boxd.it/1\n2024-01-11,Movie B,2021,https://boxd.it/2\n2024-01-12,Movie C,2022,https://boxd.it/3",
       "watchlist.csv": "Date,Name,Year,Letterboxd URI",
@@ -1020,17 +1009,12 @@ describe("parseLetterboxdExport", () => {
     const result = await parseLetterboxdExport(zip);
 
     expect(result.data.movies).toHaveLength(3);
-    expect(result.data.movies.map((m) => m.title)).toEqual([
-      "Movie A",
-      "Movie B",
-      "Movie C",
-    ]);
+    expect(result.data.movies.map((m) => m.title)).toEqual(["Movie A", "Movie B", "Movie C"]);
   });
 
   test("uses Title column as fallback when Name column is absent", async () => {
     const zip = createLetterboxdZip({
-      "diary.csv":
-        "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date",
+      "diary.csv": "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date",
       "watched.csv":
         "Date,Title,Year,Letterboxd URI\n2024-01-10,Fallback Title,2020,https://boxd.it/1",
       "watchlist.csv": "Date,Name,Year,Letterboxd URI",
@@ -1045,8 +1029,7 @@ describe("parseLetterboxdExport", () => {
 
   test("watchlist items all have type movie", async () => {
     const zip = createLetterboxdZip({
-      "diary.csv":
-        "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date",
+      "diary.csv": "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date",
       "watched.csv": "Date,Name,Year,Letterboxd URI",
       "watchlist.csv":
         "Date,Name,Year,Letterboxd URI\n2024-01-20,WL Item A,2024,https://boxd.it/1\n2024-01-21,WL Item B,2025,https://boxd.it/2",

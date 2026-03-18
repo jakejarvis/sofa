@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
-import { formatDate } from "@sofa/i18n/format";
 import {
   IconAlertTriangle,
   IconCalendar,
@@ -12,15 +11,11 @@ import {
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, useWindowDimensions, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
+
 import { DetailStackHeader } from "@/components/navigation/modal-stack-header";
 import { ExpandableText } from "@/components/ui/expandable-text";
 import { Image } from "@/components/ui/image";
@@ -32,6 +27,7 @@ import { Text } from "@/components/ui/text";
 import { useTitleActions } from "@/hooks/use-title-actions";
 import { orpc } from "@/lib/orpc";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
+import { formatDate } from "@sofa/i18n/format";
 
 const FILMOGRAPHY_GAP = 12;
 const FILMOGRAPHY_PADDING = 16;
@@ -68,12 +64,9 @@ export default function PersonDetailScreen() {
   const { back } = useRouter();
   const { width: screenWidth } = useWindowDimensions();
   const useAutomaticInsets = process.env.EXPO_OS === "ios";
-  const filmographyColumns =
-    screenWidth >= 900 ? 4 : screenWidth >= 600 ? 3 : 2;
+  const filmographyColumns = screenWidth >= 900 ? 4 : screenWidth >= 600 ? 3 : 2;
   const columnWidth = Math.floor(
-    (screenWidth -
-      FILMOGRAPHY_PADDING * 2 -
-      FILMOGRAPHY_GAP * (filmographyColumns - 1)) /
+    (screenWidth - FILMOGRAPHY_PADDING * 2 - FILMOGRAPHY_GAP * (filmographyColumns - 1)) /
       filmographyColumns,
   );
 
@@ -82,40 +75,29 @@ export default function PersonDetailScreen() {
 
   const { quickAdd } = useTitleActions();
   const handleQuickAdd = useCallback(
-    (id: string) => quickAdd.mutate({ id }),
+    (titleId: string) => quickAdd.mutate({ id: titleId }),
     [quickAdd],
   );
-  const addingKey = quickAdd.isPending
-    ? (quickAdd.variables?.id ?? null)
-    : null;
+  const addingKey = quickAdd.isPending ? (quickAdd.variables?.id ?? null) : null;
 
-  const {
-    data,
-    isPending,
-    isError,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(
-    orpc.people.detail.infiniteOptions({
-      input: (pageParam: number) => ({ id, page: pageParam, limit: 20 }),
-      initialPageParam: 1,
-      getNextPageParam: (lastPage) =>
-        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-    }),
-  );
+  const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery(
+      orpc.people.detail.infiniteOptions({
+        input: (pageParam: number) => ({ id, page: pageParam, limit: 20 }),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) =>
+          lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+      }),
+    );
 
   const person = data?.pages[0]?.person;
-  const filmography = useMemo(
-    () => data?.pages.flatMap((p) => p.filmography) ?? [],
-    [data?.pages],
-  );
+  const filmography = useMemo(() => data?.pages.flatMap((p) => p.filmography) ?? [], [data?.pages]);
   const userStatuses = useMemo(
     () =>
-      Object.assign(
-        {},
-        ...(data?.pages.map((p) => p.userStatuses) ?? []),
-      ) as Record<string, "watchlist" | "in_progress" | "completed">,
+      Object.assign({}, ...(data?.pages.map((p) => p.userStatuses) ?? [])) as Record<
+        string,
+        "watchlist" | "in_progress" | "completed"
+      >,
     [data?.pages],
   );
 
@@ -166,25 +148,15 @@ export default function PersonDetailScreen() {
       <>
         <DetailStackHeader />
         <View
-          className="flex-1 items-center bg-background"
+          className="bg-background flex-1 items-center"
           style={{ paddingTop: headerHeight + 24 }}
         >
           {/* Profile photo skeleton */}
           <Skeleton width={120} height={120} borderRadius={60} />
           {/* Name skeleton */}
-          <Skeleton
-            width={180}
-            height={28}
-            borderRadius={6}
-            style={{ marginTop: 16 }}
-          />
+          <Skeleton width={180} height={28} borderRadius={6} style={{ marginTop: 16 }} />
           {/* Department badge skeleton */}
-          <Skeleton
-            width={80}
-            height={24}
-            borderRadius={12}
-            style={{ marginTop: 8 }}
-          />
+          <Skeleton width={80} height={24} borderRadius={12} style={{ marginTop: 8 }} />
           {/* Bio skeleton */}
           <View className="mt-6 gap-2 self-stretch px-4">
             <Skeleton width="100%" height={14} />
@@ -201,18 +173,15 @@ export default function PersonDetailScreen() {
       <>
         <DetailStackHeader />
         <View
-          className="flex-1 items-center justify-center bg-background"
+          className="bg-background flex-1 items-center justify-center"
           style={{ paddingTop: insets.top }}
         >
-          <Animated.View
-            entering={FadeIn.duration(400)}
-            className="items-center"
-          >
+          <Animated.View entering={FadeIn.duration(400)} className="items-center">
             <IconAlertTriangle size={48} color={mutedForeground} />
-            <Text className="mt-3 font-display text-foreground text-xl">
+            <Text className="font-display text-foreground mt-3 text-xl">
               <Trans>Something went wrong</Trans>
             </Text>
-            <Text className="mt-1 text-center text-muted-foreground text-sm">
+            <Text className="text-muted-foreground mt-1 text-center text-sm">
               <Trans>Could not load person details</Trans>
             </Text>
             <Pressable onPress={() => back()} className="mt-4">
@@ -231,15 +200,12 @@ export default function PersonDetailScreen() {
       <>
         <DetailStackHeader />
         <View
-          className="flex-1 items-center justify-center bg-background"
+          className="bg-background flex-1 items-center justify-center"
           style={{ paddingTop: insets.top }}
         >
-          <Animated.View
-            entering={FadeIn.duration(400)}
-            className="items-center"
-          >
+          <Animated.View entering={FadeIn.duration(400)} className="items-center">
             <IconUser size={48} color={mutedForeground} />
-            <Text className="mt-3 font-display text-foreground text-xl">
+            <Text className="font-display text-foreground mt-3 text-xl">
               <Trans>Person not found</Trans>
             </Text>
             <Pressable onPress={() => back()} className="mt-4">
@@ -266,7 +232,7 @@ export default function PersonDetailScreen() {
           paddingBottom: 24,
         }}
       >
-        <View className="size-[120px] overflow-hidden rounded-full bg-secondary">
+        <View className="bg-secondary size-[120px] overflow-hidden rounded-full">
           {person.profilePath && (
             <Image
               source={{ uri: person.profilePath }}
@@ -277,15 +243,14 @@ export default function PersonDetailScreen() {
           )}
         </View>
 
-        <Text className="mt-4 text-center font-display text-3xl text-foreground">
+        <Text className="font-display text-foreground mt-4 text-center text-3xl">
           {person.name}
         </Text>
 
         {person.knownForDepartment ? (
-          <View className="mt-2 rounded-full bg-secondary px-3 py-1">
-            <Text className="text-muted-foreground text-xs uppercase tracking-wider">
-              {getDepartmentLabels(t)[person.knownForDepartment] ??
-                person.knownForDepartment}
+          <View className="bg-secondary mt-2 rounded-full px-3 py-1">
+            <Text className="text-muted-foreground text-xs tracking-wider uppercase">
+              {getDepartmentLabels(t)[person.knownForDepartment] ?? person.knownForDepartment}
             </Text>
           </View>
         ) : null}
@@ -294,18 +259,12 @@ export default function PersonDetailScreen() {
           <View className="mt-3 items-center gap-1.5">
             {person.birthday ? (
               <View className="flex-row items-center gap-1.5">
-                <ScaledIcon
-                  icon={IconCalendar}
-                  size={14}
-                  color={primaryColor}
-                />
+                <ScaledIcon icon={IconCalendar} size={14} color={primaryColor} />
                 <Text selectable className="text-muted-foreground text-sm">
                   {formatDate(person.birthday)}
                   {(() => {
                     const age = calculateAge(person.birthday, person.deathday);
-                    return person.deathday
-                      ? ` (${t`died at ${age}`})`
-                      : ` (${t`age ${age}`})`;
+                    return person.deathday ? ` (${t`died at ${age}`})` : ` (${t`age ${age}`})`;
                   })()}
                 </Text>
               </View>
@@ -333,10 +292,7 @@ export default function PersonDetailScreen() {
 
       {/* Filmography section header */}
       {filmography.length > 0 && (
-        <Animated.View
-          entering={FadeInDown.duration(300).delay(200)}
-          className="px-4"
-        >
+        <Animated.View entering={FadeInDown.duration(300).delay(200)} className="px-4">
           <SectionHeader title={t`Filmography`} icon={IconMovie} />
         </Animated.View>
       )}
@@ -344,16 +300,14 @@ export default function PersonDetailScreen() {
   );
 
   return (
-    <View className="flex-1 bg-background" collapsable={false}>
+    <View className="bg-background flex-1" collapsable={false}>
       <FlashList
         data={filmography}
         keyExtractor={(item) => item.titleId}
         renderItem={renderFilmographyItem}
         numColumns={filmographyColumns}
         showsVerticalScrollIndicator={false}
-        contentInsetAdjustmentBehavior={
-          useAutomaticInsets ? "automatic" : "never"
-        }
+        contentInsetAdjustmentBehavior={useAutomaticInsets ? "automatic" : "never"}
         contentContainerStyle={{
           paddingBottom: useAutomaticInsets ? 32 : insets.bottom + 32,
           paddingHorizontal: FILMOGRAPHY_PADDING - FILMOGRAPHY_GUTTER,

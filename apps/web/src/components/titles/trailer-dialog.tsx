@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { IconPlayerPlayFilled } from "@tabler/icons-react";
 import { lazy, Suspense, useState } from "react";
+
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 const YoutubeVideo = lazy(() => import("youtube-video-element/react"));
@@ -31,7 +32,7 @@ export function TrailerDialog({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex h-5 items-center gap-1 rounded border border-border/50 px-2 text-muted-foreground text-xs transition-colors hover:border-border hover:text-foreground"
+          className="border-border/50 text-muted-foreground hover:border-border hover:text-foreground inline-flex h-5 items-center gap-1 rounded border px-2 text-xs transition-colors"
         >
           <IconPlayerPlayFilled aria-hidden={true} className="h-2.5 w-2.5" />
           {t`Trailer`}

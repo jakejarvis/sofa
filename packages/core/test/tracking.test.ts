@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+
 import { and, eq } from "@sofa/db/helpers";
 import {
   userEpisodeWatches,
@@ -6,13 +7,8 @@ import {
   userRatings,
   userTitleStatus,
 } from "@sofa/db/schema";
-import {
-  clearAllTables,
-  insertTitle,
-  insertTvShow,
-  insertUser,
-  testDb,
-} from "@sofa/db/test-utils";
+import { clearAllTables, insertTitle, insertTvShow, insertUser, testDb } from "@sofa/db/test-utils";
+
 import {
   getUserTitleInfo,
   logEpisodeWatch,
@@ -41,12 +37,7 @@ describe("setTitleStatus", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, "title-1"),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "title-1")))
       .get();
     expect(row?.status).toBe("watchlist");
   });
@@ -60,12 +51,7 @@ describe("setTitleStatus", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, "title-1"),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "title-1")))
       .get();
     expect(row?.status).toBe("in_progress");
   });
@@ -79,12 +65,7 @@ describe("setTitleStatus", () => {
     const rows = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, "title-1"),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "title-1")))
       .all();
     expect(rows).toHaveLength(1);
     expect(rows[0].status).toBe("completed");
@@ -103,12 +84,7 @@ describe("removeTitleStatus", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, "title-1"),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "title-1")))
       .get();
     expect(row).toBeUndefined();
   });
@@ -146,12 +122,7 @@ describe("logMovieWatch", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, "title-1"),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "title-1")))
       .get();
     expect(row?.status).toBe("completed");
   });
@@ -165,12 +136,7 @@ describe("logMovieWatch", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, "title-1"),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "title-1")))
       .get();
     expect(row?.status).toBe("completed");
   });
@@ -184,12 +150,7 @@ describe("logMovieWatch", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, "title-1"),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "title-1")))
       .get();
     expect(row?.status).toBe("completed");
   });
@@ -203,12 +164,7 @@ describe("logMovieWatch", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, "title-1"),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "title-1")))
       .get();
     expect(row?.status).toBe("completed");
   });
@@ -239,12 +195,7 @@ describe("logEpisodeWatch", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("in_progress");
   });
@@ -258,12 +209,7 @@ describe("logEpisodeWatch", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("in_progress");
   });
@@ -277,12 +223,7 @@ describe("logEpisodeWatch", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("completed");
   });
@@ -298,12 +239,7 @@ describe("logEpisodeWatch", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("completed");
   });
@@ -333,12 +269,7 @@ describe("logEpisodeWatchBatch", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("in_progress");
   });
@@ -351,12 +282,7 @@ describe("logEpisodeWatchBatch", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("completed");
   });
@@ -392,12 +318,7 @@ describe("markAllEpisodesWatched", () => {
     const row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("completed");
   });
@@ -460,12 +381,7 @@ describe("unwatchEpisode", () => {
     let row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("completed");
 
@@ -475,12 +391,7 @@ describe("unwatchEpisode", () => {
     row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("in_progress");
   });
@@ -495,12 +406,7 @@ describe("unwatchEpisode", () => {
     let row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("in_progress");
 
@@ -509,12 +415,7 @@ describe("unwatchEpisode", () => {
     row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("in_progress");
   });
@@ -550,12 +451,7 @@ describe("unwatchSeason", () => {
     let row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("completed");
 
@@ -565,12 +461,7 @@ describe("unwatchSeason", () => {
     row = testDb
       .select()
       .from(userTitleStatus)
-      .where(
-        and(
-          eq(userTitleStatus.userId, "user-1"),
-          eq(userTitleStatus.titleId, titleId),
-        ),
-      )
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("in_progress");
   });
@@ -587,12 +478,7 @@ describe("rateTitleStars", () => {
     const row = testDb
       .select()
       .from(userRatings)
-      .where(
-        and(
-          eq(userRatings.userId, "user-1"),
-          eq(userRatings.titleId, "title-1"),
-        ),
-      )
+      .where(and(eq(userRatings.userId, "user-1"), eq(userRatings.titleId, "title-1")))
       .get();
     expect(row?.ratingStars).toBe(4);
   });
@@ -606,12 +492,7 @@ describe("rateTitleStars", () => {
     const rows = testDb
       .select()
       .from(userRatings)
-      .where(
-        and(
-          eq(userRatings.userId, "user-1"),
-          eq(userRatings.titleId, "title-1"),
-        ),
-      )
+      .where(and(eq(userRatings.userId, "user-1"), eq(userRatings.titleId, "title-1")))
       .all();
     expect(rows).toHaveLength(1);
     expect(rows[0].ratingStars).toBe(5);
@@ -626,12 +507,7 @@ describe("rateTitleStars", () => {
     const row = testDb
       .select()
       .from(userRatings)
-      .where(
-        and(
-          eq(userRatings.userId, "user-1"),
-          eq(userRatings.titleId, "title-1"),
-        ),
-      )
+      .where(and(eq(userRatings.userId, "user-1"), eq(userRatings.titleId, "title-1")))
       .get();
     expect(row).toBeUndefined();
   });

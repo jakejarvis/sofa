@@ -3,6 +3,7 @@ import { IconChevronRight } from "@tabler/icons-react-native";
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
+
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 
@@ -45,19 +46,14 @@ export function SettingsRow({
       {!right && value ? (
         <Text
           selectable={!onPress}
-          className="mr-1 max-w-[180px] shrink text-right text-muted-foreground text-sm"
+          className="text-muted-foreground mr-1 max-w-[180px] shrink text-right text-sm"
           numberOfLines={2}
         >
           {value}
         </Text>
       ) : null}
       {!right && onPress && (
-        <ScaledIcon
-          icon={IconChevronRight}
-          size={16}
-          color={mutedFgColor}
-          accessible={false}
-        />
+        <ScaledIcon icon={IconChevronRight} size={16} color={mutedFgColor} accessible={false} />
       )}
     </>
   );

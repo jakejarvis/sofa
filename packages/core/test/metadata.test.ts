@@ -1,9 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import type {
-  TmdbMovieDetails,
-  TmdbTvDetails,
-  TmdbVideo,
-} from "@sofa/tmdb/client";
+
+import type { TmdbMovieDetails, TmdbTvDetails, TmdbVideo } from "@sofa/tmdb/client";
+
 import {
   extractMovieContentRating,
   extractTvContentRating,

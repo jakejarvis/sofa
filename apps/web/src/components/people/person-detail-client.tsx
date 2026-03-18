@@ -1,8 +1,10 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { orpc } from "@/lib/orpc/client";
+
 import { FilmographyGrid } from "./filmography-grid";
 import { PersonHero } from "./person-hero";
 
@@ -30,15 +32,14 @@ export function PersonDetailSkeleton() {
 }
 
 export function PersonDetailClient({ id }: { id: string }) {
-  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(
-      orpc.people.detail.infiniteOptions({
-        input: (pageParam: number) => ({ id, page: pageParam, limit: 20 }),
-        initialPageParam: 1,
-        getNextPageParam: (lastPage) =>
-          lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-      }),
-    );
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
+    orpc.people.detail.infiniteOptions({
+      input: (pageParam: number) => ({ id, page: pageParam, limit: 20 }),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) =>
+        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    }),
+  );
 
   const sentinelRef = useInfiniteScroll({
     fetchNextPage,
@@ -47,16 +48,13 @@ export function PersonDetailClient({ id }: { id: string }) {
   });
 
   const person = data?.pages[0]?.person;
-  const filmography = useMemo(
-    () => data?.pages.flatMap((p) => p.filmography) ?? [],
-    [data?.pages],
-  );
+  const filmography = useMemo(() => data?.pages.flatMap((p) => p.filmography) ?? [], [data?.pages]);
   const userStatuses = useMemo(
     () =>
-      Object.assign(
-        {},
-        ...(data?.pages.map((p) => p.userStatuses) ?? []),
-      ) as Record<string, "watchlist" | "in_progress" | "completed">,
+      Object.assign({}, ...(data?.pages.map((p) => p.userStatuses) ?? [])) as Record<
+        string,
+        "watchlist" | "in_progress" | "completed"
+      >,
     [data?.pages],
   );
 
@@ -70,7 +68,7 @@ export function PersonDetailClient({ id }: { id: string }) {
       <div ref={sentinelRef} />
       {isFetchingNextPage && (
         <div className="flex justify-center py-4">
-          <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <div className="border-primary size-6 animate-spin rounded-full border-2 border-t-transparent" />
         </div>
       )}
     </div>

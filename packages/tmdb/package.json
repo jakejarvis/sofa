@@ -9,8 +9,9 @@
     "./config": "./src/config.ts"
   },
   "scripts": {
-    "lint": "biome check",
-    "format": "biome format --write",
+    "lint": "oxlint",
+    "format": "oxfmt --config ../../.oxfmtrc.json",
+    "format:check": "oxfmt --check --config ../../.oxfmtrc.json",
     "check-types": "tsc --noEmit",
     "generate-schema": "bunx openapi-typescript https://developer.themoviedb.org/openapi/tmdb-api.json -o ./src/schema.d.ts"
   },

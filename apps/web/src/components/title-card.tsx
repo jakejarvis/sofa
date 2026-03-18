@@ -13,19 +13,16 @@ import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { type MotionStyle, type MotionValue, motion } from "motion/react";
 import { useEffect, useState } from "react";
+
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTiltEffect } from "@/hooks/use-tilt-effect";
 import { orpc } from "@/lib/orpc/client";
 import { thumbHashToUrl } from "@/lib/thumbhash";
 
 export function TitleCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl bg-card ring-1 ring-white/[0.06]">
+    <div className="bg-card overflow-hidden rounded-xl ring-1 ring-white/[0.06]">
       <Skeleton className="aspect-[2/3] w-full rounded-none" />
       <div className="px-3 pt-2.5 pb-3">
         <Skeleton className="h-4 w-3/4" />
@@ -80,18 +77,10 @@ function useStatusConfig() {
   } as const;
 }
 
-function QuickAddButton({
-  id,
-  userStatus,
-}: {
-  id: string;
-  userStatus?: TitleStatus | null;
-}) {
+function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStatus | null }) {
   const { t } = useLingui();
   const statusConfig = useStatusConfig();
-  const [addedStatus, setAddedStatus] = useState<TitleStatus | null>(
-    userStatus ?? null,
-  );
+  const [addedStatus, setAddedStatus] = useState<TitleStatus | null>(userStatus ?? null);
 
   // Sync local state when prop changes (e.g. after navigation or SWR revalidation)
   useEffect(() => {
@@ -139,9 +128,7 @@ function QuickAddButton({
         render={<button type="button" />}
       >
         {!quickAddMutation.isPending && <IconPlus className="size-4" />}
-        {quickAddMutation.isPending && (
-          <IconLoader className="size-4 animate-spin" />
-        )}
+        {quickAddMutation.isPending && <IconLoader className="size-4 animate-spin" />}
       </TooltipTrigger>
       <TooltipContent side="bottom">{t`Add to Watchlist`}</TooltipContent>
     </Tooltip>
@@ -158,13 +145,11 @@ function ProgressBar({ watched, total }: { watched: number; total: number }) {
         render={<div />}
       >
         <div
-          className="h-full bg-status-watching transition-[width] duration-500 ease-out"
+          className="bg-status-watching h-full transition-[width] duration-500 ease-out"
           style={{ width: `${pct}%` }}
         />
       </TooltipTrigger>
-      <TooltipContent side="top">
-        {t`${watched}/${total} episodes`}
-      </TooltipContent>
+      <TooltipContent side="top">{t`${watched}/${total} episodes`}</TooltipContent>
     </Tooltip>
   );
 }
@@ -185,16 +170,14 @@ function CardInner({
   const TypeIcon = type === "movie" ? IconMovie : IconDeviceTv;
   const placeholderUrl = thumbHashToUrl(posterThumbHash);
 
-  const ringClass = userStatus
-    ? "ring-primary/25 shadow-sm shadow-primary/5"
-    : "ring-white/[0.06]";
+  const ringClass = userStatus ? "ring-primary/25 shadow-sm shadow-primary/5" : "ring-white/[0.06]";
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-card ring-1 transition-[box-shadow,ring-color] duration-200 ease-out hover:shadow-lg hover:shadow-primary/5 hover:ring-primary/25 ${ringClass}`}
+      className={`bg-card hover:shadow-primary/5 hover:ring-primary/25 relative overflow-hidden rounded-xl ring-1 transition-[box-shadow,ring-color] duration-200 ease-out hover:shadow-lg ${ringClass}`}
     >
       <div
-        className="aspect-[2/3] overflow-hidden bg-card"
+        className="bg-card aspect-[2/3] overflow-hidden"
         style={
           placeholderUrl
             ? {
@@ -217,14 +200,14 @@ function CardInner({
             />
           </motion.div>
         ) : (
-          <div className="relative flex h-full items-center justify-center overflow-hidden bg-gradient-to-br from-card via-secondary to-muted">
+          <div className="from-card via-secondary to-muted relative flex h-full items-center justify-center overflow-hidden bg-gradient-to-br">
             <div
               className="pointer-events-none absolute inset-0 opacity-[0.06]"
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/10 via-transparent to-transparent" />
+            <div className="from-primary/10 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
             <div className="relative px-3 text-center">
               <p className="font-display text-foreground/70 text-sm leading-snug tracking-tight">
                 {title}
@@ -264,18 +247,13 @@ function CardInner({
               <TooltipContent>{statusConfig[userStatus].label}</TooltipContent>
             </Tooltip>
           )}
-          <p className="line-clamp-1 font-medium text-sm leading-snug">
-            {title}
-          </p>
+          <p className="line-clamp-1 text-sm leading-snug font-medium">{title}</p>
         </div>
-        <div className="mt-1.5 flex items-center gap-2 text-muted-foreground text-xs">
-          <TypeIcon
-            aria-hidden={true}
-            className="size-3.5 shrink-0 text-primary/60"
-          />
+        <div className="text-muted-foreground mt-1.5 flex items-center gap-2 text-xs">
+          <TypeIcon aria-hidden={true} className="text-primary/60 size-3.5 shrink-0" />
           {year && <span>{year}</span>}
           {voteAverage != null && voteAverage > 0 && (
-            <span className="ml-auto flex items-center gap-0.5 text-primary/80">
+            <span className="text-primary/80 ml-auto flex items-center gap-0.5">
               <IconStarFilled aria-hidden={true} className="size-[11px]" />
               {voteAverage.toFixed(1)}
             </span>
@@ -284,10 +262,7 @@ function CardInner({
       </div>
 
       {episodeProgress && episodeProgress.watched > 0 && (
-        <ProgressBar
-          watched={episodeProgress.watched}
-          total={episodeProgress.total}
-        />
+        <ProgressBar watched={episodeProgress.watched} total={episodeProgress.total} />
       )}
     </div>
   );

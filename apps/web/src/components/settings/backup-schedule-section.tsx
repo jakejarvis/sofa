@@ -1,11 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { BackupFrequency } from "@sofa/api/schemas";
-import { formatDate, formatRelativeTime } from "@sofa/i18n/format";
 import { IconCalendarWeek } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
@@ -19,6 +18,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { orpc } from "@/lib/orpc/client";
+import type { BackupFrequency } from "@sofa/api/schemas";
+import { formatDate, formatRelativeTime } from "@sofa/i18n/format";
 
 const FREQUENCY_OPTIONS: { value: BackupFrequency; label: string }[] = [
   { value: "6h", label: "6h" },
@@ -37,11 +38,7 @@ interface BackupScheduleState {
   dow: number;
 }
 
-function getNextBackupDate(
-  frequency: BackupFrequency,
-  time: string,
-  dayOfWeek: number,
-): Date {
+function getNextBackupDate(frequency: BackupFrequency, time: string, dayOfWeek: number): Date {
   const now = new Date();
   const [h, m] = time.split(":").map(Number);
 
@@ -121,12 +118,8 @@ export function BackupScheduleSection() {
 
   const { enabled, maxRetention, frequency, time, dow } = current;
 
-  function formatNextBackup(
-    frequency: BackupFrequency,
-    time: string,
-    dayOfWeek: number,
-  ): string {
-    const next = getNextBackupDate(frequency, time, dayOfWeek);
+  function formatNextBackup(freq: BackupFrequency, timeOfDay: string, dayOfWeek: number): string {
+    const next = getNextBackupDate(freq, timeOfDay, dayOfWeek);
     const distance = formatRelativeTime(next);
     return t`Next backup ${distance}`;
   }
@@ -137,10 +130,8 @@ export function BackupScheduleSection() {
         const previous = { ...current };
         const patch: Partial<BackupScheduleState> = {};
         if (input.enabled !== undefined) patch.enabled = input.enabled;
-        if (input.maxRetention !== undefined)
-          patch.maxRetention = input.maxRetention;
-        if (input.frequency !== undefined)
-          patch.frequency = input.frequency as BackupFrequency;
+        if (input.maxRetention !== undefined) patch.maxRetention = input.maxRetention;
+        if (input.frequency !== undefined) patch.frequency = input.frequency as BackupFrequency;
         if (input.time !== undefined) patch.time = input.time;
         if (input.dayOfWeek !== undefined) patch.dow = input.dayOfWeek;
         setSchedule({ ...current, ...patch });
@@ -160,11 +151,9 @@ export function BackupScheduleSection() {
   );
 
   const togglingSchedule =
-    updateScheduleMutation.isPending &&
-    updateScheduleMutation.variables?.enabled !== undefined;
+    updateScheduleMutation.isPending && updateScheduleMutation.variables?.enabled !== undefined;
   const savingSchedule =
-    updateScheduleMutation.isPending &&
-    updateScheduleMutation.variables?.frequency !== undefined;
+    updateScheduleMutation.isPending && updateScheduleMutation.variables?.frequency !== undefined;
 
   const toggleScheduled = useCallback(
     (checked: boolean) => {
@@ -172,11 +161,7 @@ export function BackupScheduleSection() {
         { enabled: checked },
         {
           onSuccess: () =>
-            toast.success(
-              checked
-                ? t`Scheduled backups enabled`
-                : t`Scheduled backups disabled`,
-            ),
+            toast.success(checked ? t`Scheduled backups enabled` : t`Scheduled backups disabled`),
         },
       );
     },
@@ -223,11 +208,8 @@ export function BackupScheduleSection() {
       <CardContent>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <IconCalendarWeek
-                aria-hidden={true}
-                className="size-4 text-primary"
-              />
+            <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+              <IconCalendarWeek aria-hidden={true} className="text-primary size-4" />
             </div>
             <div>
               <CardTitle>
@@ -235,36 +217,23 @@ export function BackupScheduleSection() {
               </CardTitle>
               <CardDescription>
                 {enabled ? (
-                  <span
-                    className="inline-flex flex-wrap items-baseline"
-                    suppressHydrationWarning
-                  >
+                  <span className="inline-flex flex-wrap items-baseline" suppressHydrationWarning>
                     {formatNextBackup(frequency, time, dow)}.{" "}
                     <Trans>
                       Keeping{" "}
                       <Select
                         value={String(maxRetention)}
-                        onValueChange={(v) =>
-                          v && changeMaxRetention(Number(v))
-                        }
+                        onValueChange={(v) => v && changeMaxRetention(Number(v))}
                         modal={false}
                       >
-                        <SelectTrigger className="!h-auto mr-0.5 ml-1.5 w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 underline decoration-muted-foreground/50 decoration-dotted underline-offset-4 shadow-none hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:decoration-foreground focus-visible:decoration-solid focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent">
+                        <SelectTrigger className="decoration-muted-foreground/50 hover:text-foreground hover:decoration-foreground/50 focus-visible:decoration-foreground mr-0.5 ml-1.5 !h-auto w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 underline decoration-dotted underline-offset-4 shadow-none hover:bg-transparent focus-visible:decoration-solid focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent">
                           <SelectValue>
                             {(value: string | null) =>
-                              value === "0"
-                                ? t`unlimited`
-                                : value
-                                  ? t`last ${value}`
-                                  : null
+                              value === "0" ? t`unlimited` : value ? t`last ${value}` : null
                             }
                           </SelectValue>
                         </SelectTrigger>
-                        <SelectContent
-                          align="start"
-                          alignItemWithTrigger={false}
-                          className="p-1"
-                        >
+                        <SelectContent align="start" alignItemWithTrigger={false} className="p-1">
                           {[3, 5, 7, 14, 30, 0].map((n) => (
                             <SelectItem key={n} value={String(n)}>
                               {n === 0 ? t`unlimited` : t`last ${n}`}
@@ -276,9 +245,7 @@ export function BackupScheduleSection() {
                     </Trans>
                   </span>
                 ) : (
-                  <Trans>
-                    Automatically back up your database on a schedule
-                  </Trans>
+                  <Trans>Automatically back up your database on a schedule</Trans>
                 )}
               </CardDescription>
             </div>
@@ -305,7 +272,7 @@ export function BackupScheduleSection() {
               <div className="space-y-3">
                 {/* Frequency selector */}
                 <div className="space-y-1.5">
-                  <span className="inline-block font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
+                  <span className="text-muted-foreground/70 inline-block text-[11px] font-medium tracking-wider uppercase">
                     <Trans>Frequency</Trans>
                   </span>
                   <ButtonGroup>
@@ -318,7 +285,7 @@ export function BackupScheduleSection() {
                         onClick={() => changeSchedule(opt.value, time)}
                         className={
                           frequency === opt.value
-                            ? "border-primary/50 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
+                            ? "border-primary/50 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground shadow-sm"
                             : "border-border/50 bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                         }
                       >
@@ -338,30 +305,22 @@ export function BackupScheduleSection() {
                       transition={{ duration: 0.15 }}
                       className="overflow-hidden"
                     >
-                      <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
+                      <span className="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase">
                         <Trans>Day:</Trans>{" "}
                       </span>
                       <Select
                         value={String(dow)}
-                        onValueChange={(v) =>
-                          v && changeSchedule(frequency, time, Number(v))
-                        }
+                        onValueChange={(v) => v && changeSchedule(frequency, time, Number(v))}
                         modal={false}
                       >
-                        <SelectTrigger className="h-auto gap-1 border-border/50 bg-muted/30 px-2.5 py-1 text-foreground text-xs hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50">
+                        <SelectTrigger className="border-border/50 bg-muted/30 text-foreground hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50 h-auto gap-1 px-2.5 py-1 text-xs">
                           <SelectValue>
                             {(value: string | null) =>
-                              value !== null
-                                ? DAYS_OF_WEEK[Number(value)]
-                                : null
+                              value !== null ? DAYS_OF_WEEK[Number(value)] : null
                             }
                           </SelectValue>
                         </SelectTrigger>
-                        <SelectContent
-                          align="start"
-                          alignItemWithTrigger={false}
-                          className="p-1"
-                        >
+                        <SelectContent align="start" alignItemWithTrigger={false} className="p-1">
                           {DAYS_OF_WEEK.map((day, i) => (
                             <SelectItem key={day} value={String(i)}>
                               {day}
@@ -383,7 +342,7 @@ export function BackupScheduleSection() {
                       transition={{ duration: 0.15 }}
                       className="overflow-hidden"
                     >
-                      <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
+                      <span className="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase">
                         {frequency === "12h" ? (
                           <Trans>Starting at</Trans>
                         ) : (
@@ -395,35 +354,22 @@ export function BackupScheduleSection() {
                         onValueChange={(v) => v && changeSchedule(frequency, v)}
                         modal={false}
                       >
-                        <SelectTrigger className="h-auto gap-1 border-border/50 bg-muted/30 px-2.5 py-1 text-foreground text-xs hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50">
+                        <SelectTrigger className="border-border/50 bg-muted/30 text-foreground hover:bg-muted/50 dark:bg-muted/30 dark:hover:bg-muted/50 h-auto gap-1 px-2.5 py-1 text-xs">
                           <SelectValue>
                             {(value: string | null) =>
                               value
-                                ? formatDate(
-                                    new Date(
-                                      2000,
-                                      0,
-                                      1,
-                                      Number(value.split(":")[0]),
-                                      0,
-                                    ),
-                                    {
-                                      hour: "numeric",
-                                      minute: "2-digit",
-                                      year: undefined,
-                                      month: undefined,
-                                      day: undefined,
-                                    },
-                                  )
+                                ? formatDate(new Date(2000, 0, 1, Number(value.split(":")[0]), 0), {
+                                    hour: "numeric",
+                                    minute: "2-digit",
+                                    year: undefined,
+                                    month: undefined,
+                                    day: undefined,
+                                  })
                                 : null
                             }
                           </SelectValue>
                         </SelectTrigger>
-                        <SelectContent
-                          align="start"
-                          alignItemWithTrigger={false}
-                          className="p-1"
-                        >
+                        <SelectContent align="start" alignItemWithTrigger={false} className="p-1">
                           {HOURS.map((h) => {
                             const val = `${String(h).padStart(2, "0")}:00`;
                             return (

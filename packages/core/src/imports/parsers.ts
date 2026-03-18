@@ -254,9 +254,7 @@ export function parseTraktPayload(data: {
     if (!entry?.title || item.rating == null) continue;
     const converted = convertRating10to5(item.rating);
     if (converted == null) {
-      warnings.push(
-        `Skipped invalid Trakt rating ${item.rating} for "${entry.title}"`,
-      );
+      warnings.push(`Skipped invalid Trakt rating ${item.rating} for "${entry.title}"`);
       continue;
     }
     ratings.push({
@@ -345,11 +343,7 @@ export function parseSimklPayload(data: {
         year: item.year,
         type: "movie",
       });
-    } else if (
-      item.status === "completed" ||
-      item.status === "watching" ||
-      item.last_watched_at
-    ) {
+    } else if (item.status === "completed" || item.status === "watching" || item.last_watched_at) {
       movies.push({
         tmdbId: tmdbId ?? undefined,
         imdbId: item.ids?.imdb,
@@ -422,10 +416,7 @@ export function parseSimklPayload(data: {
       }
     }
 
-    if (
-      !item.seasons?.length &&
-      (item.status === "completed" || item.status === "watching")
-    ) {
+    if (!item.seasons?.length && (item.status === "completed" || item.status === "watching")) {
       warnings.push(
         `"${item.title}" is marked ${item.status} but has no episode data — episode watches were not imported.`,
       );
@@ -475,15 +466,9 @@ const LETTERBOXD_EXPECTED_FILES = [
   "ratings.csv",
 ] as const;
 
-const LETTERBOXD_IGNORED_FILES = new Set([
-  "reviews.csv",
-  "profile.csv",
-  "comments.csv",
-]);
+const LETTERBOXD_IGNORED_FILES = new Set(["reviews.csv", "profile.csv", "comments.csv"]);
 
-export async function parseLetterboxdExport(
-  zipFile: Blob,
-): Promise<ParseResult> {
+export async function parseLetterboxdExport(zipFile: Blob): Promise<ParseResult> {
   const warnings: string[] = [];
   const movies: ImportMovie[] = [];
   const watchlist: ImportWatchlistItem[] = [];
@@ -495,9 +480,7 @@ export async function parseLetterboxdExport(
     const buffer = Buffer.from(await zipFile.arrayBuffer());
     zip = new AdmZip(buffer);
   } catch {
-    warnings.push(
-      "Failed to read ZIP file. Ensure it is a valid Letterboxd export.",
-    );
+    warnings.push("Failed to read ZIP file. Ensure it is a valid Letterboxd export.");
     return {
       data: {
         source: "letterboxd",
@@ -519,11 +502,7 @@ export async function parseLetterboxdExport(
     // Letterboxd exports may nest files in a subdirectory — use the basename
     const name = entry.entryName.split("/").pop() ?? entry.entryName;
     allFilenames.push(name);
-    if (
-      LETTERBOXD_EXPECTED_FILES.includes(
-        name as (typeof LETTERBOXD_EXPECTED_FILES)[number],
-      )
-    ) {
+    if (LETTERBOXD_EXPECTED_FILES.includes(name as (typeof LETTERBOXD_EXPECTED_FILES)[number])) {
       entryMap.set(name, entry.getData().toString("utf-8"));
     }
   }
@@ -539,11 +518,7 @@ export async function parseLetterboxdExport(
 
   // Log ignored files
   for (const name of allFilenames) {
-    if (
-      LETTERBOXD_EXPECTED_FILES.includes(
-        name as (typeof LETTERBOXD_EXPECTED_FILES)[number],
-      )
-    ) {
+    if (LETTERBOXD_EXPECTED_FILES.includes(name as (typeof LETTERBOXD_EXPECTED_FILES)[number])) {
       continue;
     }
     if (!LETTERBOXD_IGNORED_FILES.has(name)) {
@@ -625,9 +600,7 @@ export async function parseLetterboxdExport(
 
     const converted = convertLetterboxdRating(rawRating);
     if (converted == null) {
-      warnings.push(
-        `Skipped invalid Letterboxd rating ${rawRating} for "${title}"`,
-      );
+      warnings.push(`Skipped invalid Letterboxd rating ${rawRating} for "${title}"`);
       continue;
     }
 

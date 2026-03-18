@@ -1,15 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  IconCompass,
-  IconHome,
-  IconLogout,
-  IconSearch,
-  IconSettings,
-} from "@tabler/icons-react";
+import { IconCompass, IconHome, IconLogout, IconSearch, IconSettings } from "@tabler/icons-react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useSetAtom } from "jotai";
 import { motion } from "motion/react";
 import { useLayoutEffect, useRef, useState } from "react";
+
 import { SofaLogo } from "@/components/sofa-logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -81,12 +76,7 @@ function useActiveIndicator<T>(
       const item = itemRefs.current[activeIndex];
       const container = containerRef.current;
       if (item && container && container.offsetWidth > 0) {
-        setValue(
-          measure(
-            item.getBoundingClientRect(),
-            container.getBoundingClientRect(),
-          ),
-        );
+        setValue(measure(item.getBoundingClientRect(), container.getBoundingClientRect()));
       } else {
         setValue(null);
       }
@@ -128,9 +118,7 @@ export function NavBar({
 
   const initial = userName?.charAt(0).toUpperCase() ?? "?";
 
-  const activeIndex = navLinks.findIndex((link) =>
-    isLinkActive(pathname, link.href),
-  );
+  const activeIndex = navLinks.findIndex((link) => isLinkActive(pathname, link.href));
   const navRef = useRef<HTMLElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const { value: indicator, instant: desktopInstant } = useActiveIndicator(
@@ -141,12 +129,12 @@ export function NavBar({
   );
 
   return (
-    <header className="sticky top-0 z-50 border-border/50 border-b bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+    <header className="border-border/50 bg-background/80 sticky top-0 z-50 border-b pt-[env(safe-area-inset-top)] backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-5 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))] sm:gap-0 sm:pr-[max(1.5rem,env(safe-area-inset-right))] sm:pl-[max(1.5rem,env(safe-area-inset-left))]">
         <div className="flex items-center gap-3 sm:gap-6">
           <Link
             to="/dashboard"
-            className="shrink-0 text-foreground transition-colors hover:text-primary"
+            className="text-foreground hover:text-primary shrink-0 transition-colors"
           >
             <SofaLogo className="size-7" />
           </Link>
@@ -165,7 +153,7 @@ export function NavBar({
                   }}
                   to={link.href}
                   aria-current={isActive ? "page" : undefined}
-                  className="relative inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  className="text-muted-foreground hover:text-foreground focus-visible:text-foreground focus-visible:ring-primary/40 relative inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   {link.label}
                 </Link>
@@ -173,7 +161,7 @@ export function NavBar({
             })}
             {indicator && (
               <motion.div
-                className="absolute -bottom-[11px] h-0.5 rounded-full bg-primary"
+                className="bg-primary absolute -bottom-[11px] h-0.5 rounded-full"
                 initial={false}
                 animate={{ left: indicator.left, width: indicator.width }}
                 transition={desktopInstant ? { duration: 0 } : springTransition}
@@ -187,7 +175,7 @@ export function NavBar({
           <button
             type="button"
             onClick={() => setCommandPaletteOpen(true)}
-            className="flex flex-1 items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-[13px] text-muted-foreground transition-colors hover:border-primary/20 hover:bg-card sm:hidden"
+            className="border-border/50 bg-card/50 text-muted-foreground hover:border-primary/20 hover:bg-card flex flex-1 items-center gap-2 rounded-lg border px-3 py-1.5 text-[13px] transition-colors sm:hidden"
           >
             <IconSearch aria-hidden={true} className="size-3.5" />
             <span>{t`Search…`}</span>
@@ -196,7 +184,7 @@ export function NavBar({
           <button
             type="button"
             onClick={() => setCommandPaletteOpen(true)}
-            className="hidden items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-[13px] text-muted-foreground transition-colors hover:border-primary/20 hover:bg-card sm:inline-flex"
+            className="border-border/50 bg-card/50 text-muted-foreground hover:border-primary/20 hover:bg-card hidden items-center gap-2 rounded-lg border px-3 py-1.5 text-[13px] transition-colors sm:inline-flex"
           >
             <IconSearch aria-hidden={true} className="size-3.5" />
             <span>{t`Search…`}</span>
@@ -204,12 +192,12 @@ export function NavBar({
           </button>
           <Separator
             orientation="vertical"
-            className="mx-1.5 my-auto hidden h-6 bg-border/50 sm:block"
+            className="bg-border/50 mx-1.5 my-auto hidden h-6 sm:block"
           />
           {/* User avatar dropdown */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger
-              className="hidden cursor-pointer rounded-full outline-none ring-2 ring-transparent transition-all hover:ring-primary/40 focus-visible:ring-primary/60 sm:block"
+              className="hover:ring-primary/40 focus-visible:ring-primary/60 hidden cursor-pointer rounded-full ring-2 ring-transparent transition-all outline-none sm:block"
               aria-label="Account menu"
             >
               <Avatar>
@@ -228,17 +216,15 @@ export function NavBar({
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-foreground text-sm leading-tight">
+                  <p className="text-foreground truncate text-sm leading-tight font-medium">
                     {userName}
                     {userRole === "admin" && (
-                      <Badge className="mb-0.5 ml-1.5 rounded-md border-0 bg-primary/10 align-middle text-primary">
+                      <Badge className="bg-primary/10 text-primary mb-0.5 ml-1.5 rounded-md border-0 align-middle">
                         <Trans>Admin</Trans>
                       </Badge>
                     )}
                   </p>
-                  <p className="truncate text-muted-foreground text-xs">
-                    {userEmail}
-                  </p>
+                  <p className="text-muted-foreground truncate text-xs">{userEmail}</p>
                 </div>
               </div>
               <DropdownMenuSeparator />
@@ -266,12 +252,12 @@ export function NavBar({
           {/* Mobile: simple avatar link to settings */}
           <Link
             to="/settings"
-            className="rounded-full ring-2 ring-transparent transition-all hover:ring-primary/40 sm:hidden"
+            className="hover:ring-primary/40 rounded-full ring-2 ring-transparent transition-all sm:hidden"
             aria-label="Settings"
           >
             <Avatar size="sm">
               <AvatarImage src={userImage} alt={userName} />
-              <AvatarFallback className="bg-primary/10 font-display text-[10px] text-primary">
+              <AvatarFallback className="bg-primary/10 font-display text-primary text-[10px]">
                 {initial}
               </AvatarFallback>
             </Avatar>
@@ -292,9 +278,7 @@ export function MobileTabBar() {
     { href: "/settings", label: t`Settings`, icon: IconSettings },
   ] as const;
 
-  const activeIndex = mobileTabs.findIndex((tab) =>
-    isLinkActive(pathname, tab.href),
-  );
+  const activeIndex = mobileTabs.findIndex((tab) => isLinkActive(pathname, tab.href));
   const containerRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const { value: indicatorLeft, instant: mobileInstant } = useActiveIndicator(
@@ -307,7 +291,7 @@ export function MobileTabBar() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed right-0 bottom-0 left-0 z-50 border-border/50 border-t bg-background/90 pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] backdrop-blur-xl sm:hidden"
+      className="border-border/50 bg-background/90 fixed right-0 bottom-0 left-0 z-50 border-t pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] backdrop-blur-xl sm:hidden"
     >
       <div ref={containerRef} className="relative flex h-14 items-stretch">
         {mobileTabs.map((tab, i) => {
@@ -321,13 +305,11 @@ export function MobileTabBar() {
               }}
               to={tab.href}
               aria-current={isActive ? "page" : undefined}
-              className="relative flex flex-1 flex-col items-center justify-center gap-0.5 focus-visible:text-foreground focus-visible:outline-none"
+              className="focus-visible:text-foreground relative flex flex-1 flex-col items-center justify-center gap-0.5 focus-visible:outline-none"
             >
-              <Icon
-                className={`size-5 ${isActive ? "text-primary" : "text-muted-foreground"}`}
-              />
+              <Icon className={`size-5 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
               <span
-                className={`font-medium text-[10px] ${isActive ? "text-primary" : "text-muted-foreground"}`}
+                className={`text-[10px] font-medium ${isActive ? "text-primary" : "text-muted-foreground"}`}
               >
                 {tab.label}
               </span>
@@ -336,7 +318,7 @@ export function MobileTabBar() {
         })}
         {indicatorLeft !== null && (
           <motion.div
-            className="absolute top-0 h-0.5 w-8 rounded-full bg-primary"
+            className="bg-primary absolute top-0 h-0.5 w-8 rounded-full"
             initial={false}
             animate={{ left: indicatorLeft }}
             transition={mobileInstant ? { duration: 0 } : springTransition}

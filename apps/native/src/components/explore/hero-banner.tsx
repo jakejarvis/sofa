@@ -6,6 +6,7 @@ import { Pressable, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
+
 import { Image } from "@/components/ui/image";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
@@ -76,36 +77,22 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
                     padding: 16,
                   }}
                 >
-                  <Text
-                    className="font-display text-2xl text-white"
-                    numberOfLines={2}
-                  >
+                  <Text className="font-display text-2xl text-white" numberOfLines={2}>
                     {item.title}
                   </Text>
                   {item.overview ? (
-                    <Text
-                      className="mt-1 text-white/70 text-xs"
-                      numberOfLines={2}
-                    >
+                    <Text className="mt-1 text-xs text-white/70" numberOfLines={2}>
                       {item.overview}
                     </Text>
                   ) : null}
                   <View className="mt-2 flex-row items-center gap-2">
                     {item.voteAverage != null && item.voteAverage > 0 && (
                       <View className="flex-row items-center gap-1">
-                        <ScaledIcon
-                          icon={IconStarFilled}
-                          size={12}
-                          color={primary}
-                        />
-                        <Text className="text-primary text-xs">
-                          {item.voteAverage.toFixed(1)}
-                        </Text>
+                        <ScaledIcon icon={IconStarFilled} size={12} color={primary} />
+                        <Text className="text-primary text-xs">{item.voteAverage.toFixed(1)}</Text>
                       </View>
                     )}
-                    <Text className="text-white/50 text-xs">
-                      {item.releaseDate?.slice(0, 4)}
-                    </Text>
+                    <Text className="text-xs text-white/50">{item.releaseDate?.slice(0, 4)}</Text>
                   </View>
                 </GlassView>
               ) : (
@@ -115,36 +102,24 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
                     style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
                   />
                   <View className="flex-1 justify-end p-4">
-                    <Text
-                      className="font-display text-2xl text-white"
-                      numberOfLines={2}
-                    >
+                    <Text className="font-display text-2xl text-white" numberOfLines={2}>
                       {item.title}
                     </Text>
                     {item.overview ? (
-                      <Text
-                        className="mt-1 text-white/70 text-xs"
-                        numberOfLines={2}
-                      >
+                      <Text className="mt-1 text-xs text-white/70" numberOfLines={2}>
                         {item.overview}
                       </Text>
                     ) : null}
                     <View className="mt-2 flex-row items-center gap-2">
                       {item.voteAverage != null && item.voteAverage > 0 && (
                         <View className="flex-row items-center gap-1">
-                          <ScaledIcon
-                            icon={IconStarFilled}
-                            size={12}
-                            color={primary}
-                          />
+                          <ScaledIcon icon={IconStarFilled} size={12} color={primary} />
                           <Text className="text-primary text-xs">
                             {item.voteAverage.toFixed(1)}
                           </Text>
                         </View>
                       )}
-                      <Text className="text-white/50 text-xs">
-                        {item.releaseDate?.slice(0, 4)}
-                      </Text>
+                      <Text className="text-xs text-white/50">{item.releaseDate?.slice(0, 4)}</Text>
                     </View>
                   </View>
                 </>

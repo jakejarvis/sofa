@@ -4,6 +4,7 @@ import { Link } from "expo-router";
 import { memo, useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
+
 import { Image } from "@/components/ui/image";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
@@ -30,17 +31,8 @@ export const SearchResultRow = memo(function SearchResultRow({
   const primary = useCSSVariable("--color-primary") as string;
   const imageSrc = item.posterPath ?? item.profilePath;
 
-  const typeLabel =
-    item.type === "movie"
-      ? t`Movie`
-      : item.type === "tv"
-        ? t`TV show`
-        : t`Person`;
-  const accessibilityLabel = [
-    item.title,
-    typeLabel,
-    item.releaseDate?.slice(0, 4),
-  ]
+  const typeLabel = item.type === "movie" ? t`Movie` : item.type === "tv" ? t`TV show` : t`Person`;
+  const accessibilityLabel = [item.title, typeLabel, item.releaseDate?.slice(0, 4)]
     .filter(Boolean)
     .join(", ");
 
@@ -61,7 +53,7 @@ export const SearchResultRow = memo(function SearchResultRow({
       })}
     >
       <View
-        className="mr-3 overflow-hidden bg-secondary"
+        className="bg-secondary mr-3 overflow-hidden"
         style={{
           width: 44,
           height: item.type === "person" ? 44 : 66,
@@ -80,29 +72,17 @@ export const SearchResultRow = memo(function SearchResultRow({
       </View>
 
       <View className="flex-1">
-        <Text
-          numberOfLines={1}
-          className="font-medium font-sans text-base text-foreground"
-        >
+        <Text numberOfLines={1} className="text-foreground font-sans text-base font-medium">
           {item.title}
         </Text>
         <View className="mt-1 flex-row items-center gap-2">
-          <View className="rounded-full bg-secondary px-2 py-0.5">
-            <Text
-              maxFontSizeMultiplier={1.0}
-              className="text-muted-foreground text-xs"
-            >
-              {item.type === "movie"
-                ? t`Movie`
-                : item.type === "tv"
-                  ? t`TV`
-                  : t`Person`}
+          <View className="bg-secondary rounded-full px-2 py-0.5">
+            <Text maxFontSizeMultiplier={1.0} className="text-muted-foreground text-xs">
+              {item.type === "movie" ? t`Movie` : item.type === "tv" ? t`TV` : t`Person`}
             </Text>
           </View>
           {item.releaseDate ? (
-            <Text className="text-muted-foreground text-xs">
-              {item.releaseDate.slice(0, 4)}
-            </Text>
+            <Text className="text-muted-foreground text-xs">{item.releaseDate.slice(0, 4)}</Text>
           ) : null}
         </View>
       </View>
@@ -111,7 +91,7 @@ export const SearchResultRow = memo(function SearchResultRow({
 
   return (
     <View
-      className="flex-row items-center border-border border-b px-4 py-3"
+      className="border-border flex-row items-center border-b px-4 py-3"
       style={{
         borderBottomWidth: 0.5,
       }}

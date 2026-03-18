@@ -1,20 +1,14 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { expo } from "@better-auth/expo";
-import {
-  getUserCount,
-  isRegistrationOpen,
-  setSetting,
-} from "@sofa/core/settings";
-import { db } from "@sofa/db/client";
-import { createLogger } from "@sofa/logger";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { type BetterAuthOptions, betterAuth } from "better-auth/minimal";
 import { admin, genericOAuth } from "better-auth/plugins";
-import {
-  isOidcAutoRegisterEnabled,
-  isOidcConfigured,
-  isPasswordLoginDisabled,
-} from "./config";
+
+import { getUserCount, isRegistrationOpen, setSetting } from "@sofa/core/settings";
+import { db } from "@sofa/db/client";
+import { createLogger } from "@sofa/logger";
+
+import { isOidcAutoRegisterEnabled, isOidcConfigured, isPasswordLoginDisabled } from "./config";
 
 const authLog = createLogger("auth");
 
@@ -63,8 +57,7 @@ export const auth = betterAuth({
                 pkce: true,
                 disableImplicitSignUp: !isOidcAutoRegisterEnabled(),
                 mapProfileToUser: (profile) => ({
-                  name:
-                    profile.name || profile.preferred_username || profile.email,
+                  name: profile.name || profile.preferred_username || profile.email,
                 }),
               },
             ],

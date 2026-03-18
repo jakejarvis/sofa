@@ -7,7 +7,6 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-
 import { useCSSVariable } from "uniwind";
 
 interface SkeletonProps {
@@ -17,12 +16,7 @@ interface SkeletonProps {
   style?: ViewStyle;
 }
 
-export function Skeleton({
-  width,
-  height = 14,
-  borderRadius = 4,
-  style,
-}: SkeletonProps) {
+export function Skeleton({ width, height = 14, borderRadius = 4, style }: SkeletonProps) {
   const secondaryColor = useCSSVariable("--color-secondary") as string;
   const reduceMotion = useReducedMotion();
   const opacity = useSharedValue(reduceMotion ? 0.7 : 0.4);

@@ -5,9 +5,7 @@ export function hasReachedHorizontalEnd(element: HTMLElement, threshold = 24) {
     return false;
   }
 
-  return (
-    element.scrollLeft + element.clientWidth >= element.scrollWidth - threshold
-  );
+  return element.scrollLeft + element.clientWidth >= element.scrollWidth - threshold;
 }
 
 export function useInfiniteScroll({

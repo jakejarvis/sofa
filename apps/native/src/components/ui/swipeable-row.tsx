@@ -3,10 +3,8 @@ import type { PropsWithChildren } from "react";
 import { View } from "react-native";
 import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import type { SharedValue } from "react-native-reanimated";
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-} from "react-native-reanimated";
+import Animated, { interpolate, useAnimatedStyle } from "react-native-reanimated";
+
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import * as Haptics from "@/utils/haptics";
 
@@ -22,10 +20,7 @@ function RightAction({ drag }: { drag: SharedValue<number> }) {
   });
 
   return (
-    <View
-      className="items-center justify-center bg-destructive"
-      style={{ width: ACTION_WIDTH }}
-    >
+    <View className="bg-destructive items-center justify-center" style={{ width: ACTION_WIDTH }}>
       <Animated.View style={animatedStyle}>
         <ScaledIcon icon={IconTrash} size={22} color="#fff" />
       </Animated.View>

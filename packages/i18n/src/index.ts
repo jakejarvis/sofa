@@ -1,4 +1,5 @@
 import { i18n, type Messages } from "@lingui/core";
+
 import { messages as enMessages } from "./po/en";
 
 export const SUPPORTED_LOCALES = ["en", "fr", "de", "es", "it", "pt"] as const;

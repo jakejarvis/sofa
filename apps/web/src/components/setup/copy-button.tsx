@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 
 export function CopyButton({ code }: { code: string }) {
@@ -17,7 +18,7 @@ export function CopyButton({ code }: { code: string }) {
       variant="ghost"
       size="sm"
       onClick={handleCopy}
-      className="text-[11px] text-muted-foreground"
+      className="text-muted-foreground text-[11px]"
     >
       {copied ? (
         <>

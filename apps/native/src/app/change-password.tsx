@@ -6,16 +6,12 @@ import { Alert, ScrollView, type TextInput, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useResolveClassNames } from "uniwind";
 import { z } from "zod";
+
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
-import {
-  FieldError,
-  Input,
-  Label,
-  TextField,
-} from "@/components/ui/text-field";
+import { FieldError, Input, Label, TextField } from "@/components/ui/text-field";
 import { authClient } from "@/lib/server";
 import { toast } from "@/lib/toast";
 import * as Haptics from "@/utils/haptics";
@@ -85,7 +81,7 @@ export default function ChangePasswordScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-background"
+      className="bg-background flex-1"
       contentContainerStyle={{
         paddingHorizontal: 16,
         paddingTop: 16,
@@ -156,9 +152,7 @@ export default function ChangePasswordScreen() {
                       textContentType="newPassword"
                       returnKeyType="next"
                       blurOnSubmit={false}
-                      onSubmitEditing={() =>
-                        confirmPasswordRef.current?.focus()
-                      }
+                      onSubmitEditing={() => confirmPasswordRef.current?.focus()}
                     />
                   </TextField>
                 )}
@@ -192,10 +186,10 @@ export default function ChangePasswordScreen() {
 
             <Animated.View
               entering={FadeInDown.duration(300).delay(400)}
-              className="flex-row items-center justify-between rounded-xl border border-border bg-input px-3.5 py-3"
+              className="border-border bg-input flex-row items-center justify-between rounded-xl border px-3.5 py-3"
               style={{ borderCurve: "continuous" }}
             >
-              <Text className="text-base text-foreground">
+              <Text className="text-foreground text-base">
                 <Trans>Sign out of other sessions</Trans>
               </Text>
               <Switch
@@ -209,7 +203,7 @@ export default function ChangePasswordScreen() {
               <Button
                 onPress={form.handleSubmit}
                 disabled={isSubmitting}
-                className="mt-2 bg-primary"
+                className="bg-primary mt-2"
               >
                 {isSubmitting ? (
                   <Spinner size="sm" />

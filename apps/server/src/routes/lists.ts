@@ -1,10 +1,6 @@
-import {
-  getRadarrList,
-  getSonarrList,
-  parseStatusParam,
-  resolveListToken,
-} from "@sofa/core/lists";
 import { Hono } from "hono";
+
+import { getRadarrList, getSonarrList, parseStatusParam, resolveListToken } from "@sofa/core/lists";
 
 const app = new Hono();
 

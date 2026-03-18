@@ -1,5 +1,6 @@
 import { ImageResponse } from "@takumi-rs/image-response";
 import { notFound } from "next/navigation";
+
 import { getPageImage, source } from "@/lib/source";
 
 export const revalidate = false;
@@ -37,10 +38,7 @@ const PRIMARY = "#fba952";
 // oklch(0.63 0.02 80)   → muted foreground
 const MUTED = "#90887c";
 
-export async function GET(
-  _req: Request,
-  { params }: RouteContext<"/og/docs/[...slug]">,
-) {
+export async function GET(_req: Request, { params }: RouteContext<"/og/docs/[...slug]">) {
   const { slug } = await params;
   const page = source.getPage(slug.slice(0, -1));
   if (!page) notFound();
@@ -110,9 +108,7 @@ export async function GET(
           {title}
         </div>
         {description ? (
-          <div style={{ fontSize: "24px", lineHeight: 1.5, color: MUTED }}>
-            {description}
-          </div>
+          <div style={{ fontSize: "24px", lineHeight: 1.5, color: MUTED }}>{description}</div>
         ) : null}
       </div>
 

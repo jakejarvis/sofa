@@ -15,6 +15,7 @@ import { Pressable, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
+
 import { Image } from "@/components/ui/image";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -83,18 +84,13 @@ export function PosterCard({
         : userStatus === "watchlist"
           ? "on watchlist"
           : undefined;
-  const cardAccessibilityLabel = [
-    title,
-    type === "movie" ? "movie" : "TV show",
-    year,
-    statusLabel,
-  ]
+  const cardAccessibilityLabel = [title, type === "movie" ? "movie" : "TV show", year, statusLabel]
     .filter(Boolean)
     .join(", ");
 
   const cardContent = (
     <View
-      className={`overflow-hidden rounded-xl border bg-card ${
+      className={`bg-card overflow-hidden rounded-xl border ${
         userStatus ? "border-primary/25" : "border-white/[0.06]"
       }`}
       style={{ borderCurve: "continuous" }}
@@ -111,10 +107,8 @@ export function PosterCard({
             transition={200}
           />
         ) : (
-          <View className="flex-1 items-center justify-center bg-secondary p-3">
-            <Text className="text-center font-display text-foreground/[0.44] text-sm">
-              {title}
-            </Text>
+          <View className="bg-secondary flex-1 items-center justify-center p-3">
+            <Text className="font-display text-foreground/[0.44] text-center text-sm">{title}</Text>
           </View>
         )}
 
@@ -136,21 +130,19 @@ export function PosterCard({
         )}
 
         {/* Episode progress bar */}
-        {episodeProgress &&
-          episodeProgress.total > 0 &&
-          episodeProgress.watched > 0 && (
+        {episodeProgress && episodeProgress.total > 0 && episodeProgress.watched > 0 && (
+          <View
+            className="absolute right-0 bottom-0 left-0 h-[3px]"
+            style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
+          >
             <View
-              className="absolute right-0 bottom-0 left-0 h-[3px]"
-              style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
-            >
-              <View
-                className="h-full bg-status-watching"
-                style={{
-                  width: `${episodeProgress.total > 0 ? (episodeProgress.watched / episodeProgress.total) * 100 : 0}%`,
-                }}
-              />
-            </View>
-          )}
+              className="bg-status-watching h-full"
+              style={{
+                width: `${episodeProgress.total > 0 ? (episodeProgress.watched / episodeProgress.total) * 100 : 0}%`,
+              }}
+            />
+          </View>
+        )}
       </View>
 
       {/* Metadata */}
@@ -162,10 +154,7 @@ export function PosterCard({
               style={{ backgroundColor: statusColors[userStatus] }}
             />
           )}
-          <Text
-            className="flex-1 font-medium font-sans text-foreground text-sm"
-            numberOfLines={1}
-          >
+          <Text className="text-foreground flex-1 font-sans text-sm font-medium" numberOfLines={1}>
             {title}
           </Text>
         </View>
@@ -175,19 +164,11 @@ export function PosterCard({
           ) : (
             <ScaledIcon icon={IconDeviceTv} size={12} color={primaryColor} />
           )}
-          {year ? (
-            <Text className="text-muted-foreground text-xs">{year}</Text>
-          ) : null}
+          {year ? <Text className="text-muted-foreground text-xs">{year}</Text> : null}
           {voteAverage != null && voteAverage > 0 && (
             <View className="ml-auto flex-row items-center gap-1">
-              <ScaledIcon
-                icon={IconStarFilled}
-                size={10}
-                color={primaryColor}
-              />
-              <Text className="text-primary text-xs">
-                {voteAverage.toFixed(1)}
-              </Text>
+              <ScaledIcon icon={IconStarFilled} size={10} color={primaryColor} />
+              <Text className="text-primary text-xs">{voteAverage.toFixed(1)}</Text>
             </View>
           )}
         </View>
@@ -207,11 +188,7 @@ export function PosterCard({
         className="size-[30px] items-center justify-center rounded-full"
         style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
       >
-        {isAdding ? (
-          <IconLoader size={16} color="white" />
-        ) : (
-          <IconPlus size={16} color="white" />
-        )}
+        {isAdding ? <IconLoader size={16} color="white" /> : <IconPlus size={16} color="white" />}
       </View>
     </Pressable>
   ) : null;
@@ -224,10 +201,7 @@ export function PosterCard({
         <View>
           <Link href={titleHref} asChild>
             <Link.Trigger withAppleZoom>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={cardAccessibilityLabel}
-              >
+              <Pressable accessibilityRole="button" accessibilityLabel={cardAccessibilityLabel}>
                 {cardContent}
               </Pressable>
             </Link.Trigger>
@@ -275,7 +249,7 @@ export function PosterCardSkeleton({ width = 140 }: { width?: number }) {
   const imageHeight = width * 1.5;
   return (
     <View
-      className="overflow-hidden rounded-xl border border-white/[0.06] bg-card"
+      className="bg-card overflow-hidden rounded-xl border border-white/[0.06]"
       style={{
         width,
         borderCurve: "continuous",

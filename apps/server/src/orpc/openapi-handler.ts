@@ -2,12 +2,10 @@ import { SmartCoercionPlugin } from "@orpc/json-schema";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
+
 import { createLogger } from "@sofa/logger";
-import {
-  generateOpenApiSpec,
-  openApiTags,
-  schemaConverters,
-} from "./openapi-spec";
+
+import { generateOpenApiSpec, openApiTags, schemaConverters } from "./openapi-spec";
 import { implementedRouter } from "./router";
 
 const log = createLogger("openapi");
@@ -81,8 +79,7 @@ export const openApiHandler = new OpenAPIHandler(implementedRouter, {
   ],
   interceptors: [
     async (options) => {
-      const requestPathname =
-        options.request.url.pathname.replace(/\/$/, "") || "/";
+      const requestPathname = options.request.url.pathname.replace(/\/$/, "") || "/";
       const prefix = options.prefix?.replace(/\/$/, "") || "";
       const specPath = `${prefix}/spec.json`.replace(/\/$/, "") || "/";
 

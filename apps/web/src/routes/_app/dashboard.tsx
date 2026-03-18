@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import { ContinueWatchingSection } from "@/components/dashboard/continue-watching-section";
 import { LibrarySection } from "@/components/dashboard/library-section";
 import { RecommendationsSection } from "@/components/dashboard/recommendations-section";

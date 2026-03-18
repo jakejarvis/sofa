@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
+
 import { SofaLogo } from "@/components/sofa-logo";
 
 // Poster positions arranged in angled columns behind the hero
@@ -77,11 +78,11 @@ export function LandingPage({
       </div>
 
       {/* Radial fade over posters to keep center clear */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-background via-background/95 to-background/40" />
+      <div className="from-background via-background/95 to-background/40 pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))]" />
 
       {/* Warm primary glow */}
       <motion.div
-        className="pointer-events-none absolute top-1/3 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[120px]"
+        className="bg-primary/5 pointer-events-none absolute top-1/3 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px]"
         animate={{ opacity: [0.4, 0.7, 0.4] }}
         transition={{
           duration: 6,
@@ -93,7 +94,7 @@ export function LandingPage({
       <main className="relative z-10 flex flex-col items-center gap-10 px-6 text-center">
         <div className="space-y-4">
           <motion.p
-            className="font-medium text-primary text-sm uppercase tracking-[0.3em]"
+            className="text-primary text-sm font-medium tracking-[0.3em] uppercase"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -105,7 +106,7 @@ export function LandingPage({
             <Trans>Self-hosted movie & TV tracker</Trans>
           </motion.p>
           <motion.div
-            className="flex justify-center text-primary"
+            className="text-primary flex justify-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -118,7 +119,7 @@ export function LandingPage({
             <SofaLogo className="size-24 sm:size-28 md:size-32" />
           </motion.div>
           <motion.p
-            className="mx-auto max-w-md text-lg text-muted-foreground leading-relaxed"
+            className="text-muted-foreground mx-auto max-w-md text-lg leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -150,7 +151,7 @@ export function LandingPage({
           {freshInstall ? (
             <Link
               to="/register"
-              className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-shadow hover:shadow-lg hover:shadow-primary/20"
+              className="group bg-primary text-primary-foreground hover:shadow-primary/20 relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg px-8 font-medium transition-shadow hover:shadow-lg"
             >
               <span className="relative z-10">
                 <Trans>Get Started</Trans>
@@ -161,7 +162,7 @@ export function LandingPage({
             <>
               <Link
                 to="/login"
-                className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-shadow hover:shadow-lg hover:shadow-primary/20"
+                className="group bg-primary text-primary-foreground hover:shadow-primary/20 relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg px-8 font-medium transition-shadow hover:shadow-lg"
               >
                 <span className="relative z-10">
                   <Trans>Sign In</Trans>
@@ -171,7 +172,7 @@ export function LandingPage({
               {registrationOpen && (
                 <Link
                   to="/register"
-                  className="inline-flex h-12 items-center justify-center rounded-lg border border-border px-8 font-medium transition-colors hover:border-primary/40 hover:bg-primary/5"
+                  className="border-border hover:border-primary/40 hover:bg-primary/5 inline-flex h-12 items-center justify-center rounded-lg border px-8 font-medium transition-colors"
                 >
                   <Trans>Register</Trans>
                 </Link>
@@ -182,7 +183,7 @@ export function LandingPage({
       </main>
 
       {/* Bottom fade */}
-      <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="from-background pointer-events-none absolute right-0 bottom-0 left-0 h-32 bg-gradient-to-t to-transparent" />
     </div>
   );
 }

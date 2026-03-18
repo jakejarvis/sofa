@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, spyOn, test } from "bun:test";
+
 import { eq } from "@sofa/db/helpers";
 import {
   importJobs,
@@ -16,17 +17,14 @@ import {
   testDb,
 } from "@sofa/db/test-utils";
 import * as tmdbClient from "@sofa/tmdb/client";
+
 import type { NormalizedImport } from "../src/imports/parsers";
 import { processImportJob, readImportJob } from "../src/imports/processor";
 
 // ── Helpers ─────────────────────────────────────────────────────────
 
 /** Insert a fully-fetched movie title (lastFetchedAt set so metadata won't re-fetch). */
-function insertMovieTitle(
-  id: string,
-  tmdbId: number,
-  movieTitle = "Test Movie",
-) {
+function insertMovieTitle(id: string, tmdbId: number, movieTitle = "Test Movie") {
   testDb
     .insert(titles)
     .values({
@@ -49,11 +47,7 @@ function insertTvShowWithFetchedAt(
 ) {
   const result = insertTvShow(titleId, tmdbId, seasonCount, epsPerSeason);
   // Mark as fully fetched so getOrFetchTitleByTmdbId skips TMDB API calls
-  testDb
-    .update(titles)
-    .set({ lastFetchedAt: new Date() })
-    .where(eq(titles.id, titleId))
-    .run();
+  testDb.update(titles).set({ lastFetchedAt: new Date() }).where(eq(titles.id, titleId)).run();
   return result;
 }
 
@@ -348,9 +342,7 @@ describe("processImportJob — state transitions", () => {
   });
 
   test("readImportJob throws for non-existent job", () => {
-    expect(() => readImportJob("non-existent-id")).toThrow(
-      "Import job non-existent-id not found",
-    );
+    expect(() => readImportJob("non-existent-id")).toThrow("Import job non-existent-id not found");
   });
 });
 

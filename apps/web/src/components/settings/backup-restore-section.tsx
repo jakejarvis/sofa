@@ -3,6 +3,7 @@ import { IconCloudUpload } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,11 +49,8 @@ export function BackupRestoreSection() {
     <CardContent>
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <IconCloudUpload
-              aria-hidden={true}
-              className="size-4 text-primary"
-            />
+          <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+            <IconCloudUpload aria-hidden={true} className="text-primary size-4" />
           </div>
           <div>
             <CardTitle>
@@ -60,8 +58,7 @@ export function BackupRestoreSection() {
             </CardTitle>
             <CardDescription>
               <Trans>
-                Upload a .db file to replace the current database. A safety
-                backup is created first.
+                Upload a .db file to replace the current database. A safety backup is created first.
               </Trans>
             </CardDescription>
           </div>
@@ -79,10 +76,7 @@ export function BackupRestoreSection() {
             }
           }}
         />
-        <AlertDialog
-          open={restoreDialogOpen}
-          onOpenChange={setRestoreDialogOpen}
-        >
+        <AlertDialog open={restoreDialogOpen} onOpenChange={setRestoreDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
@@ -90,9 +84,9 @@ export function BackupRestoreSection() {
               </AlertDialogTitle>
               <AlertDialogDescription>
                 <Trans>
-                  This will replace your entire database with the uploaded file.
-                  A safety backup of your current data will be created first.
-                  Active sessions may need to refresh after restore.
+                  This will replace your entire database with the uploaded file. A safety backup of
+                  your current data will be created first. Active sessions may need to refresh after
+                  restore.
                 </Trans>
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -123,16 +117,8 @@ export function BackupRestoreSection() {
           onClick={() => fileInputRef.current?.click()}
           disabled={restoreMutation.isPending}
         >
-          {restoreMutation.isPending ? (
-            <Spinner />
-          ) : (
-            <IconCloudUpload aria-hidden={true} />
-          )}
-          {restoreMutation.isPending ? (
-            <Trans>Restoring…</Trans>
-          ) : (
-            <Trans>Upload</Trans>
-          )}
+          {restoreMutation.isPending ? <Spinner /> : <IconCloudUpload aria-hidden={true} />}
+          {restoreMutation.isPending ? <Trans>Restoring…</Trans> : <Trans>Upload</Trans>}
         </Button>
       </div>
     </CardContent>

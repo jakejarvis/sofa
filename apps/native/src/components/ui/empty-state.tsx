@@ -3,6 +3,7 @@ import { IconMovie } from "@tabler/icons-react-native";
 import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
+
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 
@@ -32,19 +33,15 @@ export function EmptyState({
       <View accessible={false}>
         <IconComponent size={48} color={mutedForeground} />
       </View>
-      <Text className="mt-3 text-center font-medium font-sans text-base text-foreground">
+      <Text className="text-foreground mt-3 text-center font-sans text-base font-medium">
         {title}
       </Text>
       {description && (
-        <Text className="mt-1 text-center text-muted-foreground text-sm">
-          {description}
-        </Text>
+        <Text className="text-muted-foreground mt-1 text-center text-sm">{description}</Text>
       )}
       {actionLabel && onAction && (
-        <Button onPress={onAction} size="sm" className="mt-4 bg-primary">
-          <ButtonLabel className="text-primary-foreground">
-            {actionLabel}
-          </ButtonLabel>
+        <Button onPress={onAction} size="sm" className="bg-primary mt-4">
+          <ButtonLabel className="text-primary-foreground">{actionLabel}</ButtonLabel>
         </Button>
       )}
     </Animated.View>

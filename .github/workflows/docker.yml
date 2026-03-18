@@ -11,7 +11,8 @@ on:
       - "turbo.json"
       - "package.json"
       - "bun.lock"
-      - "biome.json"
+      - ".oxlintrc.json"
+      - ".oxfmtrc.json"
       - "tsconfig.json"
       - ".github/workflows/docker.yml"
     tags: ["v*"]

@@ -1,9 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const colors = {
@@ -44,19 +41,12 @@ export function StatusDot({
 
   const dotEl = pulse ? (
     <motion.span
-      className={cn(
-        "inline-block h-2 w-2 shrink-0 rounded-full",
-        bg,
-        className,
-      )}
+      className={cn("inline-block h-2 w-2 shrink-0 rounded-full", bg, className)}
       animate={
         prefersReducedMotion
           ? {}
           : {
-              boxShadow: [
-                shadow,
-                pulseColors[status as keyof typeof pulseColors],
-              ],
+              boxShadow: [shadow, pulseColors[status as keyof typeof pulseColors]],
             }
       }
       transition={{
@@ -67,13 +57,7 @@ export function StatusDot({
       }}
     />
   ) : (
-    <span
-      className={cn(
-        "inline-block h-2 w-2 shrink-0 rounded-full",
-        bg,
-        className,
-      )}
-    />
+    <span className={cn("inline-block h-2 w-2 shrink-0 rounded-full", bg, className)} />
   );
 
   return (

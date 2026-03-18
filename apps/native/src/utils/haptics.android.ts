@@ -16,18 +16,13 @@ const impactStyleToAndroid: Record<ImpactFeedbackStyle, AndroidHaptics> = {
   [ImpactFeedbackStyle.Rigid]: AndroidHaptics.Virtual_Key,
 };
 
-const notificationTypeToAndroid: Record<
-  NotificationFeedbackType,
-  AndroidHaptics
-> = {
+const notificationTypeToAndroid: Record<NotificationFeedbackType, AndroidHaptics> = {
   [NotificationFeedbackType.Success]: AndroidHaptics.Confirm,
   [NotificationFeedbackType.Warning]: AndroidHaptics.Segment_Tick,
   [NotificationFeedbackType.Error]: AndroidHaptics.Reject,
 };
 
-export async function impactAsync(
-  style: ImpactFeedbackStyle = ImpactFeedbackStyle.Medium,
-) {
+export async function impactAsync(style: ImpactFeedbackStyle = ImpactFeedbackStyle.Medium) {
   return performAndroidHapticsAsync(impactStyleToAndroid[style]);
 }
 

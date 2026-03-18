@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { PersonCredit } from "@sofa/api/schemas";
 import { IconMovie } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
+
 import { TitleCard } from "@/components/title-card";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { PersonCredit } from "@sofa/api/schemas";
 
 type Filter = "all" | "movie" | "tv";
 type Sort = "newest" | "rating";
@@ -20,10 +21,7 @@ interface FilmographyGridProps {
   userStatuses?: Record<string, "watchlist" | "in_progress" | "completed">;
 }
 
-export function FilmographyGrid({
-  credits,
-  userStatuses,
-}: FilmographyGridProps) {
+export function FilmographyGrid({ credits, userStatuses }: FilmographyGridProps) {
   const { t } = useLingui();
   const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<Sort>("newest");
@@ -64,13 +62,11 @@ export function FilmographyGrid({
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <IconMovie aria-hidden={true} className="size-5 text-primary" />
-          <h2 className="text-balance font-display text-xl tracking-tight">
+          <IconMovie aria-hidden={true} className="text-primary size-5" />
+          <h2 className="font-display text-xl tracking-tight text-balance">
             <Trans>Filmography</Trans>
           </h2>
-          <span className="text-muted-foreground text-sm">
-            ({filtered.length})
-          </span>
+          <span className="text-muted-foreground text-sm">({filtered.length})</span>
         </div>
 
         <Select
@@ -82,19 +78,11 @@ export function FilmographyGrid({
           <SelectTrigger size="sm">
             <SelectValue>
               {(value: string | null) =>
-                value === "newest"
-                  ? t`Newest`
-                  : value === "rating"
-                    ? t`Rating`
-                    : null
+                value === "newest" ? t`Newest` : value === "rating" ? t`Rating` : null
               }
             </SelectValue>
           </SelectTrigger>
-          <SelectContent
-            align="end"
-            alignItemWithTrigger={false}
-            className="p-1"
-          >
+          <SelectContent align="end" alignItemWithTrigger={false} className="p-1">
             <SelectItem value="newest">
               <Trans>Newest</Trans>
             </SelectItem>

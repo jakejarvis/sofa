@@ -3,10 +3,11 @@ import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { ContractRouterClient } from "@orpc/contract";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
-import type { contract } from "@sofa/api/contract";
-import { i18n } from "@sofa/i18n";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+import type { contract } from "@sofa/api/contract";
+import { i18n } from "@sofa/i18n";
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -26,7 +27,6 @@ export const link = new RPCLink({
   fetch: (input, init) => fetch(input, { ...init, credentials: "include" }),
 });
 
-export const client: ContractRouterClient<typeof contract> =
-  createORPCClient(link);
+export const client: ContractRouterClient<typeof contract> = createORPCClient(link);
 
 export const orpc = createTanstackQueryUtils(client);

@@ -18,8 +18,4 @@ export {
   processImportJob,
   readImportJob,
 } from "./processor";
-export {
-  type ExternalIds,
-  resolveMovieTmdbId,
-  resolveShowTmdbId,
-} from "./resolve";
+export { type ExternalIds, resolveMovieTmdbId, resolveShowTmdbId } from "./resolve";

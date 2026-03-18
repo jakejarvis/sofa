@@ -1,5 +1,6 @@
-import { auth } from "@sofa/auth/server";
 import { Hono } from "hono";
+
+import { auth } from "@sofa/auth/server";
 
 const app = new Hono();
 

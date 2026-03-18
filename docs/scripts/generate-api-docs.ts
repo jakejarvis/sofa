@@ -1,4 +1,5 @@
 import { generateFiles } from "fumadocs-openapi";
+
 import { openapi } from "../src/lib/openapi";
 
 void generateFiles({

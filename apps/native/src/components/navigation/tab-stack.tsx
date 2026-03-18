@@ -1,26 +1,17 @@
 import { Stack } from "expo-router";
 import type { ReactNode } from "react";
 import { useCSSVariable, useResolveClassNames } from "uniwind";
+
 import { HeaderAvatar } from "@/components/header-avatar";
 
-export function TabStack({
-  title,
-  children,
-}: {
-  title?: string;
-  children?: ReactNode;
-}) {
+export function TabStack({ title, children }: { title?: string; children?: ReactNode }) {
   const contentStyle = useResolveClassNames("bg-background");
   const tintColor = useCSSVariable("--color-primary") as string;
   const backgroundColor = useCSSVariable("--color-background") as string;
-  const iosHeaderLargeTitleStyle = useResolveClassNames(
-    "font-display text-foreground",
-  );
-  const iosHeaderTitleStyle = useResolveClassNames(
-    "font-display text-foreground text-lg",
-  );
+  const iosHeaderLargeTitleStyle = useResolveClassNames("font-display text-foreground");
+  const iosHeaderTitleStyle = useResolveClassNames("font-display text-foreground text-lg");
   const androidHeaderTitleStyle = useResolveClassNames(
-    "font-sans font-semibold text-foreground text-lg",
+    "text-foreground font-sans text-lg font-semibold",
   );
 
   if (process.env.EXPO_OS === "ios") {
@@ -80,9 +71,7 @@ export function TabStack({
               shadowColor: "transparent",
             }}
           />
-          <Stack.Screen.Title
-            style={androidHeaderTitleStyle as Record<string, unknown>}
-          >
+          <Stack.Screen.Title style={androidHeaderTitleStyle as Record<string, unknown>}>
             {title}
           </Stack.Screen.Title>
         </Stack.Screen>

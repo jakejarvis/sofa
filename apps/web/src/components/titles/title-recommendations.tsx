@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { IconThumbUp } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
+
 import { TitleCard, TitleCardSkeleton } from "@/components/title-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
@@ -35,7 +36,7 @@ export function TitleRecommendations({ titleId }: { titleId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <IconThumbUp aria-hidden={true} className="size-5 text-primary" />
+        <IconThumbUp aria-hidden={true} className="text-primary size-5" />
         <h2 className="font-display text-xl tracking-tight">
           <Trans>Recommended</Trans>
         </h2>

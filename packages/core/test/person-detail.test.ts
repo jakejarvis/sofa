@@ -1,12 +1,5 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  mock,
-  spyOn,
-  test,
-} from "bun:test";
+import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
+
 import { eq } from "@sofa/db/helpers";
 import { personFilmography, persons } from "@sofa/db/schema";
 import { clearAllTables, testDb } from "@sofa/db/test-utils";
@@ -133,11 +126,7 @@ describe("getOrFetchPerson", () => {
       .run();
 
     const person = await getOrFetchPerson("p1");
-    const stored = testDb
-      .select()
-      .from(persons)
-      .where(eq(persons.id, "p1"))
-      .get();
+    const stored = testDb.select().from(persons).where(eq(persons.id, "p1")).get();
 
     expect(person?.profileThumbHash).toBeString();
     expect(stored?.profileThumbHash).toBe(person?.profileThumbHash);
@@ -157,11 +146,7 @@ describe("getOrFetchPerson", () => {
       .run();
 
     const person = await getOrFetchPerson("p1");
-    const stored = testDb
-      .select()
-      .from(persons)
-      .where(eq(persons.id, "p1"))
-      .get();
+    const stored = testDb.select().from(persons).where(eq(persons.id, "p1")).get();
 
     expect(stored?.profilePath).toBe("/new-profile.png");
     expect(person?.profileThumbHash).toBeString();
@@ -184,11 +169,7 @@ describe("fetchFullFilmography", () => {
 
     const first = await fetchFullFilmography("p1");
     const second = await fetchFullFilmography("p1");
-    const storedPerson = testDb
-      .select()
-      .from(persons)
-      .where(eq(persons.id, "p1"))
-      .get();
+    const storedPerson = testDb.select().from(persons).where(eq(persons.id, "p1")).get();
     const storedCredits = testDb
       .select()
       .from(personFilmography)

@@ -3,10 +3,10 @@ import { checkRateLimit } from "@vercel/firewall";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { z } from "zod";
+
 import { getProvider, getProviderConfig } from "./providers";
 
-const GITHUB_RELEASES_URL =
-  "https://api.github.com/repos/jakejarvis/sofa/releases/latest";
+const GITHUB_RELEASES_URL = "https://api.github.com/repos/jakejarvis/sofa/releases/latest";
 
 const app = new Hono();
 
@@ -33,20 +33,14 @@ app.get("/v1/version", async (c) => {
       html_url: string;
     };
 
-    c.header(
-      "Cache-Control",
-      "public, s-maxage=900, stale-while-revalidate=3600",
-    );
+    c.header("Cache-Control", "public, s-maxage=900, stale-while-revalidate=3600");
 
     return c.json({
       version: data.tag_name.replace(/^v/, ""),
       release_url: data.html_url,
     });
   } catch (e) {
-    return c.json(
-      { error: e instanceof Error ? e.message : "Failed to fetch version" },
-      502,
-    );
+    return c.json({ error: e instanceof Error ? e.message : "Failed to fetch version" }, 502);
   }
 });
 
@@ -86,7 +80,7 @@ app.post(
             arch: body.arch,
             users: body.users,
             titles: body.titles,
-            ...(body.features ?? {}),
+            ...body.features,
           },
         }),
         signal: AbortSignal.timeout(10_000),
@@ -138,10 +132,7 @@ app.post(
     }
 
     try {
-      const result = await provider.getDeviceCode(
-        config.clientId,
-        config.clientSecret,
-      );
+      const result = await provider.getDeviceCode(config.clientId, config.clientSecret);
       return c.json(result);
     } catch (e) {
       return c.json(
@@ -191,11 +182,7 @@ app.post(
     }
 
     try {
-      const result = await provider.pollForToken(
-        config.clientId,
-        config.clientSecret,
-        device_code,
-      );
+      const result = await provider.pollForToken(config.clientId, config.clientSecret, device_code);
 
       if (result.status !== "authorized") {
         return c.json({ status: result.status });
@@ -203,10 +190,7 @@ app.post(
 
       // Fetch user data and return it inline
       try {
-        const data = await provider.fetchUserData(
-          result.accessToken,
-          config.clientId,
-        );
+        const data = await provider.fetchUserData(result.accessToken, config.clientId);
         return c.json({ status: "authorized", data });
       } catch (e) {
         // Auth succeeded but data fetch failed. Return a distinct status so
@@ -217,10 +201,7 @@ app.post(
         });
       }
     } catch (e) {
-      return c.json(
-        { error: e instanceof Error ? e.message : "Poll failed" },
-        502,
-      );
+      return c.json({ error: e instanceof Error ? e.message : "Poll failed" }, 502);
     }
   },
 );

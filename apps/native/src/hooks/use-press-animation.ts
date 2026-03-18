@@ -20,9 +20,7 @@ export function usePressAnimation(scale = 0.97) {
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       {
-        scale: reduceMotion
-          ? 1
-          : interpolate(pressed.get(), [0, 1], [1, scale]),
+        scale: reduceMotion ? 1 : interpolate(pressed.get(), [0, 1], [1, scale]),
       },
     ],
   }));

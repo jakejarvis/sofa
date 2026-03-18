@@ -31,8 +31,6 @@ export default defineConfig({
   },
   define: {
     __APP_VERSION__: JSON.stringify(process.env.APP_VERSION || "0.0.0"),
-    __GIT_COMMIT_SHA__: JSON.stringify(
-      (process.env.GIT_COMMIT_SHA || "").slice(0, 7),
-    ),
+    __GIT_COMMIT_SHA__: JSON.stringify((process.env.GIT_COMMIT_SHA || "").slice(0, 7)),
   },
 });

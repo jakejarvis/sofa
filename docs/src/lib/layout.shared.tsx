@@ -1,4 +1,5 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+
 import { SofaLogo } from "@/components/sofa-logo";
 
 export const gitConfig = {

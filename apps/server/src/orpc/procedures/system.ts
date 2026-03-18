@@ -1,15 +1,8 @@
-import {
-  getOidcProviderName,
-  isOidcConfigured,
-  isPasswordLoginDisabled,
-} from "@sofa/auth/config";
-import {
-  getInstanceId,
-  getUserCount,
-  isRegistrationOpen,
-} from "@sofa/core/settings";
+import { getOidcProviderName, isOidcConfigured, isPasswordLoginDisabled } from "@sofa/auth/config";
+import { getInstanceId, getUserCount, isRegistrationOpen } from "@sofa/core/settings";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
+
 import { os } from "../context";
 
 // Well-known TMDB poster paths for the background collage

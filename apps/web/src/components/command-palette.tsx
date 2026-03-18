@@ -13,6 +13,7 @@ import { skipToken, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
+
 import { useProgress } from "@/components/navigation-progress";
 import {
   Command,
@@ -59,10 +60,7 @@ const SHORTCUT_DESCRIPTIONS = [
   { scope: "Title", description: "Rate 5 stars", keys: ["5"] },
 ] as const;
 
-const groupedShortcuts: Record<
-  string,
-  { description: string; keys: readonly string[] }[]
-> = {};
+const groupedShortcuts: Record<string, { description: string; keys: readonly string[] }[]> = {};
 for (const entry of SHORTCUT_DESCRIPTIONS) {
   if (!groupedShortcuts[entry.scope]) groupedShortcuts[entry.scope] = [];
   groupedShortcuts[entry.scope].push(entry);
@@ -85,9 +83,7 @@ export function CommandPalette() {
   const { t } = useLingui();
   const navigate = useNavigate();
   const progress = useProgress();
-  const [commandPaletteOpen, setCommandPaletteOpen] = useAtom(
-    commandPaletteOpenAtom,
-  );
+  const [commandPaletteOpen, setCommandPaletteOpen] = useAtom(commandPaletteOpenAtom);
   const [helpOpen, setHelpOpen] = useAtom(helpOpenAtom);
   const [recentSearches, setRecentSearches] = useAtom(recentSearchesAtom);
   const [query, setQuery] = useState("");
@@ -200,7 +196,6 @@ export function CommandPalette() {
               {hasQuery && loading && (
                 <div className="space-y-2 p-3">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
                     <div key={`skel-${i}`} className="flex items-center gap-3">
                       <Skeleton className="h-12 w-8 shrink-0 rounded" />
                       <div className="flex-1 space-y-1.5">
@@ -227,7 +222,7 @@ export function CommandPalette() {
                       className="flex items-center gap-3 py-2"
                     >
                       {r.type === "person" ? (
-                        <div className="size-10 shrink-0 overflow-hidden rounded-full bg-muted">
+                        <div className="bg-muted size-10 shrink-0 overflow-hidden rounded-full">
                           {r.profilePath ? (
                             <img
                               src={r.profilePath}
@@ -242,13 +237,13 @@ export function CommandPalette() {
                             <div className="flex h-full items-center justify-center">
                               <IconUser
                                 aria-hidden={true}
-                                className="size-4 text-muted-foreground"
+                                className="text-muted-foreground size-4"
                               />
                             </div>
                           )}
                         </div>
                       ) : (
-                        <div className="h-12 w-8 shrink-0 overflow-hidden rounded bg-muted">
+                        <div className="bg-muted h-12 w-8 shrink-0 overflow-hidden rounded">
                           {r.posterPath ? (
                             <img
                               src={r.posterPath}
@@ -260,44 +255,29 @@ export function CommandPalette() {
                               className="h-full w-full object-cover"
                             />
                           ) : (
-                            <div className="flex h-full items-center justify-center text-[8px] text-muted-foreground">
+                            <div className="text-muted-foreground flex h-full items-center justify-center text-[8px]">
                               ?
                             </div>
                           )}
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium text-xs">
-                          {r.title}
-                        </p>
-                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                        <p className="truncate text-xs font-medium">{r.title}</p>
+                        <div className="text-muted-foreground flex items-center gap-1.5 text-[10px]">
                           {r.type === "person" ? (
-                            <IconUser
-                              aria-hidden={true}
-                              className="size-[11px]"
-                            />
+                            <IconUser aria-hidden={true} className="size-[11px]" />
                           ) : r.type === "movie" ? (
-                            <IconMovie
-                              aria-hidden={true}
-                              className="size-[11px]"
-                            />
+                            <IconMovie aria-hidden={true} className="size-[11px]" />
                           ) : (
-                            <IconDeviceTv
-                              aria-hidden={true}
-                              className="size-[11px]"
-                            />
+                            <IconDeviceTv aria-hidden={true} className="size-[11px]" />
                           )}
                           <span className="uppercase">{r.type}</span>
                           {r.type !== "person" && r.releaseDate && (
                             <span>{r.releaseDate.slice(0, 4)}</span>
                           )}
-                          {r.type === "person" &&
-                            r.knownFor &&
-                            r.knownFor.length > 0 && (
-                              <span className="truncate">
-                                {r.knownFor.join(", ")}
-                              </span>
-                            )}
+                          {r.type === "person" && r.knownFor && r.knownFor.length > 0 && (
+                            <span className="truncate">{r.knownFor.join(", ")}</span>
+                          )}
                         </div>
                       </div>
                     </CommandItem>
@@ -317,7 +297,7 @@ export function CommandPalette() {
                           <button
                             type="button"
                             onClick={handleClearRecent}
-                            className="font-normal text-[10px] text-muted-foreground transition-colors hover:text-foreground"
+                            className="text-muted-foreground hover:text-foreground text-[10px] font-normal transition-colors"
                           >
                             <Trans>Clear all</Trans>
                           </button>
@@ -332,13 +312,10 @@ export function CommandPalette() {
                         >
                           <IconSearch
                             aria-hidden={true}
-                            className="size-3.5 text-muted-foreground"
+                            className="text-muted-foreground size-3.5"
                           />
                           <span className="flex-1">{q}</span>
-                          <span
-                            data-slot="command-shortcut"
-                            className="ml-auto"
-                          >
+                          <span data-slot="command-shortcut" className="ml-auto">
                             <button
                               type="button"
                               aria-label="Remove from recent searches"
@@ -346,7 +323,7 @@ export function CommandPalette() {
                                 e.stopPropagation();
                                 handleRemoveRecent(q);
                               }}
-                              className="rounded-sm p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-data-[selected=true]:opacity-100"
+                              className="text-muted-foreground hover:text-foreground rounded-sm p-0.5 opacity-0 transition-opacity group-data-[selected=true]:opacity-100"
                             >
                               <IconX className="size-3" />
                             </button>
@@ -407,7 +384,7 @@ export function CommandPalette() {
           <div className="space-y-5 py-2">
             {Object.entries(groupedShortcuts).map(([scope, items]) => (
               <div key={scope} className="space-y-2">
-                <h3 className="font-semibold text-[10px] text-muted-foreground uppercase tracking-wider">
+                <h3 className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
                   {scope}
                 </h3>
                 <div className="space-y-1">
@@ -416,16 +393,12 @@ export function CommandPalette() {
                       key={item.description}
                       className="flex items-center justify-between rounded-md px-2 py-1.5"
                     >
-                      <span className="text-foreground text-xs">
-                        {item.description}
-                      </span>
+                      <span className="text-foreground text-xs">{item.description}</span>
                       <div className="flex items-center gap-1">
                         {item.keys.map((key, i) => (
                           <span key={key} className="flex items-center gap-1">
                             {i > 0 && (
-                              <span className="text-[10px] text-muted-foreground">
-                                then
-                              </span>
+                              <span className="text-muted-foreground text-[10px]">then</span>
                             )}
                             <Kbd>{formatKey(key)}</Kbd>
                           </span>

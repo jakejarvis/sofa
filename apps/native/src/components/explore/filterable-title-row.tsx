@@ -3,6 +3,7 @@ import type { Icon } from "@tabler/icons-react-native";
 import { skipToken, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
+
 import {
   HorizontalPosterRow,
   type PosterRowItem,
@@ -68,28 +69,25 @@ export function FilterableTitleRow({
   );
   const discoverStatuses = useMemo(
     () =>
-      Object.assign(
-        {},
-        ...(discover.data?.pages.map((p) => p.userStatuses) ?? []),
-      ) as Record<string, TitleStatus>,
+      Object.assign({}, ...(discover.data?.pages.map((p) => p.userStatuses) ?? [])) as Record<
+        string,
+        TitleStatus
+      >,
     [discover.data?.pages],
   );
   const discoverProgress = useMemo(
     () =>
-      Object.assign(
-        {},
-        ...(discover.data?.pages.map((p) => p.episodeProgress) ?? []),
-      ) as Record<string, { watched: number; total: number }>,
+      Object.assign({}, ...(discover.data?.pages.map((p) => p.episodeProgress) ?? [])) as Record<
+        string,
+        { watched: number; total: number }
+      >,
     [discover.data?.pages],
   );
 
   const rawItems = selectedGenre === null ? defaultItems : discoverItems;
-  const userStatuses =
-    selectedGenre === null ? defaultUserStatuses : discoverStatuses;
-  const episodeProgress =
-    selectedGenre === null ? defaultEpisodeProgress : discoverProgress;
-  const showLoading =
-    isLoading || (selectedGenre !== null && discover.isPending);
+  const userStatuses = selectedGenre === null ? defaultUserStatuses : discoverStatuses;
+  const episodeProgress = selectedGenre === null ? defaultEpisodeProgress : discoverProgress;
+  const showLoading = isLoading || (selectedGenre !== null && discover.isPending);
 
   // Map items into PosterRowItem shape with status/progress resolved
   const items = useMemo<PosterRowItem[]>(
@@ -125,9 +123,7 @@ export function FilterableTitleRow({
               key={genre.id}
               label={genre.name}
               isSelected={selectedGenre === genre.id}
-              onPress={() =>
-                setSelectedGenre(selectedGenre === genre.id ? null : genre.id)
-              }
+              onPress={() => setSelectedGenre(selectedGenre === genre.id ? null : genre.id)}
             />
           ))}
         </ScrollView>

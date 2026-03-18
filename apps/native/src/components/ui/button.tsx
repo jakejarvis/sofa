@@ -1,7 +1,7 @@
 import { createContext, forwardRef, useContext } from "react";
 import { Pressable, type PressableProps, type TextProps } from "react-native";
-import { Text } from "@/components/ui/text";
 
+import { Text } from "@/components/ui/text";
 import { cn } from "@/utils/cn";
 
 type ButtonVariant = "default" | "secondary";
@@ -14,21 +14,8 @@ interface ButtonProps extends PressableProps {
   className?: string;
 }
 
-export const Button = forwardRef<
-  React.ComponentRef<typeof Pressable>,
-  ButtonProps
->(
-  (
-    {
-      size = "default",
-      variant = "default",
-      className,
-      style,
-      disabled,
-      ...props
-    },
-    ref,
-  ) => {
+export const Button = forwardRef<React.ComponentRef<typeof Pressable>, ButtonProps>(
+  ({ size = "default", variant = "default", className, style, disabled, ...props }, ref) => {
     return (
       <ButtonVariantContext.Provider value={variant}>
         <Pressable
@@ -67,10 +54,8 @@ export function ButtonLabel({ style, className, ...props }: ButtonLabelProps) {
   return (
     <Text
       className={cn(
-        "text-center font-medium font-sans text-base",
-        variant === "secondary"
-          ? "text-secondary-foreground"
-          : "text-primary-foreground",
+        "text-center font-sans text-base font-medium",
+        variant === "secondary" ? "text-secondary-foreground" : "text-primary-foreground",
         className,
       )}
       style={style}

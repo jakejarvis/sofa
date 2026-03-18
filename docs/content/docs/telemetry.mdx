@@ -10,11 +10,11 @@ Sofa includes optional, privacy-focused telemetry to help understand how the pro
 
 Sofa has two separate telemetry systems depending on the platform:
 
-| | Server | Mobile App | Web App |
-|---|---|---|---|
-| **System** | Custom reporting | PostHog | None |
-| **Default** | Disabled | Disabled | N/A |
-| **Opt-in** | Admin toggle | User toggle + ATT | N/A |
+|             | Server           | Mobile App        | Web App |
+| ----------- | ---------------- | ----------------- | ------- |
+| **System**  | Custom reporting | PostHog           | None    |
+| **Default** | Disabled         | Disabled          | N/A     |
+| **Opt-in**  | Admin toggle     | User toggle + ATT | N/A     |
 
 The web app has **zero analytics** — no tracking scripts, no third-party services.
 
@@ -48,7 +48,7 @@ A single JSON payload is sent to `https://public-api.sofa.watch/v1/telemetry`:
 ```
 
 | Field | Description |
-|---|---|
+| --- | --- |
 | `instanceId` | A random UUID generated once per server instance. Not tied to any user or IP. |
 | `version` | The Sofa version running on your server. |
 | `arch` | OS and CPU architecture (e.g. `linux-x64`, `darwin-arm64`). |
