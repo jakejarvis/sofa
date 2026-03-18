@@ -21,6 +21,9 @@ WORKDIR /app
 COPY --from=deps /app/ .
 COPY --from=prepare /app/out/full/ .
 
+# Lingui config lives at monorepo root — turbo prune doesn't include it
+COPY lingui.config.ts .
+
 ARG APP_VERSION
 ARG GIT_COMMIT_SHA
 ENV NODE_ENV=production
