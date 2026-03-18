@@ -146,10 +146,11 @@ export async function cacheImagesForTitle(titleId: string) {
 
   // Parallel cache checks instead of sequential awaits
   const checks = await Promise.all(
-    candidates.map(async (c) => ({
-      ...c,
-      cached: await isImageCached(c.category, path.basename(c.imgPath)),
-    })),
+    candidates.map(async (c) =>
+      Object.assign(c, {
+        cached: await isImageCached(c.category, path.basename(c.imgPath)),
+      }),
+    ),
   );
   const tasks = checks
     .filter((c) => !c.cached)

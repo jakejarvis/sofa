@@ -38,6 +38,14 @@
     ],
     "functions": ["cn", "clsx", "cva", "useResolveClassNames"]
   },
+  "overrides": [
+    {
+      "files": ["**/*.json", "**/*.jsonc"],
+      "options": {
+        "trailingComma": "none"
+      }
+    }
+  ],
   "ignorePatterns": [
     "node_modules",
     "dist",

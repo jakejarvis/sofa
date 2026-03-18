@@ -50,11 +50,10 @@ export const discover = os.discover.use(authed).handler(async ({ input, context 
   const titleMap = ensureBrowseTitlesExist(baseItems);
   const items = baseItems.map((item) => {
     const entry = titleMap.get(`${item.tmdbId}-${item.type}`);
-    return {
-      ...item,
+    return Object.assign(item, {
       id: entry?.id ?? "",
       posterThumbHash: entry?.posterThumbHash ?? null,
-    };
+    });
   });
 
   const titleIds = items.map((r) => r.id);

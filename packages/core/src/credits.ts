@@ -361,8 +361,7 @@ export function getCastForTitle(titleId: string): CastMember[] {
     .orderBy(titleCast.displayOrder)
     .all();
 
-  return rows.map((r) => ({
-    ...r,
-    profilePath: tmdbImageUrl(r.profilePath, "profiles"),
-  }));
+  return rows.map((r) =>
+    Object.assign(r, { profilePath: tmdbImageUrl(r.profilePath, "profiles") }),
+  );
 }

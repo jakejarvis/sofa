@@ -1,9 +1,13 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["eslint", "typescript", "unicorn", "oxc", "react", "import"],
+  "plugins": ["oxc", "eslint", "typescript", "react", "import", "unicorn"],
+  "env": {
+    "builtin": true
+  },
   "categories": {
     "correctness": "error",
-    "suspicious": "warn"
+    "suspicious": "warn",
+    "perf": "warn"
   },
   "rules": {
     "react/react-in-jsx-scope": "off",
@@ -12,7 +16,9 @@
     "import/no-named-as-default-member": "off",
     "unicorn/no-array-sort": "off",
     "unicorn/consistent-function-scoping": "off",
-    "no-new": "off"
+    "no-new": "off",
+    "no-await-in-loop": "off",
+    "react/no-array-index-key": "off"
   },
   "ignorePatterns": ["node_modules", "dist", "build", "docs", "**/routeTree.gen.ts"]
 }

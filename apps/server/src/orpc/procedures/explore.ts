@@ -64,11 +64,10 @@ export const trending = os.explore.trending.use(authed).handler(async ({ input, 
 
   const items = baseItems.map((item) => {
     const entry = titleMap.get(`${item.tmdbId}-${item.type}`);
-    return {
-      ...item,
+    return Object.assign(item, {
       id: entry?.id ?? "",
       posterThumbHash: entry?.posterThumbHash ?? null,
-    };
+    });
   });
 
   const heroEntry = heroResult
@@ -125,11 +124,10 @@ export const popular = os.explore.popular.use(authed).handler(async ({ input, co
   const titleMap = ensureBrowseTitlesExist(baseItems);
   const items = baseItems.map((item) => {
     const entry = titleMap.get(`${item.tmdbId}-${item.type}`);
-    return {
-      ...item,
+    return Object.assign(item, {
       id: entry?.id ?? "",
       posterThumbHash: entry?.posterThumbHash ?? null,
-    };
+    });
   });
 
   const titleIds = items.map((r) => r.id);

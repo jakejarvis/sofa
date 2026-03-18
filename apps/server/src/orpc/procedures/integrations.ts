@@ -55,8 +55,7 @@ export const list = os.integrations.list.use(authed).handler(({ context }) => {
 
   const result = userIntegrations.map((integration) => {
     const events = eventsByIntegration.get(integration.id) ?? [];
-    return {
-      ...serializeIntegration(integration),
+    return Object.assign(serializeIntegration(integration), {
       recentEvents: events.map((e) => ({
         id: e.id,
         eventType: e.eventType,
@@ -65,7 +64,7 @@ export const list = os.integrations.list.use(authed).handler(({ context }) => {
         status: e.status,
         receivedAt: e.receivedAt.toISOString(),
       })),
-    };
+    });
   });
 
   return { integrations: result };
