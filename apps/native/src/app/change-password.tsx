@@ -3,6 +3,7 @@ import { Stack, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { Alert, ScrollView, type TextInput, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useResolveClassNames } from "uniwind";
 import { z } from "zod";
 import { Button, ButtonLabel } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -46,6 +47,8 @@ export default function ChangePasswordScreen() {
   const newPasswordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
   const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);
+
+  const headerTitleStyle = useResolveClassNames("font-display text-xl");
 
   const form = useForm({
     defaultValues: {
@@ -92,7 +95,9 @@ export default function ChangePasswordScreen() {
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
     >
-      <Stack.Screen.Title>Change Password</Stack.Screen.Title>
+      <Stack.Screen.Title style={headerTitleStyle as Record<string, unknown>}>
+        Change Password
+      </Stack.Screen.Title>
 
       <form.Subscribe
         selector={(state) => ({

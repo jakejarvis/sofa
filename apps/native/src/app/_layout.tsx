@@ -153,8 +153,7 @@ function AppContent() {
             name="person/[id]"
             dangerouslySingular
             options={{
-              headerShown: true,
-              animation: "slide_from_right",
+              presentation: "modal",
             }}
           />
         </Stack.Protected>
