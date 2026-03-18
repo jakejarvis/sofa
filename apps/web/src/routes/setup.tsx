@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconExternalLink, IconKey } from "@tabler/icons-react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { CopyButton } from "@/components/setup/copy-button";
@@ -94,10 +95,10 @@ function SetupPage() {
       <div className="space-y-3">
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 font-medium text-primary text-xs">
           <IconKey aria-hidden={true} className="size-3.5" />
-          Setup required
+          <Trans>Setup required</Trans>
         </div>
         <h1 className="text-balance font-display text-3xl tracking-tight sm:text-4xl">
-          Connect to TMDB
+          <Trans>Connect to TMDB</Trans>
         </h1>
         <p className="max-w-lg text-muted-foreground leading-relaxed">
           Sofa uses{" "}
@@ -183,8 +184,10 @@ function SetupPage() {
           <TmdbLogo className="h-3" />
         </a>
         <p className="text-[10px] text-muted-foreground leading-relaxed">
-          This product uses the TMDB API but is not endorsed or certified by
-          TMDB.
+          <Trans>
+            This product uses the TMDB API but is not endorsed or certified by
+            TMDB.
+          </Trans>
         </p>
       </div>
     </div>

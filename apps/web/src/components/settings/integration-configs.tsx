@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconExternalLink, IconInfoCircle } from "@tabler/icons-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -37,46 +38,55 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
     connectedStatus: webhookStatus,
     alert: (
       <RequirementAlert>
-        Requires an active{" "}
-        <a
-          href="https://www.plex.tv/plex-pass/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
-        >
-          Plex Pass
-          <IconExternalLink
-            aria-hidden={true}
-            className="inline-block size-3 translate-y-[-1px]"
-          />
-        </a>{" "}
-        subscription.
+        <Trans>
+          Requires an active{" "}
+          <a
+            href="https://www.plex.tv/plex-pass/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+          >
+            Plex Pass
+            <IconExternalLink
+              aria-hidden={true}
+              className="inline-block size-3 translate-y-[-1px]"
+            />
+          </a>{" "}
+          subscription.
+        </Trans>
       </RequirementAlert>
     ),
     setupSteps: (
       <>
         <li>
-          Open Plex, go to{" "}
-          <a
-            href="https://app.plex.tv/desktop/#!/settings/webhooks"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
-          >
-            Settings &gt; Webhooks
-            <IconExternalLink
-              aria-hidden={true}
-              className="inline-block size-3 translate-y-[-1px]"
-            />
-          </a>
+          <Trans>
+            Open Plex, go to{" "}
+            <a
+              href="https://app.plex.tv/desktop/#!/settings/webhooks"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+            >
+              Settings &gt; Webhooks
+              <IconExternalLink
+                aria-hidden={true}
+                className="inline-block size-3 translate-y-[-1px]"
+              />
+            </a>
+          </Trans>
         </li>
         <li>
-          Click <span className="font-medium text-foreground">Add Webhook</span>{" "}
-          and paste the URL above
+          <Trans>
+            Click{" "}
+            <span className="font-medium text-foreground">Add Webhook</span> and
+            paste the URL above
+          </Trans>
         </li>
         <li>
-          Sofa will automatically log movies and episodes when you finish
-          watching them
+          <Trans>
+            Sofa will automatically log movies and episodes when you finish
+            watching them
+          </Trans>
         </li>
       </>
     ),
@@ -92,42 +102,52 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
     setupSteps: (
       <>
         <li>
-          Install the{" "}
-          <a
-            href="https://github.com/jellyfin/jellyfin-plugin-webhook/tree/master"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
-          >
-            Webhook plugin
-            <IconExternalLink
-              aria-hidden={true}
-              className="inline-block size-3 translate-y-[-1px]"
-            />
-          </a>{" "}
-          from Jellyfin&apos;s plugin catalog
+          <Trans>
+            Install the{" "}
+            <a
+              href="https://github.com/jellyfin/jellyfin-plugin-webhook/tree/master"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+            >
+              Webhook plugin
+              <IconExternalLink
+                aria-hidden={true}
+                className="inline-block size-3 translate-y-[-1px]"
+              />
+            </a>{" "}
+            from Jellyfin's plugin catalog
+          </Trans>
         </li>
         <li>
-          Go to{" "}
-          <span className="font-medium text-foreground">
-            Dashboard &gt; Plugins &gt; Webhook
-          </span>
+          <Trans>
+            Go to{" "}
+            <span className="font-medium text-foreground">
+              Dashboard &gt; Plugins &gt; Webhook
+            </span>
+          </Trans>
         </li>
         <li>
-          Add a{" "}
-          <span className="font-medium text-foreground">
-            Generic Destination
-          </span>{" "}
-          and paste the URL above
+          <Trans>
+            Add a{" "}
+            <span className="font-medium text-foreground">
+              Generic Destination
+            </span>{" "}
+            and paste the URL above
+          </Trans>
         </li>
         <li>
-          Enable the{" "}
-          <span className="font-medium text-foreground">Playback Stop</span>{" "}
-          notification type
+          <Trans>
+            Enable the{" "}
+            <span className="font-medium text-foreground">Playback Stop</span>{" "}
+            notification type
+          </Trans>
         </li>
         <li>
-          Sofa will automatically log movies and episodes when you finish
-          watching them
+          <Trans>
+            Sofa will automatically log movies and episodes when you finish
+            watching them
+          </Trans>
         </li>
       </>
     ),
@@ -142,41 +162,53 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
     connectedStatus: webhookStatus,
     alert: (
       <RequirementAlert>
-        Requires{" "}
-        <span className="font-medium text-foreground">Emby Server 4.7.9+</span>{" "}
-        and an active{" "}
-        <a
-          href="https://emby.media/premiere.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
-        >
-          Emby Premiere
-          <IconExternalLink
-            aria-hidden={true}
-            className="inline-block size-3 translate-y-[-1px]"
-          />
-        </a>{" "}
-        license.
+        <Trans>
+          Requires{" "}
+          <span className="font-medium text-foreground">
+            Emby Server 4.7.9+
+          </span>{" "}
+          and an active{" "}
+          <a
+            href="https://emby.media/premiere.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
+          >
+            Emby Premiere
+            <IconExternalLink
+              aria-hidden={true}
+              className="inline-block size-3 translate-y-[-1px]"
+            />
+          </a>{" "}
+          license.
+        </Trans>
       </RequirementAlert>
     ),
     setupSteps: (
       <>
         <li>
-          Open Emby, go to{" "}
-          <span className="font-medium text-foreground">
-            Settings &gt; Webhooks
-          </span>
-        </li>
-        <li>Add a new webhook and paste the URL above</li>
-        <li>
-          Enable the{" "}
-          <span className="font-medium text-foreground">Playback</span> event
-          category
+          <Trans>
+            Open Emby, go to{" "}
+            <span className="font-medium text-foreground">
+              Settings &gt; Webhooks
+            </span>
+          </Trans>
         </li>
         <li>
-          Sofa will automatically log movies and episodes when you finish
-          watching them
+          <Trans>Add a new webhook and paste the URL above</Trans>
+        </li>
+        <li>
+          <Trans>
+            Enable the{" "}
+            <span className="font-medium text-foreground">Playback</span> event
+            category
+          </Trans>
+        </li>
+        <li>
+          <Trans>
+            Sofa will automatically log movies and episodes when you finish
+            watching them
+          </Trans>
         </li>
       </>
     ),
@@ -194,21 +226,31 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
     setupSteps: (
       <>
         <li>
-          Open Sonarr, go to{" "}
-          <span className="font-medium text-foreground">
-            Settings &gt; Import Lists
-          </span>
+          <Trans>
+            Open Sonarr, go to{" "}
+            <span className="font-medium text-foreground">
+              Settings &gt; Import Lists
+            </span>
+          </Trans>
         </li>
         <li>
-          Click <span className="font-medium text-foreground">+</span> and
-          select{" "}
-          <span className="font-medium text-foreground">Custom Lists</span>
+          <Trans>
+            Click <span className="font-medium text-foreground">+</span> and
+            select{" "}
+            <span className="font-medium text-foreground">Custom Lists</span>
+          </Trans>
         </li>
-        <li>Paste the Sonarr URL above into the List URL field</li>
-        <li>Set your preferred quality profile and root folder</li>
         <li>
-          Titles on your Sofa watchlist will be automatically added for download
-          when Sonarr polls this list (every 6 hours by default)
+          <Trans>Paste the Sonarr URL above into the List URL field</Trans>
+        </li>
+        <li>
+          <Trans>Set your preferred quality profile and root folder</Trans>
+        </li>
+        <li>
+          <Trans>
+            Titles on your Sofa watchlist will be automatically added for
+            download when Sonarr polls this list (every 6 hours by default)
+          </Trans>
         </li>
       </>
     ),
@@ -224,21 +266,31 @@ export const INTEGRATION_CONFIGS: IntegrationConfig[] = [
     setupSteps: (
       <>
         <li>
-          Open Radarr, go to{" "}
-          <span className="font-medium text-foreground">
-            Settings &gt; Import Lists
-          </span>
+          <Trans>
+            Open Radarr, go to{" "}
+            <span className="font-medium text-foreground">
+              Settings &gt; Import Lists
+            </span>
+          </Trans>
         </li>
         <li>
-          Click <span className="font-medium text-foreground">+</span> and
-          select{" "}
-          <span className="font-medium text-foreground">Custom Lists</span>
+          <Trans>
+            Click <span className="font-medium text-foreground">+</span> and
+            select{" "}
+            <span className="font-medium text-foreground">Custom Lists</span>
+          </Trans>
         </li>
-        <li>Paste the Radarr URL above into the List URL field</li>
-        <li>Set your preferred quality profile and root folder</li>
         <li>
-          Titles on your Sofa watchlist will be automatically added for download
-          when Radarr polls this list (every 12 hours by default)
+          <Trans>Paste the Radarr URL above into the List URL field</Trans>
+        </li>
+        <li>
+          <Trans>Set your preferred quality profile and root folder</Trans>
+        </li>
+        <li>
+          <Trans>
+            Titles on your Sofa watchlist will be automatically added for
+            download when Radarr polls this list (every 12 hours by default)
+          </Trans>
         </li>
       </>
     ),

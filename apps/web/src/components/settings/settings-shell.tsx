@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconSettings } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import { Children, type ReactNode } from "react";
@@ -32,11 +33,11 @@ export function SettingsShell({
         <div className="flex items-center gap-2">
           <IconSettings aria-hidden={true} className="size-5 text-primary" />
           <h1 className="text-balance font-display text-3xl tracking-tight">
-            Settings
+            <Trans>Settings</Trans>
           </h1>
         </div>
         <p className="mt-1 text-muted-foreground text-sm">
-          Manage your account and preferences
+          <Trans>Manage your account and preferences</Trans>
         </p>
       </motion.div>
 

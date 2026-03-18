@@ -1,3 +1,5 @@
+import { Trans, useLingui } from "@lingui/react/macro";
+import { formatDate } from "@sofa/i18n/format";
 import {
   IconAlertTriangle,
   IconCamera,
@@ -43,6 +45,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { authClient, signOut } from "@/lib/auth/client";
+import { getErrorMessage } from "@/lib/error-messages";
 import { orpc } from "@/lib/orpc/client";
 
 export function AccountSection({
@@ -56,6 +59,7 @@ export function AccountSection({
     role?: string;
   };
 }) {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const router = useRouter();
   const [avatarUrl, setAvatarUrl] = useState(user.image);
@@ -73,12 +77,11 @@ export function AccountSection({
         const trimmed = editValue.trim();
         setDisplayName(trimmed);
         setIsEditingName(false);
-        toast.success("Name updated");
+        toast.success(t`Name updated`);
         router.invalidate();
       },
       onError: (err) => {
-        const message = err instanceof Error ? err.message : "Update failed";
-        toast.error(message);
+        toast.error(getErrorMessage(err, t, t`Update failed`));
       },
     }),
   );
@@ -91,9 +94,10 @@ export function AccountSection({
     }
   }, [isEditingName]);
 
-  const memberSince = new Date(user.createdAt).toLocaleDateString(undefined, {
+  const memberSince = formatDate(user.createdAt, {
     year: "numeric",
     month: "long",
+    day: undefined,
   });
   const initial = displayName?.charAt(0).toUpperCase() ?? "?";
 
@@ -101,12 +105,11 @@ export function AccountSection({
     orpc.account.uploadAvatar.mutationOptions({
       onSuccess: (data) => {
         setAvatarUrl(data.imageUrl);
-        toast.success("Profile picture updated");
+        toast.success(t`Profile picture updated`);
         router.invalidate();
       },
       onError: (err) => {
-        const message = err instanceof Error ? err.message : "Upload failed";
-        toast.error(message);
+        toast.error(getErrorMessage(err, t, t`Upload failed`));
       },
       onSettled: () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
@@ -124,11 +127,11 @@ export function AccountSection({
     orpc.account.removeAvatar.mutationOptions({
       onSuccess: () => {
         setAvatarUrl(undefined);
-        toast.success("Profile picture removed");
+        toast.success(t`Profile picture removed`);
         router.invalidate();
       },
       onError: () => {
-        toast.error("Failed to remove profile picture");
+        toast.error(t`Failed to remove profile picture`);
       },
     }),
   );
@@ -169,7 +172,7 @@ export function AccountSection({
       <div className="mb-3 flex items-center gap-2">
         <IconUser aria-hidden={true} className="size-4 text-muted-foreground" />
         <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-          Account
+          <Trans>Account</Trans>
         </h2>
       </div>
       <Card>
@@ -192,7 +195,9 @@ export function AccountSection({
               }
               className="relative shrink-0 cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               aria-label={
-                avatarUrl ? "Remove profile picture" : "Upload profile picture"
+                avatarUrl
+                  ? t`Remove profile picture`
+                  : t`Upload profile picture`
               }
             >
               <Avatar className="size-12 overflow-hidden">
@@ -230,7 +235,11 @@ export function AccountSection({
               </AnimatePresence>
             </TooltipTrigger>
             <TooltipContent>
-              {avatarUrl ? "Remove picture" : "Upload picture"}
+              {avatarUrl ? (
+                <Trans>Remove picture</Trans>
+              ) : (
+                <Trans>Upload picture</Trans>
+              )}
             </TooltipContent>
           </Tooltip>
 
@@ -284,7 +293,7 @@ export function AccountSection({
                             handleNameSave();
                           }}
                           className="shrink-0 rounded-md p-0.5 text-muted-foreground transition-colors hover:text-primary"
-                          aria-label="Save name"
+                          aria-label={t`Save name`}
                         >
                           <IconCheck className="size-3.5" />
                         </button>
@@ -295,7 +304,7 @@ export function AccountSection({
                             handleNameCancel();
                           }}
                           className="shrink-0 rounded-md p-0.5 text-muted-foreground transition-colors hover:text-destructive"
-                          aria-label="Cancel editing"
+                          aria-label={t`Cancel editing`}
                         >
                           <IconX className="size-3.5" />
                         </button>
@@ -323,12 +332,12 @@ export function AccountSection({
               {user.email}
               {user.role === "admin" && (
                 <Badge className="ml-1.5 rounded-md border-0 bg-primary/10 align-middle text-primary">
-                  Admin
+                  <Trans>Admin</Trans>
                 </Badge>
               )}
             </CardDescription>
             <p className="mt-0.5 text-muted-foreground/60 text-xs">
-              Member since {memberSince}
+              <Trans>Member since {memberSince}</Trans>
             </p>
           </div>
 
@@ -342,7 +351,7 @@ export function AccountSection({
               }}
             >
               <IconLogout aria-hidden={true} />
-              Sign out
+              <Trans>Sign out</Trans>
             </Button>
           </div>
         </CardContent>
@@ -352,6 +361,7 @@ export function AccountSection({
 }
 
 function ChangePasswordDialog() {
+  const { t } = useLingui();
   const [open, setOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -378,15 +388,15 @@ function ChangePasswordDialog() {
     setError("");
 
     if (!currentPassword) {
-      setError("Current password is required");
+      setError(t`Current password is required`);
       return;
     }
     if (newPassword.length < 8) {
-      setError("New password must be at least 8 characters");
+      setError(t`New password must be at least 8 characters`);
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t`Passwords do not match`);
       return;
     }
 
@@ -398,13 +408,13 @@ function ChangePasswordDialog() {
         revokeOtherSessions,
       });
       if (result.error) {
-        setError(result.error.message ?? "Failed to change password");
+        setError(t`Failed to change password`);
         return;
       }
-      toast.success("Password updated");
+      toast.success(t`Password updated`);
       handleOpenChange(false);
     } catch {
-      setError("Something went wrong");
+      setError(t`Something went wrong`);
     } finally {
       setIsSubmitting(false);
     }
@@ -414,13 +424,15 @@ function ChangePasswordDialog() {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <Button variant="outline" onClick={() => setOpen(true)}>
         <IconLockPassword aria-hidden={true} />
-        Change password
+        <Trans>Change password</Trans>
       </Button>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Change password</DialogTitle>
+          <DialogTitle>
+            <Trans>Change password</Trans>
+          </DialogTitle>
           <DialogDescription>
-            Enter your current password and choose a new one.
+            <Trans>Enter your current password and choose a new one.</Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -433,7 +445,9 @@ function ChangePasswordDialog() {
           )}
 
           <div className="grid gap-1.5">
-            <Label htmlFor="current-password">Current password</Label>
+            <Label htmlFor="current-password">
+              <Trans>Current password</Trans>
+            </Label>
             <Input
               id="current-password"
               type="password"
@@ -445,7 +459,9 @@ function ChangePasswordDialog() {
           </div>
 
           <div className="grid gap-1.5">
-            <Label htmlFor="new-password">New password</Label>
+            <Label htmlFor="new-password">
+              <Trans>New password</Trans>
+            </Label>
             <Input
               id="new-password"
               type="password"
@@ -457,7 +473,9 @@ function ChangePasswordDialog() {
           </div>
 
           <div className="grid gap-1.5">
-            <Label htmlFor="confirm-password">Confirm new password</Label>
+            <Label htmlFor="confirm-password">
+              <Trans>Confirm new password</Trans>
+            </Label>
             <Input
               id="confirm-password"
               type="password"
@@ -478,17 +496,17 @@ function ChangePasswordDialog() {
               disabled={isSubmitting}
             />
             <Label htmlFor="revoke-sessions" className="cursor-pointer">
-              Sign out of other sessions
+              <Trans>Sign out of other sessions</Trans>
             </Label>
           </div>
 
           <DialogFooter className="pt-2">
             <DialogClose render={<Button variant="outline" />}>
-              Cancel
+              <Trans>Cancel</Trans>
             </DialogClose>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Spinner className="size-3.5" />}
-              Update password
+              <Trans>Update password</Trans>
             </Button>
           </DialogFooter>
         </form>

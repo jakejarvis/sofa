@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconCloudOff } from "@tabler/icons-react-native";
 import * as Network from "expo-network";
 import { useEffect, useRef, useState } from "react";
@@ -70,14 +71,14 @@ export function ServerUnreachableBanner() {
       <View className="mx-4 flex-row items-center justify-center gap-2 rounded-xl bg-status-watching px-4 py-2.5">
         <ScaledIcon icon={IconCloudOff} size={16} color="white" />
         <Text className="font-medium font-sans text-sm text-white">
-          Can't reach server
+          <Trans>Can't reach server</Trans>
         </Text>
         <Pressable
           onPress={handleRetry}
           className="ml-1 rounded-md bg-white/20 px-2 py-0.5"
         >
           <Text className="font-medium font-sans text-white text-xs">
-            Retry
+            <Trans>Retry</Trans>
           </Text>
         </Pressable>
       </View>

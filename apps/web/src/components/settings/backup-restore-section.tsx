@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconCloudUpload } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -15,9 +16,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { getErrorMessage } from "@/lib/error-messages";
 import { orpc } from "@/lib/orpc/client";
 
 export function BackupRestoreSection() {
+  const { t } = useLingui();
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -25,12 +28,11 @@ export function BackupRestoreSection() {
   const restoreMutation = useMutation(
     orpc.admin.backups.restore.mutationOptions({
       onSuccess: () => {
-        toast.success("Database restored. Reloading...");
+        toast.success(t`Database restored. Reloading...`);
         setTimeout(() => window.location.reload(), 1500);
       },
       onError: (err) => {
-        const message = err instanceof Error ? err.message : "Restore failed";
-        toast.error(message);
+        toast.error(getErrorMessage(err, t, t`Restore failed`));
       },
       onSettled: () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
@@ -53,10 +55,14 @@ export function BackupRestoreSection() {
             />
           </div>
           <div>
-            <CardTitle>Restore</CardTitle>
+            <CardTitle>
+              <Trans>Restore</Trans>
+            </CardTitle>
             <CardDescription>
-              Upload a .db file to replace the current database. A safety backup
-              is created first.
+              <Trans>
+                Upload a .db file to replace the current database. A safety
+                backup is created first.
+              </Trans>
             </CardDescription>
           </div>
         </div>
@@ -79,11 +85,15 @@ export function BackupRestoreSection() {
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Restore database?</AlertDialogTitle>
+              <AlertDialogTitle>
+                <Trans>Restore database?</Trans>
+              </AlertDialogTitle>
               <AlertDialogDescription>
-                This will replace your entire database with the uploaded file. A
-                safety backup of your current data will be created first. Active
-                sessions may need to refresh after restore.
+                <Trans>
+                  This will replace your entire database with the uploaded file.
+                  A safety backup of your current data will be created first.
+                  Active sessions may need to refresh after restore.
+                </Trans>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -94,7 +104,7 @@ export function BackupRestoreSection() {
                   if (fileInputRef.current) fileInputRef.current.value = "";
                 }}
               >
-                Cancel
+                <Trans>Cancel</Trans>
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => {
@@ -103,7 +113,7 @@ export function BackupRestoreSection() {
                   setSelectedFile(null);
                 }}
               >
-                Restore
+                <Trans>Restore</Trans>
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -118,7 +128,11 @@ export function BackupRestoreSection() {
           ) : (
             <IconCloudUpload aria-hidden={true} />
           )}
-          {restoreMutation.isPending ? "Restoring…" : "Upload"}
+          {restoreMutation.isPending ? (
+            <Trans>Restoring…</Trans>
+          ) : (
+            <Trans>Upload</Trans>
+          )}
         </Button>
       </div>
     </CardContent>

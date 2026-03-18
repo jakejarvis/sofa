@@ -1,6 +1,7 @@
+import { useLingui } from "@lingui/react/macro";
 import type { ResolvedPerson } from "@sofa/api/schemas";
+import { formatDate } from "@sofa/i18n/format";
 import { IconCalendar, IconMapPin } from "@tabler/icons-react";
-import { format, parseISO } from "date-fns";
 
 import { ExpandableText } from "@/components/expandable-text";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ function calculateAge(birthday: string, deathday?: string | null): number {
 }
 
 export function PersonHero({ person }: PersonHeroProps) {
+  const { t } = useLingui();
   const age = person.birthday
     ? calculateAge(person.birthday, person.deathday)
     : null;
@@ -66,15 +68,15 @@ export function PersonHero({ person }: PersonHeroProps) {
         {person.knownForDepartment && (
           <Badge className="border-0 bg-primary/10 px-2.5 font-semibold text-primary uppercase tracking-wider">
             {person.knownForDepartment === "Acting"
-              ? "Actor"
+              ? t`Actor`
               : person.knownForDepartment === "Directing"
-                ? "Director"
+                ? t`Director`
                 : person.knownForDepartment === "Writing"
-                  ? "Writer"
+                  ? t`Writer`
                   : person.knownForDepartment === "Production"
-                    ? "Producer"
+                    ? t`Producer`
                     : person.knownForDepartment === "Editing"
-                      ? "Editor"
+                      ? t`Editor`
                       : person.knownForDepartment}
           </Badge>
         )}
@@ -83,10 +85,10 @@ export function PersonHero({ person }: PersonHeroProps) {
           {person.birthday && (
             <span className="flex items-center gap-1.5">
               <IconCalendar aria-hidden={true} className="size-3.5" />
-              {format(parseISO(person.birthday), "MMMM d, yyyy")}
+              {formatDate(person.birthday)}
               {age !== null && (
                 <span className="text-muted-foreground/60">
-                  ({person.deathday ? `died at ${age}` : `age ${age}`})
+                  ({person.deathday ? t`died at ${age}` : t`age ${age}`})
                 </span>
               )}
             </span>

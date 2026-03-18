@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconBookmarkFilled,
   IconCheck,
@@ -12,26 +13,37 @@ import * as Haptics from "@/utils/haptics";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
-const statusConfig = {
+const STATUS_ICONS = {
+  watchlist: IconBookmarkFilled,
+  in_progress: IconPlayerPlayFilled,
+  completed: IconCheck,
+} as const;
+
+const STATUS_STYLES = {
   watchlist: {
-    label: "Watchlisted",
-    Icon: IconBookmarkFilled,
     bgClass: "bg-title-accent/10 border-title-accent/20",
     textClass: "text-title-accent",
   },
   in_progress: {
-    label: "Watching",
-    Icon: IconPlayerPlayFilled,
     bgClass: "bg-title-accent/10 border-title-accent/20",
     textClass: "text-title-accent",
   },
   completed: {
-    label: "Completed",
-    Icon: IconCheck,
     bgClass: "bg-status-completed/10 border-status-completed/20",
     textClass: "text-status-completed",
   },
 } as const;
+
+function StatusLabel({ status }: { status: TitleStatus }) {
+  switch (status) {
+    case "watchlist":
+      return <Trans>Watchlisted</Trans>;
+    case "in_progress":
+      return <Trans>Watching</Trans>;
+    case "completed":
+      return <Trans>Completed</Trans>;
+  }
+}
 
 export function StatusActionButton({
   currentStatus,
@@ -42,16 +54,13 @@ export function StatusActionButton({
   onStatusChange: (status: TitleStatus | null) => void;
   isPending: boolean;
 }) {
+  const { t } = useLingui();
   const [titleAccent, completedColor] = useCSSVariable([
     "--color-title-accent",
     "--color-status-completed",
   ]) as [string, string];
 
-  const config = currentStatus
-    ? statusConfig[currentStatus as keyof typeof statusConfig]
-    : null;
-
-  if (!config) {
+  if (!currentStatus) {
     return (
       <Pressable
         onPress={() => {
@@ -60,7 +69,7 @@ export function StatusActionButton({
         }}
         disabled={isPending}
         accessibilityRole="button"
-        accessibilityLabel="Add to watchlist"
+        accessibilityLabel={t`Add to watchlist`}
         className="flex-row items-center gap-1.5 rounded-lg border border-title-accent/20 bg-title-accent/10 px-4 py-2"
       >
         <ScaledIcon
@@ -70,12 +79,14 @@ export function StatusActionButton({
           strokeWidth={2.5}
         />
         <Text className="font-medium font-sans text-sm text-title-accent">
-          Watchlist
+          <Trans>Watchlist</Trans>
         </Text>
       </Pressable>
     );
   }
 
+  const StatusIcon = STATUS_ICONS[currentStatus];
+  const styles = STATUS_STYLES[currentStatus];
   const iconColor =
     currentStatus === "completed" ? completedColor : titleAccent;
 
@@ -87,12 +98,12 @@ export function StatusActionButton({
       }}
       disabled={isPending}
       accessibilityRole="button"
-      accessibilityLabel={`${config.label}, double tap to remove`}
-      className={`flex-row items-center gap-1.5 rounded-lg border px-4 py-2 ${config.bgClass}`}
+      accessibilityLabel={t`Remove from library`}
+      className={`flex-row items-center gap-1.5 rounded-lg border px-4 py-2 ${styles.bgClass}`}
     >
-      <ScaledIcon icon={config.Icon} size={14} color={iconColor} />
-      <Text className={`font-medium font-sans text-sm ${config.textClass}`}>
-        {config.label}
+      <ScaledIcon icon={StatusIcon} size={14} color={iconColor} />
+      <Text className={`font-medium font-sans text-sm ${styles.textClass}`}>
+        <StatusLabel status={currentStatus} />
       </Text>
     </Pressable>
   );

@@ -1,3 +1,5 @@
+import { plural } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconChevronDown } from "@tabler/icons-react-native";
 import { useCallback, useEffect, useState } from "react";
 import { InteractionManager, Pressable, View } from "react-native";
@@ -33,6 +35,7 @@ export function SeasonAccordion({
   }>;
   watchedEpisodeIds: Set<string>;
 }) {
+  const { t } = useLingui();
   const titleAccentColor = useCSSVariable("--color-title-accent") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
 
@@ -116,16 +119,16 @@ export function SeasonAccordion({
       <Pressable
         onPress={toggleExpanded}
         accessibilityRole="button"
-        accessibilityLabel={`${season.name ?? `Season ${season.seasonNumber}`}, ${watchedCount} of ${episodes.length} episodes watched`}
+        accessibilityLabel={`${season.name ?? t`Season ${season.seasonNumber}`}, ${t`${watchedCount} of ${episodes.length} episodes watched`}`}
         accessibilityState={{ expanded }}
         className="flex-row items-center justify-between p-4"
       >
         <View className="flex-1">
           <Text className="font-medium font-sans text-base text-foreground">
-            {season.name ?? `Season ${season.seasonNumber}`}
+            {season.name ?? t`Season ${season.seasonNumber}`}
           </Text>
           <Text className="mt-0.5 text-muted-foreground text-xs">
-            {watchedCount}/{episodes.length} episodes
+            {t`${watchedCount}/${episodes.length} ${plural(episodes.length, { one: "episode", other: "episodes" })}`}
           </Text>
         </View>
 
@@ -158,7 +161,7 @@ export function SeasonAccordion({
               className="mx-4 mb-2 flex-row items-center justify-center rounded-lg bg-secondary py-2"
             >
               <Text className="font-medium font-sans text-title-accent text-xs">
-                Mark All Watched
+                <Trans>Mark All Watched</Trans>
               </Text>
             </Pressable>
           )}

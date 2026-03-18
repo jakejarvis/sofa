@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
@@ -41,6 +42,7 @@ function mergeMaps<T>(
 }
 
 export function ExploreClient() {
+  const { t } = useLingui();
   const {
     data: trendingData,
     isPending: trendingPending,
@@ -107,7 +109,7 @@ export function ExploreClient() {
 
       <div>
         <TitleRow
-          heading="Trending Today"
+          heading={t`Trending Today`}
           icon={
             <IconFlame aria-hidden={true} className="size-5 text-primary" />
           }
@@ -121,7 +123,7 @@ export function ExploreClient() {
       </div>
 
       <FilterableTitleRow
-        heading="Popular Movies"
+        heading={t`Popular Movies`}
         icon={<IconMovie aria-hidden={true} className="size-5 text-primary" />}
         mediaType="movie"
         defaultItems={(popularMoviesData?.items ?? []).slice(0, 20)}
@@ -131,7 +133,7 @@ export function ExploreClient() {
       />
 
       <FilterableTitleRow
-        heading="Popular TV Shows"
+        heading={t`Popular TV Shows`}
         icon={
           <IconDeviceTv aria-hidden={true} className="size-5 text-primary" />
         }

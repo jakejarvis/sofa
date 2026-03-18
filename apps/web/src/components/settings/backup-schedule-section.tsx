@@ -1,7 +1,8 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { BackupFrequency } from "@sofa/api/schemas";
+import { formatDate, formatRelativeTime } from "@sofa/i18n/format";
 import { IconCalendarWeek } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { format, formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -27,16 +28,6 @@ const FREQUENCY_OPTIONS: { value: BackupFrequency; label: string }[] = [
 ];
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
-
-const DAYS_OF_WEEK = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-] as const;
 
 interface BackupScheduleState {
   enabled: boolean;
@@ -98,16 +89,19 @@ function getNextBackupDate(
   return next;
 }
 
-function formatNextBackup(
-  frequency: BackupFrequency,
-  time: string,
-  dayOfWeek: number,
-): string {
-  const next = getNextBackupDate(frequency, time, dayOfWeek);
-  return `Next backup ${formatDistanceToNow(next, { addSuffix: true })}`;
-}
-
 export function BackupScheduleSection() {
+  const { t } = useLingui();
+
+  const DAYS_OF_WEEK = [
+    t`Sunday`,
+    t`Monday`,
+    t`Tuesday`,
+    t`Wednesday`,
+    t`Thursday`,
+    t`Friday`,
+    t`Saturday`,
+  ];
+
   const {
     data: scheduleData,
     isPending,
@@ -127,6 +121,16 @@ export function BackupScheduleSection() {
 
   const { enabled, maxRetention, frequency, time, dow } = current;
 
+  function formatNextBackup(
+    frequency: BackupFrequency,
+    time: string,
+    dayOfWeek: number,
+  ): string {
+    const next = getNextBackupDate(frequency, time, dayOfWeek);
+    const distance = formatRelativeTime(next);
+    return t`Next backup ${distance}`;
+  }
+
   const updateScheduleMutation = useMutation(
     orpc.admin.backups.updateSchedule.mutationOptions({
       onMutate: (input) => {
@@ -145,11 +149,11 @@ export function BackupScheduleSection() {
       onError: (_, input, ctx) => {
         if (ctx?.previous) setSchedule(ctx.previous);
         if (input.enabled !== undefined) {
-          toast.error("Failed to update scheduled backup setting");
+          toast.error(t`Failed to update scheduled backup setting`);
         } else if (input.maxRetention !== undefined) {
-          toast.error("Failed to update retention setting");
+          toast.error(t`Failed to update retention setting`);
         } else {
-          toast.error("Failed to update schedule");
+          toast.error(t`Failed to update schedule`);
         }
       },
     }),
@@ -170,13 +174,13 @@ export function BackupScheduleSection() {
           onSuccess: () =>
             toast.success(
               checked
-                ? "Scheduled backups enabled"
-                : "Scheduled backups disabled",
+                ? t`Scheduled backups enabled`
+                : t`Scheduled backups disabled`,
             ),
         },
       );
     },
-    [updateScheduleMutation],
+    [updateScheduleMutation, t],
   );
 
   const changeMaxRetention = useCallback(
@@ -194,10 +198,10 @@ export function BackupScheduleSection() {
           time: newTime,
           dayOfWeek: newDow,
         },
-        { onSuccess: () => toast.success("Schedule updated") },
+        { onSuccess: () => toast.success(t`Schedule updated`) },
       );
     },
-    [updateScheduleMutation, current.dow],
+    [updateScheduleMutation, current.dow, t],
   );
 
   if (isPending) {
@@ -208,7 +212,7 @@ export function BackupScheduleSection() {
     return (
       <CardContent>
         <p className="text-muted-foreground text-sm">
-          Failed to load backup schedule settings.
+          <Trans>Failed to load backup schedule settings.</Trans>
         </p>
       </CardContent>
     );
@@ -226,46 +230,55 @@ export function BackupScheduleSection() {
               />
             </div>
             <div>
-              <CardTitle>Backup schedule</CardTitle>
+              <CardTitle>
+                <Trans>Backup schedule</Trans>
+              </CardTitle>
               <CardDescription>
                 {enabled ? (
                   <span
                     className="inline-flex flex-wrap items-baseline"
                     suppressHydrationWarning
                   >
-                    {formatNextBackup(frequency, time, dow)}. Keeping{" "}
-                    <Select
-                      value={String(maxRetention)}
-                      onValueChange={(v) => v && changeMaxRetention(Number(v))}
-                      modal={false}
-                    >
-                      <SelectTrigger className="!h-auto mr-0.5 ml-1.5 w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 underline decoration-muted-foreground/50 decoration-dotted underline-offset-4 shadow-none hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:decoration-foreground focus-visible:decoration-solid focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent">
-                        <SelectValue>
-                          {(value: string | null) =>
-                            value === "0"
-                              ? "unlimited"
-                              : value
-                                ? `last ${value}`
-                                : null
-                          }
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent
-                        align="start"
-                        alignItemWithTrigger={false}
-                        className="p-1"
+                    {formatNextBackup(frequency, time, dow)}.{" "}
+                    <Trans>
+                      Keeping{" "}
+                      <Select
+                        value={String(maxRetention)}
+                        onValueChange={(v) =>
+                          v && changeMaxRetention(Number(v))
+                        }
+                        modal={false}
                       >
-                        {[3, 5, 7, 14, 30, 0].map((n) => (
-                          <SelectItem key={n} value={String(n)}>
-                            {n === 0 ? "unlimited" : `last ${n}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>{" "}
-                    backups.
+                        <SelectTrigger className="!h-auto mr-0.5 ml-1.5 w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 underline decoration-muted-foreground/50 decoration-dotted underline-offset-4 shadow-none hover:bg-transparent hover:text-foreground hover:decoration-foreground/50 focus-visible:decoration-foreground focus-visible:decoration-solid focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent">
+                          <SelectValue>
+                            {(value: string | null) =>
+                              value === "0"
+                                ? t`unlimited`
+                                : value
+                                  ? t`last ${value}`
+                                  : null
+                            }
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent
+                          align="start"
+                          alignItemWithTrigger={false}
+                          className="p-1"
+                        >
+                          {[3, 5, 7, 14, 30, 0].map((n) => (
+                            <SelectItem key={n} value={String(n)}>
+                              {n === 0 ? t`unlimited` : t`last ${n}`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>{" "}
+                      backups.
+                    </Trans>
                   </span>
                 ) : (
-                  "Automatically back up your database on a schedule"
+                  <Trans>
+                    Automatically back up your database on a schedule
+                  </Trans>
                 )}
               </CardDescription>
             </div>
@@ -274,7 +287,7 @@ export function BackupScheduleSection() {
             checked={enabled}
             onCheckedChange={toggleScheduled}
             disabled={togglingSchedule}
-            aria-label="Toggle scheduled backups"
+            aria-label={t`Toggle scheduled backups`}
           />
         </div>
       </CardContent>
@@ -293,7 +306,7 @@ export function BackupScheduleSection() {
                 {/* Frequency selector */}
                 <div className="space-y-1.5">
                   <span className="inline-block font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
-                    Frequency
+                    <Trans>Frequency</Trans>
                   </span>
                   <ButtonGroup>
                     {FREQUENCY_OPTIONS.map((opt) => (
@@ -326,7 +339,7 @@ export function BackupScheduleSection() {
                       className="overflow-hidden"
                     >
                       <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
-                        Day:{" "}
+                        <Trans>Day:</Trans>{" "}
                       </span>
                       <Select
                         value={String(dow)}
@@ -371,7 +384,11 @@ export function BackupScheduleSection() {
                       className="overflow-hidden"
                     >
                       <span className="font-medium text-[11px] text-muted-foreground/70 uppercase tracking-wider">
-                        {frequency === "12h" ? "Starting at" : "Time:"}{" "}
+                        {frequency === "12h" ? (
+                          <Trans>Starting at</Trans>
+                        ) : (
+                          <Trans>Time:</Trans>
+                        )}{" "}
                       </span>
                       <Select
                         value={time}
@@ -382,7 +399,7 @@ export function BackupScheduleSection() {
                           <SelectValue>
                             {(value: string | null) =>
                               value
-                                ? format(
+                                ? formatDate(
                                     new Date(
                                       2000,
                                       0,
@@ -390,7 +407,13 @@ export function BackupScheduleSection() {
                                       Number(value.split(":")[0]),
                                       0,
                                     ),
-                                    "h:mm a",
+                                    {
+                                      hour: "numeric",
+                                      minute: "2-digit",
+                                      year: undefined,
+                                      month: undefined,
+                                      day: undefined,
+                                    },
                                   )
                                 : null
                             }
@@ -405,7 +428,13 @@ export function BackupScheduleSection() {
                             const val = `${String(h).padStart(2, "0")}:00`;
                             return (
                               <SelectItem key={h} value={val}>
-                                {format(new Date(2000, 0, 1, h, 0), "h:mm a")}
+                                {formatDate(new Date(2000, 0, 1, h, 0), {
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                  year: undefined,
+                                  month: undefined,
+                                  day: undefined,
+                                })}
                               </SelectItem>
                             );
                           })}

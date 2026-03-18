@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   PersonDetailClient,
@@ -48,11 +49,13 @@ function PersonNotFound() {
         style={{ "--stagger-index": 1 } as React.CSSProperties}
       >
         <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
-          Person not found
+          <Trans>Person not found</Trans>
         </h2>
         <p className="mx-auto max-w-sm text-muted-foreground text-sm leading-relaxed">
-          The person you&apos;re looking for doesn&apos;t exist or may have been
-          removed from the database.
+          <Trans>
+            The person you&apos;re looking for doesn&apos;t exist or may have
+            been removed from the database.
+          </Trans>
         </p>
       </div>
       <div
@@ -63,14 +66,16 @@ function PersonNotFound() {
           to="/explore"
           className="group relative inline-flex h-10 items-center justify-center overflow-hidden rounded-lg bg-primary px-5 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-lg hover:shadow-primary/20"
         >
-          <span className="relative z-10">Explore titles</span>
+          <span className="relative z-10">
+            <Trans>Explore titles</Trans>
+          </span>
           <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
         </Link>
         <Link
           to="/dashboard"
           className="inline-flex h-10 items-center justify-center rounded-lg border border-border px-5 font-medium text-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
         >
-          Dashboard
+          <Trans>Dashboard</Trans>
         </Link>
       </div>
     </div>

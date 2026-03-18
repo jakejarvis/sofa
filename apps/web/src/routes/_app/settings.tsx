@@ -1,6 +1,8 @@
+import { Trans } from "@lingui/react/macro";
 import {
   IconAlertTriangle,
   IconDatabaseExport,
+  IconDeviceDesktopCog,
   IconServer2,
   IconShieldLock,
 } from "@tabler/icons-react";
@@ -12,6 +14,7 @@ import { BackupSection } from "@/components/settings/backup-section";
 import { CacheSection } from "@/components/settings/danger-section";
 import { ImportsSection } from "@/components/settings/imports-section";
 import { IntegrationsSection } from "@/components/settings/integrations-section";
+import { LanguageSection } from "@/components/settings/language-section";
 import { RegistrationSection } from "@/components/settings/registration-section";
 import { SettingsShell } from "@/components/settings/settings-shell";
 import { SystemHealthCards } from "@/components/settings/system-health-section";
@@ -35,7 +38,7 @@ function SettingsPage() {
         <footer className="border-border/50 border-t pt-6 pb-2 text-center text-muted-foreground text-xs">
           <p>
             <a
-              href={`https://github.com/${GITHUB_REPO}`}
+              href="https://sofa.watch"
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-primary/80 transition-colors hover:text-primary"
@@ -69,8 +72,10 @@ function SettingsPage() {
               <TmdbLogo className="h-3" />
             </a>
             <p className="text-[10px] text-muted-foreground leading-relaxed">
-              This product uses the TMDB API but is not endorsed or certified by
-              TMDB.
+              <Trans>
+                This product uses the TMDB API but is not endorsed or certified
+                by TMDB.
+              </Trans>
             </p>
           </div>
         </footer>
@@ -86,6 +91,20 @@ function SettingsPage() {
         }}
       />
 
+      {/* App Settings */}
+      <div>
+        <div className="mb-3 flex items-center gap-2">
+          <IconDeviceDesktopCog
+            aria-hidden={true}
+            className="size-4 text-muted-foreground"
+          />
+          <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+            <Trans>App Settings</Trans>
+          </h2>
+        </div>
+        <LanguageSection />
+      </div>
+
       <IntegrationsSection />
 
       <ImportsSection />
@@ -99,10 +118,10 @@ function SettingsPage() {
               className="size-4 text-muted-foreground"
             />
             <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-              Server
+              <Trans>Server</Trans>
             </h2>
             <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
-              Admin only
+              <Trans>Admin only</Trans>
             </span>
           </div>
           <SystemHealthCards />
@@ -118,7 +137,7 @@ function SettingsPage() {
               className="size-4 text-muted-foreground"
             />
             <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-              Security
+              <Trans>Security</Trans>
             </h2>
             <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
               Admin only
@@ -144,7 +163,7 @@ function SettingsPage() {
               className="size-4 text-muted-foreground"
             />
             <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-              Backups
+              <Trans>Backups</Trans>
             </h2>
             <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
               Admin only
@@ -173,7 +192,7 @@ function SettingsPage() {
               className="size-4 text-destructive"
             />
             <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-              Danger Zone
+              <Trans>Danger Zone</Trans>
             </h2>
             <span className="rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-[10px] text-primary">
               Admin only

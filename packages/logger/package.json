@@ -6,6 +6,11 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "lint": "biome check",
+    "format": "biome format --write",
+    "check-types": "tsc --noEmit"
+  },
   "dependencies": {
     "pino": "10.3.1",
     "pino-pretty": "13.1.3"

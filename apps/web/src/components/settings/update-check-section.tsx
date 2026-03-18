@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconWorldUpload } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useOptimistic, useState, useTransition } from "react";
@@ -8,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { orpc } from "@/lib/orpc/client";
 
 export function UpdateCheckSection() {
+  const { t } = useLingui();
   const { data, isPending: isLoading } = useQuery(
     orpc.admin.updateCheck.queryOptions(),
   );
@@ -35,10 +37,10 @@ export function UpdateCheckSection() {
         await toggleMutation.mutateAsync({ enabled: checked });
         setLocalEnabled(checked);
         toast.success(
-          checked ? "Update checks enabled" : "Update checks disabled",
+          checked ? t`Update checks enabled` : t`Update checks disabled`,
         );
       } catch {
-        toast.error("Failed to update setting");
+        toast.error(t`Failed to update setting`);
       }
     });
   }
@@ -54,9 +56,11 @@ export function UpdateCheckSection() {
             />
           </div>
           <div>
-            <CardTitle>Automatic update checks</CardTitle>
+            <CardTitle>
+              <Trans>Automatic update checks</Trans>
+            </CardTitle>
             <CardDescription>
-              Periodically check GitHub for new Sofa releases
+              <Trans>Periodically check GitHub for new Sofa releases</Trans>
             </CardDescription>
           </div>
         </div>
@@ -64,7 +68,7 @@ export function UpdateCheckSection() {
           checked={optimisticEnabled}
           onCheckedChange={handleToggle}
           disabled={isPending}
-          aria-label="Toggle automatic update checks"
+          aria-label={t`Toggle automatic update checks`}
         />
       </div>
     </CardContent>

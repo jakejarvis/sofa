@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
 import { Alert, Pressable, View } from "react-native";
 import * as DropdownMenu from "zeego/dropdown-menu";
@@ -8,6 +9,7 @@ import { authClient } from "@/lib/server";
 import * as Haptics from "@/utils/haptics";
 
 export function HeaderAvatar() {
+  const { t } = useLingui();
   const { data: session } = authClient.useSession();
   const { navigate } = useRouter();
 
@@ -58,17 +60,17 @@ export function HeaderAvatar() {
             ios={{ name: "gear" }}
             androidIconName="ic_menu_preferences"
           />
-          <DropdownMenu.ItemTitle>Settings</DropdownMenu.ItemTitle>
+          <DropdownMenu.ItemTitle>{t`Settings`}</DropdownMenu.ItemTitle>
         </DropdownMenu.Item>
 
         <DropdownMenu.Item
           key="sign-out"
           destructive
           onSelect={() => {
-            Alert.alert("Sign Out", "Are you sure you want to sign out?", [
-              { text: "Cancel", style: "cancel" },
+            Alert.alert(t`Sign Out`, t`Are you sure you want to sign out?`, [
+              { text: t`Cancel`, style: "cancel" },
               {
-                text: "Sign Out",
+                text: t`Sign Out`,
                 style: "destructive",
                 onPress: () => {
                   authClient.signOut();
@@ -82,7 +84,7 @@ export function HeaderAvatar() {
             ios={{ name: "rectangle.portrait.and.arrow.right" }}
             androidIconName="ic_menu_close_clear_cancel"
           />
-          <DropdownMenu.ItemTitle>Sign out</DropdownMenu.ItemTitle>
+          <DropdownMenu.ItemTitle>{t`Sign out`}</DropdownMenu.ItemTitle>
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu.Root>

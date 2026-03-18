@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { CastMember } from "@sofa/api/schemas";
 import { IconUser, IconUsers } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
@@ -11,11 +12,14 @@ interface CastCarouselProps {
 }
 
 export function CastCarousel({ actors, titleType }: CastCarouselProps) {
+  const { t } = useLingui();
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
         <IconUsers aria-hidden={true} className="size-5 text-primary" />
-        <h2 className="font-display text-xl tracking-tight">Cast</h2>
+        <h2 className="font-display text-xl tracking-tight">
+          <Trans>Cast</Trans>
+        </h2>
       </div>
 
       {actors.length > 0 && (
@@ -73,8 +77,7 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
                       )}
                       {titleType === "tv" && member.episodeCount && (
                         <p className="text-[10px] text-muted-foreground/70">
-                          {member.episodeCount} ep
-                          {member.episodeCount !== 1 ? "s" : ""}
+                          {t`${member.episodeCount} ep${member.episodeCount !== 1 ? "s" : ""}`}
                         </p>
                       )}
                     </div>

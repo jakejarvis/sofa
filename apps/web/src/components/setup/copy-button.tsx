@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -21,12 +22,12 @@ export function CopyButton({ code }: { code: string }) {
       {copied ? (
         <>
           <IconCheck aria-hidden={true} className="size-3 text-green-400" />
-          Copied
+          <Trans>Copied</Trans>
         </>
       ) : (
         <>
           <IconCopy aria-hidden={true} className="size-3" />
-          Copy
+          <Trans>Copy</Trans>
         </>
       )}
     </Button>

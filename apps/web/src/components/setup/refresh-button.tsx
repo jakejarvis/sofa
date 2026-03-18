@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconRefresh } from "@tabler/icons-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,11 @@ export function RefreshButton() {
       ) : (
         <IconRefresh aria-hidden={true} className="size-3.5" />
       )}
-      {isRefreshing ? "Checking…" : "Check configuration"}
+      {isRefreshing ? (
+        <Trans>Checking…</Trans>
+      ) : (
+        <Trans>Check configuration</Trans>
+      )}
     </Button>
   );
 }

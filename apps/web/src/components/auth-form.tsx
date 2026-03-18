@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconKey } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
@@ -105,10 +106,18 @@ export function AuthForm({
             <SofaLogo className="size-9" />
           </Link>
           <h1 className="text-balance font-medium text-lg">
-            {isRegister ? "Create your account" : "Welcome back"}
+            {isRegister ? (
+              <Trans>Create your account</Trans>
+            ) : (
+              <Trans>Welcome back</Trans>
+            )}
           </h1>
           <p className="text-muted-foreground text-sm">
-            {isRegister ? "Start tracking your watches" : "Sign in to continue"}
+            {isRegister ? (
+              <Trans>Start tracking your watches</Trans>
+            ) : (
+              <Trans>Sign in to continue</Trans>
+            )}
           </p>
         </div>
 
@@ -130,9 +139,13 @@ export function AuthForm({
                 className="h-11 w-full gap-2 rounded-lg border-border/50 bg-background/50 text-sm hover:bg-accent hover:text-foreground"
               >
                 <IconKey aria-hidden={true} className="size-4" />
-                {oidcLoading
-                  ? "Redirecting…"
-                  : `Sign in with ${authConfig?.oidcProviderName || "SSO"}`}
+                {oidcLoading ? (
+                  <Trans>Redirecting…</Trans>
+                ) : (
+                  <Trans>
+                    Sign in with {authConfig?.oidcProviderName || "SSO"}
+                  </Trans>
+                )}
               </Button>
             </motion.div>
           </motion.div>
@@ -141,7 +154,9 @@ export function AuthForm({
         {showOidc && showPasswordForm && (
           <div className="flex items-center gap-3">
             <div className="h-px flex-1 bg-border/50" />
-            <span className="text-muted-foreground text-xs">or</span>
+            <span className="text-muted-foreground text-xs">
+              <Trans>or</Trans>
+            </span>
             <div className="h-px flex-1 bg-border/50" />
           </div>
         )}
@@ -163,7 +178,7 @@ export function AuthForm({
                   htmlFor="name"
                   className="text-muted-foreground uppercase tracking-wider"
                 >
-                  Name
+                  <Trans>Name</Trans>
                 </Label>
                 <Input
                   id="name"
@@ -183,7 +198,7 @@ export function AuthForm({
                 htmlFor="email"
                 className="text-muted-foreground uppercase tracking-wider"
               >
-                Email
+                <Trans>Email</Trans>
               </Label>
               <Input
                 id="email"
@@ -203,7 +218,7 @@ export function AuthForm({
                 htmlFor="password"
                 className="text-muted-foreground uppercase tracking-wider"
               >
-                Password
+                <Trans>Password</Trans>
               </Label>
               <Input
                 id="password"
@@ -226,11 +241,13 @@ export function AuthForm({
                 disabled={loading}
                 className="h-11 w-full rounded-lg text-sm hover:shadow-lg hover:shadow-primary/20"
               >
-                {loading
-                  ? "Loading…"
-                  : isRegister
-                    ? "Create account"
-                    : "Sign in"}
+                {loading ? (
+                  <Trans>Loading…</Trans>
+                ) : isRegister ? (
+                  <Trans>Create account</Trans>
+                ) : (
+                  <Trans>Sign in</Trans>
+                )}
               </Button>
             </motion.div>
           </motion.form>
@@ -258,22 +275,22 @@ export function AuthForm({
             <p className="text-center text-muted-foreground text-sm">
               {isRegister ? (
                 <>
-                  Already have an account?{" "}
+                  <Trans>Already have an account?</Trans>{" "}
                   <Link
                     to="/login"
                     className="font-medium text-primary transition-colors hover:text-primary/80"
                   >
-                    Sign in
+                    <Trans>Sign in</Trans>
                   </Link>
                 </>
               ) : (
                 <>
-                  Don&apos;t have an account?{" "}
+                  <Trans>Don&apos;t have an account?</Trans>{" "}
                   <Link
                     to="/register"
                     className="font-medium text-primary transition-colors hover:text-primary/80"
                   >
-                    Register
+                    <Trans>Register</Trans>
                   </Link>
                 </>
               )}

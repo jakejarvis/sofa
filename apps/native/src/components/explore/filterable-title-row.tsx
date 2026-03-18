@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { Icon } from "@tabler/icons-react-native";
 import { skipToken, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -42,6 +43,7 @@ export function FilterableTitleRow({
   genres?: Array<{ id: number; name: string }>;
   isLoading?: boolean;
 }) {
+  const { t } = useLingui();
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
 
   const discover = useInfiniteQuery({
@@ -114,7 +116,7 @@ export function FilterableTitleRow({
           contentContainerStyle={genreChipsContentStyle}
         >
           <GenreChip
-            label="All"
+            label={t`All`}
             isSelected={selectedGenre === null}
             onPress={() => setSelectedGenre(null)}
           />
@@ -134,7 +136,7 @@ export function FilterableTitleRow({
       {!showLoading && items.length === 0 && selectedGenre !== null ? (
         <View className="items-center py-6">
           <Text className="text-muted-foreground text-sm">
-            No titles found for this genre.
+            <Trans>No titles found for this genre.</Trans>
           </Text>
         </View>
       ) : (

@@ -1,3 +1,5 @@
+import { ORPCError } from "@orpc/server";
+import { AppErrorCode } from "@sofa/api/errors";
 import type { ParseResult } from "@sofa/core/imports";
 import {
   countUnresolved,
@@ -31,9 +33,10 @@ export const parseFile = os.imports.parseFile
         try {
           json = await file.json();
         } catch {
-          throw new Error(
-            "Invalid JSON file. Ensure it is a valid Trakt export.",
-          );
+          throw new ORPCError("BAD_REQUEST", {
+            message: "Invalid JSON file",
+            data: { code: AppErrorCode.IMPORT_INVALID_FILE },
+          });
         }
         result = parseTraktPayload(
           json as Parameters<typeof parseTraktPayload>[0],
@@ -45,9 +48,10 @@ export const parseFile = os.imports.parseFile
         try {
           json = await file.json();
         } catch {
-          throw new Error(
-            "Invalid JSON file. Ensure it is a valid Simkl export.",
-          );
+          throw new ORPCError("BAD_REQUEST", {
+            message: "Invalid JSON file",
+            data: { code: AppErrorCode.IMPORT_INVALID_FILE },
+          });
         }
         result = parseSimklPayload(
           json as Parameters<typeof parseSimklPayload>[0],
@@ -99,9 +103,10 @@ export const createJob = os.imports.createJob
       data.watchlist.length +
       data.ratings.length;
     if (totalItems > 100_000) {
-      throw new Error(
-        `Import payload too large (${totalItems} items, max 100,000)`,
-      );
+      throw new ORPCError("BAD_REQUEST", {
+        message: "Import payload too large",
+        data: { code: AppErrorCode.IMPORT_PAYLOAD_TOO_LARGE },
+      });
     }
 
     // Prevent concurrent imports per user.
@@ -137,7 +142,10 @@ export const createJob = os.imports.createJob
           .run();
         log.warn(`Auto-cancelled stale import job ${existing.id}`);
       } else {
-        throw new Error("An import is already in progress");
+        throw new ORPCError("CONFLICT", {
+          message: "An import is already in progress",
+          data: { code: AppErrorCode.IMPORT_ALREADY_RUNNING },
+        });
       }
     }
 
@@ -175,7 +183,10 @@ export const cancelJob = os.imports.cancelJob
   .handler(({ input, context }) => {
     const job = readImportJob(input.id, context.user.id);
     if (job.status !== "pending" && job.status !== "running") {
-      throw new Error("Can only cancel pending or running jobs");
+      throw new ORPCError("BAD_REQUEST", {
+        message: "Can only cancel pending or running jobs",
+        data: { code: AppErrorCode.IMPORT_CANNOT_CANCEL },
+      });
     }
     db.update(importJobs)
       .set({ status: "cancelled" })

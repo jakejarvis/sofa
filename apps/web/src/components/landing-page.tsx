@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { SofaLogo } from "@/components/sofa-logo";
@@ -101,7 +102,7 @@ export function LandingPage({
               damping: 20,
             }}
           >
-            Self-hosted movie & TV tracker
+            <Trans>Self-hosted movie & TV tracker</Trans>
           </motion.p>
           <motion.div
             className="flex justify-center text-primary"
@@ -127,9 +128,11 @@ export function LandingPage({
               delay: 0.2,
             }}
           >
-            Track what you watch. Know what&apos;s next.
-            <br />
-            Your library, your data, your rules.
+            <Trans>
+              Track what you watch. Know what&apos;s next.
+              <br />
+              Your library, your data, your rules.
+            </Trans>
           </motion.p>
         </div>
 
@@ -149,7 +152,9 @@ export function LandingPage({
               to="/register"
               className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-shadow hover:shadow-lg hover:shadow-primary/20"
             >
-              <span className="relative z-10">Get Started</span>
+              <span className="relative z-10">
+                <Trans>Get Started</Trans>
+              </span>
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             </Link>
           ) : (
@@ -158,7 +163,9 @@ export function LandingPage({
                 to="/login"
                 className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg bg-primary px-8 font-medium text-primary-foreground transition-shadow hover:shadow-lg hover:shadow-primary/20"
               >
-                <span className="relative z-10">Sign In</span>
+                <span className="relative z-10">
+                  <Trans>Sign In</Trans>
+                </span>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
               </Link>
               {registrationOpen && (
@@ -166,7 +173,7 @@ export function LandingPage({
                   to="/register"
                   className="inline-flex h-12 items-center justify-center rounded-lg border border-border px-8 font-medium transition-colors hover:border-primary/40 hover:bg-primary/5"
                 >
-                  Register
+                  <Trans>Register</Trans>
                 </Link>
               )}
             </>

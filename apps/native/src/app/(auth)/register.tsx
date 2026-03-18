@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
@@ -35,6 +36,7 @@ const signUpSchema = z.object({
 });
 
 export default function RegisterScreen() {
+  const { t } = useLingui();
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
   const [errorFields, setErrorFields] = useState<Set<string>>(new Set());
@@ -62,7 +64,7 @@ export default function RegisterScreen() {
         },
         {
           onError(error) {
-            toast.error(error.error?.message || "Failed to create account");
+            toast.error(error.error?.message || t`Failed to create account`);
           },
           onSuccess() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -92,14 +94,14 @@ export default function RegisterScreen() {
   if (!registrationOpen && !publicInfo.isPending) {
     return (
       <AuthScreen
-        title="Registration Closed"
-        subtitle="New account creation is currently disabled."
+        title={t`Registration Closed`}
+        subtitle={t`New account creation is currently disabled.`}
       >
         <Animated.View entering={FadeInDown.duration(300).delay(200)}>
           <Link href="/(auth)/login" asChild>
             <Button className="mt-6 bg-primary">
               <ButtonLabel className="text-primary-foreground">
-                Back to Login
+                <Trans>Back to Login</Trans>
               </ButtonLabel>
             </Button>
           </Link>
@@ -110,15 +112,17 @@ export default function RegisterScreen() {
 
   return (
     <AuthScreen
-      title="Create Account"
-      subtitle={`Registering on ${serverHost}`}
+      title={t`Create Account`}
+      subtitle={t`Registering on ${serverHost}`}
     >
       <View className="gap-3">
         <Animated.View entering={FadeInDown.duration(300).delay(100)}>
           <form.Field name="name">
             {(field) => (
               <TextField>
-                <Label>Name</Label>
+                <Label>
+                  <Trans>Name</Trans>
+                </Label>
                 <Input
                   value={field.state.value}
                   accessibilityLabel="Name"
@@ -127,7 +131,7 @@ export default function RegisterScreen() {
                     field.handleChange(text);
                     clearFieldError("name");
                   }}
-                  placeholder="Your name"
+                  placeholder={t`Your name`}
                   autoComplete="name"
                   textContentType="name"
                   returnKeyType="next"
@@ -146,7 +150,9 @@ export default function RegisterScreen() {
           <form.Field name="email">
             {(field) => (
               <TextField>
-                <Label>Email</Label>
+                <Label>
+                  <Trans>Email</Trans>
+                </Label>
                 <Input
                   ref={emailRef}
                   value={field.state.value}
@@ -177,7 +183,9 @@ export default function RegisterScreen() {
           <form.Field name="password">
             {(field) => (
               <TextField>
-                <Label>Password</Label>
+                <Label>
+                  <Trans>Password</Trans>
+                </Label>
                 <Input
                   ref={passwordRef}
                   value={field.state.value}
@@ -213,7 +221,9 @@ export default function RegisterScreen() {
             {busy ? (
               <Spinner size="sm" />
             ) : (
-              <ButtonLabel>Create Account</ButtonLabel>
+              <ButtonLabel>
+                <Trans>Create Account</Trans>
+              </ButtonLabel>
             )}
           </Button>
         </Animated.View>
@@ -226,7 +236,7 @@ export default function RegisterScreen() {
         <Link href="/(auth)/login" asChild>
           <Pressable disabled={busy}>
             <Text className="text-primary text-sm">
-              Already have an account? Sign in
+              <Trans>Already have an account? Sign in</Trans>
             </Text>
           </Pressable>
         </Link>

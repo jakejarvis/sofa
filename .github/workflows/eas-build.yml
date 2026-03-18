@@ -23,6 +23,7 @@ on:
     paths:
       - apps/native/**
       - packages/api/**
+      - packages/i18n/**
 
 jobs:
   build:

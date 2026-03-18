@@ -13,6 +13,7 @@
       "!dist",
       "!build",
       "!packages/db/drizzle",
+      "!packages/i18n/src/po/*.ts",
       "!packages/tmdb/src/schema.d.ts",
       "!**/routeTree.gen.ts",
       "!apps/native/.expo/types/**/*.ts",

@@ -1691,13 +1691,24 @@
                           "type": "string",
                           "default": "Title not found"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TITLE_NOT_FOUND"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -2161,13 +2172,24 @@
                           "type": "string",
                           "default": "Title not found"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TITLE_NOT_FOUND"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -2547,13 +2569,24 @@
                           "type": "string",
                           "default": "Person not found"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "PERSON_NOT_FOUND"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -3325,13 +3358,24 @@
                           "type": "string",
                           "default": "TMDB API key is not configured"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TMDB_NOT_CONFIGURED"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -3509,13 +3553,24 @@
                           "type": "string",
                           "default": "TMDB API key is not configured"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TMDB_NOT_CONFIGURED"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -3640,13 +3695,24 @@
                           "type": "string",
                           "default": "TMDB API key is not configured"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TMDB_NOT_CONFIGURED"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -4587,13 +4653,24 @@
                           "type": "string",
                           "default": "Integration not found"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "INTEGRATION_NOT_FOUND"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -4753,13 +4830,24 @@
                           "type": "string",
                           "default": "Failed to delete backup"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "BACKUP_DELETE_FAILED"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -4813,13 +4901,24 @@
                           "type": "string",
                           "default": "Backup not found"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "BACKUP_NOT_FOUND"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -4912,13 +5011,24 @@
                           "type": "string",
                           "default": "Backup restoration failed"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "BACKUP_RESTORE_FAILED"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -5458,13 +5568,24 @@
                           "type": "string",
                           "default": "Job not found"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "JOB_NOT_FOUND"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -6033,6 +6154,77 @@
                     "data",
                     "warnings",
                     "stats"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": true
+                        },
+                        "code": {
+                          "const": "BAD_REQUEST"
+                        },
+                        "status": {
+                          "const": 400
+                        },
+                        "message": {
+                          "type": "string",
+                          "default": "Invalid import file"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "IMPORT_INVALID_FILE"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message",
+                        "data"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": false
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {}
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message"
+                      ]
+                    }
                   ]
                 }
               }
@@ -6848,6 +7040,148 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": true
+                        },
+                        "code": {
+                          "const": "BAD_REQUEST"
+                        },
+                        "status": {
+                          "const": 400
+                        },
+                        "message": {
+                          "type": "string",
+                          "default": "Import payload too large"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "IMPORT_PAYLOAD_TOO_LARGE"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message",
+                        "data"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": false
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {}
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "409",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": true
+                        },
+                        "code": {
+                          "const": "CONFLICT"
+                        },
+                        "status": {
+                          "const": 409
+                        },
+                        "message": {
+                          "type": "string",
+                          "default": "An import is already in progress"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "IMPORT_ALREADY_RUNNING"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message",
+                        "data"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": false
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {}
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -7128,6 +7462,77 @@
                     "createdAt",
                     "startedAt",
                     "finishedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": true
+                        },
+                        "code": {
+                          "const": "BAD_REQUEST"
+                        },
+                        "status": {
+                          "const": 400
+                        },
+                        "message": {
+                          "type": "string",
+                          "default": "Import cannot be cancelled"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "IMPORT_CANNOT_CANCEL"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message",
+                        "data"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": false
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {}
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message"
+                      ]
+                    }
                   ]
                 }
               }

@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconThumbUp } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { TitleCard, TitleCardSkeleton } from "@/components/title-card";
@@ -35,7 +36,9 @@ export function TitleRecommendations({ titleId }: { titleId: string }) {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <IconThumbUp aria-hidden={true} className="size-5 text-primary" />
-        <h2 className="font-display text-xl tracking-tight">Recommended</h2>
+        <h2 className="font-display text-xl tracking-tight">
+          <Trans>Recommended</Trans>
+        </h2>
       </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         {data.recommendations.slice(0, 12).map((rec, i) => (

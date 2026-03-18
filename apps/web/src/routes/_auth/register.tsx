@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconLock } from "@tabler/icons-react";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { AuthForm } from "@/components/auth-form";
@@ -28,18 +29,20 @@ function RegisterPage() {
           </div>
           <div className="space-y-2">
             <h1 className="text-balance font-display text-xl tracking-tight">
-              Registration Closed
+              <Trans>Registration Closed</Trans>
             </h1>
             <p className="text-muted-foreground text-sm">
-              New accounts are not being accepted right now. Contact the admin
-              if you need access.
+              <Trans>
+                New accounts are not being accepted right now. Contact the admin
+                if you need access.
+              </Trans>
             </p>
           </div>
           <Link
             to="/login"
             className="inline-flex h-10 items-center rounded-lg bg-primary px-6 font-medium text-primary-foreground text-sm transition-all hover:shadow-md hover:shadow-primary/20"
           >
-            Sign in instead
+            <Trans>Sign in instead</Trans>
           </Link>
         </div>
       </div>

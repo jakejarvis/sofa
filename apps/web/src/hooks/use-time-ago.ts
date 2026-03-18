@@ -1,4 +1,4 @@
-import { formatDistanceToNowStrict } from "date-fns";
+import { formatRelativeTime } from "@sofa/i18n/format";
 import { useSyncExternalStore } from "react";
 
 // Shared ticker — one interval regardless of how many components subscribe
@@ -36,10 +36,10 @@ function toTimestamp(date: string | Date | null | undefined): number | null {
 
 export function useTimeAgo(
   date: string | Date | null | undefined,
-  { addSuffix = true, fallback = "" } = {},
+  { fallback = "" } = {},
 ): string {
   useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   const ts = toTimestamp(date);
   if (ts === null) return fallback;
-  return formatDistanceToNowStrict(ts, { addSuffix });
+  return formatRelativeTime(new Date(ts));
 }

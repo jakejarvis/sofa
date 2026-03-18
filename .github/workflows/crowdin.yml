@@ -1,0 +1,68 @@
+name: Crowdin Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/i18n/src/po/en.po"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  upload:
+    name: Upload sources
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Upload sources to Crowdin
+        uses: crowdin/github-action@v2
+        with:
+          upload_sources: true
+          upload_translations: false
+          download_translations: false
+          config: crowdin.yml
+        env:
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+  download:
+    name: Download translations
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install --frozen-lockfile
+
+      - name: Download translations from Crowdin
+        uses: crowdin/github-action@v2
+        with:
+          upload_sources: false
+          upload_translations: false
+          download_translations: true
+          create_pull_request: true
+          pull_request_title: "chore(i18n): update translations from Crowdin"
+          pull_request_body: "Automated PR with latest translations from Crowdin."
+          config: crowdin.yml
+        env:
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compile catalogs
+        run: bun run i18n:compile
+
+      - name: Commit compiled catalogs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add packages/i18n/src/po/
+          git diff --cached --quiet || git commit -m "chore(i18n): compile updated translation catalogs"
+          git push

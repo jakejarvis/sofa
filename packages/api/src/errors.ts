@@ -1,0 +1,23 @@
+import { z } from "zod";
+
+export const AppErrorCode = {
+  TITLE_NOT_FOUND: "TITLE_NOT_FOUND",
+  PERSON_NOT_FOUND: "PERSON_NOT_FOUND",
+  INTEGRATION_NOT_FOUND: "INTEGRATION_NOT_FOUND",
+  BACKUP_NOT_FOUND: "BACKUP_NOT_FOUND",
+  BACKUP_DELETE_FAILED: "BACKUP_DELETE_FAILED",
+  BACKUP_RESTORE_FAILED: "BACKUP_RESTORE_FAILED",
+  JOB_NOT_FOUND: "JOB_NOT_FOUND",
+  TMDB_NOT_CONFIGURED: "TMDB_NOT_CONFIGURED",
+  IMPORT_INVALID_FILE: "IMPORT_INVALID_FILE",
+  IMPORT_PAYLOAD_TOO_LARGE: "IMPORT_PAYLOAD_TOO_LARGE",
+  IMPORT_ALREADY_RUNNING: "IMPORT_ALREADY_RUNNING",
+  IMPORT_CANNOT_CANCEL: "IMPORT_CANNOT_CANCEL",
+  REGISTRATION_CLOSED: "REGISTRATION_CLOSED",
+} as const;
+
+export type AppErrorCode = (typeof AppErrorCode)[keyof typeof AppErrorCode];
+
+/** Typed error data schema for use in contract `.errors()` */
+export const appErrorData = <T extends AppErrorCode>(code: T) =>
+  z.object({ code: z.literal(code) });

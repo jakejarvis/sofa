@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { Season } from "@sofa/api/schemas";
 import { getNextEpisode } from "@sofa/api/utils";
 import { IconPlayerPlay } from "@tabler/icons-react-native";
@@ -22,6 +23,7 @@ export function ContinueWatchingBanner({
   backdropPath: string | null;
   backdropThumbHash?: string | null;
 }) {
+  const { t } = useLingui();
   const titleAccentColor = useCSSVariable("--color-title-accent") as string;
 
   const { nextEpisode, totalEpisodes, watchedEpisodes } = useMemo(
@@ -41,7 +43,7 @@ export function ContinueWatchingBanner({
       className="mt-6 px-4"
     >
       <SectionHeader
-        title="Next Episode"
+        title={t`Next Episode`}
         icon={IconPlayerPlay}
         iconColor={titleAccentColor}
       />
@@ -74,7 +76,7 @@ export function ContinueWatchingBanner({
                 maxFontSizeMultiplier={1.0}
                 className="font-medium font-sans text-title-accent text-xs uppercase tracking-wider"
               >
-                Up next
+                <Trans>Up next</Trans>
               </Text>
             </View>
             <Text

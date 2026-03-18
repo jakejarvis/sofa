@@ -1,4 +1,11 @@
+import { plural } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { BackupInfo } from "@sofa/api/schemas";
+import {
+  formatBytes as formatBytesI18n,
+  formatDate,
+  formatRelativeTime,
+} from "@sofa/i18n/format";
 import {
   IconClock,
   IconCloudDownload,
@@ -9,7 +16,6 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { format, formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -34,17 +40,17 @@ import {
 } from "@/components/ui/tooltip";
 import { orpc } from "@/lib/orpc/client";
 
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 function formatBackupDate(dateStr: string): string {
-  return format(new Date(dateStr), "MMM d, h:mm a");
+  return formatDate(dateStr, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 export function BackupSection() {
+  const { t } = useLingui();
   const { data } = useQuery(orpc.admin.backups.list.queryOptions());
   const [backups, setBackups] = useState<BackupInfo[] | null>(null);
 
@@ -60,9 +66,9 @@ export function BackupSection() {
             (b: BackupInfo) => b.filename !== backup.filename,
           ),
         ]);
-        toast.success("Backup created", {
+        toast.success(t`Backup created`, {
           action: {
-            label: "Download",
+            label: t`Download`,
             onClick: () => {
               const a = document.createElement("a");
               a.href = `/api/backup/${backup.filename}`;
@@ -72,7 +78,7 @@ export function BackupSection() {
           },
         });
       },
-      onError: () => toast.error("Failed to create backup"),
+      onError: () => toast.error(t`Failed to create backup`),
     }),
   );
 
@@ -85,10 +91,10 @@ export function BackupSection() {
         );
         return { previous };
       },
-      onSuccess: () => toast.success("Backup deleted"),
+      onSuccess: () => toast.success(t`Backup deleted`),
       onError: (_, __, ctx) => {
         if (ctx?.previous) setBackups(ctx.previous);
-        toast.error("Failed to delete backup");
+        toast.error(t`Failed to delete backup`);
       },
     }),
   );
@@ -97,6 +103,11 @@ export function BackupSection() {
   const deleting = deleteMutation.isPending
     ? (deleteMutation.variables?.filename ?? null)
     : null;
+
+  const backupCountLabel =
+    displayBackups.length > 0
+      ? t`${displayBackups.length} ${plural(displayBackups.length, { one: "backup", other: "backups" })} stored`
+      : t`No backups yet`;
 
   return (
     <>
@@ -111,12 +122,10 @@ export function BackupSection() {
               />
             </div>
             <div>
-              <CardTitle>Database backups</CardTitle>
-              <CardDescription>
-                {displayBackups.length > 0
-                  ? `${displayBackups.length} backup${displayBackups.length !== 1 ? "s" : ""} stored`
-                  : "No backups yet"}
-              </CardDescription>
+              <CardTitle>
+                <Trans>Database backups</Trans>
+              </CardTitle>
+              <CardDescription>{backupCountLabel}</CardDescription>
             </div>
           </div>
           <Button onClick={() => createMutation.mutate()} disabled={creating}>
@@ -125,7 +134,7 @@ export function BackupSection() {
             ) : (
               <IconPlus aria-hidden={true} />
             )}
-            {creating ? "Creating…" : "New backup"}
+            {creating ? <Trans>Creating…</Trans> : <Trans>New backup</Trans>}
           </Button>
         </div>
       </CardContent>
@@ -167,10 +176,10 @@ export function BackupSection() {
                       </TooltipTrigger>
                       <TooltipContent>
                         {backup.source === "scheduled"
-                          ? "Scheduled backup"
+                          ? t`Scheduled backup`
                           : backup.source === "pre-restore"
-                            ? "Pre-restore backup"
-                            : "Manual backup"}
+                            ? t`Pre-restore backup`
+                            : t`Manual backup`}
                       </TooltipContent>
                     </Tooltip>
                     <div className="min-w-0 flex-1">
@@ -179,15 +188,13 @@ export function BackupSection() {
                           {formatBackupDate(backup.createdAt)}
                         </span>
                         <span className="text-[11px] text-muted-foreground">
-                          {formatBytes(backup.sizeBytes)}
+                          {formatBytesI18n(backup.sizeBytes)}
                         </span>
                         <span
                           className="text-[11px] text-muted-foreground/50"
                           suppressHydrationWarning
                         >
-                          {formatDistanceToNow(new Date(backup.createdAt), {
-                            addSuffix: true,
-                          })}
+                          {formatRelativeTime(backup.createdAt)}
                         </span>
                       </div>
                     </div>
@@ -204,7 +211,7 @@ export function BackupSection() {
                                 <a
                                   href={`/api/backup/${backup.filename}`}
                                   download
-                                  aria-label="Download backup"
+                                  aria-label={t`Download backup`}
                                 >
                                   <IconCloudDownload />
                                 </a>
@@ -212,7 +219,9 @@ export function BackupSection() {
                             />
                           }
                         />
-                        <TooltipContent>Download</TooltipContent>
+                        <TooltipContent>
+                          <Trans>Download</Trans>
+                        </TooltipContent>
                       </Tooltip>
                       <AlertDialog>
                         <Tooltip>
@@ -223,7 +232,7 @@ export function BackupSection() {
                                   <Button
                                     variant="ghost"
                                     size="icon-sm"
-                                    aria-label="Delete backup"
+                                    aria-label={t`Delete backup`}
                                     className="text-muted-foreground hover:text-destructive"
                                     disabled={deleting === backup.filename}
                                   />
@@ -237,21 +246,29 @@ export function BackupSection() {
                               <IconTrash />
                             )}
                           </AlertDialogTrigger>
-                          <TooltipContent>Delete</TooltipContent>
+                          <TooltipContent>
+                            <Trans>Delete</Trans>
+                          </TooltipContent>
                         </Tooltip>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete backup?</AlertDialogTitle>
+                            <AlertDialogTitle>
+                              <Trans>Delete backup?</Trans>
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                              This will permanently delete the backup from{" "}
-                              <strong>
-                                {formatBackupDate(backup.createdAt)}
-                              </strong>
-                              . This cannot be undone.
+                              <Trans>
+                                This will permanently delete the backup from{" "}
+                                <strong>
+                                  {formatBackupDate(backup.createdAt)}
+                                </strong>
+                                . This cannot be undone.
+                              </Trans>
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>
+                              <Trans>Cancel</Trans>
+                            </AlertDialogCancel>
                             <AlertDialogAction
                               variant="destructive"
                               onClick={() =>
@@ -260,7 +277,7 @@ export function BackupSection() {
                                 })
                               }
                             >
-                              Delete
+                              <Trans>Delete</Trans>
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

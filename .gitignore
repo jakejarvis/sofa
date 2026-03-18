@@ -49,6 +49,7 @@ coverage
 .cache
 tmp
 temp
+crowdin-context.jsonl
 
 # local data
 *.db

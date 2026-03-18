@@ -1,0 +1,28 @@
+{
+  "name": "@sofa/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./locales": "./src/locales.ts",
+    "./format": "./src/format.ts",
+    "./test-utils": "./src/test-utils.tsx"
+  },
+  "scripts": {
+    "lint": "biome check",
+    "format": "biome format --write",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lingui/core": "catalog:",
+    "@lingui/react": "catalog:"
+  },
+  "devDependencies": {
+    "@lingui/cli": "catalog:",
+    "@lingui/conf": "catalog:",
+    "@lingui/format-po": "catalog:",
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
+  }
+}

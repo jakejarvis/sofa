@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   IconBookmarkFilled,
   IconCheckbox,
@@ -52,6 +53,7 @@ export function PosterCard({
   onQuickAdd,
   isAdding,
 }: PosterCardProps) {
+  const { t } = useLingui();
   const primaryColor = useCSSVariable("--color-primary") as string;
   const watchlistColor = useCSSVariable("--color-status-watchlist") as string;
   const watchingColor = useCSSVariable("--color-status-watching") as string;
@@ -233,28 +235,28 @@ export function PosterCard({
             <Link.Menu>
               {!userStatus && (
                 <Link.MenuAction
-                  title="Add to Watchlist"
+                  title={t`Add to Watchlist`}
                   icon="bookmark"
                   onPress={handleQuickAddPress}
                 />
               )}
               {userStatus !== "in_progress" && (
                 <Link.MenuAction
-                  title="Mark as Watching"
+                  title={t`Mark as Watching`}
                   icon="play.fill"
                   onPress={() => titleActions.markWatching(id)}
                 />
               )}
               {type === "movie" && (
                 <Link.MenuAction
-                  title="Mark as Watched"
+                  title={t`Mark as Watched`}
                   icon="checkmark.circle"
                   onPress={() => titleActions.markMovieWatched(id, title)}
                 />
               )}
               {userStatus && (
                 <Link.MenuAction
-                  title="Remove from Library"
+                  title={t`Remove from Library`}
                   icon="trash"
                   destructive
                   onPress={() => titleActions.removeFromLibrary(id)}

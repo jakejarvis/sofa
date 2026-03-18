@@ -7,7 +7,11 @@ import { closeDatabase, db } from "@sofa/db/client";
 import { sql } from "@sofa/db/helpers";
 import { runMigrations } from "@sofa/db/migrate";
 import { createLogger } from "@sofa/logger";
-import { format } from "date-fns";
+
+function formatTimestamp(date: Date): string {
+  const p = (n: number, len = 2) => String(n).padStart(len, "0");
+  return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}-${p(date.getHours())}${p(date.getMinutes())}${p(date.getSeconds())}${p(date.getMilliseconds(), 3)}`;
+}
 
 const log = createLogger("backup");
 
@@ -138,7 +142,7 @@ export function isValidBackupFilename(filename: string): boolean {
 async function createBackupInternal(prefix: BackupPrefix): Promise<BackupInfo> {
   await ensureBackupDir();
 
-  const timestamp = format(new Date(), "yyyy-MM-dd-HHmmssSSS");
+  const timestamp = formatTimestamp(new Date());
   const filename = `${prefix}-${timestamp}.db`;
   const dest = path.join(BACKUP_DIR, filename);
 
@@ -223,7 +227,7 @@ export async function restoreFromBackup(
     const dbDir = path.dirname(DATABASE_URL);
     await mkdir(dbDir, { recursive: true });
 
-    const timestamp = format(new Date(), "yyyy-MM-dd-HHmmssSSS");
+    const timestamp = formatTimestamp(new Date());
     const tempPath = path.join(
       dbDir,
       `.restore-temp-${timestamp}-${crypto.randomUUID()}.db`,

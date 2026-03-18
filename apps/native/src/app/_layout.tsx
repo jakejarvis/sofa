@@ -1,5 +1,8 @@
+import "@/lib/intl-polyfills";
 import "@/global.css";
+import { I18nProvider } from "@lingui/react";
 import { ThemeProvider } from "@react-navigation/native";
+import { i18n } from "@sofa/i18n";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
   persistQueryClientRestore,
@@ -17,11 +20,13 @@ import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";
 import { useEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableFreeze } from "react-native-screens";
 import { Uniwind, useResolveClassNames } from "uniwind";
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-banner";
 import { useServerConnection } from "@/hooks/use-server-connection";
+import { initLocale } from "@/lib/i18n";
 import { applyTrackingTransparency, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
 import {
@@ -35,6 +40,7 @@ import { sofaTheme } from "@/lib/theme";
 SplashScreen.preventAutoHideAsync();
 enableFreeze(true);
 initialize();
+const localeReady = initLocale();
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
@@ -62,6 +68,15 @@ const changePasswordOptions =
 function AppContent() {
   const contentStyle = useResolveClassNames("bg-background");
   const { session, isPending, hasServerUrl } = useServerConnection();
+
+  // --- Locale readiness (wait for async catalog load before showing UI) ---
+  const [isLocaleReady, setLocaleReady] = useState(false);
+
+  useEffect(() => {
+    localeReady
+      .then(() => setLocaleReady(true))
+      .catch(() => setLocaleReady(true));
+  }, []);
 
   // --- App Tracking Transparency (must resolve before screen tracking) ---
   const [trackingReady, setTrackingReady] = useState(false);
@@ -111,10 +126,10 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
-    if (!isPending || !hasServerUrl) {
+    if (isLocaleReady && (!isPending || !hasServerUrl)) {
       SplashScreen.hideAsync();
     }
-  }, [isPending, hasServerUrl]);
+  }, [isPending, hasServerUrl, isLocaleReady]);
 
   return (
     <ThemeProvider value={sofaTheme}>
@@ -215,13 +230,17 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   const inner = (
-    <QueryProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <KeyboardProvider>
-          <AppContent />
-        </KeyboardProvider>
-      </GestureHandlerRootView>
-    </QueryProvider>
+    <I18nProvider i18n={i18n}>
+      <QueryProvider>
+        <SafeAreaProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <KeyboardProvider>
+              <AppContent />
+            </KeyboardProvider>
+          </GestureHandlerRootView>
+        </SafeAreaProvider>
+      </QueryProvider>
+    </I18nProvider>
   );
 
   if (!posthog) return inner;

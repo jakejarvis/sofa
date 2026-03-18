@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   IconCircleCheckFilled,
   IconCircleDashed,
@@ -24,14 +25,15 @@ export function EpisodeRow({
   accentColor: string;
   mutedColor: string;
 }) {
-  const episodeLabel = episode.name ?? `Episode ${episode.episodeNumber}`;
+  const { t } = useLingui();
+  const episodeLabel = episode.name ?? t`Episode ${episode.episodeNumber}`;
 
   return (
     <Pressable
       onPress={onToggle}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: isWatched }}
-      accessibilityLabel={`Episode ${episode.episodeNumber}, ${episodeLabel}`}
+      accessibilityLabel={t`Episode ${episode.episodeNumber}, ${episodeLabel}`}
       className="flex-row items-center border-border border-b px-4 py-3"
       style={{ borderBottomWidth: 0.5 }}
     >
@@ -50,7 +52,7 @@ export function EpisodeRow({
           numberOfLines={1}
         >
           {episode.episodeNumber}.{" "}
-          {episode.name ?? `Episode ${episode.episodeNumber}`}
+          {episode.name ?? t`Episode ${episode.episodeNumber}`}
         </Text>
         {episode.airDate ? (
           <Text className="mt-0.5 text-muted-foreground text-xs">

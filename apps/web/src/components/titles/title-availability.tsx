@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { AvailabilityOffer } from "@sofa/api/schemas";
 
 import {
@@ -13,13 +14,7 @@ import {
 
 const MAX_VISIBLE = 4;
 
-const offerLabels: Record<string, string> = {
-  flatrate: "Stream",
-  rent: "Rent",
-  buy: "Buy",
-  free: "Free",
-  ads: "With Ads",
-};
+// offerLabels moved into component for LingUI
 
 function ProviderBadge({
   name,
@@ -30,6 +25,7 @@ function ProviderBadge({
   logoPath: string | null;
   watchUrl: string | null;
 }) {
+  const { t } = useLingui();
   return (
     <Tooltip>
       <TooltipTrigger
@@ -60,7 +56,7 @@ function ProviderBadge({
         )}
       </TooltipTrigger>
       <TooltipContent className="bg-popover px-2 py-1 font-medium text-[10px] text-popover-foreground shadow-md [&>:last-child]:hidden">
-        {watchUrl ? `Watch on ${name}` : name}
+        {watchUrl ? t`Watch on ${name}` : name}
       </TooltipContent>
     </Tooltip>
   );
@@ -136,6 +132,14 @@ export function TitleAvailability({
 }: {
   availability: AvailabilityOffer[];
 }) {
+  const { t } = useLingui();
+  const offerLabels: Record<string, string> = {
+    flatrate: t`Stream`,
+    rent: t`Rent`,
+    buy: t`Buy`,
+    free: t`Free`,
+    ads: t`With Ads`,
+  };
   const availByType: Record<string, AvailabilityOffer[]> = {};
   for (const offer of availability) {
     if (!availByType[offer.offerType]) availByType[offer.offerType] = [];
@@ -147,7 +151,7 @@ export function TitleAvailability({
   return (
     <div className="space-y-2 pt-1">
       <h2 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
-        Where to Watch
+        <Trans>Where to Watch</Trans>
       </h2>
       <div className="flex flex-wrap gap-4">
         {Object.entries(availByType).map(([type, offers]) => {

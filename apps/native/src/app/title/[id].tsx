@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
 import {
@@ -87,6 +88,7 @@ const titleDetailStyles = StyleSheet.create({
 });
 
 export default function TitleDetailScreen() {
+  const { t } = useLingui();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
@@ -246,10 +248,12 @@ export default function TitleDetailScreen() {
         <View className="flex-1 items-center justify-center bg-background px-6">
           <IconMovie size={48} color={mutedForeground} />
           <Text className="mt-3 font-display text-foreground text-xl">
-            Title not found
+            <Trans>Title not found</Trans>
           </Text>
           <Pressable onPress={() => back()} className="mt-4">
-            <Text className="text-primary">Go back</Text>
+            <Text className="text-primary">
+              <Trans>Go back</Trans>
+            </Text>
           </Pressable>
         </View>
       </>
@@ -355,7 +359,7 @@ export default function TitleDetailScreen() {
                   maxFontSizeMultiplier={1.0}
                   className="font-medium font-sans text-title-accent-foreground text-xs"
                 >
-                  {title.type === "movie" ? "Movie" : "TV"}
+                  {title.type === "movie" ? t`Movie` : t`TV`}
                 </Text>
               </View>
               {year ? (
@@ -442,7 +446,7 @@ export default function TitleDetailScreen() {
                     color={titleAccentForeground}
                   />
                   <Text className="font-medium font-sans text-sm text-title-accent-foreground">
-                    Mark Watched
+                    <Trans>Mark Watched</Trans>
                   </Text>
                 </>
               )}
@@ -476,7 +480,7 @@ export default function TitleDetailScreen() {
         >
           <View className="px-4">
             <SectionHeader
-              title="Where to Watch"
+              title={t`Where to Watch`}
               icon={providerIcon}
               iconColor={titleAccent}
             />
@@ -529,7 +533,7 @@ export default function TitleDetailScreen() {
           className="mt-6 px-4"
         >
           <SectionHeader
-            title="Seasons"
+            title={t`Seasons`}
             icon={IconList}
             iconColor={titleAccent}
           />
@@ -552,7 +556,7 @@ export default function TitleDetailScreen() {
         >
           <View className="px-4">
             <SectionHeader
-              title="Cast"
+              title={t`Cast`}
               icon={IconUsers}
               iconColor={titleAccent}
             />
@@ -578,7 +582,7 @@ export default function TitleDetailScreen() {
         >
           <View className="px-4">
             <SectionHeader
-              title="More Like This"
+              title={t`More Like This`}
               icon={IconThumbUp}
               iconColor={titleAccent}
             />

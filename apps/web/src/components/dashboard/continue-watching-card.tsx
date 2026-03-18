@@ -1,3 +1,5 @@
+import { plural } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
 import { IconPlayerPlay } from "@tabler/icons-react";
 
 import { Link } from "@tanstack/react-router";
@@ -26,6 +28,7 @@ export function ContinueWatchingCard({
 }: {
   item: ContinueWatchingItemProps;
 }) {
+  const { t } = useLingui();
   const stillUrl =
     item.nextEpisode?.stillPath ?? item.title.backdropPath ?? null;
   const progress =
@@ -71,7 +74,7 @@ export function ContinueWatchingCard({
           <div className="absolute right-3 bottom-2.5 left-3">
             <p className="flex items-center gap-1.5 font-medium text-[10px] text-primary uppercase tracking-wider">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary motion-safe:animate-pulse" />
-              Up next
+              {t`Up next`}
             </p>
             <p className="mt-0.5 truncate font-medium text-sm text-white">
               <span className="mr-0.5 font-mono text-white/60 text-xs [word-spacing:-0.25em]">
@@ -87,7 +90,7 @@ export function ContinueWatchingCard({
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium text-sm">{item.title.title}</p>
           <p className="text-muted-foreground text-xs">
-            {item.watchedEpisodes}/{item.totalEpisodes} episodes
+            {t`${item.watchedEpisodes}/${item.totalEpisodes} ${plural(item.totalEpisodes, { one: "episode", other: "episodes" })}`}
           </p>
         </div>
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">

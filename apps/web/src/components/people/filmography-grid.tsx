@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { PersonCredit } from "@sofa/api/schemas";
 import { IconMovie } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
@@ -23,6 +24,7 @@ export function FilmographyGrid({
   credits,
   userStatuses,
 }: FilmographyGridProps) {
+  const { t } = useLingui();
   const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<Sort>("newest");
 
@@ -53,9 +55,9 @@ export function FilmographyGrid({
   if (credits.length === 0) return null;
 
   const filters: { value: Filter; label: string }[] = [
-    { value: "all", label: "All" },
-    { value: "movie", label: "Movies" },
-    { value: "tv", label: "TV" },
+    { value: "all", label: t`All` },
+    { value: "movie", label: t`Movies` },
+    { value: "tv", label: t`TV` },
   ];
 
   return (
@@ -64,7 +66,7 @@ export function FilmographyGrid({
         <div className="flex items-center gap-2">
           <IconMovie aria-hidden={true} className="size-5 text-primary" />
           <h2 className="text-balance font-display text-xl tracking-tight">
-            Filmography
+            <Trans>Filmography</Trans>
           </h2>
           <span className="text-muted-foreground text-sm">
             ({filtered.length})
@@ -81,9 +83,9 @@ export function FilmographyGrid({
             <SelectValue>
               {(value: string | null) =>
                 value === "newest"
-                  ? "Newest"
+                  ? t`Newest`
                   : value === "rating"
-                    ? "Rating"
+                    ? t`Rating`
                     : null
               }
             </SelectValue>
@@ -93,8 +95,12 @@ export function FilmographyGrid({
             alignItemWithTrigger={false}
             className="p-1"
           >
-            <SelectItem value="newest">Newest</SelectItem>
-            <SelectItem value="rating">Rating</SelectItem>
+            <SelectItem value="newest">
+              <Trans>Newest</Trans>
+            </SelectItem>
+            <SelectItem value="rating">
+              <Trans>Rating</Trans>
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>

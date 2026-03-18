@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import {
   IconDeviceTv,
   IconMovie,
@@ -55,12 +56,12 @@ export function HeroBanner({
                     {type === "movie" ? (
                       <>
                         <IconMovie aria-hidden className="size-3.5" />
-                        Movie
+                        <Trans>Movie</Trans>
                       </>
                     ) : (
                       <>
                         <IconDeviceTv aria-hidden className="size-3.5" />
-                        TV
+                        <Trans>TV</Trans>
                       </>
                     )}
                   </span>
@@ -74,7 +75,7 @@ export function HeroBanner({
                     </span>
                   )}
                   <span className="text-muted-foreground text-xs">
-                    Trending today
+                    <Trans>Trending today</Trans>
                   </span>
                 </div>
                 <Link
@@ -95,7 +96,7 @@ export function HeroBanner({
                   className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-md hover:shadow-primary/20"
                 >
                   <IconPlus aria-hidden={true} className="size-4" />
-                  Add to Library
+                  <Trans>Add to Library</Trans>
                 </Link>
               </div>
             </div>

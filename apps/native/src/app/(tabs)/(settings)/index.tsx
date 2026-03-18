@@ -1,3 +1,7 @@
+import { plural } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { activateLocale, type SupportedLocale } from "@sofa/i18n";
+import { LOCALE_INFO } from "@sofa/i18n/locales";
 import {
   IconArrowUpRight,
   IconBrandGithub,
@@ -7,6 +11,7 @@ import {
   IconDatabase,
   IconDeviceMobileCog,
   IconDots,
+  IconLanguage,
   IconLink,
   IconLock,
   IconLogout,
@@ -40,9 +45,11 @@ import { SettingsSection } from "@/components/settings/settings-section";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { Image } from "@/components/ui/image";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
+import { SelectModal } from "@/components/ui/select-modal";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
+import { setPersistedLocale } from "@/lib/i18n";
 import { orpc } from "@/lib/orpc";
 import { isAnalyticsEnabled, setAnalyticsEnabled } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
@@ -56,6 +63,7 @@ const settingsContentContainerStyle = {
 };
 
 export default function SettingsScreen() {
+  const { t, i18n } = useLingui();
   const { push } = useRouter();
   const { data: session, refetch: refetchSession } = authClient.useSession();
   const [isEditingName, setIsEditingName] = useState(false);
@@ -65,7 +73,11 @@ export default function SettingsScreen() {
     if (!isEditingName && session?.user?.name) setNameInput(session.user.name);
   }, [session?.user?.name, isEditingName]);
 
+  const [languageModalOpen, setLanguageModalOpen] = useState(false);
+  const languageLabel =
+    LOCALE_INFO.find((o) => o.code === i18n.locale)?.nativeName ?? i18n.locale;
   const [analyticsEnabled, setAnalyticsToggle] = useState(isAnalyticsEnabled);
+
   const isAdmin = session?.user?.role === "admin";
   const serverUrl = getServerUrl();
 
@@ -92,34 +104,34 @@ export default function SettingsScreen() {
   const updateName = useMutation(
     orpc.account.updateName.mutationOptions({
       onSuccess: () => {
-        toast.success("Name updated");
+        toast.success(t`Name updated`);
         setIsEditingName(false);
         queryClient.invalidateQueries({ queryKey: orpc.account.key() });
         refetchSession();
       },
-      onError: () => toast.error("Failed to update name"),
+      onError: () => toast.error(t`Failed to update name`),
     }),
   );
 
   const uploadAvatar = useMutation(
     orpc.account.uploadAvatar.mutationOptions({
       onSuccess: () => {
-        toast.success("Profile picture updated");
+        toast.success(t`Profile picture updated`);
         queryClient.invalidateQueries({ queryKey: orpc.account.key() });
         refetchSession();
       },
-      onError: () => toast.error("Failed to upload avatar"),
+      onError: () => toast.error(t`Failed to upload avatar`),
     }),
   );
 
   const removeAvatar = useMutation(
     orpc.account.removeAvatar.mutationOptions({
       onSuccess: () => {
-        toast.success("Profile picture removed");
+        toast.success(t`Profile picture removed`);
         queryClient.invalidateQueries({ queryKey: orpc.account.key() });
         refetchSession();
       },
-      onError: () => toast.error("Failed to remove profile picture"),
+      onError: () => toast.error(t`Failed to remove profile picture`),
     }),
   );
 
@@ -152,12 +164,12 @@ export default function SettingsScreen() {
   const toggleRegistration = useMutation(
     orpc.admin.toggleRegistration.mutationOptions({
       onSuccess: (_data, { open }) => {
-        toast.success(open ? "Registration opened" : "Registration closed");
+        toast.success(open ? t`Registration opened` : t`Registration closed`);
         queryClient.invalidateQueries({
           queryKey: orpc.admin.registration.key(),
         });
       },
-      onError: () => toast.error("Failed to update registration setting"),
+      onError: () => toast.error(t`Failed to update registration setting`),
     }),
   );
 
@@ -170,13 +182,13 @@ export default function SettingsScreen() {
     orpc.admin.toggleUpdateCheck.mutationOptions({
       onSuccess: (_data, { enabled }) => {
         toast.success(
-          enabled ? "Update checks enabled" : "Update checks disabled",
+          enabled ? t`Update checks enabled` : t`Update checks disabled`,
         );
         queryClient.invalidateQueries({
           queryKey: orpc.admin.updateCheck.key(),
         });
       },
-      onError: () => toast.error("Failed to update setting"),
+      onError: () => toast.error(t`Failed to update setting`),
     }),
   );
 
@@ -191,10 +203,10 @@ export default function SettingsScreen() {
   }, []);
 
   const handleSignOut = () => {
-    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t`Sign Out`, t`Are you sure you want to sign out?`, [
+      { text: t`Cancel`, style: "cancel" },
       {
-        text: "Sign Out",
+        text: t`Sign Out`,
         style: "destructive",
         onPress: () => {
           authClient.signOut();
@@ -216,7 +228,7 @@ export default function SettingsScreen() {
     >
       {/* Account */}
       <Animated.View entering={FadeInDown.duration(300).delay(100)}>
-        <SettingsSection title="Account" icon={IconUser}>
+        <SettingsSection title={t`Account`} icon={IconUser}>
           <View className="flex-row items-center py-3.5">
             {hasAvatarImage ? (
               <DropdownMenu.Root>
@@ -252,7 +264,7 @@ export default function SettingsScreen() {
                       ios={{ name: "photo.on.rectangle.angled" }}
                     />
                     <DropdownMenu.ItemTitle>
-                      Change Photo
+                      <Trans>Change Photo</Trans>
                     </DropdownMenu.ItemTitle>
                   </DropdownMenu.Item>
                   <DropdownMenu.Item
@@ -262,7 +274,7 @@ export default function SettingsScreen() {
                   >
                     <DropdownMenu.ItemIcon ios={{ name: "trash" }} />
                     <DropdownMenu.ItemTitle>
-                      Remove Photo
+                      <Trans>Remove Photo</Trans>
                     </DropdownMenu.ItemTitle>
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
@@ -306,7 +318,9 @@ export default function SettingsScreen() {
                   <Pressable
                     onPress={() => updateName.mutate({ name: nameInput })}
                   >
-                    <Text className="text-primary text-sm">Save</Text>
+                    <Text className="text-primary text-sm">
+                      <Trans>Save</Trans>
+                    </Text>
                   </Pressable>
                   <Pressable
                     onPress={() => {
@@ -315,7 +329,7 @@ export default function SettingsScreen() {
                     }}
                   >
                     <Text className="text-muted-foreground text-sm">
-                      Cancel
+                      <Trans>Cancel</Trans>
                     </Text>
                   </Pressable>
                 </View>
@@ -336,7 +350,7 @@ export default function SettingsScreen() {
                   maxFontSizeMultiplier={1.0}
                   className="font-medium font-sans text-primary text-xs"
                 >
-                  Admin
+                  <Trans>Admin</Trans>
                 </Text>
               </View>
             )}
@@ -344,14 +358,14 @@ export default function SettingsScreen() {
 
           {showPasswordOption && (
             <SettingsRow
-              label={hasPassword ? "Change password" : "Set password"}
+              label={hasPassword ? t`Change password` : t`Set password`}
               icon={IconLock}
               onPress={() => push("/change-password")}
             />
           )}
 
           <SettingsRow
-            label="Sign out"
+            label={t`Sign out`}
             icon={IconLogout}
             onPress={handleSignOut}
             destructive
@@ -361,19 +375,19 @@ export default function SettingsScreen() {
 
       {/* Server */}
       <Animated.View entering={FadeInDown.duration(300).delay(200)}>
-        <SettingsSection title="Application" icon={IconDeviceMobileCog}>
+        <SettingsSection title={t`Application`} icon={IconDeviceMobileCog}>
           <SettingsRow
-            label="Server URL"
+            label={t`Server URL`}
             value={serverUrl}
             icon={IconLink}
             onPress={() => {
               Alert.alert(
-                "Change Server",
-                "You'll be signed out to change the server URL.",
+                t`Change Server`,
+                t`You'll be signed out to change the server URL.`,
                 [
-                  { text: "Cancel", style: "cancel" },
+                  { text: t`Cancel`, style: "cancel" },
                   {
-                    text: "Continue",
+                    text: t`Continue`,
                     style: "destructive",
                     onPress: async () => {
                       await authClient.signOut();
@@ -386,7 +400,31 @@ export default function SettingsScreen() {
             }}
           />
           <SettingsRow
-            label="Anonymous usage reporting"
+            label={t`Language`}
+            value={languageLabel}
+            icon={IconLanguage}
+            onPress={() => setLanguageModalOpen(true)}
+          />
+          <SelectModal
+            open={languageModalOpen}
+            onOpenChange={setLanguageModalOpen}
+            label={t`Language`}
+            icon={IconLanguage}
+            selection={i18n.locale}
+            options={LOCALE_INFO.map((info) => ({
+              value: info.code,
+              label: info.nativeName,
+            }))}
+            onSelect={(locale) => {
+              setLanguageModalOpen(false);
+              activateLocale(locale as SupportedLocale).then(
+                () => setPersistedLocale(locale as SupportedLocale),
+                () => {},
+              );
+            }}
+          />
+          <SettingsRow
+            label={t`Anonymous usage reporting`}
             icon={IconChartBar}
             right={
               <Switch
@@ -411,9 +449,9 @@ export default function SettingsScreen() {
       {isAdmin && (
         <Animated.View entering={FadeInDown.duration(300).delay(400)}>
           <SettingsSection
-            title="Server Health"
+            title={t`Server Health`}
             icon={IconServer}
-            badge="Admin"
+            badge={t`Admin`}
           >
             {systemHealth.isPending ? (
               <View className="items-center py-4">
@@ -422,24 +460,26 @@ export default function SettingsScreen() {
             ) : systemHealth.data ? (
               <>
                 <SettingsRow
-                  label="Database"
+                  label={t`Database`}
                   value={
                     systemHealth.data?.database
-                      ? `${systemHealth.data.database.titleCount} titles`
+                      ? t`${plural(systemHealth.data.database.titleCount, { one: "# title", other: "# titles" })}`
                       : "—"
                   }
                   icon={IconDatabase}
                 />
                 <SettingsRow
                   label="TMDB"
-                  value={systemHealth.data?.tmdb?.connected ? "Connected" : "—"}
+                  value={
+                    systemHealth.data?.tmdb?.connected ? t`Connected` : "—"
+                  }
                   icon={IconCloud}
                 />
                 <SettingsRow
-                  label="Image Cache"
+                  label={t`Image Cache`}
                   value={
                     systemHealth.data?.imageCache
-                      ? `${systemHealth.data.imageCache.imageCount} images`
+                      ? t`${plural(systemHealth.data.imageCache.imageCount, { one: "# image", other: "# images" })}`
                       : "—"
                   }
                   icon={IconPhoto}
@@ -453,9 +493,13 @@ export default function SettingsScreen() {
       {/* Admin: Security */}
       {isAdmin && (
         <Animated.View entering={FadeInDown.duration(300).delay(500)}>
-          <SettingsSection title="Security" icon={IconShield} badge="Admin">
+          <SettingsSection
+            title={t`Security`}
+            icon={IconShield}
+            badge={t`Admin`}
+          >
             <SettingsRow
-              label="Open registration"
+              label={t`Open registration`}
               icon={IconUserPlus}
               right={
                 <Switch
@@ -466,7 +510,7 @@ export default function SettingsScreen() {
               }
             />
             <SettingsRow
-              label="Check for updates"
+              label={t`Check for updates`}
               icon={IconCloud}
               right={
                 <Switch
@@ -481,7 +525,10 @@ export default function SettingsScreen() {
             {updateCheck.data?.updateCheck?.updateAvailable && (
               <View className="py-3.5">
                 <Text className="font-medium font-sans text-sm text-status-completed">
-                  Update available: {updateCheck.data.updateCheck.latestVersion}
+                  <Trans>
+                    Update available:{" "}
+                    {updateCheck.data.updateCheck.latestVersion}
+                  </Trans>
                 </Text>
               </View>
             )}
@@ -491,14 +538,14 @@ export default function SettingsScreen() {
 
       {/* More Settings */}
       <Animated.View entering={FadeInDown.duration(300).delay(400)}>
-        <SettingsSection title="More Settings" icon={IconDots}>
+        <SettingsSection title={t`More Settings`} icon={IconDots}>
           <Pressable
             onPress={() => Linking.openURL(`${serverUrl}/settings`)}
             className="flex-row items-center justify-center py-3.5 active:opacity-70"
           >
             <ScaledIcon icon={IconWorld} size={18} color={mutedFgColor} />
             <Text className="ml-2 flex-1 text-base text-foreground">
-              Open in browser…
+              <Trans>Open in browser…</Trans>
             </Text>
             <ScaledIcon
               icon={IconArrowUpRight}
@@ -556,8 +603,10 @@ export default function SettingsScreen() {
             maxFontSizeMultiplier={1.0}
             className="text-center text-muted-foreground text-xs leading-relaxed"
           >
-            This product uses the TMDB API but is not endorsed or certified by
-            TMDB.
+            <Trans>
+              This product uses the TMDB API but is not endorsed or certified by
+              TMDB.
+            </Trans>
           </Text>
         </Pressable>
       </Animated.View>

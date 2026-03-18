@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TitleActions } from "@/components/titles/title-actions";
 import { TitleAvailability } from "@/components/titles/title-availability";
@@ -111,16 +112,18 @@ function TitleErrorComponent() {
   return (
     <div className="flex flex-col items-center gap-6 py-24 text-center">
       <h1 className="font-display text-2xl tracking-tight sm:text-3xl">
-        Failed to load title
+        <Trans>Failed to load title</Trans>
       </h1>
       <p className="mx-auto max-w-sm text-muted-foreground text-sm leading-relaxed">
-        Something went wrong while loading this title. Please try again.
+        <Trans>
+          Something went wrong while loading this title. Please try again.
+        </Trans>
       </p>
       <Link
         to="/dashboard"
         className="inline-flex h-10 items-center justify-center rounded-lg border border-border px-5 font-medium text-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
       >
-        Dashboard
+        <Trans>Dashboard</Trans>
       </Link>
     </div>
   );
@@ -140,11 +143,13 @@ function TitleNotFound() {
         style={{ "--stagger-index": 1 } as React.CSSProperties}
       >
         <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
-          Title not found
+          <Trans>Title not found</Trans>
         </h2>
         <p className="mx-auto max-w-sm text-muted-foreground text-sm leading-relaxed">
-          The title you&apos;re looking for doesn&apos;t exist or may have been
-          removed from the database.
+          <Trans>
+            The title you&apos;re looking for doesn&apos;t exist or may have
+            been removed from the database.
+          </Trans>
         </p>
       </div>
       <div
@@ -155,14 +160,16 @@ function TitleNotFound() {
           to="/explore"
           className="group relative inline-flex h-10 items-center justify-center overflow-hidden rounded-lg bg-primary px-5 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-lg hover:shadow-primary/20"
         >
-          <span className="relative z-10">Explore titles</span>
+          <span className="relative z-10">
+            <Trans>Explore titles</Trans>
+          </span>
           <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
         </Link>
         <Link
           to="/dashboard"
           className="inline-flex h-10 items-center justify-center rounded-lg border border-border px-5 font-medium text-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
         >
-          Dashboard
+          <Trans>Dashboard</Trans>
         </Link>
       </div>
     </div>

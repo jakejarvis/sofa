@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react-native";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
@@ -15,6 +16,7 @@ const exploreContentContainerStyle = {
 };
 
 export default function ExploreScreen() {
+  const { t } = useLingui();
   const trending = useInfiniteQuery(
     orpc.explore.trending.infiniteOptions({
       input: (pageParam: number) => ({ type: "all" as const, page: pageParam }),
@@ -81,14 +83,16 @@ export default function ExploreScreen() {
     >
       <View className="gap-8">
         {heroItem && (
-          <Animated.View entering={FadeIn.duration(400)}>
+          <Animated.View
+            entering={FadeIn.duration(400).withInitialValues({ opacity: 0.01 })}
+          >
             <HeroBanner item={heroItem} />
           </Animated.View>
         )}
 
         <Animated.View entering={FadeInDown.duration(300).delay(100)}>
           <FilterableTitleRow
-            title="Trending Today"
+            title={t`Trending Today`}
             icon={IconFlame}
             mediaType="movie"
             defaultItems={trendingItems}
@@ -100,7 +104,7 @@ export default function ExploreScreen() {
 
         <Animated.View entering={FadeInDown.duration(300).delay(200)}>
           <FilterableTitleRow
-            title="Popular Movies"
+            title={t`Popular Movies`}
             icon={IconMovie}
             mediaType="movie"
             defaultItems={popularMovies.data?.items ?? []}
@@ -113,7 +117,7 @@ export default function ExploreScreen() {
 
         <Animated.View entering={FadeInDown.duration(300).delay(300)}>
           <FilterableTitleRow
-            title="Popular TV Shows"
+            title={t`Popular TV Shows`}
             icon={IconDeviceTv}
             mediaType="tv"
             defaultItems={popularTv.data?.items ?? []}

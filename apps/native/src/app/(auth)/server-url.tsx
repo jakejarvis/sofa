@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconAlertCircle,
   IconCircleCheck,
@@ -33,18 +34,20 @@ type ConnectionState =
   | { phase: "success" }
   | { phase: "error"; error: ValidationError };
 
-const ERROR_MESSAGES: Record<ValidationError, string> = {
-  network_unreachable:
-    "Could not reach the server. Check your connection and the URL.",
-  timeout: "Connection timed out. The server might be down or unreachable.",
-  not_sofa_server:
-    "This doesn't appear to be a Sofa server. Double-check the URL.",
-  server_unhealthy:
-    "Server found but reporting an issue. Try again in a moment.",
-  invalid_url: "That URL doesn't look right. Include the full server address.",
-};
+function getErrorMessages(
+  t: (strings: TemplateStringsArray, ...values: unknown[]) => string,
+): Record<ValidationError, string> {
+  return {
+    network_unreachable: t`Could not reach the server. Check your connection and the URL.`,
+    timeout: t`Connection timed out. The server might be down or unreachable.`,
+    not_sofa_server: t`This doesn't appear to be a Sofa server. Double-check the URL.`,
+    server_unhealthy: t`Server found but reporting an issue. Try again in a moment.`,
+    invalid_url: t`That URL doesn't look right. Include the full server address.`,
+  };
+}
 
 export default function ServerUrlScreen() {
+  const { t } = useLingui();
   const { replace } = useRouter();
   const inputRef = useRef<TextInput>(null);
   const successTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -145,7 +148,7 @@ export default function ServerUrlScreen() {
   return (
     <AuthScreen
       title="Sofa"
-      subtitle="Enter your Sofa server URL to get started"
+      subtitle={t`Enter your Sofa server URL to get started`}
       logoStyle={iconAnimatedStyle}
     >
       <Animated.View entering={FadeInDown.duration(300).delay(200)}>
@@ -180,7 +183,7 @@ export default function ServerUrlScreen() {
               style={dotAnimatedStyle}
             />
             <Text className="text-muted-foreground text-sm">
-              Connecting to server...
+              <Trans>Connecting to server...</Trans>
             </Text>
           </View>
         ) : isSuccess ? (
@@ -191,7 +194,7 @@ export default function ServerUrlScreen() {
               color={statusCompletedColor}
             />
             <Text className="font-medium font-sans text-sm text-status-completed">
-              Connected
+              <Trans>Connected</Trans>
             </Text>
           </View>
         ) : (
@@ -200,7 +203,9 @@ export default function ServerUrlScreen() {
             disabled={!isValidUrl}
             className="bg-primary"
           >
-            <ButtonLabel>Connect</ButtonLabel>
+            <ButtonLabel>
+              <Trans>Connect</Trans>
+            </ButtonLabel>
           </Button>
         )}
       </Animated.View>
@@ -218,7 +223,7 @@ export default function ServerUrlScreen() {
               style={{ marginTop: 1 }}
             />
             <Text selectable className="flex-1 text-destructive text-sm">
-              {ERROR_MESSAGES[connection.error]}
+              {getErrorMessages(t)[connection.error]}
             </Text>
           </Animated.View>
         )}
@@ -234,7 +239,7 @@ export default function ServerUrlScreen() {
         >
           <ScaledIcon icon={IconInfoCircle} size={16} color={mutedFgColor} />
           <Text className="font-medium font-sans text-primary text-sm">
-            Don't have a server?
+            <Trans>Don't have a server?</Trans>
           </Text>
         </Pressable>
       </Animated.View>

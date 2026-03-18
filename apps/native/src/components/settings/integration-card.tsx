@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconCheck,
   IconChevronDown,
@@ -46,6 +47,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
     | "sonarr"
     | "radarr";
 
+  const { t } = useLingui();
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
   const primaryColor = useCSSVariable("--color-primary") as string;
 
@@ -91,30 +93,30 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
   const connectMutation = useMutation(
     orpc.integrations.create.mutationOptions({
       onSuccess: () => {
-        toast.success(`${label} connected`);
+        toast.success(t`${label} connected`);
         queryClient.invalidateQueries({ queryKey: orpc.integrations.key() });
       },
-      onError: () => toast.error(`Failed to connect ${label}`),
+      onError: () => toast.error(t`Failed to connect ${label}`),
     }),
   );
 
   const deleteMutation = useMutation(
     orpc.integrations.delete.mutationOptions({
       onSuccess: () => {
-        toast.success(`${label} disconnected`);
+        toast.success(t`${label} disconnected`);
         queryClient.invalidateQueries({ queryKey: orpc.integrations.key() });
       },
-      onError: () => toast.error(`Failed to disconnect ${label}`),
+      onError: () => toast.error(t`Failed to disconnect ${label}`),
     }),
   );
 
   const regenerateMutation = useMutation(
     orpc.integrations.regenerateToken.mutationOptions({
       onSuccess: () => {
-        toast.success(`${label} URL regenerated`);
+        toast.success(t`${label} URL regenerated`);
         queryClient.invalidateQueries({ queryKey: orpc.integrations.key() });
       },
-      onError: () => toast.error(`Failed to regenerate ${label} URL`),
+      onError: () => toast.error(t`Failed to regenerate ${label} URL`),
     }),
   );
 
@@ -124,39 +126,39 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
     if (!url) return;
     await Clipboard.setStringAsync(url);
     setCopied(true);
-    toast.success("URL copied to clipboard");
+    toast.success(t`URL copied to clipboard`);
     setTimeout(() => setCopied(false), 2000);
-  }, [url]);
+  }, [url, t]);
 
   const handleRegenerate = useCallback(() => {
     Alert.alert(
-      "Regenerate URL",
-      `This will invalidate the current ${label} URL. You'll need to update it in ${label}.`,
+      t`Regenerate URL`,
+      t`This will invalidate the current ${label} URL. You'll need to update it in ${label}.`,
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t`Cancel`, style: "cancel" },
         {
-          text: "Regenerate",
+          text: t`Regenerate`,
           style: "destructive",
           onPress: () => regenerateMutation.mutate({ provider: providerInput }),
         },
       ],
     );
-  }, [label, providerInput, regenerateMutation]);
+  }, [label, providerInput, regenerateMutation, t]);
 
   const handleDisconnect = useCallback(() => {
     Alert.alert(
-      `Disconnect ${label}`,
-      `Are you sure you want to disconnect ${label}? The current URL will stop working.`,
+      t`Disconnect ${label}`,
+      t`Are you sure you want to disconnect ${label}? The current URL will stop working.`,
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t`Cancel`, style: "cancel" },
         {
-          text: "Disconnect",
+          text: t`Disconnect`,
           style: "destructive",
           onPress: () => deleteMutation.mutate({ provider: providerInput }),
         },
       ],
     );
-  }, [label, providerInput, deleteMutation]);
+  }, [label, providerInput, deleteMutation, t]);
 
   const Icon = config.icon;
 
@@ -189,7 +191,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
             <Text className="mt-0.5 text-muted-foreground text-xs">
               {connection
                 ? config.connectedStatus(connection.lastEventAt)
-                : "Not configured"}
+                : t`Not configured`}
             </Text>
           </View>
         </View>
@@ -231,7 +233,9 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
               className="items-center rounded-lg bg-primary py-2.5 active:opacity-80"
             >
               <Text className="font-medium font-sans text-primary-foreground">
-                {connectMutation.isPending ? "Connecting…" : `Connect ${label}`}
+                {connectMutation.isPending
+                  ? t`Connecting…`
+                  : t`Connect ${label}`}
               </Text>
             </Pressable>
           ) : (
@@ -282,7 +286,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                     color={mutedFgColor}
                   />
                   <Text className="font-medium font-sans text-foreground text-sm">
-                    Regenerate
+                    <Trans>Regenerate</Trans>
                   </Text>
                 </Pressable>
                 <Pressable
@@ -291,7 +295,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                 >
                   <ScaledIcon icon={IconTrash} size={14} color="#ef4444" />
                   <Text className="font-medium font-sans text-destructive text-sm">
-                    Disconnect
+                    <Trans>Disconnect</Trans>
                   </Text>
                 </Pressable>
               </View>
@@ -312,7 +316,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                 />
               </Animated.View>
               <Text className="text-muted-foreground text-xs">
-                Setup instructions
+                <Trans>Setup instructions</Trans>
               </Text>
             </Pressable>
 

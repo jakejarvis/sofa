@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconWifiOff } from "@tabler/icons-react-native";
 import * as Network from "expo-network";
 import { useEffect, useRef, useState } from "react";
@@ -55,7 +56,7 @@ export function OfflineBanner() {
       <View className="mx-4 flex-row items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5">
         <ScaledIcon icon={IconWifiOff} size={16} color="white" />
         <Text className="font-medium font-sans text-sm text-white">
-          No internet connection
+          <Trans>No internet connection</Trans>
         </Text>
       </View>
     </Animated.View>
