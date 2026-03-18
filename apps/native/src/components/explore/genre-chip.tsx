@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
@@ -11,6 +12,7 @@ export function GenreChip({
   isSelected: boolean;
   onPress: () => void;
 }) {
+  const { t } = useLingui();
   return (
     <Pressable
       onPress={() => {
@@ -22,8 +24,8 @@ export function GenreChip({
       accessibilityState={{ selected: isSelected }}
       accessibilityHint={
         isSelected
-          ? "Double tap to clear this filter"
-          : `Double tap to filter by ${label}`
+          ? t`Double tap to clear this filter`
+          : t`Double tap to filter by ${label}`
       }
       className={`mr-2 rounded-full px-3 py-1.5 ${isSelected ? "bg-primary" : "bg-secondary"}`}
     >

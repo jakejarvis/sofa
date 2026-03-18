@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconWebhook } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -37,7 +38,7 @@ export function IntegrationsSection() {
           className="size-4 text-muted-foreground"
         />
         <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-          Integrations
+          <Trans>Integrations</Trans>
         </h2>
       </div>
       {isPending ? (

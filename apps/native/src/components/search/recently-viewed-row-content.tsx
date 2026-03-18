@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { IconDeviceTv, IconMovie, IconUser } from "@tabler/icons-react-native";
 import { View } from "react-native";
 import { useCSSVariable } from "uniwind";
@@ -11,17 +12,22 @@ const TypeIcon = {
   person: IconUser,
 } as const;
 
-const TypeLabel = {
-  movie: "Movie",
-  tv: "TV",
-  person: "Person",
-} as const;
+function getTypeLabel(
+  t: (strings: TemplateStringsArray, ...values: unknown[]) => string,
+) {
+  return {
+    movie: t`Movie`,
+    tv: t`TV`,
+    person: t`Person`,
+  } as const;
+}
 
 export function RecentlyViewedRowContent({
   item,
 }: {
   item: RecentlyViewedItem;
 }) {
+  const { t } = useLingui();
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const Icon = TypeIcon[item.type];
 
@@ -63,7 +69,7 @@ export function RecentlyViewedRowContent({
               maxFontSizeMultiplier={1.0}
               className="text-muted-foreground text-xs"
             >
-              {TypeLabel[item.type]}
+              {getTypeLabel(t)[item.type]}
             </Text>
           </View>
           {item.subtitle ? (

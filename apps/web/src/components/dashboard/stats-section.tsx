@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconDeviceTv } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
@@ -27,16 +28,18 @@ export function StatsSection() {
             <IconDeviceTv aria-hidden={true} className="size-8 text-primary" />
           </div>
           <div className="space-y-1">
-            <p className="font-medium">Your library is empty</p>
+            <p className="font-medium">
+              <Trans>Your library is empty</Trans>
+            </p>
             <p className="text-muted-foreground text-sm">
-              Search for movies and TV shows to start tracking
+              <Trans>Search for movies and TV shows to start tracking</Trans>
             </p>
           </div>
           <Link
             to="/explore"
             className="inline-flex h-9 items-center rounded-lg bg-primary px-4 font-medium text-primary-foreground text-sm transition-shadow hover:shadow-md hover:shadow-primary/20"
           >
-            Start exploring
+            <Trans>Start exploring</Trans>
           </Link>
         </div>
       )}

@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconRefresh, IconWebhook } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { Pressable, View } from "react-native";
@@ -10,11 +11,12 @@ import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
 
 export function IntegrationsSection() {
+  const { t } = useLingui();
   const integrations = useQuery(orpc.integrations.list.queryOptions());
 
   return (
     <View className="mb-6">
-      <SectionHeader title="Integrations" icon={IconWebhook} />
+      <SectionHeader title={t`Integrations`} icon={IconWebhook} />
 
       {integrations.isPending ? (
         <View className="items-center py-4">
@@ -23,7 +25,7 @@ export function IntegrationsSection() {
       ) : integrations.isError ? (
         <View className="items-center gap-2 py-4">
           <Text className="text-muted-foreground text-sm">
-            Could not load integrations
+            <Trans>Could not load integrations</Trans>
           </Text>
           <Pressable
             onPress={() => integrations.refetch()}
@@ -36,7 +38,7 @@ export function IntegrationsSection() {
               className="accent-primary"
             />
             <Text className="font-medium font-sans text-primary text-sm">
-              Retry
+              <Trans>Retry</Trans>
             </Text>
           </Pressable>
         </View>

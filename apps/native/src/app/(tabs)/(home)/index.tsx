@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { FlashList } from "@shopify/flash-list";
 import {
   IconBooks,
@@ -30,6 +31,7 @@ const dashboardContentContainerStyle = {
 };
 
 export default function DashboardScreen() {
+  const { t } = useLingui();
   const { push } = useRouter();
   authClient.useSession();
 
@@ -55,12 +57,12 @@ export default function DashboardScreen() {
 
   const statsData = useMemo(
     () => [
-      { label: "Movies this month", value: stats.data?.moviesThisMonth },
-      { label: "Episodes this week", value: stats.data?.episodesThisWeek },
-      { label: "In library", value: stats.data?.librarySize },
-      { label: "Completed", value: stats.data?.completed },
+      { label: t`Movies this month`, value: stats.data?.moviesThisMonth },
+      { label: t`Episodes this week`, value: stats.data?.episodesThisWeek },
+      { label: t`In library`, value: stats.data?.librarySize },
+      { label: t`Completed`, value: stats.data?.completed },
     ],
-    [stats.data],
+    [stats.data, t],
   );
 
   const renderStatItem = useCallback(
@@ -107,7 +109,10 @@ export default function DashboardScreen() {
         {hasContinueWatching && (
           <Animated.View entering={FadeInDown.duration(300).delay(200)}>
             <View className="px-4">
-              <SectionHeader title="Continue Watching" icon={IconPlayerPlay} />
+              <SectionHeader
+                title={t`Continue Watching`}
+                icon={IconPlayerPlay}
+              />
             </View>
             <FlashList
               horizontal
@@ -125,7 +130,7 @@ export default function DashboardScreen() {
         {/* Library */}
         <Animated.View entering={FadeInDown.duration(300).delay(300)}>
           <View className="px-4">
-            <SectionHeader title="In Your Library" icon={IconBooks} />
+            <SectionHeader title={t`In Your Library`} icon={IconBooks} />
           </View>
           {library.isPending ? (
             <HorizontalPosterRow items={[]} isLoading />
@@ -133,9 +138,9 @@ export default function DashboardScreen() {
             <HorizontalPosterRow items={library.data?.items ?? []} />
           ) : (
             <EmptyState
-              title="Your library is empty"
-              description="Start tracking movies and shows"
-              actionLabel="Explore"
+              title={t`Your library is empty`}
+              description={t`Start tracking movies and shows`}
+              actionLabel={t`Explore`}
               onAction={() => push("/(tabs)/(explore)")}
             />
           )}
@@ -145,7 +150,10 @@ export default function DashboardScreen() {
         {hasRecommendations && (
           <Animated.View entering={FadeInDown.duration(300).delay(400)}>
             <View className="px-4">
-              <SectionHeader title="Recommended for You" icon={IconThumbUp} />
+              <SectionHeader
+                title={t`Recommended for You`}
+                icon={IconThumbUp}
+              />
             </View>
             <HorizontalPosterRow
               items={recommendations.data?.items ?? []}

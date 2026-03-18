@@ -17,6 +17,7 @@
     "@better-auth/expo": "catalog:",
     "@expo/metro-runtime": "55.0.6",
     "@expo/ui": "55.0.3",
+    "@lingui/react": "catalog:",
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
     "@orpc/tanstack-query": "catalog:",
@@ -25,6 +26,7 @@
     "@react-navigation/native": "7.1.33",
     "@shopify/flash-list": "2.0.2",
     "@sofa/api": "workspace:*",
+    "@sofa/i18n": "workspace:*",
     "@tabler/icons-react-native": "3.40.0",
     "@tanstack/query-async-storage-persister": "5.90.24",
     "@tanstack/react-form": "1.28.5",
@@ -77,6 +79,8 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@lingui/babel-plugin-lingui-macro": "catalog:",
+    "@lingui/metro-transformer": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "typescript": "catalog:"

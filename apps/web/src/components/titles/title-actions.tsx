@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconCheck } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -25,7 +26,7 @@ export function TitleActions() {
           className="h-9 rounded-lg px-4 text-sm hover:shadow-md hover:shadow-primary/20 active:scale-[0.97]"
         >
           <IconCheck aria-hidden={true} className="size-3.5" />
-          Mark Watched
+          <Trans>Mark Watched</Trans>
         </Button>
       )}
       <Separator

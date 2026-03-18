@@ -1,3 +1,5 @@
+import { msg, plural } from "@lingui/core/macro";
+import { i18n } from "@sofa/i18n";
 import { client, orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { toast } from "@/lib/toast";
@@ -17,11 +19,13 @@ export const titleActions = {
     try {
       await client.titles.quickAdd({ id });
       toast.success(
-        titleName ? `Added "${titleName}" to watchlist` : "Added to watchlist",
+        titleName
+          ? i18n._(msg`Added "${titleName}" to watchlist`)
+          : i18n._(msg`Added to watchlist`),
       );
       invalidateTitleQueries();
     } catch {
-      toast.error("Failed to add to watchlist");
+      toast.error(i18n._(msg`Failed to add to watchlist`));
       // Refetch so any optimistic local status reverts on failure
       queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
     }
@@ -30,10 +34,10 @@ export const titleActions = {
   async markWatching(id: string) {
     try {
       await client.titles.updateStatus({ id, status: "in_progress" });
-      toast.success("Marked as watching");
+      toast.success(i18n._(msg`Marked as watching`));
       invalidateTitleQueries();
     } catch {
-      toast.error("Failed to update status");
+      toast.error(i18n._(msg`Failed to update status`));
     }
   },
 
@@ -42,12 +46,12 @@ export const titleActions = {
       await client.titles.updateStatus({ id, status: "completed" });
       toast.success(
         titleName
-          ? `Marked "${titleName}" as completed`
-          : "Marked as completed",
+          ? i18n._(msg`Marked "${titleName}" as completed`)
+          : i18n._(msg`Marked as completed`),
       );
       invalidateTitleQueries();
     } catch {
-      toast.error("Failed to update status");
+      toast.error(i18n._(msg`Failed to update status`));
     }
   },
 
@@ -55,21 +59,23 @@ export const titleActions = {
     try {
       await client.titles.watchMovie({ id });
       toast.success(
-        titleName ? `Marked "${titleName}" as watched` : "Marked as watched",
+        titleName
+          ? i18n._(msg`Marked "${titleName}" as watched`)
+          : i18n._(msg`Marked as watched`),
       );
       invalidateTitleQueries();
     } catch {
-      toast.error("Failed to mark as watched");
+      toast.error(i18n._(msg`Failed to mark as watched`));
     }
   },
 
   async removeFromLibrary(id: string) {
     try {
       await client.titles.updateStatus({ id, status: null });
-      toast.success("Removed from library");
+      toast.success(i18n._(msg`Removed from library`));
       invalidateTitleQueries();
     } catch {
-      toast.error("Failed to remove from library");
+      toast.error(i18n._(msg`Failed to remove from library`));
     }
   },
 
@@ -78,32 +84,34 @@ export const titleActions = {
       await client.titles.updateRating({ id, stars });
       toast.success(
         stars > 0
-          ? `Rated ${stars} star${stars > 1 ? "s" : ""}`
-          : "Rating removed",
+          ? i18n._(
+              msg`Rated ${plural(stars, { one: "# star", other: "# stars" })}`,
+            )
+          : i18n._(msg`Rating removed`),
       );
       queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
     } catch {
-      toast.error("Failed to update rating");
+      toast.error(i18n._(msg`Failed to update rating`));
     }
   },
 
   async watchEpisode(id: string) {
     try {
       await client.episodes.watch({ id });
-      toast.success("Episode watched");
+      toast.success(i18n._(msg`Episode watched`));
       invalidateTitleQueries();
     } catch {
-      toast.error("Failed to mark episode");
+      toast.error(i18n._(msg`Failed to mark episode`));
     }
   },
 
   async unwatchEpisode(id: string) {
     try {
       await client.episodes.unwatch({ id });
-      toast.success("Episode unwatched");
+      toast.success(i18n._(msg`Episode unwatched`));
       invalidateTitleQueries();
     } catch {
-      toast.error("Failed to unmark episode");
+      toast.error(i18n._(msg`Failed to unmark episode`));
     }
   },
 
@@ -111,11 +119,13 @@ export const titleActions = {
     try {
       await client.seasons.watch({ id });
       toast.success(
-        seasonName ? `Watched all of ${seasonName}` : "Season watched",
+        seasonName
+          ? i18n._(msg`Watched all of ${seasonName}`)
+          : i18n._(msg`Season watched`),
       );
       invalidateTitleQueries();
     } catch {
-      toast.error("Failed to mark some episodes");
+      toast.error(i18n._(msg`Failed to mark some episodes`));
     }
   },
 };

@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { skipToken, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { TitleCard, TitleCardSkeleton } from "@/components/title-card";
@@ -147,7 +148,7 @@ export function FilterableTitleRow({
       {/* Empty state */}
       {!isLoading && selectedGenre !== null && items.length === 0 && (
         <p className="py-8 text-center text-muted-foreground text-sm">
-          No titles found for this genre.
+          <Trans>No titles found for this genre.</Trans>
         </p>
       )}
 

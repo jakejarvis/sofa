@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+import { AppErrorCode } from "@sofa/api/errors";
 import { fetchFullFilmography, getOrFetchPerson } from "@sofa/core/person";
 import { getUserStatusesByTitleIds } from "@sofa/core/tracking";
 import { os } from "../context";
@@ -9,7 +10,10 @@ export const detail = os.people.detail
   .handler(async ({ input, context }) => {
     const person = await getOrFetchPerson(input.id);
     if (!person)
-      throw new ORPCError("NOT_FOUND", { message: "Person not found" });
+      throw new ORPCError("NOT_FOUND", {
+        message: "Person not found",
+        data: { code: AppErrorCode.PERSON_NOT_FOUND },
+      });
 
     const allCredits = await fetchFullFilmography(person.id);
 

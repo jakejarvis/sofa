@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import type { Season } from "@sofa/api/schemas";
 import {
   IconCheck,
@@ -97,7 +98,9 @@ export function TitleSeasons({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <IconDeviceTvOld aria-hidden={true} className="size-5 text-primary" />
-          <h2 className="font-display text-2xl tracking-tight">Episodes</h2>
+          <h2 className="font-display text-2xl tracking-tight">
+            <Trans>Episodes</Trans>
+          </h2>
         </div>
         {userStatus !== "completed" && (
           <AlertDialog open={markAllOpen} onOpenChange={setMarkAllOpen}>
@@ -109,29 +112,33 @@ export function TitleSeasons({
                   className="text-muted-foreground uppercase tracking-wider"
                 >
                   <IconChecks aria-hidden={true} className="size-3.5" />
-                  Mark All Watched
+                  <Trans>Mark All Watched</Trans>
                 </Button>
               }
             />
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>
-                  Mark all episodes as watched?
+                  <Trans>Mark all episodes as watched?</Trans>
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will mark every episode of this show as watched. You can
-                  undo this later by unmarking individual seasons.
+                  <Trans>
+                    This will mark every episode of this show as watched. You
+                    can undo this later by unmarking individual seasons.
+                  </Trans>
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>
+                  <Trans>Cancel</Trans>
+                </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => {
                     handleMarkAllWatched();
                     setMarkAllOpen(false);
                   }}
                 >
-                  Mark All Watched
+                  <Trans>Mark All Watched</Trans>
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -191,7 +198,9 @@ export function TitleSeasons({
                         aria-hidden={true}
                         className="size-3.5 sm:hidden"
                       />
-                      <span className="hidden sm:inline">Watch all</span>
+                      <span className="hidden sm:inline">
+                        <Trans>Watch all</Trans>
+                      </span>
                     </Button>
                   )}
                   {totalCount > 0 && watchedCount === totalCount && (
@@ -208,7 +217,9 @@ export function TitleSeasons({
                         aria-hidden={true}
                         className="size-3.5 sm:hidden"
                       />
-                      <span className="hidden sm:inline">Unwatch all</span>
+                      <span className="hidden sm:inline">
+                        <Trans>Unwatch all</Trans>
+                      </span>
                     </Button>
                   )}
                   {totalCount > 0 && (
@@ -326,7 +337,7 @@ export function TitleSeasons({
                                 </span>
                                 <span className="hidden sm:inline"> </span>
                                 <span className="font-medium">
-                                  {ep.name ?? "Untitled"}
+                                  {ep.name ?? <Trans>Untitled</Trans>}
                                 </span>
                               </p>
                               <p className="text-muted-foreground text-xs">

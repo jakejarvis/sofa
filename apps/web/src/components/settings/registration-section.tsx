@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconDoorEnter } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useOptimistic, useState, useTransition } from "react";
@@ -8,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { orpc } from "@/lib/orpc/client";
 
 export function RegistrationSection() {
+  const { t } = useLingui();
   const { data, isPending: isLoading } = useQuery(
     orpc.admin.registration.queryOptions(),
   );
@@ -35,9 +37,11 @@ export function RegistrationSection() {
       try {
         await toggleMutation.mutateAsync({ open: checked });
         setRegistrationOpen(checked);
-        toast.success(checked ? "Registration opened" : "Registration closed");
+        toast.success(
+          checked ? t`Registration opened` : t`Registration closed`,
+        );
       } catch {
-        toast.error("Failed to update registration setting");
+        toast.error(t`Failed to update registration setting`);
       }
     });
   }
@@ -50,9 +54,11 @@ export function RegistrationSection() {
             <IconDoorEnter aria-hidden={true} className="size-4 text-primary" />
           </div>
           <div>
-            <CardTitle>Open registration</CardTitle>
+            <CardTitle>
+              <Trans>Open registration</Trans>
+            </CardTitle>
             <CardDescription>
-              Allow new users to create accounts
+              <Trans>Allow new users to create accounts</Trans>
             </CardDescription>
           </div>
         </div>
@@ -60,7 +66,7 @@ export function RegistrationSection() {
           checked={optimisticOpen}
           onCheckedChange={handleToggle}
           disabled={isPending}
-          aria-label="Toggle open registration"
+          aria-label={t`Toggle open registration`}
         />
       </div>
     </CardContent>

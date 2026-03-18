@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconBookmarkFilled,
   IconCheck,
@@ -12,26 +13,30 @@ import * as Haptics from "@/utils/haptics";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
-const statusConfig = {
-  watchlist: {
-    label: "Watchlisted",
-    Icon: IconBookmarkFilled,
-    bgClass: "bg-title-accent/10 border-title-accent/20",
-    textClass: "text-title-accent",
-  },
-  in_progress: {
-    label: "Watching",
-    Icon: IconPlayerPlayFilled,
-    bgClass: "bg-title-accent/10 border-title-accent/20",
-    textClass: "text-title-accent",
-  },
-  completed: {
-    label: "Completed",
-    Icon: IconCheck,
-    bgClass: "bg-status-completed/10 border-status-completed/20",
-    textClass: "text-status-completed",
-  },
-} as const;
+function getStatusConfig(
+  t: (strings: TemplateStringsArray, ...values: unknown[]) => string,
+) {
+  return {
+    watchlist: {
+      label: t`Watchlisted`,
+      Icon: IconBookmarkFilled,
+      bgClass: "bg-title-accent/10 border-title-accent/20",
+      textClass: "text-title-accent",
+    },
+    in_progress: {
+      label: t`Watching`,
+      Icon: IconPlayerPlayFilled,
+      bgClass: "bg-title-accent/10 border-title-accent/20",
+      textClass: "text-title-accent",
+    },
+    completed: {
+      label: t`Completed`,
+      Icon: IconCheck,
+      bgClass: "bg-status-completed/10 border-status-completed/20",
+      textClass: "text-status-completed",
+    },
+  };
+}
 
 export function StatusActionButton({
   currentStatus,
@@ -42,11 +47,13 @@ export function StatusActionButton({
   onStatusChange: (status: TitleStatus | null) => void;
   isPending: boolean;
 }) {
+  const { t } = useLingui();
   const [titleAccent, completedColor] = useCSSVariable([
     "--color-title-accent",
     "--color-status-completed",
   ]) as [string, string];
 
+  const statusConfig = getStatusConfig(t);
   const config = currentStatus
     ? statusConfig[currentStatus as keyof typeof statusConfig]
     : null;
@@ -70,7 +77,7 @@ export function StatusActionButton({
           strokeWidth={2.5}
         />
         <Text className="font-medium font-sans text-sm text-title-accent">
-          Watchlist
+          <Trans>Watchlist</Trans>
         </Text>
       </Pressable>
     );

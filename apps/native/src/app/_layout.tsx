@@ -1,5 +1,7 @@
 import "@/global.css";
+import { I18nProvider } from "@lingui/react";
 import { ThemeProvider } from "@react-navigation/native";
+import { i18n } from "@sofa/i18n";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
   persistQueryClientRestore,
@@ -22,6 +24,7 @@ import { Uniwind, useResolveClassNames } from "uniwind";
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-banner";
 import { useServerConnection } from "@/hooks/use-server-connection";
+import { initLocale } from "@/lib/i18n";
 import { applyTrackingTransparency, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
 import {
@@ -35,6 +38,7 @@ import { sofaTheme } from "@/lib/theme";
 SplashScreen.preventAutoHideAsync();
 enableFreeze(true);
 initialize();
+initLocale();
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
@@ -215,13 +219,15 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   const inner = (
-    <QueryProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <KeyboardProvider>
-          <AppContent />
-        </KeyboardProvider>
-      </GestureHandlerRootView>
-    </QueryProvider>
+    <I18nProvider i18n={i18n}>
+      <QueryProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <KeyboardProvider>
+            <AppContent />
+          </KeyboardProvider>
+        </GestureHandlerRootView>
+      </QueryProvider>
+    </I18nProvider>
   );
 
   if (!posthog) return inner;

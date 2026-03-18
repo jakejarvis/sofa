@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { IconStarFilled } from "@tabler/icons-react-native";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { Link } from "expo-router";
@@ -22,6 +23,7 @@ export interface HeroBannerItem {
 }
 
 export function HeroBanner({ item }: { item: HeroBannerItem }) {
+  const { t } = useLingui();
   const primary = useCSSVariable("--color-primary") as string;
   const { animatedStyle, gesture: tapGesture } = usePressAnimation(0.98);
 
@@ -152,7 +154,7 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
           <Link.Preview />
           <Link.Menu>
             <Link.MenuAction
-              title="Add to Watchlist"
+              title={t`Add to Watchlist`}
               icon="bookmark"
               onPress={() => titleActions.quickAdd(item.id, item.title)}
             />

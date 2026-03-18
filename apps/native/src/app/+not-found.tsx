@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { IconAlertTriangle } from "@tabler/icons-react-native";
 import { Link, Stack } from "expo-router";
 import { View } from "react-native";
@@ -12,7 +13,9 @@ export default function NotFoundScreen() {
 
   return (
     <>
-      <Stack.Screen.Title>Not Found</Stack.Screen.Title>
+      <Stack.Screen.Title>
+        <Trans>Not Found</Trans>
+      </Stack.Screen.Title>
       <Container>
         <View className="flex-1 items-center justify-center p-4">
           <Animated.View
@@ -21,17 +24,17 @@ export default function NotFoundScreen() {
           >
             <IconAlertTriangle size={48} color={mutedForeground} />
             <Text className="mt-3 font-display text-foreground text-xl">
-              Page Not Found
+              <Trans>Page Not Found</Trans>
             </Text>
             <Text className="mt-1 mb-4 text-center text-muted-foreground text-sm">
-              The page you're looking for doesn't exist.
+              <Trans>The page you're looking for doesn't exist.</Trans>
             </Text>
           </Animated.View>
           <Animated.View entering={FadeInDown.duration(300).delay(200)}>
             <Link href="/" asChild>
               <Button size="sm" className="bg-primary">
                 <ButtonLabel className="text-primary-foreground">
-                  Go Home
+                  <Trans>Go Home</Trans>
                 </ButtonLabel>
               </Button>
             </Link>

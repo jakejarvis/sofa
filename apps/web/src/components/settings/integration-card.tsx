@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconBook2,
   IconCheck,
@@ -87,6 +88,7 @@ export function IntegrationCard({
   connection: IntegrationConnection | null;
   setConnections: React.Dispatch<React.SetStateAction<IntegrationConnection[]>>;
 }) {
+  const { t } = useLingui();
   const { provider, label } = config;
   const providerInput = provider as
     | "plex"
@@ -99,9 +101,9 @@ export function IntegrationCard({
     orpc.integrations.create.mutationOptions({
       onSuccess: (result) => {
         setConnections((prev) => [...prev, { ...result, recentEvents: [] }]);
-        toast.success(`${label} connected`);
+        toast.success(t`${label} connected`);
       },
-      onError: () => toast.error(`Failed to connect ${label}`),
+      onError: () => toast.error(t`Failed to connect ${label}`),
     }),
   );
 
@@ -115,10 +117,10 @@ export function IntegrationCard({
         });
         return { previous };
       },
-      onSuccess: () => toast.success(`${label} disconnected`),
+      onSuccess: () => toast.success(t`${label} disconnected`),
       onError: (_, __, ctx) => {
         if (ctx?.previous) setConnections(ctx.previous);
-        toast.error(`Failed to disconnect ${label}`);
+        toast.error(t`Failed to disconnect ${label}`);
       },
     }),
   );
@@ -131,9 +133,9 @@ export function IntegrationCard({
             c.provider === provider ? { ...c, token: result.token } : c,
           ),
         );
-        toast.success(`${label} URL regenerated`);
+        toast.success(t`${label} URL regenerated`);
       },
-      onError: () => toast.error(`Failed to regenerate ${label} URL`),
+      onError: () => toast.error(t`Failed to regenerate ${label} URL`),
     }),
   );
   const [copied, setCopied] = useState(false);
@@ -169,7 +171,7 @@ export function IntegrationCard({
                 <CardDescription>
                   {connection
                     ? config.connectedStatus(connection.lastEventAt)
-                    : "Not configured"}
+                    : t`Not configured`}
                 </CardDescription>
               </div>
             </div>
@@ -193,7 +195,11 @@ export function IntegrationCard({
                 size="lg"
                 className="w-full"
               >
-                {connecting ? "Connecting\u2026" : `Connect ${config.label}`}
+                {connecting ? (
+                  <Trans>Connecting...</Trans>
+                ) : (
+                  <Trans>Connect {config.label}</Trans>
+                )}
               </Button>
             ) : (
               <AnimatePresence>
@@ -234,7 +240,9 @@ export function IntegrationCard({
                                 <IconCopy />
                               )}
                             </TooltipTrigger>
-                            <TooltipContent>Copy URL</TooltipContent>
+                            <TooltipContent>
+                              <Trans>Copy URL</Trans>
+                            </TooltipContent>
                           </Tooltip>
                         </InputGroupAddon>
                       </InputGroup>
@@ -251,7 +259,7 @@ export function IntegrationCard({
                         }
                       >
                         <IconRefresh />
-                        Regenerate URL
+                        <Trans>Regenerate URL</Trans>
                       </Button>
                       <Button
                         variant="destructive"
@@ -261,7 +269,7 @@ export function IntegrationCard({
                         }
                       >
                         <IconTrash />
-                        Disconnect
+                        <Trans>Disconnect</Trans>
                       </Button>
                     </div>
                   </motion.div>
@@ -275,7 +283,7 @@ export function IntegrationCard({
                   aria-hidden={true}
                   className={`size-3 transition-transform ${setupOpen ? "rotate-0" : "-rotate-90"}`}
                 />
-                Setup instructions
+                <Trans>Setup instructions</Trans>
               </CollapsibleTrigger>
               <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
                 <div className="mt-2 rounded-lg border border-border/50 bg-muted/30 p-3 text-muted-foreground text-xs leading-relaxed">
@@ -288,14 +296,14 @@ export function IntegrationCard({
                         aria-hidden={true}
                         className="mr-1 inline-block size-3 translate-y-[-1px]"
                       />
-                      Need more help?{" "}
+                      <Trans>Need more help?</Trans>{" "}
                       <a
                         href={config.docsUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline"
                       >
-                        Open docs{" "}
+                        <Trans>Open docs</Trans>{" "}
                         <IconExternalLink
                           aria-hidden={true}
                           className="inline-block size-3 translate-y-[-1px]"

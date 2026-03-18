@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import type { ColorPalette, ResolvedTitle } from "@sofa/api/schemas";
 import {
   IconCalendarEvent,
@@ -138,7 +139,9 @@ export function TitleHero({
                       aria-hidden
                       className="size-3.5 translate-y-[-0.5px]"
                     />
-                    <span className="hidden md:inline">Movie</span>
+                    <span className="hidden md:inline">
+                      <Trans>Movie</Trans>
+                    </span>
                   </>
                 ) : (
                   <>
@@ -146,7 +149,9 @@ export function TitleHero({
                       aria-hidden
                       className="size-3.5 translate-y-[-0.5px]"
                     />
-                    <span className="hidden md:inline">TV</span>
+                    <span className="hidden md:inline">
+                      <Trans>TV</Trans>
+                    </span>
                   </>
                 )}
               </div>

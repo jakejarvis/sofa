@@ -1,5 +1,6 @@
 import path from "node:path";
 import { ORPCError } from "@orpc/server";
+import { AppErrorCode } from "@sofa/api/errors";
 import { BACKUP_DIR } from "@sofa/config";
 import {
   createBackup,
@@ -47,9 +48,15 @@ export const backupsDelete = os.admin.backups.delete
       if (err instanceof ORPCError) throw err;
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes("not found")) {
-        throw new ORPCError("NOT_FOUND", { message: msg });
+        throw new ORPCError("NOT_FOUND", {
+          message: msg,
+          data: { code: AppErrorCode.BACKUP_NOT_FOUND },
+        });
       }
-      throw new ORPCError("BAD_REQUEST", { message: msg });
+      throw new ORPCError("BAD_REQUEST", {
+        message: msg,
+        data: { code: AppErrorCode.BACKUP_DELETE_FAILED },
+      });
     }
   });
 
@@ -71,7 +78,10 @@ export const backupsRestore = os.admin.backups.restore
       if (await f.exists()) await f.delete();
       if (err instanceof ORPCError) throw err;
       const msg = err instanceof Error ? err.message : String(err);
-      throw new ORPCError("BAD_REQUEST", { message: msg });
+      throw new ORPCError("BAD_REQUEST", {
+        message: msg,
+        data: { code: AppErrorCode.BACKUP_RESTORE_FAILED },
+      });
     }
   });
 
@@ -160,7 +170,10 @@ export const triggerJob = os.admin.triggerJob
   .handler(async ({ input }) => {
     const triggered = await triggerCronJob(input.name);
     if (!triggered) {
-      throw new ORPCError("NOT_FOUND", { message: "Job not found" });
+      throw new ORPCError("NOT_FOUND", {
+        message: "Job not found",
+        data: { code: AppErrorCode.JOB_NOT_FOUND },
+      });
     }
     return { ok: true as const };
   });

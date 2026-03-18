@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { FlashList } from "@shopify/flash-list";
 import { skipToken, useInfiniteQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router";
@@ -16,6 +17,7 @@ import { useTitleActions } from "@/hooks/use-title-actions";
 import { orpc } from "@/lib/orpc";
 
 export default function SearchScreen() {
+  const { t } = useLingui();
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query.trim(), 300);
 
@@ -85,7 +87,7 @@ export default function SearchScreen() {
       />
       <Stack.Screen.Title>Search</Stack.Screen.Title>
       <Stack.SearchBar
-        placeholder="Search movies, shows, people..."
+        placeholder={t`Search movies, shows, people...`}
         onChangeText={(e) => setQuery(e.nativeEvent.text)}
         onCancelButtonPress={() => setQuery("")}
         onClose={() => setQuery("")}
@@ -108,7 +110,7 @@ export default function SearchScreen() {
           className="flex-1 items-center justify-center"
         >
           <Text className="text-base text-muted-foreground">
-            No results for "{debouncedQuery}"
+            <Trans>No results for "{debouncedQuery}"</Trans>
           </Text>
         </Animated.View>
       ) : (

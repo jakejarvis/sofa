@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
 import { Stack, useRouter } from "expo-router";
 import { useRef, useState } from "react";
@@ -43,6 +44,7 @@ function formatFormErrors(errors: unknown): string | null {
 }
 
 export default function ChangePasswordScreen() {
+  const { t } = useLingui();
   const { back } = useRouter();
   const newPasswordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
@@ -67,19 +69,19 @@ export default function ChangePasswordScreen() {
         if (result.error) {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
           Alert.alert(
-            "Error",
-            result.error.message ?? "Failed to change password",
+            t`Error`,
+            result.error.message ?? t`Failed to change password`,
           );
           return;
         }
 
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        toast.success("Password updated");
+        toast.success(t`Password updated`);
         formApi.reset();
         back();
       } catch {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        Alert.alert("Error", "Something went wrong");
+        Alert.alert(t`Error`, t`Something went wrong`);
       }
     },
   });
@@ -96,7 +98,7 @@ export default function ChangePasswordScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <Stack.Screen.Title style={headerTitleStyle as Record<string, unknown>}>
-        Change Password
+        <Trans>Change Password</Trans>
       </Stack.Screen.Title>
 
       <form.Subscribe
@@ -117,7 +119,9 @@ export default function ChangePasswordScreen() {
               <form.Field name="currentPassword">
                 {(field) => (
                   <TextField>
-                    <Label>Current password</Label>
+                    <Label>
+                      <Trans>Current password</Trans>
+                    </Label>
                     <Input
                       value={field.state.value}
                       accessibilityLabel="Current password"
@@ -140,7 +144,9 @@ export default function ChangePasswordScreen() {
               <form.Field name="newPassword">
                 {(field) => (
                   <TextField>
-                    <Label>New password</Label>
+                    <Label>
+                      <Trans>New password</Trans>
+                    </Label>
                     <Input
                       ref={newPasswordRef}
                       value={field.state.value}
@@ -166,7 +172,9 @@ export default function ChangePasswordScreen() {
               <form.Field name="confirmPassword">
                 {(field) => (
                   <TextField>
-                    <Label>Confirm new password</Label>
+                    <Label>
+                      <Trans>Confirm new password</Trans>
+                    </Label>
                     <Input
                       ref={confirmPasswordRef}
                       value={field.state.value}
@@ -191,7 +199,7 @@ export default function ChangePasswordScreen() {
               style={{ borderCurve: "continuous" }}
             >
               <Text className="text-base text-foreground">
-                Sign out of other sessions
+                <Trans>Sign out of other sessions</Trans>
               </Text>
               <Switch
                 value={revokeOtherSessions}
@@ -209,7 +217,9 @@ export default function ChangePasswordScreen() {
                 {isSubmitting ? (
                   <Spinner size="sm" />
                 ) : (
-                  <ButtonLabel>Update Password</ButtonLabel>
+                  <ButtonLabel>
+                    <Trans>Update Password</Trans>
+                  </ButtonLabel>
                 )}
               </Button>
             </Animated.View>

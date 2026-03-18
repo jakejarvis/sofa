@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import type {
   DashboardStats,
   HistoryBucket,
@@ -44,13 +45,6 @@ export function StatsSectionSkeleton() {
     </div>
   );
 }
-
-const periodLabels: Record<TimePeriod, string> = {
-  today: "Today",
-  this_week: "This Week",
-  this_month: "This Month",
-  this_year: "This Year",
-};
 
 const periods: TimePeriod[] = ["today", "this_week", "this_month", "this_year"];
 
@@ -112,6 +106,14 @@ function PeriodSelector({
   period: TimePeriod;
   onPeriodChange: (period: TimePeriod) => void;
 }) {
+  const { t } = useLingui();
+  const periodLabels: Record<TimePeriod, string> = {
+    today: t`Today`,
+    this_week: t`This Week`,
+    this_month: t`This Month`,
+    this_year: t`This Year`,
+  };
+
   return (
     <span className="inline-flex items-baseline gap-1">
       {noun}{" "}
@@ -144,6 +146,7 @@ function PeriodSelector({
 }
 
 export function StatsDisplay({ stats }: { stats: DashboardStats }) {
+  const { t } = useLingui();
   const [moviePeriod, setMoviePeriod] = useState<TimePeriod>("this_month");
   const [episodePeriod, setEpisodePeriod] = useState<TimePeriod>("this_week");
 
@@ -175,7 +178,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         sparklineData={movieHistory}
         label={
           <PeriodSelector
-            noun="Movies"
+            noun={t`Movies`}
             period={moviePeriod}
             onPeriodChange={setMoviePeriod}
           />
@@ -190,7 +193,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         sparklineData={episodeHistory}
         label={
           <PeriodSelector
-            noun="Episodes"
+            noun={t`Episodes`}
             period={episodePeriod}
             onPeriodChange={setEpisodePeriod}
           />
@@ -202,7 +205,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         bgColor="bg-status-watchlist/10"
         value={stats.librarySize}
         index={2}
-        label="In Library"
+        label={t`In Library`}
       />
       <StatCard
         icon={IconCheck}
@@ -210,7 +213,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         bgColor="bg-status-completed/10"
         value={stats.completed}
         index={3}
-        label="Completed"
+        label={t`Completed`}
       />
     </div>
   );

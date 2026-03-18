@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconDeviceTv,
   IconHome,
@@ -81,6 +82,7 @@ interface SearchResult {
 }
 
 export function CommandPalette() {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const progress = useProgress();
   const [commandPaletteOpen, setCommandPaletteOpen] = useAtom(
@@ -181,7 +183,7 @@ export function CommandPalette() {
         <DialogHeader className="sr-only">
           <DialogTitle>Command Palette</DialogTitle>
           <DialogDescription>
-            Search for movies, TV shows, or run commands
+            <Trans>Search for movies, TV shows, or run commands</Trans>
           </DialogDescription>
         </DialogHeader>
         <DialogContent
@@ -190,7 +192,7 @@ export function CommandPalette() {
         >
           <Command shouldFilter={false}>
             <CommandInput
-              placeholder="Search movies & TV shows…"
+              placeholder={t`Search movies & TV shows…`}
               value={query}
               onValueChange={setQuery}
             />
@@ -211,11 +213,13 @@ export function CommandPalette() {
               )}
 
               {hasQuery && !loading && results.length === 0 && (
-                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandEmpty>
+                  <Trans>No results found.</Trans>
+                </CommandEmpty>
               )}
 
               {hasQuery && !loading && results.length > 0 && (
-                <CommandGroup heading="Results">
+                <CommandGroup heading={t`Results`}>
                   {results.map((r) => (
                     <CommandItem
                       key={r.id ?? `${r.type}-${r.tmdbId}`}
@@ -307,13 +311,15 @@ export function CommandPalette() {
                     <CommandGroup
                       heading={
                         <div className="flex items-center justify-between">
-                          <span>Recent Searches</span>
+                          <span>
+                            <Trans>Recent Searches</Trans>
+                          </span>
                           <button
                             type="button"
                             onClick={handleClearRecent}
                             className="font-normal text-[10px] text-muted-foreground transition-colors hover:text-foreground"
                           >
-                            Clear all
+                            <Trans>Clear all</Trans>
                           </button>
                         </div>
                       }
@@ -350,7 +356,7 @@ export function CommandPalette() {
                     </CommandGroup>
                   )}
                   {recentSearches.length > 0 && <CommandSeparator />}
-                  <CommandGroup heading="Quick Actions">
+                  <CommandGroup heading={t`Quick Actions`}>
                     <CommandItem
                       onSelect={() => {
                         setCommandPaletteOpen(false);
@@ -359,7 +365,7 @@ export function CommandPalette() {
                       }}
                     >
                       <IconHome aria-hidden={true} className="size-3.5" />
-                      Go to Dashboard
+                      <Trans>Go to Dashboard</Trans>
                       <CommandShortcut>G H</CommandShortcut>
                     </CommandItem>
                     <CommandItem
@@ -370,7 +376,7 @@ export function CommandPalette() {
                       }}
                     >
                       <IconSearch aria-hidden={true} className="size-3.5" />
-                      Go to Explore
+                      <Trans>Go to Explore</Trans>
                       <CommandShortcut>G E</CommandShortcut>
                     </CommandItem>
                     <CommandItem
@@ -380,7 +386,7 @@ export function CommandPalette() {
                       }}
                     >
                       <IconKeyboard aria-hidden={true} className="size-3.5" />
-                      Keyboard Shortcuts
+                      <Trans>Keyboard Shortcuts</Trans>
                       <CommandShortcut>?</CommandShortcut>
                     </CommandItem>
                   </CommandGroup>
@@ -394,7 +400,9 @@ export function CommandPalette() {
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Keyboard Shortcuts</DialogTitle>
+            <DialogTitle>
+              <Trans>Keyboard Shortcuts</Trans>
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-5 py-2">
             {Object.entries(groupedShortcuts).map(([scope, items]) => (

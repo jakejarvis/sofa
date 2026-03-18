@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { NormalizedImport } from "@sofa/api/schemas";
 import { IconCloudUpload, IconFileImport, IconLink } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -23,6 +24,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { getErrorMessage } from "@/lib/error-messages";
 import { client, orpc } from "@/lib/orpc/client";
 
 // ─── Source Configs ──────────────────────────────────────────
@@ -174,7 +176,7 @@ export function ImportsSection() {
       <div className="mb-3 flex items-center gap-2">
         <IconFileImport aria-hidden className="size-4 text-muted-foreground" />
         <h2 className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
-          Import
+          <Trans>Import</Trans>
         </h2>
       </div>
       <div className="space-y-2.5">
@@ -189,6 +191,7 @@ export function ImportsSection() {
 // ─── Source Card ─────────────────────────────────────────────
 
 function ImportSourceCard({ config }: { config: SourceConfig }) {
+  const { t } = useLingui();
   const { data: systemStatus } = useQuery(orpc.system.status.queryOptions());
   const publicApiUrl =
     systemStatus?.publicApiUrl ?? "https://public-api.sofa.watch";
@@ -219,9 +222,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         setDialogOpen(true);
       },
       onError: (err) => {
-        toast.error(
-          err instanceof Error ? err.message : "Failed to parse file",
-        );
+        toast.error(getErrorMessage(err, t, t`Failed to parse file`));
       },
       onSettled: () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
@@ -236,9 +237,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         setStep("preview");
       },
       onError: (err) => {
-        toast.error(
-          err instanceof Error ? err.message : "Failed to parse import data",
-        );
+        toast.error(getErrorMessage(err, t, t`Failed to parse import data`));
         setStep("choose");
       },
     }),
@@ -290,13 +289,13 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
           setStep("done");
           if (event.job.importedCount > 0) {
             toast.success(
-              `Imported ${event.job.importedCount} items from ${config.label}`,
+              t`Imported ${event.job.importedCount} items from ${config.label}`,
             );
           }
         } else if (event.type === "timeout") {
           receivedComplete = true;
           toast.info(
-            "Import is still running in the background. Check back later.",
+            t`Import is still running in the background. Check back later.`,
           );
           setStep("preview");
         } else {
@@ -327,18 +326,18 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
             setStep("done");
           } else {
             toast.info(
-              "Import is still running in the background. Check back later.",
+              t`Import is still running in the background. Check back later.`,
             );
             setStep("preview");
           }
         } catch {
-          toast.error("Lost connection to import. Check status in settings.");
+          toast.error(t`Lost connection to import. Check status in settings.`);
           setStep("preview");
         }
       }
     } catch (err) {
       if (abort.signal.aborted) return;
-      toast.error(err instanceof Error ? err.message : "Import failed");
+      toast.error(getErrorMessage(err, t, t`Import failed`));
       setStep("preview");
     } finally {
       importAbortRef.current = null;
@@ -386,7 +385,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         const err = await res.json().catch(() => ({}));
         throw new Error(
           (err as { error?: string }).error ??
-            `Failed to start ${config.label} connection`,
+            t`Failed to start ${config.label} connection`,
         );
       }
       const data = (await res.json()) as DeviceCodeInfo;
@@ -396,7 +395,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
       // Start polling
       startPolling(data);
     } catch (e) {
-      setOauthError(e instanceof Error ? e.message : "Failed to connect");
+      setOauthError(e instanceof Error ? e.message : t`Failed to connect`);
       setStep("choose");
       setDialogOpen(true);
     }
@@ -410,7 +409,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
     pollTimerRef.current = setInterval(async () => {
       if (Date.now() > expiresAt) {
         stopPolling();
-        setOauthError("Device code expired. Please try again.");
+        setOauthError(t`Device code expired. Please try again.`);
         setStep("choose");
         return;
       }
@@ -438,17 +437,17 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
           parsePayloadMutation.mutate({ data: data.data as NormalizedImport });
         } else if (data.status === "denied") {
           stopPolling();
-          setOauthError("Authorization was denied. Please try again.");
+          setOauthError(t`Authorization was denied. Please try again.`);
           setStep("choose");
         } else if (data.status === "expired") {
           stopPolling();
-          setOauthError("Device code expired. Please try again.");
+          setOauthError(t`Device code expired. Please try again.`);
           setStep("choose");
         } else if (data.status === "fetch_error") {
           stopPolling();
           setOauthError(
             data.error ||
-              "Authorization succeeded but failed to fetch your library. Please try again.",
+              t`Authorization succeeded but failed to fetch your library. Please try again.`,
           );
           setStep("choose");
         }
@@ -497,7 +496,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
                 }}
               >
                 <IconLink aria-hidden />
-                Connect
+                <Trans>Connect</Trans>
               </Button>
             )}
             {!config.supportsOAuth && (
@@ -507,7 +506,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
                 disabled={isParsing}
               >
                 {isParsing ? <Spinner /> : <IconCloudUpload aria-hidden />}
-                {isParsing ? "Parsing…" : "Upload"}
+                {isParsing ? <Trans>Parsing...</Trans> : <Trans>Upload</Trans>}
               </Button>
             )}
           </div>
@@ -577,12 +576,15 @@ function ChooseStep({
   isParsing: boolean;
   onCancel: () => void;
 }) {
+  const { t } = useLingui();
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Import from {config.label}</DialogTitle>
+        <DialogTitle>
+          <Trans>Import from {config.label}</Trans>
+        </DialogTitle>
         <DialogDescription>
-          Choose how to import your {config.label} data.
+          <Trans>Choose how to import your {config.label} data.</Trans>
         </DialogDescription>
       </DialogHeader>
 
@@ -602,10 +604,14 @@ function ChooseStep({
             <IconLink aria-hidden className="size-5 text-primary" />
           </div>
           <div>
-            <p className="font-medium text-sm">Connect with {config.label}</p>
+            <p className="font-medium text-sm">
+              <Trans>Connect with {config.label}</Trans>
+            </p>
             <p className="text-muted-foreground text-xs">
-              Authorize Sofa to read your {config.label} library. No password
-              shared.
+              <Trans>
+                Authorize Sofa to read your {config.label} library. No password
+                shared.
+              </Trans>
             </p>
           </div>
         </button>
@@ -624,10 +630,11 @@ function ChooseStep({
             <IconCloudUpload aria-hidden className="size-5 text-primary" />
           </div>
           <div>
-            <p className="font-medium text-sm">Upload export file</p>
+            <p className="font-medium text-sm">
+              <Trans>Upload export file</Trans>
+            </p>
             <p className="text-muted-foreground text-xs">
-              Upload a {config.accept} export from your {config.label} account
-              settings.
+              {t`Upload a ${config.accept} export from your ${config.label} account settings.`}
             </p>
           </div>
         </button>
@@ -635,7 +642,7 @@ function ChooseStep({
 
       <DialogFooter>
         <DialogClose render={<Button variant="outline" />} onClick={onCancel}>
-          Cancel
+          <Trans>Cancel</Trans>
         </DialogClose>
       </DialogFooter>
     </>
@@ -654,16 +661,22 @@ function DeviceCodeStep({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Connect to {source}</DialogTitle>
+        <DialogTitle>
+          <Trans>Connect to {source}</Trans>
+        </DialogTitle>
         <DialogDescription>
-          Enter the code below on {source}'s website to authorize Sofa.
+          <Trans>
+            Enter the code below on {source}'s website to authorize Sofa.
+          </Trans>
         </DialogDescription>
       </DialogHeader>
 
       {deviceCode ? (
         <div className="space-y-4 py-4">
           <div className="flex flex-col items-center gap-3">
-            <p className="text-muted-foreground text-sm">Your code:</p>
+            <p className="text-muted-foreground text-sm">
+              <Trans>Your code:</Trans>
+            </p>
             <p className="rounded-lg bg-muted px-6 py-3 font-bold font-mono text-2xl tracking-widest">
               {deviceCode.user_code}
             </p>
@@ -677,13 +690,13 @@ function DeviceCodeStep({
               className="inline-flex items-center gap-1.5 font-medium text-primary text-sm underline-offset-4 hover:underline"
             >
               <IconLink aria-hidden className="size-4" />
-              Open {source} to enter code
+              <Trans>Open {source} to enter code</Trans>
             </a>
           </div>
 
           <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
             <Spinner className="size-3" />
-            Waiting for authorization...
+            <Trans>Waiting for authorization...</Trans>
           </div>
         </div>
       ) : (
@@ -694,7 +707,7 @@ function DeviceCodeStep({
 
       <DialogFooter>
         <Button variant="outline" onClick={onCancel}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
       </DialogFooter>
     </>
@@ -705,15 +718,19 @@ function FetchingStep({ source }: { source: string }) {
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Connected to {source}</DialogTitle>
+        <DialogTitle>
+          <Trans>Connected to {source}</Trans>
+        </DialogTitle>
         <DialogDescription>
-          Fetching your library data from {source}...
+          <Trans>Fetching your library data from {source}...</Trans>
         </DialogDescription>
       </DialogHeader>
       <div className="flex flex-col items-center gap-3 py-8">
         <Spinner className="size-8" />
         <p className="text-muted-foreground text-sm">
-          Retrieving your watch history, watchlist, and ratings...
+          <Trans>
+            Retrieving your watch history, watchlist, and ratings...
+          </Trans>
         </p>
       </div>
     </>
@@ -739,6 +756,7 @@ function PreviewStep({
   onImport: () => void;
   onCancel: () => void;
 }) {
+  const { t } = useLingui();
   const { stats, warnings } = preview;
   const totalItems =
     (options.importWatches ? stats.movies + stats.episodes : 0) +
@@ -748,46 +766,52 @@ function PreviewStep({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Import from {source}</DialogTitle>
+        <DialogTitle>
+          <Trans>Import from {source}</Trans>
+        </DialogTitle>
         <DialogDescription>
-          Review what was found and choose what to import.
+          <Trans>Review what was found and choose what to import.</Trans>
         </DialogDescription>
       </DialogHeader>
 
       <div className="space-y-4 py-2">
         <div className="grid grid-cols-2 gap-3">
-          <StatBadge label="Movies" count={stats.movies} />
-          <StatBadge label="Episodes" count={stats.episodes} />
-          <StatBadge label="Watchlist" count={stats.watchlist} />
-          <StatBadge label="Ratings" count={stats.ratings} />
+          <StatBadge label={t`Movies`} count={stats.movies} />
+          <StatBadge label={t`Episodes`} count={stats.episodes} />
+          <StatBadge label={t`Watchlist`} count={stats.watchlist} />
+          <StatBadge label={t`Ratings`} count={stats.ratings} />
         </div>
 
         {preview.diagnostics && preview.diagnostics.unresolved > 0 && (
           <div className="rounded-lg bg-muted/50 p-3">
             <p className="text-muted-foreground text-xs">
-              {preview.diagnostics.unresolved} items have no external IDs and
-              will be resolved by title search, which may be less accurate.
+              <Trans>
+                {preview.diagnostics.unresolved} items have no external IDs and
+                will be resolved by title search, which may be less accurate.
+              </Trans>
             </p>
           </div>
         )}
 
         <div className="space-y-2">
-          <p className="font-medium text-sm">Import options</p>
+          <p className="font-medium text-sm">
+            <Trans>Import options</Trans>
+          </p>
           <OptionCheckbox
-            label="Watch history"
-            description={`${stats.movies} movies, ${stats.episodes} episodes`}
+            label={t`Watch history`}
+            description={t`${stats.movies} movies, ${stats.episodes} episodes`}
             checked={options.importWatches}
             onChange={(v) => setOptions({ ...options, importWatches: v })}
           />
           <OptionCheckbox
-            label="Watchlist"
-            description={`${stats.watchlist} items`}
+            label={t`Watchlist`}
+            description={t`${stats.watchlist} items`}
             checked={options.importWatchlist}
             onChange={(v) => setOptions({ ...options, importWatchlist: v })}
           />
           <OptionCheckbox
-            label="Ratings"
-            description={`${stats.ratings} ratings`}
+            label={t`Ratings`}
+            description={t`${stats.ratings} ratings`}
             checked={options.importRatings}
             onChange={(v) => setOptions({ ...options, importRatings: v })}
           />
@@ -795,7 +819,9 @@ function PreviewStep({
 
         {warnings.length > 0 && (
           <div className="rounded-lg bg-yellow-500/10 p-3">
-            <p className="mb-1 font-medium text-xs text-yellow-600">Warnings</p>
+            <p className="mb-1 font-medium text-xs text-yellow-600">
+              <Trans>Warnings</Trans>
+            </p>
             <ul className="space-y-0.5 text-xs text-yellow-600/80">
               {warnings.map((w, i) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: static display list
@@ -808,10 +834,10 @@ function PreviewStep({
 
       <DialogFooter>
         <DialogClose render={<Button variant="outline" />} onClick={onCancel}>
-          Cancel
+          <Trans>Cancel</Trans>
         </DialogClose>
         <Button onClick={onImport} disabled={totalItems === 0}>
-          Import {totalItems} items
+          <Trans>Import {totalItems} items</Trans>
         </Button>
       </DialogFooter>
     </>
@@ -833,10 +859,14 @@ function ImportingStep({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Importing from {source}</DialogTitle>
+        <DialogTitle>
+          <Trans>Importing from {source}</Trans>
+        </DialogTitle>
         <DialogDescription>
-          This may take a few minutes for large libraries. Please don't close
-          this tab.
+          <Trans>
+            This may take a few minutes for large libraries. Please don't close
+            this tab.
+          </Trans>
         </DialogDescription>
       </DialogHeader>
       <div className="flex flex-col items-center gap-4 py-8">
@@ -855,7 +885,7 @@ function ImportingStep({
             <div className="flex items-center gap-2">
               <Spinner className="size-3" />
               <p className="text-muted-foreground text-sm">
-                Starting import...
+                <Trans>Starting import...</Trans>
               </p>
             </div>
           )}
@@ -874,24 +904,29 @@ function DoneStep({
   result: ImportResult;
   onClose: () => void;
 }) {
+  const { t } = useLingui();
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Import complete</DialogTitle>
-        <DialogDescription>Finished importing from {source}.</DialogDescription>
+        <DialogTitle>
+          <Trans>Import complete</Trans>
+        </DialogTitle>
+        <DialogDescription>
+          <Trans>Finished importing from {source}.</Trans>
+        </DialogDescription>
       </DialogHeader>
 
       <div className="space-y-4 py-2">
         <div className="grid grid-cols-3 gap-3">
-          <StatBadge label="Imported" count={result.imported} />
-          <StatBadge label="Skipped" count={result.skipped} />
-          <StatBadge label="Failed" count={result.failed} />
+          <StatBadge label={t`Imported`} count={result.imported} />
+          <StatBadge label={t`Skipped`} count={result.skipped} />
+          <StatBadge label={t`Failed`} count={result.failed} />
         </div>
 
         {result.errors.length > 0 && (
           <div className="max-h-40 overflow-y-auto rounded-lg bg-destructive/10 p-3">
             <p className="mb-1 font-medium text-destructive text-xs">
-              Errors ({result.errors.length})
+              <Trans>Errors ({result.errors.length})</Trans>
             </p>
             <ul className="space-y-0.5 text-destructive/80 text-xs">
               {result.errors.slice(0, 50).map((e, i) => (
@@ -899,7 +934,9 @@ function DoneStep({
                 <li key={i}>{e}</li>
               ))}
               {result.errors.length > 50 && (
-                <li>...and {result.errors.length - 50} more</li>
+                <li>
+                  <Trans>...and {result.errors.length - 50} more</Trans>
+                </li>
               )}
             </ul>
           </div>
@@ -908,7 +945,7 @@ function DoneStep({
         {result.warnings.length > 0 && (
           <div className="max-h-32 overflow-y-auto rounded-lg bg-yellow-500/10 p-3">
             <p className="mb-1 font-medium text-xs text-yellow-600">
-              Warnings ({result.warnings.length})
+              <Trans>Warnings ({result.warnings.length})</Trans>
             </p>
             <ul className="space-y-0.5 text-xs text-yellow-600/80">
               {result.warnings.slice(0, 20).map((w, i) => (
@@ -921,7 +958,9 @@ function DoneStep({
       </div>
 
       <DialogFooter>
-        <Button onClick={onClose}>Done</Button>
+        <Button onClick={onClose}>
+          <Trans>Done</Trans>
+        </Button>
       </DialogFooter>
     </>
   );

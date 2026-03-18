@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+import { AppErrorCode } from "@sofa/api/errors";
 import { db } from "@sofa/db/client";
 import { and, desc, eq } from "@sofa/db/helpers";
 import { integrationEvents, integrations } from "@sofa/db/schema";
@@ -145,7 +146,10 @@ export const regenerateToken = os.integrations.regenerateToken
       .get();
 
     if (!row) {
-      throw new ORPCError("NOT_FOUND", { message: "Integration not found" });
+      throw new ORPCError("NOT_FOUND", {
+        message: "Integration not found",
+        data: { code: AppErrorCode.INTEGRATION_NOT_FOUND },
+      });
     }
 
     return serializeIntegration(row);

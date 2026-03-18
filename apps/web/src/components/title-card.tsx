@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   IconBookmarkFilled,
   IconCircleCheckFilled,
@@ -58,23 +59,26 @@ export interface TitleCardProps extends CardInnerProps {
   id: string;
 }
 
-const statusConfig = {
-  watchlist: {
-    icon: IconBookmarkFilled,
-    label: "On Watchlist",
-    badgeClass: "bg-status-watching/90 text-white",
-  },
-  in_progress: {
-    icon: IconPlayerPlayFilled,
-    label: "Watching",
-    badgeClass: "bg-status-watching/90 text-white",
-  },
-  completed: {
-    icon: IconCircleCheckFilled,
-    label: "Completed",
-    badgeClass: "bg-status-completed/90 text-white",
-  },
-} as const;
+function useStatusConfig() {
+  const { t } = useLingui();
+  return {
+    watchlist: {
+      icon: IconBookmarkFilled,
+      label: t`On Watchlist`,
+      badgeClass: "bg-status-watching/90 text-white",
+    },
+    in_progress: {
+      icon: IconPlayerPlayFilled,
+      label: t`Watching`,
+      badgeClass: "bg-status-watching/90 text-white",
+    },
+    completed: {
+      icon: IconCircleCheckFilled,
+      label: t`Completed`,
+      badgeClass: "bg-status-completed/90 text-white",
+    },
+  } as const;
+}
 
 function QuickAddButton({
   id,
@@ -83,6 +87,8 @@ function QuickAddButton({
   id: string;
   userStatus?: TitleStatus | null;
 }) {
+  const { t } = useLingui();
+  const statusConfig = useStatusConfig();
   const [addedStatus, setAddedStatus] = useState<TitleStatus | null>(
     userStatus ?? null,
   );
@@ -137,12 +143,13 @@ function QuickAddButton({
           <IconLoader className="size-4 animate-spin" />
         )}
       </TooltipTrigger>
-      <TooltipContent side="bottom">Add to Watchlist</TooltipContent>
+      <TooltipContent side="bottom">{t`Add to Watchlist`}</TooltipContent>
     </Tooltip>
   );
 }
 
 function ProgressBar({ watched, total }: { watched: number; total: number }) {
+  const { t } = useLingui();
   const pct = total > 0 ? (watched / total) * 100 : 0;
   return (
     <Tooltip>
@@ -156,7 +163,7 @@ function ProgressBar({ watched, total }: { watched: number; total: number }) {
         />
       </TooltipTrigger>
       <TooltipContent side="top">
-        {watched}/{total} episodes
+        {t`${watched}/${total} episodes`}
       </TooltipContent>
     </Tooltip>
   );
@@ -173,6 +180,7 @@ function CardInner({
   episodeProgress,
   tiltStyles,
 }: CardInnerProps) {
+  const statusConfig = useStatusConfig();
   const year = releaseDate?.slice(0, 4);
   const TypeIcon = type === "movie" ? IconMovie : IconDeviceTv;
   const placeholderUrl = thumbHashToUrl(posterThumbHash);

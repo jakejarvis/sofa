@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconServer2 } from "@tabler/icons-react-native";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
@@ -30,6 +31,7 @@ const signInSchema = z.object({
 });
 
 export default function LoginScreen() {
+  const { t } = useLingui();
   const passwordRef = useRef<TextInput>(null);
   const [errorFields, setErrorFields] = useState<Set<string>>(new Set());
   const [isSignedIn, setIsSignedIn] = useState(false);
@@ -51,7 +53,7 @@ export default function LoginScreen() {
         { email: result.data.email, password: result.data.password },
         {
           onError(error) {
-            toast.error(error.error?.message || "Failed to sign in");
+            toast.error(error.error?.message || t`Failed to sign in`);
           },
           onSuccess() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -86,7 +88,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <AuthScreen title="Sofa" subtitle="Sign in to continue">
+    <AuthScreen title="Sofa" subtitle={t`Sign in to continue`}>
       {showOidc && (
         <Animated.View
           entering={FadeInDown.duration(300).delay(100)}
@@ -103,14 +105,18 @@ export default function LoginScreen() {
             className="w-full"
           >
             <ButtonLabel>
-              Sign in with {authConfig.data?.oidcProviderName ?? "SSO"}
+              <Trans>
+                Sign in with {authConfig.data?.oidcProviderName ?? "SSO"}
+              </Trans>
             </ButtonLabel>
           </Button>
 
           {showPasswordLogin && (
             <View className="my-4 flex-row items-center">
               <View className="h-px flex-1 bg-border" />
-              <Text className="px-3 text-muted-foreground text-xs">OR</Text>
+              <Text className="px-3 text-muted-foreground text-xs">
+                <Trans>OR</Trans>
+              </Text>
               <View className="h-px flex-1 bg-border" />
             </View>
           )}
@@ -123,7 +129,9 @@ export default function LoginScreen() {
             <form.Field name="email">
               {(field) => (
                 <TextField>
-                  <Label>Email</Label>
+                  <Label>
+                    <Trans>Email</Trans>
+                  </Label>
                   <Input
                     value={field.state.value}
                     accessibilityLabel="Email"
@@ -155,7 +163,9 @@ export default function LoginScreen() {
             <form.Field name="password">
               {(field) => (
                 <TextField>
-                  <Label>Password</Label>
+                  <Label>
+                    <Trans>Password</Trans>
+                  </Label>
                   <Input
                     ref={passwordRef}
                     value={field.state.value}
@@ -191,7 +201,9 @@ export default function LoginScreen() {
               {busy ? (
                 <Spinner size="sm" />
               ) : (
-                <ButtonLabel>Sign In</ButtonLabel>
+                <ButtonLabel>
+                  <Trans>Sign In</Trans>
+                </ButtonLabel>
               )}
             </Button>
           </Animated.View>
@@ -200,7 +212,9 @@ export default function LoginScreen() {
             <Animated.View entering={FadeIn.duration(300).delay(500)}>
               <Link href="/(auth)/register" asChild>
                 <Button disabled={busy} variant="secondary">
-                  <ButtonLabel>Create an account</ButtonLabel>
+                  <ButtonLabel>
+                    <Trans>Create an account</Trans>
+                  </ButtonLabel>
                 </Button>
               </Link>
             </Animated.View>
@@ -223,8 +237,11 @@ export default function LoginScreen() {
                   color={statusCompletedColor}
                 />
                 <Text className="font-sans text-muted-foreground text-xs">
-                  Connected to <Text className="font-medium">{serverHost}</Text>
-                  . Tap to change.
+                  <Trans>
+                    Connected to{" "}
+                    <Text className="font-medium">{serverHost}</Text>. Tap to
+                    change.
+                  </Trans>
                 </Text>
               </Pressable>
             </Link>

@@ -1,18 +1,19 @@
+import { msg } from "@lingui/core/macro";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { ContractRouterClient } from "@orpc/contract";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { contract } from "@sofa/api/contract";
+import { i18n } from "@sofa/i18n";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: (error, query) => {
-      toast.error("Something went wrong…", {
-        description: error.message,
+    onError: (_error, query) => {
+      toast.error(i18n._(msg`Something went wrong…`), {
         action: {
-          label: "Retry",
+          label: i18n._(msg`Retry`),
           onClick: () => query.invalidate(),
         },
       });

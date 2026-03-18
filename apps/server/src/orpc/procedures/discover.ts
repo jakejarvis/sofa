@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+import { AppErrorCode } from "@sofa/api/errors";
 import { ensureBrowseTitlesExist } from "@sofa/core/metadata";
 import {
   getEpisodeProgressByTitleIds,
@@ -16,6 +17,7 @@ export const discover = os.discover
     if (!isTmdbConfigured()) {
       throw new ORPCError("PRECONDITION_FAILED", {
         message: "TMDB API key is not configured",
+        data: { code: AppErrorCode.TMDB_NOT_CONFIGURED },
       });
     }
 

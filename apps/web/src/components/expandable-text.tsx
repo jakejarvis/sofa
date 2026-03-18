@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -47,7 +48,7 @@ export function ExpandableText({
           onClick={() => setExpanded(!expanded)}
           className="mt-1 font-medium text-primary text-xs transition-colors hover:text-primary/80"
         >
-          {expanded ? "Show less" : "Read more"}
+          {expanded ? <Trans>Show less</Trans> : <Trans>Read more</Trans>}
         </button>
       )}
     </div>

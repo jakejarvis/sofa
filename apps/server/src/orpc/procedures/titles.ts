@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+import { AppErrorCode } from "@sofa/api/errors";
 import { getRecommendationsForTitle } from "@sofa/core/discovery";
 import { getOrFetchTitle, getOrFetchTitleByTmdbId } from "@sofa/core/metadata";
 import {
@@ -21,7 +22,10 @@ export const detail = os.titles.detail
   .handler(async ({ input }) => {
     const result = await getOrFetchTitle(input.id);
     if (!result)
-      throw new ORPCError("NOT_FOUND", { message: "Title not found" });
+      throw new ORPCError("NOT_FOUND", {
+        message: "Title not found",
+        data: { code: AppErrorCode.TITLE_NOT_FOUND },
+      });
     return result;
   });
 
@@ -80,7 +84,10 @@ export const quickAdd = os.titles.quickAdd
       .where(eq(titles.id, input.id))
       .get();
     if (!title) {
-      throw new ORPCError("NOT_FOUND", { message: "Title not found" });
+      throw new ORPCError("NOT_FOUND", {
+        message: "Title not found",
+        data: { code: AppErrorCode.TITLE_NOT_FOUND },
+      });
     }
 
     // Trigger full TMDB import if still a shell

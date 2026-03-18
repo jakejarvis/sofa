@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
 import {
@@ -48,15 +49,20 @@ function calculateAge(birthday: string, deathday?: string | null): number {
   return age;
 }
 
-const departmentLabels: Record<string, string> = {
-  Acting: "Actor",
-  Directing: "Director",
-  Writing: "Writer",
-  Production: "Producer",
-  Editing: "Editor",
-};
+function getDepartmentLabels(
+  t: (strings: TemplateStringsArray, ...values: unknown[]) => string,
+): Record<string, string> {
+  return {
+    Acting: t`Actor`,
+    Directing: t`Director`,
+    Writing: t`Writer`,
+    Production: t`Producer`,
+    Editing: t`Editor`,
+  };
+}
 
 export default function PersonDetailScreen() {
+  const { t } = useLingui();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
@@ -205,13 +211,15 @@ export default function PersonDetailScreen() {
           >
             <IconAlertTriangle size={48} color={mutedForeground} />
             <Text className="mt-3 font-display text-foreground text-xl">
-              Something went wrong
+              <Trans>Something went wrong</Trans>
             </Text>
             <Text className="mt-1 text-center text-muted-foreground text-sm">
-              Could not load person details
+              <Trans>Could not load person details</Trans>
             </Text>
             <Pressable onPress={() => back()} className="mt-4">
-              <Text className="text-primary">Go back</Text>
+              <Text className="text-primary">
+                <Trans>Go back</Trans>
+              </Text>
             </Pressable>
           </Animated.View>
         </View>
@@ -233,10 +241,12 @@ export default function PersonDetailScreen() {
           >
             <IconUser size={48} color={mutedForeground} />
             <Text className="mt-3 font-display text-foreground text-xl">
-              Person not found
+              <Trans>Person not found</Trans>
             </Text>
             <Pressable onPress={() => back()} className="mt-4">
-              <Text className="text-primary">Go back</Text>
+              <Text className="text-primary">
+                <Trans>Go back</Trans>
+              </Text>
             </Pressable>
           </Animated.View>
         </View>
@@ -275,7 +285,7 @@ export default function PersonDetailScreen() {
         {person.knownForDepartment ? (
           <View className="mt-2 rounded-full bg-secondary px-3 py-1">
             <Text className="text-muted-foreground text-xs uppercase tracking-wider">
-              {departmentLabels[person.knownForDepartment] ??
+              {getDepartmentLabels(t)[person.knownForDepartment] ??
                 person.knownForDepartment}
             </Text>
           </View>
@@ -295,8 +305,8 @@ export default function PersonDetailScreen() {
                   {(() => {
                     const age = calculateAge(person.birthday, person.deathday);
                     return person.deathday
-                      ? ` (died at ${age})`
-                      : ` (age ${age})`;
+                      ? ` (${t`died at ${age}`})`
+                      : ` (${t`age ${age}`})`;
                   })()}
                 </Text>
               </View>
@@ -328,7 +338,7 @@ export default function PersonDetailScreen() {
           entering={FadeInDown.duration(300).delay(200)}
           className="px-4"
         >
-          <SectionHeader title="Filmography" icon={IconMovie} />
+          <SectionHeader title={t`Filmography`} icon={IconMovie} />
         </Animated.View>
       )}
     </>

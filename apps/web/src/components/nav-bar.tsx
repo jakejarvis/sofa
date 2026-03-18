@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconCompass,
   IconHome,
@@ -35,16 +36,7 @@ const springTransition = {
   damping: 30,
 } as const;
 
-const navLinks = [
-  { href: "/dashboard", label: "Home" },
-  { href: "/explore", label: "Explore" },
-] as const;
-
-const mobileTabs = [
-  { href: "/dashboard", label: "Home", icon: IconHome },
-  { href: "/explore", label: "Explore", icon: IconCompass },
-  { href: "/settings", label: "Settings", icon: IconSettings },
-] as const;
+// navLinks and mobileTabs moved inside components for LingUI
 
 function isLinkActive(pathname: string, href: string) {
   return (
@@ -124,9 +116,15 @@ export function NavBar({
   userImage?: string;
   userRole?: string;
 }) {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const setCommandPaletteOpen = useSetAtom(commandPaletteOpenAtom);
+
+  const navLinks = [
+    { href: "/dashboard", label: t`Home` },
+    { href: "/explore", label: t`Explore` },
+  ] as const;
 
   const initial = userName?.charAt(0).toUpperCase() ?? "?";
 
@@ -192,7 +190,7 @@ export function NavBar({
             className="flex flex-1 items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-[13px] text-muted-foreground transition-colors hover:border-primary/20 hover:bg-card sm:hidden"
           >
             <IconSearch aria-hidden={true} className="size-3.5" />
-            <span>Search…</span>
+            <span>{t`Search…`}</span>
           </button>
           {/* Desktop search trigger pill */}
           <button
@@ -201,7 +199,7 @@ export function NavBar({
             className="hidden items-center gap-2 rounded-lg border border-border/50 bg-card/50 px-3 py-1.5 text-[13px] text-muted-foreground transition-colors hover:border-primary/20 hover:bg-card sm:inline-flex"
           >
             <IconSearch aria-hidden={true} className="size-3.5" />
-            <span>Search…</span>
+            <span>{t`Search…`}</span>
             <Kbd className="ml-2.5">⌘ K</Kbd>
           </button>
           <Separator
@@ -234,7 +232,7 @@ export function NavBar({
                     {userName}
                     {userRole === "admin" && (
                       <Badge className="mb-0.5 ml-1.5 rounded-md border-0 bg-primary/10 align-middle text-primary">
-                        Admin
+                        <Trans>Admin</Trans>
                       </Badge>
                     )}
                   </p>
@@ -249,7 +247,7 @@ export function NavBar({
                 className="cursor-pointer text-[13px]"
               >
                 <IconSettings className="size-3.5" />
-                Settings
+                <Trans>Settings</Trans>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -261,7 +259,7 @@ export function NavBar({
                 className="cursor-pointer text-[13px]"
               >
                 <IconLogout className="size-3.5" />
-                Sign out
+                <Trans>Sign out</Trans>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -285,7 +283,14 @@ export function NavBar({
 }
 
 export function MobileTabBar() {
+  const { t } = useLingui();
   const { pathname } = useLocation();
+
+  const mobileTabs = [
+    { href: "/dashboard", label: t`Home`, icon: IconHome },
+    { href: "/explore", label: t`Explore`, icon: IconCompass },
+    { href: "/settings", label: t`Settings`, icon: IconSettings },
+  ] as const;
 
   const activeIndex = mobileTabs.findIndex((tab) =>
     isLinkActive(pathname, tab.href),

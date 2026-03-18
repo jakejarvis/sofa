@@ -8,6 +8,7 @@ import {
   onTapGesture,
   scrollContentBackground,
 } from "@expo/ui/swift-ui/modifiers";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconHistory, IconSearch } from "@tabler/icons-react-native";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
@@ -23,6 +24,7 @@ import {
 import * as Haptics from "@/utils/haptics";
 
 export function RecentlyViewedList() {
+  const { t } = useLingui();
   const { navigate } = useRouter();
   const { items, removeItem, clearAll } = useRecentlyViewed();
   const [mutedForeground, primaryColor] = useCSSVariable([
@@ -55,18 +57,18 @@ export function RecentlyViewedList() {
   const handleClear = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Alert.alert(
-      "Clear Recently Viewed?",
-      "This will remove all items from your history.",
+      t`Clear Recently Viewed?`,
+      t`This will remove all items from your history.`,
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t`Cancel`, style: "cancel" },
         {
-          text: "Clear",
+          text: t`Clear`,
           style: "destructive",
           onPress: () => clearAll(),
         },
       ],
     );
-  }, [clearAll]);
+  }, [clearAll, t]);
 
   if (items.length === 0) {
     return (
@@ -76,7 +78,7 @@ export function RecentlyViewedList() {
       >
         <IconSearch size={64} color={mutedForeground} />
         <Text className="mt-3 text-base text-muted-foreground">
-          Search for movies, shows, or people
+          <Trans>Search for movies, shows, or people</Trans>
         </Text>
       </Animated.View>
     );
@@ -101,7 +103,7 @@ export function RecentlyViewedList() {
                 <View className="flex-row items-center gap-2">
                   <IconHistory size={20} color={primaryColor} />
                   <Text className="font-display text-foreground text-xl tracking-tight">
-                    Recently Viewed
+                    <Trans>Recently Viewed</Trans>
                   </Text>
                 </View>
                 <Pressable
@@ -109,7 +111,9 @@ export function RecentlyViewedList() {
                   hitSlop={8}
                   style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
                 >
-                  <Text className="text-primary text-sm">Clear</Text>
+                  <Text className="text-primary text-sm">
+                    <Trans>Clear</Trans>
+                  </Text>
                 </Pressable>
               </View>
             </RNHostView>

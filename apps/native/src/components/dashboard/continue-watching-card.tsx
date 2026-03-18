@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Link } from "expo-router";
 import { Pressable, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
@@ -26,6 +27,7 @@ export interface ContinueWatchingItem {
 }
 
 export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
+  const { t } = useLingui();
   const { animatedStyle, gesture: tapGesture } = usePressAnimation();
 
   const progressLabel = `${item.watchedEpisodes} of ${item.totalEpisodes} episodes`;
@@ -117,14 +119,14 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
           <Link.Preview />
           <Link.Menu>
             <Link.MenuAction
-              title="Mark as Completed"
+              title={t`Mark as Completed`}
               icon="checkmark.circle"
               onPress={() =>
                 titleActions.markCompleted(item.title.id, item.title.title)
               }
             />
             <Link.MenuAction
-              title="Remove from Library"
+              title={t`Remove from Library`}
               icon="trash"
               destructive
               onPress={() => titleActions.removeFromLibrary(item.title.id)}

@@ -1,3 +1,5 @@
+import { msg } from "@lingui/core/macro";
+import { i18n } from "@sofa/i18n";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 
 import { posthog } from "@/lib/posthog";
@@ -28,9 +30,7 @@ export const queryClient = new QueryClient({
       // banner is already visible — avoids flooding native toasts.
       if (!getIsReachable() && isNetworkError(error)) return;
 
-      toast.error("Something went wrong\u2026", {
-        description: error.message,
-      });
+      toast.error(i18n._(msg`Something went wrong\u2026`));
       posthog?.captureException(error, { source: "react-query" });
     },
   }),

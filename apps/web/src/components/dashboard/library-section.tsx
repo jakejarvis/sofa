@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { IconBooks } from "@tabler/icons-react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
@@ -16,6 +17,8 @@ export function LibrarySection() {
       }),
     );
 
+  const { t } = useLingui();
+
   const sentinelRef = useInfiniteScroll({
     fetchNextPage,
     hasNextPage,
@@ -29,7 +32,7 @@ export function LibrarySection() {
 
   return (
     <FeedSection
-      title="In Your Library"
+      title={t`In Your Library`}
       icon={<IconBooks className="size-5 text-primary" />}
     >
       <TitleGrid items={items} />

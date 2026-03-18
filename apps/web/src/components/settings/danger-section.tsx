@@ -1,3 +1,5 @@
+import { plural } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconDatabase, IconPhoto, IconTrash } from "@tabler/icons-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -26,6 +28,7 @@ function formatBytes(bytes: number): string {
 }
 
 export function CacheSection() {
+  const { t } = useLingui();
   const queryClient = useQueryClient();
 
   const invalidateHealth = () =>
@@ -35,23 +38,24 @@ export function CacheSection() {
     orpc.admin.purgeMetadataCache.mutationOptions({
       onSuccess: (data) => {
         toast.success(
-          `Purged ${data.deletedTitles} stale title${data.deletedTitles !== 1 ? "s" : ""} and ${data.deletedPersons} orphaned person${data.deletedPersons !== 1 ? "s" : ""}`,
+          t`Purged ${plural(data.deletedTitles, { one: "# stale title", other: "# stale titles" })} and ${plural(data.deletedPersons, { one: "# orphaned person", other: "# orphaned persons" })}`,
         );
         invalidateHealth();
       },
-      onError: () => toast.error("Failed to purge metadata cache"),
+      onError: () => toast.error(t`Failed to purge metadata cache`),
     }),
   );
 
   const purgeImages = useMutation(
     orpc.admin.purgeImageCache.mutationOptions({
       onSuccess: (data) => {
+        const freed = formatBytes(data.freedBytes);
         toast.success(
-          `Deleted ${data.deletedFiles.toLocaleString()} file${data.deletedFiles !== 1 ? "s" : ""}, freed ${formatBytes(data.freedBytes)}`,
+          t`Deleted ${plural(data.deletedFiles, { one: "# file", other: "# files" })}, freed ${freed}`,
         );
         invalidateHealth();
       },
-      onError: () => toast.error("Failed to purge image cache"),
+      onError: () => toast.error(t`Failed to purge image cache`),
     }),
   );
 
@@ -62,12 +66,13 @@ export function CacheSection() {
         client.admin.purgeImageCache(),
       ]),
     onSuccess: ([metaResult, imageResult]) => {
+      const freed = formatBytes(imageResult.freedBytes);
       toast.success(
-        `Purged ${metaResult.deletedTitles} title${metaResult.deletedTitles !== 1 ? "s" : ""}, ${metaResult.deletedPersons} person${metaResult.deletedPersons !== 1 ? "s" : ""}, ${imageResult.deletedFiles.toLocaleString()} file${imageResult.deletedFiles !== 1 ? "s" : ""} (${formatBytes(imageResult.freedBytes)} freed)`,
+        t`Purged ${plural(metaResult.deletedTitles, { one: "# title", other: "# titles" })}, ${plural(metaResult.deletedPersons, { one: "# person", other: "# persons" })}, ${plural(imageResult.deletedFiles, { one: "# file", other: "# files" })} (${freed} freed)`,
       );
       invalidateHealth();
     },
-    onError: () => toast.error("Failed to purge caches"),
+    onError: () => toast.error(t`Failed to purge caches`),
   });
 
   const disabled =
@@ -80,9 +85,13 @@ export function CacheSection() {
           <IconTrash aria-hidden={true} className="size-4 text-primary" />
         </div>
         <div className="flex-1">
-          <CardTitle>Cache management</CardTitle>
+          <CardTitle>
+            <Trans>Cache management</Trans>
+          </CardTitle>
           <CardDescription>
-            Free up disk space by clearing cached metadata and images
+            <Trans>
+              Free up disk space by clearing cached metadata and images
+            </Trans>
           </CardDescription>
 
           <div className="mt-4 flex flex-wrap gap-2">
@@ -98,24 +107,34 @@ export function CacheSection() {
                 ) : (
                   <IconDatabase aria-hidden={true} />
                 )}
-                {purgeMetadata.isPending ? "Purging…" : "Purge metadata"}
+                {purgeMetadata.isPending ? (
+                  <Trans>Purging...</Trans>
+                ) : (
+                  <Trans>Purge metadata</Trans>
+                )}
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Purge metadata cache?</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    <Trans>Purge metadata cache?</Trans>
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will delete un-enriched stub titles that aren't in any
-                    user's library and clean up orphaned person records. Deleted
-                    titles will be re-imported if accessed again.
+                    <Trans>
+                      This will delete un-enriched stub titles that aren't in
+                      any user's library and clean up orphaned person records.
+                      Deleted titles will be re-imported if accessed again.
+                    </Trans>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>
+                    <Trans>Cancel</Trans>
+                  </AlertDialogCancel>
                   <AlertDialogAction
                     variant="destructive"
                     onClick={() => purgeMetadata.mutate()}
                   >
-                    Purge metadata
+                    <Trans>Purge metadata</Trans>
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -133,23 +152,33 @@ export function CacheSection() {
                 ) : (
                   <IconPhoto aria-hidden={true} />
                 )}
-                {purgeImages.isPending ? "Purging…" : "Purge images"}
+                {purgeImages.isPending ? (
+                  <Trans>Purging...</Trans>
+                ) : (
+                  <Trans>Purge images</Trans>
+                )}
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Purge image cache?</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    <Trans>Purge image cache?</Trans>
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will delete all cached TMDB images from disk. Images
-                    will be re-downloaded automatically as needed.
+                    <Trans>
+                      This will delete all cached TMDB images from disk. Images
+                      will be re-downloaded automatically as needed.
+                    </Trans>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>
+                    <Trans>Cancel</Trans>
+                  </AlertDialogCancel>
                   <AlertDialogAction
                     variant="destructive"
                     onClick={() => purgeImages.mutate()}
                   >
-                    Purge images
+                    <Trans>Purge images</Trans>
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -167,24 +196,34 @@ export function CacheSection() {
                 ) : (
                   <IconTrash aria-hidden={true} />
                 )}
-                {purgeAll.isPending ? "Purging…" : "Purge all"}
+                {purgeAll.isPending ? (
+                  <Trans>Purging...</Trans>
+                ) : (
+                  <Trans>Purge all</Trans>
+                )}
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Purge all caches?</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    <Trans>Purge all caches?</Trans>
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will delete all un-enriched stub titles and all cached
-                    images from disk. Everything will be re-imported and
-                    re-downloaded as needed.
+                    <Trans>
+                      This will delete all un-enriched stub titles and all
+                      cached images from disk. Everything will be re-imported
+                      and re-downloaded as needed.
+                    </Trans>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>
+                    <Trans>Cancel</Trans>
+                  </AlertDialogCancel>
                   <AlertDialogAction
                     variant="destructive"
                     onClick={() => purgeAll.mutate()}
                   >
-                    Purge all
+                    <Trans>Purge all</Trans>
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

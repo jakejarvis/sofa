@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { useCallback, useRef, useState } from "react";
 import type { NativeSyntheticEvent, TextLayoutEventData } from "react-native";
 import { Platform, Pressable, View } from "react-native";
@@ -12,6 +13,7 @@ export function ExpandableText({
   maxLines?: number;
   actionColor?: string;
 }) {
+  const { t } = useLingui();
   const prevTextRef = useRef(text);
   let expanded: boolean;
   let needsTruncation: boolean;
@@ -57,14 +59,14 @@ export function ExpandableText({
         <Pressable
           onPress={() => setExpanded(!expanded)}
           accessibilityRole="button"
-          accessibilityLabel={expanded ? "Show less" : "Show more"}
+          accessibilityLabel={expanded ? t`Show less` : t`Show more`}
           className="mt-1"
         >
           <Text
             className="font-medium font-sans text-primary text-sm"
             style={actionColor ? { color: actionColor } : undefined}
           >
-            {expanded ? "Show less" : "Show more"}
+            {expanded ? t`Show less` : t`Show more`}
           </Text>
         </Pressable>
       )}

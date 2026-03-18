@@ -1,5 +1,6 @@
 import { eventIterator, oc } from "@orpc/contract";
 import { z } from "zod";
+import { AppErrorCode, appErrorData } from "./errors";
 import {
   AuthConfigOutput,
   BackupCreateOutput,
@@ -78,7 +79,10 @@ export const contract = {
       .input(IdParam)
       .output(TitleDetailOutput)
       .errors({
-        NOT_FOUND: { message: "Title not found" },
+        NOT_FOUND: {
+          message: "Title not found",
+          data: appErrorData(AppErrorCode.TITLE_NOT_FOUND),
+        },
       }),
     updateStatus: oc
       .route({
@@ -163,7 +167,10 @@ export const contract = {
       .input(IdParam)
       .output(QuickAddOutput)
       .errors({
-        NOT_FOUND: { message: "Title not found" },
+        NOT_FOUND: {
+          message: "Title not found",
+          data: appErrorData(AppErrorCode.TITLE_NOT_FOUND),
+        },
       }),
   },
   episodes: {
@@ -238,7 +245,10 @@ export const contract = {
       .input(IdParam.merge(PaginatedInput))
       .output(PersonDetailOutput)
       .errors({
-        NOT_FOUND: { message: "Person not found" },
+        NOT_FOUND: {
+          message: "Person not found",
+          data: appErrorData(AppErrorCode.PERSON_NOT_FOUND),
+        },
       }),
   },
   dashboard: {
@@ -315,7 +325,10 @@ export const contract = {
       .input(TrendingTypeParam.merge(PageParam))
       .output(TrendingOutput)
       .errors({
-        PRECONDITION_FAILED: { message: "TMDB API key is not configured" },
+        PRECONDITION_FAILED: {
+          message: "TMDB API key is not configured",
+          data: appErrorData(AppErrorCode.TMDB_NOT_CONFIGURED),
+        },
       }),
     popular: oc
       .route({
@@ -330,7 +343,10 @@ export const contract = {
       .input(MediaTypeParam.merge(PageParam))
       .output(PopularOutput)
       .errors({
-        PRECONDITION_FAILED: { message: "TMDB API key is not configured" },
+        PRECONDITION_FAILED: {
+          message: "TMDB API key is not configured",
+          data: appErrorData(AppErrorCode.TMDB_NOT_CONFIGURED),
+        },
       }),
     genres: oc
       .route({
@@ -345,7 +361,10 @@ export const contract = {
       .input(MediaTypeParam)
       .output(GenresOutput)
       .errors({
-        PRECONDITION_FAILED: { message: "TMDB API key is not configured" },
+        PRECONDITION_FAILED: {
+          message: "TMDB API key is not configured",
+          data: appErrorData(AppErrorCode.TMDB_NOT_CONFIGURED),
+        },
       }),
   },
   search: oc
@@ -461,7 +480,10 @@ export const contract = {
       .input(ProviderParam)
       .output(IntegrationOutput)
       .errors({
-        NOT_FOUND: { message: "Integration not found" },
+        NOT_FOUND: {
+          message: "Integration not found",
+          data: appErrorData(AppErrorCode.INTEGRATION_NOT_FOUND),
+        },
       }),
   },
   admin: {
@@ -500,8 +522,14 @@ export const contract = {
         .input(FilenameParam)
         .output(z.void())
         .errors({
-          NOT_FOUND: { message: "Backup not found" },
-          BAD_REQUEST: { message: "Failed to delete backup" },
+          NOT_FOUND: {
+            message: "Backup not found",
+            data: appErrorData(AppErrorCode.BACKUP_NOT_FOUND),
+          },
+          BAD_REQUEST: {
+            message: "Failed to delete backup",
+            data: appErrorData(AppErrorCode.BACKUP_DELETE_FAILED),
+          },
         }),
       restore: oc
         .route({
@@ -515,7 +543,10 @@ export const contract = {
         .input(RestoreBackupInput)
         .output(z.void())
         .errors({
-          BAD_REQUEST: { message: "Backup restoration failed" },
+          BAD_REQUEST: {
+            message: "Backup restoration failed",
+            data: appErrorData(AppErrorCode.BACKUP_RESTORE_FAILED),
+          },
         }),
       schedule: oc
         .route({
@@ -616,7 +647,10 @@ export const contract = {
       .input(TriggerJobInput)
       .output(TriggerJobOutput)
       .errors({
-        NOT_FOUND: { message: "Job not found" },
+        NOT_FOUND: {
+          message: "Job not found",
+          data: appErrorData(AppErrorCode.JOB_NOT_FOUND),
+        },
       }),
     purgeMetadataCache: oc
       .route({
@@ -701,7 +735,13 @@ export const contract = {
         successDescription: "Preview of importable items with counts",
       })
       .input(ParseFileInput)
-      .output(ImportPreviewSchema),
+      .output(ImportPreviewSchema)
+      .errors({
+        BAD_REQUEST: {
+          message: "Invalid import file",
+          data: appErrorData(AppErrorCode.IMPORT_INVALID_FILE),
+        },
+      }),
     parsePayload: oc
       .route({
         method: "POST",
@@ -725,7 +765,17 @@ export const contract = {
         successDescription: "Created import job",
       })
       .input(CreateImportJobInput)
-      .output(ImportJobSchema),
+      .output(ImportJobSchema)
+      .errors({
+        BAD_REQUEST: {
+          message: "Import payload too large",
+          data: appErrorData(AppErrorCode.IMPORT_PAYLOAD_TOO_LARGE),
+        },
+        CONFLICT: {
+          message: "An import is already in progress",
+          data: appErrorData(AppErrorCode.IMPORT_ALREADY_RUNNING),
+        },
+      }),
     getJob: oc
       .route({
         method: "GET",
@@ -748,7 +798,13 @@ export const contract = {
         successDescription: "Updated job state",
       })
       .input(IdParam)
-      .output(ImportJobSchema),
+      .output(ImportJobSchema)
+      .errors({
+        BAD_REQUEST: {
+          message: "Import cannot be cancelled",
+          data: appErrorData(AppErrorCode.IMPORT_CANNOT_CANCEL),
+        },
+      }),
     jobEvents: oc
       .route({
         method: "GET",

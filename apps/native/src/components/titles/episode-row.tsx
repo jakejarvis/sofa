@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   IconCircleCheckFilled,
   IconCircleDashed,
@@ -24,7 +25,8 @@ export function EpisodeRow({
   accentColor: string;
   mutedColor: string;
 }) {
-  const episodeLabel = episode.name ?? `Episode ${episode.episodeNumber}`;
+  const { t } = useLingui();
+  const episodeLabel = episode.name ?? t`Episode ${episode.episodeNumber}`;
 
   return (
     <Pressable
@@ -50,7 +52,7 @@ export function EpisodeRow({
           numberOfLines={1}
         >
           {episode.episodeNumber}.{" "}
-          {episode.name ?? `Episode ${episode.episodeNumber}`}
+          {episode.name ?? t`Episode ${episode.episodeNumber}`}
         </Text>
         {episode.airDate ? (
           <Text className="mt-0.5 text-muted-foreground text-xs">

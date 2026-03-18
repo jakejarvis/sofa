@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { IconLoader, IconPlus } from "@tabler/icons-react-native";
 import { Link } from "expo-router";
 import { memo, useMemo } from "react";
@@ -25,11 +26,16 @@ export const SearchResultRow = memo(function SearchResultRow({
   onQuickAdd: (id: string) => void;
   isAdding: boolean;
 }) {
+  const { t } = useLingui();
   const primary = useCSSVariable("--color-primary") as string;
   const imageSrc = item.posterPath ?? item.profilePath;
 
   const typeLabel =
-    item.type === "movie" ? "Movie" : item.type === "tv" ? "TV show" : "Person";
+    item.type === "movie"
+      ? t`Movie`
+      : item.type === "tv"
+        ? t`TV show`
+        : t`Person`;
   const accessibilityLabel = [
     item.title,
     typeLabel,
@@ -87,10 +93,10 @@ export const SearchResultRow = memo(function SearchResultRow({
               className="text-muted-foreground text-xs"
             >
               {item.type === "movie"
-                ? "Movie"
+                ? t`Movie`
                 : item.type === "tv"
-                  ? "TV"
-                  : "Person"}
+                  ? t`TV`
+                  : t`Person`}
             </Text>
           </View>
           {item.releaseDate ? (
