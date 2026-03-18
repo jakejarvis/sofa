@@ -62,10 +62,6 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
                       contentFit="cover"
                     />
                   )}
-                  <View
-                    className="absolute inset-0"
-                    style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-                  />
                   {item.nextEpisode && (
                     <View className="absolute right-2.5 bottom-3 left-2.5">
                       <Text

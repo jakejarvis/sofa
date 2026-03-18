@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Stack, useRouter } from "expo-router";
 import { View } from "react-native";
 
-export function DetailStackHeader() {
+export function ModalStackHeader() {
   const { dismissAll } = useRouter();
   const { t } = useLingui();
   return (

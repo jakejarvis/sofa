@@ -3,7 +3,7 @@ import { IconDeviceTv, IconFlame, IconMovie } from "@tabler/icons-react-native";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { FilterableTitleRow } from "@/components/explore/filterable-title-row";
 import { HeroBanner } from "@/components/explore/hero-banner";
@@ -70,11 +70,7 @@ export default function ExploreScreen() {
       refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
     >
       <View className="gap-8">
-        {heroItem && (
-          <Animated.View entering={FadeIn.duration(400).withInitialValues({ opacity: 0.01 })}>
-            <HeroBanner item={heroItem} />
-          </Animated.View>
-        )}
+        {heroItem && <HeroBanner item={heroItem} />}
 
         <Animated.View entering={FadeInDown.duration(300).delay(100)}>
           <FilterableTitleRow

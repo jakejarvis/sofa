@@ -16,7 +16,7 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
 
-import { DetailStackHeader } from "@/components/navigation/modal-stack-header";
+import { ModalStackHeader } from "@/components/navigation/modal-stack-header";
 import { ExpandableText } from "@/components/ui/expandable-text";
 import { Image } from "@/components/ui/image";
 import { PosterCard } from "@/components/ui/poster-card";
@@ -146,7 +146,7 @@ export default function PersonDetailScreen() {
   if (isPending) {
     return (
       <>
-        <DetailStackHeader />
+        <ModalStackHeader />
         <View
           className="bg-background flex-1 items-center"
           style={{ paddingTop: headerHeight + 24 }}
@@ -171,7 +171,7 @@ export default function PersonDetailScreen() {
   if (isError && !data) {
     return (
       <>
-        <DetailStackHeader />
+        <ModalStackHeader />
         <View
           className="bg-background flex-1 items-center justify-center"
           style={{ paddingTop: insets.top }}
@@ -198,7 +198,7 @@ export default function PersonDetailScreen() {
   if (!person) {
     return (
       <>
-        <DetailStackHeader />
+        <ModalStackHeader />
         <View
           className="bg-background flex-1 items-center justify-center"
           style={{ paddingTop: insets.top }}
@@ -221,7 +221,7 @@ export default function PersonDetailScreen() {
 
   const listHeader = (
     <>
-      <DetailStackHeader />
+      <ModalStackHeader />
 
       {/* Profile hero */}
       <Animated.View

@@ -27,7 +27,7 @@ import {
   HorizontalPosterRow,
   type PosterRowItem,
 } from "@/components/dashboard/horizontal-poster-row";
-import { DetailStackHeader } from "@/components/navigation/modal-stack-header";
+import { ModalStackHeader } from "@/components/navigation/modal-stack-header";
 import { CastCard } from "@/components/titles/cast-card";
 import { ContinueWatchingBanner } from "@/components/titles/continue-watching-banner";
 import { SeasonAccordion } from "@/components/titles/season-accordion";
@@ -198,7 +198,7 @@ export default function TitleDetailScreen() {
   if (detail.isPending) {
     return (
       <>
-        <DetailStackHeader />
+        <ModalStackHeader />
         <View className="bg-background flex-1">
           {/* Hero skeleton */}
           <Skeleton width="100%" height={300} borderRadius={0} />
@@ -228,7 +228,7 @@ export default function TitleDetailScreen() {
   if (!title) {
     return (
       <>
-        <DetailStackHeader />
+        <ModalStackHeader />
         <View className="bg-background flex-1 items-center justify-center px-6">
           <IconMovie size={48} color={mutedForeground} />
           <Text className="font-display text-foreground mt-3 text-xl">
@@ -252,7 +252,7 @@ export default function TitleDetailScreen() {
       contentInsetAdjustmentBehavior={useAutomaticInsets ? "automatic" : "never"}
       contentContainerStyle={titleScrollContentStyle}
     >
-      <DetailStackHeader />
+      <ModalStackHeader />
 
       {/* Hero */}
       <View className="h-[300px]" style={heroMarginStyle}>
