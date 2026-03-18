@@ -1,5 +1,4 @@
 import { IconChevronDown } from "@tabler/icons-react-native";
-import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import { InteractionManager, Pressable, View } from "react-native";
 import Animated, {
@@ -14,9 +13,7 @@ import { useCSSVariable } from "uniwind";
 import { EpisodeRow } from "@/components/titles/episode-row";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
-import { orpc } from "@/lib/orpc";
-import { queryClient } from "@/lib/query-client";
-import { toast } from "@/lib/toast";
+import { useTitleActions } from "@/hooks/use-title-actions";
 
 export function SeasonAccordion({
   season,
@@ -79,50 +76,23 @@ export function SeasonAccordion({
     transform: [{ rotate: `${chevronRotation.get()}deg` }],
   }));
 
-  const watchEpisode = useMutation(
-    orpc.episodes.watch.mutationOptions({
-      onSuccess: (_data, { id: epId }) => {
+  const { watchEpisode, unwatchEpisode, watchSeason } = useTitleActions({
+    toasts: {
+      watchEpisode: ({ id: epId }) => {
         const ep = episodes.find((e) => e.id === epId);
-        toast.success(
-          ep
-            ? `Watched S${season.seasonNumber} E${ep.episodeNumber}`
-            : "Episode watched",
-        );
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
+        return ep
+          ? `Watched S${season.seasonNumber} E${ep.episodeNumber}`
+          : "Episode watched";
       },
-      onError: () => toast.error("Failed to mark episode"),
-    }),
-  );
-
-  const unwatchEpisode = useMutation(
-    orpc.episodes.unwatch.mutationOptions({
-      onSuccess: (_data, { id: epId }) => {
+      unwatchEpisode: ({ id: epId }) => {
         const ep = episodes.find((e) => e.id === epId);
-        toast.success(
-          ep
-            ? `Unwatched S${season.seasonNumber} E${ep.episodeNumber}`
-            : "Episode unwatched",
-        );
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
+        return ep
+          ? `Unwatched S${season.seasonNumber} E${ep.episodeNumber}`
+          : "Episode unwatched";
       },
-      onError: () => toast.error("Failed to unmark episode"),
-    }),
-  );
-
-  const watchSeason = useMutation(
-    orpc.seasons.watch.mutationOptions({
-      onSuccess: () => {
-        toast.success(
-          `Watched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
-        );
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
-      },
-      onError: () => toast.error("Failed to mark some episodes"),
-    }),
-  );
+      watchSeason: `Watched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
+    },
+  });
 
   const handleEpisodeToggle = useCallback(
     (episodeId: string) => {

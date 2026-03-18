@@ -1,18 +1,11 @@
 import { Link } from "expo-router";
 import { Pressable, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  useReducedMotion,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import { GestureDetector } from "react-native-gesture-handler";
+import Animated from "react-native-reanimated";
 import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
-import { client, orpc } from "@/lib/orpc";
-import { queryClient } from "@/lib/query-client";
-import { toast } from "@/lib/toast";
+import { usePressAnimation } from "@/hooks/use-press-animation";
+import { titleActions } from "@/lib/title-actions";
 
 export interface ContinueWatchingItem {
   title: {
@@ -33,23 +26,7 @@ export interface ContinueWatchingItem {
 }
 
 export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
-  const reduceMotion = useReducedMotion();
-  const pressed = useSharedValue(0);
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        scale: reduceMotion ? 1 : interpolate(pressed.get(), [0, 1], [1, 0.97]),
-      },
-    ],
-  }));
-
-  const tapGesture = Gesture.Tap()
-    .onBegin(() => {
-      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
-    })
-    .onFinalize(() => {
-      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
-    });
+  const { animatedStyle, gesture: tapGesture } = usePressAnimation();
 
   const progressLabel = `${item.watchedEpisodes} of ${item.totalEpisodes} episodes`;
   const nextEpLabel = item.nextEpisode
@@ -142,37 +119,15 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
             <Link.MenuAction
               title="Mark as Completed"
               icon="checkmark.circle"
-              onPress={async () => {
-                await client.titles.updateStatus({
-                  id: item.title.id,
-                  status: "completed",
-                });
-                toast.success(`Marked "${item.title.title}" as completed`);
-                queryClient.invalidateQueries({
-                  queryKey: orpc.titles.key(),
-                });
-                queryClient.invalidateQueries({
-                  queryKey: orpc.dashboard.key(),
-                });
-              }}
+              onPress={() =>
+                titleActions.markCompleted(item.title.id, item.title.title)
+              }
             />
             <Link.MenuAction
               title="Remove from Library"
               icon="trash"
               destructive
-              onPress={async () => {
-                await client.titles.updateStatus({
-                  id: item.title.id,
-                  status: null,
-                });
-                toast.success("Removed from library");
-                queryClient.invalidateQueries({
-                  queryKey: orpc.titles.key(),
-                });
-                queryClient.invalidateQueries({
-                  queryKey: orpc.dashboard.key(),
-                });
-              }}
+              onPress={() => titleActions.removeFromLibrary(item.title.id)}
             />
           </Link.Menu>
         </Link>

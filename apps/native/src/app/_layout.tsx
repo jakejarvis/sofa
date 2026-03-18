@@ -5,12 +5,7 @@ import {
   persistQueryClientRestore,
   persistQueryClientSubscribe,
 } from "@tanstack/react-query-persist-client";
-import {
-  Stack,
-  useGlobalSearchParams,
-  usePathname,
-  useRouter,
-} from "expo-router";
+import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import {
@@ -26,49 +21,24 @@ import { enableFreeze } from "react-native-screens";
 import { Uniwind, useResolveClassNames } from "uniwind";
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-banner";
-import { authClient, rebuildAuthClient } from "@/lib/auth-client";
-import { getCachedSession } from "@/lib/cached-session";
+import { authClient } from "@/lib/auth-client";
 import {
-  clearStorageScope,
   hasScopedStorage,
   onStorageScopeChange,
   queryPersister,
-  setStorageScope,
 } from "@/lib/mmkv";
 import { applyTrackingTransparency, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
-import {
-  onServerReachabilityChange,
-  startReachabilityMonitor,
-} from "@/lib/server-reachability";
-import {
-  ensureInstanceId,
-  getCurrentInstanceId,
-  hasStoredServerUrl,
-  onServerUrlChange,
-} from "@/lib/server-url";
+import { getCurrentInstanceId } from "@/lib/server-url";
 import { sofaTheme } from "@/lib/theme";
-import { toast } from "@/lib/toast";
+import {
+  seedSessionFromCache,
+  useServerConnection,
+} from "@/lib/use-server-connection";
 
 SplashScreen.preventAutoHideAsync();
 enableFreeze(true);
-
-// Seed the session atom with cached data from SecureStore before React renders.
-// This allows the app to show cached data immediately when the server is
-// unreachable, instead of hanging on the splash screen or dumping the user
-// on the login screen. Better Auth's background fetch will still fire and
-// update the atom when the server responds.
-const cachedSession = getCachedSession();
-if (cachedSession) {
-  const sessionAtom = authClient.$store.atoms.session;
-  sessionAtom.set({
-    data: cachedSession,
-    error: null,
-    isPending: false,
-    isRefetching: true,
-    refetch: sessionAtom.get().refetch,
-  });
-}
+seedSessionFromCache();
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
@@ -95,45 +65,7 @@ const changePasswordOptions =
 
 function AppContent() {
   const contentStyle = useResolveClassNames("bg-background");
-
-  // Force re-render when server URL changes so useSession()
-  // re-subscribes to the rebuilt authClient's session atom.
-  const [, setUrlVersion] = useState(0);
-  useEffect(() => onServerUrlChange(() => setUrlVersion((n) => n + 1)), []);
-
-  const { data: session, isPending } = authClient.useSession();
-  const hasServerUrl =
-    !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
-
-  // --- Ensure instance ID is available (handles upgrades and env-based URLs) ---
-  const [instanceId, setInstanceId] = useState(getCurrentInstanceId);
-
-  useEffect(() => {
-    if (!instanceId && hasServerUrl) {
-      ensureInstanceId().then((id) => {
-        if (id) {
-          setInstanceId(id);
-          rebuildAuthClient();
-        }
-      });
-    }
-  }, [instanceId, hasServerUrl]);
-
-  // Re-sync instanceId when server URL changes (registerServer sets it synchronously)
-  useEffect(() => {
-    return onServerUrlChange(() => setInstanceId(getCurrentInstanceId()));
-  }, []);
-
-  // --- Set storage scope when we have both instanceId and userId ---
-  const userId = session?.user?.id;
-
-  useEffect(() => {
-    if (instanceId && userId) {
-      setStorageScope(instanceId, userId);
-    } else if (!userId && hasScopedStorage()) {
-      clearStorageScope();
-    }
-  }, [instanceId, userId]);
+  const { session, isPending, hasServerUrl } = useServerConnection();
 
   // --- App Tracking Transparency (must resolve before screen tracking) ---
   const [trackingReady, setTrackingReady] = useState(false);
@@ -187,54 +119,6 @@ function AppContent() {
       SplashScreen.hideAsync();
     }
   }, [isPending, hasServerUrl]);
-
-  // --- Server reachability monitor ---
-  useEffect(() => {
-    if (!hasServerUrl) return;
-    return startReachabilityMonitor();
-  }, [hasServerUrl]);
-
-  // --- Session reconciliation: re-validate when server comes back ---
-  // Tracks whether the current session was seeded from cache and has NOT
-  // yet been confirmed by the server. Once confirmed (isRefetching becomes
-  // false while session still exists), this flips to false so that an
-  // explicit sign-out doesn't show a misleading "session expired" toast.
-  const hadOptimisticSession = useRef(!!cachedSession);
-  const prevSession = useRef(session);
-
-  const { isRefetching } = authClient.useSession();
-  if (hadOptimisticSession.current && session && !isRefetching) {
-    hadOptimisticSession.current = false;
-  }
-
-  useEffect(() => {
-    return onServerReachabilityChange((reachable) => {
-      if (reachable) {
-        // Server came back — trigger session re-validation
-        const atom = authClient.$store.atoms.session;
-        atom.get().refetch?.();
-      }
-    });
-  }, []);
-
-  const { replace } = useRouter();
-
-  // When session is lost (sign-out or server invalidation), explicitly
-  // navigate to auth. Stack.Protected handles screen availability, but
-  // enableFreeze can prevent the navigator from transitioning on its own.
-  useEffect(() => {
-    if (prevSession.current && !session) {
-      replace("/(auth)/login");
-
-      if (hadOptimisticSession.current) {
-        toast.info("Session expired", {
-          description: "Please sign in again.",
-        });
-        hadOptimisticSession.current = false;
-      }
-    }
-    prevSession.current = session;
-  }, [session, replace]);
 
   return (
     <ThemeProvider value={sofaTheme}>

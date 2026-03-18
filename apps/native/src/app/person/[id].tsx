@@ -29,7 +29,7 @@ import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
-import { usePosterActions } from "@/hooks/use-poster-actions";
+import { useTitleActions } from "@/hooks/use-title-actions";
 import { orpc } from "@/lib/orpc";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
 
@@ -75,7 +75,14 @@ export default function PersonDetailScreen() {
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const primaryColor = useCSSVariable("--color-primary") as string;
 
-  const { handleQuickAdd, addingKey } = usePosterActions();
+  const { quickAdd } = useTitleActions();
+  const handleQuickAdd = useCallback(
+    (id: string) => quickAdd.mutate({ id }),
+    [quickAdd],
+  );
+  const addingKey = quickAdd.isPending
+    ? (quickAdd.variables?.id ?? null)
+    : null;
 
   const {
     data,

@@ -11,22 +11,15 @@ import {
 import { Link } from "expo-router";
 import { useCallback } from "react";
 import { Pressable, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  useReducedMotion,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import { GestureDetector } from "react-native-gesture-handler";
+import Animated from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
 import { Image } from "@/components/ui/image";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
-import { client, orpc } from "@/lib/orpc";
-import { queryClient } from "@/lib/query-client";
-import { toast } from "@/lib/toast";
+import { usePressAnimation } from "@/hooks/use-press-animation";
+import { titleActions } from "@/lib/title-actions";
 
 type TitleStatus = "watchlist" | "in_progress" | "completed";
 
@@ -70,16 +63,7 @@ export function PosterCard({
     completed: completedColor,
   };
 
-  const reduceMotion = useReducedMotion();
-  const pressed = useSharedValue(0);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        scale: reduceMotion ? 1 : interpolate(pressed.get(), [0, 1], [1, 0.97]),
-      },
-    ],
-  }));
+  const { animatedStyle, gesture: pressGesture } = usePressAnimation();
 
   const handleQuickAddPress = useCallback(() => {
     if (userStatus || isAdding) return;
@@ -230,15 +214,6 @@ export function PosterCard({
     </Pressable>
   ) : null;
 
-  // Gesture for UI-thread press animation (used by both paths)
-  const pressGesture = Gesture.Tap()
-    .onBegin(() => {
-      pressed.set(withSpring(1, { damping: 15, stiffness: 300 }));
-    })
-    .onFinalize(() => {
-      pressed.set(withSpring(0, { damping: 15, stiffness: 300 }));
-    });
-
   const titleHref = `/title/${id}` as `/title/${string}`;
 
   return (
@@ -267,39 +242,14 @@ export function PosterCard({
                 <Link.MenuAction
                   title="Mark as Watching"
                   icon="play.fill"
-                  onPress={async () => {
-                    await client.titles.updateStatus({
-                      id,
-                      status: "in_progress",
-                    });
-                    toast.success("Marked as watching");
-                    queryClient.invalidateQueries({
-                      queryKey: orpc.titles.key(),
-                    });
-                    queryClient.invalidateQueries({
-                      queryKey: orpc.dashboard.key(),
-                    });
-                  }}
+                  onPress={() => titleActions.markWatching(id)}
                 />
               )}
               {type === "movie" && (
                 <Link.MenuAction
                   title="Mark as Watched"
                   icon="checkmark.circle"
-                  onPress={async () => {
-                    await client.titles.watchMovie({ id });
-                    toast.success(
-                      title
-                        ? `Marked "${title}" as watched`
-                        : "Marked as watched",
-                    );
-                    queryClient.invalidateQueries({
-                      queryKey: orpc.titles.key(),
-                    });
-                    queryClient.invalidateQueries({
-                      queryKey: orpc.dashboard.key(),
-                    });
-                  }}
+                  onPress={() => titleActions.markMovieWatched(id, title)}
                 />
               )}
               {userStatus && (
@@ -307,16 +257,7 @@ export function PosterCard({
                   title="Remove from Library"
                   icon="trash"
                   destructive
-                  onPress={async () => {
-                    await client.titles.updateStatus({ id, status: null });
-                    toast.success("Removed from library");
-                    queryClient.invalidateQueries({
-                      queryKey: orpc.titles.key(),
-                    });
-                    queryClient.invalidateQueries({
-                      queryKey: orpc.dashboard.key(),
-                    });
-                  }}
+                  onPress={() => titleActions.removeFromLibrary(id)}
                 />
               )}
             </Link.Menu>

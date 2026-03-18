@@ -7,7 +7,7 @@ import {
   horizontalListStyle,
 } from "@/components/ui/horizontal-list-spacing";
 import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
-import { usePosterActions } from "@/hooks/use-poster-actions";
+import { useTitleActions } from "@/hooks/use-title-actions";
 
 export interface PosterRowItem {
   id: string;
@@ -29,7 +29,14 @@ export function HorizontalPosterRow({
   items: PosterRowItem[];
   isLoading?: boolean;
 }) {
-  const { handleQuickAdd, addingKey } = usePosterActions();
+  const { quickAdd } = useTitleActions();
+  const handleQuickAdd = useCallback(
+    (id: string) => quickAdd.mutate({ id }),
+    [quickAdd],
+  );
+  const addingKey = quickAdd.isPending
+    ? (quickAdd.variables?.id ?? null)
+    : null;
   const keyExtractor = useCallback((item: PosterRowItem) => item.id, []);
   const renderItem = useCallback(
     ({ item }: { item: PosterRowItem }) => (

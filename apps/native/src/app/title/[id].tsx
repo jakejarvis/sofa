@@ -11,7 +11,7 @@ import {
   IconThumbUp,
   IconUsers,
 } from "@tabler/icons-react-native";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
@@ -43,11 +43,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { StarRating } from "@/components/ui/star-rating";
 import { Text } from "@/components/ui/text";
+import { useTitleActions } from "@/hooks/use-title-actions";
 import { useTitleTheme } from "@/hooks/use-title-theme";
 import { orpc } from "@/lib/orpc";
-import { queryClient } from "@/lib/query-client";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
-import { toast } from "@/lib/toast";
 
 const titleGenresContentStyle = { paddingHorizontal: 16 };
 const titleAvailabilityContentStyle = { gap: 8, paddingHorizontal: 16 };
@@ -108,65 +107,19 @@ export default function TitleDetailScreen() {
     orpc.titles.recommendations.queryOptions({ input: { id } }),
   );
 
-  const updateStatus = useMutation(
-    orpc.titles.updateStatus.mutationOptions({
-      onSuccess: (_data, { status }) => {
-        const statusMessages: Record<string, string> = {
-          watchlist: "Added to watchlist",
-          in_progress: "Marked as watching",
-          completed: "Marked as completed",
-        };
-        toast.success(
-          status
-            ? (statusMessages[status] ?? "Status updated")
-            : "Removed from library",
-        );
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
-      },
-      onError: () => toast.error("Failed to update status"),
-    }),
-  );
-
-  const updateRating = useMutation(
-    orpc.titles.updateRating.mutationOptions({
-      onSuccess: (_data, { stars }) => {
-        toast.success(
-          stars > 0
-            ? `Rated ${stars} star${stars > 1 ? "s" : ""}`
-            : "Rating removed",
-        );
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-      },
-      onError: () => toast.error("Failed to update rating"),
-    }),
-  );
-
-  const watchMovie = useMutation(
-    orpc.titles.watchMovie.mutationOptions({
-      onSuccess: () => {
-        toast.success(
-          title?.title
-            ? `Marked "${title.title}" as watched`
-            : "Marked as watched",
-        );
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
-      },
-      onError: () => toast.error("Failed to mark as watched"),
-    }),
-  );
-
-  const quickAddMutation = useMutation(
-    orpc.titles.quickAdd.mutationOptions({
-      onSuccess: () => {
-        toast.success("Added to watchlist");
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
-      },
-      onError: () => toast.error("Failed to add to watchlist"),
-    }),
-  );
+  const {
+    updateStatus,
+    updateRating,
+    watchMovie,
+    quickAdd: quickAddMutation,
+  } = useTitleActions({
+    toasts: {
+      watchMovie: () =>
+        title?.title
+          ? `Marked "${title.title}" as watched`
+          : "Marked as watched",
+    },
+  });
 
   const title = detail.data?.title;
   const palette = title?.colorPalette ?? null;

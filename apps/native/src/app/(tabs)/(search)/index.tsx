@@ -1,11 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
-import {
-  skipToken,
-  useInfiniteQuery,
-  useMutation,
-} from "@tanstack/react-query";
+import { skipToken, useInfiniteQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { RecentlyViewedList } from "@/components/search/recently-viewed-list";
@@ -16,9 +12,8 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useTitleActions } from "@/hooks/use-title-actions";
 import { orpc } from "@/lib/orpc";
-import { queryClient } from "@/lib/query-client";
-import { toast } from "@/lib/toast";
 
 export default function SearchScreen() {
   const [query, setQuery] = useState("");
@@ -36,32 +31,14 @@ export default function SearchScreen() {
     }),
   });
 
-  // Track which item is currently being added
-  const [addingId, setAddingId] = useState<string | null>(null);
+  const { quickAdd: quickAddMutation } = useTitleActions();
 
-  const quickAddMutation = useMutation(
-    orpc.titles.quickAdd.mutationOptions({
-      onSuccess: () => {
-        setAddingId(null);
-        toast.success("Added to watchlist");
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-        queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
-      },
-      onError: () => {
-        setAddingId(null);
-        toast.error("Failed to add to watchlist");
-      },
-    }),
+  const handleQuickAdd = useCallback(
+    (id: string) => {
+      quickAddMutation.mutate({ id });
+    },
+    [quickAddMutation],
   );
-
-  // Use ref for mutation.mutate to keep callback stable across renders
-  const quickAddMutateRef = useRef(quickAddMutation.mutate);
-  quickAddMutateRef.current = quickAddMutation.mutate;
-
-  const handleQuickAdd = useCallback((id: string) => {
-    setAddingId(id);
-    quickAddMutateRef.current({ id });
-  }, []);
 
   // Memoize mapped results to maintain stable references
   const allResults = useMemo<SearchResultItem[]>(
@@ -78,6 +55,10 @@ export default function SearchScreen() {
       ) ?? [],
     [searchResults.data?.pages],
   );
+
+  const addingId = quickAddMutation.isPending
+    ? (quickAddMutation.variables?.id ?? null)
+    : null;
 
   const renderItem = useCallback(
     ({ item }: { item: SearchResultItem }) => (
