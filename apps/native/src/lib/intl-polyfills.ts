@@ -9,39 +9,39 @@
  */
 
 // 1. getCanonicalLocales (no dependencies)
-import "@formatjs/intl-getcanonicallocales/polyfill";
+import "@formatjs/intl-getcanonicallocales/polyfill.js";
 // 2. Locale (depends on getCanonicalLocales)
-import "@formatjs/intl-locale/polyfill";
+import "@formatjs/intl-locale/polyfill.js";
 // 3. PluralRules (depends on Locale)
-import "@formatjs/intl-pluralrules/polyfill-force";
-import "@formatjs/intl-pluralrules/locale-data/en";
-import "@formatjs/intl-pluralrules/locale-data/fr";
-import "@formatjs/intl-pluralrules/locale-data/de";
-import "@formatjs/intl-pluralrules/locale-data/es";
-import "@formatjs/intl-pluralrules/locale-data/it";
-import "@formatjs/intl-pluralrules/locale-data/pt";
+import "@formatjs/intl-pluralrules/polyfill-force.js";
+import "@formatjs/intl-pluralrules/locale-data/en.js";
+import "@formatjs/intl-pluralrules/locale-data/fr.js";
+import "@formatjs/intl-pluralrules/locale-data/de.js";
+import "@formatjs/intl-pluralrules/locale-data/es.js";
+import "@formatjs/intl-pluralrules/locale-data/it.js";
+import "@formatjs/intl-pluralrules/locale-data/pt.js";
 // 4. NumberFormat (depends on PluralRules, Locale)
-import "@formatjs/intl-numberformat/polyfill-force";
-import "@formatjs/intl-numberformat/locale-data/en";
-import "@formatjs/intl-numberformat/locale-data/fr";
-import "@formatjs/intl-numberformat/locale-data/de";
-import "@formatjs/intl-numberformat/locale-data/es";
-import "@formatjs/intl-numberformat/locale-data/it";
-import "@formatjs/intl-numberformat/locale-data/pt";
+import "@formatjs/intl-numberformat/polyfill-force.js";
+import "@formatjs/intl-numberformat/locale-data/en.js";
+import "@formatjs/intl-numberformat/locale-data/fr.js";
+import "@formatjs/intl-numberformat/locale-data/de.js";
+import "@formatjs/intl-numberformat/locale-data/es.js";
+import "@formatjs/intl-numberformat/locale-data/it.js";
+import "@formatjs/intl-numberformat/locale-data/pt.js";
 // 5. DateTimeFormat (depends on Locale)
-import "@formatjs/intl-datetimeformat/polyfill-force";
-import "@formatjs/intl-datetimeformat/locale-data/en";
-import "@formatjs/intl-datetimeformat/locale-data/fr";
-import "@formatjs/intl-datetimeformat/locale-data/de";
-import "@formatjs/intl-datetimeformat/locale-data/es";
-import "@formatjs/intl-datetimeformat/locale-data/it";
-import "@formatjs/intl-datetimeformat/locale-data/pt";
-import "@formatjs/intl-datetimeformat/add-all-tz";
+import "@formatjs/intl-datetimeformat/polyfill-force.js";
+import "@formatjs/intl-datetimeformat/locale-data/en.js";
+import "@formatjs/intl-datetimeformat/locale-data/fr.js";
+import "@formatjs/intl-datetimeformat/locale-data/de.js";
+import "@formatjs/intl-datetimeformat/locale-data/es.js";
+import "@formatjs/intl-datetimeformat/locale-data/it.js";
+import "@formatjs/intl-datetimeformat/locale-data/pt.js";
+import "@formatjs/intl-datetimeformat/add-all-tz.js";
 // 6. RelativeTimeFormat (depends on PluralRules, Locale)
-import "@formatjs/intl-relativetimeformat/polyfill-force";
-import "@formatjs/intl-relativetimeformat/locale-data/en";
-import "@formatjs/intl-relativetimeformat/locale-data/fr";
-import "@formatjs/intl-relativetimeformat/locale-data/de";
-import "@formatjs/intl-relativetimeformat/locale-data/es";
-import "@formatjs/intl-relativetimeformat/locale-data/it";
-import "@formatjs/intl-relativetimeformat/locale-data/pt";
+import "@formatjs/intl-relativetimeformat/polyfill-force.js";
+import "@formatjs/intl-relativetimeformat/locale-data/en.js";
+import "@formatjs/intl-relativetimeformat/locale-data/fr.js";
+import "@formatjs/intl-relativetimeformat/locale-data/de.js";
+import "@formatjs/intl-relativetimeformat/locale-data/es.js";
+import "@formatjs/intl-relativetimeformat/locale-data/it.js";
+import "@formatjs/intl-relativetimeformat/locale-data/pt.js";
