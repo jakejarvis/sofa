@@ -147,14 +147,22 @@ function PeriodSelector({
     this_year: t`This Year`,
   };
 
+  const select = (
+    <PeriodSelect
+      key="select"
+      period={period}
+      onPeriodChange={onPeriodChange}
+      periodLabels={periodLabels}
+    />
+  );
+
   return (
     <span className="inline-flex items-baseline gap-1">
-      {type === "movies" ? <Trans>Movies</Trans> : <Trans>Episodes</Trans>}
-      <PeriodSelect
-        period={period}
-        onPeriodChange={onPeriodChange}
-        periodLabels={periodLabels}
-      />
+      {type === "movies" ? (
+        <Trans>Movies {select}</Trans>
+      ) : (
+        <Trans>Episodes {select}</Trans>
+      )}
     </span>
   );
 }

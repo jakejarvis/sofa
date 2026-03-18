@@ -1,4 +1,6 @@
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { i18n } from "@sofa/i18n";
 import { formatRelativeTime } from "@sofa/i18n/format";
 import {
   IconBook2,
@@ -326,13 +328,13 @@ export function IntegrationCard({
 /** Status line for webhook integrations (shows last event time). */
 export function webhookStatus(lastEventAt: string | null): string {
   return lastEventAt
-    ? `Last event ${formatRelativeTime(lastEventAt)}`
-    : "Ready \u2014 nothing received yet";
+    ? i18n._(msg`Last event ${formatRelativeTime(lastEventAt)}`)
+    : i18n._(msg`Ready — nothing received yet`);
 }
 
 /** Status line for list integrations (shows last event time). */
 export function listStatus(lastEventAt: string | null): string {
   return lastEventAt
-    ? `Last polled ${formatRelativeTime(lastEventAt)}`
-    : "Ready \u2014 not polled yet";
+    ? i18n._(msg`Last polled ${formatRelativeTime(lastEventAt)}`)
+    : i18n._(msg`Ready — not polled yet`);
 }

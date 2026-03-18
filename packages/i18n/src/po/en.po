@@ -19,18 +19,18 @@ msgid "...and {0} more"
 msgstr "...and {0} more"
 
 #. placeholder {0}: systemHealth.data.imageCache.imageCount
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:479
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:482
 msgid "{0, plural, one {# image} other {# images}}"
 msgstr "{0, plural, one {# image} other {# images}}"
 
 #. placeholder {0}: systemHealth.data.database.titleCount
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:463
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:466
 msgid "{0, plural, one {# title} other {# titles}}"
 msgstr "{0, plural, one {# title} other {# titles}}"
 
 #. placeholder {0}: displayBackups.length
 #. placeholder {1}: displayBackups.length
-#: apps/web/src/components/settings/backup-section.tsx:106
+#: apps/web/src/components/settings/backup-section.tsx:109
 msgid "{0} {1, plural, one {backup} other {backups}} stored"
 msgstr "{0} {1, plural, one {backup} other {backups}} stored"
 
@@ -110,17 +110,17 @@ msgid "{healthyCount} of {0} jobs healthy"
 msgstr "{healthyCount} of {0} jobs healthy"
 
 #: apps/native/src/components/settings/integration-card.tsx:96
-#: apps/web/src/components/settings/integration-card.tsx:104
+#: apps/web/src/components/settings/integration-card.tsx:106
 msgid "{label} connected"
 msgstr "{label} connected"
 
 #: apps/native/src/components/settings/integration-card.tsx:106
-#: apps/web/src/components/settings/integration-card.tsx:120
+#: apps/web/src/components/settings/integration-card.tsx:122
 msgid "{label} disconnected"
 msgstr "{label} disconnected"
 
 #: apps/native/src/components/settings/integration-card.tsx:116
-#: apps/web/src/components/settings/integration-card.tsx:136
+#: apps/web/src/components/settings/integration-card.tsx:138
 msgid "{label} URL regenerated"
 msgstr "{label} URL regenerated"
 
@@ -173,6 +173,10 @@ msgstr "Add a new webhook and paste the URL above"
 msgid "Add to Library"
 msgstr "Add to Library"
 
+#: apps/native/src/components/titles/status-action-button.tsx:72
+msgid "Add to watchlist"
+msgstr "Add to watchlist"
+
 #: apps/native/src/components/explore/hero-banner.tsx:157
 #: apps/native/src/components/ui/poster-card.tsx:238
 #: apps/web/src/components/title-card.tsx:146
@@ -191,18 +195,18 @@ msgid "Added to watchlist"
 msgstr "Added to watchlist"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx:353
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:451
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:496
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:454
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:499
 #: apps/web/src/components/nav-bar.tsx:235
 #: apps/web/src/components/settings/account-section.tsx:335
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/web/src/routes/_app/settings.tsx:113
+#: apps/web/src/routes/_app/settings.tsx:124
 msgid "Admin only"
 msgstr "Admin only"
 
-#: apps/native/src/app/person/[id].tsx:309
+#: apps/native/src/app/person/[id].tsx:308
 #: apps/web/src/components/people/person-hero.tsx:91
 msgid "age {age}"
 msgstr "age {age}"
@@ -228,9 +232,13 @@ msgstr "Already have an account? Sign in"
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
 msgstr "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:424
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:427
 msgid "Anonymous usage reporting"
 msgstr "Anonymous usage reporting"
+
+#: apps/web/src/routes/_app/settings.tsx:102
+msgid "App Settings"
+msgstr "App Settings"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx:378
 msgid "Application"
@@ -262,7 +270,7 @@ msgstr "Authorize Sofa to read your {0} library. No password shared."
 msgid "Automatic update checks"
 msgstr "Automatic update checks"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:280
+#: apps/web/src/components/settings/backup-schedule-section.tsx:279
 msgid "Automatically back up your database on a schedule"
 msgstr "Automatically back up your database on a schedule"
 
@@ -282,20 +290,20 @@ msgstr "Background jobs"
 msgid "Backup"
 msgstr "Backup"
 
-#: apps/web/src/components/settings/backup-section.tsx:66
+#: apps/web/src/components/settings/backup-section.tsx:69
 msgid "Backup created"
 msgstr "Backup created"
 
-#: apps/web/src/components/settings/backup-section.tsx:91
+#: apps/web/src/components/settings/backup-section.tsx:94
 msgid "Backup deleted"
 msgstr "Backup deleted"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:235
+#: apps/web/src/components/settings/backup-schedule-section.tsx:234
 msgid "Backup schedule"
 msgstr "Backup schedule"
 
 #: apps/web/src/components/settings/system-health-section.tsx:641
-#: apps/web/src/routes/_app/settings.tsx:155
+#: apps/web/src/routes/_app/settings.tsx:166
 msgid "Backups"
 msgstr "Backups"
 
@@ -326,10 +334,10 @@ msgstr "Can't reach server"
 #: apps/native/src/components/settings/integration-card.tsx:153
 #: apps/web/src/components/settings/account-section.tsx:505
 #: apps/web/src/components/settings/backup-restore-section.tsx:107
-#: apps/web/src/components/settings/backup-section.tsx:269
-#: apps/web/src/components/settings/danger-section.tsx:131
-#: apps/web/src/components/settings/danger-section.tsx:175
-#: apps/web/src/components/settings/danger-section.tsx:220
+#: apps/web/src/components/settings/backup-section.tsx:270
+#: apps/web/src/components/settings/danger-section.tsx:129
+#: apps/web/src/components/settings/danger-section.tsx:171
+#: apps/web/src/components/settings/danger-section.tsx:214
 #: apps/web/src/components/settings/imports-section.tsx:645
 #: apps/web/src/components/settings/imports-section.tsx:710
 #: apps/web/src/components/settings/imports-section.tsx:837
@@ -379,7 +387,7 @@ msgstr "Change Server"
 msgid "Check configuration"
 msgstr "Check configuration"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:510
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:513
 msgid "Check for updates"
 msgstr "Check for updates"
 
@@ -397,8 +405,8 @@ msgid "Choose how to import your {0} data."
 msgstr "Choose how to import your {0} data."
 
 #: apps/web/src/components/settings/language-section.tsx:29
-msgid "Choose your preferred display language"
-msgstr "Choose your preferred display language"
+#~ msgid "Choose your preferred display language"
+#~ msgstr "Choose your preferred display language"
 
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx:65
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx:115
@@ -439,7 +447,8 @@ msgid "Close"
 msgstr "Close"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx:63
-#: apps/web/src/components/dashboard/stats-display.tsx:230
+#: apps/native/src/components/titles/status-action-button.tsx:44
+#: apps/web/src/components/dashboard/stats-display.tsx:238
 #: apps/web/src/components/title-card.tsx:77
 #: apps/web/src/components/titles/status-button.tsx:30
 msgid "Completed"
@@ -456,7 +465,7 @@ msgid "Connect"
 msgstr "Connect"
 
 #. placeholder {0}: config.label
-#: apps/web/src/components/settings/integration-card.tsx:201
+#: apps/web/src/components/settings/integration-card.tsx:203
 msgid "Connect {0}"
 msgstr "Connect {0}"
 
@@ -478,7 +487,7 @@ msgid "Connect with {0}"
 msgstr "Connect with {0}"
 
 #: apps/native/src/app/(auth)/server-url.tsx:197
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:471
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:474
 #: apps/web/src/components/settings/system-health-section.tsx:256
 msgid "Connected"
 msgstr "Connected"
@@ -495,7 +504,7 @@ msgstr "Connected to <0>{serverHost}</0>. Tap to change."
 msgid "Connecting to server..."
 msgstr "Connecting to server..."
 
-#: apps/web/src/components/settings/integration-card.tsx:199
+#: apps/web/src/components/settings/integration-card.tsx:201
 msgid "Connecting..."
 msgstr "Connecting..."
 
@@ -520,7 +529,7 @@ msgstr "Copied"
 msgid "Copy"
 msgstr "Copy"
 
-#: apps/web/src/components/settings/integration-card.tsx:244
+#: apps/web/src/components/settings/integration-card.tsx:246
 msgid "Copy URL"
 msgstr "Copy URL"
 
@@ -528,7 +537,7 @@ msgstr "Copy URL"
 msgid "Could not load integrations"
 msgstr "Could not load integrations"
 
-#: apps/native/src/app/person/[id].tsx:217
+#: apps/native/src/app/person/[id].tsx:216
 msgid "Could not load person details"
 msgstr "Could not load person details"
 
@@ -549,7 +558,7 @@ msgstr "Create an account"
 msgid "Create your account"
 msgstr "Create your account"
 
-#: apps/web/src/components/settings/backup-section.tsx:134
+#: apps/web/src/components/settings/backup-section.tsx:137
 msgid "Creating…"
 msgstr "Creating…"
 
@@ -562,7 +571,7 @@ msgstr "Current password"
 msgid "Current password is required"
 msgstr "Current password is required"
 
-#: apps/web/src/routes/_app/settings.tsx:184
+#: apps/web/src/routes/_app/settings.tsx:195
 msgid "Danger Zone"
 msgstr "Danger Zone"
 
@@ -573,12 +582,12 @@ msgstr "Danger Zone"
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:460
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:463
 #: apps/web/src/components/settings/system-health-section.tsx:229
 msgid "Database"
 msgstr "Database"
 
-#: apps/web/src/components/settings/backup-section.tsx:123
+#: apps/web/src/components/settings/backup-section.tsx:126
 msgid "Database backups"
 msgstr "Database backups"
 
@@ -586,20 +595,20 @@ msgstr "Database backups"
 msgid "Database restored. Reloading..."
 msgstr "Database restored. Reloading..."
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:343
+#: apps/web/src/components/settings/backup-schedule-section.tsx:342
 msgid "Day:"
 msgstr "Day:"
 
-#: apps/web/src/components/settings/backup-section.tsx:249
-#: apps/web/src/components/settings/backup-section.tsx:279
+#: apps/web/src/components/settings/backup-section.tsx:250
+#: apps/web/src/components/settings/backup-section.tsx:280
 msgid "Delete"
 msgstr "Delete"
 
-#: apps/web/src/components/settings/backup-section.tsx:234
+#: apps/web/src/components/settings/backup-section.tsx:235
 msgid "Delete backup"
 msgstr "Delete backup"
 
-#: apps/web/src/components/settings/backup-section.tsx:255
+#: apps/web/src/components/settings/backup-section.tsx:256
 msgid "Delete backup?"
 msgstr "Delete backup?"
 
@@ -613,7 +622,7 @@ msgstr "Deleted {0, plural, one {# file} other {# files}}, freed {freed}"
 msgid "Device code expired. Please try again."
 msgstr "Device code expired. Please try again."
 
-#: apps/native/src/app/person/[id].tsx:308
+#: apps/native/src/app/person/[id].tsx:307
 #: apps/web/src/components/people/person-hero.tsx:91
 msgid "died at {age}"
 msgstr "died at {age}"
@@ -629,7 +638,7 @@ msgstr "Disabled"
 
 #: apps/native/src/components/settings/integration-card.tsx:155
 #: apps/native/src/components/settings/integration-card.tsx:298
-#: apps/web/src/components/settings/integration-card.tsx:272
+#: apps/web/src/components/settings/integration-card.tsx:274
 msgid "Disconnect"
 msgstr "Disconnect"
 
@@ -657,12 +666,12 @@ msgstr "Double tap to clear this filter"
 msgid "Double tap to filter by {label}"
 msgstr "Double tap to filter by {label}"
 
-#: apps/web/src/components/settings/backup-section.tsx:68
-#: apps/web/src/components/settings/backup-section.tsx:222
+#: apps/web/src/components/settings/backup-section.tsx:71
+#: apps/web/src/components/settings/backup-section.tsx:223
 msgid "Download"
 msgstr "Download"
 
-#: apps/web/src/components/settings/backup-section.tsx:213
+#: apps/web/src/components/settings/backup-section.tsx:214
 msgid "Download backup"
 msgstr "Download backup"
 
@@ -729,7 +738,6 @@ msgstr "Episode unwatched"
 msgid "Episode watched"
 msgstr "Episode watched"
 
-#: apps/web/src/components/dashboard/stats-display.tsx:152
 #: apps/web/src/components/settings/imports-section.tsx:780
 #: apps/web/src/components/titles/title-seasons.tsx:102
 msgid "Episodes"
@@ -738,6 +746,10 @@ msgstr "Episodes"
 #: apps/web/src/components/dashboard/stats-display.tsx:162
 #~ msgid "Episodes {periodSelect}"
 #~ msgstr "Episodes {periodSelect}"
+
+#: apps/web/src/components/dashboard/stats-display.tsx:164
+msgid "Episodes {select}"
+msgstr "Episodes {select}"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx:61
 msgid "Episodes this week"
@@ -787,7 +799,7 @@ msgid "Failed to connect"
 msgstr "Failed to connect"
 
 #: apps/native/src/components/settings/integration-card.tsx:99
-#: apps/web/src/components/settings/integration-card.tsx:106
+#: apps/web/src/components/settings/integration-card.tsx:108
 msgid "Failed to connect {label}"
 msgstr "Failed to connect {label}"
 
@@ -795,20 +807,20 @@ msgstr "Failed to connect {label}"
 msgid "Failed to create account"
 msgstr "Failed to create account"
 
-#: apps/web/src/components/settings/backup-section.tsx:78
+#: apps/web/src/components/settings/backup-section.tsx:81
 msgid "Failed to create backup"
 msgstr "Failed to create backup"
 
-#: apps/web/src/components/settings/backup-section.tsx:94
+#: apps/web/src/components/settings/backup-section.tsx:97
 msgid "Failed to delete backup"
 msgstr "Failed to delete backup"
 
 #: apps/native/src/components/settings/integration-card.tsx:109
-#: apps/web/src/components/settings/integration-card.tsx:123
+#: apps/web/src/components/settings/integration-card.tsx:125
 msgid "Failed to disconnect {label}"
 msgstr "Failed to disconnect {label}"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:216
+#: apps/web/src/components/settings/backup-schedule-section.tsx:215
 msgid "Failed to load backup schedule settings."
 msgstr "Failed to load backup schedule settings."
 
@@ -859,7 +871,7 @@ msgid "Failed to purge metadata cache"
 msgstr "Failed to purge metadata cache"
 
 #: apps/native/src/components/settings/integration-card.tsx:119
-#: apps/web/src/components/settings/integration-card.tsx:138
+#: apps/web/src/components/settings/integration-card.tsx:140
 msgid "Failed to regenerate {label} URL"
 msgstr "Failed to regenerate {label} URL"
 
@@ -910,15 +922,15 @@ msgstr "Failed to update rating"
 msgid "Failed to update registration setting"
 msgstr "Failed to update registration setting"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:155
+#: apps/web/src/components/settings/backup-schedule-section.tsx:154
 msgid "Failed to update retention setting"
 msgstr "Failed to update retention setting"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:157
+#: apps/web/src/components/settings/backup-schedule-section.tsx:156
 msgid "Failed to update schedule"
 msgstr "Failed to update schedule"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:153
+#: apps/web/src/components/settings/backup-schedule-section.tsx:152
 msgid "Failed to update scheduled backup setting"
 msgstr "Failed to update scheduled backup setting"
 
@@ -942,7 +954,7 @@ msgstr "Failed to upload avatar"
 msgid "Fetching your library data from {source}..."
 msgstr "Fetching your library data from {source}..."
 
-#: apps/native/src/app/person/[id].tsx:341
+#: apps/native/src/app/person/[id].tsx:340
 #: apps/web/src/components/people/filmography-grid.tsx:69
 msgid "Filmography"
 msgstr "Filmography"
@@ -959,11 +971,11 @@ msgstr "Free"
 msgid "Free up disk space by clearing cached metadata and images"
 msgstr "Free up disk space by clearing cached metadata and images"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:310
+#: apps/web/src/components/settings/backup-schedule-section.tsx:309
 msgid "Frequency"
 msgstr "Frequency"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:102
+#: apps/web/src/components/settings/backup-schedule-section.tsx:101
 msgid "Friday"
 msgstr "Friday"
 
@@ -971,8 +983,8 @@ msgstr "Friday"
 msgid "Get Started"
 msgstr "Get Started"
 
-#: apps/native/src/app/person/[id].tsx:221
-#: apps/native/src/app/person/[id].tsx:248
+#: apps/native/src/app/person/[id].tsx:220
+#: apps/native/src/app/person/[id].tsx:247
 #: apps/native/src/app/title/[id].tsx:255
 msgid "Go back"
 msgstr "Go back"
@@ -1015,7 +1027,7 @@ msgstr "Home"
 msgid "Image cache"
 msgstr "Image cache"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:476
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:479
 msgid "Image Cache"
 msgstr "Image Cache"
 
@@ -1075,7 +1087,7 @@ msgstr "Importing from {source}"
 msgid "In library"
 msgstr "In library"
 
-#: apps/web/src/components/dashboard/stats-display.tsx:222
+#: apps/web/src/components/dashboard/stats-display.tsx:230
 msgid "In Library"
 msgstr "In Library"
 
@@ -1111,7 +1123,7 @@ msgstr "Job"
 
 #. placeholder {0}: (value: string | null) => value === "0" ? t`unlimited` : value ? t`last ${value}` : null
 #. placeholder {1}: [3, 5, 7, 14, 30, 0].map((n) => ( <SelectItem key={n} value={String(n)}> {n === 0 ? t`unlimited` : t`last ${n}`} </SelectItem> ))
-#: apps/web/src/components/settings/backup-schedule-section.tsx:244
+#: apps/web/src/components/settings/backup-schedule-section.tsx:243
 msgid "Keeping <0><1><2>{0}</2></1><3>{1}</3></0> backups."
 msgstr "Keeping <0><1><2>{0}</2></1><3>{1}</3></0> backups."
 
@@ -1122,21 +1134,31 @@ msgstr "Keyboard Shortcuts"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx:403
 #: apps/native/src/app/(tabs)/(settings)/index.tsx:411
-#: apps/web/src/components/settings/language-section.tsx:26
+#: apps/web/src/components/settings/language-section.tsx:42
 msgid "Language"
 msgstr "Language"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:271
+#: apps/web/src/components/settings/backup-schedule-section.tsx:270
 msgid "last {n}"
 msgstr "last {n}"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:259
+#: apps/web/src/components/settings/backup-schedule-section.tsx:258
 msgid "last {value}"
 msgstr "last {value}"
+
+#. placeholder {0}: formatRelativeTime(lastEventAt)
+#: apps/web/src/components/settings/integration-card.tsx:331
+msgid "Last event {0}"
+msgstr "Last event {0}"
 
 #: apps/native/src/components/settings/integration-configs.ts:29
 msgid "Last event {timeAgo}"
 msgstr "Last event {timeAgo}"
+
+#. placeholder {0}: formatRelativeTime(lastEventAt)
+#: apps/web/src/components/settings/integration-card.tsx:338
+msgid "Last polled {0}"
+msgstr "Last polled {0}"
 
 #: apps/native/src/components/settings/integration-configs.ts:37
 msgid "Last polled {timeAgo}"
@@ -1170,7 +1192,7 @@ msgstr "Lost connection to import. Check status in settings."
 msgid "Manage your account and preferences"
 msgstr "Manage your account and preferences"
 
-#: apps/web/src/components/settings/backup-section.tsx:179
+#: apps/web/src/components/settings/backup-section.tsx:182
 msgid "Manual backup"
 msgstr "Manual backup"
 
@@ -1233,7 +1255,7 @@ msgstr "Marked as watching"
 msgid "Member since {memberSince}"
 msgstr "Member since {memberSince}"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:98
+#: apps/web/src/components/settings/backup-schedule-section.tsx:97
 msgid "Monday"
 msgstr "Monday"
 
@@ -1241,7 +1263,7 @@ msgstr "Monday"
 msgid "More Like This"
 msgstr "More Like This"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:538
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:541
 msgid "More Settings"
 msgstr "More Settings"
 
@@ -1253,7 +1275,6 @@ msgstr "More Settings"
 msgid "Movie"
 msgstr "Movie"
 
-#: apps/web/src/components/dashboard/stats-display.tsx:152
 #: apps/web/src/components/people/filmography-grid.tsx:59
 #: apps/web/src/components/settings/imports-section.tsx:779
 msgid "Movies"
@@ -1262,6 +1283,10 @@ msgstr "Movies"
 #: apps/web/src/components/dashboard/stats-display.tsx:161
 #~ msgid "Movies {periodSelect}"
 #~ msgstr "Movies {periodSelect}"
+
+#: apps/web/src/components/dashboard/stats-display.tsx:162
+msgid "Movies {select}"
+msgstr "Movies {select}"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx:60
 msgid "Movies this month"
@@ -1277,7 +1302,7 @@ msgstr "Name"
 msgid "Name updated"
 msgstr "Name updated"
 
-#: apps/web/src/components/settings/integration-card.tsx:299
+#: apps/web/src/components/settings/integration-card.tsx:301
 msgid "Need more help?"
 msgstr "Need more help?"
 
@@ -1297,7 +1322,7 @@ msgstr "New account creation is currently disabled."
 msgid "New accounts are not being accepted right now. Contact the admin if you need access."
 msgstr "New accounts are not being accepted right now. Contact the admin if you need access."
 
-#: apps/web/src/components/settings/backup-section.tsx:134
+#: apps/web/src/components/settings/backup-section.tsx:137
 msgid "New backup"
 msgstr "New backup"
 
@@ -1315,7 +1340,7 @@ msgstr "New password must be at least 8 characters"
 msgid "Newest"
 msgstr "Newest"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:132
+#: apps/web/src/components/settings/backup-schedule-section.tsx:131
 msgid "Next backup {distance}"
 msgstr "Next backup {distance}"
 
@@ -1327,7 +1352,7 @@ msgstr "Next Episode"
 msgid "Next run"
 msgstr "Next run"
 
-#: apps/web/src/components/settings/backup-section.tsx:107
+#: apps/web/src/components/settings/backup-section.tsx:110
 #: apps/web/src/components/settings/system-health-section.tsx:662
 msgid "No backups yet"
 msgstr "No backups yet"
@@ -1352,7 +1377,7 @@ msgid "No titles found for this genre."
 msgstr "No titles found for this genre."
 
 #: apps/native/src/components/settings/integration-card.tsx:194
-#: apps/web/src/components/settings/integration-card.tsx:174
+#: apps/web/src/components/settings/integration-card.tsx:176
 #: apps/web/src/components/settings/system-health-section.tsx:249
 msgid "Not configured"
 msgstr "Not configured"
@@ -1369,7 +1394,7 @@ msgstr "On Watchlist"
 msgid "Open {source} to enter code"
 msgstr "Open {source} to enter code"
 
-#: apps/web/src/components/settings/integration-card.tsx:306
+#: apps/web/src/components/settings/integration-card.tsx:308
 msgid "Open docs"
 msgstr "Open docs"
 
@@ -1381,7 +1406,7 @@ msgstr "Open Emby, go to <0>Settings > Webhooks</0>"
 msgid "Open Emby, go to Settings > Webhooks"
 msgstr "Open Emby, go to Settings > Webhooks"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:545
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:548
 msgid "Open in browser…"
 msgstr "Open in browser…"
 
@@ -1401,7 +1426,7 @@ msgstr "Open Radarr, go to <0>Settings > Import Lists</0>"
 msgid "Open Radarr, go to Settings > Import Lists"
 msgstr "Open Radarr, go to Settings > Import Lists"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:499
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:502
 #: apps/web/src/components/settings/registration-section.tsx:58
 msgid "Open registration"
 msgstr "Open registration"
@@ -1464,7 +1489,7 @@ msgstr "Periodically check GitHub for new Sofa releases"
 msgid "Person"
 msgstr "Person"
 
-#: apps/native/src/app/person/[id].tsx:244
+#: apps/native/src/app/person/[id].tsx:243
 #: apps/web/src/routes/_app/people.$id.tsx:52
 msgid "Person not found"
 msgstr "Person not found"
@@ -1483,7 +1508,7 @@ msgstr "Popular Movies"
 msgid "Popular TV Shows"
 msgstr "Popular TV Shows"
 
-#: apps/web/src/components/settings/backup-section.tsx:178
+#: apps/web/src/components/settings/backup-section.tsx:181
 msgid "Pre-restore backup"
 msgstr "Pre-restore backup"
 
@@ -1501,30 +1526,30 @@ msgstr "Profile picture removed"
 msgid "Profile picture updated"
 msgstr "Profile picture updated"
 
-#: apps/web/src/components/settings/danger-section.tsx:202
-#: apps/web/src/components/settings/danger-section.tsx:226
+#: apps/web/src/components/settings/danger-section.tsx:196
+#: apps/web/src/components/settings/danger-section.tsx:220
 msgid "Purge all"
 msgstr "Purge all"
 
-#: apps/web/src/components/settings/danger-section.tsx:208
+#: apps/web/src/components/settings/danger-section.tsx:202
 msgid "Purge all caches?"
 msgstr "Purge all caches?"
 
-#: apps/web/src/components/settings/danger-section.tsx:164
+#: apps/web/src/components/settings/danger-section.tsx:160
 msgid "Purge image cache?"
 msgstr "Purge image cache?"
 
-#: apps/web/src/components/settings/danger-section.tsx:158
-#: apps/web/src/components/settings/danger-section.tsx:181
+#: apps/web/src/components/settings/danger-section.tsx:154
+#: apps/web/src/components/settings/danger-section.tsx:177
 msgid "Purge images"
 msgstr "Purge images"
 
-#: apps/web/src/components/settings/danger-section.tsx:113
-#: apps/web/src/components/settings/danger-section.tsx:137
+#: apps/web/src/components/settings/danger-section.tsx:111
+#: apps/web/src/components/settings/danger-section.tsx:135
 msgid "Purge metadata"
 msgstr "Purge metadata"
 
-#: apps/web/src/components/settings/danger-section.tsx:119
+#: apps/web/src/components/settings/danger-section.tsx:117
 msgid "Purge metadata cache?"
 msgstr "Purge metadata cache?"
 
@@ -1541,9 +1566,9 @@ msgstr "Purged {0, plural, one {# stale title} other {# stale titles}} and {1, p
 msgid "Purged {0, plural, one {# title} other {# titles}}, {1, plural, one {# person} other {# persons}}, {2, plural, one {# file} other {# files}} ({freed} freed)"
 msgstr "Purged {0, plural, one {# title} other {# titles}}, {1, plural, one {# person} other {# persons}}, {2, plural, one {# file} other {# files}} ({freed} freed)"
 
-#: apps/web/src/components/settings/danger-section.tsx:111
-#: apps/web/src/components/settings/danger-section.tsx:156
-#: apps/web/src/components/settings/danger-section.tsx:200
+#: apps/web/src/components/settings/danger-section.tsx:109
+#: apps/web/src/components/settings/danger-section.tsx:152
+#: apps/web/src/components/settings/danger-section.tsx:194
 msgid "Purging..."
 msgstr "Purging..."
 
@@ -1594,10 +1619,12 @@ msgid "Read more"
 msgstr "Read more"
 
 #: apps/native/src/components/settings/integration-configs.ts:39
+#: apps/web/src/components/settings/integration-card.tsx:339
 msgid "Ready — not polled yet"
 msgstr "Ready — not polled yet"
 
 #: apps/native/src/components/settings/integration-configs.ts:31
+#: apps/web/src/components/settings/integration-card.tsx:332
 msgid "Ready — nothing received yet"
 msgstr "Ready — nothing received yet"
 
@@ -1641,7 +1668,7 @@ msgid "Regenerate"
 msgstr "Regenerate"
 
 #: apps/native/src/components/settings/integration-card.tsx:135
-#: apps/web/src/components/settings/integration-card.tsx:262
+#: apps/web/src/components/settings/integration-card.tsx:264
 msgid "Regenerate URL"
 msgstr "Regenerate URL"
 
@@ -1673,6 +1700,7 @@ msgstr "Registration opened"
 msgid "Remove"
 msgstr "Remove"
 
+#: apps/native/src/components/titles/status-action-button.tsx:101
 #: apps/web/src/components/titles/status-button.tsx:66
 msgid "Remove from library"
 msgstr "Remove from library"
@@ -1764,7 +1792,7 @@ msgstr "Review what was found and choose what to import."
 msgid "Run now"
 msgstr "Run now"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:103
+#: apps/web/src/components/settings/backup-schedule-section.tsx:102
 msgid "Saturday"
 msgstr "Saturday"
 
@@ -1784,19 +1812,19 @@ msgstr "Scene not found"
 msgid "Schedule"
 msgstr "Schedule"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:202
+#: apps/web/src/components/settings/backup-schedule-section.tsx:201
 msgid "Schedule updated"
 msgstr "Schedule updated"
 
-#: apps/web/src/components/settings/backup-section.tsx:176
+#: apps/web/src/components/settings/backup-section.tsx:179
 msgid "Scheduled backup"
 msgstr "Scheduled backup"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:179
+#: apps/web/src/components/settings/backup-schedule-section.tsx:178
 msgid "Scheduled backups disabled"
 msgstr "Scheduled backups disabled"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:178
+#: apps/web/src/components/settings/backup-schedule-section.tsx:177
 msgid "Scheduled backups enabled"
 msgstr "Scheduled backups enabled"
 
@@ -1843,8 +1871,8 @@ msgstr "Season watched"
 msgid "Seasons"
 msgstr "Seasons"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:494
-#: apps/web/src/routes/_app/settings.tsx:129
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:497
+#: apps/web/src/routes/_app/settings.tsx:140
 msgid "Security"
 msgstr "Security"
 
@@ -1852,11 +1880,11 @@ msgstr "Security"
 msgid "Self-hosted movie & TV tracker"
 msgstr "Self-hosted movie & TV tracker"
 
-#: apps/web/src/routes/_app/settings.tsx:110
+#: apps/web/src/routes/_app/settings.tsx:121
 msgid "Server"
 msgstr "Server"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:449
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:452
 msgid "Server Health"
 msgstr "Server Health"
 
@@ -1883,7 +1911,7 @@ msgid "Settings"
 msgstr "Settings"
 
 #: apps/native/src/components/settings/integration-card.tsx:319
-#: apps/web/src/components/settings/integration-card.tsx:286
+#: apps/web/src/components/settings/integration-card.tsx:288
 msgid "Setup instructions"
 msgstr "Setup instructions"
 
@@ -1966,7 +1994,7 @@ msgid "Sofa will automatically log movies and episodes when you finish watching 
 msgstr "Sofa will automatically log movies and episodes when you finish watching them"
 
 #: apps/native/src/app/change-password.tsx:81
-#: apps/native/src/app/person/[id].tsx:214
+#: apps/native/src/app/person/[id].tsx:213
 #: apps/web/src/components/settings/account-section.tsx:417
 #: apps/web/src/routes/__root.tsx:143
 msgid "Something went wrong"
@@ -1997,7 +2025,7 @@ msgstr "Start tracking movies and shows"
 msgid "Start tracking your watches"
 msgstr "Start tracking your watches"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:389
+#: apps/web/src/components/settings/backup-schedule-section.tsx:388
 msgid "Starting at"
 msgstr "Starting at"
 
@@ -2017,12 +2045,12 @@ msgstr "Storage"
 msgid "Stream"
 msgstr "Stream"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:97
+#: apps/web/src/components/settings/backup-schedule-section.tsx:96
 msgid "Sunday"
 msgstr "Sunday"
 
 #. placeholder {0}: info.name
-#: apps/web/src/components/settings/language-section.tsx:44
+#: apps/web/src/components/settings/language-section.tsx:69
 msgid "Switch to {0}"
 msgstr "Switch to {0}"
 
@@ -2050,8 +2078,8 @@ msgstr "This Month"
 msgid "This page was left on the cutting room floor. It may have been moved, removed, or never made it past the screenplay."
 msgstr "This page was left on the cutting room floor. It may have been moved, removed, or never made it past the screenplay."
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:603
-#: apps/web/src/routes/_app/settings.tsx:74
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:606
+#: apps/web/src/routes/_app/settings.tsx:75
 #: apps/web/src/routes/setup.tsx:187
 msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
 msgstr "This product uses the TMDB API but is not endorsed or certified by TMDB."
@@ -2060,15 +2088,15 @@ msgstr "This product uses the TMDB API but is not endorsed or certified by TMDB.
 msgid "This Week"
 msgstr "This Week"
 
-#: apps/web/src/components/settings/danger-section.tsx:167
+#: apps/web/src/components/settings/danger-section.tsx:163
 msgid "This will delete all cached TMDB images from disk. Images will be re-downloaded automatically as needed."
 msgstr "This will delete all cached TMDB images from disk. Images will be re-downloaded automatically as needed."
 
-#: apps/web/src/components/settings/danger-section.tsx:211
+#: apps/web/src/components/settings/danger-section.tsx:205
 msgid "This will delete all un-enriched stub titles and all cached images from disk. Everything will be re-imported and re-downloaded as needed."
 msgstr "This will delete all un-enriched stub titles and all cached images from disk. Everything will be re-imported and re-downloaded as needed."
 
-#: apps/web/src/components/settings/danger-section.tsx:122
+#: apps/web/src/components/settings/danger-section.tsx:120
 msgid "This will delete un-enriched stub titles that aren't in any user's library and clean up orphaned person records. Deleted titles will be re-imported if accessed again."
 msgstr "This will delete un-enriched stub titles that aren't in any user's library and clean up orphaned person records. Deleted titles will be re-imported if accessed again."
 
@@ -2081,7 +2109,7 @@ msgid "This will mark every episode of this show as watched. You can undo this l
 msgstr "This will mark every episode of this show as watched. You can undo this later by unmarking individual seasons."
 
 #. placeholder {0}: formatBackupDate(backup.createdAt)
-#: apps/web/src/components/settings/backup-section.tsx:258
+#: apps/web/src/components/settings/backup-section.tsx:259
 msgid "This will permanently delete the backup from <0>{0}</0>. This cannot be undone."
 msgstr "This will permanently delete the backup from <0>{0}</0>. This cannot be undone."
 
@@ -2098,11 +2126,11 @@ msgstr "This will replace your entire database with the uploaded file. A safety 
 msgid "This Year"
 msgstr "This Year"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:101
+#: apps/web/src/components/settings/backup-schedule-section.tsx:100
 msgid "Thursday"
 msgstr "Thursday"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:391
+#: apps/web/src/components/settings/backup-schedule-section.tsx:390
 msgid "Time:"
 msgstr "Time:"
 
@@ -2133,7 +2161,7 @@ msgstr "Toggle automatic update checks"
 msgid "Toggle open registration"
 msgstr "Toggle open registration"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:291
+#: apps/web/src/components/settings/backup-schedule-section.tsx:290
 msgid "Toggle scheduled backups"
 msgstr "Toggle scheduled backups"
 
@@ -2163,7 +2191,7 @@ msgstr "Trigger job"
 msgid "Try again"
 msgstr "Try again"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:99
+#: apps/web/src/components/settings/backup-schedule-section.tsx:98
 msgid "Tuesday"
 msgstr "Tuesday"
 
@@ -2187,8 +2215,8 @@ msgstr "TV show"
 msgid "unknown"
 msgstr "unknown"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:257
-#: apps/web/src/components/settings/backup-schedule-section.tsx:271
+#: apps/web/src/components/settings/backup-schedule-section.tsx:256
+#: apps/web/src/components/settings/backup-schedule-section.tsx:270
 msgid "unlimited"
 msgstr "unlimited"
 
@@ -2219,7 +2247,7 @@ msgid "Up next"
 msgstr "Up next"
 
 #. placeholder {0}: updateCheck.data.updateCheck.latestVersion
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:525
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:528
 msgid "Update available: {0}"
 msgstr "Update available: {0}"
 
@@ -2327,17 +2355,22 @@ msgstr "Watched all of {seasonName}"
 msgid "Watched S{seasonNum} E{epNum}"
 msgstr "Watched S{seasonNum} E{epNum}"
 
+#: apps/native/src/components/titles/status-action-button.tsx:42
 #: apps/web/src/components/title-card.tsx:72
 #: apps/web/src/components/titles/status-button.tsx:19
 msgid "Watching"
 msgstr "Watching"
 
-#: apps/native/src/components/titles/status-action-button.tsx:80
+#: apps/native/src/components/titles/status-action-button.tsx:82
 #: apps/web/src/components/settings/imports-section.tsx:781
 #: apps/web/src/components/settings/imports-section.tsx:807
 #: apps/web/src/components/titles/status-button.tsx:55
 msgid "Watchlist"
 msgstr "Watchlist"
+
+#: apps/native/src/components/titles/status-action-button.tsx:40
+msgid "Watchlisted"
+msgstr "Watchlisted"
 
 #: apps/native/src/components/settings/integration-configs.ts:50
 #: apps/native/src/components/settings/integration-configs.ts:67
@@ -2345,7 +2378,7 @@ msgstr "Watchlist"
 msgid "Webhook URL"
 msgstr "Webhook URL"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:100
+#: apps/web/src/components/settings/backup-schedule-section.tsx:99
 msgid "Wednesday"
 msgstr "Wednesday"
 

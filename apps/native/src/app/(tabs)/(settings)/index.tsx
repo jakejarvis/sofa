@@ -416,9 +416,11 @@ export default function SettingsScreen() {
               label: info.nativeName,
             }))}
             onSelect={(locale) => {
-              setPersistedLocale(locale as SupportedLocale);
-              activateLocale(locale as SupportedLocale);
               setLanguageModalOpen(false);
+              activateLocale(locale as SupportedLocale).then(
+                () => setPersistedLocale(locale as SupportedLocale),
+                () => {},
+              );
             }}
           />
           <SettingsRow
