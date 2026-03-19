@@ -1,4 +1,7 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useId, useMemo } from "react";
+import { useCallback, useState } from "react";
+import { StyleSheet, View, type LayoutChangeEvent } from "react-native";
+import Svg, { Defs, LinearGradient, Path, Stop } from "react-native-svg";
 
 interface SparklineProps {
   data: Array<{ bucket: string; count: number }>;
@@ -21,12 +24,14 @@ function computeMonotonePath(
   const n = points.length;
   if (n < 2) return null;
 
+  // Step 1: compute secants between adjacent points
   const deltas: number[] = [];
   for (let k = 0; k < n - 1; k++) {
     const dx = points[k + 1].x - points[k].x;
     deltas[k] = dx === 0 ? 0 : (points[k + 1].y - points[k].y) / dx;
   }
 
+  // Step 2: compute initial tangent slopes
   const tangents: number[] = Array.from({ length: n });
   tangents[0] = deltas[0];
   tangents[n - 1] = deltas[n - 2];
@@ -38,6 +43,7 @@ function computeMonotonePath(
     }
   }
 
+  // Step 3: Fritsch-Carlson monotonicity fix
   for (let k = 0; k < n - 1; k++) {
     if (deltas[k] === 0) {
       tangents[k] = 0;
@@ -54,6 +60,7 @@ function computeMonotonePath(
     }
   }
 
+  // Step 4: build SVG path with cubic Bezier segments
   let strokePath = `M${points[0].x},${points[0].y}`;
   for (let k = 0; k < n - 1; k++) {
     const dx = points[k + 1].x - points[k].x;
@@ -64,6 +71,7 @@ function computeMonotonePath(
     strokePath += ` C${cp1x},${cp1y} ${cp2x},${cp2y} ${points[k + 1].x},${points[k + 1].y}`;
   }
 
+  // Close the area path along the bottom edge
   const areaPath = `${strokePath} L${points[n - 1].x},${height} L${points[0].x},${height} Z`;
 
   return { strokePath, areaPath };
@@ -72,25 +80,17 @@ function computeMonotonePath(
 export function Sparkline({ data, color }: SparklineProps) {
   const uniqueId = useId();
   const gradientId = `sparkline-${uniqueId.replace(/:/g, "")}`;
-  const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const observer = new ResizeObserver(([entry]) => {
-      const { width, height } = entry.contentRect;
-      if (width > 0 && height > 0) {
-        setSize({ width, height });
-      }
-    });
-
-    observer.observe(el);
-    return () => observer.disconnect();
+  const handleLayout = useCallback((event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    if (width > 0 && height > 0) {
+      setSize({ width, height });
+    }
   }, []);
 
   const paths = useMemo(() => {
+    if (!data.some((d) => d.count > 0)) return null;
     if (size.width === 0 || size.height === 0) return null;
 
     const counts = data.map((d) => d.count);
@@ -112,28 +112,32 @@ export function Sparkline({ data, color }: SparklineProps) {
   if (!data.some((d) => d.count > 0)) return null;
 
   return (
-    <div
-      ref={containerRef}
-      className={`pointer-events-none absolute inset-0 overflow-hidden ${color}`}
-    >
+    <View style={StyleSheet.absoluteFill} onLayout={handleLayout} pointerEvents="none">
       {paths && (
-        <svg width={size.width} height={size.height}>
-          <defs>
-            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="currentColor" stopOpacity={0.08} />
-              <stop offset="100%" stopColor="currentColor" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <path d={paths.areaPath} fill={`url(#${gradientId})`} />
-          <path
+        <Svg width={size.width} height={size.height}>
+          <Defs>
+            <LinearGradient
+              id={gradientId}
+              x1="0"
+              y1="0"
+              x2="0"
+              y2={String(size.height)}
+              gradientUnits="userSpaceOnUse"
+            >
+              <Stop offset="0" stopColor={color} stopOpacity={0.08} />
+              <Stop offset="1" stopColor={color} stopOpacity={0} />
+            </LinearGradient>
+          </Defs>
+          <Path d={paths.areaPath} fill={`url(#${gradientId})`} />
+          <Path
             d={paths.strokePath}
             fill="none"
-            stroke="currentColor"
+            stroke={color}
             strokeWidth={1}
             strokeOpacity={0.15}
           />
-        </svg>
+        </Svg>
       )}
-    </div>
+    </View>
   );
 }

@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { IconCheck, IconLibrary, IconMovie, IconPlayerPlay } from "@tabler/icons-react";
+import { IconBooks, IconCheck, IconDeviceTvOld, IconMovie } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
-import { Suspense, lazy, useState } from "react";
+import { useState } from "react";
 
 import {
   Select,
@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
 import type { DashboardStats, HistoryBucket, TimePeriod } from "@sofa/api/schemas";
 
-const Sparkline = lazy(() => import("./sparkline").then((m) => ({ default: m.Sparkline })));
+import { Sparkline } from "./sparkline";
 
 function StatCardSkeleton() {
   return (
@@ -66,11 +66,7 @@ function StatCard({
       className="animate-stagger-item border-border/30 bg-card/50 relative overflow-hidden rounded-xl border p-4"
       style={{ "--stagger-index": index } as React.CSSProperties}
     >
-      {sparklineData && (
-        <Suspense>
-          <Sparkline data={sparklineData} color={color} />
-        </Suspense>
-      )}
+      {sparklineData && <Sparkline data={sparklineData} color={color} />}
       <div className="relative z-10 flex items-center gap-2">
         <div className={`flex h-6 w-6 items-center justify-center rounded-md ${bgColor}`}>
           <Icon aria-hidden={true} className={`size-[13px] ${color}`} />
@@ -192,7 +188,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         }
       />
       <StatCard
-        icon={IconPlayerPlay}
+        icon={IconDeviceTvOld}
         color="text-status-watching"
         bgColor="bg-status-watching/10"
         value={episodeCount}
@@ -207,7 +203,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         }
       />
       <StatCard
-        icon={IconLibrary}
+        icon={IconBooks}
         color="text-status-watchlist"
         bgColor="bg-status-watchlist/10"
         value={stats.librarySize}

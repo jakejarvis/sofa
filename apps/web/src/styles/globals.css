@@ -123,6 +123,12 @@
     cursor: pointer;
   }
 
+  /* Text selection */
+  ::selection {
+    background: oklch(0.8 0.14 65 / 50%);
+    color: oklch(0.93 0.015 80);
+  }
+
   /* Scrollbar styling */
   ::-webkit-scrollbar {
     width: 6px;

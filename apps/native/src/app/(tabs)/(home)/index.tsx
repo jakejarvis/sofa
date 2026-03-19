@@ -1,11 +1,19 @@
 import { useLingui } from "@lingui/react/macro";
 import { FlashList } from "@shopify/flash-list";
-import { IconBooks, IconPlayerPlay, IconThumbUp } from "@tabler/icons-react-native";
+import {
+  IconBooks,
+  IconCheck,
+  IconDeviceTvOld,
+  IconMovie,
+  IconPlayerPlay,
+  IconThumbUp,
+} from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useCallback, useMemo } from "react";
+import { useCallback, useState } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useCSSVariable } from "uniwind";
 
 import { ContinueWatchingCard } from "@/components/dashboard/continue-watching-card";
 import { HorizontalPosterRow } from "@/components/dashboard/horizontal-poster-row";
@@ -20,6 +28,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { authClient } from "@/lib/server";
+import type { TimePeriod } from "@sofa/api/schemas";
 
 const dashboardContentContainerStyle = {
   paddingTop: 8,
@@ -31,12 +40,37 @@ export default function DashboardScreen() {
   const { push } = useRouter();
   authClient.useSession();
 
+  const [moviePeriod, setMoviePeriod] = useState<TimePeriod>("this_month");
+  const [episodePeriod, setEpisodePeriod] = useState<TimePeriod>("this_week");
+
+  const [primaryColor, watchingColor, watchlistColor, completedColor] = useCSSVariable([
+    "--color-primary",
+    "--color-status-watching",
+    "--color-status-watchlist",
+    "--color-status-completed",
+  ]) as [string, string, string, string];
+
   const stats = useQuery(orpc.dashboard.stats.queryOptions());
+  const movieHistory = useQuery(
+    orpc.dashboard.watchHistory.queryOptions({
+      input: { type: "movie", period: moviePeriod },
+    }),
+  );
+  const episodeHistory = useQuery(
+    orpc.dashboard.watchHistory.queryOptions({
+      input: { type: "episode", period: episodePeriod },
+    }),
+  );
   const continueWatching = useQuery(orpc.dashboard.continueWatching.queryOptions());
   const library = useQuery(orpc.dashboard.library.queryOptions({ input: {} }));
   const recommendations = useQuery(orpc.dashboard.recommendations.queryOptions());
 
-  const isRefreshing = stats.isRefetching || continueWatching.isRefetching || library.isRefetching;
+  const isRefreshing =
+    stats.isRefetching ||
+    continueWatching.isRefetching ||
+    library.isRefetching ||
+    movieHistory.isRefetching ||
+    episodeHistory.isRefetching;
 
   const onRefresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
@@ -46,22 +80,16 @@ export default function DashboardScreen() {
   const hasContinueWatching = (continueWatching.data?.items?.length ?? 0) > 0;
   const hasRecommendations = (recommendations.data?.items?.length ?? 0) > 0;
 
-  const statsData = useMemo(
-    () => [
-      { label: t`Movies this month`, value: stats.data?.moviesThisMonth },
-      { label: t`Episodes this week`, value: stats.data?.episodesThisWeek },
-      { label: t`In library`, value: stats.data?.librarySize },
-      { label: t`Completed`, value: stats.data?.completed },
-    ],
-    [stats.data, t],
-  );
+  const movieCount = movieHistory.data?.count ?? stats.data?.moviesThisMonth;
+  const episodeCount = episodeHistory.data?.count ?? stats.data?.episodesThisWeek;
 
-  const renderStatItem = useCallback(
-    ({ item }: { item: (typeof statsData)[number] }) => (
-      <StatsCard label={item.label} value={item.value} />
-    ),
-    [],
-  );
+  const periodLabels: Record<TimePeriod, string> = {
+    today: t`today`,
+    this_week: t`this week`,
+    this_month: t`this month`,
+    this_year: t`this year`,
+  };
+
   const renderContinueWatchingItem = useCallback(
     ({ item }: { item: NonNullable<typeof continueWatching.data>["items"][number] }) => (
       <ContinueWatchingCard item={item} />
@@ -77,19 +105,53 @@ export default function DashboardScreen() {
       scrollToOverflowEnabled
       refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
     >
-      <View className="gap-8">
-        {/* Stats */}
-        <Animated.View entering={FadeInDown.duration(300).delay(100)}>
-          <FlashList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={statsData}
-            keyExtractor={(item) => item.label}
-            renderItem={renderStatItem}
-            ItemSeparatorComponent={HorizontalListSeparator}
-            contentContainerStyle={horizontalListContentStyle}
-            style={horizontalListStyle}
-          />
+      <View className="gap-6">
+        {/* Stats Grid */}
+        <Animated.View entering={FadeInDown.duration(300).delay(100)} className="px-4">
+          <View className="gap-3">
+            <View className="flex-row gap-3">
+              <StatsCard
+                label={t`Movies ${periodLabels[moviePeriod]}`}
+                value={movieCount}
+                icon={IconMovie}
+                color="text-primary"
+                tintColor={primaryColor}
+                bgColor="bg-primary/10"
+                sparklineData={movieHistory.data?.history}
+                period={moviePeriod}
+                onPeriodChange={setMoviePeriod}
+              />
+              <StatsCard
+                label={t`Episodes ${periodLabels[episodePeriod]}`}
+                value={episodeCount}
+                icon={IconDeviceTvOld}
+                color="text-status-watching"
+                tintColor={watchingColor}
+                bgColor="bg-status-watching/10"
+                sparklineData={episodeHistory.data?.history}
+                period={episodePeriod}
+                onPeriodChange={setEpisodePeriod}
+              />
+            </View>
+            <View className="flex-row gap-3">
+              <StatsCard
+                label={t`In library`}
+                value={stats.data?.librarySize}
+                icon={IconBooks}
+                color="text-status-watchlist"
+                tintColor={watchlistColor}
+                bgColor="bg-status-watchlist/10"
+              />
+              <StatsCard
+                label={t`Completed`}
+                value={stats.data?.completed}
+                icon={IconCheck}
+                color="text-status-completed"
+                tintColor={completedColor}
+                bgColor="bg-status-completed/10"
+              />
+            </View>
+          </View>
         </Animated.View>
 
         {/* Continue Watching */}
