@@ -16,7 +16,7 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
 
-import { ModalStackHeader } from "@/components/navigation/modal-stack-header";
+import { ModalLayout } from "@/components/navigation/modal-layout";
 import { ExpandableText } from "@/components/ui/expandable-text";
 import { Image } from "@/components/ui/image";
 import { PosterCard } from "@/components/ui/poster-card";
@@ -140,12 +140,8 @@ export default function PersonDetailScreen() {
 
   if (isPending) {
     return (
-      <>
-        <ModalStackHeader />
-        <View
-          className="bg-background flex-1 items-center"
-          style={{ paddingTop: headerHeight + 24 }}
-        >
+      <ModalLayout>
+        <View className="flex-1 items-center" style={{ paddingTop: headerHeight + 24 }}>
           {/* Profile photo skeleton */}
           <Skeleton width={120} height={120} borderRadius={60} />
           {/* Name skeleton */}
@@ -159,18 +155,14 @@ export default function PersonDetailScreen() {
             <Skeleton width="60%" height={14} />
           </View>
         </View>
-      </>
+      </ModalLayout>
     );
   }
 
   if (isError && !data) {
     return (
-      <>
-        <ModalStackHeader />
-        <View
-          className="bg-background flex-1 items-center justify-center"
-          style={{ paddingTop: insets.top }}
-        >
+      <ModalLayout>
+        <View className="flex-1 items-center justify-center" style={{ paddingTop: insets.top }}>
           <Animated.View entering={FadeIn.duration(400)} className="items-center">
             <IconAlertTriangle size={48} color={mutedForeground} />
             <Text className="font-display text-foreground mt-3 text-xl">
@@ -186,18 +178,14 @@ export default function PersonDetailScreen() {
             </Pressable>
           </Animated.View>
         </View>
-      </>
+      </ModalLayout>
     );
   }
 
   if (!person) {
     return (
-      <>
-        <ModalStackHeader />
-        <View
-          className="bg-background flex-1 items-center justify-center"
-          style={{ paddingTop: insets.top }}
-        >
+      <ModalLayout>
+        <View className="flex-1 items-center justify-center" style={{ paddingTop: insets.top }}>
           <Animated.View entering={FadeIn.duration(400)} className="items-center">
             <IconUser size={48} color={mutedForeground} />
             <Text className="font-display text-foreground mt-3 text-xl">
@@ -210,14 +198,12 @@ export default function PersonDetailScreen() {
             </Pressable>
           </Animated.View>
         </View>
-      </>
+      </ModalLayout>
     );
   }
 
   const listHeader = (
     <>
-      <ModalStackHeader />
-
       {/* Profile hero */}
       <Animated.View
         entering={FadeIn.duration(400)}
@@ -297,7 +283,7 @@ export default function PersonDetailScreen() {
   );
 
   return (
-    <View className="bg-background flex-1" collapsable={false}>
+    <ModalLayout>
       <FlashList
         data={filmography}
         keyExtractor={(item) => item.titleId}
@@ -324,6 +310,6 @@ export default function PersonDetailScreen() {
           ) : null
         }
       />
-    </View>
+    </ModalLayout>
   );
 }
