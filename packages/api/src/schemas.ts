@@ -197,7 +197,7 @@ export const UpdateScheduleInput = z
 // ─── Account inputs ────────────────────────────────────────────
 
 export const UpdateNameInput = z.object({
-  name: z.string().min(1).describe("New display name"),
+  name: z.string().min(1).max(100).describe("New display name"),
 });
 
 export const UploadAvatarInput = z

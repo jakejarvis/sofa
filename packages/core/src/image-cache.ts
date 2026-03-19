@@ -44,20 +44,41 @@ export async function readCachedImage(
   return Buffer.from(await file.arrayBuffer());
 }
 
+const FETCH_TIMEOUT_MS = 10_000;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB
+
 async function fetchRemoteImage(
   tmdbPath: string,
   category: ImageCategory,
 ): Promise<{ buffer: Buffer; contentType: string } | null> {
   const url = tmdbCdnImageUrl(tmdbPath, category) ?? `${TMDB_IMAGE_BASE_URL}${tmdbPath}`;
 
-  const res = await globalThis.fetch(url);
+  let res: Response;
+  try {
+    res = await globalThis.fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+  } catch (err) {
+    log.warn(`Fetch error: ${url} -> ${err instanceof Error ? err.message : err}`);
+    return null;
+  }
   if (!res.ok) {
     log.warn(`Fetch failed: ${url} -> ${res.status}`);
     return null;
   }
 
+  const contentLength = Number(res.headers.get("content-length") || "0");
+  if (contentLength > MAX_IMAGE_BYTES) {
+    log.warn(`Image too large: ${url} -> ${contentLength} bytes`);
+    return null;
+  }
+
+  const buffer = Buffer.from(await res.arrayBuffer());
+  if (buffer.length > MAX_IMAGE_BYTES) {
+    log.warn(`Image too large after download: ${url} -> ${buffer.length} bytes`);
+    return null;
+  }
+
   return {
-    buffer: Buffer.from(await res.arrayBuffer()),
+    buffer,
     contentType: res.headers.get("content-type") || "image/jpeg",
   };
 }

@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { renameSync, unlinkSync } from "node:fs";
+import { renameSync, unlinkSync, closeSync, openSync, readSync } from "node:fs";
 import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 
@@ -97,7 +97,22 @@ function unlinkIfExistsSync(filePath: string): void {
   }
 }
 
+const SQLITE_MAGIC = "SQLite format 3\0";
+
 function validateBackupDatabase(filePath: string): void {
+  // Check SQLite magic bytes before opening with Database() to avoid
+  // passing arbitrary files to the SQLite parser.
+  const header = Buffer.alloc(16);
+  const fd = openSync(filePath, "r");
+  try {
+    readSync(fd, header, 0, 16, 0);
+  } finally {
+    closeSync(fd);
+  }
+  if (header.toString("ascii", 0, 16) !== SQLITE_MAGIC) {
+    throw new Error("Not a valid SQLite database file");
+  }
+
   const testDb = new Database(filePath, { readonly: true });
   try {
     const integrityRows = testDb.query("PRAGMA integrity_check").all() as {

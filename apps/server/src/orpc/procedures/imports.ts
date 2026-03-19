@@ -20,6 +20,9 @@ import { authed } from "../middleware";
 
 const log = createLogger("imports");
 
+const MAX_SSE_PER_USER = 3;
+const activeSSEConnections = new Map<string, number>();
+
 export const parseFile = os.imports.parseFile.use(authed).handler(async ({ input }) => {
   const { source, file } = input;
   let result: ParseResult;
@@ -162,27 +165,45 @@ export const jobEvents = os.imports.jobEvents.use(authed).handler(async function
 }) {
   readImportJob(input.id, context.user.id);
 
-  const JOB_POLL_INTERVAL = 500;
-  const MAX_POLL_DURATION_MS = 30 * 60 * 1000; // 30 minutes
-  const startedAt = Date.now();
+  const userId = context.user.id;
+  const current = activeSSEConnections.get(userId) ?? 0;
+  if (current >= MAX_SSE_PER_USER) {
+    throw new ORPCError("TOO_MANY_REQUESTS", {
+      message: "Too many concurrent event streams",
+    });
+  }
+  activeSSEConnections.set(userId, current + 1);
 
-  while (true) {
-    const job = readImportJob(input.id);
-    const isTerminal =
-      job.status === "success" || job.status === "error" || job.status === "cancelled";
+  try {
+    const JOB_POLL_INTERVAL = 500;
+    const MAX_POLL_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+    const startedAt = Date.now();
 
-    yield {
-      type: (isTerminal ? "complete" : "progress") as "complete" | "progress",
-      job,
-    };
+    while (true) {
+      const job = readImportJob(input.id);
+      const isTerminal =
+        job.status === "success" || job.status === "error" || job.status === "cancelled";
 
-    if (isTerminal) return;
+      yield {
+        type: (isTerminal ? "complete" : "progress") as "complete" | "progress",
+        job,
+      };
 
-    if (Date.now() - startedAt > MAX_POLL_DURATION_MS) {
-      yield { type: "timeout" as const, job };
-      return;
+      if (isTerminal) return;
+
+      if (Date.now() - startedAt > MAX_POLL_DURATION_MS) {
+        yield { type: "timeout" as const, job };
+        return;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, JOB_POLL_INTERVAL));
     }
-
-    await new Promise((resolve) => setTimeout(resolve, JOB_POLL_INTERVAL));
+  } finally {
+    const count = activeSSEConnections.get(userId) ?? 1;
+    if (count <= 1) {
+      activeSSEConnections.delete(userId);
+    } else {
+      activeSSEConnections.set(userId, count - 1);
+    }
   }
 });
