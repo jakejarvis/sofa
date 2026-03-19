@@ -8,10 +8,10 @@
     ],
     "catalog": {
       "@better-auth/expo": "1.5.5",
-      "@orpc/client": "1.13.8",
-      "@orpc/contract": "1.13.8",
-      "@orpc/tanstack-query": "1.13.8",
-      "@tanstack/react-query": "5.91.0",
+      "@orpc/client": "1.13.9",
+      "@orpc/contract": "1.13.9",
+      "@orpc/tanstack-query": "1.13.9",
+      "@tanstack/react-query": "5.91.2",
       "@types/bun": "1.3.11",
       "@types/node": "25.5.0",
       "@types/react": "19.2.14",
@@ -55,7 +55,7 @@
     "@lingui/format-po": "catalog:",
     "oxfmt": "0.41.0",
     "oxlint": "1.56.0",
-    "turbo": "2.8.19",
+    "turbo": "2.8.20",
     "typescript": "catalog:"
   },
   "packageManager": "bun@1.3.11"

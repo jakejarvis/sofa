@@ -26,7 +26,7 @@
     "@sofa/api": "workspace:*",
     "@sofa/i18n": "workspace:*",
     "@tabler/icons-react": "3.40.0",
-    "@tanstack/react-hotkeys": "0.4.1",
+    "@tanstack/react-hotkeys": "0.4.2",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "1.167.5",
     "better-auth": "catalog:",
@@ -61,6 +61,6 @@
     "babel-plugin-react-compiler": "1.0.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vite": "8.0.0"
+    "vite": "8.0.1"
   }
 }
