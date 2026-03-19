@@ -10,6 +10,13 @@ import type { contract } from "@sofa/api/contract";
 import { i18n } from "@sofa/i18n";
 
 export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      gcTime: 10 * 60_000,
+      refetchOnWindowFocus: false,
+    },
+  },
   queryCache: new QueryCache({
     onError: (_error, query) => {
       toast.error(i18n._(msg`Something went wrong…`), {

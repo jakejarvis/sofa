@@ -275,49 +275,34 @@ export function getEpisodeProgressByTitleIds(userId: string, titleIds: string[])
 }
 
 export function getUserTitleInfo(userId: string, titleId: string) {
-  const status = db
-    .select()
+  const info = db
+    .select({
+      status: userTitleStatus.status,
+      ratingStars: userRatings.ratingStars,
+    })
     .from(userTitleStatus)
+    .leftJoin(
+      userRatings,
+      and(
+        eq(userRatings.userId, userTitleStatus.userId),
+        eq(userRatings.titleId, userTitleStatus.titleId),
+      ),
+    )
     .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, titleId)))
     .get();
 
-  const rating = db
-    .select()
-    .from(userRatings)
-    .where(and(eq(userRatings.userId, userId), eq(userRatings.titleId, titleId)))
-    .get();
-
-  const allEps = db
-    .select({ id: episodes.id })
-    .from(episodes)
+  const watchedEpisodeIds = db
+    .selectDistinct({ episodeId: userEpisodeWatches.episodeId })
+    .from(userEpisodeWatches)
+    .innerJoin(episodes, eq(userEpisodeWatches.episodeId, episodes.id))
     .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
-    .where(eq(seasons.titleId, titleId))
-    .all();
-
-  const epIds = allEps.map((ep) => ep.id);
-
-  const watchedEpisodeIds =
-    epIds.length > 0
-      ? Array.from(
-          new Set(
-            db
-              .select({ episodeId: userEpisodeWatches.episodeId })
-              .from(userEpisodeWatches)
-              .where(
-                and(
-                  eq(userEpisodeWatches.userId, userId),
-                  inArray(userEpisodeWatches.episodeId, epIds),
-                ),
-              )
-              .all()
-              .map((w) => w.episodeId),
-          ),
-        )
-      : [];
+    .where(and(eq(userEpisodeWatches.userId, userId), eq(seasons.titleId, titleId)))
+    .all()
+    .map((w) => w.episodeId);
 
   return {
-    status: status?.status ?? null,
-    rating: rating?.ratingStars ?? null,
+    status: info?.status ?? null,
+    rating: info?.ratingStars ?? null,
     episodeWatches: watchedEpisodeIds,
   };
 }

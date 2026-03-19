@@ -170,14 +170,7 @@ export function getLibraryFeed(userId: string, page = 1, limit = 20) {
     eq(userTitleStatus.userId, userId),
   );
 
-  const [{ count }] = db
-    .select({ count: sql<number>`count(*)` })
-    .from(titles)
-    .innerJoin(userTitleStatus, joinCondition)
-    .where(availabilityFilter)
-    .all();
-
-  const items = db
+  const rows = db
     .select({
       titleId: titles.id,
       title: titles.title,
@@ -190,6 +183,7 @@ export function getLibraryFeed(userId: string, page = 1, limit = 20) {
       voteAverage: titles.voteAverage,
       popularity: titles.popularity,
       userStatus: userTitleStatus.status,
+      totalCount: sql<number>`count(*) over()`.as("totalCount"),
     })
     .from(titles)
     .innerJoin(userTitleStatus, joinCondition)
@@ -199,7 +193,17 @@ export function getLibraryFeed(userId: string, page = 1, limit = 20) {
     .offset(offset)
     .all();
 
-  const totalResults = count ?? 0;
+  let totalResults = rows[0]?.totalCount ?? 0;
+  if (rows.length === 0 && offset > 0) {
+    const [{ count }] = db
+      .select({ count: sql<number>`count(*)` })
+      .from(titles)
+      .innerJoin(userTitleStatus, joinCondition)
+      .where(availabilityFilter)
+      .all();
+    totalResults = count ?? 0;
+  }
+  const items = rows.map(({ totalCount: _, ...item }) => item);
   return {
     items,
     page,

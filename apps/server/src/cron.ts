@@ -298,6 +298,10 @@ export function startJobs() {
   schedule("telemetryReport", "30 0 * * *", async () => {
     await performTelemetryReport();
   });
+  schedule("optimizeDb", "0 4 * * 0", async () => {
+    const { optimizeDatabase } = await import("@sofa/db/client");
+    optimizeDatabase();
+  });
 
   log.info(`Started ${jobs.size} jobs`);
 }

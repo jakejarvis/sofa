@@ -1,14 +1,42 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { ContinueWatchingSectionSkeleton } from "@/components/dashboard/continue-watching-list";
 import { ContinueWatchingSection } from "@/components/dashboard/continue-watching-section";
 import { LibrarySection } from "@/components/dashboard/library-section";
 import { RecommendationsSection } from "@/components/dashboard/recommendations-section";
+import { StatsSectionSkeleton } from "@/components/dashboard/stats-display";
 import { StatsSection } from "@/components/dashboard/stats-section";
+import { TitleGridSectionSkeleton } from "@/components/dashboard/title-grid";
 import { WelcomeHeader } from "@/components/dashboard/welcome-header";
+import { Skeleton } from "@/components/ui/skeleton";
+import { orpc } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_app/dashboard")({
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(orpc.dashboard.stats.queryOptions()),
+      context.queryClient.ensureQueryData(orpc.dashboard.continueWatching.queryOptions()),
+      context.queryClient.ensureQueryData(orpc.dashboard.recommendations.queryOptions()),
+    ]);
+  },
+  pendingComponent: DashboardSkeleton,
   component: DashboardPage,
 });
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-10">
+      <div>
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="mt-2 h-4 w-48" />
+      </div>
+      <StatsSectionSkeleton />
+      <ContinueWatchingSectionSkeleton />
+      <TitleGridSectionSkeleton />
+      <TitleGridSectionSkeleton />
+    </div>
+  );
+}
 
 function DashboardPage() {
   const { session } = Route.useRouteContext();

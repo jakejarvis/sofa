@@ -38,6 +38,10 @@ function getClient() {
     globalForDb._client.run("PRAGMA journal_mode = WAL");
     globalForDb._client.run("PRAGMA foreign_keys = ON");
     globalForDb._client.run("PRAGMA busy_timeout = 5000");
+    globalForDb._client.run("PRAGMA synchronous = NORMAL");
+    globalForDb._client.run("PRAGMA cache_size = -64000");
+    globalForDb._client.run("PRAGMA temp_store = MEMORY");
+    globalForDb._client.run("PRAGMA mmap_size = 268435456");
   }
   return globalForDb._client;
 }
@@ -58,6 +62,15 @@ export const db = new Proxy({} as ReturnType<typeof drizzle>, {
     return Reflect.get(getDb(), prop);
   },
 });
+
+/** Run PRAGMA optimize to refresh query planner statistics. */
+export function optimizeDatabase() {
+  getClient().run("PRAGMA optimize");
+}
+
+export function vacuumDatabase(into: string): void {
+  getClient().run("VACUUM INTO ?", [into.replace(/'/g, "''")]);
+}
 
 /** Close the current connection, and clear singletons so the Proxy re-initializes on next access. */
 export function closeDatabase() {

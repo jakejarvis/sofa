@@ -88,7 +88,7 @@ Cross-package imports:
 
 - `@sofa/api/contract`, `@sofa/api/schemas` — Contract and Zod types
 - `@sofa/db/queries/*` — Query layer (e.g., `@sofa/db/queries/tracking`, `@sofa/db/queries/metadata`)
-- `@sofa/db/client`, `@sofa/db/schema`, `@sofa/db/utils`, `@sofa/db/migrate`, `@sofa/db/test-utils`
+- `@sofa/db/client`, `@sofa/db/schema`, `@sofa/db/migrate`, `@sofa/db/test-utils`
 - `@sofa/tmdb/client`, `@sofa/tmdb/image`
 - `@sofa/core/metadata`, `@sofa/core/tracking`, `@sofa/core/imports`, etc.
 - `@sofa/auth/server`, `@sofa/auth/config`

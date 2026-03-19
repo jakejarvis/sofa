@@ -22,12 +22,48 @@ import { SystemHealthCards } from "@/components/settings/system-health-section";
 import { UpdateCheckSection } from "@/components/settings/update-check-section";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { orpc } from "@/lib/orpc/client";
 
 const GITHUB_REPO = "jakejarvis/sofa";
 
 export const Route = createFileRoute("/_app/settings")({
+  loader: async ({ context }) => {
+    const promises: Promise<unknown>[] = [
+      context.queryClient.ensureQueryData(orpc.integrations.list.queryOptions()),
+      context.queryClient.ensureQueryData(orpc.system.status.queryOptions()),
+    ];
+    const isAdmin = context.session.user.role === "admin";
+    if (isAdmin) {
+      promises.push(
+        context.queryClient.ensureQueryData(orpc.admin.systemHealth.queryOptions()),
+        context.queryClient.ensureQueryData(orpc.admin.backups.list.queryOptions()),
+        context.queryClient.ensureQueryData(orpc.admin.backups.schedule.queryOptions()),
+      );
+    }
+    await Promise.all(promises);
+  },
+  pendingComponent: SettingsSkeleton,
   component: SettingsPage,
 });
+
+function SettingsSkeleton() {
+  return (
+    <div className="mx-auto max-w-2xl space-y-8">
+      <div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="size-5 rounded" />
+          <Skeleton className="h-8 w-32" />
+        </div>
+        <Skeleton className="mt-2 h-4 w-56" />
+      </div>
+      <Skeleton className="h-40 w-full rounded-xl" />
+      <Skeleton className="h-24 w-full rounded-xl" />
+      <Skeleton className="h-24 w-full rounded-xl" />
+      <Skeleton className="h-24 w-full rounded-xl" />
+    </div>
+  );
+}
 
 function SettingsPage() {
   const { session } = Route.useRouteContext();

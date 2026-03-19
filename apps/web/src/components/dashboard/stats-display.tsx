@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconCheck, IconLibrary, IconMovie, IconPlayerPlay } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 
 import {
   Select,
@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
 import type { DashboardStats, HistoryBucket, TimePeriod } from "@sofa/api/schemas";
 
-import { Sparkline } from "./sparkline";
+const Sparkline = lazy(() => import("./sparkline").then((m) => ({ default: m.Sparkline })));
 
 function StatCardSkeleton() {
   return (
@@ -66,7 +66,11 @@ function StatCard({
       className="animate-stagger-item border-border/30 bg-card/50 relative overflow-hidden rounded-xl border p-4"
       style={{ "--stagger-index": index } as React.CSSProperties}
     >
-      {sparklineData && <Sparkline data={sparklineData} color={color} />}
+      {sparklineData && (
+        <Suspense>
+          <Sparkline data={sparklineData} color={color} />
+        </Suspense>
+      )}
       <div className="relative z-10 flex items-center gap-2">
         <div className={`flex h-6 w-6 items-center justify-center rounded-md ${bgColor}`}>
           <Icon aria-hidden={true} className={`size-[13px] ${color}`} />
