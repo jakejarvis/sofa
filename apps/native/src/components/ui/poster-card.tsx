@@ -10,7 +10,7 @@ import {
   IconStarFilled,
 } from "@tabler/icons-react-native";
 import { Link } from "expo-router";
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import { Pressable, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
@@ -40,7 +40,7 @@ interface PosterCardProps {
   isAdding?: boolean;
 }
 
-export function PosterCard({
+export const PosterCard = memo(function PosterCard({
   id,
   title,
   type,
@@ -243,7 +243,7 @@ export function PosterCard({
       </Animated.View>
     </GestureDetector>
   );
-}
+});
 
 export function PosterCardSkeleton({ width = 140 }: { width?: number }) {
   const imageHeight = width * 1.5;

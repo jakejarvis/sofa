@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FlashList } from "@shopify/flash-list";
 import { IconHistory, IconSearch } from "@tabler/icons-react-native";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Alert, Pressable, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
@@ -47,6 +47,32 @@ export function RecentlyViewedList() {
 
   const keyExtractor = useCallback((item: RecentlyViewedItem) => item.id, []);
 
+  const listHeaderComponent = useMemo(
+    () => (
+      <Animated.View
+        entering={FadeInDown.duration(300)}
+        className="mb-1 flex-row items-center justify-between px-4 pt-2 pb-1"
+      >
+        <View className="flex-row items-center gap-2">
+          <IconHistory size={20} color={primaryColor} />
+          <Text className="font-display text-foreground text-xl tracking-tight">
+            <Trans>Recently Viewed</Trans>
+          </Text>
+        </View>
+        <Pressable
+          onPress={handleClear}
+          hitSlop={8}
+          style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+        >
+          <Text className="text-primary text-sm">
+            <Trans>Clear</Trans>
+          </Text>
+        </Pressable>
+      </Animated.View>
+    ),
+    [primaryColor, handleClear],
+  );
+
   if (items.length === 0) {
     return (
       <Animated.View entering={FadeIn.duration(400)} className="flex-1 items-center justify-center">
@@ -66,28 +92,7 @@ export function RecentlyViewedList() {
         renderItem={renderItem}
         keyboardShouldPersistTaps="handled"
         contentInsetAdjustmentBehavior="automatic"
-        ListHeaderComponent={
-          <Animated.View
-            entering={FadeInDown.duration(300)}
-            className="mb-1 flex-row items-center justify-between px-4 pt-2 pb-1"
-          >
-            <View className="flex-row items-center gap-2">
-              <IconHistory size={20} color={primaryColor} />
-              <Text className="font-display text-foreground text-xl tracking-tight">
-                <Trans>Recently Viewed</Trans>
-              </Text>
-            </View>
-            <Pressable
-              onPress={handleClear}
-              hitSlop={8}
-              style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
-            >
-              <Text className="text-primary text-sm">
-                <Trans>Clear</Trans>
-              </Text>
-            </Pressable>
-          </Animated.View>
-        }
+        ListHeaderComponent={listHeaderComponent}
       />
     </Animated.View>
   );

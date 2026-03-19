@@ -46,13 +46,6 @@ function calculateAge(birthday: string, deathday?: string | null): number {
 
 export default function PersonDetailScreen() {
   const { t } = useLingui();
-  const departmentLabels: Record<string, string> = {
-    Acting: t`Actor`,
-    Directing: t`Director`,
-    Writing: t`Writer`,
-    Production: t`Producer`,
-    Editing: t`Editor`,
-  };
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
@@ -138,6 +131,98 @@ export default function PersonDetailScreen() {
     [columnWidth, userStatuses, handleQuickAdd, addingKey],
   );
 
+  const listHeader = useMemo(() => {
+    if (!person) return null;
+
+    const departmentLabels: Record<string, string> = {
+      Acting: t`Actor`,
+      Directing: t`Director`,
+      Writing: t`Writer`,
+      Production: t`Producer`,
+      Editing: t`Editor`,
+    };
+
+    return (
+      <>
+        {/* Profile hero */}
+        <Animated.View
+          entering={FadeIn.duration(400)}
+          className="items-center"
+          style={{
+            paddingTop: useAutomaticInsets ? 16 : insets.top + 56,
+            paddingBottom: 24,
+          }}
+        >
+          <View className="bg-secondary size-[120px] overflow-hidden rounded-full">
+            {person.profilePath && (
+              <Image
+                source={{ uri: person.profilePath }}
+                thumbHash={person.profileThumbHash}
+                style={{ width: "100%", height: "100%" }}
+                contentFit="cover"
+              />
+            )}
+          </View>
+
+          <Text className="font-display text-foreground mt-4 text-center text-3xl">
+            {person.name}
+          </Text>
+
+          {person.knownForDepartment ? (
+            <View className="bg-secondary mt-2 rounded-full px-3 py-1">
+              <Text className="text-muted-foreground text-xs tracking-wider uppercase">
+                {departmentLabels[person.knownForDepartment] ?? person.knownForDepartment}
+              </Text>
+            </View>
+          ) : null}
+
+          {person.birthday || person.placeOfBirth ? (
+            <View className="mt-3 items-center gap-1.5">
+              {person.birthday ? (
+                <View className="flex-row items-center gap-1.5">
+                  <ScaledIcon icon={IconCalendar} size={14} color={primaryColor} />
+                  <Text selectable className="text-muted-foreground text-sm">
+                    {formatDate(person.birthday)}
+                    <Text className="text-muted-foreground/60 text-sm">
+                      {(() => {
+                        const age = calculateAge(person.birthday, person.deathday);
+                        return person.deathday ? ` (${t`died at ${age}`})` : ` (${t`age ${age}`})`;
+                      })()}
+                    </Text>
+                  </Text>
+                </View>
+              ) : null}
+              {person.placeOfBirth ? (
+                <View className="flex-row items-center gap-1.5">
+                  <ScaledIcon icon={IconMapPin} size={14} color={primaryColor} />
+                  <Text selectable className="text-muted-foreground text-sm">
+                    {person.placeOfBirth}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+          ) : null}
+        </Animated.View>
+
+        {/* Biography */}
+        {person.biography ? (
+          <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+            <View className="mb-6 px-4">
+              <ExpandableText text={person.biography} maxLines={4} />
+            </View>
+          </Animated.View>
+        ) : null}
+
+        {/* Filmography section header */}
+        {filmography.length > 0 && (
+          <Animated.View entering={FadeInDown.duration(300).delay(200)} className="px-4">
+            <SectionHeader title={t`Filmography`} icon={IconMovie} />
+          </Animated.View>
+        )}
+      </>
+    );
+  }, [person, filmography.length, insets.top, useAutomaticInsets, primaryColor, t]);
+
   if (isPending) {
     return (
       <ModalLayout>
@@ -201,86 +286,6 @@ export default function PersonDetailScreen() {
       </ModalLayout>
     );
   }
-
-  const listHeader = (
-    <>
-      {/* Profile hero */}
-      <Animated.View
-        entering={FadeIn.duration(400)}
-        className="items-center"
-        style={{
-          paddingTop: useAutomaticInsets ? 16 : insets.top + 56,
-          paddingBottom: 24,
-        }}
-      >
-        <View className="bg-secondary size-[120px] overflow-hidden rounded-full">
-          {person.profilePath && (
-            <Image
-              source={{ uri: person.profilePath }}
-              thumbHash={person.profileThumbHash}
-              style={{ width: "100%", height: "100%" }}
-              contentFit="cover"
-            />
-          )}
-        </View>
-
-        <Text className="font-display text-foreground mt-4 text-center text-3xl">
-          {person.name}
-        </Text>
-
-        {person.knownForDepartment ? (
-          <View className="bg-secondary mt-2 rounded-full px-3 py-1">
-            <Text className="text-muted-foreground text-xs tracking-wider uppercase">
-              {departmentLabels[person.knownForDepartment] ?? person.knownForDepartment}
-            </Text>
-          </View>
-        ) : null}
-
-        {person.birthday || person.placeOfBirth ? (
-          <View className="mt-3 items-center gap-1.5">
-            {person.birthday ? (
-              <View className="flex-row items-center gap-1.5">
-                <ScaledIcon icon={IconCalendar} size={14} color={primaryColor} />
-                <Text selectable className="text-muted-foreground text-sm">
-                  {formatDate(person.birthday)}
-                  <Text className="text-muted-foreground/60 text-sm">
-                    {(() => {
-                      const age = calculateAge(person.birthday, person.deathday);
-                      return person.deathday ? ` (${t`died at ${age}`})` : ` (${t`age ${age}`})`;
-                    })()}
-                  </Text>
-                </Text>
-              </View>
-            ) : null}
-            {person.placeOfBirth ? (
-              <View className="flex-row items-center gap-1.5">
-                <ScaledIcon icon={IconMapPin} size={14} color={primaryColor} />
-                <Text selectable className="text-muted-foreground text-sm">
-                  {person.placeOfBirth}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-        ) : null}
-      </Animated.View>
-
-      {/* Biography */}
-      {person.biography ? (
-        <Animated.View entering={FadeInDown.duration(300).delay(100)}>
-          <View className="mb-6 px-4">
-            <ExpandableText text={person.biography} maxLines={4} />
-          </View>
-        </Animated.View>
-      ) : null}
-
-      {/* Filmography section header */}
-      {filmography.length > 0 && (
-        <Animated.View entering={FadeInDown.duration(300).delay(200)} className="px-4">
-          <SectionHeader title={t`Filmography`} icon={IconMovie} />
-        </Animated.View>
-      )}
-    </>
-  );
 
   return (
     <ModalLayout>

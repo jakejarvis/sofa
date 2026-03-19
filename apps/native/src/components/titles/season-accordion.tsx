@@ -157,9 +157,12 @@ export function SeasonAccordion({
           {episodes.slice(0, visibleCount).map((episode) => (
             <EpisodeRow
               key={episode.id}
-              episode={episode}
+              episodeId={episode.id}
+              episodeNumber={episode.episodeNumber}
+              name={episode.name}
+              airDate={episode.airDate}
               isWatched={watchedEpisodeIds.has(episode.id)}
-              onToggle={() => handleEpisodeToggle(episode.id)}
+              onToggle={handleEpisodeToggle}
               accentColor={titleAccentColor}
               mutedColor={mutedFgColor}
             />

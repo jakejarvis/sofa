@@ -9,7 +9,7 @@ import {
 } from "@tabler/icons-react-native";
 import { useMutation } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, Pressable, View } from "react-native";
 import Animated, {
   FadeIn,
@@ -51,6 +51,8 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const chevronRotation = useSharedValue(0);
   const setupChevronRotation = useSharedValue(0);
@@ -110,12 +112,19 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
 
   const url = connection ? config.buildUrl(connection.token) : null;
 
+  useEffect(() => {
+    return () => {
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+    };
+  }, []);
+
   const handleCopy = useCallback(async () => {
     if (!url) return;
     await Clipboard.setStringAsync(url);
     setCopied(true);
     toast.success(t`URL copied to clipboard`);
-    setTimeout(() => setCopied(false), 2000);
+    if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+    copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
   }, [url, t]);
 
   const handleRegenerate = useCallback(() => {

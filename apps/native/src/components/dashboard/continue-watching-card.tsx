@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Link } from "expo-router";
+import { memo } from "react";
 import { Pressable, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
@@ -27,7 +28,11 @@ export interface ContinueWatchingItem {
   } | null;
 }
 
-export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
+export const ContinueWatchingCard = memo(function ContinueWatchingCard({
+  item,
+}: {
+  item: ContinueWatchingItem;
+}) {
   const { t } = useLingui();
   const { animatedStyle, gesture: tapGesture } = usePressAnimation();
 
@@ -115,4 +120,4 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItem }) {
       </Animated.View>
     </GestureDetector>
   );
-}
+});

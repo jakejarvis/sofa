@@ -1,37 +1,41 @@
 import { useLingui } from "@lingui/react/macro";
 import { IconCircleCheckFilled, IconCircleDashed } from "@tabler/icons-react-native";
+import { memo, useCallback } from "react";
 import { Pressable, View } from "react-native";
 
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 
-export function EpisodeRow({
-  episode,
+export const EpisodeRow = memo(function EpisodeRow({
+  episodeId,
+  episodeNumber,
+  name,
+  airDate,
   isWatched,
   onToggle,
   accentColor,
   mutedColor,
 }: {
-  episode: {
-    id: string;
-    episodeNumber: number;
-    name: string | null;
-    airDate: string | null;
-  };
+  episodeId: string;
+  episodeNumber: number;
+  name: string | null;
+  airDate: string | null;
   isWatched: boolean;
-  onToggle: () => void;
+  onToggle: (episodeId: string) => void;
   accentColor: string;
   mutedColor: string;
 }) {
   const { t } = useLingui();
-  const episodeLabel = episode.name ?? t`Episode ${episode.episodeNumber}`;
+  const episodeLabel = name ?? t`Episode ${episodeNumber}`;
+
+  const handleToggle = useCallback(() => onToggle(episodeId), [onToggle, episodeId]);
 
   return (
     <Pressable
-      onPress={onToggle}
+      onPress={handleToggle}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: isWatched }}
-      accessibilityLabel={t`Episode ${episode.episodeNumber}, ${episodeLabel}`}
+      accessibilityLabel={t`Episode ${episodeNumber}, ${episodeLabel}`}
       className="border-border flex-row items-center border-b px-4 py-3"
       style={{ borderBottomWidth: 0.5 }}
     >
@@ -45,12 +49,10 @@ export function EpisodeRow({
           className={`font-sans text-sm font-medium ${isWatched ? "text-muted-foreground" : "text-foreground"}`}
           numberOfLines={1}
         >
-          {episode.episodeNumber}. {episode.name ?? t`Episode ${episode.episodeNumber}`}
+          {episodeNumber}. {name ?? t`Episode ${episodeNumber}`}
         </Text>
-        {episode.airDate ? (
-          <Text className="text-muted-foreground mt-0.5 text-xs">{episode.airDate}</Text>
-        ) : null}
+        {airDate ? <Text className="text-muted-foreground mt-0.5 text-xs">{airDate}</Text> : null}
       </View>
     </Pressable>
   );
-}
+});
