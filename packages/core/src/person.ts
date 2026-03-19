@@ -202,14 +202,20 @@ async function syncPersonFilmography(
   const tmdbIds = [...new Set(allEntries.map((c) => c.id))];
 
   const existingTitles = getExistingTitlesByTmdbIds(tmdbIds);
-  const titleIdMap = new Map<number, string>(
-    existingTitles.map((title) => [title.tmdbId, title.id]),
+  // Key by (tmdbId, type) composite since the same tmdbId can be a movie and TV show
+  const titleIdMap = new Map<string, string>(
+    existingTitles.map((title) => [`${title.tmdbId}-${title.type}`, title.id]),
   );
 
-  const newEntries = allEntries.filter((entry) => !titleIdMap.has(entry.id));
+  const newEntries = allEntries.filter(
+    (entry) => !titleIdMap.has(`${entry.id}-${entry.media_type}`),
+  );
   if (newEntries.length > 0) {
     const shellEntries = newEntries
-      .filter((entry, index, arr) => arr.findIndex((e) => e.id === entry.id) === index)
+      .filter(
+        (entry, index, arr) =>
+          arr.findIndex((e) => e.id === entry.id && e.media_type === entry.media_type) === index,
+      )
       .map((entry) => ({
         tmdbId: entry.id,
         mediaType: entry.media_type as "movie" | "tv",
@@ -225,8 +231,8 @@ async function syncPersonFilmography(
       }));
 
     const updatedMap = batchInsertShellTitlesTransaction(shellEntries, titleIdMap);
-    for (const [tmdbId, id] of updatedMap) {
-      titleIdMap.set(tmdbId, id);
+    for (const [key, id] of updatedMap) {
+      titleIdMap.set(key, id);
     }
   }
 
@@ -234,7 +240,7 @@ async function syncPersonFilmography(
   let displayOrder = 0;
 
   for (const credit of validCast) {
-    const titleId = titleIdMap.get(credit.id);
+    const titleId = titleIdMap.get(`${credit.id}-${credit.media_type}`);
     if (!titleId) continue;
 
     nextRows.push({
@@ -249,7 +255,7 @@ async function syncPersonFilmography(
   }
 
   for (const credit of validCrew) {
-    const titleId = titleIdMap.get(credit.id);
+    const titleId = titleIdMap.get(`${credit.id}-${credit.media_type}`);
     if (!titleId) continue;
 
     nextRows.push({

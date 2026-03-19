@@ -65,21 +65,23 @@ interface ShellTitleEntry {
 }
 
 /**
- * Insert shell title rows inside a transaction, returning a map of tmdbId to
- * internal UUID for every entry that was inserted (or already existed via
- * conflict fallback).
+ * Insert shell title rows inside a transaction, returning a map of
+ * "tmdbId-type" composite key to internal UUID for every entry that was
+ * inserted (or already existed via conflict fallback).
  */
 export function batchInsertShellTitlesTransaction(
   entries: ShellTitleEntry[],
-  existingTitleIdMap: Map<number, string>,
-): Map<number, string> {
+  existingTitleIdMap: Map<string, string>,
+): Map<string, string> {
   const titleIdMap = new Map(existingTitleIdMap);
 
-  const insertedTmdbIds = new Set<number>();
+  // Deduplicate by (tmdbId, type) since the unique constraint is on both columns
+  const insertedKeys = new Set<string>();
   db.transaction((tx) => {
     for (const entry of entries) {
-      if (insertedTmdbIds.has(entry.tmdbId)) continue;
-      insertedTmdbIds.add(entry.tmdbId);
+      const key = `${entry.tmdbId}-${entry.mediaType}`;
+      if (insertedKeys.has(key)) continue;
+      insertedKeys.add(key);
       const row = tx
         .insert(titles)
         .values({
@@ -99,21 +101,22 @@ export function batchInsertShellTitlesTransaction(
         .onConflictDoNothing()
         .returning()
         .get();
-      if (row) titleIdMap.set(entry.tmdbId, row.id);
+      if (row) titleIdMap.set(key, row.id);
     }
   });
 
   // Resolve any rows that hit onConflictDoNothing (already existed but weren't
   // in the initial map)
-  const stillMissing = [...insertedTmdbIds].filter((tmdbId) => !titleIdMap.has(tmdbId));
+  const stillMissing = [...insertedKeys].filter((key) => !titleIdMap.has(key));
   if (stillMissing.length > 0) {
+    const missingTmdbIds = stillMissing.map((key) => Number(key.split("-")[0]));
     const fallbacks = db
-      .select({ id: titles.id, tmdbId: titles.tmdbId })
+      .select({ id: titles.id, tmdbId: titles.tmdbId, type: titles.type })
       .from(titles)
-      .where(inArray(titles.tmdbId, stillMissing))
+      .where(inArray(titles.tmdbId, missingTmdbIds))
       .all();
-    for (const fallback of fallbacks) {
-      titleIdMap.set(fallback.tmdbId, fallback.id);
+    for (const f of fallbacks) {
+      titleIdMap.set(`${f.tmdbId}-${f.type}`, f.id);
     }
   }
 

@@ -315,6 +315,7 @@ export function upsertRecommendationsTransaction(
     .select({
       id: titles.id,
       tmdbId: titles.tmdbId,
+      type: titles.type,
       posterPath: titles.posterPath,
       backdropPath: titles.backdropPath,
       posterThumbHash: titles.posterThumbHash,
@@ -323,13 +324,22 @@ export function upsertRecommendationsTransaction(
     .from(titles)
     .where(inArray(titles.tmdbId, tmdbIds))
     .all();
-  const existingTitleMap = new Map(existingTitles.map((t) => [t.tmdbId, t]));
-  const titleIdMap = new Map<number, string>(existingTitles.map((t) => [t.tmdbId, t.id]));
+
+  // Key by (tmdbId, type) composite since the unique constraint is on both columns.
+  // The same tmdbId can exist as both a movie and TV show.
+  const existingTitleMap = new Map(existingTitles.map((t) => [`${t.tmdbId}-${t.type}`, t]));
+  const titleIdMap = new Map<number, string>();
+  for (const [tmdbId, item] of uniqueTitles) {
+    const existing = existingTitleMap.get(`${tmdbId}-${item.type}`);
+    if (existing) {
+      titleIdMap.set(tmdbId, existing.id);
+    }
+  }
 
   db.transaction((tx) => {
     const insertedTmdbIds = new Set<number>();
     for (const item of uniqueTitles.values()) {
-      const existingTitle = existingTitleMap.get(item.tmdbId);
+      const existingTitle = existingTitleMap.get(`${item.tmdbId}-${item.type}`);
       if (existingTitle) {
         const posterPathChanged = existingTitle.posterPath !== item.posterPath;
         const backdropPathChanged = existingTitle.backdropPath !== item.backdropPath;
@@ -392,11 +402,18 @@ export function upsertRecommendationsTransaction(
     const stillMissing = [...insertedTmdbIds].filter((id) => !titleIdMap.has(id));
     if (stillMissing.length > 0) {
       const fallbacks = tx
-        .select({ id: titles.id, tmdbId: titles.tmdbId })
+        .select({ id: titles.id, tmdbId: titles.tmdbId, type: titles.type })
         .from(titles)
         .where(inArray(titles.tmdbId, stillMissing))
         .all();
-      for (const f of fallbacks) titleIdMap.set(f.tmdbId, f.id);
+
+      for (const f of fallbacks) {
+        // Only map if the type matches what we were trying to insert
+        const expected = uniqueTitles.get(f.tmdbId);
+        if (expected && expected.type === f.type) {
+          titleIdMap.set(f.tmdbId, f.id);
+        }
+      }
     }
 
     // Batch upsert all recommendation rows
