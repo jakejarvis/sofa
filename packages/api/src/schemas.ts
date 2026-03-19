@@ -542,6 +542,61 @@ export const DashboardRecommendationsOutput = z
     description: "Personalized title recommendations for the dashboard",
   });
 
+// ─── Upcoming outputs ─────────────────────────────────────────
+
+export const UpcomingInput = z
+  .object({
+    days: z
+      .number()
+      .int()
+      .min(1)
+      .max(90)
+      .default(90)
+      .describe("How many days into the future to look"),
+    limit: z.number().int().min(1).max(50).default(20).describe("Maximum items per page"),
+    cursor: z.string().optional().describe("Pagination cursor"),
+  })
+  .meta({ description: "Filters for the upcoming feed" });
+
+export const UpcomingItemSchema = z
+  .object({
+    titleId: z.string().describe("Internal title ID"),
+    titleName: z.string().describe("Display title"),
+    titleType: z.enum(["movie", "tv"]).describe("Media type"),
+    posterPath: z.string().nullable().describe("Poster image path"),
+    posterThumbHash: z.string().nullable().describe("ThumbHash blur placeholder"),
+    seasonNumber: z.number().nullable().describe("Season number (TV only)"),
+    episodeNumber: z.number().nullable().describe("Episode number (TV only)"),
+    episodeName: z.string().nullable().describe("Episode title (TV only)"),
+    episodeCount: z
+      .number()
+      .describe("Number of episodes (1 for single, >1 for collapsed batch drops)"),
+    date: z.string().describe("Air date or release date (YYYY-MM-DD)"),
+    userStatus: z
+      .enum(["watchlist", "in_progress", "completed"])
+      .describe("User's tracking status"),
+    isNewSeason: z.boolean().describe("Whether this is a new season for a completed show"),
+    streamingProvider: z
+      .object({
+        providerId: z.number(),
+        providerName: z.string(),
+        logoPath: z.string().nullable(),
+      })
+      .nullable()
+      .describe("Primary streaming provider, or null"),
+  })
+  .meta({ description: "An upcoming episode or movie release" });
+
+export const UpcomingOutput = z
+  .object({
+    items: z.array(UpcomingItemSchema),
+    nextCursor: z
+      .string()
+      .nullable()
+      .describe("Cursor for the next page, or null if no more items"),
+  })
+  .meta({ description: "Upcoming episodes and movie releases for tracked titles" });
+
 // ─── Explore outputs ───────────────────────────────────────────
 
 export const TrendingOutput = z
@@ -1038,4 +1093,5 @@ export type PaginationInfo = z.infer<typeof PaginationMeta>;
 export type TimePeriod = z.infer<typeof WatchHistoryInput>["period"];
 export type ImportJob = z.infer<typeof ImportJobSchema>;
 export type NormalizedImport = z.infer<typeof NormalizedImportSchema>;
+export type UpcomingItem = z.infer<typeof UpcomingItemSchema>;
 export type UpdateCheckResult = z.infer<typeof UpdateCheckResultSchema>;

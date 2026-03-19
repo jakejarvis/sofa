@@ -7,6 +7,7 @@ import { RecommendationsSection } from "@/components/dashboard/recommendations-s
 import { StatsSectionSkeleton } from "@/components/dashboard/stats-display";
 import { StatsSection } from "@/components/dashboard/stats-section";
 import { TitleGridSectionSkeleton } from "@/components/dashboard/title-grid";
+import { UpcomingSection } from "@/components/dashboard/upcoming-section";
 import { WelcomeHeader } from "@/components/dashboard/welcome-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
@@ -19,6 +20,9 @@ export const Route = createFileRoute("/_app/dashboard")({
       context.queryClient.ensureQueryData(orpc.dashboard.stats.queryOptions()),
       context.queryClient.ensureQueryData(orpc.dashboard.continueWatching.queryOptions()),
       context.queryClient.ensureQueryData(orpc.dashboard.recommendations.queryOptions()),
+      context.queryClient.ensureQueryData(
+        orpc.dashboard.upcoming.queryOptions({ input: { days: 7, limit: 5 } }),
+      ),
     ]);
   },
   pendingComponent: DashboardSkeleton,
@@ -47,6 +51,7 @@ function DashboardPage() {
       <WelcomeHeader name={session.user.name} />
       <StatsSection />
       <ContinueWatchingSection />
+      <UpcomingSection />
       <LibrarySection />
       <RecommendationsSection />
     </div>

@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray, lte, sql } from "drizzle-orm";
 
 import { db } from "../client";
 import {
@@ -271,4 +271,83 @@ export function getRecommendationRowsForTitle(titleId: string) {
 
 export function getTitleByIdOrNull(titleId: string) {
   return db.select().from(titles).where(eq(titles.id, titleId)).get() ?? null;
+}
+
+// ─── Upcoming feed queries ──────────────────────────────────────────
+
+export function getUpcomingEpisodes(
+  userId: string,
+  fromDate: string,
+  toDate: string,
+  limit: number,
+) {
+  return db
+    .select({
+      titleId: titles.id,
+      titleName: titles.title,
+      posterPath: titles.posterPath,
+      posterThumbHash: titles.posterThumbHash,
+      seasonNumber: seasons.seasonNumber,
+      episodeNumber: episodes.episodeNumber,
+      episodeName: episodes.name,
+      airDate: episodes.airDate,
+      userStatus: userTitleStatus.status,
+    })
+    .from(episodes)
+    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
+    .innerJoin(titles, and(eq(seasons.titleId, titles.id), eq(titles.type, "tv")))
+    .innerJoin(
+      userTitleStatus,
+      and(eq(userTitleStatus.titleId, titles.id), eq(userTitleStatus.userId, userId)),
+    )
+    .where(and(gt(episodes.airDate, fromDate), lte(episodes.airDate, toDate)))
+    .orderBy(asc(episodes.airDate), asc(titles.title))
+    .limit(limit)
+    .all();
+}
+
+export function getUpcomingMovies(userId: string, fromDate: string, toDate: string, limit: number) {
+  return db
+    .select({
+      titleId: titles.id,
+      titleName: titles.title,
+      posterPath: titles.posterPath,
+      posterThumbHash: titles.posterThumbHash,
+      releaseDate: titles.releaseDate,
+      userStatus: userTitleStatus.status,
+    })
+    .from(titles)
+    .innerJoin(
+      userTitleStatus,
+      and(eq(userTitleStatus.titleId, titles.id), eq(userTitleStatus.userId, userId)),
+    )
+    .where(
+      and(
+        eq(titles.type, "movie"),
+        gt(titles.releaseDate, fromDate),
+        lte(titles.releaseDate, toDate),
+      ),
+    )
+    .orderBy(asc(titles.releaseDate), asc(titles.title))
+    .limit(limit)
+    .all();
+}
+
+export function getAvailabilityByTitleIds(titleIds: string[]) {
+  if (titleIds.length === 0) return [];
+  return db
+    .select({
+      titleId: availabilityOffers.titleId,
+      providerId: availabilityOffers.providerId,
+      providerName: availabilityOffers.providerName,
+      logoPath: availabilityOffers.logoPath,
+    })
+    .from(availabilityOffers)
+    .where(
+      and(
+        inArray(availabilityOffers.titleId, titleIds),
+        eq(availabilityOffers.offerType, "flatrate"),
+      ),
+    )
+    .all();
 }

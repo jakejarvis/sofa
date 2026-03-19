@@ -160,6 +160,7 @@ export const episodes = sqliteTable(
   },
   (table) => [
     uniqueIndex("episodes_seasonId_episodeNumber").on(table.seasonId, table.episodeNumber),
+    index("episodes_airDate").on(table.airDate),
   ],
 );
 

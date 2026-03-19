@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as AppUpcomingRouteImport } from './routes/_app/upcoming'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppExploreRouteImport } from './routes/_app/explore'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
@@ -49,6 +50,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const AppUpcomingRoute = AppUpcomingRouteImport.update({
+  id: '/upcoming',
+  path: '/upcoming',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/explore': typeof AppExploreRoute
   '/settings': typeof AppSettingsRoute
+  '/upcoming': typeof AppUpcomingRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/people/$id': typeof AppPeopleIdRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/explore': typeof AppExploreRoute
   '/settings': typeof AppSettingsRoute
+  '/upcoming': typeof AppUpcomingRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/people/$id': typeof AppPeopleIdRoute
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/explore': typeof AppExploreRoute
   '/_app/settings': typeof AppSettingsRoute
+  '/_app/upcoming': typeof AppUpcomingRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_app/people/$id': typeof AppPeopleIdRoute
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/explore'
     | '/settings'
+    | '/upcoming'
     | '/login'
     | '/register'
     | '/people/$id'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/explore'
     | '/settings'
+    | '/upcoming'
     | '/login'
     | '/register'
     | '/people/$id'
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/explore'
     | '/_app/settings'
+    | '/_app/upcoming'
     | '/_auth/login'
     | '/_auth/register'
     | '/_app/people/$id'
@@ -200,6 +212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_app/upcoming': {
+      id: '/_app/upcoming'
+      path: '/upcoming'
+      fullPath: '/upcoming'
+      preLoaderRoute: typeof AppUpcomingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/settings': {
       id: '/_app/settings'
       path: '/settings'
@@ -242,6 +261,7 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppExploreRoute: typeof AppExploreRoute
   AppSettingsRoute: typeof AppSettingsRoute
+  AppUpcomingRoute: typeof AppUpcomingRoute
   AppPeopleIdRoute: typeof AppPeopleIdRoute
   AppTitlesIdRoute: typeof AppTitlesIdRoute
 }
@@ -250,6 +270,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppExploreRoute: AppExploreRoute,
   AppSettingsRoute: AppSettingsRoute,
+  AppUpcomingRoute: AppUpcomingRoute,
   AppPeopleIdRoute: AppPeopleIdRoute,
   AppTitlesIdRoute: AppTitlesIdRoute,
 }

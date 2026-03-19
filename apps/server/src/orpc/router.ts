@@ -40,6 +40,7 @@ export const implementedRouter = {
   dashboard: {
     stats: dashboard.stats,
     continueWatching: dashboard.continueWatching,
+    upcoming: dashboard.upcoming,
     library: dashboard.library,
     recommendations: dashboard.recommendations,
     watchHistory: dashboard.watchHistory,

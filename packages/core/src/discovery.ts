@@ -1,5 +1,6 @@
 import {
   getAllTrackedTitleIds,
+  getAvailabilityByTitleIds,
   getCompletedTitleIds,
   getEpisodesBySeasonIds,
   getEpisodeWatchCountSince,
@@ -17,6 +18,8 @@ import {
   getTitleByIdOrNull,
   getTitlesByIds,
   getTvTitlesByIds,
+  getUpcomingEpisodes,
+  getUpcomingMovies,
   getUserStatusCounts,
 } from "@sofa/db/queries/discovery";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
@@ -338,6 +341,189 @@ export function getRecommendationsFeed(userId: string) {
   const recTitleMap = new Map(recTitles.map((t) => [t.id, t]));
 
   return sorted.map((r) => recTitleMap.get(r.titleId)).filter(Boolean);
+}
+
+// ─── Upcoming feed ──────────────────────────────────────────────────
+
+export interface UpcomingItem {
+  titleId: string;
+  titleName: string;
+  titleType: "movie" | "tv";
+  posterPath: string | null;
+  posterThumbHash: string | null;
+  seasonNumber: number | null;
+  episodeNumber: number | null;
+  episodeName: string | null;
+  episodeCount: number;
+  date: string;
+  userStatus: "watchlist" | "in_progress" | "completed";
+  isNewSeason: boolean;
+  streamingProvider: {
+    providerId: number;
+    providerName: string;
+    logoPath: string | null;
+  } | null;
+}
+
+export interface UpcomingFeedResult {
+  items: UpcomingItem[];
+  nextCursor: string | null;
+}
+
+export function getUpcomingFeed(
+  userId: string,
+  options: { days?: number; limit?: number; cursor?: string } = {},
+): UpcomingFeedResult {
+  const { days = 90, limit = 20, cursor } = options;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const fromDate = cursor ?? today;
+  const horizon = new Date();
+  horizon.setDate(horizon.getDate() + days);
+  const toDate = horizon.toISOString().slice(0, 10);
+
+  // Fetch limit + 1 from each to detect if there are more pages
+  const fetchLimit = limit + 1;
+
+  const episodeRows = getUpcomingEpisodes(userId, fromDate, toDate, fetchLimit);
+  const movieRows = getUpcomingMovies(userId, fromDate, toDate, fetchLimit);
+
+  // Merge into unified items
+  type RawItem = { date: string; titleId: string; titleName: string } & (
+    | { type: "tv"; row: (typeof episodeRows)[number] }
+    | { type: "movie"; row: (typeof movieRows)[number] }
+  );
+
+  const merged: RawItem[] = [
+    ...episodeRows.map((r) => ({
+      date: r.airDate!,
+      titleId: r.titleId,
+      titleName: r.titleName,
+      type: "tv" as const,
+      row: r,
+    })),
+    ...movieRows.map((r) => ({
+      date: r.releaseDate!,
+      titleId: r.titleId,
+      titleName: r.titleName,
+      type: "movie" as const,
+      row: r,
+    })),
+  ];
+
+  // Sort by date ASC, then title ASC
+  merged.sort((a, b) => a.date.localeCompare(b.date) || a.titleName.localeCompare(b.titleName));
+
+  // Collapse batch drops: group 3+ episodes from the same title on the same date into one item
+  const collapsed: (RawItem & { episodeCount: number })[] = [];
+  let i = 0;
+  while (i < merged.length) {
+    const current = merged[i]!;
+    if (current.type === "tv") {
+      // Count consecutive episodes with the same (titleId, date)
+      let groupEnd = i + 1;
+      while (
+        groupEnd < merged.length &&
+        merged[groupEnd]!.type === "tv" &&
+        merged[groupEnd]!.titleId === current.titleId &&
+        merged[groupEnd]!.date === current.date
+      ) {
+        groupEnd++;
+      }
+      const groupSize = groupEnd - i;
+      if (groupSize >= 3) {
+        // Collapse: keep first item with episodeCount and clear episode name
+        collapsed.push({ ...current, episodeCount: groupSize });
+        i = groupEnd;
+      } else {
+        // Keep individual items
+        for (let j = i; j < groupEnd; j++) {
+          collapsed.push({ ...merged[j]!, episodeCount: 1 });
+        }
+        i = groupEnd;
+      }
+    } else {
+      collapsed.push({ ...current, episodeCount: 1 });
+      i++;
+    }
+  }
+
+  // Handle cursor deduplication: if cursor has a titleId component, skip items until past it
+  let filtered: typeof collapsed = collapsed;
+  if (cursor && cursor.includes("_")) {
+    const [cursorDate, cursorTitleId] = cursor.split("_", 2);
+    filtered = collapsed.filter(
+      (item) =>
+        item.date > cursorDate! || (item.date === cursorDate && item.titleId > cursorTitleId!),
+    );
+  }
+
+  const hasMore = filtered.length > limit;
+  const pageItems = filtered.slice(0, limit);
+
+  // Compute compound cursor for next page
+  let nextCursor: string | null = null;
+  if (hasMore && pageItems.length > 0) {
+    const last = pageItems[pageItems.length - 1]!;
+    nextCursor = `${last.date}_${last.titleId}`;
+  }
+
+  // Batch-fetch streaming providers
+  const titleIds = [...new Set(pageItems.map((item) => item.titleId))];
+  const providerRows = getAvailabilityByTitleIds(titleIds);
+  const providerMap = new Map<
+    string,
+    { providerId: number; providerName: string; logoPath: string | null }
+  >();
+  for (const p of providerRows) {
+    if (!providerMap.has(p.titleId)) {
+      providerMap.set(p.titleId, {
+        providerId: p.providerId,
+        providerName: p.providerName,
+        logoPath: p.logoPath,
+      });
+    }
+  }
+
+  const items: UpcomingItem[] = pageItems.map((item) => {
+    if (item.type === "tv") {
+      const r = item.row;
+      const isCollapsed = item.episodeCount > 1;
+      return {
+        titleId: r.titleId,
+        titleName: r.titleName,
+        titleType: "tv",
+        posterPath: r.posterPath,
+        posterThumbHash: r.posterThumbHash,
+        seasonNumber: r.seasonNumber,
+        episodeNumber: r.episodeNumber,
+        episodeName: isCollapsed ? null : r.episodeName,
+        episodeCount: item.episodeCount,
+        date: r.airDate!,
+        userStatus: r.userStatus as "watchlist" | "in_progress" | "completed",
+        isNewSeason: r.userStatus === "completed" && r.episodeNumber === 1,
+        streamingProvider: providerMap.get(r.titleId) ?? null,
+      };
+    }
+    const r = item.row;
+    return {
+      titleId: r.titleId,
+      titleName: r.titleName,
+      titleType: "movie",
+      posterPath: r.posterPath,
+      posterThumbHash: r.posterThumbHash,
+      seasonNumber: null,
+      episodeNumber: null,
+      episodeName: null,
+      episodeCount: 1,
+      date: r.releaseDate!,
+      userStatus: r.userStatus as "watchlist" | "in_progress" | "completed",
+      isNewSeason: false,
+      streamingProvider: providerMap.get(r.titleId) ?? null,
+    };
+  });
+
+  return { items, nextCursor };
 }
 
 export function getRecommendationsForTitle(titleId: string) {
