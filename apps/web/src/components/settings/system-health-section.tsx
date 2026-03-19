@@ -105,7 +105,7 @@ function LiveTimeAgo({
   fallback?: string;
 }) {
   const text = useTimeAgo(date, { fallback });
-  return <>{text}</>;
+  return <span suppressHydrationWarning>{text}</span>;
 }
 
 /** Hydrates system health state and renders the 3 cards */
@@ -192,7 +192,7 @@ function SystemStatusCard({
               <CardTitle>
                 <Trans>Health status</Trans>
               </CardTitle>
-              <CardDescription suppressHydrationWarning>
+              <CardDescription>
                 <Trans>
                   Checked <LiveTimeAgo date={checkedAt} />
                 </Trans>
@@ -431,10 +431,7 @@ function BackgroundJobsCard({
                       <Tooltip>
                         <TooltipTrigger className="cursor-default">
                           <div className="flex items-baseline gap-1.5">
-                            <span
-                              className="text-muted-foreground/80 text-xs"
-                              suppressHydrationWarning
-                            >
+                            <span className="text-muted-foreground/80 text-xs">
                               <LiveTimeAgo date={job.lastRunAt} />
                             </span>
                             {job.lastDurationMs !== null && job.lastDurationMs > 0 && (
@@ -463,10 +460,7 @@ function BackgroundJobsCard({
                     {job.nextRunAt ? (
                       <Tooltip>
                         <TooltipTrigger className="cursor-default">
-                          <span
-                            className="text-muted-foreground/80 text-xs"
-                            suppressHydrationWarning
-                          >
+                          <span className="text-muted-foreground/80 text-xs">
                             <LiveTimeAgo date={job.nextRunAt} />
                           </span>
                         </TooltipTrigger>
@@ -595,7 +589,7 @@ function StorageCard({
           )}
         </div>
         {backups.backupCount > 0 ? (
-          <p className="text-muted-foreground mt-1 text-xs" suppressHydrationWarning>
+          <p className="text-muted-foreground mt-1 text-xs">
             <Trans>
               {backups.backupCount} backups · last{" "}
               <LiveTimeAgo date={backups.lastBackupAt} fallback={t`unknown`} />

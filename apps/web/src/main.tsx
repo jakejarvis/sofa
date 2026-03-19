@@ -10,7 +10,8 @@ import { routeTree } from "./routeTree.gen";
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
-  defaultPreloadStaleTime: 0,
+  defaultPreloadStaleTime: 60_000,
+  defaultPendingMs: 0,
   scrollRestoration: true,
   context: { orpc, queryClient },
   Wrap: function WrapComponent({ children }: { children: React.ReactNode }) {

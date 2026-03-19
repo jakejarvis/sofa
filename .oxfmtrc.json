@@ -1,7 +1,14 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "sortImports": {
-    "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+    "groups": [
+      "builtin",
+      "external",
+      ["internal", "subpath"],
+      ["parent", "sibling", "index"],
+      "style",
+      "unknown"
+    ],
     "internalPattern": ["@/", "@sofa/"],
     "newlinesBetween": true,
     "order": "asc"

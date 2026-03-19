@@ -1,4 +1,3 @@
-import type { Hotkey } from "@tanstack/react-hotkeys";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useAtomValue } from "jotai";
 
@@ -37,9 +36,11 @@ export function TitleKeyboardShortcuts() {
     { enabled },
   );
 
-  for (const n of [1, 2, 3, 4, 5]) {
-    useHotkey(String(n) as Hotkey, () => handleRating(n), { enabled });
-  }
+  useHotkey("1", () => handleRating(1), { enabled });
+  useHotkey("2", () => handleRating(2), { enabled });
+  useHotkey("3", () => handleRating(3), { enabled });
+  useHotkey("4", () => handleRating(4), { enabled });
+  useHotkey("5", () => handleRating(5), { enabled });
 
   return null;
 }

@@ -134,8 +134,9 @@ bun run dev
 
 Useful commands:
 
-- `bun run test`
+- `bun test`
 - `bun run lint`
+- `bun run format`
 - `bun run check-types`
 - `cd packages/db && bun run db:generate`
 - `cd packages/db && bun run db:migrate`

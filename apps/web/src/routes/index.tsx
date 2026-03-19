@@ -6,9 +6,11 @@ import { client } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/")({
   beforeLoad: async () => {
-    const { data: session } = await authClient.getSession();
+    const [{ data: session }, info] = await Promise.all([
+      authClient.getSession(),
+      client.system.publicInfo({}),
+    ]);
     if (session?.user) throw redirect({ to: "/dashboard" });
-    const info = await client.system.publicInfo({});
     if (!info.tmdbConfigured) throw redirect({ to: "/setup" });
     return { info };
   },

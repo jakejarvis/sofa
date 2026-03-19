@@ -15,8 +15,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { initLocale } from "@/lib/i18n";
 import type { orpc } from "@/lib/orpc/client";
-import globalsCss from "@/styles/globals.css?url";
 import { i18n } from "@sofa/i18n";
+
+import "@/styles/globals.css";
 
 export const Route = createRootRouteWithContext<{
   orpc: typeof orpc;
@@ -37,7 +38,6 @@ export const Route = createRootRouteWithContext<{
       { name: "description", content: "Track your movies and TV shows" },
     ],
     links: [
-      { rel: "stylesheet", href: globalsCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/apple-icon.png" },
     ],

@@ -18,7 +18,9 @@
     "unicorn/consistent-function-scoping": "off",
     "no-new": "off",
     "no-await-in-loop": "off",
-    "react/no-array-index-key": "off"
+    "react/no-array-index-key": "off",
+    "react/jsx-no-useless-fragment": "error",
+    "react/rules-of-hooks": "error"
   },
   "ignorePatterns": ["node_modules", "dist", "build", "docs", "**/routeTree.gen.ts"]
 }

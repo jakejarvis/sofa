@@ -6,6 +6,8 @@ process.env.LOG_LEVEL ??= "error";
 
 mock.module("@sofa/db/client", () => ({
   db: testDb,
+  optimizeDatabase: () => {},
+  vacuumDatabase: () => {},
   closeDatabase: () => {},
 }));
 

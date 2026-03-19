@@ -11,19 +11,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_app/explore")({
-  loader: ({ context }) => {
-    context.queryClient.ensureQueryData(
-      orpc.explore.popular.queryOptions({ input: { type: "movie" } }),
-    );
-    context.queryClient.ensureQueryData(
-      orpc.explore.popular.queryOptions({ input: { type: "tv" } }),
-    );
-    context.queryClient.ensureQueryData(
-      orpc.explore.genres.queryOptions({ input: { type: "movie" } }),
-    );
-    context.queryClient.ensureQueryData(
-      orpc.explore.genres.queryOptions({ input: { type: "tv" } }),
-    );
+  loader: async ({ context }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(
+        orpc.explore.popular.queryOptions({ input: { type: "movie" } }),
+      ),
+      context.queryClient.ensureQueryData(
+        orpc.explore.popular.queryOptions({ input: { type: "tv" } }),
+      ),
+      context.queryClient.ensureQueryData(
+        orpc.explore.genres.queryOptions({ input: { type: "movie" } }),
+      ),
+      context.queryClient.ensureQueryData(
+        orpc.explore.genres.queryOptions({ input: { type: "tv" } }),
+      ),
+    ]);
   },
   pendingComponent: ExploreSkeletons,
   component: ExplorePage,

@@ -4,13 +4,17 @@
 
 ```bash
 # Root commands (via Turborepo)
-bun run dev              # Start API server + Vite dev server
+bun run dev              # Start API, Vite dev, and Expo dev servers
+bun run dev:docs         # Start the fumadocs/Next.js dev server
 bun run build            # Production build (both apps)
 bun run lint             # Oxlint lint check
 bun run format           # Oxfmt format (auto-fix)
 bun run check-types      # TypeScript type check
 bun run test             # Run tests
 bun run generate:openapi # Regenerate OpenAPI spec + docs API pages (run after contract/schema changes)
+bun run i18n:extract     # Run LingUI's string extraction
+bun run i18n:compile     # Run LingUI's typescript compilation
+bun run i18n:claude      # Prompt Claude Code to fill in untranslated strings
 
 # Database commands (run from packages/db/)
 cd packages/db && bun run db:push       # Push schema changes to SQLite database
@@ -21,14 +25,15 @@ cd packages/db && bun run db:studio     # Open Drizzle Studio (visual DB browser
 
 **Use Bun, not Node.js** — `bun <file>`, `bun test`, `bun install`, `bun run <script>`, `bunx <pkg>`. Bun auto-loads `.env`.
 
-## Pre-commit checks
+## CRITICAL: Pre-commit checks
 
-All three must pass with zero warnings or errors:
+Before declaring a task is complete, all four commands MUST pass with zero errors or warnings:
 
 ```bash
 bun run lint
+bun run format:check
 bun run check-types
-bun run test
+bun test
 ```
 
 ## Architecture
@@ -53,9 +58,9 @@ couch-potato/
 │   └── tmdb/          # @sofa/tmdb — TMDB API client + image URL helper (JIT)
 ├── .oxlintrc.json
 ├── .oxfmtrc.json
-├── turbo.json
 ├── Dockerfile
-└── package.json
+├── package.json
+└── turbo.json
 ```
 
 All shared packages are JIT (raw TypeScript exports, no build step).
@@ -79,6 +84,7 @@ All shared packages are JIT (raw TypeScript exports, no build step).
 - **Docs**: Fumadocs (Next.js), fumadocs-openapi for API reference
 - **Linting**: Oxlint + Oxfmt (2-space indent, organized imports, Tailwind class sorting)
 - **External API**: TMDB (The Movie Database)
+- **Translation**: LingUI + Crowdin
 
 ### Package imports
 
@@ -108,6 +114,18 @@ Cross-package imports:
 **TMDB images** — Only paths stored in DB. The API server resolves full URLs via `tmdbImageUrl()`. When `IMAGE_CACHE_ENABLED` (default), images are downloaded to disk and served via `/images/:category/:filename`.
 
 **Database IDs** — All app tables use UUIDv7 text PKs via `Bun.randomUUIDv7()`.
+
+**i18n (LingUI)** — All user-facing strings are wrapped with LingUI macros. The `@sofa/i18n` shared package holds the i18n singleton, locale metadata, and `Intl`-based format utilities. Config lives at the repo root (`lingui.config.ts`). PO catalogs and compiled TS files live in `packages/i18n/src/po/`. Crowdin syncs via `crowdin.yml` with `languages_mapping` to map regional codes (es-ES→es, pt-PT→pt).
+
+- **JSX text** → `<Trans>` from `@lingui/react/macro`
+- **Strings in hooks/components** → `const { t } = useLingui()` from `@lingui/react/macro`, then `` t`string` ``
+- **Strings outside React** (plain modules) → `import { msg } from "@lingui/core/macro"` + `import { i18n } from "@sofa/i18n"`, then `` i18n._(msg`string`) ``
+- **Pluralization** → `import { plural } from "@lingui/core/macro"`, use inside `t`: `` t`${plural(count, { one: "# item", other: "# items" })}` ``
+- **DO NOT use** `t(i18n)` — it's deprecated in v5 and removed in v6. Use `i18n._(msg`...`)` instead.
+- **Date/number formatting** → use `formatDate`, `formatRelativeTime`, `formatNumber`, `formatBytes` from `@sofa/i18n/format` (Intl-based, locale-aware). Never use `date-fns` in app code.
+- **Native Intl polyfills** → `@formatjs/intl-*` polyfills loaded in `apps/native/src/lib/intl-polyfills.ts` (strict dependency order, with locale data for all 6 languages).
+- **Error messages** → Server throws `ORPCError` with `data: { code: AppErrorCode.XXX }`. Clients map codes to localized strings via per-app `error-messages.ts`. Never display `error.message` to users.
+- After adding/changing strings, run `bun run i18n:extract` then `bun run i18n:compile`.
 
 ### Environment variables
 
