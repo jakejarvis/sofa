@@ -1,0 +1,76 @@
+---
+title: Translations
+description: Language support and how to contribute translations.
+icon: Languages
+---
+
+Sofa supports multiple languages for the web and mobile apps. The current supported locales are:
+
+- English (source)
+- French
+- German
+- Spanish
+- Italian
+- Portuguese
+
+You can switch languages in **Settings > Language** on web or the mobile app. Sofa detects your browser or device language on first launch and defaults to it if supported. This setting is **not** saved to the server — it is only persisted to the current browser or device.
+
+## How translations work
+
+Sofa uses [Lingui](https://lingui.dev) for internationalization. All translatable strings are extracted from the source code into PO files (an industry-standard format), which live in [`packages/i18n/src/po/`](https://github.com/jakejarvis/sofa/tree/main/packages/i18n/src/po).
+
+The translation pipeline:
+
+1. React (web) and React Native (mobile) apps wrap UI strings in `<Trans>` components or `` msg`...` `` macros
+2. `bun run i18n:extract` scans the codebase and updates `en.po` with new strings
+3. Translations are added to each locale's `.po` file (e.g. `fr.po`, `de.po`)
+4. `bun run i18n:compile` compiles `.po` files into TypeScript for use at runtime
+5. Non-English locales are lazy-loaded on demand
+
+## Contributing via Crowdin
+
+The easiest way to contribute translations is through [Crowdin](https://crowdin.com/project/sofa), a community translation platform. No development setup required — just sign up and start translating in the browser!
+
+When source strings change on `main`, they are automatically uploaded to Crowdin [via GitHub Actions](https://github.com/jakejarvis/sofa/blob/main/.github/workflows/crowdin.yml). To pull completed translations back into the repo, a maintainer triggers the download workflow which creates a PR with the updated `.po` files.
+
+## AI translation with Claude
+
+For maintainers, Sofa includes a script, [`claude.ts`](https://github.com/jakejarvis/sofa/blob/main/packages/i18n/scripts/claude.ts), that uses [Claude Code](https://docs.anthropic.com/en/docs/claude-code) to roughly translate any yet-to-be-translated strings.
+
+```bash
+# Translate a single locale
+bun packages/i18n/scripts/claude.ts fr
+
+# Translate all locales (runs in parallel)
+bun packages/i18n/scripts/claude.ts all
+
+# Preview without translating
+bun packages/i18n/scripts/claude.ts all --dry-run
+
+# Use a specific model
+bun packages/i18n/scripts/claude.ts all --model opus
+```
+
+The script only translates strings with empty `msgstr` — existing translations are never overwritten. It reads the locale list from [`lingui.config.ts`](https://github.com/jakejarvis/sofa/blob/main/lingui.config.ts) automatically and compiles catalogs after translating.
+
+<Callout type="info">
+  Using this script really only makes sense if you have a [Claude Max
+  subscription](https://claude.ai/upgrade) with Anthropic's cash to burn.
+</Callout>
+
+## Adding a new language
+
+1. Add the locale code to the `locales` array in [`lingui.config.ts`](https://github.com/jakejarvis/sofa/blob/main/lingui.config.ts)
+2. Run `bun run i18n:extract` — this creates a new `.po` file for the locale
+3. Translate the strings (via Crowdin, manually, or with `bun packages/i18n/scripts/claude.ts <locale>`)
+4. Add the locale to the `LOCALE_INFO` array in [`packages/i18n/src/locales.ts`](https://github.com/jakejarvis/sofa/blob/main/packages/i18n/src/locales.ts) with its native name
+5. Run `bun run i18n:compile`
+
+## Translation guidelines
+
+Whether translating via Crowdin, AI, or manually, these rules apply:
+
+- **Keep it concise** — these are UI labels, buttons, and short messages
+- **Preserve placeholders** — `{0}`, `{name}`, `{count, plural, ...}`, `<0>text</0>` must appear in the translation exactly as in the source
+- **Adapt plurals** — ICU plural blocks should use the correct plural categories for your language (e.g. French needs `one`/`other`, Czech needs `one`/`few`/`many`/`other`)
+- **Don't translate brand names** — Sofa, TMDB, Plex, Jellyfin, etc. stay as-is

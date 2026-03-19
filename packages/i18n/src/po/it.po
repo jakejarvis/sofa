@@ -8,54 +8,54 @@ msgstr ""
 "Language: it\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-18 16:04\n"
+"PO-Revision-Date: 2026-03-19 00:35\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Crowdin-Project: sofa\n"
 "X-Crowdin-Project-ID: 881052\n"
 "X-Crowdin-Language: it\n"
-"X-Crowdin-File: /packages/i18n/src/po/en.po\n"
-"X-Crowdin-File-ID: 12\n"
+"X-Crowdin-File: en.po\n"
+"X-Crowdin-File-ID: 14\n"
 
 #. placeholder {0}: result.errors.length - 50
-#: apps/web/src/components/settings/imports-section.tsx:938
+#: apps/web/src/components/settings/imports-section.tsx:895
 msgid "...and {0} more"
-msgstr ""
+msgstr "...e altri {0}"
 
 #. placeholder {0}: systemHealth.data.imageCache.imageCount
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:482
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:456
 msgid "{0, plural, one {# image} other {# images}}"
-msgstr ""
+msgstr "{0, plural, one {# immagine} other {# immagini}}"
 
 #. placeholder {0}: systemHealth.data.database.titleCount
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:466
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:442
 msgid "{0, plural, one {# title} other {# titles}}"
-msgstr ""
+msgstr "{0, plural, one {# titolo} other {# titoli}}"
 
 #. placeholder {0}: displayBackups.length
 #. placeholder {1}: displayBackups.length
-#: apps/web/src/components/settings/backup-section.tsx:109
+#: apps/web/src/components/settings/backup-section.tsx:98
 msgid "{0} {1, plural, one {backup} other {backups}} stored"
-msgstr ""
+msgstr "{0} {1, plural, one {backup} other {backup}} archiviati"
 
 #: apps/web/src/components/settings/backup-section.tsx:105
 #~ msgid "{0} backup{1} stored"
 #~ msgstr "{0} backup{1} stored"
 
 #. placeholder {0}: backups.backupCount
-#: apps/web/src/components/settings/system-health-section.tsx:654
+#: apps/web/src/components/settings/system-health-section.tsx:599
 msgid "{0} backups · last <0/>"
-msgstr ""
+msgstr "{0} backup · ultimo <0/>"
 
 #. placeholder {0}: imageCache.imageCount.toLocaleString()
-#: apps/web/src/components/settings/system-health-section.tsx:621
+#: apps/web/src/components/settings/system-health-section.tsx:569
 msgid "{0} cached images"
-msgstr ""
+msgstr "{0} immagini in cache"
 
 #. placeholder {0}: member.episodeCount
 #. placeholder {1}: member.episodeCount !== 1 ? "s" : ""
-#: apps/web/src/components/titles/cast-carousel.tsx:80
+#: apps/web/src/components/titles/cast-carousel.tsx:78
 msgid "{0} ep{1}"
 msgstr ""
 
@@ -64,1061 +64,1061 @@ msgstr ""
 #~ msgstr "{0} images"
 
 #. placeholder {0}: stats.watchlist
-#: apps/web/src/components/settings/imports-section.tsx:808
+#: apps/web/src/components/settings/imports-section.tsx:770
 msgid "{0} items"
-msgstr ""
+msgstr "{0} elementi"
 
 #. placeholder {0}: preview.diagnostics.unresolved
-#: apps/web/src/components/settings/imports-section.tsx:788
+#: apps/web/src/components/settings/imports-section.tsx:750
 msgid "{0} items have no external IDs and will be resolved by title search, which may be less accurate."
-msgstr ""
+msgstr "{0} elementi non hanno ID esterni e verranno risolti tramite ricerca per titolo, che potrebbe essere meno accurata."
 
 #. placeholder {0}: stats.movies
 #. placeholder {1}: stats.episodes
-#: apps/web/src/components/settings/imports-section.tsx:802
+#: apps/web/src/components/settings/imports-section.tsx:764
 msgid "{0} movies, {1} episodes"
-msgstr ""
+msgstr "{0} film, {1} episodi"
 
 #. placeholder {0}: stats.ratings
-#: apps/web/src/components/settings/imports-section.tsx:814
+#: apps/web/src/components/settings/imports-section.tsx:776
 msgid "{0} ratings"
-msgstr ""
+msgstr "{0} valutazioni"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx:456
 #~ msgid "{0} titles"
 #~ msgstr "{0} titles"
 
 #. placeholder {0}: JOB_LABELS[name] ?? name
-#: apps/web/src/components/settings/system-health-section.tsx:343
+#: apps/web/src/components/settings/system-health-section.tsx:316
 msgid "{0} triggered"
-msgstr ""
+msgstr "{0} attivato"
 
 #. placeholder {0}: item.watchedEpisodes
 #. placeholder {1}: item.totalEpisodes
 #. placeholder {2}: item.totalEpisodes
-#: apps/web/src/components/dashboard/continue-watching-card.tsx:93
+#: apps/web/src/components/dashboard/continue-watching-card.tsx:78
 msgid "{0}/{1} {2, plural, one {episode} other {episodes}}"
-msgstr ""
+msgstr "{0}/{1} {2, plural, one {episodio} other {episodi}}"
 
 #: apps/web/src/components/dashboard/continue-watching-card.tsx:92
 #~ msgid "{0}/{1} episodes"
 #~ msgstr "{0}/{1} episodes"
 
-#: apps/web/src/components/titles/use-title-actions.ts:221
-#: apps/web/src/components/titles/use-title-actions.ts:299
+#: apps/web/src/components/titles/use-title-actions.ts:200
+#: apps/web/src/components/titles/use-title-actions.ts:278
 msgid "{count} earlier {count, plural, one {episode} other {episodes}} unwatched"
 msgstr ""
 
 #. placeholder {0}: activeJobs.length
-#: apps/web/src/components/settings/system-health-section.tsx:385
+#: apps/web/src/components/settings/system-health-section.tsx:351
 msgid "{healthyCount} of {0} jobs healthy"
-msgstr ""
+msgstr "{healthyCount} di {0} job attivi"
 
-#: apps/native/src/components/settings/integration-card.tsx:96
-#: apps/web/src/components/settings/integration-card.tsx:106
+#: apps/native/src/components/settings/integration-card.tsx:84
+#: apps/web/src/components/settings/integration-card.tsx:89
 msgid "{label} connected"
-msgstr ""
+msgstr "Connesso: {label}"
 
-#: apps/native/src/components/settings/integration-card.tsx:106
-#: apps/web/src/components/settings/integration-card.tsx:122
+#: apps/native/src/components/settings/integration-card.tsx:94
+#: apps/web/src/components/settings/integration-card.tsx:105
 msgid "{label} disconnected"
-msgstr ""
+msgstr "Disconnesso: {label}"
 
-#: apps/native/src/components/settings/integration-card.tsx:116
-#: apps/web/src/components/settings/integration-card.tsx:138
+#: apps/native/src/components/settings/integration-card.tsx:104
+#: apps/web/src/components/settings/integration-card.tsx:119
 msgid "{label} URL regenerated"
-msgstr ""
+msgstr "URL {label} rigenerato"
 
-#: apps/web/src/components/title-card.tsx:166
+#: apps/web/src/components/title-card.tsx:152
 msgid "{watched}/{total} episodes"
-msgstr ""
+msgstr "{watched}/{total} episodi"
 
 #. placeholder {0}: episodes.length
-#: apps/native/src/components/titles/season-accordion.tsx:122
+#: apps/native/src/components/titles/season-accordion.tsx:113
 msgid "{watchedCount} of {0} episodes watched"
-msgstr ""
+msgstr "{watchedCount} di {0} episodi visti"
 
 #. placeholder {0}: episodes.length
 #. placeholder {1}: episodes.length
-#: apps/native/src/components/titles/season-accordion.tsx:131
+#: apps/native/src/components/titles/season-accordion.tsx:122
 msgid "{watchedCount}/{0} {1, plural, one {episode} other {episodes}}"
-msgstr ""
+msgstr "{watchedCount}/{0} {1, plural, one {episodio} other {episodi}}"
 
 #: apps/native/src/components/titles/season-accordion.tsx:130
 #~ msgid "{watchedCount}/{0} episodes"
 #~ msgstr "{watchedCount}/{0} episodes"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:231
-#: apps/web/src/components/settings/account-section.tsx:175
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:224
+#: apps/web/src/components/settings/account-section.tsx:166
 msgid "Account"
 msgstr ""
 
-#: apps/web/src/components/settings/system-health-section.tsx:412
+#: apps/web/src/components/settings/system-health-section.tsx:378
 msgid "Actions"
-msgstr ""
+msgstr "Azioni"
 
-#: apps/web/src/components/people/person-hero.tsx:71
+#: apps/web/src/components/people/person-hero.tsx:69
 msgid "Actor"
-msgstr ""
+msgstr "Attore"
 
-#: apps/native/src/components/settings/integration-configs.ts:72
+#: apps/native/src/components/settings/integration-configs.ts:71
 msgid "Add a \"Generic Destination\" and paste the URL above"
-msgstr ""
+msgstr "Aggiungi una \"Destinazione generica\" e incolla l'URL sopra"
 
-#: apps/web/src/components/settings/integration-configs.tsx:131
+#: apps/web/src/components/settings/integration-configs.tsx:121
 msgid "Add a <0>Generic Destination</0> and paste the URL above"
-msgstr ""
+msgstr "Aggiungi una <0>Destinazione generica</0> e incolla l'URL sopra"
 
-#: apps/native/src/components/settings/integration-configs.ts:92
-#: apps/web/src/components/settings/integration-configs.tsx:198
+#: apps/native/src/components/settings/integration-configs.ts:89
+#: apps/web/src/components/settings/integration-configs.tsx:178
 msgid "Add a new webhook and paste the URL above"
-msgstr ""
+msgstr "Aggiungi un nuovo webhook e incolla l'URL sopra"
 
-#: apps/web/src/components/explore/hero-banner.tsx:99
+#: apps/web/src/components/explore/hero-banner.tsx:87
 msgid "Add to Library"
-msgstr ""
+msgstr "Aggiungi alla libreria"
 
-#: apps/native/src/components/titles/status-action-button.tsx:72
+#: apps/native/src/components/titles/status-action-button.tsx:73
 msgid "Add to watchlist"
-msgstr ""
+msgstr "Aggiungi alla watchlist"
 
-#: apps/native/src/components/explore/hero-banner.tsx:157
-#: apps/native/src/components/ui/poster-card.tsx:238
-#: apps/web/src/components/title-card.tsx:146
+#: apps/native/src/components/explore/hero-banner.tsx:132
+#: apps/native/src/components/ui/poster-card.tsx:212
+#: apps/web/src/components/title-card.tsx:133
 msgid "Add to Watchlist"
-msgstr ""
+msgstr "Aggiungi alla watchlist"
 
-#: apps/native/src/lib/title-actions.ts:23
+#: apps/native/src/lib/title-actions.ts:24
 msgid "Added \"{titleName}\" to watchlist"
-msgstr ""
+msgstr "Aggiunto \"{titleName}\" alla watchlist"
 
 #: apps/native/src/hooks/use-title-actions.ts:44
-#: apps/native/src/hooks/use-title-actions.ts:60
-#: apps/native/src/lib/title-actions.ts:24
-#: apps/web/src/components/titles/use-title-actions.ts:111
+#: apps/native/src/hooks/use-title-actions.ts:59
+#: apps/native/src/lib/title-actions.ts:25
+#: apps/web/src/components/titles/use-title-actions.ts:98
 msgid "Added to watchlist"
-msgstr ""
+msgstr "Aggiunto alla watchlist"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:353
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:454
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:499
-#: apps/web/src/components/nav-bar.tsx:235
-#: apps/web/src/components/settings/account-section.tsx:335
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:342
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:431
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:470
+#: apps/web/src/components/nav-bar.tsx:223
+#: apps/web/src/components/settings/account-section.tsx:309
 msgid "Admin"
 msgstr ""
 
-#: apps/web/src/routes/_app/settings.tsx:124
+#: apps/web/src/routes/_app/settings.tsx:118
 msgid "Admin only"
-msgstr ""
+msgstr "Solo admin"
 
-#: apps/native/src/app/person/[id].tsx:308
-#: apps/web/src/components/people/person-hero.tsx:91
+#: apps/native/src/app/person/[id].tsx:267
+#: apps/web/src/components/people/person-hero.tsx:89
 msgid "age {age}"
-msgstr ""
+msgstr "età {age}"
 
-#: apps/native/src/components/explore/filterable-title-row.tsx:119
-#: apps/web/src/components/people/filmography-grid.tsx:58
+#: apps/native/src/components/explore/filterable-title-row.tsx:117
+#: apps/web/src/components/people/filmography-grid.tsx:56
 msgid "All"
-msgstr ""
+msgstr "Tutti"
 
-#: apps/web/src/components/settings/registration-section.tsx:61
+#: apps/web/src/components/settings/registration-section.tsx:54
 msgid "Allow new users to create accounts"
-msgstr ""
+msgstr "Consenti la creazione di nuovi account"
 
-#: apps/web/src/components/auth-form.tsx:278
+#: apps/web/src/components/auth-form.tsx:259
 msgid "Already have an account?"
-msgstr ""
+msgstr "Hai già un account?"
 
-#: apps/native/src/app/(auth)/register.tsx:239
+#: apps/native/src/app/(auth)/register.tsx:211
 msgid "Already have an account? Sign in"
-msgstr ""
+msgstr "Hai già un account? Accedi"
 
-#: apps/web/src/routes/__root.tsx:146
+#: apps/web/src/routes/__root.tsx:143
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
-msgstr ""
+msgstr "Si è verificato un errore imprevisto durante il caricamento di questa pagina. Puoi riprovare o tornare alla dashboard."
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:427
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:407
 msgid "Anonymous usage reporting"
-msgstr ""
+msgstr "Segnalazione anonima dell'utilizzo"
 
-#: apps/web/src/routes/_app/settings.tsx:102
+#: apps/web/src/routes/_app/settings.tsx:99
 msgid "App Settings"
-msgstr ""
+msgstr "Impostazioni app"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:378
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:362
 msgid "Application"
-msgstr ""
+msgstr "Applicazione"
 
-#: apps/native/src/components/settings/integration-card.tsx:151
+#: apps/native/src/components/settings/integration-card.tsx:139
 msgid "Are you sure you want to disconnect {label}? The current URL will stop working."
-msgstr ""
+msgstr "Sei sicuro di voler disconnettere {label}? L'URL attuale smetterà di funzionare."
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:206
-#: apps/native/src/components/header-avatar.tsx:70
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:201
+#: apps/native/src/components/header-avatar.tsx:62
 msgid "Are you sure you want to sign out?"
-msgstr ""
+msgstr "Sei sicuro di voler uscire?"
 
-#: apps/web/src/components/settings/imports-section.tsx:450
+#: apps/web/src/components/settings/imports-section.tsx:429
 msgid "Authorization succeeded but failed to fetch your library. Please try again."
-msgstr ""
+msgstr "Autorizzazione riuscita ma impossibile recuperare la libreria. Riprova."
 
-#: apps/web/src/components/settings/imports-section.tsx:440
+#: apps/web/src/components/settings/imports-section.tsx:419
 msgid "Authorization was denied. Please try again."
-msgstr ""
+msgstr "Autorizzazione negata. Riprova."
 
 #. placeholder {0}: config.label
-#: apps/web/src/components/settings/imports-section.tsx:611
+#: apps/web/src/components/settings/imports-section.tsx:580
 msgid "Authorize Sofa to read your {0} library. No password shared."
-msgstr ""
+msgstr "Autorizza Sofa a leggere la tua libreria {0}. Nessuna password condivisa."
 
-#: apps/web/src/components/settings/update-check-section.tsx:60
+#: apps/web/src/components/settings/update-check-section.tsx:51
 msgid "Automatic update checks"
-msgstr ""
+msgstr "Controllo aggiornamenti automatico"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:279
+#: apps/web/src/components/settings/backup-schedule-section.tsx:248
 msgid "Automatically back up your database on a schedule"
-msgstr ""
+msgstr "Esegui il backup automatico del database secondo una pianificazione"
 
-#: apps/web/src/components/settings/system-health-section.tsx:332
+#: apps/web/src/components/settings/system-health-section.tsx:305
 msgid "Availability"
-msgstr ""
+msgstr "Disponibilità"
 
-#: apps/native/src/app/(auth)/register.tsx:104
+#: apps/native/src/app/(auth)/register.tsx:94
 msgid "Back to Login"
-msgstr ""
+msgstr "Torna al login"
 
-#: apps/web/src/components/settings/system-health-section.tsx:382
+#: apps/web/src/components/settings/system-health-section.tsx:348
 msgid "Background jobs"
-msgstr ""
+msgstr "Job in background"
 
-#: apps/web/src/components/settings/system-health-section.tsx:336
+#: apps/web/src/components/settings/system-health-section.tsx:309
 msgid "Backup"
 msgstr ""
 
-#: apps/web/src/components/settings/backup-section.tsx:69
+#: apps/web/src/components/settings/backup-section.tsx:62
 msgid "Backup created"
-msgstr ""
+msgstr "Backup creato"
 
-#: apps/web/src/components/settings/backup-section.tsx:94
+#: apps/web/src/components/settings/backup-section.tsx:85
 msgid "Backup deleted"
-msgstr ""
+msgstr "Backup eliminato"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:234
+#: apps/web/src/components/settings/backup-schedule-section.tsx:216
 msgid "Backup schedule"
-msgstr ""
+msgstr "Pianificazione backup"
 
-#: apps/web/src/components/settings/system-health-section.tsx:641
-#: apps/web/src/routes/_app/settings.tsx:166
+#: apps/web/src/components/settings/system-health-section.tsx:589
+#: apps/web/src/routes/_app/settings.tsx:154
 msgid "Backups"
-msgstr ""
+msgstr "Backup"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx:272
 #~ msgid "backups."
 #~ msgstr "backups."
 
-#: apps/web/src/components/titles/title-availability.tsx:139
+#: apps/web/src/components/titles/title-availability.tsx:115
 msgid "Buy"
-msgstr ""
+msgstr "Acquista"
 
-#: apps/web/src/components/settings/danger-section.tsx:89
+#: apps/web/src/components/settings/danger-section.tsx:85
 msgid "Cache management"
-msgstr ""
+msgstr "Gestione cache"
 
-#: apps/native/src/components/ui/server-unreachable-banner.ios.tsx:66
-#: apps/native/src/components/ui/server-unreachable-banner.tsx:74
+#: apps/native/src/components/ui/server-unreachable-banner.ios.tsx:67
+#: apps/native/src/components/ui/server-unreachable-banner.tsx:75
 msgid "Can't reach server"
-msgstr ""
+msgstr "Impossibile raggiungere il server"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:207
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:332
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:388
-#: apps/native/src/components/header-avatar.tsx:71
-#: apps/native/src/components/search/recently-viewed-list.ios.tsx:63
-#: apps/native/src/components/search/recently-viewed-list.tsx:37
-#: apps/native/src/components/settings/integration-card.tsx:138
-#: apps/native/src/components/settings/integration-card.tsx:153
-#: apps/web/src/components/settings/account-section.tsx:505
-#: apps/web/src/components/settings/backup-restore-section.tsx:107
-#: apps/web/src/components/settings/backup-section.tsx:270
-#: apps/web/src/components/settings/danger-section.tsx:129
-#: apps/web/src/components/settings/danger-section.tsx:171
-#: apps/web/src/components/settings/danger-section.tsx:214
-#: apps/web/src/components/settings/imports-section.tsx:645
-#: apps/web/src/components/settings/imports-section.tsx:710
-#: apps/web/src/components/settings/imports-section.tsx:837
-#: apps/web/src/components/titles/title-seasons.tsx:133
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:202
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:321
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:369
+#: apps/native/src/components/header-avatar.tsx:63
+#: apps/native/src/components/search/recently-viewed-list.ios.tsx:58
+#: apps/native/src/components/search/recently-viewed-list.tsx:32
+#: apps/native/src/components/settings/integration-card.tsx:126
+#: apps/native/src/components/settings/integration-card.tsx:141
+#: apps/web/src/components/settings/account-section.tsx:477
+#: apps/web/src/components/settings/backup-restore-section.tsx:101
+#: apps/web/src/components/settings/backup-section.tsx:240
+#: apps/web/src/components/settings/danger-section.tsx:121
+#: apps/web/src/components/settings/danger-section.tsx:154
+#: apps/web/src/components/settings/danger-section.tsx:187
+#: apps/web/src/components/settings/imports-section.tsx:611
+#: apps/web/src/components/settings/imports-section.tsx:674
+#: apps/web/src/components/settings/imports-section.tsx:798
+#: apps/web/src/components/titles/title-seasons.tsx:127
 msgid "Cancel"
-msgstr ""
+msgstr "Annulla"
 
-#: apps/web/src/components/settings/account-section.tsx:307
+#: apps/web/src/components/settings/account-section.tsx:281
 msgid "Cancel editing"
-msgstr ""
+msgstr "Annulla modifica"
 
-#: apps/native/src/app/title/[id].tsx:559
+#: apps/native/src/app/title/[id].tsx:489
 #: apps/web/src/components/titles/cast-carousel.tsx:21
 msgid "Cast"
 msgstr ""
 
-#: apps/web/src/components/titles/use-title-actions.ts:223
-#: apps/web/src/components/titles/use-title-actions.ts:301
+#: apps/web/src/components/titles/use-title-actions.ts:202
+#: apps/web/src/components/titles/use-title-actions.ts:280
 msgid "Catch up"
-msgstr ""
+msgstr "Recupera episodi"
 
 #. placeholder {0}: episodeIds.length
 #. placeholder {1}: episodeIds.length
-#: apps/web/src/components/titles/use-title-actions.ts:82
+#: apps/web/src/components/titles/use-title-actions.ts:72
 msgid "Caught up — marked {0} {1, plural, one {episode} other {episodes}} as watched"
-msgstr ""
+msgstr "Recuperati — {0} {1, plural, one {episodio} other {episodi}} segnati come visti"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:361
-#: apps/web/src/components/settings/account-section.tsx:427
-#: apps/web/src/components/settings/account-section.tsx:432
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:350
+#: apps/web/src/components/settings/account-section.tsx:401
+#: apps/web/src/components/settings/account-section.tsx:406
 msgid "Change password"
-msgstr ""
+msgstr "Cambia password"
 
-#: apps/native/src/app/change-password.tsx:98
+#: apps/native/src/app/change-password.tsx:94
 msgid "Change Password"
-msgstr ""
+msgstr "Cambia password"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:267
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:258
 msgid "Change Photo"
-msgstr ""
+msgstr "Cambia foto"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:385
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:368
 msgid "Change Server"
-msgstr ""
+msgstr "Cambia server"
 
-#: apps/web/src/components/setup/refresh-button.tsx:30
+#: apps/web/src/components/setup/refresh-button.tsx:24
 msgid "Check configuration"
-msgstr ""
+msgstr "Verifica configurazione"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:513
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:483
 msgid "Check for updates"
-msgstr ""
+msgstr "Cerca aggiornamenti"
 
-#: apps/web/src/components/settings/system-health-section.tsx:215
+#: apps/web/src/components/settings/system-health-section.tsx:196
 msgid "Checked <0/>"
-msgstr ""
+msgstr "Controllato <0/>"
 
-#: apps/web/src/components/setup/refresh-button.tsx:28
+#: apps/web/src/components/setup/refresh-button.tsx:24
 msgid "Checking…"
-msgstr ""
+msgstr "Verifica in corso…"
 
 #. placeholder {0}: config.label
-#: apps/web/src/components/settings/imports-section.tsx:587
+#: apps/web/src/components/settings/imports-section.tsx:556
 msgid "Choose how to import your {0} data."
-msgstr ""
+msgstr "Scegli come importare i tuoi dati {0}."
 
 #: apps/web/src/components/settings/language-section.tsx:29
 #~ msgid "Choose your preferred display language"
 #~ msgstr "Choose your preferred display language"
 
-#: apps/native/src/components/search/recently-viewed-list.ios.tsx:65
-#: apps/native/src/components/search/recently-viewed-list.ios.tsx:115
-#: apps/native/src/components/search/recently-viewed-list.tsx:39
-#: apps/native/src/components/search/recently-viewed-list.tsx:95
-msgid "Clear"
-msgstr ""
-
-#: apps/web/src/components/command-palette.tsx:322
-msgid "Clear all"
-msgstr ""
-
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx:60
+#: apps/native/src/components/search/recently-viewed-list.ios.tsx:104
 #: apps/native/src/components/search/recently-viewed-list.tsx:34
+#: apps/native/src/components/search/recently-viewed-list.tsx:86
+msgid "Clear"
+msgstr "Cancella"
+
+#: apps/web/src/components/command-palette.tsx:302
+msgid "Clear all"
+msgstr "Cancella tutto"
+
+#: apps/native/src/components/search/recently-viewed-list.ios.tsx:57
+#: apps/native/src/components/search/recently-viewed-list.tsx:31
 msgid "Clear Recently Viewed?"
-msgstr ""
+msgstr "Cancellare la cronologia recente?"
 
-#: apps/native/src/components/settings/integration-configs.ts:109
-#: apps/native/src/components/settings/integration-configs.ts:127
+#: apps/native/src/components/settings/integration-configs.ts:104
+#: apps/native/src/components/settings/integration-configs.ts:122
 msgid "Click \"+\" and select \"Custom Lists\""
-msgstr ""
+msgstr "Clicca \"+\" e seleziona \"Custom Lists\""
 
-#: apps/native/src/components/settings/integration-configs.ts:55
+#: apps/native/src/components/settings/integration-configs.ts:56
 msgid "Click \"Add Webhook\" and paste the URL above"
-msgstr ""
+msgstr "Clicca \"Add Webhook\" e incolla l'URL sopra"
 
-#: apps/web/src/components/settings/integration-configs.tsx:237
-#: apps/web/src/components/settings/integration-configs.tsx:277
+#: apps/web/src/components/settings/integration-configs.tsx:212
+#: apps/web/src/components/settings/integration-configs.tsx:249
 msgid "Click <0>+</0> and select <1>Custom Lists</1>"
-msgstr ""
+msgstr "Clicca <0>+</0> e seleziona <1>Custom Lists</1>"
 
-#: apps/web/src/components/settings/integration-configs.tsx:79
+#: apps/web/src/components/settings/integration-configs.tsx:73
 msgid "Click <0>Add Webhook</0> and paste the URL above"
-msgstr ""
+msgstr "Clicca <0>Add Webhook</0> e incolla l'URL sopra"
 
 #: apps/native/src/components/navigation/modal-stack-header.tsx:14
 msgid "Close"
-msgstr ""
+msgstr "Chiudi"
 
-#: apps/native/src/app/(tabs)/(home)/index.tsx:63
-#: apps/native/src/components/titles/status-action-button.tsx:44
-#: apps/web/src/components/dashboard/stats-display.tsx:238
-#: apps/web/src/components/title-card.tsx:77
-#: apps/web/src/components/titles/status-button.tsx:30
+#: apps/native/src/app/(tabs)/(home)/index.tsx:54
+#: apps/native/src/components/titles/status-action-button.tsx:45
+#: apps/web/src/components/dashboard/stats-display.tsx:219
+#: apps/web/src/components/title-card.tsx:74
+#: apps/web/src/components/titles/status-button.tsx:25
 msgid "Completed"
-msgstr ""
+msgstr "Completato"
 
-#: apps/native/src/app/change-password.tsx:173
-#: apps/web/src/components/settings/account-section.tsx:477
+#: apps/native/src/app/change-password.tsx:167
+#: apps/web/src/components/settings/account-section.tsx:451
 msgid "Confirm new password"
-msgstr ""
+msgstr "Conferma nuova password"
 
-#: apps/native/src/app/(auth)/server-url.tsx:207
-#: apps/web/src/components/settings/imports-section.tsx:499
+#: apps/native/src/app/(auth)/server-url.tsx:182
+#: apps/web/src/components/settings/imports-section.tsx:478
 msgid "Connect"
-msgstr ""
+msgstr "Connetti"
 
 #. placeholder {0}: config.label
-#: apps/web/src/components/settings/integration-card.tsx:203
+#: apps/web/src/components/settings/integration-card.tsx:175
 msgid "Connect {0}"
-msgstr ""
+msgstr "Connetti {0}"
 
-#: apps/native/src/components/settings/integration-card.tsx:238
+#: apps/native/src/components/settings/integration-card.tsx:207
 msgid "Connect {label}"
-msgstr ""
+msgstr "Connetti {label}"
 
-#: apps/web/src/components/settings/imports-section.tsx:665
+#: apps/web/src/components/settings/imports-section.tsx:631
 msgid "Connect to {source}"
-msgstr ""
+msgstr "Connetti a {source}"
 
-#: apps/web/src/routes/setup.tsx:101
+#: apps/web/src/routes/setup.tsx:98
 msgid "Connect to TMDB"
-msgstr ""
+msgstr "Connetti a TMDB"
 
 #. placeholder {0}: config.label
-#: apps/web/src/components/settings/imports-section.tsx:608
+#: apps/web/src/components/settings/imports-section.tsx:577
 msgid "Connect with {0}"
-msgstr ""
+msgstr "Connetti con {0}"
 
-#: apps/native/src/app/(auth)/server-url.tsx:197
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:474
-#: apps/web/src/components/settings/system-health-section.tsx:256
+#: apps/native/src/app/(auth)/server-url.tsx:176
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:449
+#: apps/web/src/components/settings/system-health-section.tsx:236
 msgid "Connected"
-msgstr ""
+msgstr "Connesso"
 
-#: apps/web/src/components/settings/imports-section.tsx:722
+#: apps/web/src/components/settings/imports-section.tsx:686
 msgid "Connected to {source}"
-msgstr ""
+msgstr "Connesso a {source}"
 
-#: apps/native/src/app/(auth)/login.tsx:240
+#: apps/native/src/app/(auth)/login.tsx:211
 msgid "Connected to <0>{serverHost}</0>. Tap to change."
-msgstr ""
+msgstr "Connesso a <0>{serverHost}</0>. Tocca per cambiare."
 
-#: apps/native/src/app/(auth)/server-url.tsx:186
+#: apps/native/src/app/(auth)/server-url.tsx:169
 msgid "Connecting to server..."
-msgstr ""
+msgstr "Connessione al server in corso..."
 
-#: apps/web/src/components/settings/integration-card.tsx:201
+#: apps/web/src/components/settings/integration-card.tsx:175
 msgid "Connecting..."
-msgstr ""
+msgstr "Connessione in corso..."
 
-#: apps/native/src/components/settings/integration-card.tsx:237
+#: apps/native/src/components/settings/integration-card.tsx:207
 msgid "Connecting…"
-msgstr ""
+msgstr "Connessione in corso…"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:390
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:371
 msgid "Continue"
-msgstr ""
+msgstr "Continua"
 
-#: apps/native/src/app/(tabs)/(home)/index.tsx:113
-#: apps/web/src/components/dashboard/continue-watching-section.tsx:25
+#: apps/native/src/app/(tabs)/(home)/index.tsx:99
+#: apps/web/src/components/dashboard/continue-watching-section.tsx:22
 msgid "Continue Watching"
-msgstr ""
+msgstr "Continua a guardare"
 
-#: apps/web/src/components/setup/copy-button.tsx:25
+#: apps/web/src/components/setup/copy-button.tsx:26
 msgid "Copied"
-msgstr ""
+msgstr "Copiato"
 
-#: apps/web/src/components/setup/copy-button.tsx:30
+#: apps/web/src/components/setup/copy-button.tsx:31
 msgid "Copy"
-msgstr ""
+msgstr "Copia"
 
-#: apps/web/src/components/settings/integration-card.tsx:246
+#: apps/web/src/components/settings/integration-card.tsx:208
 msgid "Copy URL"
-msgstr ""
+msgstr "Copia URL"
 
-#: apps/native/src/components/settings/integrations-section.tsx:29
+#: apps/native/src/components/settings/integrations-section.tsx:30
 msgid "Could not load integrations"
-msgstr ""
+msgstr "Impossibile caricare le integrazioni"
 
-#: apps/native/src/app/person/[id].tsx:216
+#: apps/native/src/app/person/[id].tsx:185
 msgid "Could not load person details"
-msgstr ""
+msgstr "Impossibile caricare i dettagli della persona"
 
-#: apps/web/src/components/auth-form.tsx:247
+#: apps/web/src/components/auth-form.tsx:231
 msgid "Create account"
-msgstr ""
+msgstr "Crea account"
 
-#: apps/native/src/app/(auth)/register.tsx:115
-#: apps/native/src/app/(auth)/register.tsx:225
+#: apps/native/src/app/(auth)/register.tsx:104
+#: apps/native/src/app/(auth)/register.tsx:200
 msgid "Create Account"
-msgstr ""
+msgstr "Crea account"
 
-#: apps/native/src/app/(auth)/login.tsx:216
+#: apps/native/src/app/(auth)/login.tsx:194
 msgid "Create an account"
-msgstr ""
+msgstr "Crea un account"
 
 #: apps/web/src/components/auth-form.tsx:110
 msgid "Create your account"
-msgstr ""
+msgstr "Crea il tuo account"
 
-#: apps/web/src/components/settings/backup-section.tsx:137
+#: apps/web/src/components/settings/backup-section.tsx:119
 msgid "Creating…"
-msgstr ""
+msgstr "Creazione in corso…"
 
-#: apps/native/src/app/change-password.tsx:120
-#: apps/web/src/components/settings/account-section.tsx:449
+#: apps/native/src/app/change-password.tsx:116
+#: apps/web/src/components/settings/account-section.tsx:423
 msgid "Current password"
-msgstr ""
+msgstr "Password attuale"
 
-#: apps/web/src/components/settings/account-section.tsx:391
+#: apps/web/src/components/settings/account-section.tsx:365
 msgid "Current password is required"
-msgstr ""
+msgstr "La password attuale è obbligatoria"
 
-#: apps/web/src/routes/_app/settings.tsx:195
+#: apps/web/src/routes/_app/settings.tsx:180
 msgid "Danger Zone"
-msgstr ""
+msgstr "Zona pericolosa"
 
-#: apps/web/src/routes/__root.tsx:167
-#: apps/web/src/routes/_app/people.$id.tsx:78
-#: apps/web/src/routes/_app/titles.$id.tsx:126
-#: apps/web/src/routes/_app/titles.$id.tsx:172
+#: apps/web/src/routes/__root.tsx:164
+#: apps/web/src/routes/_app/people.$id.tsx:76
+#: apps/web/src/routes/_app/titles.$id.tsx:119
+#: apps/web/src/routes/_app/titles.$id.tsx:165
 msgid "Dashboard"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:463
-#: apps/web/src/components/settings/system-health-section.tsx:229
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:439
+#: apps/web/src/components/settings/system-health-section.tsx:210
 msgid "Database"
 msgstr ""
 
-#: apps/web/src/components/settings/backup-section.tsx:126
+#: apps/web/src/components/settings/backup-section.tsx:112
 msgid "Database backups"
-msgstr ""
+msgstr "Backup del database"
 
-#: apps/web/src/components/settings/backup-restore-section.tsx:31
+#: apps/web/src/components/settings/backup-restore-section.tsx:32
 msgid "Database restored. Reloading..."
-msgstr ""
+msgstr "Database ripristinato. Ricaricamento..."
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:342
+#: apps/web/src/components/settings/backup-schedule-section.tsx:309
 msgid "Day:"
-msgstr ""
+msgstr "Giorno:"
 
+#: apps/web/src/components/settings/backup-section.tsx:222
 #: apps/web/src/components/settings/backup-section.tsx:250
-#: apps/web/src/components/settings/backup-section.tsx:280
 msgid "Delete"
-msgstr ""
+msgstr "Elimina"
 
-#: apps/web/src/components/settings/backup-section.tsx:235
+#: apps/web/src/components/settings/backup-section.tsx:211
 msgid "Delete backup"
-msgstr ""
+msgstr "Elimina backup"
 
-#: apps/web/src/components/settings/backup-section.tsx:256
+#: apps/web/src/components/settings/backup-section.tsx:228
 msgid "Delete backup?"
-msgstr ""
+msgstr "Eliminare il backup?"
 
 #. placeholder {0}: data.deletedFiles
 #: apps/web/src/components/settings/danger-section.tsx:54
 msgid "Deleted {0, plural, one {# file} other {# files}}, freed {freed}"
-msgstr ""
+msgstr "Eliminati {0, plural, one {# file} other {# file}}, liberati {freed}"
 
-#: apps/web/src/components/settings/imports-section.tsx:412
-#: apps/web/src/components/settings/imports-section.tsx:444
+#: apps/web/src/components/settings/imports-section.tsx:394
+#: apps/web/src/components/settings/imports-section.tsx:423
 msgid "Device code expired. Please try again."
-msgstr ""
+msgstr "Il codice del dispositivo è scaduto. Riprova."
 
-#: apps/native/src/app/person/[id].tsx:307
-#: apps/web/src/components/people/person-hero.tsx:91
+#: apps/native/src/app/person/[id].tsx:267
+#: apps/web/src/components/people/person-hero.tsx:89
 msgid "died at {age}"
-msgstr ""
+msgstr "morto a {age}"
 
-#: apps/web/src/components/people/person-hero.tsx:73
+#: apps/web/src/components/people/person-hero.tsx:71
 msgid "Director"
-msgstr ""
+msgstr "Regista"
 
-#: apps/web/src/components/settings/system-health-section.tsx:431
-#: apps/web/src/components/settings/system-health-section.tsx:632
+#: apps/web/src/components/settings/system-health-section.tsx:394
+#: apps/web/src/components/settings/system-health-section.tsx:580
 msgid "Disabled"
-msgstr ""
+msgstr "Disabilitato"
 
-#: apps/native/src/components/settings/integration-card.tsx:155
-#: apps/native/src/components/settings/integration-card.tsx:298
-#: apps/web/src/components/settings/integration-card.tsx:274
+#: apps/native/src/components/settings/integration-card.tsx:143
+#: apps/native/src/components/settings/integration-card.tsx:257
+#: apps/web/src/components/settings/integration-card.tsx:234
 msgid "Disconnect"
-msgstr ""
+msgstr "Disconnetti"
 
-#: apps/native/src/components/settings/integration-card.tsx:150
+#: apps/native/src/components/settings/integration-card.tsx:138
 msgid "Disconnect {label}"
-msgstr ""
+msgstr "Disconnetti {label}"
 
-#: apps/native/src/app/(auth)/server-url.tsx:242
+#: apps/native/src/app/(auth)/server-url.tsx:217
 msgid "Don't have a server?"
-msgstr ""
+msgstr "Non hai un server?"
 
-#: apps/web/src/components/auth-form.tsx:288
+#: apps/web/src/components/auth-form.tsx:269
 msgid "Don't have an account?"
-msgstr ""
+msgstr "Non hai un account?"
 
-#: apps/web/src/components/settings/imports-section.tsx:962
+#: apps/web/src/components/settings/imports-section.tsx:918
 msgid "Done"
-msgstr ""
+msgstr "Fatto"
 
 #: apps/native/src/components/explore/genre-chip.tsx:27
 msgid "Double tap to clear this filter"
-msgstr ""
+msgstr "Tocca due volte per rimuovere questo filtro"
 
-#: apps/native/src/components/explore/genre-chip.tsx:28
+#: apps/native/src/components/explore/genre-chip.tsx:27
 msgid "Double tap to filter by {label}"
-msgstr ""
+msgstr "Tocca due volte per filtrare per {label}"
 
-#: apps/web/src/components/settings/backup-section.tsx:71
-#: apps/web/src/components/settings/backup-section.tsx:223
+#: apps/web/src/components/settings/backup-section.tsx:64
+#: apps/web/src/components/settings/backup-section.tsx:199
 msgid "Download"
-msgstr ""
+msgstr "Scarica"
 
-#: apps/web/src/components/settings/backup-section.tsx:214
+#: apps/web/src/components/settings/backup-section.tsx:190
 msgid "Download backup"
-msgstr ""
+msgstr "Scarica backup"
 
-#: apps/web/src/components/people/person-hero.tsx:79
+#: apps/web/src/components/people/person-hero.tsx:77
 msgid "Editor"
-msgstr ""
+msgstr "Montatore"
 
-#: apps/native/src/app/(auth)/login.tsx:133
-#: apps/native/src/app/(auth)/register.tsx:154
-#: apps/web/src/components/auth-form.tsx:201
+#: apps/native/src/app/(auth)/login.tsx:123
+#: apps/native/src/app/(auth)/register.tsx:139
+#: apps/web/src/components/auth-form.tsx:190
 msgid "Email"
 msgstr ""
 
-#: apps/native/src/components/settings/integration-configs.ts:73
+#: apps/native/src/components/settings/integration-configs.ts:72
 msgid "Enable the \"Playback Stop\" notification type"
-msgstr ""
+msgstr "Abilita il tipo di notifica \"Playback Stop\""
 
-#: apps/native/src/components/settings/integration-configs.ts:93
+#: apps/native/src/components/settings/integration-configs.ts:90
 msgid "Enable the \"Playback\" event category"
-msgstr ""
+msgstr "Abilita la categoria evento \"Playback\""
 
-#: apps/web/src/components/settings/integration-configs.tsx:140
+#: apps/web/src/components/settings/integration-configs.tsx:127
 msgid "Enable the <0>Playback Stop</0> notification type"
-msgstr ""
+msgstr "Abilita il tipo di notifica <0>Playback Stop</0>"
 
-#: apps/web/src/components/settings/integration-configs.tsx:201
+#: apps/web/src/components/settings/integration-configs.tsx:181
 msgid "Enable the <0>Playback</0> event category"
-msgstr ""
+msgstr "Abilita la categoria evento <0>Playback</0>"
 
-#: apps/web/src/components/settings/imports-section.tsx:668
+#: apps/web/src/components/settings/imports-section.tsx:634
 msgid "Enter the code below on {source}'s website to authorize Sofa."
-msgstr ""
+msgstr "Inserisci il codice qui sotto sul sito di {source} per autorizzare Sofa."
 
-#: apps/web/src/components/settings/account-section.tsx:435
+#: apps/web/src/components/settings/account-section.tsx:409
 msgid "Enter your current password and choose a new one."
-msgstr ""
+msgstr "Inserisci la tua password attuale e scegline una nuova."
 
-#: apps/native/src/app/(auth)/server-url.tsx:151
+#: apps/native/src/app/(auth)/server-url.tsx:140
 msgid "Enter your Sofa server URL to get started"
-msgstr ""
+msgstr "Inserisci l'URL del tuo server Sofa per iniziare"
 
-#: apps/web/src/components/settings/system-health-section.tsx:289
+#: apps/web/src/components/settings/system-health-section.tsx:267
 msgid "Environment"
-msgstr ""
+msgstr "Ambiente"
 
 #. placeholder {0}: episode.episodeNumber
-#: apps/native/src/components/titles/episode-row.tsx:29
-#: apps/native/src/components/titles/episode-row.tsx:55
+#: apps/native/src/components/titles/episode-row.tsx:27
+#: apps/native/src/components/titles/episode-row.tsx:48
 msgid "Episode {0}"
-msgstr ""
+msgstr "Episodio {0}"
 
 #. placeholder {0}: episode.episodeNumber
-#: apps/native/src/components/titles/episode-row.tsx:36
+#: apps/native/src/components/titles/episode-row.tsx:34
 msgid "Episode {0}, {episodeLabel}"
-msgstr ""
+msgstr "Episodio {0}, {episodeLabel}"
 
-#: apps/native/src/hooks/use-title-actions.ts:123
-#: apps/native/src/lib/title-actions.ts:111
+#: apps/native/src/hooks/use-title-actions.ts:111
+#: apps/native/src/lib/title-actions.ts:108
 msgid "Episode unwatched"
-msgstr ""
+msgstr "Episodio non visto"
 
-#: apps/native/src/hooks/use-title-actions.ts:109
-#: apps/native/src/lib/title-actions.ts:101
+#: apps/native/src/hooks/use-title-actions.ts:101
+#: apps/native/src/lib/title-actions.ts:98
 msgid "Episode watched"
-msgstr ""
+msgstr "Episodio visto"
 
-#: apps/web/src/components/settings/imports-section.tsx:780
-#: apps/web/src/components/titles/title-seasons.tsx:102
+#: apps/web/src/components/settings/imports-section.tsx:742
+#: apps/web/src/components/titles/title-seasons.tsx:96
 msgid "Episodes"
-msgstr ""
+msgstr "Episodi"
 
 #: apps/web/src/components/dashboard/stats-display.tsx:162
 #~ msgid "Episodes {periodSelect}"
 #~ msgstr "Episodes {periodSelect}"
 
-#: apps/web/src/components/dashboard/stats-display.tsx:164
+#: apps/web/src/components/dashboard/stats-display.tsx:150
 msgid "Episodes {select}"
-msgstr ""
+msgstr "Episodi {select}"
 
-#: apps/native/src/app/(tabs)/(home)/index.tsx:61
+#: apps/native/src/app/(tabs)/(home)/index.tsx:52
 msgid "Episodes this week"
-msgstr ""
+msgstr "Episodi di questa settimana"
 
-#: apps/native/src/app/change-password.tsx:71
-#: apps/native/src/app/change-password.tsx:81
+#: apps/native/src/app/change-password.tsx:67
+#: apps/native/src/app/change-password.tsx:77
 msgid "Error"
-msgstr ""
+msgstr "Errore"
 
 #. placeholder {0}: result.errors.length
-#: apps/web/src/components/settings/imports-section.tsx:929
+#: apps/web/src/components/settings/imports-section.tsx:887
 msgid "Errors ({0})"
-msgstr ""
+msgstr "Errori ({0})"
 
-#: apps/native/src/app/(tabs)/(home)/index.tsx:143
-#: apps/web/src/components/nav-bar.tsx:126
-#: apps/web/src/components/nav-bar.tsx:291
+#: apps/native/src/app/(tabs)/(home)/index.tsx:127
+#: apps/web/src/components/nav-bar.tsx:116
+#: apps/web/src/components/nav-bar.tsx:277
 msgid "Explore"
-msgstr ""
+msgstr "Esplora"
 
-#: apps/web/src/routes/_app/people.$id.tsx:70
-#: apps/web/src/routes/_app/titles.$id.tsx:164
+#: apps/web/src/routes/_app/people.$id.tsx:68
+#: apps/web/src/routes/_app/titles.$id.tsx:157
 msgid "Explore titles"
-msgstr ""
+msgstr "Esplora titoli"
 
-#: apps/web/src/components/settings/imports-section.tsx:923
+#: apps/web/src/components/settings/imports-section.tsx:881
 msgid "Failed"
-msgstr ""
+msgstr "Non riuscito"
 
-#: apps/native/src/hooks/use-title-actions.ts:49
-#: apps/native/src/lib/title-actions.ts:28
+#: apps/native/src/hooks/use-title-actions.ts:48
+#: apps/native/src/lib/title-actions.ts:29
 msgid "Failed to add to watchlist"
-msgstr ""
+msgstr "Impossibile aggiungere alla watchlist"
 
-#: apps/web/src/components/titles/use-title-actions.ts:90
+#: apps/web/src/components/titles/use-title-actions.ts:80
 msgid "Failed to catch up"
-msgstr ""
+msgstr "Impossibile recuperare gli episodi"
 
-#: apps/native/src/app/change-password.tsx:71
-#: apps/web/src/components/settings/account-section.tsx:411
+#: apps/native/src/app/change-password.tsx:67
+#: apps/web/src/components/settings/account-section.tsx:385
 msgid "Failed to change password"
-msgstr ""
+msgstr "Impossibile cambiare la password"
 
-#: apps/web/src/components/settings/imports-section.tsx:398
+#: apps/web/src/components/settings/imports-section.tsx:380
 msgid "Failed to connect"
-msgstr ""
+msgstr "Impossibile connettersi"
 
-#: apps/native/src/components/settings/integration-card.tsx:99
-#: apps/web/src/components/settings/integration-card.tsx:108
+#: apps/native/src/components/settings/integration-card.tsx:87
+#: apps/web/src/components/settings/integration-card.tsx:91
 msgid "Failed to connect {label}"
-msgstr ""
+msgstr "Impossibile connettere {label}"
 
-#: apps/native/src/app/(auth)/register.tsx:67
+#: apps/native/src/app/(auth)/register.tsx:57
 msgid "Failed to create account"
-msgstr ""
+msgstr "Impossibile creare l'account"
 
-#: apps/web/src/components/settings/backup-section.tsx:81
+#: apps/web/src/components/settings/backup-section.tsx:74
 msgid "Failed to create backup"
-msgstr ""
+msgstr "Impossibile creare il backup"
 
-#: apps/web/src/components/settings/backup-section.tsx:97
+#: apps/web/src/components/settings/backup-section.tsx:88
 msgid "Failed to delete backup"
-msgstr ""
+msgstr "Impossibile eliminare il backup"
 
-#: apps/native/src/components/settings/integration-card.tsx:109
-#: apps/web/src/components/settings/integration-card.tsx:125
+#: apps/native/src/components/settings/integration-card.tsx:97
+#: apps/web/src/components/settings/integration-card.tsx:108
 msgid "Failed to disconnect {label}"
-msgstr ""
+msgstr "Impossibile disconnettere {label}"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:215
+#: apps/web/src/components/settings/backup-schedule-section.tsx:200
 msgid "Failed to load backup schedule settings."
-msgstr ""
+msgstr "Impossibile caricare le impostazioni di pianificazione backup."
 
-#: apps/web/src/routes/_app/titles.$id.tsx:115
+#: apps/web/src/routes/_app/titles.$id.tsx:110
 msgid "Failed to load title"
-msgstr ""
+msgstr "Impossibile caricare il titolo"
 
-#: apps/web/src/components/titles/use-title-actions.ts:367
+#: apps/web/src/components/titles/use-title-actions.ts:344
 msgid "Failed to mark all episodes as watched"
-msgstr ""
+msgstr "Impossibile segnare tutti gli episodi come visti"
 
-#: apps/native/src/hooks/use-title-actions.ts:84
-#: apps/native/src/lib/title-actions.ts:68
-#: apps/web/src/components/titles/use-title-actions.ts:150
+#: apps/native/src/hooks/use-title-actions.ts:79
+#: apps/native/src/lib/title-actions.ts:67
+#: apps/web/src/components/titles/use-title-actions.ts:137
 msgid "Failed to mark as watched"
-msgstr ""
+msgstr "Impossibile segnare come visto"
 
-#: apps/native/src/hooks/use-title-actions.ts:113
-#: apps/native/src/lib/title-actions.ts:104
-#: apps/web/src/components/titles/use-title-actions.ts:237
+#: apps/native/src/hooks/use-title-actions.ts:104
+#: apps/native/src/lib/title-actions.ts:101
+#: apps/web/src/components/titles/use-title-actions.ts:216
 msgid "Failed to mark episode"
-msgstr ""
+msgstr "Impossibile segnare l'episodio"
 
-#: apps/native/src/hooks/use-title-actions.ts:141
-#: apps/native/src/lib/title-actions.ts:128
-#: apps/web/src/components/titles/use-title-actions.ts:315
+#: apps/native/src/hooks/use-title-actions.ts:124
+#: apps/native/src/lib/title-actions.ts:123
+#: apps/web/src/components/titles/use-title-actions.ts:294
 msgid "Failed to mark some episodes"
-msgstr ""
+msgstr "Impossibile segnare alcuni episodi"
 
-#: apps/web/src/components/settings/imports-section.tsx:225
+#: apps/web/src/components/settings/imports-section.tsx:218
 msgid "Failed to parse file"
-msgstr ""
+msgstr "Impossibile analizzare il file"
 
-#: apps/web/src/components/settings/imports-section.tsx:240
+#: apps/web/src/components/settings/imports-section.tsx:233
 msgid "Failed to parse import data"
-msgstr ""
+msgstr "Impossibile analizzare i dati di importazione"
 
-#: apps/web/src/components/settings/danger-section.tsx:75
+#: apps/web/src/components/settings/danger-section.tsx:72
 msgid "Failed to purge caches"
-msgstr ""
+msgstr "Impossibile svuotare le cache"
 
 #: apps/web/src/components/settings/danger-section.tsx:58
 msgid "Failed to purge image cache"
-msgstr ""
+msgstr "Impossibile svuotare la cache immagini"
 
 #: apps/web/src/components/settings/danger-section.tsx:45
 msgid "Failed to purge metadata cache"
-msgstr ""
+msgstr "Impossibile svuotare la cache metadati"
 
-#: apps/native/src/components/settings/integration-card.tsx:119
-#: apps/web/src/components/settings/integration-card.tsx:140
+#: apps/native/src/components/settings/integration-card.tsx:107
+#: apps/web/src/components/settings/integration-card.tsx:121
 msgid "Failed to regenerate {label} URL"
-msgstr ""
+msgstr "Impossibile rigenerare l'URL di {label}"
 
-#: apps/native/src/lib/title-actions.ts:78
+#: apps/native/src/lib/title-actions.ts:77
 msgid "Failed to remove from library"
-msgstr ""
+msgstr "Impossibile rimuovere dalla libreria"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:134
-#: apps/web/src/components/settings/account-section.tsx:134
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:131
+#: apps/web/src/components/settings/account-section.tsx:126
 msgid "Failed to remove profile picture"
-msgstr ""
+msgstr "Impossibile rimuovere l'immagine del profilo"
 
-#: apps/native/src/app/(auth)/login.tsx:56
+#: apps/native/src/app/(auth)/login.tsx:53
 msgid "Failed to sign in"
-msgstr ""
+msgstr "Impossibile accedere"
 
 #. placeholder {0}: config.label
-#: apps/web/src/components/settings/imports-section.tsx:388
+#: apps/web/src/components/settings/imports-section.tsx:370
 msgid "Failed to start {0} connection"
-msgstr ""
+msgstr "Impossibile avviare la connessione {0}"
 
-#: apps/web/src/components/settings/system-health-section.tsx:348
+#: apps/web/src/components/settings/system-health-section.tsx:320
 msgid "Failed to trigger job"
-msgstr ""
+msgstr "Impossibile avviare il job"
 
-#: apps/native/src/hooks/use-title-actions.ts:129
-#: apps/native/src/lib/title-actions.ts:114
-#: apps/web/src/components/titles/use-title-actions.ts:181
+#: apps/native/src/hooks/use-title-actions.ts:114
+#: apps/native/src/lib/title-actions.ts:111
+#: apps/web/src/components/titles/use-title-actions.ts:163
 msgid "Failed to unmark episode"
-msgstr ""
+msgstr "Impossibile rimuovere il segno dall'episodio"
 
-#: apps/web/src/components/titles/use-title-actions.ts:343
+#: apps/web/src/components/titles/use-title-actions.ts:320
 msgid "Failed to unmark some episodes"
-msgstr ""
+msgstr "Impossibile rimuovere il segno da alcuni episodi"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:112
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:109
 msgid "Failed to update name"
-msgstr ""
+msgstr "Impossibile aggiornare il nome"
 
-#: apps/native/src/hooks/use-title-actions.ts:101
-#: apps/native/src/lib/title-actions.ts:94
-#: apps/web/src/components/titles/use-title-actions.ts:136
+#: apps/native/src/hooks/use-title-actions.ts:94
+#: apps/native/src/lib/title-actions.ts:91
+#: apps/web/src/components/titles/use-title-actions.ts:123
 msgid "Failed to update rating"
-msgstr ""
+msgstr "Impossibile aggiornare la valutazione"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:172
-#: apps/web/src/components/settings/registration-section.tsx:44
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:169
+#: apps/web/src/components/settings/registration-section.tsx:37
 msgid "Failed to update registration setting"
-msgstr ""
+msgstr "Impossibile aggiornare l'impostazione di registrazione"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:154
+#: apps/web/src/components/settings/backup-schedule-section.tsx:145
 msgid "Failed to update retention setting"
-msgstr ""
+msgstr "Impossibile aggiornare l'impostazione di conservazione"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:156
+#: apps/web/src/components/settings/backup-schedule-section.tsx:147
 msgid "Failed to update schedule"
-msgstr ""
+msgstr "Impossibile aggiornare la pianificazione"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:152
+#: apps/web/src/components/settings/backup-schedule-section.tsx:143
 msgid "Failed to update scheduled backup setting"
-msgstr ""
+msgstr "Impossibile aggiornare l'impostazione di backup pianificato"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:191
-#: apps/web/src/components/settings/update-check-section.tsx:43
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:186
+#: apps/web/src/components/settings/update-check-section.tsx:37
 msgid "Failed to update setting"
-msgstr ""
+msgstr "Impossibile aggiornare l'impostazione"
 
-#: apps/native/src/hooks/use-title-actions.ts:72
-#: apps/native/src/lib/title-actions.ts:40
-#: apps/native/src/lib/title-actions.ts:54
-#: apps/web/src/components/titles/use-title-actions.ts:114
+#: apps/native/src/hooks/use-title-actions.ts:69
+#: apps/native/src/lib/title-actions.ts:41
+#: apps/native/src/lib/title-actions.ts:55
+#: apps/web/src/components/titles/use-title-actions.ts:101
 msgid "Failed to update status"
-msgstr ""
+msgstr "Impossibile aggiornare lo stato"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:123
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:120
 msgid "Failed to upload avatar"
-msgstr ""
+msgstr "Impossibile caricare l'avatar"
 
-#: apps/web/src/components/settings/imports-section.tsx:725
+#: apps/web/src/components/settings/imports-section.tsx:689
 msgid "Fetching your library data from {source}..."
-msgstr ""
+msgstr "Recupero dei dati della tua libreria da {source}..."
 
-#: apps/native/src/app/person/[id].tsx:340
-#: apps/web/src/components/people/filmography-grid.tsx:69
+#: apps/native/src/app/person/[id].tsx:296
+#: apps/web/src/components/people/filmography-grid.tsx:67
 msgid "Filmography"
-msgstr ""
+msgstr "Filmografia"
 
-#: apps/web/src/components/settings/imports-section.tsx:915
+#: apps/web/src/components/settings/imports-section.tsx:873
 msgid "Finished importing from {source}."
-msgstr ""
+msgstr "Importazione da {source} completata."
 
-#: apps/web/src/components/titles/title-availability.tsx:140
+#: apps/web/src/components/titles/title-availability.tsx:116
 msgid "Free"
-msgstr ""
+msgstr "Gratis"
 
-#: apps/web/src/components/settings/danger-section.tsx:92
+#: apps/web/src/components/settings/danger-section.tsx:88
 msgid "Free up disk space by clearing cached metadata and images"
-msgstr ""
+msgstr "Libera spazio sul disco svuotando i metadati e le immagini in cache"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:309
+#: apps/web/src/components/settings/backup-schedule-section.tsx:276
 msgid "Frequency"
-msgstr ""
+msgstr "Frequenza"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:101
+#: apps/web/src/components/settings/backup-schedule-section.tsx:98
 msgid "Friday"
-msgstr ""
+msgstr "Venerdì"
 
-#: apps/web/src/components/landing-page.tsx:156
+#: apps/web/src/components/landing-page.tsx:157
 msgid "Get Started"
-msgstr ""
+msgstr "Inizia"
 
-#: apps/native/src/app/person/[id].tsx:220
-#: apps/native/src/app/person/[id].tsx:247
-#: apps/native/src/app/title/[id].tsx:255
+#: apps/native/src/app/person/[id].tsx:189
+#: apps/native/src/app/person/[id].tsx:213
+#: apps/native/src/app/title/[id].tsx:239
 msgid "Go back"
-msgstr ""
+msgstr "Torna indietro"
 
-#: apps/native/src/app/+not-found.tsx:37
+#: apps/native/src/app/+not-found.tsx:35
 msgid "Go Home"
-msgstr ""
+msgstr "Vai alla home"
 
-#: apps/web/src/components/settings/integration-configs.tsx:123
+#: apps/web/src/components/settings/integration-configs.tsx:115
 msgid "Go to <0>Dashboard > Plugins > Webhook</0>"
-msgstr ""
+msgstr "Vai su <0>Dashboard > Plugin > Webhook</0>"
 
-#: apps/web/src/components/command-palette.tsx:368
+#: apps/web/src/components/command-palette.tsx:345
 msgid "Go to Dashboard"
-msgstr ""
+msgstr "Vai alla Dashboard"
 
-#: apps/native/src/components/settings/integration-configs.ts:71
+#: apps/native/src/components/settings/integration-configs.ts:70
 msgid "Go to Dashboard > Plugins > Webhook"
-msgstr ""
+msgstr "Vai su Dashboard > Plugin > Webhook"
 
-#: apps/web/src/components/command-palette.tsx:379
+#: apps/web/src/components/command-palette.tsx:356
 msgid "Go to Explore"
-msgstr ""
+msgstr "Vai a Esplora"
 
-#: apps/web/src/components/settings/system-health-section.tsx:212
+#: apps/web/src/components/settings/system-health-section.tsx:193
 msgid "Health status"
-msgstr ""
+msgstr "Stato di salute"
 
-#: apps/web/src/components/dashboard/welcome-header.tsx:14
+#: apps/web/src/components/dashboard/welcome-header.tsx:10
 msgid "Here's what's happening with your library"
-msgstr ""
+msgstr "Ecco cosa sta succedendo nella tua libreria"
 
-#: apps/web/src/components/nav-bar.tsx:125
-#: apps/web/src/components/nav-bar.tsx:290
+#: apps/web/src/components/nav-bar.tsx:115
+#: apps/web/src/components/nav-bar.tsx:276
 msgid "Home"
 msgstr ""
 
-#: apps/web/src/components/settings/system-health-section.tsx:335
-#: apps/web/src/components/settings/system-health-section.tsx:610
+#: apps/web/src/components/settings/system-health-section.tsx:308
+#: apps/web/src/components/settings/system-health-section.tsx:558
 msgid "Image cache"
-msgstr ""
+msgstr "Cache immagini"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:479
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:453
 msgid "Image Cache"
-msgstr ""
+msgstr "Cache immagini"
 
-#: apps/web/src/components/settings/system-health-section.tsx:598
+#: apps/web/src/components/settings/system-health-section.tsx:546
 msgid "Image cache and backup disk usage"
-msgstr ""
+msgstr "Utilizzo disco: cache immagini e backup"
 
-#: apps/web/src/components/settings/imports-section.tsx:179
+#: apps/web/src/components/settings/imports-section.tsx:175
 msgid "Import"
-msgstr ""
+msgstr "Importazione"
 
-#: apps/web/src/components/settings/imports-section.tsx:840
+#: apps/web/src/components/settings/imports-section.tsx:801
 msgid "Import {totalItems} items"
-msgstr ""
+msgstr "Importa {totalItems} elementi"
 
-#: apps/web/src/components/settings/imports-section.tsx:912
+#: apps/web/src/components/settings/imports-section.tsx:870
 msgid "Import complete"
-msgstr ""
+msgstr "Importazione completata"
 
-#: apps/web/src/components/settings/imports-section.tsx:340
+#: apps/web/src/components/settings/imports-section.tsx:324
 msgid "Import failed"
-msgstr ""
+msgstr "Importazione fallita"
 
 #. placeholder {0}: config.label
-#: apps/web/src/components/settings/imports-section.tsx:584
+#: apps/web/src/components/settings/imports-section.tsx:553
 msgid "Import from {0}"
-msgstr ""
+msgstr "Importa da {0}"
 
-#: apps/web/src/components/settings/imports-section.tsx:770
+#: apps/web/src/components/settings/imports-section.tsx:732
 msgid "Import from {source}"
-msgstr ""
+msgstr "Importa da {source}"
 
-#: apps/web/src/components/settings/imports-section.tsx:298
-#: apps/web/src/components/settings/imports-section.tsx:329
+#: apps/web/src/components/settings/imports-section.tsx:285
+#: apps/web/src/components/settings/imports-section.tsx:314
 msgid "Import is still running in the background. Check back later."
-msgstr ""
+msgstr "L'importazione è ancora in corso in background. Ricontrolla più tardi."
 
-#: apps/web/src/components/settings/imports-section.tsx:798
+#: apps/web/src/components/settings/imports-section.tsx:760
 msgid "Import options"
-msgstr ""
+msgstr "Opzioni di importazione"
 
-#: apps/web/src/components/settings/imports-section.tsx:921
+#: apps/web/src/components/settings/imports-section.tsx:879
 msgid "Imported"
-msgstr ""
+msgstr "Importati"
 
 #. placeholder {0}: event.job.importedCount
 #. placeholder {1}: config.label
-#: apps/web/src/components/settings/imports-section.tsx:292
+#: apps/web/src/components/settings/imports-section.tsx:281
 msgid "Imported {0} items from {1}"
-msgstr ""
+msgstr "Importati {0} elementi da {1}"
 
-#: apps/web/src/components/settings/imports-section.tsx:863
+#: apps/web/src/components/settings/imports-section.tsx:822
 msgid "Importing from {source}"
-msgstr ""
+msgstr "Importazione da {source} in corso"
 
-#: apps/native/src/app/(tabs)/(home)/index.tsx:62
+#: apps/native/src/app/(tabs)/(home)/index.tsx:53
 msgid "In library"
-msgstr ""
+msgstr "In libreria"
 
-#: apps/web/src/components/dashboard/stats-display.tsx:230
+#: apps/web/src/components/dashboard/stats-display.tsx:211
 msgid "In Library"
-msgstr ""
+msgstr "In libreria"
 
-#: apps/native/src/app/(tabs)/(home)/index.tsx:133
+#: apps/native/src/app/(tabs)/(home)/index.tsx:117
 #: apps/web/src/components/dashboard/library-section.tsx:35
 msgid "In Your Library"
-msgstr ""
+msgstr "Nella tua libreria"
 
-#: apps/web/src/components/settings/integration-configs.tsx:105
+#: apps/web/src/components/settings/integration-configs.tsx:97
 msgid "Install the <0>Webhook plugin<1/></0> from Jellyfin's plugin catalog"
-msgstr ""
+msgstr "Installa il <0>plugin Webhook<1/></0> dal catalogo plugin di Jellyfin"
 
-#: apps/native/src/components/settings/integration-configs.ts:70
+#: apps/native/src/components/settings/integration-configs.ts:69
 msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
-msgstr ""
+msgstr "Installa il plugin Webhook dal catalogo plugin di Jellyfin"
 
-#: apps/native/src/components/settings/integrations-section.tsx:20
-#: apps/web/src/components/settings/integrations-section.tsx:41
+#: apps/native/src/components/settings/integrations-section.tsx:21
+#: apps/web/src/components/settings/integrations-section.tsx:33
 msgid "Integrations"
-msgstr ""
+msgstr "Integrazioni"
 
-#: apps/web/src/components/settings/system-health-section.tsx:266
+#: apps/web/src/components/settings/system-health-section.tsx:246
 msgid "Invalid token"
-msgstr ""
+msgstr "Token non valido"
 
-#: apps/web/src/components/settings/system-health-section.tsx:399
+#: apps/web/src/components/settings/system-health-section.tsx:365
 msgid "Job"
 msgstr ""
 
@@ -1128,1306 +1128,1306 @@ msgstr ""
 
 #. placeholder {0}: (value: string | null) => value === "0" ? t`unlimited` : value ? t`last ${value}` : null
 #. placeholder {1}: [3, 5, 7, 14, 30, 0].map((n) => ( <SelectItem key={n} value={String(n)}> {n === 0 ? t`unlimited` : t`last ${n}`} </SelectItem> ))
-#: apps/web/src/components/settings/backup-schedule-section.tsx:243
+#: apps/web/src/components/settings/backup-schedule-section.tsx:222
 msgid "Keeping <0><1><2>{0}</2></1><3>{1}</3></0> backups."
-msgstr ""
+msgstr "Mantenendo <0><1><2>{0}</2></1><3>{1}</3></0> backup."
 
-#: apps/web/src/components/command-palette.tsx:389
-#: apps/web/src/components/command-palette.tsx:404
+#: apps/web/src/components/command-palette.tsx:366
+#: apps/web/src/components/command-palette.tsx:381
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Scorciatoie da tastiera"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:403
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:411
-#: apps/web/src/components/settings/language-section.tsx:42
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:383
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:391
+#: apps/web/src/components/settings/language-section.tsx:34
 msgid "Language"
-msgstr ""
+msgstr "Lingua"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:270
+#: apps/web/src/components/settings/backup-schedule-section.tsx:239
 msgid "last {n}"
-msgstr ""
+msgstr "ultimi {n}"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:258
+#: apps/web/src/components/settings/backup-schedule-section.tsx:232
 msgid "last {value}"
-msgstr ""
+msgstr "ultimi {value}"
 
 #. placeholder {0}: formatRelativeTime(lastEventAt)
-#: apps/web/src/components/settings/integration-card.tsx:331
+#: apps/web/src/components/settings/integration-card.tsx:289
 msgid "Last event {0}"
-msgstr ""
+msgstr "Ultimo evento {0}"
 
-#: apps/native/src/components/settings/integration-configs.ts:29
+#: apps/native/src/components/settings/integration-configs.ts:30
 msgid "Last event {timeAgo}"
-msgstr ""
+msgstr "Ultimo evento {timeAgo}"
 
 #. placeholder {0}: formatRelativeTime(lastEventAt)
-#: apps/web/src/components/settings/integration-card.tsx:338
+#: apps/web/src/components/settings/integration-card.tsx:296
 msgid "Last polled {0}"
-msgstr ""
+msgstr "Ultimo polling {0}"
 
-#: apps/native/src/components/settings/integration-configs.ts:37
+#: apps/native/src/components/settings/integration-configs.ts:38
 msgid "Last polled {timeAgo}"
-msgstr ""
+msgstr "Ultimo polling {timeAgo}"
 
-#: apps/web/src/components/settings/system-health-section.tsx:405
+#: apps/web/src/components/settings/system-health-section.tsx:371
 msgid "Last run"
-msgstr ""
+msgstr "Ultima esecuzione"
 
-#: apps/web/src/components/settings/system-health-section.tsx:441
+#: apps/web/src/components/settings/system-health-section.tsx:402
 msgid "Last run failed"
-msgstr ""
+msgstr "Ultima esecuzione fallita"
 
-#: apps/web/src/components/settings/system-health-section.tsx:437
+#: apps/web/src/components/settings/system-health-section.tsx:400
 msgid "Last run succeeded"
-msgstr ""
+msgstr "Ultima esecuzione riuscita"
 
-#: apps/web/src/components/settings/system-health-section.tsx:331
+#: apps/web/src/components/settings/system-health-section.tsx:304
 msgid "Library refresh"
-msgstr ""
+msgstr "Aggiornamento libreria"
 
-#: apps/web/src/components/auth-form.tsx:245
+#: apps/web/src/components/auth-form.tsx:229
 msgid "Loading…"
-msgstr ""
+msgstr "Caricamento…"
 
-#: apps/web/src/components/settings/imports-section.tsx:334
+#: apps/web/src/components/settings/imports-section.tsx:318
 msgid "Lost connection to import. Check status in settings."
-msgstr ""
+msgstr "Connessione all'importazione persa. Controlla lo stato nelle impostazioni."
 
-#: apps/web/src/components/settings/settings-shell.tsx:40
+#: apps/web/src/components/settings/settings-shell.tsx:34
 msgid "Manage your account and preferences"
-msgstr ""
+msgstr "Gestisci il tuo account e le tue preferenze"
 
-#: apps/web/src/components/settings/backup-section.tsx:182
+#: apps/web/src/components/settings/backup-section.tsx:158
 msgid "Manual backup"
-msgstr ""
+msgstr "Backup manuale"
 
-#: apps/web/src/components/titles/title-seasons.tsx:122
+#: apps/web/src/components/titles/title-seasons.tsx:116
 msgid "Mark all episodes as watched?"
-msgstr ""
+msgstr "Segnare tutti gli episodi come visti?"
 
-#: apps/native/src/components/titles/season-accordion.tsx:164
-#: apps/web/src/components/titles/title-seasons.tsx:115
-#: apps/web/src/components/titles/title-seasons.tsx:141
+#: apps/native/src/components/titles/season-accordion.tsx:152
+#: apps/web/src/components/titles/title-seasons.tsx:109
+#: apps/web/src/components/titles/title-seasons.tsx:135
 msgid "Mark All Watched"
-msgstr ""
+msgstr "Segna tutti come visti"
 
-#: apps/native/src/components/dashboard/continue-watching-card.tsx:122
+#: apps/native/src/components/dashboard/continue-watching-card.tsx:103
 msgid "Mark as Completed"
-msgstr ""
+msgstr "Segna come completato"
 
-#: apps/native/src/components/ui/poster-card.tsx:252
+#: apps/native/src/components/ui/poster-card.tsx:226
 msgid "Mark as Watched"
-msgstr ""
+msgstr "Segna come visto"
 
-#: apps/native/src/components/ui/poster-card.tsx:245
+#: apps/native/src/components/ui/poster-card.tsx:219
 msgid "Mark as Watching"
-msgstr ""
+msgstr "Segna come in visione"
 
-#: apps/native/src/app/title/[id].tsx:449
-#: apps/web/src/components/titles/title-actions.tsx:29
+#: apps/native/src/app/title/[id].tsx:400
+#: apps/web/src/components/titles/title-actions.tsx:27
 msgid "Mark Watched"
-msgstr ""
+msgstr "Segna come visto"
 
-#: apps/native/src/lib/title-actions.ts:49
+#: apps/native/src/lib/title-actions.ts:50
 msgid "Marked \"{titleName}\" as completed"
-msgstr ""
+msgstr "Segnato \"{titleName}\" come completato"
 
 #: apps/native/src/lib/title-actions.ts:63
-#: apps/web/src/components/titles/use-title-actions.ts:147
+#: apps/web/src/components/titles/use-title-actions.ts:134
 msgid "Marked \"{titleName}\" as watched"
-msgstr ""
+msgstr "Segnato \"{titleName}\" come visto"
 
-#: apps/web/src/components/titles/use-title-actions.ts:360
+#: apps/web/src/components/titles/use-title-actions.ts:337
 msgid "Marked all episodes as watched"
-msgstr ""
-
-#: apps/native/src/hooks/use-title-actions.ts:62
-#: apps/native/src/lib/title-actions.ts:50
-msgid "Marked as completed"
-msgstr ""
-
-#: apps/native/src/hooks/use-title-actions.ts:80
-#: apps/native/src/lib/title-actions.ts:64
-msgid "Marked as watched"
-msgstr ""
+msgstr "Tutti gli episodi segnati come visti"
 
 #: apps/native/src/hooks/use-title-actions.ts:61
-#: apps/native/src/lib/title-actions.ts:37
+#: apps/native/src/lib/title-actions.ts:51
+msgid "Marked as completed"
+msgstr "Segnato come completato"
+
+#: apps/native/src/hooks/use-title-actions.ts:76
+#: apps/native/src/lib/title-actions.ts:63
+msgid "Marked as watched"
+msgstr "Segnato come visto"
+
+#: apps/native/src/hooks/use-title-actions.ts:60
+#: apps/native/src/lib/title-actions.ts:38
 msgid "Marked as watching"
-msgstr ""
+msgstr "Segnato come in visione"
 
-#: apps/web/src/components/settings/account-section.tsx:340
+#: apps/web/src/components/settings/account-section.tsx:314
 msgid "Member since {memberSince}"
-msgstr ""
+msgstr "Membro dal {memberSince}"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:97
+#: apps/web/src/components/settings/backup-schedule-section.tsx:94
 msgid "Monday"
-msgstr ""
+msgstr "Lunedì"
 
-#: apps/native/src/app/title/[id].tsx:585
+#: apps/native/src/app/title/[id].tsx:508
 msgid "More Like This"
-msgstr ""
+msgstr "Simili a questo"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:541
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:506
 msgid "More Settings"
-msgstr ""
+msgstr "Altre impostazioni"
 
-#: apps/native/src/app/title/[id].tsx:362
-#: apps/native/src/components/search/search-result-row.tsx:35
-#: apps/native/src/components/search/search-result-row.tsx:96
-#: apps/web/src/components/explore/hero-banner.tsx:59
-#: apps/web/src/components/titles/title-hero.tsx:143
+#: apps/native/src/app/title/[id].tsx:337
+#: apps/native/src/components/search/search-result-row.tsx:34
+#: apps/native/src/components/search/search-result-row.tsx:81
+#: apps/web/src/components/explore/hero-banner.tsx:54
+#: apps/web/src/components/titles/title-hero.tsx:141
 msgid "Movie"
-msgstr ""
+msgstr "Film"
 
-#: apps/web/src/components/people/filmography-grid.tsx:59
-#: apps/web/src/components/settings/imports-section.tsx:779
+#: apps/web/src/components/people/filmography-grid.tsx:57
+#: apps/web/src/components/settings/imports-section.tsx:741
 msgid "Movies"
-msgstr ""
+msgstr "Film"
 
 #: apps/web/src/components/dashboard/stats-display.tsx:161
 #~ msgid "Movies {periodSelect}"
 #~ msgstr "Movies {periodSelect}"
 
-#: apps/web/src/components/dashboard/stats-display.tsx:162
+#: apps/web/src/components/dashboard/stats-display.tsx:150
 msgid "Movies {select}"
-msgstr ""
+msgstr "Film {select}"
 
-#: apps/native/src/app/(tabs)/(home)/index.tsx:60
+#: apps/native/src/app/(tabs)/(home)/index.tsx:51
 msgid "Movies this month"
-msgstr ""
+msgstr "Film di questo mese"
 
-#: apps/native/src/app/(auth)/register.tsx:124
-#: apps/web/src/components/auth-form.tsx:181
+#: apps/native/src/app/(auth)/register.tsx:111
+#: apps/web/src/components/auth-form.tsx:173
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:107
-#: apps/web/src/components/settings/account-section.tsx:80
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:104
+#: apps/web/src/components/settings/account-section.tsx:72
 msgid "Name updated"
-msgstr ""
+msgstr "Nome aggiornato"
 
-#: apps/web/src/components/settings/integration-card.tsx:301
+#: apps/web/src/components/settings/integration-card.tsx:259
 msgid "Need more help?"
-msgstr ""
+msgstr "Serve altro aiuto?"
 
-#: apps/web/src/components/settings/system-health-section.tsx:501
+#: apps/web/src/components/settings/system-health-section.tsx:456
 msgid "Never"
-msgstr ""
+msgstr "Mai"
 
-#: apps/web/src/components/settings/system-health-section.tsx:435
+#: apps/web/src/components/settings/system-health-section.tsx:398
 msgid "Never run"
-msgstr ""
+msgstr "Mai eseguito"
 
-#: apps/native/src/app/(auth)/register.tsx:98
+#: apps/native/src/app/(auth)/register.tsx:88
 msgid "New account creation is currently disabled."
-msgstr ""
+msgstr "La creazione di nuovi account è attualmente disabilitata."
 
-#: apps/web/src/routes/_auth/register.tsx:35
+#: apps/web/src/routes/_auth/register.tsx:36
 msgid "New accounts are not being accepted right now. Contact the admin if you need access."
-msgstr ""
+msgstr "La registrazione di nuovi account non è disponibile al momento. Contatta l'amministratore per richiedere l'accesso."
 
-#: apps/web/src/components/settings/backup-section.tsx:137
+#: apps/web/src/components/settings/backup-section.tsx:119
 msgid "New backup"
-msgstr ""
+msgstr "Nuovo backup"
 
-#: apps/native/src/app/change-password.tsx:145
-#: apps/web/src/components/settings/account-section.tsx:463
+#: apps/native/src/app/change-password.tsx:141
+#: apps/web/src/components/settings/account-section.tsx:437
 msgid "New password"
-msgstr ""
+msgstr "Nuova password"
 
-#: apps/web/src/components/settings/account-section.tsx:395
+#: apps/web/src/components/settings/account-section.tsx:369
 msgid "New password must be at least 8 characters"
-msgstr ""
+msgstr "La nuova password deve contenere almeno 8 caratteri"
 
-#: apps/web/src/components/people/filmography-grid.tsx:86
-#: apps/web/src/components/people/filmography-grid.tsx:99
+#: apps/web/src/components/people/filmography-grid.tsx:81
+#: apps/web/src/components/people/filmography-grid.tsx:87
 msgid "Newest"
-msgstr ""
+msgstr "Più recenti"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:131
+#: apps/web/src/components/settings/backup-schedule-section.tsx:124
 msgid "Next backup {distance}"
-msgstr ""
+msgstr "Prossimo backup {distance}"
 
-#: apps/native/src/components/titles/continue-watching-banner.tsx:46
+#: apps/native/src/components/titles/continue-watching-banner.tsx:42
 msgid "Next Episode"
-msgstr ""
+msgstr "Episodio successivo"
 
-#: apps/web/src/components/settings/system-health-section.tsx:408
+#: apps/web/src/components/settings/system-health-section.tsx:374
 msgid "Next run"
-msgstr ""
+msgstr "Prossima esecuzione"
 
-#: apps/web/src/components/settings/backup-section.tsx:110
-#: apps/web/src/components/settings/system-health-section.tsx:662
+#: apps/web/src/components/settings/backup-section.tsx:99
+#: apps/web/src/components/settings/system-health-section.tsx:607
 msgid "No backups yet"
-msgstr ""
+msgstr "Nessun backup ancora"
 
-#: apps/native/src/components/ui/offline-banner.ios.tsx:74
-#: apps/native/src/components/ui/offline-banner.ios.tsx:81
-#: apps/native/src/components/ui/offline-banner.tsx:59
+#: apps/native/src/components/ui/offline-banner.ios.tsx:75
+#: apps/native/src/components/ui/offline-banner.ios.tsx:82
+#: apps/native/src/components/ui/offline-banner.tsx:60
 msgid "No internet connection"
-msgstr ""
+msgstr "Nessuna connessione internet"
 
-#: apps/native/src/app/(tabs)/(search)/index.tsx:113
+#: apps/native/src/app/(tabs)/(search)/index.tsx:100
 msgid "No results for \"{debouncedQuery}\""
-msgstr ""
+msgstr "Nessun risultato per \"{debouncedQuery}\""
 
-#: apps/web/src/components/command-palette.tsx:217
+#: apps/web/src/components/command-palette.tsx:212
 msgid "No results found."
-msgstr ""
+msgstr "Nessun risultato trovato."
 
-#: apps/native/src/components/explore/filterable-title-row.tsx:139
-#: apps/web/src/components/explore/filterable-title-row.tsx:151
+#: apps/native/src/components/explore/filterable-title-row.tsx:135
+#: apps/web/src/components/explore/filterable-title-row.tsx:144
 msgid "No titles found for this genre."
-msgstr ""
+msgstr "Nessun titolo trovato per questo genere."
 
-#: apps/native/src/components/settings/integration-card.tsx:194
-#: apps/web/src/components/settings/integration-card.tsx:176
-#: apps/web/src/components/settings/system-health-section.tsx:249
+#: apps/native/src/components/settings/integration-card.tsx:174
+#: apps/web/src/components/settings/integration-card.tsx:153
+#: apps/web/src/components/settings/system-health-section.tsx:229
 msgid "Not configured"
-msgstr ""
+msgstr "Non configurato"
 
-#: apps/native/src/app/+not-found.tsx:17
+#: apps/native/src/app/+not-found.tsx:18
 msgid "Not Found"
-msgstr ""
+msgstr "Non trovato"
 
-#: apps/web/src/components/title-card.tsx:67
+#: apps/web/src/components/title-card.tsx:64
 msgid "On Watchlist"
-msgstr ""
+msgstr "In watchlist"
 
-#: apps/web/src/components/settings/imports-section.tsx:693
+#: apps/web/src/components/settings/imports-section.tsx:657
 msgid "Open {source} to enter code"
-msgstr ""
+msgstr "Apri {source} per inserire il codice"
 
-#: apps/web/src/components/settings/integration-card.tsx:308
+#: apps/web/src/components/settings/integration-card.tsx:266
 msgid "Open docs"
-msgstr ""
+msgstr "Apri la documentazione"
 
-#: apps/web/src/components/settings/integration-configs.tsx:190
+#: apps/web/src/components/settings/integration-configs.tsx:172
 msgid "Open Emby, go to <0>Settings > Webhooks</0>"
-msgstr ""
+msgstr "Apri Emby, vai su <0>Impostazioni > Webhook</0>"
 
-#: apps/native/src/components/settings/integration-configs.ts:91
+#: apps/native/src/components/settings/integration-configs.ts:88
 msgid "Open Emby, go to Settings > Webhooks"
-msgstr ""
+msgstr "Apri Emby, vai su Impostazioni > Webhook"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:548
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:513
 msgid "Open in browser…"
-msgstr ""
+msgstr "Apri nel browser…"
 
-#: apps/web/src/components/settings/integration-configs.tsx:62
+#: apps/web/src/components/settings/integration-configs.tsx:56
 msgid "Open Plex, go to <0>Settings > Webhooks<1/></0>"
-msgstr ""
+msgstr "Apri Plex, vai su <0>Impostazioni > Webhook<1/></0>"
 
-#: apps/native/src/components/settings/integration-configs.ts:54
+#: apps/native/src/components/settings/integration-configs.ts:55
 msgid "Open Plex, go to Settings > Webhooks"
-msgstr ""
+msgstr "Apri Plex, vai su Impostazioni > Webhook"
 
-#: apps/web/src/components/settings/integration-configs.tsx:269
+#: apps/web/src/components/settings/integration-configs.tsx:243
 msgid "Open Radarr, go to <0>Settings > Import Lists</0>"
-msgstr ""
+msgstr "Apri Radarr, vai su <0>Impostazioni > Liste di importazione</0>"
 
-#: apps/native/src/components/settings/integration-configs.ts:126
+#: apps/native/src/components/settings/integration-configs.ts:121
 msgid "Open Radarr, go to Settings > Import Lists"
-msgstr ""
+msgstr "Apri Radarr, vai su Impostazioni > Liste di importazione"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:502
-#: apps/web/src/components/settings/registration-section.tsx:58
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:472
+#: apps/web/src/components/settings/registration-section.tsx:51
 msgid "Open registration"
-msgstr ""
+msgstr "Registrazione aperta"
 
-#: apps/web/src/components/settings/integration-configs.tsx:229
+#: apps/web/src/components/settings/integration-configs.tsx:206
 msgid "Open Sonarr, go to <0>Settings > Import Lists</0>"
-msgstr ""
+msgstr "Apri Sonarr, vai su <0>Impostazioni > Liste di importazione</0>"
 
-#: apps/native/src/components/settings/integration-configs.ts:108
+#: apps/native/src/components/settings/integration-configs.ts:103
 msgid "Open Sonarr, go to Settings > Import Lists"
-msgstr ""
+msgstr "Apri Sonarr, vai su Impostazioni > Liste di importazione"
 
-#: apps/web/src/components/auth-form.tsx:158
+#: apps/web/src/components/auth-form.tsx:153
 msgid "or"
-msgstr ""
+msgstr "o"
 
-#: apps/native/src/app/(auth)/login.tsx:118
+#: apps/native/src/app/(auth)/login.tsx:108
 msgid "OR"
-msgstr ""
+msgstr "O"
 
-#: apps/native/src/app/+not-found.tsx:27
+#: apps/native/src/app/+not-found.tsx:25
 msgid "Page Not Found"
-msgstr ""
+msgstr "Pagina non trovata"
 
-#: apps/web/src/components/settings/imports-section.tsx:509
+#: apps/web/src/components/settings/imports-section.tsx:488
 msgid "Parsing..."
-msgstr ""
+msgstr "Analisi in corso..."
 
-#: apps/native/src/app/(auth)/login.tsx:167
-#: apps/native/src/app/(auth)/register.tsx:187
-#: apps/web/src/components/auth-form.tsx:221
+#: apps/native/src/app/(auth)/login.tsx:153
+#: apps/native/src/app/(auth)/register.tsx:170
+#: apps/web/src/components/auth-form.tsx:207
 msgid "Password"
 msgstr ""
 
-#: apps/native/src/app/change-password.tsx:76
-#: apps/web/src/components/settings/account-section.tsx:414
+#: apps/native/src/app/change-password.tsx:72
+#: apps/web/src/components/settings/account-section.tsx:388
 msgid "Password updated"
-msgstr ""
+msgstr "Password aggiornata"
 
-#: apps/web/src/components/settings/account-section.tsx:399
+#: apps/web/src/components/settings/account-section.tsx:373
 msgid "Passwords do not match"
-msgstr ""
+msgstr "Le password non corrispondono"
 
-#: apps/native/src/components/settings/integration-configs.ts:128
-#: apps/web/src/components/settings/integration-configs.tsx:284
+#: apps/native/src/components/settings/integration-configs.ts:123
+#: apps/web/src/components/settings/integration-configs.tsx:255
 msgid "Paste the Radarr URL above into the List URL field"
-msgstr ""
+msgstr "Incolla l'URL di Radarr nel campo URL della lista"
 
-#: apps/native/src/components/settings/integration-configs.ts:110
-#: apps/web/src/components/settings/integration-configs.tsx:244
+#: apps/native/src/components/settings/integration-configs.ts:105
+#: apps/web/src/components/settings/integration-configs.tsx:218
 msgid "Paste the Sonarr URL above into the List URL field"
-msgstr ""
+msgstr "Incolla l'URL di Sonarr nel campo URL della lista"
 
-#: apps/web/src/components/settings/update-check-section.tsx:63
+#: apps/web/src/components/settings/update-check-section.tsx:54
 msgid "Periodically check GitHub for new Sofa releases"
-msgstr ""
+msgstr "Controlla periodicamente GitHub per nuove versioni di Sofa"
 
-#: apps/native/src/components/search/search-result-row.tsx:38
-#: apps/native/src/components/search/search-result-row.tsx:99
+#: apps/native/src/components/search/search-result-row.tsx:34
+#: apps/native/src/components/search/search-result-row.tsx:81
 msgid "Person"
-msgstr ""
+msgstr "Persona"
 
-#: apps/native/src/app/person/[id].tsx:243
-#: apps/web/src/routes/_app/people.$id.tsx:52
+#: apps/native/src/app/person/[id].tsx:209
+#: apps/web/src/routes/_app/people.$id.tsx:50
 msgid "Person not found"
-msgstr ""
+msgstr "Persona non trovata"
 
-#: apps/web/src/components/titles/trailer-dialog.tsx:24
+#: apps/web/src/components/titles/trailer-dialog.tsx:25
 msgid "Play trailer"
-msgstr ""
+msgstr "Riproduci trailer"
 
-#: apps/native/src/app/(tabs)/(explore)/index.tsx:107
-#: apps/web/src/components/explore/explore-client.tsx:126
+#: apps/native/src/app/(tabs)/(explore)/index.tsx:89
+#: apps/web/src/components/explore/explore-client.tsx:120
 msgid "Popular Movies"
-msgstr ""
+msgstr "Film popolari"
 
-#: apps/native/src/app/(tabs)/(explore)/index.tsx:120
-#: apps/web/src/components/explore/explore-client.tsx:136
+#: apps/native/src/app/(tabs)/(explore)/index.tsx:102
+#: apps/web/src/components/explore/explore-client.tsx:130
 msgid "Popular TV Shows"
-msgstr ""
+msgstr "Serie TV popolari"
 
-#: apps/web/src/components/settings/backup-section.tsx:181
+#: apps/web/src/components/settings/backup-section.tsx:157
 msgid "Pre-restore backup"
-msgstr ""
+msgstr "Backup pre-ripristino"
 
-#: apps/web/src/components/people/person-hero.tsx:77
+#: apps/web/src/components/people/person-hero.tsx:75
 msgid "Producer"
-msgstr ""
+msgstr "Produttore"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:130
-#: apps/web/src/components/settings/account-section.tsx:130
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:127
+#: apps/web/src/components/settings/account-section.tsx:122
 msgid "Profile picture removed"
-msgstr ""
+msgstr "Immagine del profilo rimossa"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:119
-#: apps/web/src/components/settings/account-section.tsx:108
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:116
+#: apps/web/src/components/settings/account-section.tsx:100
 msgid "Profile picture updated"
-msgstr ""
+msgstr "Immagine del profilo aggiornata"
 
-#: apps/web/src/components/settings/danger-section.tsx:196
-#: apps/web/src/components/settings/danger-section.tsx:220
+#: apps/web/src/components/settings/danger-section.tsx:171
+#: apps/web/src/components/settings/danger-section.tsx:190
 msgid "Purge all"
-msgstr ""
+msgstr "Svuota tutto"
 
-#: apps/web/src/components/settings/danger-section.tsx:202
+#: apps/web/src/components/settings/danger-section.tsx:176
 msgid "Purge all caches?"
-msgstr ""
+msgstr "Svuotare tutte le cache?"
 
-#: apps/web/src/components/settings/danger-section.tsx:160
+#: apps/web/src/components/settings/danger-section.tsx:143
 msgid "Purge image cache?"
-msgstr ""
+msgstr "Svuotare la cache immagini?"
 
-#: apps/web/src/components/settings/danger-section.tsx:154
-#: apps/web/src/components/settings/danger-section.tsx:177
+#: apps/web/src/components/settings/danger-section.tsx:138
+#: apps/web/src/components/settings/danger-section.tsx:157
 msgid "Purge images"
-msgstr ""
+msgstr "Svuota immagini"
 
-#: apps/web/src/components/settings/danger-section.tsx:111
-#: apps/web/src/components/settings/danger-section.tsx:135
+#: apps/web/src/components/settings/danger-section.tsx:103
+#: apps/web/src/components/settings/danger-section.tsx:124
 msgid "Purge metadata"
-msgstr ""
+msgstr "Svuota metadati"
 
-#: apps/web/src/components/settings/danger-section.tsx:117
+#: apps/web/src/components/settings/danger-section.tsx:109
 msgid "Purge metadata cache?"
-msgstr ""
+msgstr "Svuotare la cache metadati?"
 
 #. placeholder {0}: data.deletedTitles
 #. placeholder {1}: data.deletedPersons
 #: apps/web/src/components/settings/danger-section.tsx:41
 msgid "Purged {0, plural, one {# stale title} other {# stale titles}} and {1, plural, one {# orphaned person} other {# orphaned persons}}"
-msgstr ""
+msgstr "{0, plural, one {# titolo obsoleto} other {# titoli obsoleti}} e {1, plural, one {# persona orfana} other {# persone orfane}} eliminati"
 
 #. placeholder {0}: metaResult.deletedTitles
 #. placeholder {1}: metaResult.deletedPersons
 #. placeholder {2}: imageResult.deletedFiles
-#: apps/web/src/components/settings/danger-section.tsx:71
+#: apps/web/src/components/settings/danger-section.tsx:68
 msgid "Purged {0, plural, one {# title} other {# titles}}, {1, plural, one {# person} other {# persons}}, {2, plural, one {# file} other {# files}} ({freed} freed)"
-msgstr ""
+msgstr "{0, plural, one {# titolo} other {# titoli}}, {1, plural, one {# persona} other {# persone}}, {2, plural, one {# file} other {# file}} eliminati ({freed} liberati)"
 
-#: apps/web/src/components/settings/danger-section.tsx:109
-#: apps/web/src/components/settings/danger-section.tsx:152
-#: apps/web/src/components/settings/danger-section.tsx:194
+#: apps/web/src/components/settings/danger-section.tsx:101
+#: apps/web/src/components/settings/danger-section.tsx:138
+#: apps/web/src/components/settings/danger-section.tsx:171
 msgid "Purging..."
-msgstr ""
+msgstr "Svuotamento in corso..."
 
-#: apps/web/src/components/command-palette.tsx:359
+#: apps/web/src/components/command-palette.tsx:336
 msgid "Quick Actions"
-msgstr ""
+msgstr "Azioni rapide"
 
-#: apps/native/src/components/settings/integration-configs.ts:123
+#: apps/native/src/components/settings/integration-configs.ts:118
 msgid "Radarr List URL"
-msgstr ""
+msgstr "URL lista Radarr"
 
 #. placeholder {0}: input.stars
 #. placeholder {1}: input.stars
-#: apps/native/src/hooks/use-title-actions.ts:93
+#: apps/native/src/hooks/use-title-actions.ts:88
 msgid "Rated {0} {1, plural, one {star} other {stars}}"
-msgstr ""
+msgstr "Valutato {0} {1, plural, one {stella} other {stelle}}"
 
 #: apps/native/src/hooks/use-title-actions.ts:92
 #~ msgid "Rated {0} star{1}"
 #~ msgstr "Rated {0} star{1}"
 
-#: apps/web/src/components/titles/use-title-actions.ts:131
+#: apps/web/src/components/titles/use-title-actions.ts:118
 msgid "Rated {ratingStars} {ratingStars, plural, one {star} other {stars}}"
-msgstr ""
+msgstr "Valutato {ratingStars} {ratingStars, plural, one {stella} other {stelle}}"
 
-#: apps/native/src/lib/title-actions.ts:88
+#: apps/native/src/lib/title-actions.ts:86
 msgid "Rated {stars, plural, one {# star} other {# stars}}"
-msgstr ""
+msgstr "{stars, plural, one {# stella} other {# stelle}}"
 
-#: apps/web/src/components/people/filmography-grid.tsx:88
-#: apps/web/src/components/people/filmography-grid.tsx:102
+#: apps/web/src/components/people/filmography-grid.tsx:81
+#: apps/web/src/components/people/filmography-grid.tsx:90
 msgid "Rating"
-msgstr ""
+msgstr "Valutazione"
 
-#: apps/native/src/hooks/use-title-actions.ts:94
-#: apps/native/src/lib/title-actions.ts:90
-#: apps/web/src/components/titles/use-title-actions.ts:132
+#: apps/native/src/hooks/use-title-actions.ts:89
+#: apps/native/src/lib/title-actions.ts:87
+#: apps/web/src/components/titles/use-title-actions.ts:119
 msgid "Rating removed"
-msgstr ""
+msgstr "Valutazione rimossa"
 
-#: apps/web/src/components/settings/imports-section.tsx:782
-#: apps/web/src/components/settings/imports-section.tsx:813
+#: apps/web/src/components/settings/imports-section.tsx:744
+#: apps/web/src/components/settings/imports-section.tsx:775
 msgid "Ratings"
-msgstr ""
+msgstr "Valutazioni"
 
-#: apps/web/src/components/expandable-text.tsx:51
+#: apps/web/src/components/expandable-text.tsx:52
 msgid "Read more"
-msgstr ""
+msgstr "Leggi di più"
 
-#: apps/native/src/components/settings/integration-configs.ts:39
-#: apps/web/src/components/settings/integration-card.tsx:339
+#: apps/native/src/components/settings/integration-configs.ts:40
+#: apps/web/src/components/settings/integration-card.tsx:297
 msgid "Ready — not polled yet"
-msgstr ""
+msgstr "Pronto — nessun polling ancora"
 
-#: apps/native/src/components/settings/integration-configs.ts:31
-#: apps/web/src/components/settings/integration-card.tsx:332
+#: apps/native/src/components/settings/integration-configs.ts:32
+#: apps/web/src/components/settings/integration-card.tsx:290
 msgid "Ready — nothing received yet"
-msgstr ""
+msgstr "Pronto — nessun evento ricevuto ancora"
 
-#: apps/web/src/components/command-palette.tsx:315
+#: apps/web/src/components/command-palette.tsx:295
 msgid "Recent Searches"
-msgstr ""
+msgstr "Ricerche recenti"
 
-#: apps/native/src/components/search/recently-viewed-list.ios.tsx:106
-#: apps/native/src/components/search/recently-viewed-list.tsx:86
+#: apps/native/src/components/search/recently-viewed-list.ios.tsx:95
+#: apps/native/src/components/search/recently-viewed-list.tsx:77
 msgid "Recently Viewed"
-msgstr ""
+msgstr "Visualizzati di recente"
 
-#: apps/web/src/components/settings/system-health-section.tsx:333
+#: apps/web/src/components/settings/system-health-section.tsx:306
 msgid "Recommendations"
-msgstr ""
+msgstr "Raccomandazioni"
 
-#: apps/web/src/components/titles/title-recommendations.tsx:40
+#: apps/web/src/components/titles/title-recommendations.tsx:41
 msgid "Recommended"
-msgstr ""
+msgstr "Consigliati"
 
-#: apps/native/src/app/(tabs)/(home)/index.tsx:154
+#: apps/native/src/app/(tabs)/(home)/index.tsx:137
 #: apps/web/src/components/dashboard/recommendations-section.tsx:22
 msgid "Recommended for You"
-msgstr ""
+msgstr "Consigliati per te"
 
-#: apps/web/src/components/auth-form.tsx:143
+#: apps/web/src/components/auth-form.tsx:140
 msgid "Redirecting…"
-msgstr ""
+msgstr "Reindirizzamento in corso…"
 
-#: apps/web/src/components/settings/system-health-section.tsx:182
+#: apps/web/src/components/settings/system-health-section.tsx:166
 msgid "Refresh"
-msgstr ""
+msgstr "Aggiorna"
 
-#: apps/web/src/components/settings/system-health-section.tsx:172
+#: apps/web/src/components/settings/system-health-section.tsx:156
 msgid "Refresh system health"
-msgstr ""
+msgstr "Aggiorna stato di salute del sistema"
 
-#: apps/native/src/components/settings/integration-card.tsx:140
-#: apps/native/src/components/settings/integration-card.tsx:289
+#: apps/native/src/components/settings/integration-card.tsx:128
+#: apps/native/src/components/settings/integration-card.tsx:248
 msgid "Regenerate"
-msgstr ""
+msgstr "Rigenera"
 
-#: apps/native/src/components/settings/integration-card.tsx:135
-#: apps/web/src/components/settings/integration-card.tsx:264
+#: apps/native/src/components/settings/integration-card.tsx:123
+#: apps/web/src/components/settings/integration-card.tsx:226
 msgid "Regenerate URL"
-msgstr ""
+msgstr "Rigenera URL"
 
-#: apps/web/src/components/auth-form.tsx:293
-#: apps/web/src/components/landing-page.tsx:176
+#: apps/web/src/components/auth-form.tsx:274
+#: apps/web/src/components/landing-page.tsx:177
 msgid "Register"
-msgstr ""
+msgstr "Registrati"
 
-#: apps/native/src/app/(auth)/register.tsx:116
+#: apps/native/src/app/(auth)/register.tsx:104
 msgid "Registering on {serverHost}"
-msgstr ""
+msgstr "Registrazione su {serverHost}"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:167
-#: apps/web/src/components/settings/registration-section.tsx:41
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:164
+#: apps/web/src/components/settings/registration-section.tsx:35
 msgid "Registration closed"
-msgstr ""
+msgstr "Registrazione chiusa"
 
-#: apps/native/src/app/(auth)/register.tsx:97
-#: apps/web/src/routes/_auth/register.tsx:32
+#: apps/native/src/app/(auth)/register.tsx:87
+#: apps/web/src/routes/_auth/register.tsx:33
 msgid "Registration Closed"
-msgstr ""
+msgstr "Registrazione chiusa"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:167
-#: apps/web/src/components/settings/registration-section.tsx:41
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:164
+#: apps/web/src/components/settings/registration-section.tsx:35
 msgid "Registration opened"
-msgstr ""
+msgstr "Registrazione aperta"
 
-#: apps/web/src/components/titles/status-button.tsx:84
+#: apps/web/src/components/titles/status-button.tsx:76
 msgid "Remove"
-msgstr ""
+msgstr "Rimuovi"
 
-#: apps/native/src/components/titles/status-action-button.tsx:101
-#: apps/web/src/components/titles/status-button.tsx:66
+#: apps/native/src/components/titles/status-action-button.tsx:96
+#: apps/web/src/components/titles/status-button.tsx:60
 msgid "Remove from library"
-msgstr ""
+msgstr "Rimuovi dalla libreria"
 
-#: apps/native/src/components/dashboard/continue-watching-card.tsx:129
-#: apps/native/src/components/ui/poster-card.tsx:259
+#: apps/native/src/components/dashboard/continue-watching-card.tsx:108
+#: apps/native/src/components/ui/poster-card.tsx:233
 msgid "Remove from Library"
-msgstr ""
+msgstr "Rimuovi dalla libreria"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:277
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:268
 msgid "Remove Photo"
-msgstr ""
+msgstr "Rimuovi foto"
 
-#: apps/web/src/components/settings/account-section.tsx:239
+#: apps/web/src/components/settings/account-section.tsx:216
 msgid "Remove picture"
-msgstr ""
+msgstr "Rimuovi immagine"
 
-#: apps/web/src/components/settings/account-section.tsx:199
+#: apps/web/src/components/settings/account-section.tsx:184
 msgid "Remove profile picture"
-msgstr ""
+msgstr "Rimuovi immagine del profilo"
 
-#: apps/native/src/hooks/use-title-actions.ts:66
-#: apps/native/src/lib/title-actions.ts:75
-#: apps/web/src/components/titles/use-title-actions.ts:111
+#: apps/native/src/hooks/use-title-actions.ts:65
+#: apps/native/src/lib/title-actions.ts:74
+#: apps/web/src/components/titles/use-title-actions.ts:98
 msgid "Removed from library"
-msgstr ""
+msgstr "Rimosso dalla libreria"
 
-#: apps/web/src/components/titles/title-availability.tsx:138
+#: apps/web/src/components/titles/title-availability.tsx:114
 msgid "Rent"
-msgstr ""
+msgstr "Noleggia"
 
-#: apps/web/src/components/settings/integration-configs.tsx:165
+#: apps/web/src/components/settings/integration-configs.tsx:150
 msgid "Requires <0>Emby Server 4.7.9+</0> and an active <1>Emby Premiere<2/></1> license."
-msgstr ""
+msgstr "Richiede <0>Emby Server 4.7.9+</0> e una licenza <1>Emby Premiere<2/></1> attiva."
 
-#: apps/web/src/components/settings/integration-configs.tsx:41
+#: apps/web/src/components/settings/integration-configs.tsx:35
 msgid "Requires an active <0>Plex Pass<1/></0> subscription."
-msgstr ""
+msgstr "Richiede un abbonamento <0>Plex Pass<1/></0> attivo."
 
-#: apps/native/src/components/settings/integration-configs.ts:52
+#: apps/native/src/components/settings/integration-configs.ts:53
 msgid "Requires an active Plex Pass subscription."
-msgstr ""
+msgstr "Richiede un abbonamento Plex Pass attivo."
 
-#: apps/native/src/components/settings/integration-configs.ts:88
+#: apps/native/src/components/settings/integration-configs.ts:85
 msgid "Requires Emby Server 4.7.9+ and an active Emby Premiere license."
-msgstr ""
+msgstr "Richiede Emby Server 4.7.9+ e una licenza Emby Premiere attiva."
 
-#: apps/web/src/components/settings/backup-restore-section.tsx:59
-#: apps/web/src/components/settings/backup-restore-section.tsx:116
+#: apps/web/src/components/settings/backup-restore-section.tsx:57
+#: apps/web/src/components/settings/backup-restore-section.tsx:110
 msgid "Restore"
-msgstr ""
+msgstr "Ripristina"
 
-#: apps/web/src/components/settings/backup-restore-section.tsx:89
+#: apps/web/src/components/settings/backup-restore-section.tsx:83
 msgid "Restore database?"
-msgstr ""
+msgstr "Ripristinare il database?"
 
-#: apps/web/src/components/settings/backup-restore-section.tsx:35
+#: apps/web/src/components/settings/backup-restore-section.tsx:36
 msgid "Restore failed"
-msgstr ""
+msgstr "Ripristino fallito"
 
-#: apps/web/src/components/settings/backup-restore-section.tsx:132
+#: apps/web/src/components/settings/backup-restore-section.tsx:121
 msgid "Restoring…"
-msgstr ""
+msgstr "Ripristino in corso…"
 
-#: apps/web/src/components/command-palette.tsx:222
+#: apps/web/src/components/command-palette.tsx:217
 msgid "Results"
-msgstr ""
+msgstr "Risultati"
 
-#: apps/web/src/components/settings/imports-section.tsx:731
+#: apps/web/src/components/settings/imports-section.tsx:695
 msgid "Retrieving your watch history, watchlist, and ratings..."
-msgstr ""
+msgstr "Recupero della cronologia, watchlist e valutazioni..."
 
-#: apps/native/src/components/settings/integrations-section.tsx:42
-#: apps/native/src/components/ui/server-unreachable-banner.ios.tsx:73
-#: apps/native/src/components/ui/server-unreachable-banner.tsx:81
-#: apps/web/src/lib/orpc/client.ts:16
+#: apps/native/src/components/settings/integrations-section.tsx:39
+#: apps/native/src/components/ui/server-unreachable-banner.ios.tsx:71
+#: apps/native/src/components/ui/server-unreachable-banner.tsx:79
+#: apps/web/src/lib/orpc/client.ts:17
 msgid "Retry"
-msgstr ""
+msgstr "Riprova"
 
-#: apps/web/src/routes/__root.tsx:119
+#: apps/web/src/routes/__root.tsx:116
 msgid "Return home"
-msgstr ""
+msgstr "Torna alla home"
 
-#: apps/web/src/components/settings/imports-section.tsx:773
+#: apps/web/src/components/settings/imports-section.tsx:735
 msgid "Review what was found and choose what to import."
-msgstr ""
+msgstr "Rivedi i risultati trovati e scegli cosa importare."
 
-#: apps/web/src/components/settings/system-health-section.tsx:558
+#: apps/web/src/components/settings/system-health-section.tsx:509
 msgid "Run now"
-msgstr ""
+msgstr "Esegui ora"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:102
+#: apps/web/src/components/settings/backup-schedule-section.tsx:99
 msgid "Saturday"
-msgstr ""
+msgstr "Sabato"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:322
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:311
 msgid "Save"
-msgstr ""
+msgstr "Salva"
 
-#: apps/web/src/components/settings/account-section.tsx:296
+#: apps/web/src/components/settings/account-section.tsx:270
 msgid "Save name"
-msgstr ""
+msgstr "Salva nome"
 
-#: apps/web/src/routes/__root.tsx:101
+#: apps/web/src/routes/__root.tsx:98
 msgid "Scene not found"
-msgstr ""
+msgstr "Scena non trovata"
 
-#: apps/web/src/components/settings/system-health-section.tsx:402
+#: apps/web/src/components/settings/system-health-section.tsx:368
 msgid "Schedule"
-msgstr ""
+msgstr "Pianificazione"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:201
+#: apps/web/src/components/settings/backup-schedule-section.tsx:186
 msgid "Schedule updated"
-msgstr ""
+msgstr "Pianificazione aggiornata"
 
-#: apps/web/src/components/settings/backup-section.tsx:179
+#: apps/web/src/components/settings/backup-section.tsx:155
 msgid "Scheduled backup"
-msgstr ""
+msgstr "Backup pianificato"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:178
+#: apps/web/src/components/settings/backup-schedule-section.tsx:164
 msgid "Scheduled backups disabled"
-msgstr ""
+msgstr "Backup pianificati disabilitati"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:177
+#: apps/web/src/components/settings/backup-schedule-section.tsx:164
 msgid "Scheduled backups enabled"
-msgstr ""
+msgstr "Backup pianificati abilitati"
 
 #: apps/web/src/components/dashboard/stats-section.tsx:35
 msgid "Search for movies and TV shows to start tracking"
-msgstr ""
+msgstr "Cerca film e serie TV per iniziare a tracciare"
 
-#: apps/native/src/components/search/recently-viewed-list.ios.tsx:81
-#: apps/native/src/components/search/recently-viewed-list.tsx:64
+#: apps/native/src/components/search/recently-viewed-list.ios.tsx:72
+#: apps/native/src/components/search/recently-viewed-list.tsx:55
 msgid "Search for movies, shows, or people"
-msgstr ""
+msgstr "Cerca film, serie TV o persone"
 
-#: apps/web/src/components/command-palette.tsx:186
+#: apps/web/src/components/command-palette.tsx:182
 msgid "Search for movies, TV shows, or run commands"
-msgstr ""
+msgstr "Cerca film, serie TV o esegui comandi"
 
-#: apps/web/src/components/command-palette.tsx:195
+#: apps/web/src/components/command-palette.tsx:191
 msgid "Search movies & TV shows…"
-msgstr ""
+msgstr "Cerca film e serie TV…"
 
-#: apps/native/src/app/(tabs)/(search)/index.tsx:90
+#: apps/native/src/app/(tabs)/(search)/index.tsx:79
 msgid "Search movies, shows, people..."
-msgstr ""
+msgstr "Cerca film, serie, persone..."
 
-#: apps/web/src/components/nav-bar.tsx:193
-#: apps/web/src/components/nav-bar.tsx:202
+#: apps/web/src/components/nav-bar.tsx:181
+#: apps/web/src/components/nav-bar.tsx:190
 msgid "Search…"
-msgstr ""
+msgstr "Cerca…"
 
 #. placeholder {0}: season.seasonNumber
-#: apps/native/src/components/titles/season-accordion.tsx:122
-#: apps/native/src/components/titles/season-accordion.tsx:128
-#: apps/web/src/components/titles/use-title-actions.ts:295
-#: apps/web/src/components/titles/use-title-actions.ts:335
+#: apps/native/src/components/titles/season-accordion.tsx:113
+#: apps/native/src/components/titles/season-accordion.tsx:119
+#: apps/web/src/components/titles/use-title-actions.ts:274
+#: apps/web/src/components/titles/use-title-actions.ts:313
 msgid "Season {0}"
-msgstr ""
+msgstr "Stagione {0}"
 
-#: apps/native/src/hooks/use-title-actions.ts:137
-#: apps/native/src/lib/title-actions.ts:124
+#: apps/native/src/hooks/use-title-actions.ts:121
+#: apps/native/src/lib/title-actions.ts:119
 msgid "Season watched"
-msgstr ""
+msgstr "Stagione vista"
 
-#: apps/native/src/app/title/[id].tsx:536
+#: apps/native/src/app/title/[id].tsx:473
 msgid "Seasons"
-msgstr ""
+msgstr "Stagioni"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:497
-#: apps/web/src/routes/_app/settings.tsx:140
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:470
+#: apps/web/src/routes/_app/settings.tsx:131
 msgid "Security"
-msgstr ""
+msgstr "Sicurezza"
 
-#: apps/web/src/components/landing-page.tsx:105
+#: apps/web/src/components/landing-page.tsx:106
 msgid "Self-hosted movie & TV tracker"
-msgstr ""
+msgstr "Tracker film & TV self-hosted"
 
-#: apps/web/src/routes/_app/settings.tsx:121
+#: apps/web/src/routes/_app/settings.tsx:115
 msgid "Server"
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:452
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:431
 msgid "Server Health"
-msgstr ""
+msgstr "Salute del server"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:380
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:364
 msgid "Server URL"
-msgstr ""
+msgstr "URL server"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:361
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:350
 msgid "Set password"
-msgstr ""
+msgstr "Imposta password"
 
-#: apps/native/src/components/settings/integration-configs.ts:111
-#: apps/native/src/components/settings/integration-configs.ts:129
-#: apps/web/src/components/settings/integration-configs.tsx:247
-#: apps/web/src/components/settings/integration-configs.tsx:287
+#: apps/native/src/components/settings/integration-configs.ts:106
+#: apps/native/src/components/settings/integration-configs.ts:124
+#: apps/web/src/components/settings/integration-configs.tsx:221
+#: apps/web/src/components/settings/integration-configs.tsx:258
 msgid "Set your preferred quality profile and root folder"
-msgstr ""
+msgstr "Imposta il profilo di qualità e la cartella radice preferiti"
 
-#: apps/native/src/components/header-avatar.tsx:63
-#: apps/web/src/components/nav-bar.tsx:250
-#: apps/web/src/components/nav-bar.tsx:292
-#: apps/web/src/components/settings/settings-shell.tsx:36
+#: apps/native/src/components/header-avatar.tsx:55
+#: apps/web/src/components/nav-bar.tsx:236
+#: apps/web/src/components/nav-bar.tsx:278
+#: apps/web/src/components/settings/settings-shell.tsx:30
 msgid "Settings"
-msgstr ""
+msgstr "Impostazioni"
 
-#: apps/native/src/components/settings/integration-card.tsx:319
-#: apps/web/src/components/settings/integration-card.tsx:288
+#: apps/native/src/components/settings/integration-card.tsx:271
+#: apps/web/src/components/settings/integration-card.tsx:248
 msgid "Setup instructions"
-msgstr ""
+msgstr "Istruzioni di configurazione"
 
-#: apps/web/src/routes/setup.tsx:98
+#: apps/web/src/routes/setup.tsx:95
 msgid "Setup required"
-msgstr ""
+msgstr "Configurazione richiesta"
 
-#: apps/native/src/components/ui/expandable-text.tsx:62
-#: apps/native/src/components/ui/expandable-text.tsx:69
-#: apps/web/src/components/expandable-text.tsx:51
+#: apps/native/src/components/ui/expandable-text.tsx:63
+#: apps/native/src/components/ui/expandable-text.tsx:70
+#: apps/web/src/components/expandable-text.tsx:52
 msgid "Show less"
-msgstr ""
+msgstr "Mostra meno"
 
-#: apps/native/src/components/ui/expandable-text.tsx:62
-#: apps/native/src/components/ui/expandable-text.tsx:69
+#: apps/native/src/components/ui/expandable-text.tsx:63
+#: apps/native/src/components/ui/expandable-text.tsx:70
 msgid "Show more"
-msgstr ""
+msgstr "Mostra di più"
 
-#: apps/web/src/components/auth-form.tsx:249
-#: apps/web/src/components/auth-form.tsx:283
+#: apps/web/src/components/auth-form.tsx:233
+#: apps/web/src/components/auth-form.tsx:264
 msgid "Sign in"
-msgstr ""
+msgstr "Accedi"
 
-#: apps/native/src/app/(auth)/login.tsx:205
-#: apps/web/src/components/landing-page.tsx:167
+#: apps/native/src/app/(auth)/login.tsx:183
+#: apps/web/src/components/landing-page.tsx:168
 msgid "Sign In"
-msgstr ""
+msgstr "Accedi"
 
 #: apps/web/src/routes/_auth/register.tsx:45
 msgid "Sign in instead"
-msgstr ""
+msgstr "Accedi invece"
 
-#: apps/native/src/app/(auth)/login.tsx:91
-#: apps/web/src/components/auth-form.tsx:119
+#: apps/native/src/app/(auth)/login.tsx:86
+#: apps/web/src/components/auth-form.tsx:116
 msgid "Sign in to continue"
-msgstr ""
+msgstr "Accedi per continuare"
 
 #. placeholder {0}: authConfig.data?.oidcProviderName ?? "SSO"
 #. placeholder {0}: authConfig?.oidcProviderName || "SSO"
-#: apps/native/src/app/(auth)/login.tsx:108
-#: apps/web/src/components/auth-form.tsx:145
+#: apps/native/src/app/(auth)/login.tsx:100
+#: apps/web/src/components/auth-form.tsx:142
 msgid "Sign in with {0}"
-msgstr ""
+msgstr "Accedi con {0}"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:368
-#: apps/native/src/components/header-avatar.tsx:87
-#: apps/web/src/components/nav-bar.tsx:262
-#: apps/web/src/components/settings/account-section.tsx:354
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:356
+#: apps/native/src/components/header-avatar.tsx:79
+#: apps/web/src/components/nav-bar.tsx:248
+#: apps/web/src/components/settings/account-section.tsx:328
 msgid "Sign out"
-msgstr ""
+msgstr "Esci"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:206
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:209
-#: apps/native/src/components/header-avatar.tsx:70
-#: apps/native/src/components/header-avatar.tsx:73
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:201
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:204
+#: apps/native/src/components/header-avatar.tsx:62
+#: apps/native/src/components/header-avatar.tsx:65
 msgid "Sign Out"
-msgstr ""
+msgstr "Esci"
 
-#: apps/native/src/app/change-password.tsx:199
-#: apps/web/src/components/settings/account-section.tsx:499
+#: apps/native/src/app/change-password.tsx:193
+#: apps/web/src/components/settings/account-section.tsx:471
 msgid "Sign out of other sessions"
-msgstr ""
+msgstr "Esci dalle altre sessioni"
 
-#: apps/web/src/components/settings/imports-section.tsx:922
+#: apps/web/src/components/settings/imports-section.tsx:880
 msgid "Skipped"
-msgstr ""
+msgstr "Ignorati"
 
 #. placeholder {0}: data.latestVersion
-#: apps/web/src/components/update-toast.tsx:19
+#: apps/web/src/components/update-toast.tsx:18
 msgid "Sofa v{0} is available"
-msgstr ""
+msgstr "Sofa v{0} è disponibile"
 
 #: apps/native/src/components/settings/integration-configs.ts:57
-#: apps/native/src/components/settings/integration-configs.ts:75
-#: apps/native/src/components/settings/integration-configs.ts:95
-#: apps/web/src/components/settings/integration-configs.tsx:86
-#: apps/web/src/components/settings/integration-configs.tsx:147
-#: apps/web/src/components/settings/integration-configs.tsx:208
+#: apps/native/src/components/settings/integration-configs.ts:73
+#: apps/native/src/components/settings/integration-configs.ts:91
+#: apps/web/src/components/settings/integration-configs.tsx:79
+#: apps/web/src/components/settings/integration-configs.tsx:133
+#: apps/web/src/components/settings/integration-configs.tsx:186
 msgid "Sofa will automatically log movies and episodes when you finish watching them"
-msgstr ""
+msgstr "Sofa registrerà automaticamente film ed episodi quando finisci di guardarli"
 
-#: apps/native/src/app/change-password.tsx:81
-#: apps/native/src/app/person/[id].tsx:213
-#: apps/web/src/components/settings/account-section.tsx:417
-#: apps/web/src/routes/__root.tsx:143
+#: apps/native/src/app/change-password.tsx:77
+#: apps/native/src/app/person/[id].tsx:182
+#: apps/web/src/components/settings/account-section.tsx:391
+#: apps/web/src/routes/__root.tsx:140
 msgid "Something went wrong"
-msgstr ""
+msgstr "Qualcosa è andato storto"
 
-#: apps/web/src/routes/_app/titles.$id.tsx:118
+#: apps/web/src/routes/_app/titles.$id.tsx:113
 msgid "Something went wrong while loading this title. Please try again."
-msgstr ""
+msgstr "Qualcosa è andato storto durante il caricamento di questo titolo. Riprova."
 
 #: apps/native/src/lib/query-client.ts:33
-#: apps/web/src/lib/orpc/client.ts:14
+#: apps/web/src/lib/orpc/client.ts:15
 msgid "Something went wrong…"
-msgstr ""
+msgstr "Qualcosa è andato storto…"
 
-#: apps/native/src/components/settings/integration-configs.ts:105
+#: apps/native/src/components/settings/integration-configs.ts:100
 msgid "Sonarr List URL"
-msgstr ""
+msgstr "URL lista Sonarr"
 
 #: apps/web/src/components/dashboard/stats-section.tsx:42
 msgid "Start exploring"
-msgstr ""
+msgstr "Inizia a esplorare"
 
-#: apps/native/src/app/(tabs)/(home)/index.tsx:142
+#: apps/native/src/app/(tabs)/(home)/index.tsx:126
 msgid "Start tracking movies and shows"
-msgstr ""
+msgstr "Inizia a tracciare film e serie"
 
-#: apps/web/src/components/auth-form.tsx:117
+#: apps/web/src/components/auth-form.tsx:114
 msgid "Start tracking your watches"
-msgstr ""
+msgstr "Inizia a tracciare le tue visioni"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:388
+#: apps/web/src/components/settings/backup-schedule-section.tsx:347
 msgid "Starting at"
-msgstr ""
+msgstr "Inizia alle"
 
-#: apps/web/src/components/settings/imports-section.tsx:888
+#: apps/web/src/components/settings/imports-section.tsx:846
 msgid "Starting import..."
-msgstr ""
+msgstr "Avvio importazione..."
 
-#: apps/native/src/hooks/use-title-actions.ts:65
+#: apps/native/src/hooks/use-title-actions.ts:64
 msgid "Status updated"
-msgstr ""
+msgstr "Stato aggiornato"
 
-#: apps/web/src/components/settings/system-health-section.tsx:595
+#: apps/web/src/components/settings/system-health-section.tsx:543
 msgid "Storage"
-msgstr ""
+msgstr "Archiviazione"
 
-#: apps/web/src/components/titles/title-availability.tsx:137
+#: apps/web/src/components/titles/title-availability.tsx:113
 msgid "Stream"
-msgstr ""
+msgstr "Streaming"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:96
+#: apps/web/src/components/settings/backup-schedule-section.tsx:93
 msgid "Sunday"
-msgstr ""
+msgstr "Domenica"
 
 #. placeholder {0}: info.name
-#: apps/web/src/components/settings/language-section.tsx:69
+#: apps/web/src/components/settings/language-section.tsx:59
 msgid "Switch to {0}"
-msgstr ""
+msgstr "Passa a {0}"
 
-#: apps/native/src/app/+not-found.tsx:30
+#: apps/native/src/app/+not-found.tsx:28
 msgid "The page you're looking for doesn't exist."
-msgstr ""
+msgstr "La pagina che stai cercando non esiste."
 
-#: apps/web/src/routes/_app/people.$id.tsx:55
+#: apps/web/src/routes/_app/people.$id.tsx:53
 msgid "The person you're looking for doesn't exist or may have been removed from the database."
-msgstr ""
+msgstr "La persona che stai cercando non esiste o potrebbe essere stata rimossa dal database."
 
-#: apps/web/src/routes/_app/titles.$id.tsx:149
+#: apps/web/src/routes/_app/titles.$id.tsx:142
 msgid "The title you're looking for doesn't exist or may have been removed from the database."
-msgstr ""
+msgstr "Il titolo che stai cercando non esiste o potrebbe essere stato rimosso dal database."
 
-#: apps/web/src/components/settings/imports-section.tsx:866
+#: apps/web/src/components/settings/imports-section.tsx:825
 msgid "This may take a few minutes for large libraries. Please don't close this tab."
-msgstr ""
+msgstr "L'operazione potrebbe richiedere alcuni minuti per librerie grandi. Non chiudere questa scheda."
 
-#: apps/web/src/components/dashboard/stats-display.tsx:146
+#: apps/web/src/components/dashboard/stats-display.tsx:135
 msgid "This Month"
-msgstr ""
+msgstr "Questo mese"
 
-#: apps/web/src/routes/__root.tsx:104
+#: apps/web/src/routes/__root.tsx:101
 msgid "This page was left on the cutting room floor. It may have been moved, removed, or never made it past the screenplay."
-msgstr ""
+msgstr "Questa pagina è rimasta sul pavimento della sala di montaggio. Potrebbe essere stata spostata, rimossa, o non essere mai arrivata alla sceneggiatura."
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:606
-#: apps/web/src/routes/_app/settings.tsx:75
-#: apps/web/src/routes/setup.tsx:187
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:557
+#: apps/web/src/routes/_app/settings.tsx:76
+#: apps/web/src/routes/setup.tsx:180
 msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
-msgstr ""
+msgstr "Questo prodotto utilizza le API di TMDB ma non è approvato o certificato da TMDB."
 
-#: apps/web/src/components/dashboard/stats-display.tsx:145
+#: apps/web/src/components/dashboard/stats-display.tsx:134
 msgid "This Week"
-msgstr ""
+msgstr "Questa settimana"
 
-#: apps/web/src/components/settings/danger-section.tsx:163
+#: apps/web/src/components/settings/danger-section.tsx:146
 msgid "This will delete all cached TMDB images from disk. Images will be re-downloaded automatically as needed."
-msgstr ""
+msgstr "Questo eliminerà tutte le immagini TMDB in cache dal disco. Le immagini verranno riscaricate automaticamente secondo necessità."
 
-#: apps/web/src/components/settings/danger-section.tsx:205
+#: apps/web/src/components/settings/danger-section.tsx:179
 msgid "This will delete all un-enriched stub titles and all cached images from disk. Everything will be re-imported and re-downloaded as needed."
-msgstr ""
+msgstr "Questo eliminerà tutti i titoli stub non arricchiti e tutte le immagini in cache dal disco. Tutto verrà reimportato e riscaricato secondo necessità."
 
-#: apps/web/src/components/settings/danger-section.tsx:120
+#: apps/web/src/components/settings/danger-section.tsx:112
 msgid "This will delete un-enriched stub titles that aren't in any user's library and clean up orphaned person records. Deleted titles will be re-imported if accessed again."
-msgstr ""
+msgstr "Questo eliminerà i titoli stub non arricchiti che non sono in nessuna libreria utente e pulerà i record di persone orfane. I titoli eliminati verranno reimportati se consultati di nuovo."
 
-#: apps/native/src/components/settings/integration-card.tsx:136
+#: apps/native/src/components/settings/integration-card.tsx:124
 msgid "This will invalidate the current {label} URL. You'll need to update it in {label}."
-msgstr ""
+msgstr "Questo invaliderà l'URL attuale di {label}. Dovrai aggiornarlo in {label}."
 
-#: apps/web/src/components/titles/title-seasons.tsx:125
+#: apps/web/src/components/titles/title-seasons.tsx:119
 msgid "This will mark every episode of this show as watched. You can undo this later by unmarking individual seasons."
-msgstr ""
+msgstr "Questo segnerà tutti gli episodi di questa serie come visti. Puoi annullarlo in seguito de-segnando le singole stagioni."
 
 #. placeholder {0}: formatBackupDate(backup.createdAt)
-#: apps/web/src/components/settings/backup-section.tsx:259
+#: apps/web/src/components/settings/backup-section.tsx:231
 msgid "This will permanently delete the backup from <0>{0}</0>. This cannot be undone."
-msgstr ""
+msgstr "Questo eliminerà definitivamente il backup del <0>{0}</0>. L'operazione non può essere annullata."
 
-#: apps/native/src/components/search/recently-viewed-list.ios.tsx:61
-#: apps/native/src/components/search/recently-viewed-list.tsx:35
+#: apps/native/src/components/search/recently-viewed-list.ios.tsx:57
+#: apps/native/src/components/search/recently-viewed-list.tsx:31
 msgid "This will remove all items from your history."
-msgstr ""
+msgstr "Questo rimuoverà tutti gli elementi dalla tua cronologia."
 
-#: apps/web/src/components/settings/backup-restore-section.tsx:92
+#: apps/web/src/components/settings/backup-restore-section.tsx:86
 msgid "This will replace your entire database with the uploaded file. A safety backup of your current data will be created first. Active sessions may need to refresh after restore."
-msgstr ""
+msgstr "Questo sostituirà l'intero database con il file caricato. Prima verrà creato un backup di sicurezza dei dati attuali. Le sessioni attive potrebbero richiedere un aggiornamento dopo il ripristino."
 
-#: apps/web/src/components/dashboard/stats-display.tsx:147
+#: apps/web/src/components/dashboard/stats-display.tsx:136
 msgid "This Year"
-msgstr ""
+msgstr "Quest'anno"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:100
+#: apps/web/src/components/settings/backup-schedule-section.tsx:97
 msgid "Thursday"
-msgstr ""
+msgstr "Giovedì"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:390
+#: apps/web/src/components/settings/backup-schedule-section.tsx:349
 msgid "Time:"
-msgstr ""
+msgstr "Ora:"
 
-#: apps/native/src/app/title/[id].tsx:251
-#: apps/web/src/routes/_app/titles.$id.tsx:146
+#: apps/native/src/app/title/[id].tsx:235
+#: apps/web/src/routes/_app/titles.$id.tsx:139
 msgid "Title not found"
-msgstr ""
+msgstr "Titolo non trovato"
 
-#: apps/native/src/components/settings/integration-configs.ts:131
-#: apps/web/src/components/settings/integration-configs.tsx:290
+#: apps/native/src/components/settings/integration-configs.ts:126
+#: apps/web/src/components/settings/integration-configs.tsx:261
 msgid "Titles on your Sofa watchlist will be automatically added for download when Radarr polls this list (every 12 hours by default)"
-msgstr ""
+msgstr "I titoli nella tua watchlist di Sofa verranno aggiunti automaticamente per il download quando Radarr interroga questa lista (ogni 12 ore per impostazione predefinita)"
 
-#: apps/native/src/components/settings/integration-configs.ts:113
-#: apps/web/src/components/settings/integration-configs.tsx:250
+#: apps/native/src/components/settings/integration-configs.ts:108
+#: apps/web/src/components/settings/integration-configs.tsx:224
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
-msgstr ""
+msgstr "I titoli nella tua watchlist di Sofa verranno aggiunti automaticamente per il download quando Sonarr interroga questa lista (ogni 6 ore per impostazione predefinita)"
 
-#: apps/web/src/components/dashboard/stats-display.tsx:144
+#: apps/web/src/components/dashboard/stats-display.tsx:133
 msgid "Today"
-msgstr ""
+msgstr "Oggi"
 
-#: apps/web/src/components/settings/update-check-section.tsx:71
+#: apps/web/src/components/settings/update-check-section.tsx:62
 msgid "Toggle automatic update checks"
-msgstr ""
+msgstr "Attiva/disattiva controllo aggiornamenti automatico"
 
-#: apps/web/src/components/settings/registration-section.tsx:69
+#: apps/web/src/components/settings/registration-section.tsx:62
 msgid "Toggle open registration"
-msgstr ""
+msgstr "Attiva/disattiva registrazione aperta"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:290
+#: apps/web/src/components/settings/backup-schedule-section.tsx:257
 msgid "Toggle scheduled backups"
-msgstr ""
+msgstr "Attiva/disattiva backup pianificati"
 
-#: apps/web/src/components/landing-page.tsx:131
+#: apps/web/src/components/landing-page.tsx:132
 msgid "Track what you watch. Know what's next.<0/>Your library, your data, your rules."
-msgstr ""
+msgstr "Traccia cosa guardi. Sai cosa ti aspetta.<0/>La tua libreria, i tuoi dati, le tue regole."
 
-#: apps/web/src/components/titles/trailer-dialog.tsx:37
-#: apps/web/src/components/titles/trailer-dialog.tsx:41
+#: apps/web/src/components/titles/trailer-dialog.tsx:38
+#: apps/web/src/components/titles/trailer-dialog.tsx:42
 msgid "Trailer"
 msgstr ""
 
-#: apps/web/src/components/explore/hero-banner.tsx:78
+#: apps/web/src/components/explore/hero-banner.tsx:70
 msgid "Trending today"
-msgstr ""
+msgstr "In tendenza oggi"
 
-#: apps/native/src/app/(tabs)/(explore)/index.tsx:95
-#: apps/web/src/components/explore/explore-client.tsx:112
+#: apps/native/src/app/(tabs)/(explore)/index.tsx:77
+#: apps/web/src/components/explore/explore-client.tsx:108
 msgid "Trending Today"
-msgstr ""
+msgstr "In tendenza oggi"
 
-#: apps/web/src/components/settings/system-health-section.tsx:537
+#: apps/web/src/components/settings/system-health-section.tsx:488
 msgid "Trigger job"
-msgstr ""
+msgstr "Avvia job"
 
-#: apps/web/src/routes/__root.tsx:159
+#: apps/web/src/routes/__root.tsx:156
 msgid "Try again"
-msgstr ""
+msgstr "Riprova"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:98
+#: apps/web/src/components/settings/backup-schedule-section.tsx:95
 msgid "Tuesday"
-msgstr ""
+msgstr "Martedì"
 
-#: apps/native/src/app/title/[id].tsx:362
-#: apps/native/src/components/search/search-result-row.tsx:98
-#: apps/web/src/components/explore/hero-banner.tsx:64
-#: apps/web/src/components/people/filmography-grid.tsx:60
-#: apps/web/src/components/titles/title-hero.tsx:153
+#: apps/native/src/app/title/[id].tsx:337
+#: apps/native/src/components/search/search-result-row.tsx:81
+#: apps/web/src/components/explore/hero-banner.tsx:59
+#: apps/web/src/components/people/filmography-grid.tsx:58
+#: apps/web/src/components/titles/title-hero.tsx:148
 msgid "TV"
 msgstr ""
 
-#: apps/web/src/components/settings/system-health-section.tsx:334
+#: apps/web/src/components/settings/system-health-section.tsx:307
 msgid "TV episodes"
-msgstr ""
+msgstr "Episodi TV"
 
-#: apps/native/src/components/search/search-result-row.tsx:37
+#: apps/native/src/components/search/search-result-row.tsx:34
 msgid "TV show"
-msgstr ""
+msgstr "Serie TV"
 
-#: apps/web/src/components/settings/system-health-section.tsx:656
+#: apps/web/src/components/settings/system-health-section.tsx:601
 msgid "unknown"
-msgstr ""
+msgstr "sconosciuto"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:256
-#: apps/web/src/components/settings/backup-schedule-section.tsx:270
+#: apps/web/src/components/settings/backup-schedule-section.tsx:232
+#: apps/web/src/components/settings/backup-schedule-section.tsx:239
 msgid "unlimited"
-msgstr ""
+msgstr "illimitato"
 
-#: apps/web/src/components/settings/system-health-section.tsx:273
+#: apps/web/src/components/settings/system-health-section.tsx:253
 msgid "Unreachable"
-msgstr ""
+msgstr "Non raggiungibile"
 
-#: apps/web/src/components/titles/title-seasons.tsx:340
+#: apps/web/src/components/titles/title-seasons.tsx:318
 msgid "Untitled"
-msgstr ""
+msgstr "Senza titolo"
 
-#: apps/web/src/components/titles/title-seasons.tsx:221
+#: apps/web/src/components/titles/title-seasons.tsx:205
 msgid "Unwatch all"
-msgstr ""
+msgstr "Rimuovi visione dalla stagione"
 
 #. placeholder {0}: season.name ?? t`Season ${season.seasonNumber}`
-#: apps/web/src/components/titles/use-title-actions.ts:335
+#: apps/web/src/components/titles/use-title-actions.ts:313
 msgid "Unwatched all of {0}"
-msgstr ""
+msgstr "Rimossa visione di {0}"
 
-#: apps/web/src/components/titles/use-title-actions.ts:174
+#: apps/web/src/components/titles/use-title-actions.ts:156
 msgid "Unwatched S{seasonNum} E{epNum}"
-msgstr ""
+msgstr "Non visto S{seasonNum} E{epNum}"
 
-#: apps/native/src/components/titles/continue-watching-banner.tsx:79
-#: apps/web/src/components/dashboard/continue-watching-card.tsx:77
+#: apps/native/src/components/titles/continue-watching-banner.tsx:72
+#: apps/web/src/components/dashboard/continue-watching-card.tsx:63
 msgid "Up next"
-msgstr ""
+msgstr "Prossimo"
 
 #. placeholder {0}: updateCheck.data.updateCheck.latestVersion
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:528
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:496
 msgid "Update available: {0}"
-msgstr ""
+msgstr "Aggiornamento disponibile: {0}"
 
-#: apps/web/src/components/settings/system-health-section.tsx:337
+#: apps/web/src/components/settings/system-health-section.tsx:310
 msgid "Update check"
-msgstr ""
+msgstr "Controllo aggiornamenti"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:185
-#: apps/web/src/components/settings/update-check-section.tsx:40
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:181
+#: apps/web/src/components/settings/update-check-section.tsx:35
 msgid "Update checks disabled"
-msgstr ""
+msgstr "Controllo aggiornamenti disabilitato"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:185
-#: apps/web/src/components/settings/update-check-section.tsx:40
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:181
+#: apps/web/src/components/settings/update-check-section.tsx:35
 msgid "Update checks enabled"
-msgstr ""
+msgstr "Controllo aggiornamenti abilitato"
 
-#: apps/web/src/components/settings/account-section.tsx:84
+#: apps/web/src/components/settings/account-section.tsx:76
 msgid "Update failed"
-msgstr ""
+msgstr "Aggiornamento fallito"
 
-#: apps/web/src/components/settings/account-section.tsx:509
+#: apps/web/src/components/settings/account-section.tsx:481
 msgid "Update password"
-msgstr ""
+msgstr "Aggiorna password"
 
-#: apps/native/src/app/change-password.tsx:218
+#: apps/native/src/app/change-password.tsx:212
 msgid "Update Password"
-msgstr ""
+msgstr "Aggiorna password"
 
-#: apps/web/src/components/settings/backup-restore-section.tsx:134
-#: apps/web/src/components/settings/imports-section.tsx:509
+#: apps/web/src/components/settings/backup-restore-section.tsx:121
+#: apps/web/src/components/settings/imports-section.tsx:488
 msgid "Upload"
-msgstr ""
+msgstr "Carica"
 
-#: apps/web/src/components/settings/backup-restore-section.tsx:62
+#: apps/web/src/components/settings/backup-restore-section.tsx:60
 msgid "Upload a .db file to replace the current database. A safety backup is created first."
-msgstr ""
+msgstr "Carica un file .db per sostituire il database attuale. Prima viene creato un backup di sicurezza."
 
 #. placeholder {0}: config.accept
 #. placeholder {1}: config.label
-#: apps/web/src/components/settings/imports-section.tsx:637
+#: apps/web/src/components/settings/imports-section.tsx:603
 msgid "Upload a {0} export from your {1} account settings."
-msgstr ""
+msgstr "Carica un'esportazione {0} dalle impostazioni del tuo account {1}."
 
-#: apps/web/src/components/settings/imports-section.tsx:634
+#: apps/web/src/components/settings/imports-section.tsx:600
 msgid "Upload export file"
-msgstr ""
+msgstr "Carica file di esportazione"
 
-#: apps/web/src/components/settings/account-section.tsx:112
+#: apps/web/src/components/settings/account-section.tsx:104
 msgid "Upload failed"
-msgstr ""
+msgstr "Caricamento fallito"
 
-#: apps/web/src/components/settings/account-section.tsx:241
+#: apps/web/src/components/settings/account-section.tsx:216
 msgid "Upload picture"
-msgstr ""
+msgstr "Carica immagine"
 
-#: apps/web/src/components/settings/account-section.tsx:200
+#: apps/web/src/components/settings/account-section.tsx:184
 msgid "Upload profile picture"
-msgstr ""
+msgstr "Carica immagine del profilo"
 
-#: apps/native/src/components/settings/integration-card.tsx:129
+#: apps/native/src/components/settings/integration-card.tsx:117
 msgid "URL copied to clipboard"
-msgstr ""
+msgstr "URL copiato negli appunti"
 
-#: apps/web/src/components/update-toast.tsx:24
+#: apps/web/src/components/update-toast.tsx:23
 msgid "View release"
-msgstr ""
+msgstr "Visualizza rilascio"
 
-#: apps/web/src/components/settings/imports-section.tsx:699
+#: apps/web/src/components/settings/imports-section.tsx:663
 msgid "Waiting for authorization..."
-msgstr ""
+msgstr "In attesa di autorizzazione..."
 
-#: apps/web/src/components/settings/imports-section.tsx:823
+#: apps/web/src/components/settings/imports-section.tsx:785
 msgid "Warnings"
-msgstr ""
+msgstr "Avvisi"
 
 #. placeholder {0}: result.warnings.length
-#: apps/web/src/components/settings/imports-section.tsx:948
+#: apps/web/src/components/settings/imports-section.tsx:905
 msgid "Warnings ({0})"
-msgstr ""
+msgstr "Avvisi ({0})"
 
-#: apps/web/src/components/titles/title-seasons.tsx:202
+#: apps/web/src/components/titles/title-seasons.tsx:189
 msgid "Watch all"
-msgstr ""
+msgstr "Segna tutta la stagione come vista"
 
-#: apps/web/src/components/settings/imports-section.tsx:801
+#: apps/web/src/components/settings/imports-section.tsx:763
 msgid "Watch history"
-msgstr ""
+msgstr "Cronologia visioni"
 
-#: apps/web/src/components/titles/title-availability.tsx:59
+#: apps/web/src/components/titles/title-availability.tsx:46
 msgid "Watch on {name}"
-msgstr ""
+msgstr "Guarda su {name}"
 
-#: apps/web/src/components/titles/use-title-actions.ts:298
-#: apps/web/src/components/titles/use-title-actions.ts:307
+#: apps/web/src/components/titles/use-title-actions.ts:277
+#: apps/web/src/components/titles/use-title-actions.ts:286
 msgid "Watched all of {seasonLabel}"
-msgstr ""
+msgstr "Segnata come vista tutta la {seasonLabel}"
 
-#: apps/native/src/lib/title-actions.ts:123
+#: apps/native/src/lib/title-actions.ts:119
 msgid "Watched all of {seasonName}"
-msgstr ""
+msgstr "Segnata come vista tutta la {seasonName}"
 
-#: apps/web/src/components/titles/use-title-actions.ts:220
-#: apps/web/src/components/titles/use-title-actions.ts:229
+#: apps/web/src/components/titles/use-title-actions.ts:199
+#: apps/web/src/components/titles/use-title-actions.ts:208
 msgid "Watched S{seasonNum} E{epNum}"
-msgstr ""
+msgstr "Visto S{seasonNum} E{epNum}"
 
-#: apps/native/src/components/titles/status-action-button.tsx:42
-#: apps/web/src/components/title-card.tsx:72
-#: apps/web/src/components/titles/status-button.tsx:19
+#: apps/native/src/components/titles/status-action-button.tsx:43
+#: apps/web/src/components/title-card.tsx:69
+#: apps/web/src/components/titles/status-button.tsx:14
 msgid "Watching"
-msgstr ""
+msgstr "In visione"
 
-#: apps/native/src/components/titles/status-action-button.tsx:82
-#: apps/web/src/components/settings/imports-section.tsx:781
-#: apps/web/src/components/settings/imports-section.tsx:807
-#: apps/web/src/components/titles/status-button.tsx:55
+#: apps/native/src/components/titles/status-action-button.tsx:78
+#: apps/web/src/components/settings/imports-section.tsx:743
+#: apps/web/src/components/settings/imports-section.tsx:769
+#: apps/web/src/components/titles/status-button.tsx:49
 msgid "Watchlist"
 msgstr ""
 
-#: apps/native/src/components/titles/status-action-button.tsx:40
+#: apps/native/src/components/titles/status-action-button.tsx:41
 msgid "Watchlisted"
-msgstr ""
+msgstr "In watchlist"
 
-#: apps/native/src/components/settings/integration-configs.ts:50
-#: apps/native/src/components/settings/integration-configs.ts:67
-#: apps/native/src/components/settings/integration-configs.ts:85
+#: apps/native/src/components/settings/integration-configs.ts:51
+#: apps/native/src/components/settings/integration-configs.ts:66
+#: apps/native/src/components/settings/integration-configs.ts:82
 msgid "Webhook URL"
-msgstr ""
+msgstr "URL webhook"
 
-#: apps/web/src/components/settings/backup-schedule-section.tsx:99
+#: apps/web/src/components/settings/backup-schedule-section.tsx:96
 msgid "Wednesday"
-msgstr ""
+msgstr "Mercoledì"
 
-#: apps/web/src/components/auth-form.tsx:112
-#: apps/web/src/components/dashboard/welcome-header.tsx:10
+#: apps/web/src/components/auth-form.tsx:110
+#: apps/web/src/components/dashboard/welcome-header.tsx:7
 msgid "Welcome back"
-msgstr ""
+msgstr "Bentornato"
 
-#: apps/web/src/components/dashboard/welcome-header.tsx:8
+#: apps/web/src/components/dashboard/welcome-header.tsx:7
 msgid "Welcome back, {name}"
-msgstr ""
+msgstr "Bentornato, {name}"
 
-#: apps/native/src/app/title/[id].tsx:483
-#: apps/web/src/components/titles/title-availability.tsx:154
+#: apps/native/src/app/title/[id].tsx:430
+#: apps/web/src/components/titles/title-availability.tsx:130
 msgid "Where to Watch"
-msgstr ""
+msgstr "Dove guardarlo"
 
-#: apps/web/src/components/titles/title-availability.tsx:141
+#: apps/web/src/components/titles/title-availability.tsx:117
 msgid "With Ads"
-msgstr ""
+msgstr "Con pubblicità"
 
-#: apps/web/src/components/people/person-hero.tsx:75
+#: apps/web/src/components/people/person-hero.tsx:73
 msgid "Writer"
-msgstr ""
+msgstr "Sceneggiatore"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx:386
+#: apps/native/src/app/(tabs)/(settings)/index.tsx:368
 msgid "You'll be signed out to change the server URL."
-msgstr ""
+msgstr "Verrai disconnesso per cambiare l'URL del server."
 
 #. placeholder {0}: data.currentVersion
-#: apps/web/src/components/update-toast.tsx:20
+#: apps/web/src/components/update-toast.tsx:19
 msgid "You're running v{0}."
-msgstr ""
+msgstr "Stai usando la v{0}."
 
-#: apps/web/src/components/settings/imports-section.tsx:678
+#: apps/web/src/components/settings/imports-section.tsx:642
 msgid "Your code:"
-msgstr ""
+msgstr "Il tuo codice:"
 
-#: apps/native/src/app/(tabs)/(home)/index.tsx:141
+#: apps/native/src/app/(tabs)/(home)/index.tsx:125
 #: apps/web/src/components/dashboard/stats-section.tsx:32
 msgid "Your library is empty"
-msgstr ""
+msgstr "La tua libreria è vuota"
 
-#: apps/native/src/app/(auth)/register.tsx:134
+#: apps/native/src/app/(auth)/register.tsx:121
 msgid "Your name"
-msgstr ""
+msgstr "Il tuo nome"
 

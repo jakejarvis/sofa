@@ -99,6 +99,7 @@
               "movie",
               "tv"
             ],
+            "type": "string",
             "description": "Media type"
           },
           "title": {
@@ -555,6 +556,7 @@
               "movie",
               "tv"
             ],
+            "type": "string",
             "description": "Media type"
           },
           "title": {
@@ -901,6 +903,7 @@
               "movie",
               "tv"
             ],
+            "type": "string",
             "description": "Media type"
           },
           "title": {
@@ -992,6 +995,7 @@
               "movie",
               "tv"
             ],
+            "type": "string",
             "description": "Media type"
           },
           "title": {
@@ -1083,6 +1087,7 @@
               "webhook",
               "list"
             ],
+            "type": "string",
             "description": "Integration type: webhook (Plex/Jellyfin/Emby) or list (Sonarr/Radarr)"
           },
           "token": {
@@ -1166,6 +1171,7 @@
               "ignored",
               "error"
             ],
+            "type": "string",
             "description": "Event processing outcome"
           },
           "receivedAt": {
@@ -1204,6 +1210,7 @@
               "scheduled",
               "pre-restore"
             ],
+            "type": "string",
             "description": "How the backup was created: manual, scheduled, or automatic pre-restore"
           }
         },
@@ -1273,7 +1280,8 @@
                   "running",
                   "success",
                   "error"
-                ]
+                ],
+                "type": "string"
               },
               {
                 "type": "null"
@@ -1781,7 +1789,8 @@
                         "enum": [
                           "in_progress",
                           "completed"
-                        ]
+                        ],
+                        "type": "string"
                       },
                       {
                         "type": "null"
@@ -1983,7 +1992,8 @@
                             "watchlist",
                             "in_progress",
                             "completed"
-                          ]
+                          ],
+                          "type": "string"
                         },
                         {
                           "type": "null"
@@ -2072,7 +2082,8 @@
                           "watchlist",
                           "in_progress",
                           "completed"
-                        ]
+                        ],
+                        "type": "string"
                       },
                       "description": "Map of title ID to the user's tracking status"
                     }
@@ -2517,7 +2528,8 @@
                           "watchlist",
                           "in_progress",
                           "completed"
-                        ]
+                        ],
+                        "type": "string"
                       },
                       "description": "Map of title ID to the user's tracking status"
                     },
@@ -2898,6 +2910,7 @@
                               "movie",
                               "tv"
                             ],
+                            "type": "string",
                             "description": "Media type"
                           },
                           "title": {
@@ -2966,7 +2979,8 @@
                                   "watchlist",
                                   "in_progress",
                                   "completed"
-                                ]
+                                ],
+                                "type": "string"
                               },
                               {
                                 "type": "null"
@@ -3079,10 +3093,9 @@
                 "movie",
                 "episode"
               ],
+              "type": "string",
               "description": "What to count: movie watches or episode watches"
             },
-            "style": "deepObject",
-            "explode": true,
             "allowEmptyValue": true,
             "allowReserved": true
           },
@@ -3097,10 +3110,9 @@
                 "this_month",
                 "this_year"
               ],
+              "type": "string",
               "description": "Time range for the histogram"
             },
-            "style": "deepObject",
-            "explode": true,
             "allowEmptyValue": true,
             "allowReserved": true
           }
@@ -3176,10 +3188,9 @@
                 "movie",
                 "tv"
               ],
+              "type": "string",
               "description": "Trending category: all, movie, or tv"
             },
-            "style": "deepObject",
-            "explode": true,
             "allowEmptyValue": true,
             "allowReserved": true
           },
@@ -3231,6 +3242,7 @@
                                 "movie",
                                 "tv"
                               ],
+                              "type": "string",
                               "description": "Media type"
                             },
                             "title": {
@@ -3283,7 +3295,8 @@
                           "watchlist",
                           "in_progress",
                           "completed"
-                        ]
+                        ],
+                        "type": "string"
                       },
                       "description": "Map of title ID to the user's tracking status"
                     },
@@ -3433,10 +3446,9 @@
                 "movie",
                 "tv"
               ],
+              "type": "string",
               "description": "Media type filter"
             },
-            "style": "deepObject",
-            "explode": true,
             "allowEmptyValue": true,
             "allowReserved": true
           },
@@ -3479,7 +3491,8 @@
                           "watchlist",
                           "in_progress",
                           "completed"
-                        ]
+                        ],
+                        "type": "string"
                       },
                       "description": "Map of title ID to the user's tracking status"
                     },
@@ -3628,10 +3641,9 @@
                 "movie",
                 "tv"
               ],
+              "type": "string",
               "description": "Media type filter"
             },
-            "style": "deepObject",
-            "explode": true,
             "allowEmptyValue": true,
             "allowReserved": true
           }
@@ -3784,10 +3796,9 @@
                 "tv",
                 "person"
               ],
+              "type": "string",
               "description": "Optional type filter to narrow results"
             },
-            "style": "deepObject",
-            "explode": true,
             "allowEmptyValue": true,
             "allowReserved": true
           },
@@ -3833,6 +3844,7 @@
                               "tv",
                               "person"
                             ],
+                            "type": "string",
                             "description": "Result type"
                           },
                           "title": {
@@ -4057,10 +4069,9 @@
                 "movie",
                 "tv"
               ],
+              "type": "string",
               "description": "Media type to discover"
             },
-            "style": "deepObject",
-            "explode": true,
             "allowEmptyValue": true,
             "allowReserved": true
           },
@@ -4116,7 +4127,8 @@
                           "watchlist",
                           "in_progress",
                           "completed"
-                        ]
+                        ],
+                        "type": "string"
                       },
                       "description": "Map of title ID to the user's tracking status"
                     },
@@ -4432,6 +4444,7 @@
                               "webhook",
                               "list"
                             ],
+                            "type": "string",
                             "description": "Integration type: webhook (Plex/Jellyfin/Emby) or list (Sonarr/Radarr)"
                           },
                           "token": {
@@ -4515,6 +4528,7 @@
                       "sonarr",
                       "radarr"
                     ],
+                    "type": "string",
                     "description": "Media server provider to integrate"
                   },
                   "enabled": {
@@ -4570,6 +4584,7 @@
                 "sonarr",
                 "radarr"
               ],
+              "type": "string",
               "description": "Media server provider type"
             }
           }
@@ -4617,6 +4632,7 @@
                 "sonarr",
                 "radarr"
               ],
+              "type": "string",
               "description": "Media server provider type"
             }
           }
@@ -5110,6 +5126,7 @@
                         "1d",
                         "7d"
                       ],
+                      "type": "string",
                       "description": "Backup interval"
                     },
                     "time": {
@@ -5165,6 +5182,7 @@
                       "1d",
                       "7d"
                     ],
+                    "type": "string",
                     "description": "Backup interval"
                   },
                   "time": {
@@ -5526,6 +5544,7 @@
                       "updateCheck",
                       "telemetryReport"
                     ],
+                    "type": "string",
                     "description": "Cron job to trigger"
                   }
                 },
@@ -5881,6 +5900,7 @@
                       "simkl",
                       "letterboxd"
                     ],
+                    "type": "string",
                     "description": "External service to import from"
                   },
                   "file": {
@@ -5904,6 +5924,7 @@
                       "simkl",
                       "letterboxd"
                     ],
+                    "type": "string",
                     "description": "External service to import from"
                   },
                   "file": {
@@ -5936,6 +5957,7 @@
                             "simkl",
                             "letterboxd"
                           ],
+                          "type": "string",
                           "description": "External service to import from"
                         },
                         "movies": {
@@ -6043,7 +6065,8 @@
                                 "enum": [
                                   "movie",
                                   "tv"
-                                ]
+                                ],
+                                "type": "string"
                               }
                             },
                             "required": [
@@ -6077,7 +6100,8 @@
                                 "enum": [
                                   "movie",
                                   "tv"
-                                ]
+                                ],
+                                "type": "string"
                               },
                               "rating": {
                                 "type": "integer",
@@ -6273,6 +6297,7 @@
                           "simkl",
                           "letterboxd"
                         ],
+                        "type": "string",
                         "description": "External service to import from"
                       },
                       "movies": {
@@ -6380,7 +6405,8 @@
                               "enum": [
                                 "movie",
                                 "tv"
-                              ]
+                              ],
+                              "type": "string"
                             }
                           },
                           "required": [
@@ -6414,7 +6440,8 @@
                               "enum": [
                                 "movie",
                                 "tv"
-                              ]
+                              ],
+                              "type": "string"
                             },
                             "rating": {
                               "type": "integer",
@@ -6472,6 +6499,7 @@
                             "simkl",
                             "letterboxd"
                           ],
+                          "type": "string",
                           "description": "External service to import from"
                         },
                         "movies": {
@@ -6579,7 +6607,8 @@
                                 "enum": [
                                   "movie",
                                   "tv"
-                                ]
+                                ],
+                                "type": "string"
                               }
                             },
                             "required": [
@@ -6613,7 +6642,8 @@
                                 "enum": [
                                   "movie",
                                   "tv"
-                                ]
+                                ],
+                                "type": "string"
                               },
                               "rating": {
                                 "type": "integer",
@@ -6738,6 +6768,7 @@
                           "simkl",
                           "letterboxd"
                         ],
+                        "type": "string",
                         "description": "External service to import from"
                       },
                       "movies": {
@@ -6845,7 +6876,8 @@
                               "enum": [
                                 "movie",
                                 "tv"
-                              ]
+                              ],
+                              "type": "string"
                             }
                           },
                           "required": [
@@ -6879,7 +6911,8 @@
                               "enum": [
                                 "movie",
                                 "tv"
-                              ]
+                              ],
+                              "type": "string"
                             },
                             "rating": {
                               "type": "integer",
@@ -6960,6 +6993,7 @@
                         "simkl",
                         "letterboxd"
                       ],
+                      "type": "string",
                       "description": "External service to import from"
                     },
                     "status": {
@@ -6969,7 +7003,8 @@
                         "success",
                         "error",
                         "cancelled"
-                      ]
+                      ],
+                      "type": "string"
                     },
                     "totalItems": {
                       "type": "number"
@@ -7239,6 +7274,7 @@
                         "simkl",
                         "letterboxd"
                       ],
+                      "type": "string",
                       "description": "External service to import from"
                     },
                     "status": {
@@ -7248,7 +7284,8 @@
                         "success",
                         "error",
                         "cancelled"
-                      ]
+                      ],
+                      "type": "string"
                     },
                     "totalItems": {
                       "type": "number"
@@ -7386,6 +7423,7 @@
                         "simkl",
                         "letterboxd"
                       ],
+                      "type": "string",
                       "description": "External service to import from"
                     },
                     "status": {
@@ -7395,7 +7433,8 @@
                         "success",
                         "error",
                         "cancelled"
-                      ]
+                      ],
+                      "type": "string"
                     },
                     "totalItems": {
                       "type": "number"
@@ -7598,7 +7637,8 @@
                                 "progress",
                                 "complete",
                                 "timeout"
-                              ]
+                              ],
+                              "type": "string"
                             },
                             "job": {
                               "type": "object",
@@ -7612,6 +7652,7 @@
                                     "simkl",
                                     "letterboxd"
                                   ],
+                                  "type": "string",
                                   "description": "External service to import from"
                                 },
                                 "status": {
@@ -7621,7 +7662,8 @@
                                     "success",
                                     "error",
                                     "cancelled"
-                                  ]
+                                  ],
+                                  "type": "string"
                                 },
                                 "totalItems": {
                                   "type": "number"
