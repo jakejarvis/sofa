@@ -8,11 +8,8 @@ export function TabStack({ title, children }: { title?: string; children?: React
   const contentStyle = useResolveClassNames("bg-background");
   const tintColor = useCSSVariable("--color-primary") as string;
   const backgroundColor = useCSSVariable("--color-background") as string;
-  const iosHeaderLargeTitleStyle = useResolveClassNames("font-display text-foreground");
-  const iosHeaderTitleStyle = useResolveClassNames("font-display text-foreground text-lg");
-  const androidHeaderTitleStyle = useResolveClassNames(
-    "text-foreground font-sans text-lg font-semibold",
-  );
+  const headerTitleStyle = useResolveClassNames("font-display text-foreground text-xl");
+  const headerLargeTitleStyle = useResolveClassNames("font-display text-foreground");
 
   if (process.env.EXPO_OS === "ios") {
     return (
@@ -41,8 +38,8 @@ export function TabStack({ title, children }: { title?: string; children?: React
             />
             <Stack.Screen.Title
               large
-              style={iosHeaderTitleStyle as Record<string, unknown>}
-              largeStyle={iosHeaderLargeTitleStyle as Record<string, unknown>}
+              style={headerTitleStyle as Record<string, unknown>}
+              largeStyle={headerLargeTitleStyle as Record<string, unknown>}
             >
               {title}
             </Stack.Screen.Title>
@@ -71,7 +68,7 @@ export function TabStack({ title, children }: { title?: string; children?: React
               shadowColor: "transparent",
             }}
           />
-          <Stack.Screen.Title style={androidHeaderTitleStyle as Record<string, unknown>}>
+          <Stack.Screen.Title style={headerTitleStyle as Record<string, unknown>}>
             {title}
           </Stack.Screen.Title>
         </Stack.Screen>

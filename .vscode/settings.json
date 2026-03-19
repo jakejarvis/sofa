@@ -7,13 +7,16 @@
     "source.fixAll.oxlint": "explicit"
   },
   "files.readonlyInclude": {
-    "**/routeTree.gen.ts": true
+    "**/routeTree.gen.ts": true,
+    "packages/i18n/src/po/*": true
   },
   "files.watcherExclude": {
-    "**/routeTree.gen.ts": true
+    "**/routeTree.gen.ts": true,
+    "packages/i18n/src/po/*": true
   },
   "search.exclude": {
-    "**/routeTree.gen.ts": true
+    "**/routeTree.gen.ts": true,
+    "packages/i18n/src/po/*": true
   },
   "emmet.showExpandedAbbreviation": "never",
   "[javascript]": {

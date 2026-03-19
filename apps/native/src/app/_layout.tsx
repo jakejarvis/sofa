@@ -38,14 +38,9 @@ enableFreeze(true);
 initialize();
 const localeReady = initLocale();
 
-export const unstable_settings = {
-  initialRouteName: "(tabs)",
-};
-
 const changePasswordOptions =
   process.env.EXPO_OS === "ios"
     ? {
-        headerShown: true,
         presentation: "formSheet" as const,
         sheetAllowedDetents: "fitToContents" as const,
         sheetGrabberVisible: true,
@@ -54,7 +49,6 @@ const changePasswordOptions =
         headerBlurEffect: "none" as const,
       }
     : {
-        headerShown: true,
         presentation: "modal" as const,
         headerLargeTitle: false,
         headerTransparent: false,
@@ -89,7 +83,7 @@ function AppContent() {
       // distinct ID, but only when the resolved state is actually enabled
       // (respects both ATT result and the user's settings override).
       if (enabled && posthog) {
-        const advertisingId = await getAdvertisingId();
+        const advertisingId = getAdvertisingId();
         if (advertisingId) {
           posthog.identify(advertisingId);
         }
@@ -132,13 +126,12 @@ function AppContent() {
       <ServerUnreachableBanner />
       <Stack
         screenOptions={{
-          headerShown: false,
           contentStyle,
-          animation: "slide_from_right",
+          headerShown: false,
         }}
       >
         <Stack.Protected guard={!session}>
-          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(auth)" options={{ navigationBarHidden: true, animation: "fade" }} />
         </Stack.Protected>
 
         <Stack.Protected guard={!!session}>

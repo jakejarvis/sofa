@@ -68,13 +68,7 @@ export default function SearchScreen() {
   const keyExtractor = useCallback((item: SearchResultItem) => `${item.type}-${item.id}`, []);
 
   return (
-    <View className="bg-background flex-1">
-      <Stack.Header
-        transparent={false}
-        style={{ backgroundColor: "#000" }}
-        largeStyle={{ backgroundColor: "#000" }}
-      />
-      <Stack.Screen.Title>Search</Stack.Screen.Title>
+    <View collapsable={false} className="bg-background flex-1">
       <Stack.SearchBar
         placeholder={t`Search movies, shows, people...`}
         onChangeText={(e) => setQuery(e.nativeEvent.text)}

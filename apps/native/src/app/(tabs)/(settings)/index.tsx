@@ -58,8 +58,8 @@ import { activateLocale, type SupportedLocale } from "@sofa/i18n";
 import { LOCALE_INFO } from "@sofa/i18n/locales";
 
 const settingsContentContainerStyle = {
-  paddingTop: 8,
-  paddingBottom: 32,
+  paddingTop: 12,
+  paddingBottom: 24,
   paddingHorizontal: 16,
 };
 
@@ -535,17 +535,17 @@ export default function SettingsScreen() {
       <Animated.View entering={FadeInDown.duration(300).delay(450)} className="mt-3 items-center">
         <Pressable
           onPress={() => Linking.openURL("https://github.com/jakejarvis/sofa")}
-          className="flex-row items-center gap-1.5 active:opacity-70"
+          className="flex-row items-center gap-1 active:opacity-70"
         >
           <ScaledIcon icon={IconBrandGithub} size={14} color={mutedFgColor} />
-          <Text className="text-muted-foreground text-xs">GitHub</Text>
+          <Text className="text-muted-foreground text-xs">jakejarvis/sofa</Text>
         </Pressable>
       </Animated.View>
 
       {/* TMDB Attribution */}
       <Animated.View
         entering={FadeInDown.duration(300).delay(500)}
-        className="mt-4 items-center gap-2"
+        className="mt-5 items-center gap-2"
       >
         <Pressable
           onPress={() => Linking.openURL("https://www.themoviedb.org/")}
@@ -553,8 +553,8 @@ export default function SettingsScreen() {
         >
           <TmdbLogo height={12} />
           <Text
-            maxFontSizeMultiplier={1.0}
-            className="text-muted-foreground text-center text-xs leading-relaxed"
+            maxFontSizeMultiplier={1.2}
+            className="text-muted-foreground text-center text-[10px] leading-relaxed"
           >
             <Trans>This product uses the TMDB API but is not endorsed or certified by TMDB.</Trans>
           </Text>
