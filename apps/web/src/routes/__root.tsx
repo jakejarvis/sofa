@@ -9,7 +9,7 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Provider as StoreProvider } from "jotai";
 import { MotionConfig } from "motion/react";
 
-import { ProgressProvider } from "@/components/navigation-progress";
+import { NavigationProgress } from "@/components/navigation-progress";
 import { SofaLogo } from "@/components/sofa-logo";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -54,11 +54,10 @@ function RootComponent() {
       <StoreProvider>
         <I18nProvider i18n={i18n}>
           <MotionConfig reducedMotion="user">
-            <ProgressProvider>
-              <TooltipProvider>
-                <Outlet />
-              </TooltipProvider>
-            </ProgressProvider>
+            <NavigationProgress />
+            <TooltipProvider>
+              <Outlet />
+            </TooltipProvider>
             <Toaster position="bottom-right" />
           </MotionConfig>
         </I18nProvider>

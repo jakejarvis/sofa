@@ -1,14 +1,12 @@
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useAtomValue } from "jotai";
 
-import { useProgress } from "@/components/navigation-progress";
 import { commandPaletteOpenAtom } from "@/lib/atoms/command-palette";
 
 import { useTitleContext, useTitleUserInfo } from "./title-context";
 import { useTitleActions } from "./use-title-actions";
 
 export function TitleKeyboardShortcuts() {
-  const progress = useProgress();
   const { titleType } = useTitleContext();
   const { userStatus } = useTitleUserInfo();
   const { handleStatusChange, handleRating, handleWatchMovie } = useTitleActions();
@@ -27,14 +25,7 @@ export function TitleKeyboardShortcuts() {
     },
     { enabled },
   );
-  useHotkey(
-    "Escape",
-    () => {
-      progress.start();
-      window.history.back();
-    },
-    { enabled },
-  );
+  useHotkey("Escape", () => window.history.back(), { enabled });
 
   useHotkey("1", () => handleRating(1), { enabled });
   useHotkey("2", () => handleRating(2), { enabled });

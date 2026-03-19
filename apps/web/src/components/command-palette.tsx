@@ -14,7 +14,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useProgress } from "@/components/navigation-progress";
 import {
   Command,
   CommandEmpty,
@@ -82,7 +81,6 @@ interface SearchResult {
 export function CommandPalette() {
   const { t } = useLingui();
   const navigate = useNavigate();
-  const progress = useProgress();
   const [commandPaletteOpen, setCommandPaletteOpen] = useAtom(commandPaletteOpenAtom);
   const [helpOpen, setHelpOpen] = useAtom(helpOpenAtom);
   const [recentSearches, setRecentSearches] = useAtom(recentSearchesAtom);
@@ -103,7 +101,6 @@ export function CommandPalette() {
   useHotkeySequence(
     ["G", "H"],
     () => {
-      progress.start();
       void navigate({ to: "/dashboard" });
     },
     { enabled, timeout: 500 },
@@ -111,7 +108,6 @@ export function CommandPalette() {
   useHotkeySequence(
     ["G", "E"],
     () => {
-      progress.start();
       void navigate({ to: "/explore" });
     },
     { enabled, timeout: 500 },
@@ -146,14 +142,13 @@ export function CommandPalette() {
     (result: SearchResult) => {
       if (!result.id) return;
       setCommandPaletteOpen(false);
-      progress.start();
       if (result.type === "person") {
         void navigate({ to: "/people/$id", params: { id: result.id } });
       } else {
         void navigate({ to: "/titles/$id", params: { id: result.id } });
       }
     },
-    [setCommandPaletteOpen, progress, navigate],
+    [setCommandPaletteOpen, navigate],
   );
 
   const handleRecentSearch = useCallback((q: string) => {
@@ -337,7 +332,6 @@ export function CommandPalette() {
                     <CommandItem
                       onSelect={() => {
                         setCommandPaletteOpen(false);
-                        progress.start();
                         void navigate({ to: "/dashboard" });
                       }}
                     >
@@ -348,7 +342,6 @@ export function CommandPalette() {
                     <CommandItem
                       onSelect={() => {
                         setCommandPaletteOpen(false);
-                        progress.start();
                         void navigate({ to: "/explore" });
                       }}
                     >

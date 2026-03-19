@@ -1,29 +1,12 @@
-import { useLocation } from "@tanstack/react-router";
-import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
-type ProgressApi = {
-  start: () => void;
-  done: () => void;
-  set: (pct: number) => void;
-};
-
-const ProgressContext = createContext<ProgressApi | null>(null);
+import { useRouter } from "@tanstack/react-router";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
-export function ProgressProvider({ children }: { children: ReactNode }) {
-  const { pathname, searchStr } = useLocation();
+export function NavigationProgress() {
+  const router = useRouter();
 
   const [visible, setVisible] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -41,7 +24,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     clearTimeout(safetyTimerRef.current);
   }
 
-  function start() {
+  const start = useEffectEvent(() => {
     if (inFlightRef.current) return;
     inFlightRef.current = true;
     clearTimers();
@@ -65,10 +48,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       clearTimers();
       setVisible(false);
       setProgress(0);
-    }, 12000);
-  }
+    }, 12_000);
+  });
 
-  function done() {
+  const done = useEffectEvent(() => {
     if (!inFlightRef.current) return;
     inFlightRef.current = false;
     clearTimers();
@@ -80,67 +63,19 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       setVisible(false);
       setTimeout(() => setProgress(0), 200);
     }, 200);
-  }
-
-  function set(pct: number) {
-    const next = clamp(pct, 0, 100);
-    if (next >= 100) {
-      done();
-      return;
-    }
-    if (!inFlightRef.current) start();
-    setProgress(next);
-  }
-
-  // Effect events — always see latest closures, don't appear in deps
-  const onLinkClick = useEffectEvent((e: MouseEvent) => {
-    if (e.defaultPrevented || e.button !== 0) return;
-    if (e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) return;
-
-    const anchor = (e.target as Element)?.closest?.("a[href]");
-    if (!(anchor instanceof HTMLAnchorElement)) return;
-    if (anchor.target && anchor.target !== "_self") return;
-    if (anchor.hasAttribute("download")) return;
-
-    const href = anchor.getAttribute("href");
-    if (!href || href.startsWith("#")) return;
-
-    try {
-      const url = new URL(href, window.location.href);
-      if (url.origin !== window.location.origin) return;
-    } catch {
-      return;
-    }
-
-    start();
   });
 
-  const onPopState = useEffectEvent(() => start());
-
-  const onRouteChange = useEffectEvent(() => {
-    if (inFlightRef.current) done();
-  });
-
-  // Set up listeners once
+  // Subscribe to TanStack Router navigation lifecycle events
   useEffect(() => {
-    document.addEventListener("click", onLinkClick, true);
-    window.addEventListener("popstate", onPopState);
+    const unsubBeforeLoad = router.subscribe("onBeforeLoad", (event) => {
+      if (event.pathChanged) start();
+    });
+    const unsubResolved = router.subscribe("onResolved", () => done());
     return () => {
-      document.removeEventListener("click", onLinkClick, true);
-      window.removeEventListener("popstate", onPopState);
+      unsubBeforeLoad();
+      unsubResolved();
     };
-  }, []);
-
-  // Finish on route change — routeKey is intentionally a dep to trigger on navigation
-  const routeKey = pathname + (searchStr ?? "");
-  const firstRenderRef = useRef(true);
-  useEffect(() => {
-    if (firstRenderRef.current) {
-      firstRenderRef.current = false;
-      return;
-    }
-    onRouteChange();
-  }, [routeKey]);
+  }, [router]);
 
   // Cleanup timers on unmount
   useEffect(() => {
@@ -152,40 +87,16 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Stable context API via ref indirection
-  const apiRef = useRef<ProgressApi>({ start, done, set });
-  apiRef.current = { start, done, set };
-
-  const api = useMemo<ProgressApi>(
-    () => ({
-      start: () => apiRef.current.start(),
-      done: () => apiRef.current.done(),
-      set: (pct) => apiRef.current.set(pct),
-    }),
-    [],
-  );
-
   return (
-    <ProgressContext.Provider value={api}>
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-x-0 top-0 z-[10000] h-0.5 motion-safe:transition-opacity motion-safe:duration-200 motion-safe:ease-out"
+      style={{ opacity: visible ? 1 : 0 }}
+    >
       <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-x-0 top-0 z-[10000] h-0.5 motion-safe:transition-opacity motion-safe:duration-200 motion-safe:ease-out"
-        style={{ opacity: visible ? 1 : 0 }}
-      >
-        <div
-          className={`bg-primary h-full origin-left motion-safe:[box-shadow:0_0_8px_var(--color-primary)] ${progress === 0 ? "" : "motion-safe:transition-transform motion-safe:duration-150 motion-safe:ease-out"}`}
-          style={{ transform: `scaleX(${clamp(progress, 0, 100) / 100})` }}
-        />
-      </div>
-      {children}
-    </ProgressContext.Provider>
+        className={`bg-primary h-full origin-left motion-safe:[box-shadow:0_0_8px_var(--color-primary)] ${progress === 0 ? "" : "motion-safe:transition-transform motion-safe:duration-150 motion-safe:ease-out"}`}
+        style={{ transform: `scaleX(${clamp(progress, 0, 100) / 100})` }}
+      />
+    </div>
   );
-}
-
-export function useProgress(): ProgressApi {
-  const ctx = useContext(ProgressContext);
-  if (!ctx) {
-    throw new Error("useProgress must be used inside <ProgressProvider>.");
-  }
-  return ctx;
 }
