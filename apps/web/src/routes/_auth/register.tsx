@@ -1,19 +1,16 @@
 import { Trans } from "@lingui/react/macro";
 import { IconLock } from "@tabler/icons-react";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { AuthForm } from "@/components/auth-form";
-import { authClient } from "@/lib/auth/client";
 import { client } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_auth/register")({
   beforeLoad: async () => {
-    const { data: session } = await authClient.getSession();
-    if (session) throw redirect({ to: "/dashboard" });
-
     const authConfig = await client.system.authConfig({});
     return { authConfig };
   },
+  head: () => ({ meta: [{ title: "Create account — Sofa" }] }),
   component: RegisterPage,
 });
 

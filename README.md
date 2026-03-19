@@ -32,6 +32,8 @@
 
 ## Quick start
 
+### Self-hosted
+
 A minimal [`docker-compose.yml`](./docker-compose.yml) is provided in this repo. For most setups, the shortest path is:
 
 1. Copy the example environment file:
@@ -57,6 +59,12 @@ docker compose up -d
 4. Open `http://localhost:3000` and create the first account. The first account becomes the admin automatically, and registration closes after that by default.
 
 > The included Compose file uses `ghcr.io/jakejarvis/sofa:edge`. If you prefer to pin releases, switch to a published version tag like `ghcr.io/jakejarvis/sofa:<version>` or use the matching `jakejarvis/sofa:<version>` image on Docker Hub. Multi-arch images are published for `linux/amd64` and `linux/arm64`.
+
+### Cloud
+
+If you prefer to deploy Sofa to the cloud, there are several great options. All you'll need is the ability to run Docker containers and mount some form of persistent storage volume to `/data` within the container.
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/AqGBLF?referralCode=4AUONK&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 ## Required setup
 

@@ -5,8 +5,9 @@ import { PersonDetailClient, PersonDetailSkeleton } from "@/components/people/pe
 import { orpc } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_app/people/$id")({
+  staleTime: 60_000,
   loader: async ({ params, context }) => {
-    await context.queryClient.ensureInfiniteQueryData(
+    const data = await context.queryClient.ensureInfiniteQueryData(
       orpc.people.detail.infiniteOptions({
         input: (pageParam: number) => ({
           id: params.id,
@@ -18,10 +19,11 @@ export const Route = createFileRoute("/_app/people/$id")({
           lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
       }),
     );
+    return { personName: data.pages[0]?.person.name };
   },
-  head: ({ loaderData: _loaderData, params: _params }) => {
-    // Title is set by the component after data loads
-    return {};
+  head: ({ loaderData }) => {
+    if (!loaderData?.personName) return {};
+    return { meta: [{ title: `${loaderData.personName} — Sofa` }] };
   },
   pendingComponent: () => <PersonDetailSkeleton />,
   notFoundComponent: PersonNotFound,

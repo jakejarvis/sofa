@@ -1,0 +1,19 @@
+# Nixpacks configuration for Sofa
+# Bun runtime auto-detected via packageManager field in package.json
+
+[variables]
+NODE_ENV = 'production'
+PORT = '3000'
+HOSTNAME = '0.0.0.0'
+DATA_DIR = './data'
+
+# Install phase — auto-detected (bun install --frozen-lockfile)
+[phases.install]
+cacheDirectories = ['node_modules']
+
+[phases.build]
+cmds = ['bunx turbo run build --filter=@sofa/web --filter=@sofa/server']
+cacheDirectories = ['.turbo', 'node_modules/.cache']
+
+[start]
+cmd = 'bun apps/server/src/index.ts'

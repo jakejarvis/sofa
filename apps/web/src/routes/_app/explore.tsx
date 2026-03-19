@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_app/explore")({
+  staleTime: 60_000,
+  head: () => ({ meta: [{ title: "Explore — Sofa" }] }),
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.ensureQueryData(

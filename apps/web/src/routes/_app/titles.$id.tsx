@@ -15,6 +15,7 @@ import { orpc } from "@/lib/orpc/client";
 import { getThemeCssProperties } from "@/lib/theme";
 
 export const Route = createFileRoute("/_app/titles/$id")({
+  staleTime: 60_000,
   loader: async ({ params, context }) => {
     const [titleResult, userInfo] = await Promise.all([
       context.queryClient.ensureQueryData(

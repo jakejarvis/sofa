@@ -28,6 +28,8 @@ import { orpc } from "@/lib/orpc/client";
 const GITHUB_REPO = "jakejarvis/sofa";
 
 export const Route = createFileRoute("/_app/settings")({
+  staleTime: 30_000,
+  head: () => ({ meta: [{ title: "Settings — Sofa" }] }),
   loader: async ({ context }) => {
     const promises: Promise<unknown>[] = [
       context.queryClient.ensureQueryData(orpc.integrations.list.queryOptions()),
