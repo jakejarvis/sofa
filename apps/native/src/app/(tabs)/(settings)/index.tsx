@@ -385,24 +385,6 @@ export default function SettingsScreen() {
             icon={IconLanguage}
             onPress={() => setLanguageModalOpen(true)}
           />
-          <SelectModal
-            open={languageModalOpen}
-            onOpenChange={setLanguageModalOpen}
-            label={t`Language`}
-            icon={IconLanguage}
-            selection={i18n.locale}
-            options={LOCALE_INFO.map((info) => ({
-              value: info.code,
-              label: info.nativeName,
-            }))}
-            onSelect={(locale) => {
-              setLanguageModalOpen(false);
-              activateLocale(locale as SupportedLocale).then(
-                () => setPersistedLocale(locale as SupportedLocale),
-                () => {},
-              );
-            }}
-          />
           <SettingsRow
             label={t`Anonymous usage reporting`}
             icon={IconChartBar}
@@ -516,6 +498,26 @@ export default function SettingsScreen() {
           </Pressable>
         </SettingsSection>
       </Animated.View>
+
+      {/* Language Modal */}
+      <SelectModal
+        open={languageModalOpen}
+        onOpenChange={setLanguageModalOpen}
+        label={t`Language`}
+        icon={IconLanguage}
+        selection={i18n.locale}
+        options={LOCALE_INFO.map((info) => ({
+          value: info.code,
+          label: info.nativeName,
+        }))}
+        onSelect={(locale) => {
+          setLanguageModalOpen(false);
+          activateLocale(locale as SupportedLocale).then(
+            () => setPersistedLocale(locale as SupportedLocale),
+            () => {},
+          );
+        }}
+      />
 
       {/* Version */}
       <Animated.View entering={FadeInDown.duration(300).delay(400)} className="mt-6 items-center">

@@ -1,6 +1,6 @@
 import type { Icon } from "@tabler/icons-react-native";
 import { Children, Fragment, isValidElement, type ReactNode } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { SectionHeader } from "@/components/ui/section-header";
 import { Text } from "@/components/ui/text";
@@ -55,7 +55,7 @@ export function SettingsSection({
 
           return (
             <Fragment key={key}>
-              {i > 0 && <View className="border-border border-t" style={{ borderTopWidth: 0.5 }} />}
+              {i > 0 && <View className="bg-border" style={styles.separator} />}
               {child}
             </Fragment>
           );
@@ -64,3 +64,9 @@ export function SettingsSection({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  separator: {
+    height: StyleSheet.hairlineWidth,
+  },
+});

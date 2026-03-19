@@ -4,6 +4,10 @@ import { NativeTabBar } from "@/components/navigation/native-tab-bar";
 import { orpc } from "@/lib/orpc";
 import { authClient } from "@/lib/server";
 
+export const unstable_settings = {
+  initialRouteName: "(home)",
+};
+
 export default function TabLayout() {
   const { data: session } = authClient.useSession();
   const isAdmin = session?.user?.role === "admin";
