@@ -33,7 +33,7 @@ export const trending = os.explore.trending.use(authed).handler(async ({ input, 
         tmdbId: r.id as number,
         type: mediaType as "movie" | "tv",
         title: ((r.title ?? r.name) as string) || "",
-        posterPath: tmdbImageUrl((r.poster_path as string) ?? null, "posters"),
+        posterPath: (r.poster_path as string) ?? null,
         releaseDate: (r.release_date as string | undefined) ?? null,
         firstAirDate: (r.first_air_date as string | undefined) ?? null,
         voteAverage: (r.vote_average as number | undefined) ?? null,
@@ -52,7 +52,7 @@ export const trending = os.explore.trending.use(authed).handler(async ({ input, 
             tmdbId: heroResult.id as number,
             type: heroResult.media_type as "movie" | "tv",
             title: ((heroResult.title ?? heroResult.name) as string | undefined) ?? "",
-            posterPath: tmdbImageUrl((heroResult.poster_path as string) ?? null, "posters"),
+            posterPath: (heroResult.poster_path as string) ?? null,
             releaseDate: (heroResult.release_date as string | undefined) ?? null,
             firstAirDate: (heroResult.first_air_date as string | undefined) ?? null,
             voteAverage: (heroResult.vote_average as number | undefined) ?? null,
@@ -66,6 +66,7 @@ export const trending = os.explore.trending.use(authed).handler(async ({ input, 
     const entry = titleMap.get(`${item.tmdbId}-${item.type}`);
     return Object.assign(item, {
       id: entry?.id ?? "",
+      posterPath: tmdbImageUrl(item.posterPath, "posters"),
       posterThumbHash: entry?.posterThumbHash ?? null,
     });
   });
@@ -115,7 +116,7 @@ export const popular = os.explore.popular.use(authed).handler(async ({ input, co
       tmdbId: r.id as number,
       type: input.type,
       title: ((r.title ?? r.name) as string) || "",
-      posterPath: tmdbImageUrl((r.poster_path as string) ?? null, "posters"),
+      posterPath: (r.poster_path as string) ?? null,
       releaseDate: (r.release_date as string | undefined) ?? null,
       firstAirDate: (r.first_air_date as string | undefined) ?? null,
       voteAverage: (r.vote_average as number | undefined) ?? null,
@@ -126,6 +127,7 @@ export const popular = os.explore.popular.use(authed).handler(async ({ input, co
     const entry = titleMap.get(`${item.tmdbId}-${item.type}`);
     return Object.assign(item, {
       id: entry?.id ?? "",
+      posterPath: tmdbImageUrl(item.posterPath, "posters"),
       posterThumbHash: entry?.posterThumbHash ?? null,
     });
   });

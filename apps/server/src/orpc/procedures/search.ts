@@ -31,7 +31,7 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
       type: "person" as const,
       title: r.name ?? "",
       posterPath: null,
-      profilePath: tmdbImageUrl(r.profile_path ?? null, "profiles"),
+      profilePath: r.profile_path ?? null,
       overview: null,
       releaseDate: null,
       popularity: r.popularity ?? null,
@@ -53,7 +53,12 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
       })),
     );
     return {
-      results: personItems.map((r) => Object.assign(r, { id: personMap.get(r.tmdbId) })),
+      results: personItems.map((r) =>
+        Object.assign(r, {
+          id: personMap.get(r.tmdbId),
+          profilePath: tmdbImageUrl(r.profilePath, "profiles"),
+        }),
+      ),
       page: personResults.page ?? input.page,
       totalPages: personResults.total_pages ?? 1,
       totalResults: personResults.total_results ?? 0,
@@ -89,7 +94,7 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
           type: "person" as const,
           title: r.name ?? "Unknown",
           posterPath: null,
-          profilePath: tmdbImageUrl(r.profile_path ?? null, "profiles"),
+          profilePath: r.profile_path ?? null,
           overview: null,
           releaseDate: null,
           popularity: r.popularity ?? null,
@@ -108,7 +113,7 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
         title: r.title ?? r.name ?? "",
         overview: r.overview ?? null,
         releaseDate: r.release_date ?? r.first_air_date ?? null,
-        posterPath: tmdbImageUrl(r.poster_path ?? null, "posters"),
+        posterPath: r.poster_path ?? null,
         profilePath: null,
         popularity: r.popularity ?? null,
         voteAverage: r.vote_average ?? null,
@@ -137,9 +142,14 @@ export const search = os.search.use(authed).handler(async ({ input }) => {
   );
 
   const results = mapped.map((r) => {
-    if (r.type === "person") return Object.assign(r, { id: personMap.get(r.tmdbId) });
+    if (r.type === "person") {
+      return Object.assign(r, {
+        id: personMap.get(r.tmdbId),
+        profilePath: tmdbImageUrl(r.profilePath, "profiles"),
+      });
+    }
     const entry = titleMap.get(`${r.tmdbId}-${r.type}`);
-    return Object.assign(r, { id: entry?.id });
+    return Object.assign(r, { id: entry?.id, posterPath: tmdbImageUrl(r.posterPath, "posters") });
   });
 
   return {

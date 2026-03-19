@@ -41,7 +41,7 @@ export const discover = os.discover.use(authed).handler(async ({ input, context 
       tmdbId: r.id,
       type: input.type,
       title: r.title ?? r.name ?? "",
-      posterPath: tmdbImageUrl(r.poster_path ?? null, "posters"),
+      posterPath: r.poster_path ?? null,
       releaseDate: (r.release_date as string | undefined) ?? null,
       firstAirDate: (r.first_air_date as string | undefined) ?? null,
       voteAverage: r.vote_average ?? null,
@@ -52,6 +52,7 @@ export const discover = os.discover.use(authed).handler(async ({ input, context 
     const entry = titleMap.get(`${item.tmdbId}-${item.type}`);
     return Object.assign(item, {
       id: entry?.id ?? "",
+      posterPath: tmdbImageUrl(item.posterPath, "posters"),
       posterThumbHash: entry?.posterThumbHash ?? null,
     });
   });
