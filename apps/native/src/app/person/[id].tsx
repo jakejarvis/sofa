@@ -44,20 +44,15 @@ function calculateAge(birthday: string, deathday?: string | null): number {
   return age;
 }
 
-function getDepartmentLabels(
-  t: (strings: TemplateStringsArray, ...values: unknown[]) => string,
-): Record<string, string> {
-  return {
+export default function PersonDetailScreen() {
+  const { t } = useLingui();
+  const departmentLabels: Record<string, string> = {
     Acting: t`Actor`,
     Directing: t`Director`,
     Writing: t`Writer`,
     Production: t`Producer`,
     Editing: t`Editor`,
   };
-}
-
-export default function PersonDetailScreen() {
-  const { t } = useLingui();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
@@ -250,7 +245,7 @@ export default function PersonDetailScreen() {
         {person.knownForDepartment ? (
           <View className="bg-secondary mt-2 rounded-full px-3 py-1">
             <Text className="text-muted-foreground text-xs tracking-wider uppercase">
-              {getDepartmentLabels(t)[person.knownForDepartment] ?? person.knownForDepartment}
+              {departmentLabels[person.knownForDepartment] ?? person.knownForDepartment}
             </Text>
           </View>
         ) : null}
@@ -262,10 +257,12 @@ export default function PersonDetailScreen() {
                 <ScaledIcon icon={IconCalendar} size={14} color={primaryColor} />
                 <Text selectable className="text-muted-foreground text-sm">
                   {formatDate(person.birthday)}
-                  {(() => {
-                    const age = calculateAge(person.birthday, person.deathday);
-                    return person.deathday ? ` (${t`died at ${age}`})` : ` (${t`age ${age}`})`;
-                  })()}
+                  <Text className="text-muted-foreground/60 text-sm">
+                    {(() => {
+                      const age = calculateAge(person.birthday, person.deathday);
+                      return person.deathday ? ` (${t`died at ${age}`})` : ` (${t`age ${age}`})`;
+                    })()}
+                  </Text>
                 </Text>
               </View>
             ) : null}
