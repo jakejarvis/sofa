@@ -570,9 +570,7 @@ export const UpcomingItemSchema = z
       .number()
       .describe("Number of episodes (1 for single, >1 for collapsed batch drops)"),
     date: z.string().describe("Air date or release date (YYYY-MM-DD)"),
-    userStatus: z
-      .enum(["watchlist", "in_progress", "completed"])
-      .describe("User's tracking status"),
+    userStatus: displayStatusEnum.describe("User's display status"),
     isNewSeason: z.boolean().describe("Whether this is a new season for a completed show"),
     streamingProvider: z
       .object({

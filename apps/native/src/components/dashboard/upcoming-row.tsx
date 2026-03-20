@@ -11,8 +11,9 @@ import { Text } from "@/components/ui/text";
 import type { UpcomingItem } from "@sofa/api/schemas";
 
 const statusColors = {
-  watchlist: "--color-status-watchlist",
-  in_progress: "--color-status-watching",
+  in_watchlist: "--color-status-watchlist",
+  watching: "--color-status-watching",
+  caught_up: "--color-status-completed",
   completed: "--color-status-completed",
 } as const;
 
@@ -30,7 +31,9 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
   if (item.titleType === "movie") {
     subtitle = formatShortDate(item.date);
   } else if (item.episodeCount > 1 && item.seasonNumber != null) {
-    subtitle = t`S${item.seasonNumber} \u00b7 ${item.episodeCount} ${plural(item.episodeCount, { one: "episode", other: "episodes" })}`;
+    const seasonNum = item.seasonNumber;
+    const epCount = item.episodeCount;
+    subtitle = t`S${seasonNum} \u00b7 ${plural(epCount, { one: "# episode", other: "# episodes" })}`;
   } else {
     const episodeLabel =
       item.seasonNumber != null && item.episodeNumber != null

@@ -838,6 +838,10 @@ msgstr "פרקים {period}"
 msgid "Episodes {select}"
 msgstr "פרקים {select}"
 
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Episodes and movies coming up in the next 90 days."
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #~ msgid "Episodes this week"
 #~ msgstr ""
@@ -1439,6 +1443,10 @@ msgstr "אף פעם"
 msgid "Never run"
 msgstr "מעולם לא הורץ"
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+msgid "New"
+msgstr ""
+
 #: apps/native/src/app/(auth)/register.tsx
 msgid "New account creation is currently disabled."
 msgstr "יצירת חשבון חדש כרגע מושבתת."
@@ -1459,6 +1467,10 @@ msgstr "סיסמה חדשה"
 #: apps/web/src/components/settings/account-section.tsx
 msgid "New password must be at least 8 characters"
 msgstr "הסיסמה החדשה חייבת להכיל לפחות 8 תווים"
+
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+msgid "New Season"
+msgstr ""
 
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
@@ -1500,6 +1512,11 @@ msgstr "לא נמצאו תוצאות."
 #: apps/web/src/components/explore/filterable-title-row.tsx
 msgid "No titles found for this genre."
 msgstr "לא נמצאו כותרים לז'אנר זה."
+
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "No upcoming episodes or releases in the next 90 days."
+msgstr ""
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -1938,6 +1955,16 @@ msgstr "בדוק מה נמצא ובחר מה לייבא."
 msgid "Run now"
 msgstr "הפעל עכשיו"
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+#~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
+#~ msgstr ""
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+msgid "S{seasonNum} · {epCount, plural, one {# episode} other {# episodes}}"
+msgstr ""
+
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Saturday"
 msgstr "שבת"
@@ -2032,6 +2059,11 @@ msgstr "עונות"
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Security"
 msgstr "אבטחה"
+
+#: apps/native/src/components/ui/section-header.tsx
+#: apps/web/src/components/dashboard/feed-section.tsx
+msgid "See all"
+msgstr ""
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Self-hosted movie & TV tracker"
@@ -2453,6 +2485,13 @@ msgstr "בוטלה צפייה ב-S{seasonNum} E{epNum}"
 msgid "Up next"
 msgstr "הבא בתור"
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/components/dashboard/upcoming-section.tsx
+#: apps/web/src/components/dashboard/upcoming-section.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Upcoming"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Update available: {0}"
 #~ msgstr ""
@@ -2645,4 +2684,3 @@ msgstr "הספרייה שלך ריקה"
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Your name"
 msgstr "שמך"
-

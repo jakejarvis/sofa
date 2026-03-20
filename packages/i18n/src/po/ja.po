@@ -838,6 +838,10 @@ msgstr "エピソード {period}"
 msgid "Episodes {select}"
 msgstr "エピソード {select}"
 
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Episodes and movies coming up in the next 90 days."
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #~ msgid "Episodes this week"
 #~ msgstr ""
@@ -1439,6 +1443,10 @@ msgstr "なし"
 msgid "Never run"
 msgstr "未実行"
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+msgid "New"
+msgstr ""
+
 #: apps/native/src/app/(auth)/register.tsx
 msgid "New account creation is currently disabled."
 msgstr "現在、新規アカウントの作成は無効になっています。"
@@ -1459,6 +1467,10 @@ msgstr "新しいパスワード"
 #: apps/web/src/components/settings/account-section.tsx
 msgid "New password must be at least 8 characters"
 msgstr "新しいパスワードは8文字以上である必要があります"
+
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+msgid "New Season"
+msgstr ""
 
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
@@ -1500,6 +1512,11 @@ msgstr "結果が見つかりませんでした。"
 #: apps/web/src/components/explore/filterable-title-row.tsx
 msgid "No titles found for this genre."
 msgstr "このジャンルの作品は見つかりませんでした。"
+
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "No upcoming episodes or releases in the next 90 days."
+msgstr ""
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -1938,6 +1955,16 @@ msgstr "見つかったものを確認し、インポートする項目を選択
 msgid "Run now"
 msgstr "今すぐ実行"
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+#~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
+#~ msgstr ""
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+msgid "S{seasonNum} · {epCount, plural, one {# episode} other {# episodes}}"
+msgstr ""
+
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Saturday"
 msgstr "土曜日"
@@ -2032,6 +2059,11 @@ msgstr "シーズン"
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Security"
 msgstr "セキュリティ"
+
+#: apps/native/src/components/ui/section-header.tsx
+#: apps/web/src/components/dashboard/feed-section.tsx
+msgid "See all"
+msgstr ""
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Self-hosted movie & TV tracker"
@@ -2453,6 +2485,13 @@ msgstr "S{seasonNum} E{epNum}を未視聴にしました"
 msgid "Up next"
 msgstr "次のエピソード"
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/components/dashboard/upcoming-section.tsx
+#: apps/web/src/components/dashboard/upcoming-section.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Upcoming"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Update available: {0}"
 #~ msgstr ""
@@ -2645,4 +2684,3 @@ msgstr "ライブラリは空です"
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Your name"
 msgstr "お名前"
-

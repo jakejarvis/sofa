@@ -1,3 +1,4 @@
+import type { DisplayStatus } from "@sofa/api/display-status";
 import {
   getAllTrackedTitleIds,
   getAvailabilityByTitleIds,
@@ -23,6 +24,8 @@ import {
   getUserStatusCounts,
 } from "@sofa/db/queries/discovery";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
+
+import { getDisplayStatusesByTitleIds } from "./tracking";
 
 export type TimePeriod = "today" | "this_week" | "this_month" | "this_year";
 
@@ -356,7 +359,7 @@ export interface UpcomingItem {
   episodeName: string | null;
   episodeCount: number;
   date: string;
-  userStatus: "watchlist" | "in_progress" | "completed";
+  userStatus: DisplayStatus;
   isNewSeason: boolean;
   streamingProvider: {
     providerId: number;
@@ -468,8 +471,9 @@ export function getUpcomingFeed(
     nextCursor = `${last.date}_${last.titleId}`;
   }
 
-  // Batch-fetch streaming providers
+  // Batch-fetch display statuses and streaming providers
   const titleIds = [...new Set(pageItems.map((item) => item.titleId))];
+  const displayStatuses = getDisplayStatusesByTitleIds(userId, titleIds);
   const providerRows = getAvailabilityByTitleIds(titleIds);
   const providerMap = new Map<
     string,
@@ -500,8 +504,11 @@ export function getUpcomingFeed(
         episodeName: isCollapsed ? null : r.episodeName,
         episodeCount: item.episodeCount,
         date: r.airDate!,
-        userStatus: r.userStatus as "watchlist" | "in_progress" | "completed",
-        isNewSeason: r.userStatus === "completed" && r.episodeNumber === 1,
+        userStatus: displayStatuses[r.titleId] ?? "watching",
+        isNewSeason:
+          (displayStatuses[r.titleId] === "caught_up" ||
+            displayStatuses[r.titleId] === "completed") &&
+          r.episodeNumber === 1,
         streamingProvider: providerMap.get(r.titleId) ?? null,
       };
     }
@@ -517,7 +524,7 @@ export function getUpcomingFeed(
       episodeName: null,
       episodeCount: 1,
       date: r.releaseDate!,
-      userStatus: r.userStatus as "watchlist" | "in_progress" | "completed",
+      userStatus: displayStatuses[r.titleId] ?? "in_watchlist",
       isNewSeason: false,
       streamingProvider: providerMap.get(r.titleId) ?? null,
     };

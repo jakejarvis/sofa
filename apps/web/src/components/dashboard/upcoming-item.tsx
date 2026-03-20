@@ -7,8 +7,9 @@ import { thumbHashToUrl } from "@/lib/thumbhash";
 import type { UpcomingItem } from "@sofa/api/schemas";
 
 const statusColorClass = {
-  watchlist: "bg-status-watchlist",
-  in_progress: "bg-status-watching",
+  in_watchlist: "bg-status-watchlist",
+  watching: "bg-status-watching",
+  caught_up: "bg-status-completed",
   completed: "bg-status-completed",
 } as const;
 
@@ -24,7 +25,9 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
   if (item.titleType === "movie") {
     subtitle = formatShortDate(item.date);
   } else if (item.episodeCount > 1 && item.seasonNumber != null) {
-    subtitle = t`S${item.seasonNumber} \u00b7 ${item.episodeCount} ${plural(item.episodeCount, { one: "episode", other: "episodes" })}`;
+    const seasonNum = item.seasonNumber;
+    const epCount = item.episodeCount;
+    subtitle = t`S${seasonNum} \u00b7 ${plural(epCount, { one: "# episode", other: "# episodes" })}`;
   } else {
     const episodeLabel =
       item.seasonNumber != null && item.episodeNumber != null
