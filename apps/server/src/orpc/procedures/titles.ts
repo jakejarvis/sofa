@@ -4,7 +4,7 @@ import { AppErrorCode } from "@sofa/api/errors";
 import { getRecommendationsForTitle } from "@sofa/core/discovery";
 import { getOrFetchTitle, getOrFetchTitleByTmdbId } from "@sofa/core/metadata";
 import {
-  getUserStatusesByTitleIds,
+  getDisplayStatusesByTitleIds,
   getUserTitleInfo,
   logMovieWatch,
   markAllEpisodesWatched,
@@ -48,14 +48,19 @@ export const watchAll = os.titles.watchAll.use(authed).handler(({ input, context
 });
 
 export const userInfo = os.titles.userInfo.use(authed).handler(({ input, context }) => {
-  return getUserTitleInfo(context.user.id, input.id);
+  const info = getUserTitleInfo(context.user.id, input.id);
+  if (!info.status) return { ...info, status: null };
+
+  // Convert stored status to display status
+  const displayStatuses = getDisplayStatusesByTitleIds(context.user.id, [input.id]);
+  return { ...info, status: displayStatuses[input.id] ?? null };
 });
 
 export const recommendations = os.titles.recommendations
   .use(authed)
   .handler(({ input, context }) => {
     const recs = getRecommendationsForTitle(input.id);
-    const userStatuses = getUserStatusesByTitleIds(
+    const userStatuses = getDisplayStatusesByTitleIds(
       context.user.id,
       recs.map((r) => r.id),
     );

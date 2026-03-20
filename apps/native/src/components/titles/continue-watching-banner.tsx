@@ -32,7 +32,7 @@ export function ContinueWatchingBanner({
     [seasons, watchedEpisodeIds],
   );
 
-  if (userStatus !== "in_progress" || !nextEpisode) return null;
+  if (userStatus !== "watching" || !nextEpisode) return null;
 
   const stillUrl = nextEpisode.stillPath ?? backdropPath ?? null;
   const progress = totalEpisodes > 0 ? (watchedEpisodes / totalEpisodes) * 100 : 0;

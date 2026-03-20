@@ -193,11 +193,12 @@ describe("getSonarrList", () => {
       title: "Show B",
     });
     insertStatus("user-1", "tv1", "watchlist");
-    insertStatus("user-1", "tv2", "completed");
+    insertStatus("user-1", "tv2", "in_progress");
 
     const watchlist = await getSonarrList("user-1", ["watchlist"]);
     expect(watchlist).toEqual([{ TvdbId: 111, Title: "Show A" }]);
 
+    // 'completed' maps to 'in_progress' for TV (completion is derived)
     const all = await getSonarrList("user-1", ["watchlist", "completed"]);
     expect(all).toHaveLength(2);
   });

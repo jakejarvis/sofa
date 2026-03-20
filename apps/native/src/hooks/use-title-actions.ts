@@ -57,8 +57,6 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
       onSuccess: (_data, input) => {
         const statusMessages: Record<string, string> = {
           watchlist: t`Added to watchlist`,
-          in_progress: t`Marked as watching`,
-          completed: t`Marked as completed`,
         };
         const defaultMsg = input.status
           ? (statusMessages[input.status] ?? t`Status updated`)

@@ -105,11 +105,6 @@ export const ContinueWatchingCard = memo(function ContinueWatchingCard({
           <Link.Preview />
           <Link.Menu>
             <Link.MenuAction
-              title={t`Mark as Completed`}
-              icon="checkmark.circle"
-              onPress={() => titleActions.markCompleted(item.title.id, item.title.title)}
-            />
-            <Link.MenuAction
               title={t`Remove from Library`}
               icon="trash"
               destructive

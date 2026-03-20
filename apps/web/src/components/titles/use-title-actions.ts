@@ -10,7 +10,7 @@ import type { Season } from "@sofa/api/schemas";
 import { useTitleContext } from "./title-context";
 
 type UserInfo = {
-  status: "watchlist" | "in_progress" | "completed" | null;
+  status: "in_watchlist" | "watching" | "caught_up" | "completed" | null;
   rating: number | null;
   episodeWatches: string[];
 };
@@ -57,17 +57,14 @@ export function useTitleActions() {
       for (const id of episodeIds) newWatchSet.add(id);
       const newWatches = [...newWatchSet];
 
-      const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));
-      const allWatched = allEpIds.every((id) => newWatchSet.has(id));
-
       setUserInfo((old) => ({
         ...old,
         episodeWatches: newWatches,
-        status: allWatched ? "completed" : old.status,
       }));
 
       try {
         await batchWatchMutation.mutateAsync({ episodeIds });
+        await queryClient.invalidateQueries({ queryKey: userInfoKey });
         toast.success(
           t`Caught up — marked ${episodeIds.length} ${plural(episodeIds.length, { one: "episode", other: "episodes" })} as watched`,
         );
@@ -80,7 +77,7 @@ export function useTitleActions() {
         toast.error(t`Failed to catch up`);
       }
     },
-    [getUserInfo, setUserInfo, seasons, batchWatchMutation, t],
+    [getUserInfo, setUserInfo, batchWatchMutation, queryClient, userInfoKey, t],
   );
 
   const handleStatusChange = useCallback(
@@ -88,12 +85,12 @@ export function useTitleActions() {
       const prevStatus = getUserInfo().status;
       setUserInfo((old) => ({
         ...old,
-        status: status === "watchlist" ? "in_progress" : (status as UserInfo["status"]),
+        status: status ? "in_watchlist" : null,
       }));
       try {
         await updateStatusMutation.mutateAsync({
           id: titleId,
-          status: status ? "in_progress" : null,
+          status: status ? "watchlist" : null,
         });
         toast.success(status ? t`Added to watchlist` : t`Removed from library`);
       } catch {
@@ -148,7 +145,8 @@ export function useTitleActions() {
         setUserInfo((old) => ({
           ...old,
           episodeWatches: old.episodeWatches.filter((id) => id !== episodeId),
-          status: old.status === "completed" ? "in_progress" : old.status,
+          status:
+            old.status === "completed" || old.status === "caught_up" ? "watching" : old.status,
         }));
 
         try {
@@ -173,7 +171,7 @@ export function useTitleActions() {
         setUserInfo((old) => ({
           ...old,
           episodeWatches: newWatches,
-          status: old.status === null || old.status === "watchlist" ? "in_progress" : old.status,
+          status: old.status === null || old.status === "in_watchlist" ? "watching" : old.status,
         }));
 
         try {
@@ -243,21 +241,15 @@ export function useTitleActions() {
       for (const ep of unwatched) newWatchSet.add(ep.id);
       const newWatches = [...newWatchSet];
 
-      const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));
-      const allWatched = allEpIds.every((id) => newWatchSet.has(id));
-
       setUserInfo((old) => ({
         ...old,
         episodeWatches: newWatches,
-        status: allWatched
-          ? "completed"
-          : old.status === null || old.status === "watchlist"
-            ? "in_progress"
-            : old.status,
+        status: old.status === null || old.status === "in_watchlist" ? "watching" : old.status,
       }));
 
       try {
         await watchSeasonMutation.mutateAsync({ id: season.id });
+        await queryClient.invalidateQueries({ queryKey: userInfoKey });
 
         const currentWatchSet = new Set(getUserInfo().episodeWatches);
         const previousUnwatched: string[] = [];
@@ -294,7 +286,7 @@ export function useTitleActions() {
         toast.error(t`Failed to mark some episodes`);
       }
     },
-    [getUserInfo, setUserInfo, seasons, catchUp, watchSeasonMutation, t],
+    [getUserInfo, setUserInfo, seasons, catchUp, watchSeasonMutation, queryClient, userInfoKey, t],
   );
 
   const handleUnmarkSeason = useCallback(
@@ -305,7 +297,7 @@ export function useTitleActions() {
       setUserInfo((old) => ({
         ...old,
         episodeWatches: old.episodeWatches.filter((id) => !seasonEpIds.has(id)),
-        status: old.status === "completed" ? "in_progress" : old.status,
+        status: old.status === "completed" || old.status === "caught_up" ? "watching" : old.status,
       }));
 
       try {
@@ -330,10 +322,12 @@ export function useTitleActions() {
     setUserInfo((old) => ({
       ...old,
       episodeWatches: allEpIds,
-      status: "completed",
+      status: old.status ?? "watching",
     }));
     try {
       await watchAllMutation.mutateAsync({ id: titleId });
+      // Refresh to get server-derived display status (caught_up / completed)
+      await queryClient.invalidateQueries({ queryKey: userInfoKey });
       toast.success(t`Marked all episodes as watched`);
     } catch {
       setUserInfo((old) => ({
@@ -343,7 +337,7 @@ export function useTitleActions() {
       }));
       toast.error(t`Failed to mark all episodes as watched`);
     }
-  }, [getUserInfo, setUserInfo, seasons, titleId, watchAllMutation, t]);
+  }, [getUserInfo, setUserInfo, seasons, titleId, watchAllMutation, queryClient, userInfoKey, t]);
 
   return {
     handleStatusChange,

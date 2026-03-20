@@ -374,7 +374,7 @@ export default function TitleDetailScreen() {
             <StatusActionButton
               currentStatus={userInfo.data?.status ?? null}
               onStatusChange={(status) => {
-                if (status === "watchlist") {
+                if (status === "in_watchlist") {
                   quickAddMutation.mutate({ id });
                 } else {
                   updateStatus.mutate({ id, status: null });

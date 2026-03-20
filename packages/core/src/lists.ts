@@ -48,7 +48,11 @@ export async function getSonarrList(
   userId: string,
   statuses: Status[] = ["watchlist"],
 ): Promise<{ TvdbId: number; Title: string }[]> {
-  const rows = getSonarrShows(userId, statuses);
+  // TV never stores 'completed' — map it to 'in_progress' (completion is derived)
+  const mappedStatuses = [
+    ...new Set(statuses.map((s) => (s === "completed" ? "in_progress" : s))),
+  ] as Status[];
+  const rows = getSonarrShows(userId, mappedStatuses);
 
   // Resolve missing TVDB IDs in parallel instead of sequentially
   const needsResolution = rows.filter((r) => r.tvdbId == null);
