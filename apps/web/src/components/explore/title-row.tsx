@@ -19,7 +19,7 @@ interface TitleRowProps {
   heading: string;
   icon: React.ReactNode;
   items: TitleRowItem[];
-  userStatuses?: Record<string, "watchlist" | "in_progress" | "completed">;
+  userStatuses?: Record<string, "in_watchlist" | "watching" | "caught_up" | "completed">;
   episodeProgress?: Record<string, { watched: number; total: number }>;
   onEndReached?: () => void;
   hasNextPage?: boolean;

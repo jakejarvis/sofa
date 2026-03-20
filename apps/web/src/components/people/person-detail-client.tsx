@@ -53,7 +53,7 @@ export function PersonDetailClient({ id }: { id: string }) {
     () =>
       Object.assign({}, ...(data?.pages.map((p) => p.userStatuses) ?? [])) as Record<
         string,
-        "watchlist" | "in_progress" | "completed"
+        "in_watchlist" | "watching" | "caught_up" | "completed"
       >,
     [data?.pages],
   );

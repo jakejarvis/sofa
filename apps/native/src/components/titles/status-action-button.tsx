@@ -5,29 +5,34 @@ import {
   IconPlayerPlayFilled,
   IconPlus,
 } from "@tabler/icons-react-native";
-import { Pressable } from "react-native";
+import { Alert, Pressable } from "react-native";
 import { useCSSVariable } from "uniwind";
 
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import * as Haptics from "@/utils/haptics";
 
-type TitleStatus = "watchlist" | "in_progress" | "completed";
+type TitleStatus = "in_watchlist" | "watching" | "caught_up" | "completed";
 
 const STATUS_ICONS = {
-  watchlist: IconBookmarkFilled,
-  in_progress: IconPlayerPlayFilled,
+  in_watchlist: IconBookmarkFilled,
+  watching: IconPlayerPlayFilled,
+  caught_up: IconCheck,
   completed: IconCheck,
 } as const;
 
 const STATUS_STYLES = {
-  watchlist: {
+  in_watchlist: {
     bgClass: "bg-title-accent/10 border-title-accent/20",
     textClass: "text-title-accent",
   },
-  in_progress: {
+  watching: {
     bgClass: "bg-title-accent/10 border-title-accent/20",
     textClass: "text-title-accent",
+  },
+  caught_up: {
+    bgClass: "bg-status-completed/10 border-status-completed/20",
+    textClass: "text-status-completed",
   },
   completed: {
     bgClass: "bg-status-completed/10 border-status-completed/20",
@@ -37,10 +42,12 @@ const STATUS_STYLES = {
 
 function StatusLabel({ status }: { status: TitleStatus }) {
   switch (status) {
-    case "watchlist":
-      return <Trans>Watchlisted</Trans>;
-    case "in_progress":
+    case "in_watchlist":
+      return <Trans>In Watchlist</Trans>;
+    case "watching":
       return <Trans>Watching</Trans>;
+    case "caught_up":
+      return <Trans>Caught Up</Trans>;
     case "completed":
       return <Trans>Completed</Trans>;
   }
@@ -66,7 +73,7 @@ export function StatusActionButton({
       <Pressable
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          onStatusChange("watchlist");
+          onStatusChange("in_watchlist");
         }}
         disabled={isPending}
         accessibilityRole="button"
@@ -83,13 +90,25 @@ export function StatusActionButton({
 
   const StatusIcon = STATUS_ICONS[currentStatus];
   const styles = STATUS_STYLES[currentStatus];
-  const iconColor = currentStatus === "completed" ? completedColor : titleAccent;
+  const iconColor =
+    currentStatus === "completed" || currentStatus === "caught_up" ? completedColor : titleAccent;
 
   return (
     <Pressable
       onPress={() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        onStatusChange(null);
+        Alert.alert(
+          t`Remove from library?`,
+          t`This title will be removed from your library. Your watch history and ratings will be kept.`,
+          [
+            { text: t`Cancel`, style: "cancel" },
+            {
+              text: t`Remove`,
+              style: "destructive",
+              onPress: () => onStatusChange(null),
+            },
+          ],
+        );
       }}
       disabled={isPending}
       accessibilityRole="button"

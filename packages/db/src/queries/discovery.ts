@@ -74,12 +74,47 @@ export function getUserStatusCounts(userId: string) {
   const [row] = db
     .select({
       librarySize: sql<number>`count(*)`,
-      completed: sql<number>`sum(case when ${userTitleStatus.status} = 'completed' then 1 else 0 end)`,
+      movieCompleted: sql<number>`sum(case when ${userTitleStatus.status} = 'completed' then 1 else 0 end)`,
     })
     .from(userTitleStatus)
     .where(eq(userTitleStatus.userId, userId))
     .all();
-  return row;
+
+  // Count TV shows where all aired episodes are watched (caught_up + completed display states)
+  const today = new Date().toISOString().slice(0, 10);
+  const [tvRow] = db
+    .select({ count: sql<number>`count(*)` })
+    .from(userTitleStatus)
+    .innerJoin(titles, eq(titles.id, userTitleStatus.titleId))
+    .where(
+      and(
+        eq(userTitleStatus.userId, userId),
+        eq(userTitleStatus.status, "in_progress"),
+        eq(titles.type, "tv"),
+        sql`(
+          SELECT count(distinct e.id) FROM episodes e
+          INNER JOIN seasons s ON e.seasonId = s.id
+          WHERE s.titleId = ${titles.id} AND e.airDate IS NOT NULL AND e.airDate <= ${today}
+        ) > 0`,
+        sql`(
+          SELECT count(distinct e.id) FROM episodes e
+          INNER JOIN seasons s ON e.seasonId = s.id
+          WHERE s.titleId = ${titles.id} AND e.airDate IS NOT NULL AND e.airDate <= ${today}
+        ) = (
+          SELECT count(distinct ew.episodeId) FROM userEpisodeWatches ew
+          INNER JOIN episodes e2 ON ew.episodeId = e2.id
+          INNER JOIN seasons s2 ON e2.seasonId = s2.id
+          WHERE s2.titleId = ${titles.id} AND ew.userId = ${userTitleStatus.userId}
+            AND e2.airDate IS NOT NULL AND e2.airDate <= ${today}
+        )`,
+      ),
+    )
+    .all();
+
+  return {
+    librarySize: row?.librarySize ?? 0,
+    completed: (row?.movieCompleted ?? 0) + (tvRow?.count ?? 0),
+  };
 }
 
 export function getInProgressTitleIds(userId: string) {
@@ -212,11 +247,16 @@ export function getLibraryFeed(userId: string, page = 1, limit = 20) {
   };
 }
 
-export function getCompletedTitleIds(userId: string) {
+export function getEngagedTitleIds(userId: string) {
   return db
     .select({ titleId: userTitleStatus.titleId })
     .from(userTitleStatus)
-    .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.status, "completed")))
+    .where(
+      and(
+        eq(userTitleStatus.userId, userId),
+        sql`${userTitleStatus.status} IN ('completed', 'in_progress')`,
+      ),
+    )
     .all()
     .map((r) => r.titleId);
 }

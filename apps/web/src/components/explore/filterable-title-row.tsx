@@ -24,7 +24,7 @@ interface TitleRowItem {
   voteAverage: number | null;
 }
 
-type TitleStatus = "watchlist" | "in_progress" | "completed";
+type TitleStatus = "in_watchlist" | "watching" | "caught_up" | "completed";
 
 interface FilterableTitleRowProps {
   heading: string;

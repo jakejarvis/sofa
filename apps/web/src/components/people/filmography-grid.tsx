@@ -18,7 +18,7 @@ type Sort = "newest" | "rating";
 
 interface FilmographyGridProps {
   credits: PersonCredit[];
-  userStatuses?: Record<string, "watchlist" | "in_progress" | "completed">;
+  userStatuses?: Record<string, "in_watchlist" | "watching" | "caught_up" | "completed">;
 }
 
 export function FilmographyGrid({ credits, userStatuses }: FilmographyGridProps) {

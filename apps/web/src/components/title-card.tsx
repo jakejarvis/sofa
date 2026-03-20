@@ -32,7 +32,7 @@ export function TitleCardSkeleton() {
   );
 }
 
-type TitleStatus = "watchlist" | "in_progress" | "completed";
+type TitleStatus = "in_watchlist" | "watching" | "caught_up" | "completed";
 
 interface TiltStyles {
   imageStyle: MotionStyle;
@@ -59,14 +59,19 @@ export interface TitleCardProps extends CardInnerProps {
 function useStatusConfig() {
   const { t } = useLingui();
   return {
-    watchlist: {
+    in_watchlist: {
       icon: IconBookmarkFilled,
       label: t`On Watchlist`,
       badgeClass: "bg-status-watching/90 text-white",
     },
-    in_progress: {
+    watching: {
       icon: IconPlayerPlayFilled,
       label: t`Watching`,
+      badgeClass: "bg-status-watching/90 text-white",
+    },
+    caught_up: {
+      icon: IconCircleCheckFilled,
+      label: t`Caught Up`,
       badgeClass: "bg-status-watching/90 text-white",
     },
     completed: {
@@ -91,7 +96,7 @@ function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStat
 
   const quickAddMutation = useMutation(
     orpc.titles.quickAdd.mutationOptions({
-      onSuccess: () => setAddedStatus("watchlist"),
+      onSuccess: () => setAddedStatus("in_watchlist"),
     }),
   );
 

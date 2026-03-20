@@ -57,7 +57,7 @@ msgstr "{0} imagens em cache"
 #. placeholder {1}: member.episodeCount !== 1 ? "s" : ""
 #: apps/web/src/components/titles/cast-carousel.tsx:78
 msgid "{0} ep{1}"
-msgstr ""
+msgstr "{0} ep{1}"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx:472
 #~ msgid "{0} images"
@@ -104,8 +104,8 @@ msgstr "{0}/{1} {2, plural, one {episódio} other {episódios}}"
 #~ msgid "{0}/{1} episodes"
 #~ msgstr "{0}/{1} episodes"
 
-#: apps/web/src/components/titles/use-title-actions.ts:200
-#: apps/web/src/components/titles/use-title-actions.ts:278
+#: apps/web/src/components/titles/use-title-actions.ts:198
+#: apps/web/src/components/titles/use-title-actions.ts:270
 msgid "{count} earlier {count, plural, one {episode} other {episodes}} unwatched"
 msgstr "{count} {count, plural, one {episódio anterior não assistido} other {episódios anteriores não assistidos}}"
 
@@ -114,22 +114,22 @@ msgstr "{count} {count, plural, one {episódio anterior não assistido} other {e
 msgid "{healthyCount} of {0} jobs healthy"
 msgstr "{healthyCount} de {0} tarefas saudáveis"
 
-#: apps/native/src/components/settings/integration-card.tsx:84
+#: apps/native/src/components/settings/integration-card.tsx:86
 #: apps/web/src/components/settings/integration-card.tsx:89
 msgid "{label} connected"
 msgstr "{label} conectado"
 
-#: apps/native/src/components/settings/integration-card.tsx:94
+#: apps/native/src/components/settings/integration-card.tsx:96
 #: apps/web/src/components/settings/integration-card.tsx:105
 msgid "{label} disconnected"
 msgstr "{label} desconectado"
 
-#: apps/native/src/components/settings/integration-card.tsx:104
+#: apps/native/src/components/settings/integration-card.tsx:106
 #: apps/web/src/components/settings/integration-card.tsx:119
 msgid "{label} URL regenerated"
 msgstr "URL de {label} regenerada"
 
-#: apps/web/src/components/title-card.tsx:152
+#: apps/web/src/components/title-card.tsx:157
 msgid "{watched}/{total} episodes"
 msgstr "{watched}/{total} episódios"
 
@@ -157,7 +157,7 @@ msgstr "Conta"
 msgid "Actions"
 msgstr "Ações"
 
-#: apps/native/src/app/person/[id].tsx:50
+#: apps/native/src/app/person/[id].tsx:138
 #: apps/native/src/components/search/recently-viewed-row-content.tsx:28
 #: apps/web/src/components/people/person-hero.tsx:69
 msgid "Actor"
@@ -180,13 +180,13 @@ msgstr "Adicione um novo webhook e cole a URL acima"
 msgid "Add to Library"
 msgstr "Adicionar à Biblioteca"
 
-#: apps/native/src/components/titles/status-action-button.tsx:73
+#: apps/native/src/components/titles/status-action-button.tsx:80
 msgid "Add to watchlist"
 msgstr "Adicionar à lista de desejos"
 
 #: apps/native/src/components/explore/hero-banner.tsx:132
-#: apps/native/src/components/ui/poster-card.tsx:212
-#: apps/web/src/components/title-card.tsx:133
+#: apps/native/src/components/ui/poster-card.tsx:215
+#: apps/web/src/components/title-card.tsx:138
 msgid "Add to Watchlist"
 msgstr "Adicionar à Lista de Desejos"
 
@@ -197,7 +197,7 @@ msgstr "Adicionado \"{titleName}\" à lista de desejos"
 #: apps/native/src/hooks/use-title-actions.ts:44
 #: apps/native/src/hooks/use-title-actions.ts:59
 #: apps/native/src/lib/title-actions.ts:25
-#: apps/web/src/components/titles/use-title-actions.ts:98
+#: apps/web/src/components/titles/use-title-actions.ts:95
 msgid "Added to watchlist"
 msgstr "Adicionado à lista de desejos"
 
@@ -209,11 +209,11 @@ msgstr "Adicionado à lista de desejos"
 msgid "Admin"
 msgstr "Administrador"
 
-#: apps/web/src/routes/_app/settings.tsx:154
+#: apps/web/src/routes/_app/settings.tsx:156
 msgid "Admin only"
 msgstr "Apenas administradores"
 
-#: apps/native/src/app/person/[id].tsx:249
+#: apps/native/src/app/person/[id].tsx:189
 #: apps/web/src/components/people/person-hero.tsx:89
 msgid "age {age}"
 msgstr "idade {age}"
@@ -243,7 +243,7 @@ msgstr "Ocorreu um erro inesperado ao carregar esta página. Você pode tentar n
 msgid "Anonymous usage reporting"
 msgstr "Relatório de uso anônimo"
 
-#: apps/web/src/routes/_app/settings.tsx:135
+#: apps/web/src/routes/_app/settings.tsx:137
 msgid "App Settings"
 msgstr "Configurações do App"
 
@@ -251,7 +251,7 @@ msgstr "Configurações do App"
 msgid "Application"
 msgstr "Aplicativo"
 
-#: apps/native/src/components/settings/integration-card.tsx:139
+#: apps/native/src/components/settings/integration-card.tsx:148
 msgid "Are you sure you want to disconnect {label}? The current URL will stop working."
 msgstr "Tem certeza que deseja desconectar {label}? A URL atual deixará de funcionar."
 
@@ -295,7 +295,7 @@ msgstr "Tarefas em segundo plano"
 
 #: apps/web/src/components/settings/system-health-section.tsx:309
 msgid "Backup"
-msgstr ""
+msgstr "Backup"
 
 #: apps/web/src/components/settings/backup-section.tsx:62
 msgid "Backup created"
@@ -310,9 +310,9 @@ msgid "Backup schedule"
 msgstr "Agendamento de backup"
 
 #: apps/web/src/components/settings/system-health-section.tsx:583
-#: apps/web/src/routes/_app/settings.tsx:190
+#: apps/web/src/routes/_app/settings.tsx:192
 msgid "Backups"
-msgstr ""
+msgstr "Backups"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx:272
 #~ msgid "backups."
@@ -337,8 +337,9 @@ msgstr "Não foi possível alcançar o servidor"
 #: apps/native/src/components/header-avatar.tsx:63
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx:58
 #: apps/native/src/components/search/recently-viewed-list.tsx:32
-#: apps/native/src/components/settings/integration-card.tsx:126
-#: apps/native/src/components/settings/integration-card.tsx:141
+#: apps/native/src/components/settings/integration-card.tsx:135
+#: apps/native/src/components/settings/integration-card.tsx:150
+#: apps/native/src/components/titles/status-action-button.tsx:104
 #: apps/web/src/components/settings/account-section.tsx:477
 #: apps/web/src/components/settings/backup-restore-section.tsx:101
 #: apps/web/src/components/settings/backup-section.tsx:240
@@ -348,6 +349,7 @@ msgstr "Não foi possível alcançar o servidor"
 #: apps/web/src/components/settings/imports-section.tsx:611
 #: apps/web/src/components/settings/imports-section.tsx:674
 #: apps/web/src/components/settings/imports-section.tsx:798
+#: apps/web/src/components/titles/status-button.tsx:131
 #: apps/web/src/components/titles/title-seasons.tsx:127
 msgid "Cancel"
 msgstr "Cancelar"
@@ -361,14 +363,20 @@ msgstr "Cancelar edição"
 msgid "Cast"
 msgstr "Elenco"
 
-#: apps/web/src/components/titles/use-title-actions.ts:202
-#: apps/web/src/components/titles/use-title-actions.ts:280
+#: apps/web/src/components/titles/use-title-actions.ts:200
+#: apps/web/src/components/titles/use-title-actions.ts:272
 msgid "Catch up"
 msgstr "Colocar em dia"
 
+#: apps/native/src/components/titles/status-action-button.tsx:50
+#: apps/web/src/components/title-card.tsx:74
+#: apps/web/src/components/titles/status-button.tsx:54
+msgid "Caught Up"
+msgstr "Em dia"
+
 #. placeholder {0}: episodeIds.length
 #. placeholder {1}: episodeIds.length
-#: apps/web/src/components/titles/use-title-actions.ts:72
+#: apps/web/src/components/titles/use-title-actions.ts:69
 msgid "Caught up — marked {0} {1, plural, one {episode} other {episodes}} as watched"
 msgstr "Em dia — {0} {1, plural, one {episódio marcado como assistido} other {episódios marcados como assistidos}}"
 
@@ -418,7 +426,7 @@ msgstr "Escolha como importar seus dados do {0}."
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx:60
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx:104
 #: apps/native/src/components/search/recently-viewed-list.tsx:34
-#: apps/native/src/components/search/recently-viewed-list.tsx:86
+#: apps/native/src/components/search/recently-viewed-list.tsx:68
 msgid "Clear"
 msgstr "Limpar"
 
@@ -455,10 +463,10 @@ msgid "Close"
 msgstr "Fechar"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx:146
-#: apps/native/src/components/titles/status-action-button.tsx:45
+#: apps/native/src/components/titles/status-action-button.tsx:52
 #: apps/web/src/components/dashboard/stats-display.tsx:219
-#: apps/web/src/components/title-card.tsx:74
-#: apps/web/src/components/titles/status-button.tsx:25
+#: apps/web/src/components/title-card.tsx:79
+#: apps/web/src/components/titles/status-button.tsx:59
 msgid "Completed"
 msgstr "Concluído"
 
@@ -477,7 +485,7 @@ msgstr "Conectar"
 msgid "Connect {0}"
 msgstr "Conectar {0}"
 
-#: apps/native/src/components/settings/integration-card.tsx:207
+#: apps/native/src/components/settings/integration-card.tsx:216
 msgid "Connect {label}"
 msgstr "Conectar {label}"
 
@@ -485,7 +493,7 @@ msgstr "Conectar {label}"
 msgid "Connect to {source}"
 msgstr "Conectar a {source}"
 
-#: apps/web/src/routes/setup.tsx:98
+#: apps/web/src/routes/setup.tsx:99
 msgid "Connect to TMDB"
 msgstr "Conectar ao TMDB"
 
@@ -516,7 +524,7 @@ msgstr "Conectando ao servidor..."
 msgid "Connecting..."
 msgstr "Conectando..."
 
-#: apps/native/src/components/settings/integration-card.tsx:207
+#: apps/native/src/components/settings/integration-card.tsx:216
 msgid "Connecting…"
 msgstr "Conectando…"
 
@@ -545,7 +553,7 @@ msgstr "Copiar URL"
 msgid "Could not load integrations"
 msgstr "Não foi possível carregar as integrações"
 
-#: apps/native/src/app/person/[id].tsx:172
+#: apps/native/src/app/person/[id].tsx:257
 msgid "Could not load person details"
 msgstr "Não foi possível carregar os detalhes da pessoa"
 
@@ -579,14 +587,14 @@ msgstr "Senha atual"
 msgid "Current password is required"
 msgstr "A senha atual é obrigatória"
 
-#: apps/web/src/routes/_app/settings.tsx:216
+#: apps/web/src/routes/_app/settings.tsx:218
 msgid "Danger Zone"
 msgstr "Zona de Perigo"
 
 #: apps/web/src/routes/__root.tsx:163
-#: apps/web/src/routes/_app/people.$id.tsx:76
-#: apps/web/src/routes/_app/titles.$id.tsx:119
-#: apps/web/src/routes/_app/titles.$id.tsx:165
+#: apps/web/src/routes/_app/people.$id.tsx:78
+#: apps/web/src/routes/_app/titles.$id.tsx:120
+#: apps/web/src/routes/_app/titles.$id.tsx:166
 msgid "Dashboard"
 msgstr "Painel"
 
@@ -630,12 +638,12 @@ msgstr "{0, plural, one {# arquivo excluído} other {# arquivos excluídos}}, {f
 msgid "Device code expired. Please try again."
 msgstr "Código do dispositivo expirou. Tente novamente."
 
-#: apps/native/src/app/person/[id].tsx:249
+#: apps/native/src/app/person/[id].tsx:189
 #: apps/web/src/components/people/person-hero.tsx:89
 msgid "died at {age}"
 msgstr "faleceu aos {age}"
 
-#: apps/native/src/app/person/[id].tsx:51
+#: apps/native/src/app/person/[id].tsx:139
 #: apps/native/src/components/search/recently-viewed-row-content.tsx:29
 #: apps/web/src/components/people/person-hero.tsx:71
 msgid "Director"
@@ -646,13 +654,13 @@ msgstr "Diretor"
 msgid "Disabled"
 msgstr "Desativado"
 
-#: apps/native/src/components/settings/integration-card.tsx:143
-#: apps/native/src/components/settings/integration-card.tsx:257
+#: apps/native/src/components/settings/integration-card.tsx:152
+#: apps/native/src/components/settings/integration-card.tsx:266
 #: apps/web/src/components/settings/integration-card.tsx:234
 msgid "Disconnect"
 msgstr "Desconectar"
 
-#: apps/native/src/components/settings/integration-card.tsx:138
+#: apps/native/src/components/settings/integration-card.tsx:147
 msgid "Disconnect {label}"
 msgstr "Desconectar {label}"
 
@@ -685,11 +693,11 @@ msgstr "Baixar"
 msgid "Download backup"
 msgstr "Baixar backup"
 
-#: apps/native/src/app/person/[id].tsx:54
+#: apps/native/src/app/person/[id].tsx:142
 #: apps/native/src/components/search/recently-viewed-row-content.tsx:32
 #: apps/web/src/components/people/person-hero.tsx:77
 msgid "Editor"
-msgstr ""
+msgstr "Editor"
 
 #: apps/native/src/app/(auth)/login.tsx:123
 #: apps/native/src/app/(auth)/register.tsx:139
@@ -729,24 +737,31 @@ msgstr "Insira a URL do seu servidor Sofa para começar"
 msgid "Environment"
 msgstr "Ambiente"
 
-#. placeholder {0}: episode.episodeNumber
 #: apps/native/src/components/titles/episode-row.tsx:27
 #: apps/native/src/components/titles/episode-row.tsx:48
-msgid "Episode {0}"
-msgstr "Episódio {0}"
+#~ msgid "Episode {0}"
+#~ msgstr "Episódio {0}"
 
-#. placeholder {0}: episode.episodeNumber
 #: apps/native/src/components/titles/episode-row.tsx:34
-msgid "Episode {0}, {episodeLabel}"
-msgstr "Episódio {0}, {episodeLabel}"
+#~ msgid "Episode {0}, {episodeLabel}"
+#~ msgstr "Episódio {0}, {episodeLabel}"
 
-#: apps/native/src/hooks/use-title-actions.ts:111
-#: apps/native/src/lib/title-actions.ts:108
+#: apps/native/src/components/titles/episode-row.tsx:29
+#: apps/native/src/components/titles/episode-row.tsx:52
+msgid "Episode {episodeNumber}"
+msgstr "Episódio {episodeNumber}"
+
+#: apps/native/src/components/titles/episode-row.tsx:38
+msgid "Episode {episodeNumber}, {episodeLabel}"
+msgstr "Episódio {episodeNumber}, {episodeLabel}"
+
+#: apps/native/src/hooks/use-title-actions.ts:109
+#: apps/native/src/lib/title-actions.ts:84
 msgid "Episode unwatched"
 msgstr "Episódio não assistido"
 
-#: apps/native/src/hooks/use-title-actions.ts:101
-#: apps/native/src/lib/title-actions.ts:98
+#: apps/native/src/hooks/use-title-actions.ts:99
+#: apps/native/src/lib/title-actions.ts:74
 msgid "Episode watched"
 msgstr "Episódio assistido"
 
@@ -758,7 +773,7 @@ msgstr "Episódios"
 #. placeholder {0}: periodLabels[episodePeriod]
 #: apps/native/src/app/(tabs)/(home)/index.tsx:125
 msgid "Episodes {0}"
-msgstr ""
+msgstr "Episódios {0}"
 
 #: apps/web/src/components/dashboard/stats-display.tsx:162
 #~ msgid "Episodes {periodSelect}"
@@ -790,8 +805,8 @@ msgstr "Erros ({0})"
 msgid "Explore"
 msgstr "Explorar"
 
-#: apps/web/src/routes/_app/people.$id.tsx:68
-#: apps/web/src/routes/_app/titles.$id.tsx:157
+#: apps/web/src/routes/_app/people.$id.tsx:70
+#: apps/web/src/routes/_app/titles.$id.tsx:158
 msgid "Explore titles"
 msgstr "Explorar títulos"
 
@@ -804,7 +819,7 @@ msgstr "Falhou"
 msgid "Failed to add to watchlist"
 msgstr "Falha ao adicionar à lista de desejos"
 
-#: apps/web/src/components/titles/use-title-actions.ts:80
+#: apps/web/src/components/titles/use-title-actions.ts:77
 msgid "Failed to catch up"
 msgstr "Falha ao colocar em dia"
 
@@ -817,7 +832,7 @@ msgstr "Falha ao alterar senha"
 msgid "Failed to connect"
 msgstr "Falha ao conectar"
 
-#: apps/native/src/components/settings/integration-card.tsx:87
+#: apps/native/src/components/settings/integration-card.tsx:89
 #: apps/web/src/components/settings/integration-card.tsx:91
 msgid "Failed to connect {label}"
 msgstr "Falha ao conectar {label}"
@@ -834,7 +849,7 @@ msgstr "Falha ao criar backup"
 msgid "Failed to delete backup"
 msgstr "Falha ao excluir backup"
 
-#: apps/native/src/components/settings/integration-card.tsx:97
+#: apps/native/src/components/settings/integration-card.tsx:99
 #: apps/web/src/components/settings/integration-card.tsx:108
 msgid "Failed to disconnect {label}"
 msgstr "Falha ao desconectar {label}"
@@ -843,29 +858,30 @@ msgstr "Falha ao desconectar {label}"
 msgid "Failed to load backup schedule settings."
 msgstr "Falha ao carregar as configurações do agendamento de backup."
 
-#: apps/web/src/routes/_app/titles.$id.tsx:110
+#: apps/web/src/routes/_app/titles.$id.tsx:111
 msgid "Failed to load title"
 msgstr "Falha ao carregar título"
 
-#: apps/web/src/components/titles/use-title-actions.ts:344
+#: apps/native/src/lib/title-actions.ts:101
+#: apps/web/src/components/titles/use-title-actions.ts:338
 msgid "Failed to mark all episodes as watched"
 msgstr "Falha ao marcar todos os episódios como assistidos"
 
-#: apps/native/src/hooks/use-title-actions.ts:79
-#: apps/native/src/lib/title-actions.ts:67
-#: apps/web/src/components/titles/use-title-actions.ts:137
+#: apps/native/src/hooks/use-title-actions.ts:77
+#: apps/native/src/lib/title-actions.ts:43
+#: apps/web/src/components/titles/use-title-actions.ts:134
 msgid "Failed to mark as watched"
 msgstr "Falha ao marcar como assistido"
 
-#: apps/native/src/hooks/use-title-actions.ts:104
-#: apps/native/src/lib/title-actions.ts:101
-#: apps/web/src/components/titles/use-title-actions.ts:216
+#: apps/native/src/hooks/use-title-actions.ts:102
+#: apps/native/src/lib/title-actions.ts:77
+#: apps/web/src/components/titles/use-title-actions.ts:214
 msgid "Failed to mark episode"
 msgstr "Falha ao marcar episódio"
 
-#: apps/native/src/hooks/use-title-actions.ts:124
-#: apps/native/src/lib/title-actions.ts:123
-#: apps/web/src/components/titles/use-title-actions.ts:294
+#: apps/native/src/hooks/use-title-actions.ts:122
+#: apps/native/src/lib/title-actions.ts:113
+#: apps/web/src/components/titles/use-title-actions.ts:286
 msgid "Failed to mark some episodes"
 msgstr "Falha ao marcar alguns episódios"
 
@@ -889,12 +905,12 @@ msgstr "Falha ao limpar cache de imagens"
 msgid "Failed to purge metadata cache"
 msgstr "Falha ao limpar cache de metadados"
 
-#: apps/native/src/components/settings/integration-card.tsx:107
+#: apps/native/src/components/settings/integration-card.tsx:109
 #: apps/web/src/components/settings/integration-card.tsx:121
 msgid "Failed to regenerate {label} URL"
 msgstr "Falha ao regenerar URL de {label}"
 
-#: apps/native/src/lib/title-actions.ts:77
+#: apps/native/src/lib/title-actions.ts:53
 msgid "Failed to remove from library"
 msgstr "Falha ao remover da biblioteca"
 
@@ -916,13 +932,13 @@ msgstr "Falha ao iniciar conexão com {0}"
 msgid "Failed to trigger job"
 msgstr "Falha ao acionar tarefa"
 
-#: apps/native/src/hooks/use-title-actions.ts:114
-#: apps/native/src/lib/title-actions.ts:111
-#: apps/web/src/components/titles/use-title-actions.ts:163
+#: apps/native/src/hooks/use-title-actions.ts:112
+#: apps/native/src/lib/title-actions.ts:87
+#: apps/web/src/components/titles/use-title-actions.ts:161
 msgid "Failed to unmark episode"
 msgstr "Falha ao desmarcar episódio"
 
-#: apps/web/src/components/titles/use-title-actions.ts:320
+#: apps/web/src/components/titles/use-title-actions.ts:312
 msgid "Failed to unmark some episodes"
 msgstr "Falha ao desmarcar alguns episódios"
 
@@ -930,9 +946,9 @@ msgstr "Falha ao desmarcar alguns episódios"
 msgid "Failed to update name"
 msgstr "Falha ao atualizar nome"
 
-#: apps/native/src/hooks/use-title-actions.ts:94
-#: apps/native/src/lib/title-actions.ts:91
-#: apps/web/src/components/titles/use-title-actions.ts:123
+#: apps/native/src/hooks/use-title-actions.ts:92
+#: apps/native/src/lib/title-actions.ts:67
+#: apps/web/src/components/titles/use-title-actions.ts:120
 msgid "Failed to update rating"
 msgstr "Falha ao atualizar avaliação"
 
@@ -958,10 +974,8 @@ msgstr "Falha ao atualizar configuração de backup agendado"
 msgid "Failed to update setting"
 msgstr "Falha ao atualizar configuração"
 
-#: apps/native/src/hooks/use-title-actions.ts:69
-#: apps/native/src/lib/title-actions.ts:41
-#: apps/native/src/lib/title-actions.ts:55
-#: apps/web/src/components/titles/use-title-actions.ts:101
+#: apps/native/src/hooks/use-title-actions.ts:67
+#: apps/web/src/components/titles/use-title-actions.ts:98
 msgid "Failed to update status"
 msgstr "Falha ao atualizar status"
 
@@ -973,7 +987,7 @@ msgstr "Falha ao enviar avatar"
 msgid "Fetching your library data from {source}..."
 msgstr "Buscando seus dados da biblioteca em {source}..."
 
-#: apps/native/src/app/person/[id].tsx:279
+#: apps/native/src/app/person/[id].tsx:219
 #: apps/web/src/components/people/filmography-grid.tsx:67
 msgid "Filmography"
 msgstr "Filmografia"
@@ -1002,8 +1016,8 @@ msgstr "Sexta-feira"
 msgid "Get Started"
 msgstr "Começar"
 
-#: apps/native/src/app/person/[id].tsx:176
-#: apps/native/src/app/person/[id].tsx:196
+#: apps/native/src/app/person/[id].tsx:261
+#: apps/native/src/app/person/[id].tsx:281
 #: apps/native/src/app/title/[id].tsx:235
 msgid "Go back"
 msgstr "Voltar"
@@ -1111,6 +1125,11 @@ msgstr "Na biblioteca"
 #: apps/web/src/components/dashboard/stats-display.tsx:211
 msgid "In Library"
 msgstr "Na Biblioteca"
+
+#: apps/native/src/components/titles/status-action-button.tsx:46
+#: apps/web/src/components/titles/status-button.tsx:40
+msgid "In Watchlist"
+msgstr "Na lista"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx:179
 #: apps/web/src/components/dashboard/library-section.tsx:35
@@ -1222,22 +1241,23 @@ msgid "Mark all episodes as watched?"
 msgstr "Marcar todos os episódios como assistidos?"
 
 #: apps/native/src/components/titles/season-accordion.tsx:152
+#: apps/native/src/components/ui/poster-card.tsx:229
 #: apps/web/src/components/titles/title-seasons.tsx:109
 #: apps/web/src/components/titles/title-seasons.tsx:135
 msgid "Mark All Watched"
 msgstr "Marcar Todos como Assistidos"
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx:103
-msgid "Mark as Completed"
-msgstr "Marcar como Concluído"
+#~ msgid "Mark as Completed"
+#~ msgstr "Marcar como Concluído"
 
-#: apps/native/src/components/ui/poster-card.tsx:226
+#: apps/native/src/components/ui/poster-card.tsx:222
 msgid "Mark as Watched"
 msgstr "Marcar como Assistido"
 
 #: apps/native/src/components/ui/poster-card.tsx:219
-msgid "Mark as Watching"
-msgstr "Marcar como Assistindo"
+#~ msgid "Mark as Watching"
+#~ msgstr "Marcar como Assistindo"
 
 #: apps/native/src/app/title/[id].tsx:400
 #: apps/web/src/components/titles/title-actions.tsx:27
@@ -1245,32 +1265,37 @@ msgid "Mark Watched"
 msgstr "Marcar como Assistido"
 
 #: apps/native/src/lib/title-actions.ts:50
-msgid "Marked \"{titleName}\" as completed"
-msgstr "Marcado \"{titleName}\" como concluído"
+#~ msgid "Marked \"{titleName}\" as completed"
+#~ msgstr "Marcado \"{titleName}\" como concluído"
 
-#: apps/native/src/lib/title-actions.ts:63
-#: apps/web/src/components/titles/use-title-actions.ts:134
+#: apps/native/src/lib/title-actions.ts:39
+#: apps/web/src/components/titles/use-title-actions.ts:131
 msgid "Marked \"{titleName}\" as watched"
 msgstr "Marcado \"{titleName}\" como assistido"
 
-#: apps/web/src/components/titles/use-title-actions.ts:337
+#: apps/native/src/lib/title-actions.ts:97
+#: apps/web/src/components/titles/use-title-actions.ts:331
 msgid "Marked all episodes as watched"
 msgstr "Todos os episódios marcados como assistidos"
 
+#: apps/native/src/lib/title-actions.ts:96
+msgid "Marked all episodes of \"{titleName}\" as watched"
+msgstr "Todos os episódios de \"{titleName}\" marcados como vistos"
+
 #: apps/native/src/hooks/use-title-actions.ts:61
 #: apps/native/src/lib/title-actions.ts:51
-msgid "Marked as completed"
-msgstr "Marcado como concluído"
+#~ msgid "Marked as completed"
+#~ msgstr "Marcado como concluído"
 
-#: apps/native/src/hooks/use-title-actions.ts:76
-#: apps/native/src/lib/title-actions.ts:63
+#: apps/native/src/hooks/use-title-actions.ts:74
+#: apps/native/src/lib/title-actions.ts:39
 msgid "Marked as watched"
 msgstr "Marcado como assistido"
 
 #: apps/native/src/hooks/use-title-actions.ts:60
 #: apps/native/src/lib/title-actions.ts:38
-msgid "Marked as watching"
-msgstr "Marcado como assistindo"
+#~ msgid "Marked as watching"
+#~ msgstr "Marcado como assistindo"
 
 #: apps/web/src/components/settings/account-section.tsx:314
 msgid "Member since {memberSince}"
@@ -1305,7 +1330,7 @@ msgstr "Filmes"
 #. placeholder {0}: periodLabels[moviePeriod]
 #: apps/native/src/app/(tabs)/(home)/index.tsx:114
 msgid "Movies {0}"
-msgstr ""
+msgstr "Filmes {0}"
 
 #: apps/web/src/components/dashboard/stats-display.tsx:161
 #~ msgid "Movies {periodSelect}"
@@ -1345,7 +1370,7 @@ msgstr "Nunca executado"
 msgid "New account creation is currently disabled."
 msgstr "A criação de novas contas está desativada no momento."
 
-#: apps/web/src/routes/_auth/register.tsx:36
+#: apps/web/src/routes/_auth/register.tsx:33
 msgid "New accounts are not being accepted right now. Contact the admin if you need access."
 msgstr "Novas contas não estão sendo aceitas agora. Entre em contato com o administrador se precisar de acesso."
 
@@ -1403,7 +1428,7 @@ msgstr "Nenhum resultado encontrado."
 msgid "No titles found for this genre."
 msgstr "Nenhum título encontrado para este gênero."
 
-#: apps/native/src/components/settings/integration-card.tsx:174
+#: apps/native/src/components/settings/integration-card.tsx:183
 #: apps/web/src/components/settings/integration-card.tsx:153
 #: apps/web/src/components/settings/system-health-section.tsx:229
 msgid "Not configured"
@@ -1517,8 +1542,8 @@ msgstr "Verificar periodicamente o GitHub por novas versões do Sofa"
 msgid "Person"
 msgstr "Pessoa"
 
-#: apps/native/src/app/person/[id].tsx:192
-#: apps/web/src/routes/_app/people.$id.tsx:50
+#: apps/native/src/app/person/[id].tsx:277
+#: apps/web/src/routes/_app/people.$id.tsx:52
 msgid "Person not found"
 msgstr "Pessoa não encontrada"
 
@@ -1527,12 +1552,12 @@ msgid "Play trailer"
 msgstr "Reproduzir trailer"
 
 #: apps/native/src/app/(tabs)/(explore)/index.tsx:89
-#: apps/web/src/routes/_app/explore.tsx:141
+#: apps/web/src/routes/_app/explore.tsx:143
 msgid "Popular Movies"
 msgstr "Filmes Populares"
 
 #: apps/native/src/app/(tabs)/(explore)/index.tsx:102
-#: apps/web/src/routes/_app/explore.tsx:151
+#: apps/web/src/routes/_app/explore.tsx:153
 msgid "Popular TV Shows"
 msgstr "Séries Populares"
 
@@ -1540,7 +1565,7 @@ msgstr "Séries Populares"
 msgid "Pre-restore backup"
 msgstr "Backup pré-restauração"
 
-#: apps/native/src/app/person/[id].tsx:53
+#: apps/native/src/app/person/[id].tsx:141
 #: apps/native/src/components/search/recently-viewed-row-content.tsx:31
 #: apps/web/src/components/people/person-hero.tsx:75
 msgid "Producer"
@@ -1612,7 +1637,7 @@ msgstr "URL da Lista do Radarr"
 
 #. placeholder {0}: input.stars
 #. placeholder {1}: input.stars
-#: apps/native/src/hooks/use-title-actions.ts:88
+#: apps/native/src/hooks/use-title-actions.ts:86
 msgid "Rated {0} {1, plural, one {star} other {stars}}"
 msgstr "Avaliado com {0} {1, plural, one {estrela} other {estrelas}}"
 
@@ -1620,11 +1645,11 @@ msgstr "Avaliado com {0} {1, plural, one {estrela} other {estrelas}}"
 #~ msgid "Rated {0} star{1}"
 #~ msgstr "Rated {0} star{1}"
 
-#: apps/web/src/components/titles/use-title-actions.ts:118
+#: apps/web/src/components/titles/use-title-actions.ts:115
 msgid "Rated {ratingStars} {ratingStars, plural, one {star} other {stars}}"
 msgstr "Avaliado com {ratingStars} {ratingStars, plural, one {estrela} other {estrelas}}"
 
-#: apps/native/src/lib/title-actions.ts:86
+#: apps/native/src/lib/title-actions.ts:62
 msgid "Rated {stars, plural, one {# star} other {# stars}}"
 msgstr "Avaliado com {stars, plural, one {# estrela} other {# estrelas}}"
 
@@ -1633,9 +1658,9 @@ msgstr "Avaliado com {stars, plural, one {# estrela} other {# estrelas}}"
 msgid "Rating"
 msgstr "Avaliação"
 
-#: apps/native/src/hooks/use-title-actions.ts:89
-#: apps/native/src/lib/title-actions.ts:87
-#: apps/web/src/components/titles/use-title-actions.ts:119
+#: apps/native/src/hooks/use-title-actions.ts:87
+#: apps/native/src/lib/title-actions.ts:63
+#: apps/web/src/components/titles/use-title-actions.ts:116
 msgid "Rating removed"
 msgstr "Avaliação removida"
 
@@ -1663,7 +1688,7 @@ msgid "Recent Searches"
 msgstr "Pesquisas Recentes"
 
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx:95
-#: apps/native/src/components/search/recently-viewed-list.tsx:77
+#: apps/native/src/components/search/recently-viewed-list.tsx:59
 msgid "Recently Viewed"
 msgstr "Vistos Recentemente"
 
@@ -1692,12 +1717,12 @@ msgstr "Atualizar"
 msgid "Refresh system health"
 msgstr "Atualizar status de saúde do sistema"
 
-#: apps/native/src/components/settings/integration-card.tsx:128
-#: apps/native/src/components/settings/integration-card.tsx:248
+#: apps/native/src/components/settings/integration-card.tsx:137
+#: apps/native/src/components/settings/integration-card.tsx:257
 msgid "Regenerate"
 msgstr "Regenerar"
 
-#: apps/native/src/components/settings/integration-card.tsx:123
+#: apps/native/src/components/settings/integration-card.tsx:132
 #: apps/web/src/components/settings/integration-card.tsx:226
 msgid "Regenerate URL"
 msgstr "Regenerar URL"
@@ -1717,7 +1742,7 @@ msgid "Registration closed"
 msgstr "Registro fechado"
 
 #: apps/native/src/app/(auth)/register.tsx:87
-#: apps/web/src/routes/_auth/register.tsx:33
+#: apps/web/src/routes/_auth/register.tsx:30
 msgid "Registration Closed"
 msgstr "Registro Fechado"
 
@@ -1726,19 +1751,26 @@ msgstr "Registro Fechado"
 msgid "Registration opened"
 msgstr "Registro aberto"
 
-#: apps/web/src/components/titles/status-button.tsx:76
+#: apps/native/src/components/titles/status-action-button.tsx:106
+#: apps/web/src/components/titles/status-button.tsx:109
+#: apps/web/src/components/titles/status-button.tsx:139
 msgid "Remove"
 msgstr "Remover"
 
-#: apps/native/src/components/titles/status-action-button.tsx:96
-#: apps/web/src/components/titles/status-button.tsx:60
+#: apps/native/src/components/titles/status-action-button.tsx:115
+#: apps/web/src/components/titles/status-button.tsx:93
 msgid "Remove from library"
 msgstr "Remover da biblioteca"
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx:108
-#: apps/native/src/components/ui/poster-card.tsx:233
+#: apps/native/src/components/ui/poster-card.tsx:236
 msgid "Remove from Library"
 msgstr "Remover da Biblioteca"
+
+#: apps/native/src/components/titles/status-action-button.tsx:101
+#: apps/web/src/components/titles/status-button.tsx:120
+msgid "Remove from library?"
+msgstr "Remover da biblioteca?"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx:268
 msgid "Remove Photo"
@@ -1752,9 +1784,9 @@ msgstr "Remover foto"
 msgid "Remove profile picture"
 msgstr "Remover foto de perfil"
 
-#: apps/native/src/hooks/use-title-actions.ts:65
-#: apps/native/src/lib/title-actions.ts:74
-#: apps/web/src/components/titles/use-title-actions.ts:98
+#: apps/native/src/hooks/use-title-actions.ts:63
+#: apps/native/src/lib/title-actions.ts:50
+#: apps/web/src/components/titles/use-title-actions.ts:95
 msgid "Removed from library"
 msgstr "Removido da biblioteca"
 
@@ -1861,14 +1893,14 @@ msgstr "Backups agendados ativados"
 #: apps/native/src/app/(tabs)/(search)/_layout.tsx:7
 #: apps/native/src/components/navigation/native-tab-bar.tsx:41
 msgid "Search"
-msgstr ""
+msgstr "Pesquisar"
 
 #: apps/web/src/components/dashboard/stats-section.tsx:35
 msgid "Search for movies and TV shows to start tracking"
 msgstr "Pesquise filmes e séries para começar a acompanhar"
 
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx:72
-#: apps/native/src/components/search/recently-viewed-list.tsx:55
+#: apps/native/src/components/search/recently-viewed-list.tsx:81
 msgid "Search for movies, shows, or people"
 msgstr "Pesquise filmes, séries ou pessoas"
 
@@ -1892,13 +1924,13 @@ msgstr "Pesquisar…"
 #. placeholder {0}: season.seasonNumber
 #: apps/native/src/components/titles/season-accordion.tsx:113
 #: apps/native/src/components/titles/season-accordion.tsx:119
-#: apps/web/src/components/titles/use-title-actions.ts:274
-#: apps/web/src/components/titles/use-title-actions.ts:313
+#: apps/web/src/components/titles/use-title-actions.ts:266
+#: apps/web/src/components/titles/use-title-actions.ts:305
 msgid "Season {0}"
 msgstr "Temporada {0}"
 
-#: apps/native/src/hooks/use-title-actions.ts:121
-#: apps/native/src/lib/title-actions.ts:119
+#: apps/native/src/hooks/use-title-actions.ts:119
+#: apps/native/src/lib/title-actions.ts:109
 msgid "Season watched"
 msgstr "Temporada assistida"
 
@@ -1907,7 +1939,7 @@ msgid "Seasons"
 msgstr "Temporadas"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx:452
-#: apps/web/src/routes/_app/settings.tsx:167
+#: apps/web/src/routes/_app/settings.tsx:169
 msgid "Security"
 msgstr "Segurança"
 
@@ -1915,7 +1947,7 @@ msgstr "Segurança"
 msgid "Self-hosted movie & TV tracker"
 msgstr "Rastreador de filmes e séries auto-hospedado"
 
-#: apps/web/src/routes/_app/settings.tsx:151
+#: apps/web/src/routes/_app/settings.tsx:153
 msgid "Server"
 msgstr "Servidor"
 
@@ -1947,12 +1979,12 @@ msgstr "Defina seu perfil de qualidade preferido e pasta raiz"
 msgid "Settings"
 msgstr "Configurações"
 
-#: apps/native/src/components/settings/integration-card.tsx:271
+#: apps/native/src/components/settings/integration-card.tsx:280
 #: apps/web/src/components/settings/integration-card.tsx:248
 msgid "Setup instructions"
 msgstr "Instruções de configuração"
 
-#: apps/web/src/routes/setup.tsx:95
+#: apps/web/src/routes/setup.tsx:96
 msgid "Setup required"
 msgstr "Configuração necessária"
 
@@ -1977,7 +2009,7 @@ msgstr "Entrar"
 msgid "Sign In"
 msgstr "Entrar"
 
-#: apps/web/src/routes/_auth/register.tsx:45
+#: apps/web/src/routes/_auth/register.tsx:42
 msgid "Sign in instead"
 msgstr "Entrar em vez disso"
 
@@ -2031,13 +2063,13 @@ msgid "Sofa will automatically log movies and episodes when you finish watching 
 msgstr "O Sofa registrará automaticamente filmes e episódios quando você terminar de assisti-los"
 
 #: apps/native/src/app/change-password.tsx:77
-#: apps/native/src/app/person/[id].tsx:169
+#: apps/native/src/app/person/[id].tsx:254
 #: apps/web/src/components/settings/account-section.tsx:391
 #: apps/web/src/routes/__root.tsx:139
 msgid "Something went wrong"
 msgstr "Algo deu errado"
 
-#: apps/web/src/routes/_app/titles.$id.tsx:113
+#: apps/web/src/routes/_app/titles.$id.tsx:114
 msgid "Something went wrong while loading this title. Please try again."
 msgstr "Algo deu errado ao carregar este título. Tente novamente."
 
@@ -2070,7 +2102,7 @@ msgstr "Iniciando às"
 msgid "Starting import..."
 msgstr "Iniciando importação..."
 
-#: apps/native/src/hooks/use-title-actions.ts:64
+#: apps/native/src/hooks/use-title-actions.ts:62
 msgid "Status updated"
 msgstr "Status atualizado"
 
@@ -2095,11 +2127,11 @@ msgstr "Mudar para {0}"
 msgid "The page you're looking for doesn't exist."
 msgstr "A página que você está procurando não existe."
 
-#: apps/web/src/routes/_app/people.$id.tsx:53
+#: apps/web/src/routes/_app/people.$id.tsx:55
 msgid "The person you're looking for doesn't exist or may have been removed from the database."
 msgstr "A pessoa que você está procurando não existe ou pode ter sido removida do banco de dados."
 
-#: apps/web/src/routes/_app/titles.$id.tsx:142
+#: apps/web/src/routes/_app/titles.$id.tsx:143
 msgid "The title you're looking for doesn't exist or may have been removed from the database."
 msgstr "O título que você está procurando não existe ou pode ter sido removido do banco de dados."
 
@@ -2109,7 +2141,7 @@ msgstr "Isso pode levar alguns minutos para bibliotecas grandes. Por favor, não
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx:89
 msgid "this month"
-msgstr ""
+msgstr "este mês"
 
 #: apps/native/src/components/dashboard/stats-card.tsx:31
 #: apps/web/src/components/dashboard/stats-display.tsx:135
@@ -2121,14 +2153,19 @@ msgid "This page was left on the cutting room floor. It may have been moved, rem
 msgstr "Esta página ficou no chão da sala de montagem. Pode ter sido movida, removida ou nunca ter passado do roteiro."
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx:559
-#: apps/web/src/routes/_app/settings.tsx:112
-#: apps/web/src/routes/setup.tsx:180
+#: apps/web/src/routes/_app/settings.tsx:114
+#: apps/web/src/routes/setup.tsx:181
 msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
 msgstr "Este produto usa a API do TMDB, mas não é endossado ou certificado pelo TMDB."
 
+#: apps/native/src/components/titles/status-action-button.tsx:102
+#: apps/web/src/components/titles/status-button.tsx:123
+msgid "This title will be removed from your library. Your watch history and ratings will be kept."
+msgstr "Este título será removido da sua biblioteca. O seu histórico de visualizações e avaliações serão mantidos."
+
 #: apps/native/src/app/(tabs)/(home)/index.tsx:88
 msgid "this week"
-msgstr ""
+msgstr "esta semana"
 
 #: apps/native/src/components/dashboard/stats-card.tsx:30
 #: apps/web/src/components/dashboard/stats-display.tsx:134
@@ -2147,7 +2184,7 @@ msgstr "Isso excluirá todos os títulos stub não enriquecidos e todas as image
 msgid "This will delete un-enriched stub titles that aren't in any user's library and clean up orphaned person records. Deleted titles will be re-imported if accessed again."
 msgstr "Isso excluirá títulos stub não enriquecidos que não estão na biblioteca de nenhum usuário e limpará registros de pessoas órfãs. Os títulos excluídos serão reimportados se acessados novamente."
 
-#: apps/native/src/components/settings/integration-card.tsx:124
+#: apps/native/src/components/settings/integration-card.tsx:133
 msgid "This will invalidate the current {label} URL. You'll need to update it in {label}."
 msgstr "Isso invalidará a URL atual do {label}. Você precisará atualizá-la no {label}."
 
@@ -2171,7 +2208,7 @@ msgstr "Isso substituirá todo o seu banco de dados pelo arquivo enviado. Um bac
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx:90
 msgid "this year"
-msgstr ""
+msgstr "este ano"
 
 #: apps/native/src/components/dashboard/stats-card.tsx:32
 #: apps/web/src/components/dashboard/stats-display.tsx:136
@@ -2187,7 +2224,7 @@ msgid "Time:"
 msgstr "Hora:"
 
 #: apps/native/src/app/title/[id].tsx:231
-#: apps/web/src/routes/_app/titles.$id.tsx:139
+#: apps/web/src/routes/_app/titles.$id.tsx:140
 msgid "Title not found"
 msgstr "Título não encontrado"
 
@@ -2203,7 +2240,7 @@ msgstr "Os títulos na sua lista de desejos do Sofa serão automaticamente adici
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx:87
 msgid "today"
-msgstr ""
+msgstr "hoje"
 
 #: apps/native/src/components/dashboard/stats-card.tsx:29
 #: apps/web/src/components/dashboard/stats-display.tsx:133
@@ -2229,14 +2266,14 @@ msgstr "Acompanhe o que você assiste. Saiba o que vem a seguir.<0/>Sua bibliote
 #: apps/web/src/components/titles/trailer-dialog.tsx:38
 #: apps/web/src/components/titles/trailer-dialog.tsx:42
 msgid "Trailer"
-msgstr ""
+msgstr "Trailer"
 
 #: apps/web/src/components/explore/hero-banner.tsx:70
 msgid "Trending today"
 msgstr "Em alta hoje"
 
 #: apps/native/src/app/(tabs)/(explore)/index.tsx:77
-#: apps/web/src/routes/_app/explore.tsx:129
+#: apps/web/src/routes/_app/explore.tsx:131
 msgid "Trending Today"
 msgstr "Em Alta Hoje"
 
@@ -2291,11 +2328,11 @@ msgid "Unwatch all"
 msgstr "Desmarcar todos"
 
 #. placeholder {0}: season.name ?? t`Season ${season.seasonNumber}`
-#: apps/web/src/components/titles/use-title-actions.ts:313
+#: apps/web/src/components/titles/use-title-actions.ts:305
 msgid "Unwatched all of {0}"
 msgstr "Desmarcados todos os episódios de {0}"
 
-#: apps/web/src/components/titles/use-title-actions.ts:156
+#: apps/web/src/components/titles/use-title-actions.ts:154
 msgid "Unwatched S{seasonNum} E{epNum}"
 msgstr "Desmarcado T{seasonNum} E{epNum}"
 
@@ -2366,7 +2403,7 @@ msgstr "Enviar foto"
 msgid "Upload profile picture"
 msgstr "Enviar foto de perfil"
 
-#: apps/native/src/components/settings/integration-card.tsx:117
+#: apps/native/src/components/settings/integration-card.tsx:125
 msgid "URL copied to clipboard"
 msgstr "URL copiada para a área de transferência"
 
@@ -2399,36 +2436,36 @@ msgstr "Histórico de exibição"
 msgid "Watch on {name}"
 msgstr "Assistir em {name}"
 
-#: apps/web/src/components/titles/use-title-actions.ts:277
-#: apps/web/src/components/titles/use-title-actions.ts:286
+#: apps/web/src/components/titles/use-title-actions.ts:269
+#: apps/web/src/components/titles/use-title-actions.ts:278
 msgid "Watched all of {seasonLabel}"
 msgstr "Todos os episódios de {seasonLabel} assistidos"
 
-#: apps/native/src/lib/title-actions.ts:119
+#: apps/native/src/lib/title-actions.ts:109
 msgid "Watched all of {seasonName}"
 msgstr "Todos os episódios de {seasonName} assistidos"
 
-#: apps/web/src/components/titles/use-title-actions.ts:199
-#: apps/web/src/components/titles/use-title-actions.ts:208
+#: apps/web/src/components/titles/use-title-actions.ts:197
+#: apps/web/src/components/titles/use-title-actions.ts:206
 msgid "Watched S{seasonNum} E{epNum}"
 msgstr "Assistido T{seasonNum} E{epNum}"
 
-#: apps/native/src/components/titles/status-action-button.tsx:43
+#: apps/native/src/components/titles/status-action-button.tsx:48
 #: apps/web/src/components/title-card.tsx:69
-#: apps/web/src/components/titles/status-button.tsx:14
+#: apps/web/src/components/titles/status-button.tsx:47
 msgid "Watching"
 msgstr "Assistindo"
 
-#: apps/native/src/components/titles/status-action-button.tsx:78
+#: apps/native/src/components/titles/status-action-button.tsx:85
 #: apps/web/src/components/settings/imports-section.tsx:743
 #: apps/web/src/components/settings/imports-section.tsx:769
-#: apps/web/src/components/titles/status-button.tsx:49
+#: apps/web/src/components/titles/status-button.tsx:82
 msgid "Watchlist"
 msgstr "Lista de Desejos"
 
 #: apps/native/src/components/titles/status-action-button.tsx:41
-msgid "Watchlisted"
-msgstr "Na Lista de Desejos"
+#~ msgid "Watchlisted"
+#~ msgstr "Na Lista de Desejos"
 
 #: apps/native/src/components/settings/integration-configs.ts:51
 #: apps/native/src/components/settings/integration-configs.ts:66
@@ -2458,7 +2495,7 @@ msgstr "Onde Assistir"
 msgid "With Ads"
 msgstr "Com Anúncios"
 
-#: apps/native/src/app/person/[id].tsx:52
+#: apps/native/src/app/person/[id].tsx:140
 #: apps/native/src/components/search/recently-viewed-row-content.tsx:30
 #: apps/web/src/components/people/person-hero.tsx:73
 msgid "Writer"

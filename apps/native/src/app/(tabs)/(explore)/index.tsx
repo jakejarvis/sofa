@@ -48,7 +48,7 @@ export default function ExploreScreen() {
     () =>
       Object.assign({}, ...(trending.data?.pages.map((p) => p.userStatuses) ?? [])) as Record<
         string,
-        "watchlist" | "in_progress" | "completed"
+        "in_watchlist" | "watching" | "caught_up" | "completed"
       >,
     [trending.data?.pages],
   );

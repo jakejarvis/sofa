@@ -13,7 +13,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
 
-type TitleStatus = "watchlist" | "in_progress" | "completed";
+type TitleStatus = "in_watchlist" | "watching" | "caught_up" | "completed";
 const genreChipsContentStyle = { paddingHorizontal: 16 };
 
 export function FilterableTitleRow({

@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 
 import { AppErrorCode } from "@sofa/api/errors";
 import { ensureBrowseTitlesExist } from "@sofa/core/metadata";
-import { getEpisodeProgressByTitleIds, getUserStatusesByTitleIds } from "@sofa/core/tracking";
+import { getEpisodeProgressByTitleIds, getDisplayStatusesByTitleIds } from "@sofa/core/tracking";
 import { getGenres, getPopular, getTrending } from "@sofa/tmdb/client";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
@@ -90,7 +90,7 @@ export const trending = os.explore.trending.use(authed).handler(async ({ input, 
   const [userStatuses, episodeProgress] =
     titleIds.length > 0
       ? [
-          getUserStatusesByTitleIds(context.user.id, titleIds),
+          getDisplayStatusesByTitleIds(context.user.id, titleIds),
           getEpisodeProgressByTitleIds(context.user.id, titleIds),
         ]
       : [{}, {}];
@@ -136,7 +136,7 @@ export const popular = os.explore.popular.use(authed).handler(async ({ input, co
   const [userStatuses, episodeProgress] =
     titleIds.length > 0
       ? [
-          getUserStatusesByTitleIds(context.user.id, titleIds),
+          getDisplayStatusesByTitleIds(context.user.id, titleIds),
           getEpisodeProgressByTitleIds(context.user.id, titleIds),
         ]
       : [{}, {}];
