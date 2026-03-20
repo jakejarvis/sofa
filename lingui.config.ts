@@ -6,10 +6,14 @@ export default defineConfig({
   sourceLocale: "en",
   catalogs: [
     {
-      path: "packages/i18n/src/po/{locale}",
-      include: ["apps/web/src", "apps/native/src"],
+      path: "<rootDir>/packages/i18n/src/po/{locale}",
+      include: ["<rootDir>/apps/web/src", "<rootDir>/apps/native/src"],
     },
   ],
-  format: formatter(),
-  compileNamespace: "ts",
+  format: formatter({
+    lineNumbers: false,
+  }),
+  fallbackLocales: {
+    default: "en",
+  },
 });

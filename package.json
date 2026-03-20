@@ -46,7 +46,6 @@
     "test": "turbo run test",
     "generate:openapi": "bun scripts/generate-openapi-spec.ts && cd docs && bun run generate:api-docs",
     "i18n:extract": "lingui extract",
-    "i18n:compile": "lingui compile --typescript",
     "i18n:claude": "bun packages/i18n/scripts/claude.ts"
   },
   "devDependencies": {

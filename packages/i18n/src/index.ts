@@ -1,20 +1,20 @@
 import { i18n, type Messages } from "@lingui/core";
 
-import { messages as enMessages } from "./po/en";
+import type { SupportedLocale } from "./locales";
+import { messages as enMessages } from "./po/en.po";
 
-export const SUPPORTED_LOCALES = ["en", "fr", "de", "es", "it", "pt"] as const;
-export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+export { SUPPORTED_LOCALES, type SupportedLocale } from "./locales";
 
 // English always bundled — zero async on default locale
 i18n.load("en", enMessages);
 i18n.activate("en");
 
-const loaders: Record<string, () => Promise<{ messages: Messages }>> = {
-  fr: () => import("./po/fr"),
-  de: () => import("./po/de"),
-  es: () => import("./po/es"),
-  it: () => import("./po/it"),
-  pt: () => import("./po/pt"),
+const loaders: Record<Exclude<SupportedLocale, "en">, () => Promise<{ messages: Messages }>> = {
+  fr: () => import("./po/fr.po"),
+  de: () => import("./po/de.po"),
+  es: () => import("./po/es.po"),
+  it: () => import("./po/it.po"),
+  pt: () => import("./po/pt.po"),
 };
 
 export async function activateLocale(locale: SupportedLocale): Promise<void> {
@@ -22,12 +22,7 @@ export async function activateLocale(locale: SupportedLocale): Promise<void> {
     i18n.activate("en");
     return;
   }
-  const loader = loaders[locale];
-  if (!loader) {
-    i18n.activate("en");
-    return;
-  }
-  const { messages } = await loader();
+  const { messages } = await loaders[locale]();
   i18n.load(locale, messages);
   i18n.activate(locale);
 }

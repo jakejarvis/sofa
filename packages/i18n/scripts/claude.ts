@@ -530,16 +530,6 @@ if (!dryRun) {
     console.error("Extraction failed");
     process.exit(1);
   }
-
-  console.log("Compiling catalogs...");
-  const compile = Bun.spawn(["bun", "run", "i18n:compile"], {
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-  if ((await compile.exited) !== 0) {
-    console.error("Catalog compilation failed");
-    process.exit(1);
-  }
 }
 
 console.log("Done!");

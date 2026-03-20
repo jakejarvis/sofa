@@ -13,7 +13,6 @@ bun run check-types      # TypeScript type check
 bun run test             # Run tests
 bun run generate:openapi # Regenerate OpenAPI spec + docs API pages (run after contract/schema changes)
 bun run i18n:extract     # Run LingUI's string extraction
-bun run i18n:compile     # Run LingUI's typescript compilation
 bun run i18n:claude      # Prompt Claude Code to fill in untranslated strings
 
 # Database commands (run from packages/db/)
@@ -125,7 +124,7 @@ Cross-package imports:
 - **Date/number formatting** → use `formatDate`, `formatRelativeTime`, `formatNumber`, `formatBytes` from `@sofa/i18n/format` (Intl-based, locale-aware). Never use `date-fns` in app code.
 - **Native Intl polyfills** → `@formatjs/intl-*` polyfills loaded in `apps/native/src/lib/intl-polyfills.ts` (strict dependency order, with locale data for all 6 languages).
 - **Error messages** → Server throws `ORPCError` with `data: { code: AppErrorCode.XXX }`. Clients map codes to localized strings via per-app `error-messages.ts`. Never display `error.message` to users.
-- After adding/changing strings, run `bun run i18n:extract` then `bun run i18n:compile`.
+- After adding/changing strings, run `bun run i18n:extract`. The Vite and Metro plugins compile `.po` catalogs on the fly — no manual compile step needed.
 
 ### Environment variables
 

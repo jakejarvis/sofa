@@ -2,7 +2,7 @@ import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import type { ReactNode } from "react";
 
-import { messages } from "./po/en";
+import { messages } from "./po/en.po";
 
 i18n.load("en", messages);
 i18n.activate("en");
