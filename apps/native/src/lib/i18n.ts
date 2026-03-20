@@ -1,6 +1,8 @@
+import { reloadAppAsync } from "expo";
 import * as Localization from "expo-localization";
+import { I18nManager } from "react-native";
 
-import { activateLocale, SUPPORTED_LOCALES, type SupportedLocale } from "@sofa/i18n";
+import { activateLocale, isLocaleRTL, SUPPORTED_LOCALES, type SupportedLocale } from "@sofa/i18n";
 
 import { globalStorage } from "./mmkv";
 
@@ -23,10 +25,21 @@ export function getPersistedLocale(): SupportedLocale {
 
 export function setPersistedLocale(locale: SupportedLocale): void {
   globalStorage.set(LOCALE_STORAGE_KEY, locale);
+  const rtl = isLocaleRTL(locale);
+  I18nManager.allowRTL(rtl);
+  I18nManager.forceRTL(rtl);
 }
 
 export function initLocale(): Promise<void> {
   const locale = getPersistedLocale();
+  const rtl = isLocaleRTL(locale);
+  I18nManager.allowRTL(rtl);
+  I18nManager.forceRTL(rtl);
+  // forceRTL only takes effect on the next launch — if the current layout
+  // doesn't match (e.g. fresh install on an RTL device), reload immediately.
+  if (I18nManager.isRTL !== rtl) {
+    reloadAppAsync();
+  }
   if (locale !== "en") {
     return activateLocale(locale);
   }

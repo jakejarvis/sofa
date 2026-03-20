@@ -15,8 +15,10 @@ export function UpdateToast({ data }: { data: UpdateCheckResult | null }) {
     if (dismissedVersion === data.latestVersion) return;
 
     setDismissedVersion(data.latestVersion);
-    toast.info(t`Sofa v${data.latestVersion} is available`, {
-      description: t`You're running v${data.currentVersion}.`,
+    const latestVersion = data.latestVersion;
+    const currentVersion = data.currentVersion;
+    toast.info(t`Sofa v${latestVersion} is available`, {
+      description: t`You're running v${currentVersion}.`,
       duration: 15_000,
       action: data.releaseUrl
         ? {

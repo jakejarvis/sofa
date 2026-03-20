@@ -29,7 +29,7 @@ export function LanguageSection() {
               <div className="bg-primary/10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
                 <IconLanguage className="text-primary size-4" />
               </div>
-              <div className="text-left">
+              <div className="text-start">
                 <CardTitle>
                   <Trans>Language</Trans>
                 </CardTitle>
@@ -46,28 +46,31 @@ export function LanguageSection() {
         <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
           <CardContent className="border-border/30 border-t pt-4">
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {LOCALE_INFO.map((info) => (
-                <button
-                  key={info.code}
-                  type="button"
-                  onClick={() => handleLocaleChange(info.code)}
-                  className={`relative flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                    currentLocale === info.code
-                      ? "border-primary bg-primary/5 text-foreground"
-                      : "border-border hover:border-primary/40 hover:bg-primary/5"
-                  }`}
-                  aria-label={t`Switch to ${info.name}`}
-                  aria-pressed={currentLocale === info.code}
-                >
-                  <div className="min-w-0">
-                    <div className="truncate font-medium">{info.nativeName}</div>
-                    <div className="text-muted-foreground truncate text-xs">{info.name}</div>
-                  </div>
-                  {currentLocale === info.code && (
-                    <IconCheck className="text-primary ml-auto size-4 shrink-0" />
-                  )}
-                </button>
-              ))}
+              {LOCALE_INFO.map((info) => {
+                const name = info.name;
+                return (
+                  <button
+                    key={info.code}
+                    type="button"
+                    onClick={() => handleLocaleChange(info.code)}
+                    className={`relative flex items-center gap-2 rounded-lg border px-3 py-2 text-start text-sm transition-colors ${
+                      currentLocale === info.code
+                        ? "border-primary bg-primary/5 text-foreground"
+                        : "border-border hover:border-primary/40 hover:bg-primary/5"
+                    }`}
+                    aria-label={t`Switch to ${name}`}
+                    aria-pressed={currentLocale === info.code}
+                  >
+                    <div className="min-w-0">
+                      <div className="truncate font-medium">{info.nativeName}</div>
+                      <div className="text-muted-foreground truncate text-xs">{info.name}</div>
+                    </div>
+                    {currentLocale === info.code && (
+                      <IconCheck className="text-primary ml-auto size-4 shrink-0" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </CardContent>
         </CollapsibleContent>

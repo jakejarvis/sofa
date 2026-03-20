@@ -147,7 +147,7 @@ export function IntegrationCard({
               <div className="bg-primary/10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
                 <Icon className="text-primary size-4" />
               </div>
-              <div className="text-left">
+              <div className="text-start">
                 <CardTitle>{config.label}</CardTitle>
                 <CardDescription>
                   {connection ? config.connectedStatus(connection.lastEventAt) : t`Not configured`}
@@ -172,7 +172,7 @@ export function IntegrationCard({
                 size="lg"
                 className="w-full"
               >
-                {connecting ? <Trans>Connecting...</Trans> : <Trans>Connect {config.label}</Trans>}
+                {connecting ? <Trans>Connecting...</Trans> : <Trans>Connect {label}</Trans>}
               </Button>
             ) : (
               <AnimatePresence>
@@ -251,10 +251,10 @@ export function IntegrationCard({
                 <div className="border-border/50 bg-muted/30 text-muted-foreground mt-2 rounded-lg border p-3 text-xs leading-relaxed">
                   <ol className="list-inside list-decimal space-y-1.5">{config.setupSteps}</ol>
                   {config.docsUrl && (
-                    <p className="mt-2 -ml-0.5">
+                    <p className="-ms-0.5 mt-2">
                       <IconBook2
                         aria-hidden={true}
-                        className="mr-1 inline-block size-3 translate-y-[-1px]"
+                        className="me-1 inline-block size-3 translate-y-[-1px]"
                       />
                       <Trans>Need more help?</Trans>{" "}
                       <a
@@ -285,14 +285,18 @@ export function IntegrationCard({
 
 /** Status line for webhook integrations (shows last event time). */
 export function webhookStatus(lastEventAt: string | null): string {
-  return lastEventAt
-    ? i18n._(msg`Last event ${formatRelativeTime(lastEventAt)}`)
-    : i18n._(msg`Ready — nothing received yet`);
+  if (lastEventAt) {
+    const relativeTime = formatRelativeTime(lastEventAt);
+    return i18n._(msg`Last event ${relativeTime}`);
+  }
+  return i18n._(msg`Ready — nothing received yet`);
 }
 
 /** Status line for list integrations (shows last event time). */
 export function listStatus(lastEventAt: string | null): string {
-  return lastEventAt
-    ? i18n._(msg`Last polled ${formatRelativeTime(lastEventAt)}`)
-    : i18n._(msg`Ready — not polled yet`);
+  if (lastEventAt) {
+    const relativeTime = formatRelativeTime(lastEventAt);
+    return i18n._(msg`Last polled ${relativeTime}`);
+  }
+  return i18n._(msg`Ready — not polled yet`);
 }

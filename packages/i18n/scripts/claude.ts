@@ -518,18 +518,18 @@ for (const locale of locales) {
   await translateLocale(locale, model, batchSize, dryRun, contextMap);
 }
 
-if (!dryRun) {
-  // Re-extract to restore #. placeholder comments that @lingui/format-po's
-  // serialize() strips during the round-trip.
-  console.log("Re-extracting to restore comments...");
-  const extract = Bun.spawn(["bun", "run", "i18n:extract"], {
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-  if ((await extract.exited) !== 0) {
-    console.error("Extraction failed");
-    process.exit(1);
-  }
-}
+// if (!dryRun) {
+//   // Re-extract to restore #. placeholder comments that @lingui/format-po's
+//   // serialize() strips during the round-trip.
+//   console.log("Re-extracting to restore comments...");
+//   const extract = Bun.spawn(["bun", "run", "i18n:extract"], {
+//     stdout: "inherit",
+//     stderr: "inherit",
+//   });
+//   if ((await extract.exited) !== 0) {
+//     console.error("Extraction failed");
+//     process.exit(1);
+//   }
+// }
 
 console.log("Done!");

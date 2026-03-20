@@ -111,7 +111,10 @@ export default function DashboardScreen() {
           <View className="gap-3">
             <View className="flex-row gap-3">
               <StatsCard
-                label={t`Movies ${periodLabels[moviePeriod]}`}
+                label={(() => {
+                  const period = periodLabels[moviePeriod];
+                  return t`Movies ${period}`;
+                })()}
                 value={movieCount}
                 icon={IconMovie}
                 color="text-primary"
@@ -122,7 +125,10 @@ export default function DashboardScreen() {
                 onPeriodChange={setMoviePeriod}
               />
               <StatsCard
-                label={t`Episodes ${periodLabels[episodePeriod]}`}
+                label={(() => {
+                  const period = periodLabels[episodePeriod];
+                  return t`Episodes ${period}`;
+                })()}
                 value={episodeCount}
                 icon={IconDeviceTvOld}
                 color="text-status-watching"

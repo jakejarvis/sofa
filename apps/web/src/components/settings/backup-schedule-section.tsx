@@ -218,31 +218,28 @@ export function BackupScheduleSection() {
               <CardDescription>
                 {enabled ? (
                   <span className="inline-flex flex-wrap items-baseline" suppressHydrationWarning>
-                    {formatNextBackup(frequency, time, dow)}.{" "}
-                    <Trans>
-                      Keeping{" "}
-                      <Select
-                        value={String(maxRetention)}
-                        onValueChange={(v) => v && changeMaxRetention(Number(v))}
-                        modal={false}
-                      >
-                        <SelectTrigger className="decoration-muted-foreground/50 hover:text-foreground hover:decoration-foreground/50 focus-visible:decoration-foreground mr-0.5 ml-1.5 !h-auto w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 underline decoration-dotted underline-offset-4 shadow-none hover:bg-transparent focus-visible:decoration-solid focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent">
-                          <SelectValue>
-                            {(value: string | null) =>
-                              value === "0" ? t`unlimited` : value ? t`last ${value}` : null
-                            }
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent align="start" alignItemWithTrigger={false} className="p-1">
-                          {[3, 5, 7, 14, 30, 0].map((n) => (
-                            <SelectItem key={n} value={String(n)}>
-                              {n === 0 ? t`unlimited` : t`last ${n}`}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>{" "}
-                      backups.
-                    </Trans>
+                    {formatNextBackup(frequency, time, dow)}. <Trans>Keeping</Trans>{" "}
+                    <Select
+                      value={String(maxRetention)}
+                      onValueChange={(v) => v && changeMaxRetention(Number(v))}
+                      modal={false}
+                    >
+                      <SelectTrigger className="decoration-muted-foreground/50 hover:text-foreground hover:decoration-foreground/50 focus-visible:decoration-foreground ms-1.5 me-0.5 !h-auto w-auto gap-0.5 rounded-none border-0 bg-transparent p-0 underline decoration-dotted underline-offset-4 shadow-none hover:bg-transparent focus-visible:decoration-solid focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent">
+                        <SelectValue>
+                          {(value: string | null) =>
+                            value === "0" ? t`unlimited` : value ? t`last ${value}` : null
+                          }
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent align="start" alignItemWithTrigger={false} className="p-1">
+                        {[3, 5, 7, 14, 30, 0].map((n) => (
+                          <SelectItem key={n} value={String(n)}>
+                            {n === 0 ? t`unlimited` : t`last ${n}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>{" "}
+                    <Trans>backups.</Trans>
                   </span>
                 ) : (
                   <Trans>Automatically back up your database on a schedule</Trans>

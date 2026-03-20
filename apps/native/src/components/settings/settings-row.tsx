@@ -1,7 +1,7 @@
 import type { Icon } from "@tabler/icons-react-native";
-import { IconChevronRight } from "@tabler/icons-react-native";
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react-native";
 import type { ReactNode } from "react";
-import { Pressable, View } from "react-native";
+import { I18nManager, Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
 
 import { ScaledIcon } from "@/components/ui/scaled-icon";
@@ -53,7 +53,12 @@ export function SettingsRow({
         </Text>
       ) : null}
       {!right && onPress && (
-        <ScaledIcon icon={IconChevronRight} size={16} color={mutedFgColor} accessible={false} />
+        <ScaledIcon
+          icon={I18nManager.isRTL ? IconChevronLeft : IconChevronRight}
+          size={16}
+          color={mutedFgColor}
+          accessible={false}
+        />
       )}
     </>
   );

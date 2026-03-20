@@ -2,7 +2,7 @@ import { defineConfig } from "@lingui/conf";
 import { formatter } from "@lingui/format-po";
 
 export default defineConfig({
-  locales: ["en", "fr", "de", "es", "it", "pt"],
+  locales: ["en", "fr", "de", "es", "it", "pt", "nl", "ar", "he", "zh", "ja", "ko"],
   sourceLocale: "en",
   catalogs: [
     {

@@ -1,4 +1,4 @@
-import { activateLocale, SUPPORTED_LOCALES, type SupportedLocale } from "@sofa/i18n";
+import { activateLocale, getDirection, SUPPORTED_LOCALES, type SupportedLocale } from "@sofa/i18n";
 
 const LOCALE_STORAGE_KEY = "sofa:locale";
 
@@ -17,6 +17,7 @@ export function getPersistedLocale(): SupportedLocale {
 export function setPersistedLocale(locale: SupportedLocale): void {
   localStorage.setItem(LOCALE_STORAGE_KEY, locale);
   document.documentElement.lang = locale;
+  document.documentElement.dir = getDirection(locale);
 }
 
 let initialized = false;
@@ -26,6 +27,7 @@ export async function initLocale(): Promise<void> {
   initialized = true;
   const locale = getPersistedLocale();
   document.documentElement.lang = locale;
+  document.documentElement.dir = getDirection(locale);
   if (locale !== "en") {
     await activateLocale(locale);
   }

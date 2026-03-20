@@ -69,7 +69,7 @@ function MenubarContent({
       alignOffset={alignOffset}
       sideOffset={sideOffset}
       className={cn(
-        "data-open:fade-in-0 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=inline-end]:slide-in-from-left-2 bg-popover text-popover-foreground ring-foreground/10 data-open:animate-in min-w-32 rounded-lg p-1 shadow-md ring-1 duration-100",
+        "data-open:fade-in-0 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[side=inline-start]:slide-in-from-end-2 data-[side=inline-end]:slide-in-from-start-2 bg-popover text-popover-foreground ring-foreground/10 data-open:animate-in min-w-32 rounded-lg p-1 shadow-md ring-1 duration-100",
         className,
       )}
       {...props}
@@ -89,7 +89,7 @@ function MenubarItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "group/menubar-item focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:*:[svg]:text-destructive! min-h-7 gap-2 rounded-md px-2 py-1 text-xs/relaxed data-disabled:opacity-50 data-inset:pl-7.5 [&_svg:not([class*='size-'])]:size-3.5",
+        "group/menubar-item focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:*:[svg]:text-destructive! min-h-7 gap-2 rounded-md px-2 py-1 text-xs/relaxed data-disabled:opacity-50 data-inset:ps-7.5 [&_svg:not([class*='size-'])]:size-3.5",
         className,
       )}
       {...props}
@@ -111,13 +111,13 @@ function MenubarCheckboxItem({
       data-slot="menubar-checkbox-item"
       data-inset={inset}
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground relative flex min-h-7 cursor-default items-center gap-2 rounded-md py-1.5 pr-2 pl-7.5 text-xs outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-7.5 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground relative flex min-h-7 cursor-default items-center gap-2 rounded-md py-1.5 ps-7.5 pe-2 text-xs outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:ps-7.5 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className,
       )}
       checked={checked}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-4 items-center justify-center [&_svg:not([class*='size-'])]:size-4">
+      <span className="pointer-events-none absolute start-2 flex size-4 items-center justify-center [&_svg:not([class*='size-'])]:size-4">
         <MenuPrimitive.CheckboxItemIndicator>
           <IconCheck />
         </MenuPrimitive.CheckboxItemIndicator>
@@ -144,12 +144,12 @@ function MenubarRadioItem({
       data-slot="menubar-radio-item"
       data-inset={inset}
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground relative flex min-h-7 cursor-default items-center gap-2 rounded-md py-1.5 pr-2 pl-7.5 text-xs outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-7.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
+        "focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground relative flex min-h-7 cursor-default items-center gap-2 rounded-md py-1.5 ps-7.5 pe-2 text-xs outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:ps-7.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
         className,
       )}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-4 items-center justify-center [&_svg:not([class*='size-'])]:size-4">
+      <span className="pointer-events-none absolute start-2 flex size-4 items-center justify-center [&_svg:not([class*='size-'])]:size-4">
         <MenuPrimitive.RadioItemIndicator>
           <IconCheck />
         </MenuPrimitive.RadioItemIndicator>
@@ -170,7 +170,7 @@ function MenubarLabel({
     <DropdownMenuLabel
       data-slot="menubar-label"
       data-inset={inset}
-      className={cn("text-muted-foreground px-2 py-1.5 text-xs data-inset:pl-7.5", className)}
+      className={cn("text-muted-foreground px-2 py-1.5 text-xs data-inset:ps-7.5", className)}
       {...props}
     />
   );
@@ -197,7 +197,7 @@ function MenubarShortcut({
     <DropdownMenuShortcut
       data-slot="menubar-shortcut"
       className={cn(
-        "text-muted-foreground group-focus/menubar-item:text-accent-foreground ml-auto text-[0.625rem] tracking-widest",
+        "text-muted-foreground group-focus/menubar-item:text-accent-foreground ms-auto text-[0.625rem] tracking-widest",
         className,
       )}
       {...props}
@@ -221,7 +221,7 @@ function MenubarSubTrigger({
       data-slot="menubar-sub-trigger"
       data-inset={inset}
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-open:bg-accent data-open:text-accent-foreground min-h-7 gap-2 rounded-md px-2 py-1 text-xs data-inset:pl-7.5 [&_svg:not([class*='size-'])]:size-3.5",
+        "focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-open:bg-accent data-open:text-accent-foreground min-h-7 gap-2 rounded-md px-2 py-1 text-xs data-inset:ps-7.5 [&_svg:not([class*='size-'])]:size-3.5",
         className,
       )}
       {...props}

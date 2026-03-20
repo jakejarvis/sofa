@@ -80,7 +80,7 @@ export function SkeletonCards() {
   return (
     <div className="space-y-3">
       {["status", "jobs", "storage"].map((s) => (
-        <Card key={s} className="border-l-primary/30 border-l-2">
+        <Card key={s} className="border-s-primary/30 border-s-2">
           <CardContent>
             <div className="flex items-start gap-3">
               <Skeleton className="mt-0.5 h-8 w-8 rounded-lg" />
@@ -181,7 +181,7 @@ function SystemStatusCard({
   onRefresh: () => void;
 }) {
   return (
-    <Card className="border-l-primary/30 border-l-2">
+    <Card className="border-s-primary/30 border-s-2">
       <CardContent>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
@@ -313,7 +313,8 @@ function BackgroundJobsCard({
   const triggerJobMutation = useMutation(
     orpc.admin.triggerJob.mutationOptions({
       onSuccess: (_, { name }) => {
-        toast.success(t`${JOB_LABELS[name] ?? name} triggered`);
+        const jobLabel = JOB_LABELS[name] ?? name;
+        toast.success(t`${jobLabel} triggered`);
         setTimeout(onRefresh, 1500);
       },
       onError: (err) => {
@@ -334,9 +335,10 @@ function BackgroundJobsCard({
   });
   const activeJobs = jobs.filter((j) => !j.disabled);
   const healthyCount = activeJobs.filter((j) => j.lastStatus === "success").length;
+  const activeJobCount = activeJobs.length;
 
   return (
-    <Card className="border-l-primary/30 border-l-2">
+    <Card className="border-s-primary/30 border-s-2">
       <CardContent>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
@@ -349,7 +351,7 @@ function BackgroundJobsCard({
               </CardTitle>
               <CardDescription>
                 <Trans>
-                  {healthyCount} of {activeJobs.length} jobs healthy
+                  {healthyCount} of {activeJobCount} jobs healthy
                 </Trans>
               </CardDescription>
             </div>
@@ -361,7 +363,7 @@ function BackgroundJobsCard({
         <Table>
           <TableHeader>
             <TableRow className="border-b-border/30 hover:bg-transparent">
-              <TableHead className="text-muted-foreground h-8 pl-5 text-[10px] font-medium tracking-wider uppercase">
+              <TableHead className="text-muted-foreground h-8 ps-5 text-[10px] font-medium tracking-wider uppercase">
                 <Trans>Job</Trans>
               </TableHead>
               <TableHead className="text-muted-foreground h-8 text-[10px] font-medium tracking-wider uppercase">
@@ -373,7 +375,7 @@ function BackgroundJobsCard({
               <TableHead className="text-muted-foreground h-8 text-[10px] font-medium tracking-wider uppercase">
                 <Trans>Next run</Trans>
               </TableHead>
-              <TableHead className="text-muted-foreground h-8 pr-5 text-right text-[10px] font-medium tracking-wider uppercase">
+              <TableHead className="text-muted-foreground h-8 pe-5 text-end text-[10px] font-medium tracking-wider uppercase">
                 <span className="sr-only">
                   <Trans>Actions</Trans>
                 </span>
@@ -388,7 +390,7 @@ function BackgroundJobsCard({
               return (
                 <TableRow key={job.jobName} className="border-b-border/20 hover:bg-muted/30">
                   {/* Job name + status */}
-                  <TableCell className="pl-5">
+                  <TableCell className="ps-5">
                     <div className="flex items-center gap-2">
                       {job.disabled ? (
                         <StatusDot status="inactive" label={t`Disabled`} />
@@ -472,7 +474,7 @@ function BackgroundJobsCard({
                   </TableCell>
 
                   {/* Trigger button */}
-                  <TableCell className="pr-5 text-right">
+                  <TableCell className="pe-5 text-end">
                     <Tooltip>
                       <TooltipTrigger
                         render={
@@ -524,8 +526,11 @@ function StorageCard({
   onRefresh: () => void;
 }) {
   const { t } = useLingui();
+  const cachedImageCount = imageCache.imageCount.toLocaleString();
+  const backupCount = backups.backupCount;
+  const lastBackupAt = backups.lastBackupAt;
   return (
-    <Card className="border-l-primary/30 border-l-2">
+    <Card className="border-s-primary/30 border-s-2">
       <CardContent>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
@@ -560,7 +565,7 @@ function StorageCard({
         {imageCache.enabled ? (
           <>
             <p className="text-muted-foreground mt-1 text-xs">
-              {t`${imageCache.imageCount.toLocaleString()} cached images`}
+              {t`${cachedImageCount} cached images`}
             </p>
             <p className="text-muted-foreground/50 mt-0.5 text-[10px] leading-relaxed">
               {Object.entries(imageCache.categories)
@@ -582,17 +587,16 @@ function StorageCard({
           <span className="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase">
             <Trans>Backups</Trans>
           </span>
-          {backups.backupCount > 0 && (
+          {backupCount > 0 && (
             <span className="text-muted-foreground/50 font-mono text-[11px]">
               {formatBytes(backups.totalSizeBytes)}
             </span>
           )}
         </div>
-        {backups.backupCount > 0 ? (
+        {backupCount > 0 ? (
           <p className="text-muted-foreground mt-1 text-xs">
             <Trans>
-              {backups.backupCount} backups · last{" "}
-              <LiveTimeAgo date={backups.lastBackupAt} fallback={t`unknown`} />
+              {backupCount} backups · last <LiveTimeAgo date={lastBackupAt} fallback={t`unknown`} />
             </Trans>
           </p>
         ) : (

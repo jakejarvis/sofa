@@ -70,7 +70,7 @@ export function HeroBanner({
                     <Trans>Trending today</Trans>
                   </span>
                 </div>
-                <Link to="/titles/$id" params={{ id }} className="group/title text-left">
+                <Link to="/titles/$id" params={{ id }} className="group/title text-start">
                   <h2 className="font-display group-hover/title:text-primary text-3xl tracking-tight text-balance transition-colors sm:text-4xl">
                     {title}
                   </h2>

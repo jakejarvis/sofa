@@ -5,16 +5,16 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
-"Language: it\n"
+"Language: he\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
 "PO-Revision-Date: 2026-03-20 23:13\n"
 "Last-Translator: \n"
-"Language-Team: Italian\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language-Team: Hebrew\n"
+"Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3;\n"
 "X-Crowdin-Project: sofa\n"
 "X-Crowdin-Project-ID: 881052\n"
-"X-Crowdin-Language: it\n"
+"X-Crowdin-Language: he\n"
 "X-Crowdin-File: /packages/i18n/src/po/en.po\n"
 "X-Crowdin-File-ID: 26\n"
 
@@ -24,17 +24,17 @@ msgstr ""
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "...and {remainingErrors} more"
-msgstr ""
+msgstr "...ועוד {remainingErrors}"
 
 #. placeholder {0}: systemHealth.data.imageCache.imageCount
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "{0, plural, one {# image} other {# images}}"
-msgstr "{0, plural, one {# immagine} other {# immagini}}"
+msgstr "{0, plural, one {# תמונה} two {# תמונות} many {# תמונות} other {# תמונות}}"
 
 #. placeholder {0}: systemHealth.data.database.titleCount
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "{0, plural, one {# title} other {# titles}}"
-msgstr "{0, plural, one {# titolo} other {# titoli}}"
+msgstr "{0, plural, one {# כותרת} two {# כותרות} many {# כותרות} other {# כותרות}}"
 
 #: apps/web/src/components/settings/backup-section.tsx
 #~ msgid "{0} {1, plural, one {backup} other {backups}} stored"
@@ -94,20 +94,20 @@ msgstr "{0, plural, one {# titolo} other {# titoli}}"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "{backupCount, plural, one {# backup} other {# backups}} stored"
-msgstr ""
+msgstr "{backupCount, plural, one {# גיבוי שמור} two {# גיבויים שמורים} many {# גיבויים שמורים} other {# גיבויים שמורים}}"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "{backupCount} backups · last <0/>"
-msgstr ""
+msgstr "{backupCount} גיבויים · אחרון <0/>"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "{cachedImageCount} cached images"
-msgstr ""
+msgstr "{cachedImageCount} תמונות במטמון"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "{count, plural, one {# earlier episode} other {# earlier episodes}} unwatched"
-msgstr ""
+msgstr "{count, plural, one {# פרק קודם לא נצפה} two {# פרקים קודמים לא נצפו} many {# פרקים קודמים לא נצפו} other {# פרקים קודמים לא נצפו}}"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
@@ -116,7 +116,7 @@ msgstr ""
 
 #: apps/web/src/components/titles/cast-carousel.tsx
 msgid "{count} ep{suffix}"
-msgstr ""
+msgstr "{count} פרק{suffix}"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 #~ msgid "{healthyCount} of {0} jobs healthy"
@@ -124,42 +124,42 @@ msgstr ""
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "{healthyCount} of {activeJobCount} jobs healthy"
-msgstr ""
+msgstr "{healthyCount} מתוך {activeJobCount} משימות תקינות"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "{jobLabel} triggered"
-msgstr ""
+msgstr "{jobLabel} הופעל"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "{label} connected"
-msgstr "Connesso: {label}"
+msgstr "{label} חובר"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "{label} disconnected"
-msgstr "Disconnesso: {label}"
+msgstr "{label} נותק"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "{label} URL regenerated"
-msgstr "URL {label} rigenerato"
+msgstr "ה-URL של {label} נוצר מחדש"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "{movieCount} movies, {episodeCount} episodes"
-msgstr ""
+msgstr "{movieCount} סרטים, {episodeCount} פרקים"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "{ratingCount} ratings"
-msgstr ""
+msgstr "{ratingCount} דירוגים"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "{unresolvedCount} items have no external IDs and will be resolved by title search, which may be less accurate."
-msgstr ""
+msgstr "ל-{unresolvedCount} פריטים אין מזהים חיצוניים ויאותרו באמצעות חיפוש כותרת, שעשוי להיות פחות מדויק."
 
 #: apps/web/src/components/title-card.tsx
 msgid "{watched}/{total} episodes"
-msgstr "{watched}/{total} episodi"
+msgstr "{watched}/{total} פרקים"
 
 #: apps/native/src/components/titles/season-accordion.tsx
 #~ msgid "{watchedCount} of {0} episodes watched"
@@ -167,7 +167,7 @@ msgstr "{watched}/{total} episodi"
 
 #: apps/native/src/components/titles/season-accordion.tsx
 msgid "{watchedCount} of {episodeCount} episodes watched"
-msgstr ""
+msgstr "{watchedCount} מתוך {episodeCount} פרקים נצפו"
 
 #: apps/native/src/components/titles/season-accordion.tsx
 #~ msgid "{watchedCount}/{0} {1, plural, one {episode} other {episodes}}"
@@ -179,68 +179,68 @@ msgstr ""
 
 #: apps/native/src/components/titles/season-accordion.tsx
 msgid "{watchedCount}/{episodeCount, plural, one {# episode} other {# episodes}}"
-msgstr ""
+msgstr "{watchedCount}/{episodeCount, plural, one {# פרק} two {# פרקים} many {# פרקים} other {# פרקים}}"
 
 #: apps/web/src/components/dashboard/continue-watching-card.tsx
 msgid "{watchedEpisodes}/{totalEpisodes, plural, one {# episode} other {# episodes}}"
-msgstr ""
+msgstr "{watchedEpisodes}/{totalEpisodes, plural, one {# פרק} two {# פרקים} many {# פרקים} other {# פרקים}}"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "{watchlistCount} items"
-msgstr ""
+msgstr "{watchlistCount} פריטים"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Account"
-msgstr ""
+msgstr "חשבון"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Actions"
-msgstr "Azioni"
+msgstr "פעולות"
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/web/src/components/people/person-hero.tsx
 msgid "Actor"
-msgstr "Attore"
+msgstr "שחקן"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Add a \"Generic Destination\" and paste the URL above"
-msgstr "Aggiungi una \"Destinazione generica\" e incolla l'URL sopra"
+msgstr "הוסף \"Generic Destination\" והדבק את הכתובת למעלה"
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Add a <0>Generic Destination</0> and paste the URL above"
-msgstr "Aggiungi una <0>Destinazione generica</0> e incolla l'URL sopra"
+msgstr "הוסף <0>Generic Destination</0> והדבק את הכתובת למעלה"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Add a new webhook and paste the URL above"
-msgstr "Aggiungi un nuovo webhook e incolla l'URL sopra"
+msgstr "הוסף webhook חדש והדבק את הכתובת למעלה"
 
 #: apps/web/src/components/explore/hero-banner.tsx
 msgid "Add to Library"
-msgstr "Aggiungi alla libreria"
+msgstr "הוסף לספרייה"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 msgid "Add to watchlist"
-msgstr "Aggiungi alla watchlist"
+msgstr "הוסף לרשימת הצפייה"
 
 #: apps/native/src/components/explore/hero-banner.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 #: apps/web/src/components/title-card.tsx
 msgid "Add to Watchlist"
-msgstr "Aggiungi alla watchlist"
+msgstr "הוסף לרשימת הצפייה"
 
 #: apps/native/src/lib/title-actions.ts
 msgid "Added \"{titleName}\" to watchlist"
-msgstr "Aggiunto \"{titleName}\" alla watchlist"
+msgstr "\"{titleName}\" נוסף לרשימת הצפייה"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Added to watchlist"
-msgstr "Aggiunto alla watchlist"
+msgstr "נוסף לרשימת הצפייה"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
@@ -248,66 +248,66 @@ msgstr "Aggiunto alla watchlist"
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Admin"
-msgstr ""
+msgstr "מנהל"
 
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Admin only"
-msgstr "Solo admin"
+msgstr "למנהלים בלבד"
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/web/src/components/people/person-hero.tsx
 msgid "age {age}"
-msgstr "età {age}"
+msgstr "גיל {age}"
 
 #: apps/native/src/components/explore/filterable-title-row.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 msgid "All"
-msgstr "Tutti"
+msgstr "הכל"
 
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Allow new users to create accounts"
-msgstr "Consenti la creazione di nuovi account"
+msgstr "אפשר למשתמשים חדשים ליצור חשבונות"
 
 #: apps/web/src/components/auth-form.tsx
 msgid "Already have an account?"
-msgstr "Hai già un account?"
+msgstr "כבר יש לך חשבון?"
 
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Already have an account? Sign in"
-msgstr "Hai già un account? Accedi"
+msgstr "כבר יש לך חשבון? התחבר"
 
 #: apps/web/src/routes/__root.tsx
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
-msgstr "Si è verificato un errore imprevisto durante il caricamento di questa pagina. Puoi riprovare o tornare alla dashboard."
+msgstr "אירעה שגיאה בלתי צפויה בעת טעינת הדף. תוכל לנסות שוב או לחזור ללוח הבקרה."
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Anonymous usage reporting"
-msgstr "Segnalazione anonima dell'utilizzo"
+msgstr "דיווח שימוש אנונימי"
 
 #: apps/web/src/routes/_app/settings.tsx
 msgid "App Settings"
-msgstr "Impostazioni app"
+msgstr "הגדרות אפליקציה"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Application"
-msgstr "Applicazione"
+msgstr "אפליקציה"
 
 #: apps/native/src/components/settings/integration-card.tsx
 msgid "Are you sure you want to disconnect {label}? The current URL will stop working."
-msgstr "Sei sicuro di voler disconnettere {label}? L'URL attuale smetterà di funzionare."
+msgstr "האם אתה בטוח שברצונך לנתק את {label}? הכתובת הנוכחית תפסיק לעבוד."
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/components/header-avatar.tsx
 msgid "Are you sure you want to sign out?"
-msgstr "Sei sicuro di voler uscire?"
+msgstr "האם אתה בטוח שברצונך להתנתק?"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Authorization succeeded but failed to fetch your library. Please try again."
-msgstr "Autorizzazione riuscita ma impossibile recuperare la libreria. Riprova."
+msgstr "ההרשאה הצליחה אך נכשלה בטעינת הספרייה שלך. אנא נסה שוב."
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Authorization was denied. Please try again."
-msgstr "Autorizzazione negata. Riprova."
+msgstr "ההרשאה נדחתה. אנא נסה שוב."
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Authorize Sofa to read your {0} library. No password shared."
@@ -315,65 +315,65 @@ msgstr "Autorizzazione negata. Riprova."
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Authorize Sofa to read your {sourceLabel} library. No password shared."
-msgstr ""
+msgstr "אשר ל-Sofa לקרוא את ספריית {sourceLabel} שלך. לא משותפת סיסמה."
 
 #: apps/web/src/components/settings/update-check-section.tsx
 msgid "Automatic update checks"
-msgstr "Controllo aggiornamenti automatico"
+msgstr "בדיקות עדכונים אוטומטיות"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Automatically back up your database on a schedule"
-msgstr "Esegui il backup automatico del database secondo una pianificazione"
+msgstr "גיבוי אוטומטי של מסד הנתונים לפי לוח זמנים"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Availability"
-msgstr "Disponibilità"
+msgstr "זמינות"
 
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Back to Login"
-msgstr "Torna al login"
+msgstr "חזרה להתחברות"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Background jobs"
-msgstr "Job in background"
+msgstr "משימות רקע"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Backup"
-msgstr ""
+msgstr "גיבוי"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Backup created"
-msgstr "Backup creato"
+msgstr "גיבוי נוצר"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Backup deleted"
-msgstr "Backup eliminato"
+msgstr "גיבוי נמחק"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Backup schedule"
-msgstr "Pianificazione backup"
+msgstr "לוח זמנים לגיבוי"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Backups"
-msgstr "Backup"
+msgstr "גיבויים"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "backups."
-msgstr ""
+msgstr "גיבויים."
 
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Buy"
-msgstr "Acquista"
+msgstr "רכישה"
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Cache management"
-msgstr "Gestione cache"
+msgstr "ניהול מטמון"
 
 #: apps/native/src/components/ui/server-unreachable-banner.ios.tsx
 #: apps/native/src/components/ui/server-unreachable-banner.tsx
 msgid "Can't reach server"
-msgstr "Impossibile raggiungere il server"
+msgstr "לא ניתן להגיע לשרת"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
@@ -396,27 +396,27 @@ msgstr "Impossibile raggiungere il server"
 #: apps/web/src/components/titles/status-button.tsx
 #: apps/web/src/components/titles/title-seasons.tsx
 msgid "Cancel"
-msgstr "Annulla"
+msgstr "ביטול"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Cancel editing"
-msgstr "Annulla modifica"
+msgstr "ביטול עריכה"
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/titles/cast-carousel.tsx
 msgid "Cast"
-msgstr ""
+msgstr "שחקנים"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Catch up"
-msgstr "Recupera episodi"
+msgstr "השלם צפייה"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Caught Up"
-msgstr "In pari"
+msgstr "עדכני"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 #~ msgid "Caught up — marked {0} {1, plural, one {episode} other {episodes}} as watched"
@@ -424,41 +424,41 @@ msgstr "In pari"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Caught up — marked {count, plural, one {# episode} other {# episodes}} as watched"
-msgstr ""
+msgstr "עדכני — {count, plural, one {# פרק סומן כנצפה} two {# פרקים סומנו כנצפו} many {# פרקים סומנו כנצפו} other {# פרקים סומנו כנצפו}}"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Change password"
-msgstr "Cambia password"
+msgstr "שינוי סיסמה"
 
 #: apps/native/src/app/change-password.tsx
 msgid "Change Password"
-msgstr "Cambia password"
+msgstr "שינוי סיסמה"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Change Photo"
-msgstr "Cambia foto"
+msgstr "שינוי תמונה"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Change Server"
-msgstr "Cambia server"
+msgstr "שינוי שרת"
 
 #: apps/web/src/components/setup/refresh-button.tsx
 msgid "Check configuration"
-msgstr "Verifica configurazione"
+msgstr "בדוק תצורה"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Check for updates"
-msgstr "Cerca aggiornamenti"
+msgstr "בדוק עדכונים"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Checked <0/>"
-msgstr "Controllato <0/>"
+msgstr "נבדק <0/>"
 
 #: apps/web/src/components/setup/refresh-button.tsx
 msgid "Checking…"
-msgstr "Verifica in corso…"
+msgstr "בודק…"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Choose how to import your {0} data."
@@ -466,7 +466,7 @@ msgstr "Verifica in corso…"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Choose how to import your {sourceLabel} data."
-msgstr ""
+msgstr "בחר כיצד לייבא את נתוני {sourceLabel} שלך."
 
 #: apps/web/src/components/settings/language-section.tsx
 #~ msgid "Choose your preferred display language"
@@ -477,39 +477,39 @@ msgstr ""
 #: apps/native/src/components/search/recently-viewed-list.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 msgid "Clear"
-msgstr "Cancella"
+msgstr "נקה"
 
 #: apps/web/src/components/command-palette.tsx
 msgid "Clear all"
-msgstr "Cancella tutto"
+msgstr "נקה הכל"
 
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 msgid "Clear Recently Viewed?"
-msgstr "Cancellare la cronologia recente?"
+msgstr "לנקות את הנצפים לאחרונה?"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Click \"+\" and select \"Custom Lists\""
-msgstr "Clicca \"+\" e seleziona \"Custom Lists\""
+msgstr "לחץ על \"+\" ובחר \"Custom Lists\""
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Click \"Add Webhook\" and paste the URL above"
-msgstr "Clicca \"Add Webhook\" e incolla l'URL sopra"
+msgstr "לחץ על \"Add Webhook\" והדבק את הכתובת למעלה"
 
 #: apps/web/src/components/settings/integration-configs.tsx
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Click <0>+</0> and select <1>Custom Lists</1>"
-msgstr "Clicca <0>+</0> e seleziona <1>Custom Lists</1>"
+msgstr "לחץ על <0>+</0> ובחר <1>Custom Lists</1>"
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Click <0>Add Webhook</0> and paste the URL above"
-msgstr "Clicca <0>Add Webhook</0> e incolla l'URL sopra"
+msgstr "לחץ על <0>Add Webhook</0> והדבק את הכתובת למעלה"
 
 #: apps/native/src/components/navigation/modal-layout.tsx
 #: apps/native/src/components/navigation/modal-layout.tsx
 msgid "Close"
-msgstr "Chiudi"
+msgstr "סגור"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
@@ -517,17 +517,17 @@ msgstr "Chiudi"
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Completed"
-msgstr "Completato"
+msgstr "הושלם"
 
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Confirm new password"
-msgstr "Conferma nuova password"
+msgstr "אשר סיסמה חדשה"
 
 #: apps/native/src/app/(auth)/server-url.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Connect"
-msgstr "Connetti"
+msgstr "התחבר"
 
 #: apps/web/src/components/settings/integration-card.tsx
 #~ msgid "Connect {0}"
@@ -536,15 +536,15 @@ msgstr "Connetti"
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Connect {label}"
-msgstr "Connetti {label}"
+msgstr "התחבר ל-{label}"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Connect to {source}"
-msgstr "Connetti a {source}"
+msgstr "התחבר אל {source}"
 
 #: apps/web/src/routes/setup.tsx
 msgid "Connect to TMDB"
-msgstr "Connetti a TMDB"
+msgstr "התחבר אל TMDB"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Connect with {0}"
@@ -552,242 +552,242 @@ msgstr "Connetti a TMDB"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Connect with {sourceLabel}"
-msgstr ""
+msgstr "התחבר עם {sourceLabel}"
 
 #: apps/native/src/app/(auth)/server-url.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Connected"
-msgstr "Connesso"
+msgstr "מחובר"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Connected to {source}"
-msgstr "Connesso a {source}"
+msgstr "מחובר אל {source}"
 
 #: apps/native/src/app/(auth)/login.tsx
 msgid "Connected to <0>{serverHost}</0>. Tap to change."
-msgstr "Connesso a <0>{serverHost}</0>. Tocca per cambiare."
+msgstr "מחובר אל <0>{serverHost}</0>. הקש לשינוי."
 
 #: apps/native/src/app/(auth)/server-url.tsx
 msgid "Connecting to server..."
-msgstr "Connessione al server in corso..."
+msgstr "מתחבר לשרת..."
 
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Connecting..."
-msgstr "Connessione in corso..."
+msgstr "מתחבר..."
 
 #: apps/native/src/components/settings/integration-card.tsx
 msgid "Connecting…"
-msgstr "Connessione in corso…"
+msgstr "מתחבר…"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Continue"
-msgstr "Continua"
+msgstr "המשך"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/web/src/components/dashboard/continue-watching-section.tsx
 msgid "Continue Watching"
-msgstr "Continua a guardare"
+msgstr "המשך צפייה"
 
 #: apps/web/src/components/setup/copy-button.tsx
 msgid "Copied"
-msgstr "Copiato"
+msgstr "הועתק"
 
 #: apps/web/src/components/setup/copy-button.tsx
 msgid "Copy"
-msgstr "Copia"
+msgstr "העתק"
 
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Copy URL"
-msgstr "Copia URL"
+msgstr "העתק כתובת"
 
 #: apps/native/src/components/settings/integrations-section.tsx
 msgid "Could not load integrations"
-msgstr "Impossibile caricare le integrazioni"
+msgstr "לא ניתן לטעון את האינטגרציות"
 
 #: apps/native/src/app/person/[id].tsx
 msgid "Could not load person details"
-msgstr "Impossibile caricare i dettagli della persona"
+msgstr "לא ניתן לטעון את פרטי האדם"
 
 #: apps/web/src/components/auth-form.tsx
 msgid "Create account"
-msgstr "Crea account"
+msgstr "יצירת חשבון"
 
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Create Account"
-msgstr "Crea account"
+msgstr "יצירת חשבון"
 
 #: apps/native/src/app/(auth)/login.tsx
 msgid "Create an account"
-msgstr "Crea un account"
+msgstr "צור חשבון"
 
 #: apps/web/src/components/auth-form.tsx
 msgid "Create your account"
-msgstr "Crea il tuo account"
+msgstr "צור את חשבונך"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Creating…"
-msgstr "Creazione in corso…"
+msgstr "יוצר…"
 
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Current password"
-msgstr "Password attuale"
+msgstr "סיסמה נוכחית"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Current password is required"
-msgstr "La password attuale è obbligatoria"
+msgstr "נדרשת סיסמה נוכחית"
 
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Danger Zone"
-msgstr "Zona pericolosa"
+msgstr "אזור מסוכן"
 
 #: apps/web/src/routes/__root.tsx
 #: apps/web/src/routes/_app/people.$id.tsx
 #: apps/web/src/routes/_app/titles.$id.tsx
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Dashboard"
-msgstr ""
+msgstr "לוח בקרה"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Database"
-msgstr ""
+msgstr "מסד נתונים"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Database backups"
-msgstr "Backup del database"
+msgstr "גיבויי מסד נתונים"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Database restored. Reloading..."
-msgstr "Database ripristinato. Ricaricamento..."
+msgstr "מסד הנתונים שוחזר. טוען מחדש..."
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Day:"
-msgstr "Giorno:"
+msgstr "יום:"
 
 #: apps/web/src/components/settings/backup-section.tsx
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Delete"
-msgstr "Elimina"
+msgstr "מחק"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Delete backup"
-msgstr "Elimina backup"
+msgstr "מחק גיבוי"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Delete backup?"
-msgstr "Eliminare il backup?"
+msgstr "למחוק גיבוי?"
 
 #. placeholder {0}: data.deletedFiles
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Deleted {0, plural, one {# file} other {# files}}, freed {freed}"
-msgstr "Eliminati {0, plural, one {# file} other {# file}}, liberati {freed}"
+msgstr "{0, plural, one {נמחק # קובץ} two {נמחקו # קבצים} many {נמחקו # קבצים} other {נמחקו # קבצים}}, שוחרר {freed}"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Device code expired. Please try again."
-msgstr "Il codice del dispositivo è scaduto. Riprova."
+msgstr "קוד המכשיר פג תוקף. אנא נסה שוב."
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/web/src/components/people/person-hero.tsx
 msgid "died at {age}"
-msgstr "morto a {age}"
+msgstr "נפטר בגיל {age}"
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/web/src/components/people/person-hero.tsx
 msgid "Director"
-msgstr "Regista"
+msgstr "במאי"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Disabled"
-msgstr "Disabilitato"
+msgstr "מושבת"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Disconnect"
-msgstr "Disconnetti"
+msgstr "נתק"
 
 #: apps/native/src/components/settings/integration-card.tsx
 msgid "Disconnect {label}"
-msgstr "Disconnetti {label}"
+msgstr "נתק את {label}"
 
 #: apps/native/src/app/(auth)/server-url.tsx
 msgid "Don't have a server?"
-msgstr "Non hai un server?"
+msgstr "אין לך שרת?"
 
 #: apps/web/src/components/auth-form.tsx
 msgid "Don't have an account?"
-msgstr "Non hai un account?"
+msgstr "אין לך חשבון?"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Done"
-msgstr "Fatto"
+msgstr "סיום"
 
 #: apps/native/src/components/explore/genre-chip.tsx
 msgid "Double tap to clear this filter"
-msgstr "Tocca due volte per rimuovere questo filtro"
+msgstr "הקש פעמיים כדי לנקות את הסינון"
 
 #: apps/native/src/components/explore/genre-chip.tsx
 msgid "Double tap to filter by {label}"
-msgstr "Tocca due volte per filtrare per {label}"
+msgstr "הקש פעמיים לסינון לפי {label}"
 
 #: apps/web/src/components/settings/backup-section.tsx
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Download"
-msgstr "Scarica"
+msgstr "הורד"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Download backup"
-msgstr "Scarica backup"
+msgstr "הורד גיבוי"
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/web/src/components/people/person-hero.tsx
 msgid "Editor"
-msgstr "Montatore"
+msgstr "עורך"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Email"
-msgstr ""
+msgstr "דוא\"ל"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Enable the \"Playback Stop\" notification type"
-msgstr "Abilita il tipo di notifica \"Playback Stop\""
+msgstr "הפעל את סוג ההתראה \"Playback Stop\""
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Enable the \"Playback\" event category"
-msgstr "Abilita la categoria evento \"Playback\""
+msgstr "הפעל את קטגוריית האירוע \"Playback\""
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Enable the <0>Playback Stop</0> notification type"
-msgstr "Abilita il tipo di notifica <0>Playback Stop</0>"
+msgstr "הפעל את סוג ההתראה <0>Playback Stop</0>"
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Enable the <0>Playback</0> event category"
-msgstr "Abilita la categoria evento <0>Playback</0>"
+msgstr "הפעל את קטגוריית האירוע <0>Playback</0>"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Enter the code below on {source}'s website to authorize Sofa."
-msgstr "Inserisci il codice qui sotto sul sito di {source} per autorizzare Sofa."
+msgstr "הזן את הקוד הבא באתר {source} כדי לאשר את Sofa."
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Enter your current password and choose a new one."
-msgstr "Inserisci la tua password attuale e scegline una nuova."
+msgstr "הזן את סיסמתך הנוכחית ובחר סיסמה חדשה."
 
 #: apps/native/src/app/(auth)/server-url.tsx
 msgid "Enter your Sofa server URL to get started"
-msgstr "Inserisci l'URL del tuo server Sofa per iniziare"
+msgstr "הזן את כתובת שרת Sofa שלך כדי להתחיל"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Environment"
-msgstr "Ambiente"
+msgstr "סביבה"
 
 #: apps/native/src/components/titles/episode-row.tsx
 #: apps/native/src/components/titles/episode-row.tsx
@@ -801,26 +801,26 @@ msgstr "Ambiente"
 #: apps/native/src/components/titles/episode-row.tsx
 #: apps/native/src/components/titles/episode-row.tsx
 msgid "Episode {episodeNumber}"
-msgstr "Episodio {episodeNumber}"
+msgstr "פרק {episodeNumber}"
 
 #: apps/native/src/components/titles/episode-row.tsx
 msgid "Episode {episodeNumber}, {episodeLabel}"
-msgstr "Episodio {episodeNumber}, {episodeLabel}"
+msgstr "פרק {episodeNumber}, {episodeLabel}"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Episode unwatched"
-msgstr "Episodio non visto"
+msgstr "פרק סומן כלא נצפה"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Episode watched"
-msgstr "Episodio visto"
+msgstr "פרק סומן כנצפה"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/titles/title-seasons.tsx
 msgid "Episodes"
-msgstr "Episodi"
+msgstr "פרקים"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #~ msgid "Episodes {0}"
@@ -828,7 +828,7 @@ msgstr "Episodi"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 msgid "Episodes {period}"
-msgstr ""
+msgstr "פרקים {period}"
 
 #: apps/web/src/components/dashboard/stats-display.tsx
 #~ msgid "Episodes {periodSelect}"
@@ -836,7 +836,7 @@ msgstr ""
 
 #: apps/web/src/components/dashboard/stats-display.tsx
 msgid "Episodes {select}"
-msgstr "Episodi {select}"
+msgstr "פרקים {select}"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #~ msgid "Episodes this week"
@@ -845,7 +845,7 @@ msgstr "Episodi {select}"
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/change-password.tsx
 msgid "Error"
-msgstr "Errore"
+msgstr "שגיאה"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Errors ({0})"
@@ -853,7 +853,7 @@ msgstr "Errore"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Errors ({errorCount})"
-msgstr ""
+msgstr "שגיאות ({errorCount})"
 
 #: apps/native/src/app/(tabs)/(explore)/_layout.tsx
 #: apps/native/src/app/(tabs)/(home)/index.tsx
@@ -861,125 +861,125 @@ msgstr ""
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 msgid "Explore"
-msgstr "Esplora"
+msgstr "גלה"
 
 #: apps/web/src/routes/_app/people.$id.tsx
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Explore titles"
-msgstr "Esplora titoli"
+msgstr "גלה כותרות"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Failed"
-msgstr "Non riuscito"
+msgstr "נכשל"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to add to watchlist"
-msgstr "Impossibile aggiungere alla watchlist"
+msgstr "הוספה לרשימת הצפייה נכשלה"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to catch up"
-msgstr "Impossibile recuperare gli episodi"
+msgstr "עדכון הצפייה נכשל"
 
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Failed to change password"
-msgstr "Impossibile cambiare la password"
+msgstr "שינוי הסיסמה נכשל"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Failed to connect"
-msgstr "Impossibile connettersi"
+msgstr "ההתחברות נכשלה"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Failed to connect {label}"
-msgstr "Impossibile connettere {label}"
+msgstr "ההתחברות ל-{label} נכשלה"
 
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Failed to create account"
-msgstr "Impossibile creare l'account"
+msgstr "יצירת החשבון נכשלה"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Failed to create backup"
-msgstr "Impossibile creare il backup"
+msgstr "יצירת הגיבוי נכשלה"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Failed to delete backup"
-msgstr "Impossibile eliminare il backup"
+msgstr "מחיקת הגיבוי נכשלה"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Failed to disconnect {label}"
-msgstr "Impossibile disconnettere {label}"
+msgstr "ניתוק {label} נכשל"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Failed to load backup schedule settings."
-msgstr "Impossibile caricare le impostazioni di pianificazione backup."
+msgstr "טעינת הגדרות לוח הזמנים לגיבוי נכשלה."
 
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Failed to load title"
-msgstr "Impossibile caricare il titolo"
+msgstr "טעינת הכותרת נכשלה"
 
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark all episodes as watched"
-msgstr "Impossibile segnare tutti gli episodi come visti"
+msgstr "סימון כל הפרקים כנצפו נכשל"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark as watched"
-msgstr "Impossibile segnare come visto"
+msgstr "סימון כנצפה נכשל"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark episode"
-msgstr "Impossibile segnare l'episodio"
+msgstr "סימון הפרק נכשל"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark some episodes"
-msgstr "Impossibile segnare alcuni episodi"
+msgstr "סימון חלק מהפרקים נכשל"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Failed to parse file"
-msgstr "Impossibile analizzare il file"
+msgstr "ניתוח הקובץ נכשל"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Failed to parse import data"
-msgstr "Impossibile analizzare i dati di importazione"
+msgstr "ניתוח נתוני הייבוא נכשל"
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Failed to purge caches"
-msgstr "Impossibile svuotare le cache"
+msgstr "ניקוי המטמון נכשל"
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Failed to purge image cache"
-msgstr "Impossibile svuotare la cache immagini"
+msgstr "ניקוי מטמון התמונות נכשל"
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Failed to purge metadata cache"
-msgstr "Impossibile svuotare la cache metadati"
+msgstr "ניקוי מטמון המטאדטה נכשל"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Failed to regenerate {label} URL"
-msgstr "Impossibile rigenerare l'URL di {label}"
+msgstr "יצירת כתובת ה-URL של {label} מחדש נכשלה"
 
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to remove from library"
-msgstr "Impossibile rimuovere dalla libreria"
+msgstr "הסרה מהספרייה נכשלה"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Failed to remove profile picture"
-msgstr "Impossibile rimuovere l'immagine del profilo"
+msgstr "הסרת תמונת הפרופיל נכשלה"
 
 #: apps/native/src/app/(auth)/login.tsx
 msgid "Failed to sign in"
-msgstr "Impossibile accedere"
+msgstr "הכניסה לחשבון נכשלה"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Failed to start {0} connection"
@@ -987,165 +987,165 @@ msgstr "Impossibile accedere"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Failed to start {sourceLabel} connection"
-msgstr ""
+msgstr "הפעלת החיבור ל-{sourceLabel} נכשלה"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Failed to trigger job"
-msgstr "Impossibile avviare il job"
+msgstr "הפעלת המשימה נכשלה"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to unmark episode"
-msgstr "Impossibile rimuovere il segno dall'episodio"
+msgstr "ביטול סימון הפרק נכשל"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to unmark some episodes"
-msgstr "Impossibile rimuovere il segno da alcuni episodi"
+msgstr "ביטול סימון חלק מהפרקים נכשל"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Failed to update name"
-msgstr "Impossibile aggiornare il nome"
+msgstr "עדכון השם נכשל"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to update rating"
-msgstr "Impossibile aggiornare la valutazione"
+msgstr "עדכון הדירוג נכשל"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Failed to update registration setting"
-msgstr "Impossibile aggiornare l'impostazione di registrazione"
+msgstr "עדכון הגדרת ההרשמה נכשל"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Failed to update retention setting"
-msgstr "Impossibile aggiornare l'impostazione di conservazione"
+msgstr "עדכון הגדרת השמירה נכשל"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Failed to update schedule"
-msgstr "Impossibile aggiornare la pianificazione"
+msgstr "עדכון לוח הזמנים נכשל"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Failed to update scheduled backup setting"
-msgstr "Impossibile aggiornare l'impostazione di backup pianificato"
+msgstr "עדכון הגדרת הגיבוי המתוזמן נכשל"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/update-check-section.tsx
 msgid "Failed to update setting"
-msgstr "Impossibile aggiornare l'impostazione"
+msgstr "עדכון ההגדרה נכשל"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to update status"
-msgstr "Impossibile aggiornare lo stato"
+msgstr "עדכון הסטטוס נכשל"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Failed to upload avatar"
-msgstr "Impossibile caricare l'avatar"
+msgstr "העלאת תמונת הפרופיל נכשלה"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Fetching your library data from {source}..."
-msgstr "Recupero dei dati della tua libreria da {source}..."
+msgstr "מאחזר את נתוני הספרייה שלך מ-{source}..."
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 msgid "Filmography"
-msgstr "Filmografia"
+msgstr "פילמוגרפיה"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Finished importing from {source}."
-msgstr "Importazione da {source} completata."
+msgstr "הייבוא מ-{source} הסתיים."
 
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Free"
-msgstr "Gratis"
+msgstr "חינם"
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Free up disk space by clearing cached metadata and images"
-msgstr "Libera spazio sul disco svuotando i metadati e le immagini in cache"
+msgstr "פנה מקום בדיסק על ידי ניקוי מטמון המטאדטה והתמונות"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Frequency"
-msgstr "Frequenza"
+msgstr "תדירות"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Friday"
-msgstr "Venerdì"
+msgstr "שישי"
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Get Started"
-msgstr "Inizia"
+msgstr "התחל"
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
 msgid "Go back"
-msgstr "Torna indietro"
+msgstr "חזור"
 
 #: apps/native/src/app/+not-found.tsx
 msgid "Go Home"
-msgstr "Vai alla home"
+msgstr "עבור לדף הבית"
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Go to <0>Dashboard > Plugins > Webhook</0>"
-msgstr "Vai su <0>Dashboard > Plugin > Webhook</0>"
+msgstr "עבור אל <0>Dashboard > Plugins > Webhook</0>"
 
 #: apps/web/src/components/command-palette.tsx
 msgid "Go to Dashboard"
-msgstr "Vai alla Dashboard"
+msgstr "עבור ל-Dashboard"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Go to Dashboard > Plugins > Webhook"
-msgstr "Vai su Dashboard > Plugin > Webhook"
+msgstr "עבור אל Dashboard > Plugins > Webhook"
 
 #: apps/web/src/components/command-palette.tsx
 msgid "Go to Explore"
-msgstr "Vai a Esplora"
+msgstr "עבור לגלה"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Health status"
-msgstr "Stato di salute"
+msgstr "מצב תקינות"
 
 #: apps/web/src/components/dashboard/welcome-header.tsx
 msgid "Here's what's happening with your library"
-msgstr "Ecco cosa sta succedendo nella tua libreria"
+msgstr "הנה מה שקורה בספרייה שלך"
 
 #: apps/native/src/app/(tabs)/(home)/_layout.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 msgid "Home"
-msgstr ""
+msgstr "בית"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Image cache"
-msgstr "Cache immagini"
+msgstr "מטמון תמונות"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Image Cache"
-msgstr "Cache immagini"
+msgstr "מטמון תמונות"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Image cache and backup disk usage"
-msgstr "Utilizzo disco: cache immagini e backup"
+msgstr "שימוש בדיסק של מטמון תמונות וגיבויים"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import"
-msgstr "Importazione"
+msgstr "ייבוא"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import {totalItems} items"
-msgstr "Importa {totalItems} elementi"
+msgstr "ייבא {totalItems} פריטים"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import complete"
-msgstr "Importazione completata"
+msgstr "הייבוא הושלם"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import failed"
-msgstr "Importazione fallita"
+msgstr "הייבוא נכשל"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Import from {0}"
@@ -1153,24 +1153,24 @@ msgstr "Importazione fallita"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import from {source}"
-msgstr "Importa da {source}"
+msgstr "ייבא מ-{source}"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import from {sourceLabel}"
-msgstr ""
+msgstr "ייבא מ-{sourceLabel}"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import is still running in the background. Check back later."
-msgstr "L'importazione è ancora in corso in background. Ricontrolla più tardi."
+msgstr "הייבוא עדיין רץ ברקע. בדוק שוב מאוחר יותר."
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import options"
-msgstr "Opzioni di importazione"
+msgstr "אפשרויות ייבוא"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Imported"
-msgstr "Importati"
+msgstr "יובא"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Imported {0} items from {1}"
@@ -1178,54 +1178,54 @@ msgstr "Importati"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Imported {importedCount} items from {sourceLabel}"
-msgstr ""
+msgstr "יובאו {importedCount} פריטים מ-{sourceLabel}"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Importing from {source}"
-msgstr "Importazione da {source} in corso"
+msgstr "מייבא מ-{source}"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 msgid "In library"
-msgstr "In libreria"
+msgstr "בספרייה"
 
 #: apps/web/src/components/dashboard/stats-display.tsx
 msgid "In Library"
-msgstr "In libreria"
+msgstr "בספרייה"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "In Watchlist"
-msgstr "Nella watchlist"
+msgstr "ברשימת הצפייה"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/web/src/components/dashboard/library-section.tsx
 msgid "In Your Library"
-msgstr "Nella tua libreria"
+msgstr "בספרייה שלך"
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Install the <0>Webhook plugin<1/></0> from Jellyfin's plugin catalog"
-msgstr "Installa il <0>plugin Webhook<1/></0> dal catalogo plugin di Jellyfin"
+msgstr "התקן את <0>תוסף ה-Webhook<1/></0> מקטלוג התוספים של Jellyfin"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
-msgstr "Installa il plugin Webhook dal catalogo plugin di Jellyfin"
+msgstr "התקן את תוסף ה-Webhook מקטלוג התוספים של Jellyfin"
 
 #: apps/native/src/components/settings/integrations-section.tsx
 #: apps/web/src/components/settings/integrations-section.tsx
 msgid "Integrations"
-msgstr "Integrazioni"
+msgstr "אינטגרציות"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Invalid token"
-msgstr "Token non valido"
+msgstr "טוקן לא תקין"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Job"
-msgstr "Attività"
+msgstr "משימה"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Keeping"
-msgstr ""
+msgstr "שומר"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 #~ msgid "Keeping <0><1><2>{0}</2></1><3>{1}</3></0> backups."
@@ -1234,21 +1234,21 @@ msgstr ""
 #: apps/web/src/components/command-palette.tsx
 #: apps/web/src/components/command-palette.tsx
 msgid "Keyboard Shortcuts"
-msgstr "Scorciatoie da tastiera"
+msgstr "קיצורי מקלדת"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/language-section.tsx
 msgid "Language"
-msgstr "Lingua"
+msgstr "שפה"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "last {n}"
-msgstr "ultimi {n}"
+msgstr "{n} אחרונים"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "last {value}"
-msgstr "ultimi {value}"
+msgstr "{value} אחרונים"
 
 #: apps/web/src/components/settings/integration-card.tsx
 #~ msgid "Last event {0}"
@@ -1256,11 +1256,11 @@ msgstr "ultimi {value}"
 
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Last event {relativeTime}"
-msgstr ""
+msgstr "אירוע אחרון {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Last event {timeAgo}"
-msgstr "Ultimo evento {timeAgo}"
+msgstr "אירוע אחרון {timeAgo}"
 
 #: apps/web/src/components/settings/integration-card.tsx
 #~ msgid "Last polled {0}"
@@ -1268,54 +1268,54 @@ msgstr "Ultimo evento {timeAgo}"
 
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Last polled {relativeTime}"
-msgstr ""
+msgstr "בדיקה אחרונה {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Last polled {timeAgo}"
-msgstr "Ultimo polling {timeAgo}"
+msgstr "בדיקה אחרונה {timeAgo}"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Last run"
-msgstr "Ultima esecuzione"
+msgstr "הרצה אחרונה"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Last run failed"
-msgstr "Ultima esecuzione fallita"
+msgstr "ההרצה האחרונה נכשלה"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Last run succeeded"
-msgstr "Ultima esecuzione riuscita"
+msgstr "ההרצה האחרונה הצליחה"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Library refresh"
-msgstr "Aggiornamento libreria"
+msgstr "רענון הספרייה"
 
 #: apps/web/src/components/auth-form.tsx
 msgid "Loading…"
-msgstr "Caricamento…"
+msgstr "טוען…"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Lost connection to import. Check status in settings."
-msgstr "Connessione all'importazione persa. Controlla lo stato nelle impostazioni."
+msgstr "אבד החיבור לייבוא. בדוק את הסטטוס בהגדרות."
 
 #: apps/web/src/components/settings/settings-shell.tsx
 msgid "Manage your account and preferences"
-msgstr "Gestisci il tuo account e le tue preferenze"
+msgstr "נהל את החשבון וההעדפות שלך"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Manual backup"
-msgstr "Backup manuale"
+msgstr "גיבוי ידני"
 
 #: apps/web/src/components/titles/title-seasons.tsx
 msgid "Mark all episodes as watched?"
-msgstr "Segnare tutti gli episodi come visti?"
+msgstr "לסמן את כל הפרקים כנצפו?"
 
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 #: apps/web/src/components/titles/title-seasons.tsx
 #: apps/web/src/components/titles/title-seasons.tsx
 msgid "Mark All Watched"
-msgstr "Segna tutti come visti"
+msgstr "סמן הכל כנצפה"
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 #~ msgid "Mark as Completed"
@@ -1323,7 +1323,7 @@ msgstr "Segna tutti come visti"
 
 #: apps/native/src/components/ui/poster-card.tsx
 msgid "Mark as Watched"
-msgstr "Segna come visto"
+msgstr "סמן כנצפה"
 
 #: apps/native/src/components/ui/poster-card.tsx
 #~ msgid "Mark as Watching"
@@ -1332,7 +1332,7 @@ msgstr "Segna come visto"
 #: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/titles/title-actions.tsx
 msgid "Mark Watched"
-msgstr "Segna come visto"
+msgstr "סמן כנצפה"
 
 #: apps/native/src/lib/title-actions.ts
 #~ msgid "Marked \"{titleName}\" as completed"
@@ -1341,16 +1341,16 @@ msgstr "Segna come visto"
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Marked \"{titleName}\" as watched"
-msgstr "Segnato \"{titleName}\" come visto"
+msgstr "\"{titleName}\" סומן כנצפה"
 
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Marked all episodes as watched"
-msgstr "Tutti gli episodi segnati come visti"
+msgstr "כל הפרקים סומנו כנצפו"
 
 #: apps/native/src/lib/title-actions.ts
 msgid "Marked all episodes of \"{titleName}\" as watched"
-msgstr "Tutti gli episodi di \"{titleName}\" segnati come visti"
+msgstr "כל פרקי \"{titleName}\" סומנו כנצפו"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -1360,7 +1360,7 @@ msgstr "Tutti gli episodi di \"{titleName}\" segnati come visti"
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Marked as watched"
-msgstr "Segnato come visto"
+msgstr "סומן כנצפה"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -1369,19 +1369,19 @@ msgstr "Segnato come visto"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Member since {memberSince}"
-msgstr "Membro dal {memberSince}"
+msgstr "חבר מאז {memberSince}"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Monday"
-msgstr "Lunedì"
+msgstr "שני"
 
 #: apps/native/src/app/title/[id].tsx
 msgid "More Like This"
-msgstr "Simili a questo"
+msgstr "עוד כמו זה"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "More Settings"
-msgstr "Altre impostazioni"
+msgstr "הגדרות נוספות"
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
@@ -1390,12 +1390,12 @@ msgstr "Altre impostazioni"
 #: apps/web/src/components/explore/hero-banner.tsx
 #: apps/web/src/components/titles/title-hero.tsx
 msgid "Movie"
-msgstr "Film"
+msgstr "סרט"
 
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Movies"
-msgstr "Film"
+msgstr "סרטים"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #~ msgid "Movies {0}"
@@ -1403,7 +1403,7 @@ msgstr "Film"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 msgid "Movies {period}"
-msgstr ""
+msgstr "סרטים {period}"
 
 #: apps/web/src/components/dashboard/stats-display.tsx
 #~ msgid "Movies {periodSelect}"
@@ -1411,7 +1411,7 @@ msgstr ""
 
 #: apps/web/src/components/dashboard/stats-display.tsx
 msgid "Movies {select}"
-msgstr "Film {select}"
+msgstr "סרטים {select}"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #~ msgid "Movies this month"
@@ -1420,293 +1420,293 @@ msgstr "Film {select}"
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Name"
-msgstr "Nome"
+msgstr "שם"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Name updated"
-msgstr "Nome aggiornato"
+msgstr "השם עודכן"
 
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Need more help?"
-msgstr "Serve altro aiuto?"
+msgstr "צריך עזרה נוספת?"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Never"
-msgstr "Mai"
+msgstr "אף פעם"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Never run"
-msgstr "Mai eseguito"
+msgstr "מעולם לא הורץ"
 
 #: apps/native/src/app/(auth)/register.tsx
 msgid "New account creation is currently disabled."
-msgstr "La creazione di nuovi account è attualmente disabilitata."
+msgstr "יצירת חשבון חדש כרגע מושבתת."
 
 #: apps/web/src/routes/_auth/register.tsx
 msgid "New accounts are not being accepted right now. Contact the admin if you need access."
-msgstr "La registrazione di nuovi account non è disponibile al momento. Contatta l'amministratore per richiedere l'accesso."
+msgstr "לא מתקבלים חשבונות חדשים כרגע. פנה למנהל אם אתה זקוק לגישה."
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "New backup"
-msgstr "Nuovo backup"
+msgstr "גיבוי חדש"
 
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "New password"
-msgstr "Nuova password"
+msgstr "סיסמה חדשה"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "New password must be at least 8 characters"
-msgstr "La nuova password deve contenere almeno 8 caratteri"
+msgstr "הסיסמה החדשה חייבת להכיל לפחות 8 תווים"
 
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 msgid "Newest"
-msgstr "Più recenti"
+msgstr "החדש ביותר"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Next backup {distance}"
-msgstr "Prossimo backup {distance}"
+msgstr "גיבוי הבא {distance}"
 
 #: apps/native/src/components/titles/continue-watching-banner.tsx
 msgid "Next Episode"
-msgstr "Episodio successivo"
+msgstr "פרק הבא"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Next run"
-msgstr "Prossima esecuzione"
+msgstr "הרצה הבאה"
 
 #: apps/web/src/components/settings/backup-section.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "No backups yet"
-msgstr "Nessun backup ancora"
+msgstr "אין גיבויים עדיין"
 
 #: apps/native/src/components/ui/offline-banner.ios.tsx
 #: apps/native/src/components/ui/offline-banner.ios.tsx
 #: apps/native/src/components/ui/offline-banner.tsx
 msgid "No internet connection"
-msgstr "Nessuna connessione internet"
+msgstr "אין חיבור לאינטרנט"
 
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 msgid "No results for \"{debouncedQuery}\""
-msgstr "Nessun risultato per \"{debouncedQuery}\""
+msgstr "אין תוצאות עבור \"{debouncedQuery}\""
 
 #: apps/web/src/components/command-palette.tsx
 msgid "No results found."
-msgstr "Nessun risultato trovato."
+msgstr "לא נמצאו תוצאות."
 
 #: apps/native/src/components/explore/filterable-title-row.tsx
 #: apps/web/src/components/explore/filterable-title-row.tsx
 msgid "No titles found for this genre."
-msgstr "Nessun titolo trovato per questo genere."
+msgstr "לא נמצאו כותרים לז'אנר זה."
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Not configured"
-msgstr "Non configurato"
+msgstr "לא מוגדר"
 
 #: apps/native/src/app/+not-found.tsx
 msgid "Not Found"
-msgstr "Non trovato"
+msgstr "לא נמצא"
 
 #: apps/web/src/components/title-card.tsx
 msgid "On Watchlist"
-msgstr "In watchlist"
+msgstr "ברשימת הצפייה"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Open {source} to enter code"
-msgstr "Apri {source} per inserire il codice"
+msgstr "פתח את {source} להזנת הקוד"
 
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Open docs"
-msgstr "Apri la documentazione"
+msgstr "פתח תיעוד"
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Open Emby, go to <0>Settings > Webhooks</0>"
-msgstr "Apri Emby, vai su <0>Impostazioni > Webhook</0>"
+msgstr "פתח את Emby, עבור אל <0>Settings > Webhooks</0>"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Open Emby, go to Settings > Webhooks"
-msgstr "Apri Emby, vai su Impostazioni > Webhook"
+msgstr "פתח את Emby, עבור אל Settings > Webhooks"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Open in browser…"
-msgstr "Apri nel browser…"
+msgstr "פתח בדפדפן…"
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Open Plex, go to <0>Settings > Webhooks<1/></0>"
-msgstr "Apri Plex, vai su <0>Impostazioni > Webhook<1/></0>"
+msgstr "פתח את Plex, עבור אל <0>Settings > Webhooks<1/></0>"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Open Plex, go to Settings > Webhooks"
-msgstr "Apri Plex, vai su Impostazioni > Webhook"
+msgstr "פתח את Plex, עבור אל Settings > Webhooks"
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Open Radarr, go to <0>Settings > Import Lists</0>"
-msgstr "Apri Radarr, vai su <0>Impostazioni > Liste di importazione</0>"
+msgstr "פתח את Radarr, עבור אל <0>Settings > Import Lists</0>"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Open Radarr, go to Settings > Import Lists"
-msgstr "Apri Radarr, vai su Impostazioni > Liste di importazione"
+msgstr "פתח את Radarr, עבור אל Settings > Import Lists"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Open registration"
-msgstr "Registrazione aperta"
+msgstr "הרשמה פתוחה"
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Open Sonarr, go to <0>Settings > Import Lists</0>"
-msgstr "Apri Sonarr, vai su <0>Impostazioni > Liste di importazione</0>"
+msgstr "פתח את Sonarr, עבור אל <0>Settings > Import Lists</0>"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Open Sonarr, go to Settings > Import Lists"
-msgstr "Apri Sonarr, vai su Impostazioni > Liste di importazione"
+msgstr "פתח את Sonarr, עבור אל Settings > Import Lists"
 
 #: apps/web/src/components/auth-form.tsx
 msgid "or"
-msgstr "o"
+msgstr "או"
 
 #: apps/native/src/app/(auth)/login.tsx
 msgid "OR"
-msgstr "O"
+msgstr "או"
 
 #: apps/native/src/app/+not-found.tsx
 msgid "Page Not Found"
-msgstr "Pagina non trovata"
+msgstr "הדף לא נמצא"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Parsing..."
-msgstr "Analisi in corso..."
+msgstr "מנתח..."
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Password"
-msgstr ""
+msgstr "סיסמה"
 
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Password updated"
-msgstr "Password aggiornata"
+msgstr "הסיסמה עודכנה"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Passwords do not match"
-msgstr "Le password non corrispondono"
+msgstr "הסיסמאות אינן תואמות"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Paste the Radarr URL above into the List URL field"
-msgstr "Incolla l'URL di Radarr nel campo URL della lista"
+msgstr "הדבק את כתובת ה-URL של Radarr שלמעלה בשדה List URL"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Paste the Sonarr URL above into the List URL field"
-msgstr "Incolla l'URL di Sonarr nel campo URL della lista"
+msgstr "הדבק את כתובת ה-URL של Sonarr שלמעלה בשדה List URL"
 
 #: apps/web/src/components/settings/update-check-section.tsx
 msgid "Periodically check GitHub for new Sofa releases"
-msgstr "Controlla periodicamente GitHub per nuove versioni di Sofa"
+msgstr "בדוק מדי פעם ב-GitHub עבור גרסאות חדשות של Sofa"
 
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/native/src/components/search/search-result-row.tsx
 #: apps/native/src/components/search/search-result-row.tsx
 msgid "Person"
-msgstr "Persona"
+msgstr "אדם"
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/web/src/routes/_app/people.$id.tsx
 msgid "Person not found"
-msgstr "Persona non trovata"
+msgstr "האדם לא נמצא"
 
 #: apps/web/src/components/titles/trailer-dialog.tsx
 msgid "Play trailer"
-msgstr "Riproduci trailer"
+msgstr "הפעל טריילר"
 
 #: apps/native/src/app/(tabs)/(explore)/index.tsx
 #: apps/web/src/routes/_app/explore.tsx
 msgid "Popular Movies"
-msgstr "Film popolari"
+msgstr "סרטים פופולריים"
 
 #: apps/native/src/app/(tabs)/(explore)/index.tsx
 #: apps/web/src/routes/_app/explore.tsx
 msgid "Popular TV Shows"
-msgstr "Serie TV popolari"
+msgstr "תוכניות טלוויזיה פופולריות"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Pre-restore backup"
-msgstr "Backup pre-ripristino"
+msgstr "גיבוי לפני שחזור"
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/web/src/components/people/person-hero.tsx
 msgid "Producer"
-msgstr "Produttore"
+msgstr "מפיק"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Profile picture removed"
-msgstr "Immagine del profilo rimossa"
+msgstr "תמונת הפרופיל הוסרה"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Profile picture updated"
-msgstr "Immagine del profilo aggiornata"
+msgstr "תמונת הפרופיל עודכנה"
 
 #: apps/web/src/components/settings/danger-section.tsx
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purge all"
-msgstr "Svuota tutto"
+msgstr "נקה הכל"
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purge all caches?"
-msgstr "Svuotare tutte le cache?"
+msgstr "לנקות את כל המטמונים?"
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purge image cache?"
-msgstr "Svuotare la cache immagini?"
+msgstr "לנקות את מטמון התמונות?"
 
 #: apps/web/src/components/settings/danger-section.tsx
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purge images"
-msgstr "Svuota immagini"
+msgstr "נקה תמונות"
 
 #: apps/web/src/components/settings/danger-section.tsx
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purge metadata"
-msgstr "Svuota metadati"
+msgstr "נקה מטא-נתונים"
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purge metadata cache?"
-msgstr "Svuotare la cache metadati?"
+msgstr "לנקות את מטמון המטא-נתונים?"
 
 #. placeholder {0}: data.deletedTitles
 #. placeholder {1}: data.deletedPersons
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purged {0, plural, one {# stale title} other {# stale titles}} and {1, plural, one {# orphaned person} other {# orphaned persons}}"
-msgstr "{0, plural, one {# titolo obsoleto} other {# titoli obsoleti}} e {1, plural, one {# persona orfana} other {# persone orfane}} eliminati"
+msgstr "נוקו {0, plural, one {# כותר מיושן} two {# כותרים מיושנים} many {# כותרים מיושנים} other {# כותרים מיושנים}} ו-{1, plural, one {# אדם יתום} two {# אנשים יתומים} many {# אנשים יתומים} other {# אנשים יתומים}}"
 
 #. placeholder {0}: metaResult.deletedTitles
 #. placeholder {1}: metaResult.deletedPersons
 #. placeholder {2}: imageResult.deletedFiles
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purged {0, plural, one {# title} other {# titles}}, {1, plural, one {# person} other {# persons}}, {2, plural, one {# file} other {# files}} ({freed} freed)"
-msgstr "{0, plural, one {# titolo} other {# titoli}}, {1, plural, one {# persona} other {# persone}}, {2, plural, one {# file} other {# file}} eliminati ({freed} liberati)"
+msgstr "נוקו {0, plural, one {# כותר} two {# כותרים} many {# כותרים} other {# כותרים}}, {1, plural, one {# אדם} two {# אנשים} many {# אנשים} other {# אנשים}}, {2, plural, one {# קובץ} two {# קבצים} many {# קבצים} other {# קבצים}} ({freed} שוחרר)"
 
 #: apps/web/src/components/settings/danger-section.tsx
 #: apps/web/src/components/settings/danger-section.tsx
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purging..."
-msgstr "Svuotamento in corso..."
+msgstr "מנקה..."
 
 #: apps/web/src/components/command-palette.tsx
 msgid "Quick Actions"
-msgstr "Azioni rapide"
+msgstr "פעולות מהירות"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Radarr List URL"
-msgstr "URL lista Radarr"
+msgstr "כתובת רשימת Radarr"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #~ msgid "Rated {0} {1, plural, one {star} other {stars}}"
@@ -1718,7 +1718,7 @@ msgstr "URL lista Radarr"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Rated {ratingStars, plural, one {# star} other {# stars}}"
-msgstr ""
+msgstr "דורג {ratingStars, plural, one {# כוכב} two {# כוכבים} many {# כוכבים} other {# כוכבים}}"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 #~ msgid "Rated {ratingStars} {ratingStars, plural, one {star} other {stars}}"
@@ -1727,283 +1727,283 @@ msgstr ""
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Rated {stars, plural, one {# star} other {# stars}}"
-msgstr "{stars, plural, one {# stella} other {# stelle}}"
+msgstr "דורג {stars, plural, one {# כוכב} two {# כוכבים} many {# כוכבים} other {# כוכבים}}"
 
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 msgid "Rating"
-msgstr "Valutazione"
+msgstr "דירוג"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Rating removed"
-msgstr "Valutazione rimossa"
+msgstr "הדירוג הוסר"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Ratings"
-msgstr "Valutazioni"
+msgstr "דירוגים"
 
 #: apps/web/src/components/expandable-text.tsx
 msgid "Read more"
-msgstr "Leggi di più"
+msgstr "קרא עוד"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Ready — not polled yet"
-msgstr "Pronto — nessun polling ancora"
+msgstr "מוכן — טרם נסרק"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Ready — nothing received yet"
-msgstr "Pronto — nessun evento ricevuto ancora"
+msgstr "מוכן — טרם התקבל דבר"
 
 #: apps/web/src/components/command-palette.tsx
 msgid "Recent Searches"
-msgstr "Ricerche recenti"
+msgstr "חיפושים אחרונים"
 
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 msgid "Recently Viewed"
-msgstr "Visualizzati di recente"
+msgstr "נצפו לאחרונה"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Recommendations"
-msgstr "Raccomandazioni"
+msgstr "המלצות"
 
 #: apps/web/src/components/titles/title-recommendations.tsx
 msgid "Recommended"
-msgstr "Consigliati"
+msgstr "מומלץ"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/web/src/components/dashboard/recommendations-section.tsx
 msgid "Recommended for You"
-msgstr "Consigliati per te"
+msgstr "מומלץ עבורך"
 
 #: apps/web/src/components/auth-form.tsx
 msgid "Redirecting…"
-msgstr "Reindirizzamento in corso…"
+msgstr "מפנה…"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Refresh"
-msgstr "Aggiorna"
+msgstr "רענן"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Refresh system health"
-msgstr "Aggiorna stato di salute del sistema"
+msgstr "רענן בדיקת תקינות המערכת"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/native/src/components/settings/integration-card.tsx
 msgid "Regenerate"
-msgstr "Rigenera"
+msgstr "צור מחדש"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Regenerate URL"
-msgstr "Rigenera URL"
+msgstr "צור כתובת URL מחדש"
 
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/landing-page.tsx
 msgid "Register"
-msgstr "Registrati"
+msgstr "הירשם"
 
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Registering on {serverHost}"
-msgstr "Registrazione su {serverHost}"
+msgstr "נרשם ב-{serverHost}"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Registration closed"
-msgstr "Registrazione chiusa"
+msgstr "ההרשמה נסגרה"
 
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/routes/_auth/register.tsx
 msgid "Registration Closed"
-msgstr "Registrazione chiusa"
+msgstr "ההרשמה סגורה"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Registration opened"
-msgstr "Registrazione aperta"
+msgstr "ההרשמה נפתחה"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/titles/status-button.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Remove"
-msgstr "Rimuovi"
+msgstr "הסר"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Remove from library"
-msgstr "Rimuovi dalla libreria"
+msgstr "הסר מהספרייה"
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 msgid "Remove from Library"
-msgstr "Rimuovi dalla libreria"
+msgstr "הסר מהספרייה"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Remove from library?"
-msgstr "Rimuovere dalla libreria?"
+msgstr "להסיר מהספרייה?"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Remove Photo"
-msgstr "Rimuovi foto"
+msgstr "הסר תמונה"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Remove picture"
-msgstr "Rimuovi immagine"
+msgstr "הסר תמונה"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Remove profile picture"
-msgstr "Rimuovi immagine del profilo"
+msgstr "הסר תמונת פרופיל"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Removed from library"
-msgstr "Rimosso dalla libreria"
+msgstr "הוסר מהספרייה"
 
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Rent"
-msgstr "Noleggia"
+msgstr "השכרה"
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Requires <0>Emby Server 4.7.9+</0> and an active <1>Emby Premiere<2/></1> license."
-msgstr "Richiede <0>Emby Server 4.7.9+</0> e una licenza <1>Emby Premiere<2/></1> attiva."
+msgstr "דורש <0>Emby Server 4.7.9+</0> ורישיון <1>Emby Premiere<2/></1> פעיל."
 
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Requires an active <0>Plex Pass<1/></0> subscription."
-msgstr "Richiede un abbonamento <0>Plex Pass<1/></0> attivo."
+msgstr "דורש מנוי <0>Plex Pass<1/></0> פעיל."
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Requires an active Plex Pass subscription."
-msgstr "Richiede un abbonamento Plex Pass attivo."
+msgstr "דורש מנוי Plex Pass פעיל."
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Requires Emby Server 4.7.9+ and an active Emby Premiere license."
-msgstr "Richiede Emby Server 4.7.9+ e una licenza Emby Premiere attiva."
+msgstr "דורש Emby Server 4.7.9+ ורישיון Emby Premiere פעיל."
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Restart"
-msgstr ""
+msgstr "הפעל מחדש"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Restart Required"
-msgstr ""
+msgstr "נדרשת הפעלה מחדש"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Restore"
-msgstr "Ripristina"
+msgstr "שחזר"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Restore database?"
-msgstr "Ripristinare il database?"
+msgstr "לשחזר את מסד הנתונים?"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Restore failed"
-msgstr "Ripristino fallito"
+msgstr "השחזור נכשל"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Restoring…"
-msgstr "Ripristino in corso…"
+msgstr "משחזר…"
 
 #: apps/web/src/components/command-palette.tsx
 msgid "Results"
-msgstr "Risultati"
+msgstr "תוצאות"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Retrieving your watch history, watchlist, and ratings..."
-msgstr "Recupero della cronologia, watchlist e valutazioni..."
+msgstr "מאחזר את היסטוריית הצפייה, רשימת הצפייה והדירוגים שלך..."
 
 #: apps/native/src/components/settings/integrations-section.tsx
 #: apps/native/src/components/ui/server-unreachable-banner.ios.tsx
 #: apps/native/src/components/ui/server-unreachable-banner.tsx
 #: apps/web/src/lib/orpc/client.ts
 msgid "Retry"
-msgstr "Riprova"
+msgstr "נסה שוב"
 
 #: apps/web/src/routes/__root.tsx
 msgid "Return home"
-msgstr "Torna alla home"
+msgstr "חזור לדף הבית"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Review what was found and choose what to import."
-msgstr "Rivedi i risultati trovati e scegli cosa importare."
+msgstr "בדוק מה נמצא ובחר מה לייבא."
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Run now"
-msgstr "Esegui ora"
+msgstr "הפעל עכשיו"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Saturday"
-msgstr "Sabato"
+msgstr "שבת"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Save"
-msgstr "Salva"
+msgstr "שמור"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Save name"
-msgstr "Salva nome"
+msgstr "שמור שם"
 
 #: apps/web/src/routes/__root.tsx
 msgid "Scene not found"
-msgstr "Scena non trovata"
+msgstr "הסצנה לא נמצאה"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Schedule"
-msgstr "Pianificazione"
+msgstr "לוח זמנים"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Schedule updated"
-msgstr "Pianificazione aggiornata"
+msgstr "לוח הזמנים עודכן"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Scheduled backup"
-msgstr "Backup pianificato"
+msgstr "גיבוי מתוזמן"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Scheduled backups disabled"
-msgstr "Backup pianificati disabilitati"
+msgstr "גיבויים מתוזמנים הושבתו"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Scheduled backups enabled"
-msgstr "Backup pianificati abilitati"
+msgstr "גיבויים מתוזמנים הופעלו"
 
 #: apps/native/src/app/(tabs)/(search)/_layout.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
 msgid "Search"
-msgstr "Cerca"
+msgstr "חיפוש"
 
 #: apps/web/src/components/dashboard/stats-section.tsx
 msgid "Search for movies and TV shows to start tracking"
-msgstr "Cerca film e serie TV per iniziare a tracciare"
+msgstr "חפש סרטים ותוכניות טלוויזיה כדי להתחיל לעקוב"
 
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 msgid "Search for movies, shows, or people"
-msgstr "Cerca film, serie TV o persone"
+msgstr "חפש סרטים, תוכניות או אנשים"
 
 #: apps/web/src/components/command-palette.tsx
 msgid "Search for movies, TV shows, or run commands"
-msgstr "Cerca film, serie TV o esegui comandi"
+msgstr "חפש סרטים, תוכניות טלוויזיה, או הפעל פקודות"
 
 #: apps/web/src/components/command-palette.tsx
 msgid "Search movies & TV shows…"
-msgstr "Cerca film e serie TV…"
+msgstr "חפש סרטים ותוכניות טלוויזיה…"
 
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 msgid "Search movies, shows, people..."
-msgstr "Cerca film, serie, persone..."
+msgstr "חפש סרטים, תוכניות, אנשים..."
 
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 msgid "Search…"
-msgstr "Cerca…"
+msgstr "חיפוש…"
 
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/components/titles/season-accordion.tsx
@@ -2017,48 +2017,48 @@ msgstr "Cerca…"
 #: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Season {seasonNumber}"
-msgstr ""
+msgstr "עונה {seasonNumber}"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Season watched"
-msgstr "Stagione vista"
+msgstr "עונה סומנה כנצפית"
 
 #: apps/native/src/app/title/[id].tsx
 msgid "Seasons"
-msgstr "Stagioni"
+msgstr "עונות"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Security"
-msgstr "Sicurezza"
+msgstr "אבטחה"
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Self-hosted movie & TV tracker"
-msgstr "Tracker film & TV self-hosted"
+msgstr "מעקב סרטים וטלוויזיה לאירוח עצמי"
 
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Server"
-msgstr ""
+msgstr "שרת"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Server Health"
-msgstr "Salute del server"
+msgstr "תקינות השרת"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Server URL"
-msgstr "URL server"
+msgstr "כתובת השרת"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Set password"
-msgstr "Imposta password"
+msgstr "הגדר סיסמה"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/web/src/components/settings/integration-configs.tsx
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Set your preferred quality profile and root folder"
-msgstr "Imposta il profilo di qualità e la cartella radice preferiti"
+msgstr "הגדר את פרופיל האיכות המועדף ותיקיית הבסיס שלך"
 
 #: apps/native/src/app/(tabs)/(settings)/_layout.tsx
 #: apps/native/src/components/header-avatar.tsx
@@ -2067,46 +2067,46 @@ msgstr "Imposta il profilo di qualità e la cartella radice preferiti"
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/settings-shell.tsx
 msgid "Settings"
-msgstr "Impostazioni"
+msgstr "הגדרות"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Setup instructions"
-msgstr "Istruzioni di configurazione"
+msgstr "הוראות הגדרה"
 
 #: apps/web/src/routes/setup.tsx
 msgid "Setup required"
-msgstr "Configurazione richiesta"
+msgstr "נדרשת הגדרה"
 
 #: apps/native/src/components/ui/expandable-text.tsx
 #: apps/native/src/components/ui/expandable-text.tsx
 #: apps/web/src/components/expandable-text.tsx
 msgid "Show less"
-msgstr "Mostra meno"
+msgstr "הצג פחות"
 
 #: apps/native/src/components/ui/expandable-text.tsx
 #: apps/native/src/components/ui/expandable-text.tsx
 msgid "Show more"
-msgstr "Mostra di più"
+msgstr "הצג עוד"
 
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Sign in"
-msgstr "Accedi"
+msgstr "התחבר"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/web/src/components/landing-page.tsx
 msgid "Sign In"
-msgstr "Accedi"
+msgstr "התחבר"
 
 #: apps/web/src/routes/_auth/register.tsx
 msgid "Sign in instead"
-msgstr "Accedi invece"
+msgstr "התחבר במקום זאת"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Sign in to continue"
-msgstr "Accedi per continuare"
+msgstr "התחבר כדי להמשיך"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/web/src/components/auth-form.tsx
@@ -2115,38 +2115,38 @@ msgstr "Accedi per continuare"
 
 #: apps/web/src/components/auth-form.tsx
 msgid "Sign in with {oidcProviderName}"
-msgstr ""
+msgstr "התחבר עם {oidcProviderName}"
 
 #: apps/native/src/app/(auth)/login.tsx
 msgid "Sign in with {providerName}"
-msgstr ""
+msgstr "התחבר עם {providerName}"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/components/header-avatar.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Sign out"
-msgstr "Esci"
+msgstr "התנתק"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/components/header-avatar.tsx
 #: apps/native/src/components/header-avatar.tsx
 msgid "Sign Out"
-msgstr "Esci"
+msgstr "התנתק"
 
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Sign out of other sessions"
-msgstr "Esci dalle altre sessioni"
+msgstr "התנתק משאר ההפעלות"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Skipped"
-msgstr "Ignorati"
+msgstr "דולג"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Sofa needs to restart to apply the new layout direction."
-msgstr ""
+msgstr "יש להפעיל מחדש את Sofa כדי להחיל את כיוון הפריסה החדש."
 
 #: apps/web/src/components/update-toast.tsx
 #~ msgid "Sofa v{0} is available"
@@ -2154,7 +2154,7 @@ msgstr ""
 
 #: apps/web/src/components/update-toast.tsx
 msgid "Sofa v{latestVersion} is available"
-msgstr ""
+msgstr "Sofa v{latestVersion} זמין"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/native/src/components/settings/integration-configs.ts
@@ -2163,63 +2163,63 @@ msgstr ""
 #: apps/web/src/components/settings/integration-configs.tsx
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Sofa will automatically log movies and episodes when you finish watching them"
-msgstr "Sofa registrerà automaticamente film ed episodi quando finisci di guardarli"
+msgstr "Sofa יתעד אוטומטית סרטים ופרקים כשתסיים לצפות בהם"
 
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "Something went wrong"
-msgstr "Qualcosa è andato storto"
+msgstr "משהו השתבש"
 
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Something went wrong while loading this title. Please try again."
-msgstr "Qualcosa è andato storto durante il caricamento di questo titolo. Riprova."
+msgstr "משהו השתבש בעת טעינת הכותר. אנא נסה שוב."
 
 #: apps/native/src/lib/query-client.ts
 #: apps/web/src/lib/orpc/client.ts
 msgid "Something went wrong…"
-msgstr "Qualcosa è andato storto…"
+msgstr "משהו השתבש…"
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Sonarr List URL"
-msgstr "URL lista Sonarr"
+msgstr "כתובת רשימת Sonarr"
 
 #: apps/web/src/components/dashboard/stats-section.tsx
 msgid "Start exploring"
-msgstr "Inizia a esplorare"
+msgstr "התחל לגלות"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 msgid "Start tracking movies and shows"
-msgstr "Inizia a tracciare film e serie"
+msgstr "התחל לעקוב אחרי סרטים ותוכניות"
 
 #: apps/web/src/components/auth-form.tsx
 msgid "Start tracking your watches"
-msgstr "Inizia a tracciare le tue visioni"
+msgstr "התחל לעקוב אחרי הצפיות שלך"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Starting at"
-msgstr "Inizia alle"
+msgstr "מתחיל ב-"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Starting import..."
-msgstr "Avvio importazione..."
+msgstr "מתחיל ייבוא..."
 
 #: apps/native/src/hooks/use-title-actions.ts
 msgid "Status updated"
-msgstr "Stato aggiornato"
+msgstr "הסטטוס עודכן"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Storage"
-msgstr "Archiviazione"
+msgstr "אחסון"
 
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Stream"
-msgstr "Streaming"
+msgstr "סטרימינג"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Sunday"
-msgstr "Domenica"
+msgstr "ראשון"
 
 #: apps/web/src/components/settings/language-section.tsx
 #~ msgid "Switch to {0}"
@@ -2227,76 +2227,76 @@ msgstr "Domenica"
 
 #: apps/web/src/components/settings/language-section.tsx
 msgid "Switch to {name}"
-msgstr ""
+msgstr "עבור ל-{name}"
 
 #: apps/native/src/app/+not-found.tsx
 msgid "The page you're looking for doesn't exist."
-msgstr "La pagina che stai cercando non esiste."
+msgstr "הדף שחיפשת אינו קיים."
 
 #: apps/web/src/routes/_app/people.$id.tsx
 msgid "The person you're looking for doesn't exist or may have been removed from the database."
-msgstr "La persona che stai cercando non esiste o potrebbe essere stata rimossa dal database."
+msgstr "האדם שחיפשת אינו קיים או שמא הוסר ממסד הנתונים."
 
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "The title you're looking for doesn't exist or may have been removed from the database."
-msgstr "Il titolo che stai cercando non esiste o potrebbe essere stato rimosso dal database."
+msgstr "הכותר שחיפשת אינו קיים או שמא הוסר ממסד הנתונים."
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "This may take a few minutes for large libraries. Please don't close this tab."
-msgstr "L'operazione potrebbe richiedere alcuni minuti per librerie grandi. Non chiudere questa scheda."
+msgstr "פעולה זו עשויה לקחת מספר דקות עבור ספריות גדולות. אנא אל תסגור לשונית זו."
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 msgid "this month"
-msgstr "questo mese"
+msgstr "החודש"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
 msgid "This Month"
-msgstr "Questo mese"
+msgstr "החודש"
 
 #: apps/web/src/routes/__root.tsx
 msgid "This page was left on the cutting room floor. It may have been moved, removed, or never made it past the screenplay."
-msgstr "Questa pagina è rimasta sul pavimento della sala di montaggio. Potrebbe essere stata spostata, rimossa, o non essere mai arrivata alla sceneggiatura."
+msgstr "עמוד זה נשאר על רצפת חדר העריכה. ייתכן שהועבר, הוסר, או לא הגיע מעבר לתסריט."
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/routes/_app/settings.tsx
 #: apps/web/src/routes/setup.tsx
 msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
-msgstr "Questo prodotto utilizza le API di TMDB ma non è approvato o certificato da TMDB."
+msgstr "מוצר זה משתמש ב-TMDB API אך אינו מאושר או מוסמך על ידי TMDB."
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "This title will be removed from your library. Your watch history and ratings will be kept."
-msgstr "Questo titolo verrà rimosso dalla tua libreria. La cronologia di visualizzazione e le valutazioni verranno mantenute."
+msgstr "כותר זה יוסר מהספרייה שלך. היסטוריית הצפייה והדירוגים שלך יישמרו."
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 msgid "this week"
-msgstr "questa settimana"
+msgstr "השבוע"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
 msgid "This Week"
-msgstr "Questa settimana"
+msgstr "השבוע"
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "This will delete all cached TMDB images from disk. Images will be re-downloaded automatically as needed."
-msgstr "Questo eliminerà tutte le immagini TMDB in cache dal disco. Le immagini verranno riscaricate automaticamente secondo necessità."
+msgstr "פעולה זו תמחק את כל תמונות TMDB המאוחסנות במטמון מהדיסק. התמונות יורדו מחדש אוטומטית לפי הצורך."
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "This will delete all un-enriched stub titles and all cached images from disk. Everything will be re-imported and re-downloaded as needed."
-msgstr "Questo eliminerà tutti i titoli stub non arricchiti e tutte le immagini in cache dal disco. Tutto verrà reimportato e riscaricato secondo necessità."
+msgstr "פעולה זו תמחק את כל כותרי ה-stub שלא הועשרו ואת כל התמונות השמורות במטמון מהדיסק. הכל יובא מחדש ויורד מחדש לפי הצורך."
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "This will delete un-enriched stub titles that aren't in any user's library and clean up orphaned person records. Deleted titles will be re-imported if accessed again."
-msgstr "Questo eliminerà i titoli stub non arricchiti che non sono in nessuna libreria utente e pulerà i record di persone orfane. I titoli eliminati verranno reimportati se consultati di nuovo."
+msgstr "פעולה זו תמחק כותרי stub שלא הועשרו ואינם בספריית אף משתמש, ותנקה רשומות אנשים יתומות. כותרים שנמחקו יובאו מחדש אם ייגש אליהם שוב."
 
 #: apps/native/src/components/settings/integration-card.tsx
 msgid "This will invalidate the current {label} URL. You'll need to update it in {label}."
-msgstr "Questo invaliderà l'URL attuale di {label}. Dovrai aggiornarlo in {label}."
+msgstr "פעולה זו תבטל את כתובת ה-URL הנוכחית של {label}. יהיה עליך לעדכן אותה ב-{label}."
 
 #: apps/web/src/components/titles/title-seasons.tsx
 msgid "This will mark every episode of this show as watched. You can undo this later by unmarking individual seasons."
-msgstr "Questo segnerà tutti gli episodi di questa serie come visti. Puoi annullarlo in seguito de-segnando le singole stagioni."
+msgstr "פעולה זו תסמן כל פרק בתוכנית זו כנצפה. תוכל לבטל זאת מאוחר יותר על ידי ביטול הסימון של עונות בודדות."
 
 #: apps/web/src/components/settings/backup-section.tsx
 #~ msgid "This will permanently delete the backup from <0>{0}</0>. This cannot be undone."
@@ -2304,99 +2304,99 @@ msgstr "Questo segnerà tutti gli episodi di questa serie come visti. Puoi annul
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "This will permanently delete the backup from <0>{backupDate}</0>. This cannot be undone."
-msgstr ""
+msgstr "פעולה זו תמחק לצמיתות את הגיבוי מ-<0>{backupDate}</0>. לא ניתן לבטל פעולה זו."
 
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 msgid "This will remove all items from your history."
-msgstr "Questo rimuoverà tutti gli elementi dalla tua cronologia."
+msgstr "פעולה זו תסיר את כל הפריטים מהיסטוריה שלך."
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "This will replace your entire database with the uploaded file. A safety backup of your current data will be created first. Active sessions may need to refresh after restore."
-msgstr "Questo sostituirà l'intero database con il file caricato. Prima verrà creato un backup di sicurezza dei dati attuali. Le sessioni attive potrebbero richiedere un aggiornamento dopo il ripristino."
+msgstr "פעולה זו תחליף את מסד הנתונים כולו בקובץ שהועלה. גיבוי בטיחות של הנתונים הנוכחיים שלך ייוצר תחילה. הפעלות פעילות עשויות לדרוש רענון לאחר השחזור."
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 msgid "this year"
-msgstr "quest'anno"
+msgstr "השנה"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
 msgid "This Year"
-msgstr "Quest'anno"
+msgstr "השנה"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Thursday"
-msgstr "Giovedì"
+msgstr "חמישי"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Time:"
-msgstr "Ora:"
+msgstr "שעה:"
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Title not found"
-msgstr "Titolo non trovato"
+msgstr "כותר לא נמצא"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Titles on your Sofa watchlist will be automatically added for download when Radarr polls this list (every 12 hours by default)"
-msgstr "I titoli nella tua watchlist di Sofa verranno aggiunti automaticamente per il download quando Radarr interroga questa lista (ogni 12 ore per impostazione predefinita)"
+msgstr "כותרים ברשימת הצפייה שלך ב-Sofa יתווספו אוטומטית להורדה כאשר Radarr סוקר רשימה זו (כל 12 שעות כברירת מחדל)"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
-msgstr "I titoli nella tua watchlist di Sofa verranno aggiunti automaticamente per il download quando Sonarr interroga questa lista (ogni 6 ore per impostazione predefinita)"
+msgstr "כותרים ברשימת הצפייה שלך ב-Sofa יתווספו אוטומטית להורדה כאשר Sonarr סוקר רשימה זו (כל 6 שעות כברירת מחדל)"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 msgid "today"
-msgstr "oggi"
+msgstr "היום"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
 msgid "Today"
-msgstr "Oggi"
+msgstr "היום"
 
 #: apps/web/src/components/settings/update-check-section.tsx
 msgid "Toggle automatic update checks"
-msgstr "Attiva/disattiva controllo aggiornamenti automatico"
+msgstr "הפעל/כבה בדיקות עדכון אוטומטיות"
 
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Toggle open registration"
-msgstr "Attiva/disattiva registrazione aperta"
+msgstr "הפעל/כבה הרשמה פתוחה"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Toggle scheduled backups"
-msgstr "Attiva/disattiva backup pianificati"
+msgstr "הפעל/כבה גיבויים מתוזמנים"
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Track what you watch. Know what's next.<0/>Your library, your data, your rules."
-msgstr "Traccia cosa guardi. Sai cosa ti aspetta.<0/>La tua libreria, i tuoi dati, le tue regole."
+msgstr "עקוב אחרי מה שאתה צופה. דע מה הבא.<0/>הספרייה שלך, הנתונים שלך, הכללים שלך."
 
 #: apps/web/src/components/titles/trailer-dialog.tsx
 #: apps/web/src/components/titles/trailer-dialog.tsx
 msgid "Trailer"
-msgstr ""
+msgstr "טריילר"
 
 #: apps/web/src/components/explore/hero-banner.tsx
 msgid "Trending today"
-msgstr "In tendenza oggi"
+msgstr "פופולרי היום"
 
 #: apps/native/src/app/(tabs)/(explore)/index.tsx
 #: apps/web/src/routes/_app/explore.tsx
 msgid "Trending Today"
-msgstr "In tendenza oggi"
+msgstr "פופולרי היום"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Trigger job"
-msgstr "Avvia job"
+msgstr "הפעל משימה"
 
 #: apps/web/src/routes/__root.tsx
 msgid "Try again"
-msgstr "Riprova"
+msgstr "נסה שוב"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Tuesday"
-msgstr "Martedì"
+msgstr "שלישי"
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
@@ -2405,36 +2405,36 @@ msgstr "Martedì"
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/titles/title-hero.tsx
 msgid "TV"
-msgstr ""
+msgstr "טלוויזיה"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "TV episodes"
-msgstr "Episodi TV"
+msgstr "פרקי טלוויזיה"
 
 #: apps/native/src/components/search/search-result-row.tsx
 msgid "TV show"
-msgstr "Serie TV"
+msgstr "סדרת טלוויזיה"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "unknown"
-msgstr "sconosciuto"
+msgstr "לא ידוע"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "unlimited"
-msgstr "illimitato"
+msgstr "ללא הגבלה"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Unreachable"
-msgstr "Non raggiungibile"
+msgstr "לא נגיש"
 
 #: apps/web/src/components/titles/title-seasons.tsx
 msgid "Untitled"
-msgstr "Senza titolo"
+msgstr "ללא כותרת"
 
 #: apps/web/src/components/titles/title-seasons.tsx
 msgid "Unwatch all"
-msgstr "Rimuovi visione dalla stagione"
+msgstr "הסר צפייה מהכל"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 #~ msgid "Unwatched all of {0}"
@@ -2442,16 +2442,16 @@ msgstr "Rimuovi visione dalla stagione"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Unwatched all of {seasonLabel}"
-msgstr ""
+msgstr "בוטלה צפייה בכל {seasonLabel}"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Unwatched S{seasonNum} E{epNum}"
-msgstr "Non visto S{seasonNum} E{epNum}"
+msgstr "בוטלה צפייה ב-S{seasonNum} E{epNum}"
 
 #: apps/native/src/components/titles/continue-watching-banner.tsx
 #: apps/web/src/components/dashboard/continue-watching-card.tsx
 msgid "Up next"
-msgstr "Prossimo"
+msgstr "הבא בתור"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Update available: {0}"
@@ -2459,42 +2459,42 @@ msgstr "Prossimo"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Update available: {latestVersion}"
-msgstr ""
+msgstr "עדכון זמין: {latestVersion}"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Update check"
-msgstr "Controllo aggiornamenti"
+msgstr "בדיקת עדכונים"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/update-check-section.tsx
 msgid "Update checks disabled"
-msgstr "Controllo aggiornamenti disabilitato"
+msgstr "בדיקות עדכון הושבתו"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/update-check-section.tsx
 msgid "Update checks enabled"
-msgstr "Controllo aggiornamenti abilitato"
+msgstr "בדיקות עדכון הופעלו"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Update failed"
-msgstr "Aggiornamento fallito"
+msgstr "העדכון נכשל"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Update password"
-msgstr "Aggiorna password"
+msgstr "עדכן סיסמה"
 
 #: apps/native/src/app/change-password.tsx
 msgid "Update Password"
-msgstr "Aggiorna password"
+msgstr "עדכן סיסמה"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Upload"
-msgstr "Carica"
+msgstr "העלה"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Upload a .db file to replace the current database. A safety backup is created first."
-msgstr "Carica un file .db per sostituire il database attuale. Prima viene creato un backup di sicurezza."
+msgstr "העלה קובץ .db להחלפת מסד הנתונים הנוכחי. גיבוי בטיחות ייוצר תחילה."
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Upload a {0} export from your {1} account settings."
@@ -2502,39 +2502,39 @@ msgstr "Carica un file .db per sostituire il database attuale. Prima viene creat
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Upload a {acceptFormat} export from your {sourceLabel} account settings."
-msgstr ""
+msgstr "העלה ייצוא {acceptFormat} מהגדרות חשבון {sourceLabel} שלך."
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Upload export file"
-msgstr "Carica file di esportazione"
+msgstr "העלה קובץ ייצוא"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Upload failed"
-msgstr "Caricamento fallito"
+msgstr "ההעלאה נכשלה"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Upload picture"
-msgstr "Carica immagine"
+msgstr "העלה תמונה"
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Upload profile picture"
-msgstr "Carica immagine del profilo"
+msgstr "העלה תמונת פרופיל"
 
 #: apps/native/src/components/settings/integration-card.tsx
 msgid "URL copied to clipboard"
-msgstr "URL copiato negli appunti"
+msgstr "כתובת ה-URL הועתקה ללוח"
 
 #: apps/web/src/components/update-toast.tsx
 msgid "View release"
-msgstr "Visualizza rilascio"
+msgstr "צפה בגרסה"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Waiting for authorization..."
-msgstr "In attesa di autorizzazione..."
+msgstr "ממתין לאישור..."
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Warnings"
-msgstr "Avvisi"
+msgstr "אזהרות"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Warnings ({0})"
@@ -2542,46 +2542,46 @@ msgstr "Avvisi"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Warnings ({warningCount})"
-msgstr ""
+msgstr "אזהרות ({warningCount})"
 
 #: apps/web/src/components/titles/title-seasons.tsx
 msgid "Watch all"
-msgstr "Segna tutta la stagione come vista"
+msgstr "סמן הכל כנצפה"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Watch history"
-msgstr "Cronologia visioni"
+msgstr "היסטוריית צפייה"
 
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Watch on {name}"
-msgstr "Guarda su {name}"
+msgstr "צפה ב-{name}"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Watched all of {seasonLabel}"
-msgstr "Segnata come vista tutta la {seasonLabel}"
+msgstr "נצפתה כל {seasonLabel}"
 
 #: apps/native/src/lib/title-actions.ts
 msgid "Watched all of {seasonName}"
-msgstr "Segnata come vista tutta la {seasonName}"
+msgstr "נצפתה כל {seasonName}"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Watched S{seasonNum} E{epNum}"
-msgstr "Visto S{seasonNum} E{epNum}"
+msgstr "נצפה S{seasonNum} E{epNum}"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Watching"
-msgstr "In visione"
+msgstr "צופה"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Watchlist"
-msgstr ""
+msgstr "רשימת צפייה"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #~ msgid "Watchlisted"
@@ -2591,39 +2591,39 @@ msgstr ""
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Webhook URL"
-msgstr "URL webhook"
+msgstr "כתובת Webhook"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Wednesday"
-msgstr "Mercoledì"
+msgstr "רביעי"
 
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/dashboard/welcome-header.tsx
 msgid "Welcome back"
-msgstr "Bentornato"
+msgstr "ברוך שובך"
 
 #: apps/web/src/components/dashboard/welcome-header.tsx
 msgid "Welcome back, {name}"
-msgstr "Bentornato, {name}"
+msgstr "ברוך שובך, {name}"
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Where to Watch"
-msgstr "Dove guardarlo"
+msgstr "היכן לצפות"
 
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "With Ads"
-msgstr "Con pubblicità"
+msgstr "עם פרסומות"
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/web/src/components/people/person-hero.tsx
 msgid "Writer"
-msgstr "Sceneggiatore"
+msgstr "תסריטאי"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "You'll be signed out to change the server URL."
-msgstr "Verrai disconnesso per cambiare l'URL del server."
+msgstr "תתנתק כדי לשנות את כתובת ה-URL של השרת."
 
 #: apps/web/src/components/update-toast.tsx
 #~ msgid "You're running v{0}."
@@ -2631,18 +2631,18 @@ msgstr "Verrai disconnesso per cambiare l'URL del server."
 
 #: apps/web/src/components/update-toast.tsx
 msgid "You're running v{currentVersion}."
-msgstr ""
+msgstr "אתה מריץ גרסה v{currentVersion}."
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Your code:"
-msgstr "Il tuo codice:"
+msgstr "הקוד שלך:"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/web/src/components/dashboard/stats-section.tsx
 msgid "Your library is empty"
-msgstr "La tua libreria è vuota"
+msgstr "הספרייה שלך ריקה"
 
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Your name"
-msgstr "Il tuo nome"
+msgstr "שמך"
 

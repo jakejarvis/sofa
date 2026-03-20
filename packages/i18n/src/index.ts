@@ -3,7 +3,13 @@ import { i18n, type Messages } from "@lingui/core";
 import type { SupportedLocale } from "./locales";
 import { messages as enMessages } from "./po/en.po";
 
-export { SUPPORTED_LOCALES, type SupportedLocale } from "./locales";
+export {
+  LOCALE_INFO,
+  SUPPORTED_LOCALES,
+  type SupportedLocale,
+  isLocaleRTL,
+  getDirection,
+} from "./locales";
 
 // English always bundled — zero async on default locale
 i18n.load("en", enMessages);
@@ -15,6 +21,12 @@ const loaders: Record<Exclude<SupportedLocale, "en">, () => Promise<{ messages: 
   es: () => import("./po/es.po"),
   it: () => import("./po/it.po"),
   pt: () => import("./po/pt.po"),
+  nl: () => import("./po/nl.po"),
+  ar: () => import("./po/ar.po"),
+  he: () => import("./po/he.po"),
+  zh: () => import("./po/zh.po"),
+  ja: () => import("./po/ja.po"),
+  ko: () => import("./po/ko.po"),
 };
 
 export async function activateLocale(locale: SupportedLocale): Promise<void> {

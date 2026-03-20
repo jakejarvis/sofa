@@ -161,7 +161,7 @@ export function TitleSeasons({
                     setOpenSeason(isOpen ? null : season.seasonNumber);
                   }
                 }}
-                className="group/season hover:bg-accent/50 flex w-full cursor-pointer items-center justify-between p-4 text-left transition-colors"
+                className="group/season hover:bg-accent/50 flex w-full cursor-pointer items-center justify-between p-4 text-start transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <span className="font-medium">
@@ -253,7 +253,7 @@ export function TitleSeasons({
                                 className="h-full w-full object-cover"
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                              <span className="absolute bottom-2 left-3 font-mono text-[10px] text-white/70">
+                              <span className="absolute start-3 bottom-2 font-mono text-[10px] text-white/70">
                                 E{String(ep.episodeNumber).padStart(2, "0")}
                               </span>
                             </div>

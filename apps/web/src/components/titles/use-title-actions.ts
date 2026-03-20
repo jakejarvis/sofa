@@ -65,8 +65,9 @@ export function useTitleActions() {
       try {
         await batchWatchMutation.mutateAsync({ episodeIds });
         await queryClient.invalidateQueries({ queryKey: userInfoKey });
+        const count = episodeIds.length;
         toast.success(
-          t`Caught up — marked ${episodeIds.length} ${plural(episodeIds.length, { one: "episode", other: "episodes" })} as watched`,
+          t`Caught up — marked ${plural(count, { one: "# episode", other: "# episodes" })} as watched`,
         );
       } catch {
         setUserInfo((old) => ({
@@ -112,7 +113,7 @@ export function useTitleActions() {
         });
         toast.success(
           ratingStars > 0
-            ? t`Rated ${ratingStars} ${plural(ratingStars, { one: "star", other: "stars" })}`
+            ? t`Rated ${plural(ratingStars, { one: "# star", other: "# stars" })}`
             : t`Rating removed`,
         );
       } catch {
@@ -195,7 +196,7 @@ export function useTitleActions() {
           if (previousUnwatched.length > 0) {
             const count = previousUnwatched.length;
             toast.success(t`Watched S${seasonNum} E${epNum}`, {
-              description: t`${count} earlier ${plural(count, { one: "episode", other: "episodes" })} unwatched`,
+              description: t`${plural(count, { one: "# earlier episode", other: "# earlier episodes" })} unwatched`,
               action: {
                 label: t`Catch up`,
                 onClick: () => catchUp(previousUnwatched),
@@ -263,11 +264,12 @@ export function useTitleActions() {
           }
         }
 
-        const seasonLabel = season.name ?? t`Season ${season.seasonNumber}`;
+        const seasonNumber = season.seasonNumber;
+        const seasonLabel = season.name ?? t`Season ${seasonNumber}`;
         if (previousUnwatched.length > 0) {
           const count = previousUnwatched.length;
           toast.success(t`Watched all of ${seasonLabel}`, {
-            description: t`${count} earlier ${plural(count, { one: "episode", other: "episodes" })} unwatched`,
+            description: t`${plural(count, { one: "# earlier episode", other: "# earlier episodes" })} unwatched`,
             action: {
               label: t`Catch up`,
               onClick: () => catchUp(previousUnwatched),
@@ -302,7 +304,9 @@ export function useTitleActions() {
 
       try {
         await unwatchSeasonMutation.mutateAsync({ id: season.id });
-        toast.success(t`Unwatched all of ${season.name ?? t`Season ${season.seasonNumber}`}`);
+        const seasonNumber = season.seasonNumber;
+        const seasonLabel = season.name ?? t`Season ${seasonNumber}`;
+        toast.success(t`Unwatched all of ${seasonLabel}`);
       } catch {
         setUserInfo((old) => ({
           ...old,

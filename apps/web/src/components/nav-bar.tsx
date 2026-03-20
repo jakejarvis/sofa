@@ -188,7 +188,7 @@ export function NavBar({
           >
             <IconSearch aria-hidden={true} className="size-3.5" />
             <span>{t`Search…`}</span>
-            <Kbd className="ml-2.5">⌘ K</Kbd>
+            <Kbd className="ms-2.5">⌘ K</Kbd>
           </button>
           <Separator
             orientation="vertical"
@@ -219,7 +219,7 @@ export function NavBar({
                   <p className="text-foreground truncate text-sm leading-tight font-medium">
                     {userName}
                     {userRole === "admin" && (
-                      <Badge className="bg-primary/10 text-primary mb-0.5 ml-1.5 rounded-md border-0 align-middle">
+                      <Badge className="bg-primary/10 text-primary ms-1.5 mb-0.5 rounded-md border-0 align-middle">
                         <Trans>Admin</Trans>
                       </Badge>
                     )}
@@ -291,7 +291,7 @@ export function MobileTabBar() {
   return (
     <nav
       aria-label="Primary"
-      className="border-border/50 bg-background/90 fixed right-0 bottom-0 left-0 z-50 border-t pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] backdrop-blur-xl sm:hidden"
+      className="border-border/50 bg-background/90 fixed right-0 bottom-0 left-0 z-50 border-t ps-[env(safe-area-inset-left)] pe-[env(safe-area-inset-right)] backdrop-blur-xl sm:hidden"
     >
       <div ref={containerRef} className="relative flex h-14 items-stretch">
         {mobileTabs.map((tab, i) => {
