@@ -23,7 +23,7 @@ import { Text } from "@/components/ui/text";
 import { usePressAnimation } from "@/hooks/use-press-animation";
 import { titleActions } from "@/lib/title-actions";
 
-type TitleStatus = "watchlist" | "in_progress" | "completed";
+type TitleStatus = "in_watchlist" | "watching" | "caught_up" | "completed";
 
 interface PosterCardProps {
   id: string;
@@ -61,8 +61,9 @@ export const PosterCard = memo(function PosterCard({
   const completedColor = useCSSVariable("--color-status-completed") as string;
 
   const statusColors: Record<TitleStatus, string> = {
-    watchlist: watchlistColor,
-    in_progress: watchingColor,
+    in_watchlist: watchlistColor,
+    watching: watchingColor,
+    caught_up: completedColor,
     completed: completedColor,
   };
 
@@ -79,11 +80,13 @@ export const PosterCard = memo(function PosterCard({
   const statusLabel =
     userStatus === "completed"
       ? "completed"
-      : userStatus === "in_progress"
-        ? "watching"
-        : userStatus === "watchlist"
-          ? "on watchlist"
-          : undefined;
+      : userStatus === "caught_up"
+        ? "caught up"
+        : userStatus === "watching"
+          ? "watching"
+          : userStatus === "in_watchlist"
+            ? "on watchlist"
+            : undefined;
   const cardAccessibilityLabel = [title, type === "movie" ? "movie" : "TV show", year, statusLabel]
     .filter(Boolean)
     .join(", ");
@@ -119,9 +122,9 @@ export const PosterCard = memo(function PosterCard({
             className="absolute top-2 right-2 size-[30px] items-center justify-center rounded-full"
             style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
           >
-            {userStatus === "completed" ? (
+            {userStatus === "completed" || userStatus === "caught_up" ? (
               <IconCheckbox size={16} color="white" />
-            ) : userStatus === "in_progress" ? (
+            ) : userStatus === "watching" ? (
               <IconPlayerPlayFilled size={16} color="white" />
             ) : (
               <IconBookmarkFilled size={16} color="white" />
@@ -214,18 +217,18 @@ export const PosterCard = memo(function PosterCard({
                   onPress={handleQuickAddPress}
                 />
               )}
-              {userStatus !== "in_progress" && (
-                <Link.MenuAction
-                  title={t`Mark as Watching`}
-                  icon="play.fill"
-                  onPress={() => titleActions.markWatching(id)}
-                />
-              )}
               {type === "movie" && (
                 <Link.MenuAction
                   title={t`Mark as Watched`}
                   icon="checkmark.circle"
                   onPress={() => titleActions.markMovieWatched(id, title)}
+                />
+              )}
+              {type === "tv" && userStatus && (
+                <Link.MenuAction
+                  title={t`Mark All Watched`}
+                  icon="checkmark.circle"
+                  onPress={() => titleActions.markAllWatched(id, title)}
                 />
               )}
               {userStatus && (

@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["oxc", "eslint", "typescript", "react", "import", "unicorn"],
+  "jsPlugins": ["eslint-plugin-lingui"],
   "env": {
     "builtin": true
   },
@@ -20,7 +21,21 @@
     "no-await-in-loop": "off",
     "react/no-array-index-key": "off",
     "react/jsx-no-useless-fragment": "error",
-    "react/rules-of-hooks": "error"
+    "react/rules-of-hooks": "error",
+    "lingui/no-unlocalized-strings": "off",
+    "lingui/t-call-in-function": "error",
+    "lingui/no-single-variables-to-translate": "error",
+    "lingui/no-expression-in-message": "error",
+    "lingui/no-single-tag-to-translate": "error",
+    "lingui/no-trans-inside-trans": "error"
   },
+  "overrides": [
+    {
+      "files": ["apps/web/src/**/*", "apps/native/src/**/*"],
+      "rules": {
+        "lingui/no-unlocalized-strings": "warn"
+      }
+    }
+  ],
   "ignorePatterns": ["node_modules", "dist", "build", "docs", "**/routeTree.gen.ts"]
 }

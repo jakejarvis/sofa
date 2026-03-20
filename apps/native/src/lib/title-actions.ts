@@ -32,30 +32,6 @@ export const titleActions = {
     }
   },
 
-  async markWatching(id: string) {
-    try {
-      await client.titles.updateStatus({ id, status: "in_progress" });
-      toast.success(i18n._(msg`Marked as watching`));
-      invalidateTitleQueries();
-    } catch {
-      toast.error(i18n._(msg`Failed to update status`));
-    }
-  },
-
-  async markCompleted(id: string, titleName?: string) {
-    try {
-      await client.titles.updateStatus({ id, status: "completed" });
-      toast.success(
-        titleName
-          ? i18n._(msg`Marked "${titleName}" as completed`)
-          : i18n._(msg`Marked as completed`),
-      );
-      invalidateTitleQueries();
-    } catch {
-      toast.error(i18n._(msg`Failed to update status`));
-    }
-  },
-
   async markMovieWatched(id: string, titleName?: string) {
     try {
       await client.titles.watchMovie({ id });
@@ -109,6 +85,20 @@ export const titleActions = {
       invalidateTitleQueries();
     } catch {
       toast.error(i18n._(msg`Failed to unmark episode`));
+    }
+  },
+
+  async markAllWatched(id: string, titleName?: string) {
+    try {
+      await client.titles.watchAll({ id });
+      toast.success(
+        titleName
+          ? i18n._(msg`Marked all episodes of "${titleName}" as watched`)
+          : i18n._(msg`Marked all episodes as watched`),
+      );
+      invalidateTitleQueries();
+    } catch {
+      toast.error(i18n._(msg`Failed to mark all episodes as watched`));
     }
   },
 

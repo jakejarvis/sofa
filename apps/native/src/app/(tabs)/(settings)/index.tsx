@@ -21,6 +21,7 @@ import {
   IconWorld,
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { reloadAppAsync } from "expo";
 import * as Application from "expo-application";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -54,7 +55,7 @@ import { isAnalyticsEnabled, setAnalyticsEnabled } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
 import { authClient, getServerUrl } from "@/lib/server";
 import { toast } from "@/lib/toast";
-import { activateLocale, type SupportedLocale } from "@sofa/i18n";
+import { activateLocale, isLocaleRTL, type SupportedLocale } from "@sofa/i18n";
 import { LOCALE_INFO } from "@sofa/i18n/locales";
 
 const settingsContentContainerStyle = {
@@ -421,7 +422,10 @@ export default function SettingsScreen() {
                   label={t`Database`}
                   value={
                     systemHealth.data?.database
-                      ? t`${plural(systemHealth.data.database.titleCount, { one: "# title", other: "# titles" })}`
+                      ? plural(systemHealth.data.database.titleCount, {
+                          one: "# title",
+                          other: "# titles",
+                        })
                       : "—"
                   }
                   icon={IconDatabase}
@@ -435,7 +439,10 @@ export default function SettingsScreen() {
                   label={t`Image Cache`}
                   value={
                     systemHealth.data?.imageCache
-                      ? t`${plural(systemHealth.data.imageCache.imageCount, { one: "# image", other: "# images" })}`
+                      ? plural(systemHealth.data.imageCache.imageCount, {
+                          one: "# image",
+                          other: "# images",
+                        })
                       : "—"
                   }
                   icon={IconPhoto}
@@ -472,13 +479,16 @@ export default function SettingsScreen() {
                 />
               }
             />
-            {updateCheck.data?.updateCheck?.updateAvailable && (
-              <View className="py-3.5">
-                <Text className="text-status-completed font-sans text-sm font-medium">
-                  <Trans>Update available: {updateCheck.data.updateCheck.latestVersion}</Trans>
-                </Text>
-              </View>
-            )}
+            {(() => {
+              const latestVersion = updateCheck.data?.updateCheck?.latestVersion;
+              return updateCheck.data?.updateCheck?.updateAvailable ? (
+                <View className="py-3.5">
+                  <Text className="text-status-completed font-sans text-sm font-medium">
+                    <Trans>Update available: {latestVersion}</Trans>
+                  </Text>
+                </View>
+              ) : null;
+            })()}
           </SettingsSection>
         </Animated.View>
       )}
@@ -512,8 +522,18 @@ export default function SettingsScreen() {
         }))}
         onSelect={(locale) => {
           setLanguageModalOpen(false);
+          const previousLocale = i18n.locale;
           activateLocale(locale as SupportedLocale).then(
-            () => setPersistedLocale(locale as SupportedLocale),
+            () => {
+              setPersistedLocale(locale as SupportedLocale);
+              if (isLocaleRTL(locale) !== isLocaleRTL(previousLocale)) {
+                Alert.alert(
+                  t`Restart Required`,
+                  t`Sofa needs to restart to apply the new layout direction.`,
+                  [{ text: t`Restart`, onPress: () => reloadAppAsync() }],
+                );
+              }
+            },
             () => {},
           );
         }}

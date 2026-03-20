@@ -6,6 +6,8 @@ on:
     paths:
       - "packages/i18n/src/po/en.po"
   workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
 
 permissions:
   contents: write
@@ -56,13 +58,10 @@ jobs:
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Compile catalogs
-        run: bun run i18n:compile
-
-      - name: Commit compiled catalogs
+      - name: Commit updated catalogs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add packages/i18n/src/po/
-          git diff --cached --quiet || git commit -m "chore(i18n): compile updated translation catalogs"
+          git diff --cached --quiet || git commit -m "chore(i18n): update translation catalogs"
           git push

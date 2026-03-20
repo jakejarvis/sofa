@@ -50,13 +50,13 @@ export const UpdateStatusInput = z
   .object({
     id: z.string().min(1).describe("Title ID"),
     status: z
-      .enum(["in_progress", "completed"])
+      .enum(["watchlist"])
       .nullable()
       .describe(
-        "Tracking status: in_progress (currently watching), completed (finished), or null to remove from library",
+        "Set to watchlist to add to library, or null to remove. Other transitions happen via watch endpoints.",
       ),
   })
-  .meta({ description: "Update the user's tracking status for a title" });
+  .meta({ description: "Add a title to the user's watchlist or remove from library" });
 
 export const UpdateRatingInput = z
   .object({
@@ -391,9 +391,11 @@ export const RecommendationItemSchema = z
   })
   .meta({ description: "A recommended title" });
 
+const displayStatusEnum = z.enum(["in_watchlist", "watching", "caught_up", "completed"]);
+
 const userStatusMap = z
-  .record(z.string(), z.enum(["watchlist", "in_progress", "completed"]))
-  .describe("Map of title ID to the user's tracking status");
+  .record(z.string(), displayStatusEnum)
+  .describe("Map of title ID to the user's display status");
 const episodeProgressMap = z
   .record(z.string(), z.object({ watched: z.number(), total: z.number() }))
   .describe("Map of title ID to episode watch progress");
@@ -425,10 +427,9 @@ export const TitleDetailOutput = z
 
 export const UserInfoOutput = z
   .object({
-    status: z
-      .enum(["watchlist", "in_progress", "completed"])
+    status: displayStatusEnum
       .nullable()
-      .describe("User's tracking status, or null if not in library"),
+      .describe("User's display status, or null if not in library"),
     rating: z.number().nullable().describe("User's star rating (0-5), or null if unrated"),
     episodeWatches: z.array(z.string()).describe("IDs of episodes the user has watched"),
   })
@@ -523,10 +524,7 @@ export const LibraryOutput = z
           releaseDate: z.string().nullable().describe("Release date (ISO 8601)"),
           firstAirDate: z.string().nullable().describe("First air date (ISO 8601)"),
           voteAverage: z.number().nullable().describe("Average rating (0-10)"),
-          userStatus: z
-            .enum(["watchlist", "in_progress", "completed"])
-            .nullable()
-            .describe("User's tracking status"),
+          userStatus: displayStatusEnum.nullable().describe("User's display status"),
         })
         .meta({ description: "A library item with user status" }),
     ),

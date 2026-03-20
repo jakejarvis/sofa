@@ -74,11 +74,10 @@ export function batchInsertEpisodeWatchesTransaction(
   episodeIds: string[],
   source: "manual" | "import" | "plex" | "jellyfin" | "emby",
   watchedAt?: Date,
-): { titleId: string | null; completionReached: boolean } {
-  if (episodeIds.length === 0) return { titleId: null, completionReached: false };
+): { titleId: string | null } {
+  if (episodeIds.length === 0) return { titleId: null };
 
   let resultTitleId: string | null = null;
-  let completionReached = false;
 
   db.transaction((tx) => {
     const now = watchedAt ?? new Date();
@@ -119,46 +118,9 @@ export function batchInsertEpisodeWatchesTransaction(
         })
         .run();
     }
-
-    const allSeasons = tx.select().from(seasons).where(eq(seasons.titleId, titleId)).all();
-    if (allSeasons.length === 0) return;
-
-    const allSeasonIds = allSeasons.map((s) => s.id);
-    const allEps = tx.select().from(episodes).where(inArray(episodes.seasonId, allSeasonIds)).all();
-    const totalEpisodes = allEps.length;
-    if (totalEpisodes === 0) return;
-
-    const allEpIds = allEps.map((ep) => ep.id);
-    const [watchCount] = tx
-      .select({
-        count: sql<number>`count(distinct ${userEpisodeWatches.episodeId})`,
-      })
-      .from(userEpisodeWatches)
-      .where(
-        and(eq(userEpisodeWatches.userId, userId), inArray(userEpisodeWatches.episodeId, allEpIds)),
-      )
-      .all();
-
-    if (watchCount.count >= totalEpisodes) {
-      completionReached = true;
-      const completeNow = new Date();
-      tx.insert(userTitleStatus)
-        .values({
-          userId,
-          titleId,
-          status: "completed",
-          addedAt: completeNow,
-          updatedAt: completeNow,
-        })
-        .onConflictDoUpdate({
-          target: [userTitleStatus.userId, userTitleStatus.titleId],
-          set: { status: "completed", updatedAt: completeNow },
-        })
-        .run();
-    }
   });
 
-  return { titleId: resultTitleId, completionReached };
+  return { titleId: resultTitleId };
 }
 
 export function getAllEpisodeIdsForTitle(titleId: string): string[] {
@@ -253,12 +215,16 @@ export function getUserStatusesByTitleIds(userId: string, titleIds: string[]) {
 
 export function getEpisodeProgressByTitleIds(userId: string, titleIds: string[]) {
   if (titleIds.length === 0) return [];
+  const today = new Date().toISOString().slice(0, 10);
   return db
     .select({
       titleId: titles.id,
-      totalEpisodes: sql<number>`count(distinct ${episodes.id})`.as("totalEpisodes"),
+      totalEpisodes:
+        sql<number>`count(distinct case when ${episodes.airDate} IS NOT NULL AND ${episodes.airDate} <= ${today} then ${episodes.id} end)`.as(
+          "totalEpisodes",
+        ),
       watchedEpisodes:
-        sql<number>`count(distinct case when ${userEpisodeWatches.id} is not null then ${episodes.id} end)`.as(
+        sql<number>`count(distinct case when ${userEpisodeWatches.id} is not null AND ${episodes.airDate} IS NOT NULL AND ${episodes.airDate} <= ${today} then ${episodes.id} end)`.as(
           "watchedEpisodes",
         ),
     })

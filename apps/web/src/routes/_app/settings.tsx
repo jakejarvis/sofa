@@ -173,10 +173,10 @@ function SettingsPage() {
             </span>
           </div>
           <div className="space-y-3">
-            <Card className="border-l-primary/30 border-l-2">
+            <Card className="border-s-primary/30 border-s-2">
               <RegistrationSection />
             </Card>
-            <Card className="border-l-primary/30 border-l-2">
+            <Card className="border-s-primary/30 border-s-2">
               <UpdateCheckSection />
             </Card>
           </div>
@@ -196,13 +196,13 @@ function SettingsPage() {
             </span>
           </div>
           <div className="space-y-3">
-            <Card className="border-l-primary/30 border-l-2">
+            <Card className="border-s-primary/30 border-s-2">
               <BackupSection />
             </Card>
-            <Card className="border-l-primary/30 border-l-2">
+            <Card className="border-s-primary/30 border-s-2">
               <BackupScheduleSection />
             </Card>
-            <Card className="border-l-primary/30 border-l-2">
+            <Card className="border-s-primary/30 border-s-2">
               <BackupRestoreSection />
             </Card>
           </div>
@@ -221,7 +221,7 @@ function SettingsPage() {
               Admin only
             </span>
           </div>
-          <Card className="border-l-primary/30 border-l-2">
+          <Card className="border-s-primary/30 border-s-2">
             <CacheSection />
           </Card>
         </div>

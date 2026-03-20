@@ -6,13 +6,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { thumbHashToUrl } from "@/lib/thumbhash";
 import type { CastMember } from "@sofa/api/schemas";
 
+function EpisodeCountLabel({ count }: { count: number }) {
+  const { t } = useLingui();
+  const suffix = count !== 1 ? "s" : "";
+  return <p className="text-muted-foreground/70 text-[10px]">{t`${count} ep${suffix}`}</p>;
+}
+
 interface CastCarouselProps {
   actors: CastMember[];
   titleType: "movie" | "tv";
 }
 
 export function CastCarousel({ actors, titleType }: CastCarouselProps) {
-  const { t } = useLingui();
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2">
@@ -74,9 +79,7 @@ export function CastCarousel({ actors, titleType }: CastCarouselProps) {
                         </p>
                       )}
                       {titleType === "tv" && member.episodeCount && (
-                        <p className="text-muted-foreground/70 text-[10px]">
-                          {t`${member.episodeCount} ep${member.episodeCount !== 1 ? "s" : ""}`}
-                        </p>
+                        <EpisodeCountLabel count={member.episodeCount} />
                       )}
                     </div>
                   </Link>

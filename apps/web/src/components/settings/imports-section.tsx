@@ -277,8 +277,10 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
             warnings: event.job.warnings,
           });
           setStep("done");
-          if (event.job.importedCount > 0) {
-            toast.success(t`Imported ${event.job.importedCount} items from ${config.label}`);
+          const importedCount = event.job.importedCount;
+          const sourceLabel = config.label;
+          if (importedCount > 0) {
+            toast.success(t`Imported ${importedCount} items from ${sourceLabel}`);
           }
         } else if (event.type === "timeout") {
           receivedComplete = true;
@@ -366,8 +368,9 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
+        const sourceLabel = config.label;
         throw new Error(
-          (err as { error?: string }).error ?? t`Failed to start ${config.label} connection`,
+          (err as { error?: string }).error ?? t`Failed to start ${sourceLabel} connection`,
         );
       }
       const data = (await res.json()) as DeviceCodeInfo;
@@ -546,14 +549,16 @@ function ChooseStep({
   onCancel: () => void;
 }) {
   const { t } = useLingui();
+  const sourceLabel = config.label;
+  const acceptFormat = config.accept;
   return (
     <>
       <DialogHeader>
         <DialogTitle>
-          <Trans>Import from {config.label}</Trans>
+          <Trans>Import from {sourceLabel}</Trans>
         </DialogTitle>
         <DialogDescription>
-          <Trans>Choose how to import your {config.label} data.</Trans>
+          <Trans>Choose how to import your {sourceLabel} data.</Trans>
         </DialogDescription>
       </DialogHeader>
 
@@ -566,7 +571,7 @@ function ChooseStep({
 
         <button
           type="button"
-          className="border-border/50 hover:bg-muted/50 flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors"
+          className="border-border/50 hover:bg-muted/50 flex w-full items-center gap-3 rounded-lg border p-4 text-start transition-colors"
           onClick={onConnect}
         >
           <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
@@ -574,17 +579,17 @@ function ChooseStep({
           </div>
           <div>
             <p className="text-sm font-medium">
-              <Trans>Connect with {config.label}</Trans>
+              <Trans>Connect with {sourceLabel}</Trans>
             </p>
             <p className="text-muted-foreground text-xs">
-              <Trans>Authorize Sofa to read your {config.label} library. No password shared.</Trans>
+              <Trans>Authorize Sofa to read your {sourceLabel} library. No password shared.</Trans>
             </p>
           </div>
         </button>
 
         <button
           type="button"
-          className="border-border/50 hover:bg-muted/50 flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors"
+          className="border-border/50 hover:bg-muted/50 flex w-full items-center gap-3 rounded-lg border p-4 text-start transition-colors"
           onClick={() => {
             onCancel();
             // Small delay so the dialog closes before file picker opens
@@ -600,7 +605,7 @@ function ChooseStep({
               <Trans>Upload export file</Trans>
             </p>
             <p className="text-muted-foreground text-xs">
-              {t`Upload a ${config.accept} export from your ${config.label} account settings.`}
+              {t`Upload a ${acceptFormat} export from your ${sourceLabel} account settings.`}
             </p>
           </div>
         </button>
@@ -725,6 +730,12 @@ function PreviewStep({
     (options.importWatchlist ? stats.watchlist : 0) +
     (options.importRatings ? stats.ratings : 0);
 
+  const movieCount = stats.movies;
+  const episodeCount = stats.episodes;
+  const watchlistCount = stats.watchlist;
+  const ratingCount = stats.ratings;
+  const unresolvedCount = preview.diagnostics?.unresolved ?? 0;
+
   return (
     <>
       <DialogHeader>
@@ -738,18 +749,18 @@ function PreviewStep({
 
       <div className="space-y-4 py-2">
         <div className="grid grid-cols-2 gap-3">
-          <StatBadge label={t`Movies`} count={stats.movies} />
-          <StatBadge label={t`Episodes`} count={stats.episodes} />
-          <StatBadge label={t`Watchlist`} count={stats.watchlist} />
-          <StatBadge label={t`Ratings`} count={stats.ratings} />
+          <StatBadge label={t`Movies`} count={movieCount} />
+          <StatBadge label={t`Episodes`} count={episodeCount} />
+          <StatBadge label={t`Watchlist`} count={watchlistCount} />
+          <StatBadge label={t`Ratings`} count={ratingCount} />
         </div>
 
-        {preview.diagnostics && preview.diagnostics.unresolved > 0 && (
+        {preview.diagnostics && unresolvedCount > 0 && (
           <div className="bg-muted/50 rounded-lg p-3">
             <p className="text-muted-foreground text-xs">
               <Trans>
-                {preview.diagnostics.unresolved} items have no external IDs and will be resolved by
-                title search, which may be less accurate.
+                {unresolvedCount} items have no external IDs and will be resolved by title search,
+                which may be less accurate.
               </Trans>
             </p>
           </div>
@@ -761,19 +772,19 @@ function PreviewStep({
           </p>
           <OptionCheckbox
             label={t`Watch history`}
-            description={t`${stats.movies} movies, ${stats.episodes} episodes`}
+            description={t`${movieCount} movies, ${episodeCount} episodes`}
             checked={options.importWatches}
             onChange={(v) => setOptions({ ...options, importWatches: v })}
           />
           <OptionCheckbox
             label={t`Watchlist`}
-            description={t`${stats.watchlist} items`}
+            description={t`${watchlistCount} items`}
             checked={options.importWatchlist}
             onChange={(v) => setOptions({ ...options, importWatchlist: v })}
           />
           <OptionCheckbox
             label={t`Ratings`}
-            description={t`${stats.ratings} ratings`}
+            description={t`${ratingCount} ratings`}
             checked={options.importRatings}
             onChange={(v) => setOptions({ ...options, importRatings: v })}
           />
@@ -863,6 +874,9 @@ function DoneStep({
   onClose: () => void;
 }) {
   const { t } = useLingui();
+  const errorCount = result.errors.length;
+  const warningCount = result.warnings.length;
+  const remainingErrors = errorCount - 50;
   return (
     <>
       <DialogHeader>
@@ -881,28 +895,28 @@ function DoneStep({
           <StatBadge label={t`Failed`} count={result.failed} />
         </div>
 
-        {result.errors.length > 0 && (
+        {errorCount > 0 && (
           <div className="bg-destructive/10 max-h-40 overflow-y-auto rounded-lg p-3">
             <p className="text-destructive mb-1 text-xs font-medium">
-              <Trans>Errors ({result.errors.length})</Trans>
+              <Trans>Errors ({errorCount})</Trans>
             </p>
             <ul className="text-destructive/80 space-y-0.5 text-xs">
               {result.errors.slice(0, 50).map((e, i) => (
                 <li key={i}>{e}</li>
               ))}
-              {result.errors.length > 50 && (
+              {errorCount > 50 && (
                 <li>
-                  <Trans>...and {result.errors.length - 50} more</Trans>
+                  <Trans>...and {remainingErrors} more</Trans>
                 </li>
               )}
             </ul>
           </div>
         )}
 
-        {result.warnings.length > 0 && (
+        {warningCount > 0 && (
           <div className="max-h-32 overflow-y-auto rounded-lg bg-yellow-500/10 p-3">
             <p className="mb-1 text-xs font-medium text-yellow-600">
-              <Trans>Warnings ({result.warnings.length})</Trans>
+              <Trans>Warnings ({warningCount})</Trans>
             </p>
             <ul className="space-y-0.5 text-xs text-yellow-600/80">
               {result.warnings.slice(0, 20).map((w, i) => (

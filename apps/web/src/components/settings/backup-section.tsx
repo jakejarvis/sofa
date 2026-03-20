@@ -93,9 +93,10 @@ export function BackupSection() {
   const creating = createMutation.isPending;
   const deleting = deleteMutation.isPending ? (deleteMutation.variables?.filename ?? null) : null;
 
+  const backupCount = displayBackups.length;
   const backupCountLabel =
-    displayBackups.length > 0
-      ? t`${displayBackups.length} ${plural(displayBackups.length, { one: "backup", other: "backups" })} stored`
+    backupCount > 0
+      ? t`${plural(backupCount, { one: "# backup", other: "# backups" })} stored`
       : t`No backups yet`;
 
   return (
@@ -126,136 +127,136 @@ export function BackupSection() {
         {displayBackups.length > 0 && (
           <CardContent className="border-border/30 border-t pt-4">
             <div className="space-y-1.5">
-              {displayBackups.map((backup: BackupInfo) => (
-                <motion.div
-                  key={backup.filename}
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  <div className="group hover:bg-muted/40 flex items-center gap-3 rounded-md px-2.5 py-1.5 transition-colors">
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <span className="text-muted-foreground flex shrink-0 items-center" />
-                        }
-                      >
-                        {backup.source === "scheduled" ? (
-                          <IconClock aria-hidden={true} className="size-3.5" />
-                        ) : backup.source === "pre-restore" ? (
-                          <IconShieldCheck aria-hidden={true} className="size-3.5" />
-                        ) : (
-                          <IconPointer aria-hidden={true} className="size-3.5" />
-                        )}
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {backup.source === "scheduled"
-                          ? t`Scheduled backup`
-                          : backup.source === "pre-restore"
-                            ? t`Pre-restore backup`
-                            : t`Manual backup`}
-                      </TooltipContent>
-                    </Tooltip>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-foreground text-xs font-medium">
-                          {formatBackupDate(backup.createdAt)}
-                        </span>
-                        <span className="text-muted-foreground text-[11px]">
-                          {formatBytesI18n(backup.sizeBytes)}
-                        </span>
-                        <span
-                          className="text-muted-foreground/50 text-[11px]"
-                          suppressHydrationWarning
-                        >
-                          {formatRelativeTime(backup.createdAt)}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
+              {displayBackups.map((backup: BackupInfo) => {
+                const backupDate = formatBackupDate(backup.createdAt);
+                return (
+                  <motion.div
+                    key={backup.filename}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="group hover:bg-muted/40 flex items-center gap-3 rounded-md px-2.5 py-1.5 transition-colors">
                       <Tooltip>
                         <TooltipTrigger
                           render={
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              className="text-muted-foreground hover:text-foreground"
-                              nativeButton={false}
-                              render={
-                                <a
-                                  href={`/api/backup/${backup.filename}`}
-                                  download
-                                  aria-label={t`Download backup`}
-                                >
-                                  <IconCloudDownload />
-                                </a>
-                              }
-                            />
+                            <span className="text-muted-foreground flex shrink-0 items-center" />
                           }
-                        />
+                        >
+                          {backup.source === "scheduled" ? (
+                            <IconClock aria-hidden={true} className="size-3.5" />
+                          ) : backup.source === "pre-restore" ? (
+                            <IconShieldCheck aria-hidden={true} className="size-3.5" />
+                          ) : (
+                            <IconPointer aria-hidden={true} className="size-3.5" />
+                          )}
+                        </TooltipTrigger>
                         <TooltipContent>
-                          <Trans>Download</Trans>
+                          {backup.source === "scheduled"
+                            ? t`Scheduled backup`
+                            : backup.source === "pre-restore"
+                              ? t`Pre-restore backup`
+                              : t`Manual backup`}
                         </TooltipContent>
                       </Tooltip>
-                      <AlertDialog>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-foreground text-xs font-medium">{backupDate}</span>
+                          <span className="text-muted-foreground text-[11px]">
+                            {formatBytesI18n(backup.sizeBytes)}
+                          </span>
+                          <span
+                            className="text-muted-foreground/50 text-[11px]"
+                            suppressHydrationWarning
+                          >
+                            {formatRelativeTime(backup.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
                         <Tooltip>
-                          <AlertDialogTrigger
+                          <TooltipTrigger
                             render={
-                              <TooltipTrigger
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="text-muted-foreground hover:text-foreground"
+                                nativeButton={false}
                                 render={
-                                  <Button
-                                    variant="ghost"
-                                    size="icon-sm"
-                                    aria-label={t`Delete backup`}
-                                    className="text-muted-foreground hover:text-destructive"
-                                    disabled={deleting === backup.filename}
-                                  />
+                                  <a
+                                    href={`/api/backup/${backup.filename}`}
+                                    download
+                                    aria-label={t`Download backup`}
+                                  >
+                                    <IconCloudDownload />
+                                  </a>
                                 }
                               />
                             }
-                          >
-                            {deleting === backup.filename ? <Spinner /> : <IconTrash />}
-                          </AlertDialogTrigger>
+                          />
                           <TooltipContent>
-                            <Trans>Delete</Trans>
+                            <Trans>Download</Trans>
                           </TooltipContent>
                         </Tooltip>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              <Trans>Delete backup?</Trans>
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              <Trans>
-                                This will permanently delete the backup from{" "}
-                                <strong>{formatBackupDate(backup.createdAt)}</strong>. This cannot
-                                be undone.
-                              </Trans>
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>
-                              <Trans>Cancel</Trans>
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              variant="destructive"
-                              onClick={() =>
-                                deleteMutation.mutate({
-                                  filename: backup.filename,
-                                })
+                        <AlertDialog>
+                          <Tooltip>
+                            <AlertDialogTrigger
+                              render={
+                                <TooltipTrigger
+                                  render={
+                                    <Button
+                                      variant="ghost"
+                                      size="icon-sm"
+                                      aria-label={t`Delete backup`}
+                                      className="text-muted-foreground hover:text-destructive"
+                                      disabled={deleting === backup.filename}
+                                    />
+                                  }
+                                />
                               }
                             >
+                              {deleting === backup.filename ? <Spinner /> : <IconTrash />}
+                            </AlertDialogTrigger>
+                            <TooltipContent>
                               <Trans>Delete</Trans>
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                            </TooltipContent>
+                          </Tooltip>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                <Trans>Delete backup?</Trans>
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                <Trans>
+                                  This will permanently delete the backup from{" "}
+                                  <strong>{backupDate}</strong>. This cannot be undone.
+                                </Trans>
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>
+                                <Trans>Cancel</Trans>
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                variant="destructive"
+                                onClick={() =>
+                                  deleteMutation.mutate({
+                                    filename: backup.filename,
+                                  })
+                                }
+                              >
+                                <Trans>Delete</Trans>
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
           </CardContent>
         )}

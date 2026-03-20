@@ -27,6 +27,8 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItemProps
   const { t } = useLingui();
   const stillUrl = item.nextEpisode?.stillPath ?? item.title.backdropPath ?? null;
   const progress = item.totalEpisodes > 0 ? (item.watchedEpisodes / item.totalEpisodes) * 100 : 0;
+  const watchedEpisodes = item.watchedEpisodes;
+  const totalEpisodes = item.totalEpisodes;
 
   return (
     <Link
@@ -63,7 +65,7 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItemProps
               {t`Up next`}
             </p>
             <p className="mt-0.5 truncate text-sm font-medium text-white">
-              <span className="mr-0.5 font-mono text-xs text-white/60 [word-spacing:-0.25em]">
+              <span className="me-0.5 font-mono text-xs text-white/60 [word-spacing:-0.25em]">
                 S{item.nextEpisode.seasonNumber} E{item.nextEpisode.episodeNumber}
               </span>{" "}
               {item.nextEpisode.name}
@@ -75,7 +77,7 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItemProps
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium">{item.title.title}</p>
           <p className="text-muted-foreground text-xs">
-            {t`${item.watchedEpisodes}/${item.totalEpisodes} ${plural(item.totalEpisodes, { one: "episode", other: "episodes" })}`}
+            {t`${watchedEpisodes}/${plural(totalEpisodes, { one: "# episode", other: "# episodes" })}`}
           </p>
         </div>
         <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors">

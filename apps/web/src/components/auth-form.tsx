@@ -48,6 +48,7 @@ export function AuthForm({
   const isRegister = mode === "register";
   const showOidc = authConfig?.oidcEnabled ?? false;
   const showPasswordForm = !(authConfig?.passwordLoginDisabled ?? false);
+  const oidcProviderName = authConfig?.oidcProviderName || "SSO";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -139,7 +140,7 @@ export function AuthForm({
                 {oidcLoading ? (
                   <Trans>Redirecting…</Trans>
                 ) : (
-                  <Trans>Sign in with {authConfig?.oidcProviderName || "SSO"}</Trans>
+                  <Trans>Sign in with {oidcProviderName}</Trans>
                 )}
               </Button>
             </motion.div>

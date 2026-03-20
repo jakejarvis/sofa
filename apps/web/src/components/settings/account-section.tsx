@@ -294,7 +294,7 @@ export function AccountSection({
                     transition={{ duration: 0.1 }}
                     type="button"
                     onClick={() => setIsEditingName(true)}
-                    className="group/name hover:text-primary inline-flex items-center gap-1.5 rounded-md px-0 text-left transition-colors"
+                    className="group/name hover:text-primary inline-flex items-center gap-1.5 rounded-md px-0 text-start transition-colors"
                   >
                     {displayName}
                     <IconPencil className="group-hover/name:text-muted-foreground size-3 text-transparent transition-colors" />
@@ -305,7 +305,7 @@ export function AccountSection({
             <CardDescription>
               {user.email}
               {user.role === "admin" && (
-                <Badge className="bg-primary/10 text-primary ml-1.5 rounded-md border-0 align-middle">
+                <Badge className="bg-primary/10 text-primary ms-1.5 rounded-md border-0 align-middle">
                   <Trans>Admin</Trans>
                 </Badge>
               )}

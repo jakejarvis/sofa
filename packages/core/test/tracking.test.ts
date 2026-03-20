@@ -235,7 +235,7 @@ describe("logEpisodeWatch", () => {
     expect(row?.status).toBe("completed");
   });
 
-  test("auto-completes when all episodes are watched", () => {
+  test("stays in_progress when all episodes are watched", () => {
     insertUser();
     const { titleId, episodeIds } = insertTvShow("tv-1", 99999, 1, 3);
 
@@ -248,7 +248,7 @@ describe("logEpisodeWatch", () => {
       .from(userTitleStatus)
       .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
-    expect(row?.status).toBe("completed");
+    expect(row?.status).toBe("in_progress");
   });
 });
 
@@ -281,7 +281,7 @@ describe("logEpisodeWatchBatch", () => {
     expect(row?.status).toBe("in_progress");
   });
 
-  test("auto-completes if batch covers all episodes", () => {
+  test("stays in_progress if batch covers all episodes", () => {
     insertUser();
     const { titleId, episodeIds } = insertTvShow("tv-1", 99999, 1, 3);
     logEpisodeWatchBatch("user-1", episodeIds);
@@ -291,7 +291,7 @@ describe("logEpisodeWatchBatch", () => {
       .from(userTitleStatus)
       .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
-    expect(row?.status).toBe("completed");
+    expect(row?.status).toBe("in_progress");
   });
 
   test("no-op for empty array", () => {
@@ -310,7 +310,7 @@ describe("logEpisodeWatchBatch", () => {
 // ── markAllEpisodesWatched ──────────────────────────────────────────
 
 describe("markAllEpisodesWatched", () => {
-  test("marks all episodes as watched and sets completed", () => {
+  test("marks all episodes as watched and sets in_progress", () => {
     insertUser();
     const { titleId, episodeIds } = insertTvShow("tv-1", 99999, 1, 3);
     markAllEpisodesWatched("user-1", titleId);
@@ -327,7 +327,7 @@ describe("markAllEpisodesWatched", () => {
       .from(userTitleStatus)
       .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
-    expect(row?.status).toBe("completed");
+    expect(row?.status).toBe("in_progress");
   });
 
   test("skips already-watched episodes (no duplicates)", () => {
@@ -379,23 +379,15 @@ describe("unwatchEpisode", () => {
     expect(watches).toHaveLength(0);
   });
 
-  test("downgrades completed to in_progress", () => {
+  test("keeps in_progress when some episodes remain watched", () => {
     insertUser();
     const { titleId, episodeIds } = insertTvShow("tv-1", 99999, 1, 3);
     markAllEpisodesWatched("user-1", titleId);
 
-    // Verify completed first
-    let row = testDb
-      .select()
-      .from(userTitleStatus)
-      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
-      .get();
-    expect(row?.status).toBe("completed");
-
-    // Unwatch one episode
+    // Unwatch one episode — still has 2 watched
     unwatchEpisode("user-1", episodeIds[0]);
 
-    row = testDb
+    const row = testDb
       .select()
       .from(userTitleStatus)
       .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
@@ -403,7 +395,23 @@ describe("unwatchEpisode", () => {
     expect(row?.status).toBe("in_progress");
   });
 
-  test("doesn't change in_progress status", () => {
+  test("downgrades to watchlist when all episodes unwatched", () => {
+    insertUser();
+    const { titleId, episodeIds } = insertTvShow("tv-1", 99999, 1, 3);
+
+    // Watch one episode then unwatch it
+    logEpisodeWatch("user-1", episodeIds[0]);
+    unwatchEpisode("user-1", episodeIds[0]);
+
+    const row = testDb
+      .select()
+      .from(userTitleStatus)
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
+      .get();
+    expect(row?.status).toBe("watchlist");
+  });
+
+  test("doesn't change in_progress status when episodes remain", () => {
     insertUser();
     const { titleId, episodeIds } = insertTvShow("tv-1", 99999, 1, 3);
     logEpisodeWatch("user-1", episodeIds[0]);
@@ -448,29 +456,39 @@ describe("unwatchSeason", () => {
     expect(watches).toHaveLength(0);
   });
 
-  test("downgrades completed to in_progress", () => {
+  test("keeps in_progress when other seasons have watches", () => {
     insertUser();
     const { titleId } = insertTvShow("tv-1", 99999, 2, 2);
 
     // Watch all episodes across both seasons
     markAllEpisodesWatched("user-1", titleId);
 
-    let row = testDb
-      .select()
-      .from(userTitleStatus)
-      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
-      .get();
-    expect(row?.status).toBe("completed");
-
-    // Unwatch season 1
+    // Unwatch season 1 — season 2 still has watches
     unwatchSeason("user-1", "tv-1-s1");
 
-    row = testDb
+    const row = testDb
       .select()
       .from(userTitleStatus)
       .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
       .get();
     expect(row?.status).toBe("in_progress");
+  });
+
+  test("downgrades to watchlist when all episodes unwatched", () => {
+    insertUser();
+    const { titleId } = insertTvShow("tv-1", 99999, 1, 2);
+
+    markAllEpisodesWatched("user-1", titleId);
+
+    // Unwatch the only season — no episodes remain
+    unwatchSeason("user-1", "tv-1-s1");
+
+    const row = testDb
+      .select()
+      .from(userTitleStatus)
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, titleId)))
+      .get();
+    expect(row?.status).toBe("watchlist");
   });
 });
 

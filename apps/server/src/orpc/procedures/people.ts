@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 
 import { AppErrorCode } from "@sofa/api/errors";
 import { fetchFullFilmography, getOrFetchPerson } from "@sofa/core/person";
-import { getUserStatusesByTitleIds } from "@sofa/core/tracking";
+import { getDisplayStatusesByTitleIds } from "@sofa/core/tracking";
 
 import { os } from "../context";
 import { authed } from "../middleware";
@@ -20,7 +20,7 @@ export const detail = os.people.detail.use(authed).handler(async ({ input, conte
   const start = (input.page - 1) * input.limit;
   const pageCredits = allCredits.slice(start, start + input.limit);
 
-  const userStatuses = getUserStatusesByTitleIds(
+  const userStatuses = getDisplayStatusesByTitleIds(
     context.user.id,
     pageCredits.map((c) => c.titleId),
   );

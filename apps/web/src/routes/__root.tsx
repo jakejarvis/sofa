@@ -1,5 +1,5 @@
 import { I18nProvider } from "@lingui/react";
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
@@ -11,11 +11,12 @@ import { MotionConfig } from "motion/react";
 
 import { NavigationProgress } from "@/components/navigation-progress";
 import { SofaLogo } from "@/components/sofa-logo";
+import { DirectionProvider } from "@/components/ui/direction";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { initLocale } from "@/lib/i18n";
 import type { orpc } from "@/lib/orpc/client";
-import { i18n } from "@sofa/i18n";
+import { getDirection, i18n } from "@sofa/i18n";
 
 import "@/styles/globals.css";
 
@@ -53,13 +54,7 @@ function RootComponent() {
       <HeadContent />
       <StoreProvider>
         <I18nProvider i18n={i18n}>
-          <MotionConfig reducedMotion="user">
-            <NavigationProgress />
-            <TooltipProvider>
-              <Outlet />
-            </TooltipProvider>
-            <Toaster position="bottom-right" />
-          </MotionConfig>
+          <AppShell />
         </I18nProvider>
       </StoreProvider>
       <TanStackDevtools
@@ -75,6 +70,23 @@ function RootComponent() {
         ]}
       />
     </>
+  );
+}
+
+function AppShell() {
+  const { i18n: linguiI18n } = useLingui();
+  const direction = getDirection(linguiI18n.locale);
+
+  return (
+    <DirectionProvider direction={direction}>
+      <MotionConfig reducedMotion="user">
+        <NavigationProgress />
+        <TooltipProvider>
+          <Outlet />
+        </TooltipProvider>
+        <Toaster position={direction === "rtl" ? "bottom-left" : "bottom-right"} />
+      </MotionConfig>
+    </DirectionProvider>
   );
 }
 

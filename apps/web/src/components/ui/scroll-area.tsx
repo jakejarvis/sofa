@@ -36,7 +36,7 @@ function ScrollArea({
           "no-scrollbar focus-visible:ring-ring/50 flex-1 rounded-[inherit] outline-none focus-visible:ring-[3px] focus-visible:outline-1 data-has-overflow-x:overscroll-x-contain",
           scrollFade &&
             "mask-t-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-y-start)))] mask-r-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-x-end)))] mask-b-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-y-end)))] mask-l-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-x-start)))] [--fade-size:1.5rem]",
-          scrollbarGutter && "data-has-overflow-x:pb-2.5 data-has-overflow-y:pr-2.5",
+          scrollbarGutter && "data-has-overflow-x:pb-2.5 data-has-overflow-y:pe-2.5",
         )}
       >
         <ScrollAreaPrimitive.Content data-slot="scroll-area-content" ref={contentRef}>

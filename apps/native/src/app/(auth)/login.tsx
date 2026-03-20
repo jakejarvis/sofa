@@ -84,34 +84,38 @@ export default function LoginScreen() {
 
   return (
     <AuthScreen title="Sofa" subtitle={t`Sign in to continue`}>
-      {showOidc && (
-        <Animated.View entering={FadeInDown.duration(300).delay(100)} className="mb-4">
-          <Button
-            onPress={() => {
-              authClient.signIn.oauth2({
-                providerId: "oidc",
-                callbackURL: "/(tabs)/(home)",
-              });
-            }}
-            variant="secondary"
-            className="w-full"
-          >
-            <ButtonLabel>
-              <Trans>Sign in with {authConfig.data?.oidcProviderName ?? "SSO"}</Trans>
-            </ButtonLabel>
-          </Button>
+      {showOidc &&
+        (() => {
+          const providerName = authConfig.data?.oidcProviderName ?? "SSO";
+          return (
+            <Animated.View entering={FadeInDown.duration(300).delay(100)} className="mb-4">
+              <Button
+                onPress={() => {
+                  authClient.signIn.oauth2({
+                    providerId: "oidc",
+                    callbackURL: "/(tabs)/(home)",
+                  });
+                }}
+                variant="secondary"
+                className="w-full"
+              >
+                <ButtonLabel>
+                  <Trans>Sign in with {providerName}</Trans>
+                </ButtonLabel>
+              </Button>
 
-          {showPasswordLogin && (
-            <View className="my-4 flex-row items-center">
-              <View className="bg-border h-px flex-1" />
-              <Text className="text-muted-foreground px-3 text-xs">
-                <Trans>OR</Trans>
-              </Text>
-              <View className="bg-border h-px flex-1" />
-            </View>
-          )}
-        </Animated.View>
-      )}
+              {showPasswordLogin && (
+                <View className="my-4 flex-row items-center">
+                  <View className="bg-border h-px flex-1" />
+                  <Text className="text-muted-foreground px-3 text-xs">
+                    <Trans>OR</Trans>
+                  </Text>
+                  <View className="bg-border h-px flex-1" />
+                </View>
+              )}
+            </Animated.View>
+          );
+        })()}
 
       {showPasswordLogin && (
         <View className="gap-3">

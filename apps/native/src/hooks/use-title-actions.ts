@@ -57,8 +57,6 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
       onSuccess: (_data, input) => {
         const statusMessages: Record<string, string> = {
           watchlist: t`Added to watchlist`,
-          in_progress: t`Marked as watching`,
-          completed: t`Marked as completed`,
         };
         const defaultMsg = input.status
           ? (statusMessages[input.status] ?? t`Status updated`)
@@ -83,9 +81,10 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   const updateRating = useMutation(
     orpc.titles.updateRating.mutationOptions({
       onSuccess: (_data, input) => {
+        const stars = input.stars;
         const defaultMsg =
-          input.stars > 0
-            ? t`Rated ${input.stars} ${plural(input.stars, { one: "star", other: "stars" })}`
+          stars > 0
+            ? t`Rated ${plural(stars, { one: "# star", other: "# stars" })}`
             : t`Rating removed`;
         toast.success(resolveToast(toastOverrides?.updateRating, defaultMsg, input));
         // Rating only invalidates title queries, not dashboard

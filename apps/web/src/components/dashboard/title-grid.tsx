@@ -10,7 +10,7 @@ interface TitleGridItem {
   releaseDate?: string | null;
   firstAirDate?: string | null;
   voteAverage?: number | null;
-  userStatus?: "watchlist" | "in_progress" | "completed" | null;
+  userStatus?: "in_watchlist" | "watching" | "caught_up" | "completed" | null;
 }
 
 export function TitleGridSectionSkeleton() {

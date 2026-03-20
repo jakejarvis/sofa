@@ -11,7 +11,7 @@
       "@orpc/client": "1.13.9",
       "@orpc/contract": "1.13.9",
       "@orpc/tanstack-query": "1.13.9",
-      "@tanstack/react-query": "5.91.2",
+      "@tanstack/react-query": "5.91.3",
       "@types/bun": "1.3.11",
       "@types/node": "25.5.0",
       "@types/react": "19.2.14",
@@ -46,13 +46,13 @@
     "test": "turbo run test",
     "generate:openapi": "bun scripts/generate-openapi-spec.ts && cd docs && bun run generate:api-docs",
     "i18n:extract": "lingui extract",
-    "i18n:compile": "lingui compile --typescript",
     "i18n:claude": "bun packages/i18n/scripts/claude.ts"
   },
   "devDependencies": {
     "@lingui/cli": "catalog:",
     "@lingui/conf": "catalog:",
     "@lingui/format-po": "catalog:",
+    "eslint-plugin-lingui": "0.11.0",
     "oxfmt": "0.41.0",
     "oxlint": "1.56.0",
     "turbo": "2.8.20",

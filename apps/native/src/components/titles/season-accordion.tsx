@@ -99,6 +99,9 @@ export function SeasonAccordion({
     [watchedEpisodeIds, unwatchEpisode, watchEpisode],
   );
 
+  const seasonNumber = season.seasonNumber;
+  const episodeCount = episodes.length;
+
   return (
     <View
       className="bg-card mb-2 overflow-hidden rounded-xl border"
@@ -110,16 +113,16 @@ export function SeasonAccordion({
       <Pressable
         onPress={toggleExpanded}
         accessibilityRole="button"
-        accessibilityLabel={`${season.name ?? t`Season ${season.seasonNumber}`}, ${t`${watchedCount} of ${episodes.length} episodes watched`}`}
+        accessibilityLabel={`${season.name ?? t`Season ${seasonNumber}`}, ${t`${watchedCount} of ${episodeCount} episodes watched`}`}
         accessibilityState={{ expanded }}
         className="flex-row items-center justify-between p-4"
       >
         <View className="flex-1">
           <Text className="text-foreground font-sans text-base font-medium">
-            {season.name ?? t`Season ${season.seasonNumber}`}
+            {season.name ?? t`Season ${seasonNumber}`}
           </Text>
           <Text className="text-muted-foreground mt-0.5 text-xs">
-            {t`${watchedCount}/${episodes.length} ${plural(episodes.length, { one: "episode", other: "episodes" })}`}
+            {t`${watchedCount}/${plural(episodeCount, { one: "# episode", other: "# episodes" })}`}
           </Text>
         </View>
 

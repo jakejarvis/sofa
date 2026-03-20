@@ -32,7 +32,7 @@ export function TitleCardSkeleton() {
   );
 }
 
-type TitleStatus = "watchlist" | "in_progress" | "completed";
+type TitleStatus = "in_watchlist" | "watching" | "caught_up" | "completed";
 
 interface TiltStyles {
   imageStyle: MotionStyle;
@@ -59,14 +59,19 @@ export interface TitleCardProps extends CardInnerProps {
 function useStatusConfig() {
   const { t } = useLingui();
   return {
-    watchlist: {
+    in_watchlist: {
       icon: IconBookmarkFilled,
       label: t`On Watchlist`,
       badgeClass: "bg-status-watching/90 text-white",
     },
-    in_progress: {
+    watching: {
       icon: IconPlayerPlayFilled,
       label: t`Watching`,
+      badgeClass: "bg-status-watching/90 text-white",
+    },
+    caught_up: {
+      icon: IconCircleCheckFilled,
+      label: t`Caught Up`,
       badgeClass: "bg-status-watching/90 text-white",
     },
     completed: {
@@ -91,7 +96,7 @@ function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStat
 
   const quickAddMutation = useMutation(
     orpc.titles.quickAdd.mutationOptions({
-      onSuccess: () => setAddedStatus("watchlist"),
+      onSuccess: () => setAddedStatus("in_watchlist"),
     }),
   );
 
@@ -110,7 +115,7 @@ function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStat
     return (
       <Tooltip>
         <TooltipTrigger
-          className="absolute top-2 right-2 z-10 flex size-8 cursor-default items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm"
+          className="absolute end-2 top-2 z-10 flex size-8 cursor-default items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm"
           render={<div />}
         >
           <StatusIcon className="size-4" />
@@ -124,7 +129,7 @@ function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStat
     <Tooltip>
       <TooltipTrigger
         onClick={handleClick}
-        className="absolute top-2 right-2 z-10 flex size-8 items-center justify-center rounded-full bg-black/50 text-white opacity-60 backdrop-blur-sm transition-opacity hover:bg-black/70 focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+        className="absolute end-2 top-2 z-10 flex size-8 items-center justify-center rounded-full bg-black/50 text-white opacity-60 backdrop-blur-sm transition-opacity hover:bg-black/70 focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
         render={<button type="button" />}
       >
         {!quickAddMutation.isPending && <IconPlus className="size-4" />}

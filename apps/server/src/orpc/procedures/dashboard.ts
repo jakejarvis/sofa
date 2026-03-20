@@ -7,6 +7,7 @@ import {
   getWatchCount,
   getWatchHistory,
 } from "@sofa/core/discovery";
+import { getDisplayStatusesByTitleIds } from "@sofa/core/tracking";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 
 import { os } from "../context";
@@ -49,6 +50,10 @@ export const library = os.dashboard.library.use(authed).handler(({ input, contex
     totalPages,
     totalResults,
   } = getLibraryFeed(context.user.id, input.page, input.limit);
+
+  const titleIds = feed.map((t) => t.titleId);
+  const displayStatuses = getDisplayStatusesByTitleIds(context.user.id, titleIds);
+
   const items = feed.map((t) => ({
     id: t.titleId,
     tmdbId: t.tmdbId,
@@ -59,7 +64,7 @@ export const library = os.dashboard.library.use(authed).handler(({ input, contex
     releaseDate: t.releaseDate ?? null,
     firstAirDate: t.firstAirDate ?? null,
     voteAverage: t.voteAverage,
-    userStatus: t.userStatus,
+    userStatus: displayStatuses[t.titleId] ?? null,
   }));
   return { items, page, totalPages, totalResults };
 });

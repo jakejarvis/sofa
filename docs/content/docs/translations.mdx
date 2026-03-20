@@ -7,11 +7,17 @@ icon: Languages
 Sofa supports multiple languages for the web and mobile apps. The current supported locales are:
 
 - English (source)
+- Arabic
+- Chinese
+- Dutch
 - French
 - German
-- Spanish
+- Hebrew
 - Italian
+- Japanese
+- Korean
 - Portuguese
+- Spanish
 
 You can switch languages in **Settings > Language** on web or the mobile app. Sofa detects your browser or device language on first launch and defaults to it if supported. This setting is **not** saved to the server — it is only persisted to the current browser or device.
 
@@ -24,7 +30,7 @@ The translation pipeline:
 1. React (web) and React Native (mobile) apps wrap UI strings in `<Trans>` components or `` msg`...` `` macros
 2. `bun run i18n:extract` scans the codebase and updates `en.po` with new strings
 3. Translations are added to each locale's `.po` file (e.g. `fr.po`, `de.po`)
-4. `bun run i18n:compile` compiles `.po` files into TypeScript for use at runtime
+4. The Vite and Metro plugins compile `.po` files on the fly at dev/build time
 5. Non-English locales are lazy-loaded on demand
 
 ## Contributing via Crowdin
@@ -51,7 +57,7 @@ bun packages/i18n/scripts/claude.ts all --dry-run
 bun packages/i18n/scripts/claude.ts all --model opus
 ```
 
-The script only translates strings with empty `msgstr` — existing translations are never overwritten. It reads the locale list from [`lingui.config.ts`](https://github.com/jakejarvis/sofa/blob/main/lingui.config.ts) automatically and compiles catalogs after translating.
+The script only translates strings with empty `msgstr` — existing translations are never overwritten. It reads the locale list from [`lingui.config.ts`](https://github.com/jakejarvis/sofa/blob/main/lingui.config.ts) automatically.
 
 <Callout type="info">
   Using this script really only makes sense if you have a [Claude Max
@@ -64,7 +70,6 @@ The script only translates strings with empty `msgstr` — existing translations
 2. Run `bun run i18n:extract` — this creates a new `.po` file for the locale
 3. Translate the strings (via Crowdin, manually, or with `bun packages/i18n/scripts/claude.ts <locale>`)
 4. Add the locale to the `LOCALE_INFO` array in [`packages/i18n/src/locales.ts`](https://github.com/jakejarvis/sofa/blob/main/packages/i18n/src/locales.ts) with its native name
-5. Run `bun run i18n:compile`
 
 ## Translation guidelines
 

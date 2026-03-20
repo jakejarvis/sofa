@@ -1,7 +1,7 @@
 import {
   getAllTrackedTitleIds,
   getAvailabilityByTitleIds,
-  getCompletedTitleIds,
+  getEngagedTitleIds,
   getEpisodesBySeasonIds,
   getEpisodeWatchCountSince,
   getEpisodeWatchesByEpisodeIds,
@@ -302,7 +302,7 @@ export { getLibraryFeed } from "@sofa/db/queries/discovery";
 
 export function getRecommendationsFeed(userId: string) {
   // Get recommendations from user's highly-rated or completed titles
-  const userCompletedOrRated = getCompletedTitleIds(userId);
+  const userCompletedOrRated = getEngagedTitleIds(userId);
 
   const ratedIds = getHighlyRatedTitleIds(userId);
 

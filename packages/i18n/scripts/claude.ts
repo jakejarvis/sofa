@@ -182,9 +182,35 @@ function getUntranslatedEntries(catalog: CatalogType): UntranslatedEntry[] {
 // does not detect argument type changes, malformed plural/select, or nested corruption.
 
 function extractSimplePlaceholders(text: string): string[] {
-  // Intentionally conservative. This catches the common placeholder cases:
-  // {0}, {name}, {count}
-  return [...text.matchAll(/\{[a-zA-Z0-9_]+\}/g)].map((m) => m[0]).sort();
+  // Extract top-level ICU placeholders ({0}, {name}, {count}) while skipping
+  // content words nested inside plural/select branches like {episode} in
+  // "{count, plural, one {episode} other {episodes}}".
+  const results: string[] = [];
+  let depth = 0;
+  let argStart = -1;
+
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === "{") {
+      if (depth === 0) argStart = i;
+      depth++;
+    } else if (text[i] === "}") {
+      depth--;
+      if (depth === 0 && argStart >= 0) {
+        const inner = text.slice(argStart + 1, i);
+        // Top-level simple placeholder: just an identifier, no comma (not plural/select)
+        if (/^[a-zA-Z0-9_]+$/.test(inner)) {
+          results.push(`{${inner}}`);
+        } else {
+          // Complex ICU argument — extract just the argument name before the comma
+          const argName = inner.match(/^([a-zA-Z0-9_]+)\s*,/)?.[1];
+          if (argName) results.push(`{${argName}}`);
+        }
+        argStart = -1;
+      }
+    }
+  }
+
+  return results.sort();
 }
 
 function extractNumberedTags(text: string): string[] {
@@ -492,28 +518,18 @@ for (const locale of locales) {
   await translateLocale(locale, model, batchSize, dryRun, contextMap);
 }
 
-if (!dryRun) {
-  // Re-extract to restore #. placeholder comments that @lingui/format-po's
-  // serialize() strips during the round-trip.
-  console.log("Re-extracting to restore comments...");
-  const extract = Bun.spawn(["bun", "run", "i18n:extract"], {
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-  if ((await extract.exited) !== 0) {
-    console.error("Extraction failed");
-    process.exit(1);
-  }
-
-  console.log("Compiling catalogs...");
-  const compile = Bun.spawn(["bun", "run", "i18n:compile"], {
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-  if ((await compile.exited) !== 0) {
-    console.error("Catalog compilation failed");
-    process.exit(1);
-  }
-}
+// if (!dryRun) {
+//   // Re-extract to restore #. placeholder comments that @lingui/format-po's
+//   // serialize() strips during the round-trip.
+//   console.log("Re-extracting to restore comments...");
+//   const extract = Bun.spawn(["bun", "run", "i18n:extract"], {
+//     stdout: "inherit",
+//     stderr: "inherit",
+//   });
+//   if ((await extract.exited) !== 0) {
+//     console.error("Extraction failed");
+//     process.exit(1);
+//   }
+// }
 
 console.log("Done!");
