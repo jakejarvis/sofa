@@ -8,7 +8,7 @@ msgstr ""
 "Language: ar\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-20 23:13\n"
+"PO-Revision-Date: 2026-03-21 16:52\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
@@ -1452,7 +1452,7 @@ msgstr "لم يُشغَّل قط"
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #~ msgid "New"
-#~ msgstr ""
+#~ msgstr "New"
 
 #: apps/native/src/app/(auth)/register.tsx
 msgid "New account creation is currently disabled."
@@ -1968,7 +1968,7 @@ msgstr "تشغيل الآن"
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
 #~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
-#~ msgstr ""
+#~ msgstr "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
@@ -2697,3 +2697,4 @@ msgstr "مكتبتك فارغة"
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Your name"
 msgstr "اسمك"
+

@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-20 23:13\n"
+"PO-Revision-Date: 2026-03-21 16:52\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -1452,7 +1452,7 @@ msgstr "从未运行"
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #~ msgid "New"
-#~ msgstr ""
+#~ msgstr "New"
 
 #: apps/native/src/app/(auth)/register.tsx
 msgid "New account creation is currently disabled."
@@ -1968,7 +1968,7 @@ msgstr "立即运行"
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
 #~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
-#~ msgstr ""
+#~ msgstr "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
@@ -2697,3 +2697,4 @@ msgstr "您的媒体库为空"
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Your name"
 msgstr "您的姓名"
+
