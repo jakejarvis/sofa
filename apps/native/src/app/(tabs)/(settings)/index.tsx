@@ -53,7 +53,7 @@ import { setPersistedLocale } from "@/lib/i18n";
 import { orpc } from "@/lib/orpc";
 import { isAnalyticsEnabled, setAnalyticsEnabled } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
-import { authClient, getServerUrl } from "@/lib/server";
+import { authClient, getServerUrl, requestServerChange } from "@/lib/server";
 import { toast } from "@/lib/toast";
 import { activateLocale, isLocaleRTL, type SupportedLocale } from "@sofa/i18n";
 import { LOCALE_INFO } from "@sofa/i18n/locales";
@@ -372,9 +372,9 @@ export default function SettingsScreen() {
                   text: t`Continue`,
                   style: "destructive",
                   onPress: async () => {
+                    requestServerChange();
                     await authClient.signOut();
                     queryClient.clear();
-                    push("/(auth)/server-url");
                   },
                 },
               ]);

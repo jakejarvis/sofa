@@ -412,6 +412,28 @@ export function clearCachedSessionSeeded(): void {
 // serverManager — compound operations for server-url screen
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Server-change flag
+// ---------------------------------------------------------------------------
+
+// Signals that the next session-loss redirect should go to the server-url
+// screen instead of login (set by the "Change Server" flow in settings).
+let _serverChangeRequested = false;
+
+export function requestServerChange(): void {
+  _serverChangeRequested = true;
+}
+
+export function consumeServerChangeRequest(): boolean {
+  const was = _serverChangeRequested;
+  _serverChangeRequested = false;
+  return was;
+}
+
+// ---------------------------------------------------------------------------
+// serverManager — compound operations for server-url screen
+// ---------------------------------------------------------------------------
+
 export const serverManager = {
   validateServerUrl,
   normalizeUrl,
@@ -424,6 +446,10 @@ export const serverManager = {
   connectToServer(url: string, instanceId: string): void {
     registerServer(url, instanceId);
     setServerUrlInternal(url);
+    // Validation just succeeded, so mark the server as reachable before
+    // rebuilding. This prevents a banner flash between the monitor starting
+    // (once hasServerUrl becomes true) and the first successful fetch.
+    setReachable(true);
     authClient = buildAuthClient();
     for (const listener of serverUrlListeners) listener();
   },

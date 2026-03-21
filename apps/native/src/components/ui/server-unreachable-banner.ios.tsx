@@ -10,10 +10,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { queryClient } from "@/lib/query-client";
-import { authClient, useServerReachability } from "@/lib/server";
+import { authClient, hasStoredServerUrl, useServerReachability } from "@/lib/server";
 import * as Haptics from "@/utils/haptics";
 
 export function ServerUnreachableBanner() {
+  const hasServerUrl = !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
   const { isReachable } = useServerReachability();
   const insets = useSafeAreaInsets();
   const wasReachable = useRef(true);
@@ -26,7 +27,7 @@ export function ServerUnreachableBanner() {
 
     const handleState = (state: Network.NetworkState) => {
       if (!mounted) return;
-      setIsDeviceOnline(!!state.isConnected && !!state.isInternetReachable);
+      setIsDeviceOnline(!!state.isConnected && state.isInternetReachable !== false);
     };
 
     Network.getNetworkStateAsync().then(handleState);
@@ -39,11 +40,11 @@ export function ServerUnreachableBanner() {
   }, []);
 
   useEffect(() => {
-    if (!isReachable && wasReachable.current) {
+    if (hasServerUrl && !isReachable && wasReachable.current) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     }
     wasReachable.current = isReachable;
-  }, [isReachable]);
+  }, [hasServerUrl, isReachable]);
 
   const handleRetry = () => {
     const refetchSession = authClient.$store.atoms.session.get().refetch;
@@ -55,8 +56,9 @@ export function ServerUnreachableBanner() {
     ]);
   };
 
-  // Only show when device has internet but server is unreachable
-  if (isReachable || !isDeviceOnline) return null;
+  // Don't show on fresh install (no server configured yet) or when the device
+  // itself is offline (OfflineBanner handles that) or when everything is fine.
+  if (!hasServerUrl || isReachable || !isDeviceOnline) return null;
 
   const useGlass = isLiquidGlassAvailable();
 

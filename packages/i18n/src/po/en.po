@@ -1650,6 +1650,10 @@ msgstr ""
 msgid "Play trailer"
 msgstr ""
 
+#: apps/native/src/hooks/use-server-connection.ts
+msgid "Please sign in again."
+msgstr "Please sign in again."
+
 #: apps/native/src/app/(tabs)/(explore)/index.tsx
 #: apps/web/src/routes/_app/explore.tsx
 msgid "Popular Movies"
@@ -2090,6 +2094,10 @@ msgstr ""
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Server URL"
 msgstr ""
+
+#: apps/native/src/hooks/use-server-connection.ts
+msgid "Session expired"
+msgstr "Session expired"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Set password"

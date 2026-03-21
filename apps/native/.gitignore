@@ -10,6 +10,7 @@ npm-debug.*
 *.orig.*
 *.tar.gz
 *.ipa
+*.apk
 web-build/
 
 # macOS

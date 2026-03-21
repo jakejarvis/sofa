@@ -21,7 +21,7 @@ export function OfflineBanner() {
 
     const handleState = (state: Network.NetworkState) => {
       if (!mounted) return;
-      const offline = !state.isConnected || !state.isInternetReachable;
+      const offline = !state.isConnected || state.isInternetReachable === false;
       setIsOffline(offline);
       if (offline && wasOnline.current) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);

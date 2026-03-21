@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 
@@ -6,6 +7,7 @@ import { queryClient } from "@/lib/query-client";
 import {
   authClient,
   clearCachedSessionSeeded,
+  consumeServerChangeRequest,
   ensureInstanceId,
   getCurrentInstanceId,
   hasStoredServerUrl,
@@ -16,6 +18,7 @@ import {
   wasCachedSessionSeeded,
 } from "@/lib/server";
 import { toast } from "@/lib/toast";
+import { i18n } from "@sofa/i18n";
 
 /**
  * Manages the full server connection lifecycle:
@@ -100,16 +103,17 @@ export function useServerConnection() {
 
   const { replace } = useRouter();
 
-  // Navigate to login when session is lost. Stack.Protected handles screen
+  // Navigate to auth when session is lost. Stack.Protected handles screen
   // availability, but enableFreeze can prevent the navigator from
   // transitioning on its own.
   useEffect(() => {
     if (prevSession.current && !session) {
-      replace("/(auth)/login");
+      const changingServer = consumeServerChangeRequest();
+      replace(changingServer ? "/(auth)/server-url" : "/(auth)/login");
 
       if (hadOptimisticSession.current) {
-        toast.info("Session expired", {
-          description: "Please sign in again.",
+        toast.info(i18n._(msg`Session expired`), {
+          description: i18n._(msg`Please sign in again.`),
         });
         clearCachedSessionSeeded();
       }
