@@ -5,6 +5,7 @@ import { Link } from "@tanstack/react-router";
 
 import { thumbHashToUrl } from "@/lib/thumbhash";
 import type { UpcomingItem } from "@sofa/api/schemas";
+import { formatDate } from "@sofa/i18n/format";
 
 const statusColorClass = {
   in_watchlist: "bg-status-watchlist",
@@ -14,8 +15,7 @@ const statusColorClass = {
 } as const;
 
 function formatShortDate(dateStr: string): string {
-  const d = new Date(`${dateStr}T00:00:00`);
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return formatDate(dateStr, { month: "short", day: "numeric" });
 }
 
 export function UpcomingRow({ item }: { item: UpcomingItem }) {

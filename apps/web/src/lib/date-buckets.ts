@@ -1,3 +1,5 @@
+import { formatDate } from "@sofa/i18n/format";
+
 export type DateBucket<T> = {
   key: string;
   label: string;
@@ -26,8 +28,7 @@ function getEndOfWeek(today: string): string {
 }
 
 function getMonthLabel(dateStr: string): string {
-  const d = new Date(`${dateStr}T00:00:00`);
-  return d.toLocaleDateString(undefined, { month: "long" });
+  return formatDate(dateStr, { month: "long" });
 }
 
 type BucketKey = "today" | "tomorrow" | "this_week" | "next_week" | string;

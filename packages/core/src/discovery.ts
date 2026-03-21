@@ -381,16 +381,14 @@ export function getUpcomingFeed(
 
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-  const fromDate = cursor?.includes("_") ? cursor.split("_", 2)[0]! : (cursor ?? today);
   const horizon = new Date();
   horizon.setDate(horizon.getDate() + days);
   const toDate = `${horizon.getFullYear()}-${String(horizon.getMonth() + 1).padStart(2, "0")}-${String(horizon.getDate()).padStart(2, "0")}`;
 
-  // Fetch limit + 1 from each to detect if there are more pages
-  const fetchLimit = limit + 1;
-
-  const episodeRows = getUpcomingEpisodes(userId, fromDate, toDate, fetchLimit);
-  const movieRows = getUpcomingMovies(userId, fromDate, toDate, fetchLimit);
+  // Always fetch the full date range — the date window bounds the result set,
+  // and applying a DB-level LIMIT before cursor filtering would truncate same-day items.
+  const episodeRows = getUpcomingEpisodes(userId, today, toDate);
+  const movieRows = getUpcomingMovies(userId, today, toDate);
 
   // Merge into unified items
   type RawItem = { date: string; titleId: string; titleName: string } & (
@@ -415,8 +413,13 @@ export function getUpcomingFeed(
     })),
   ];
 
-  // Sort by date ASC, then title ASC
-  merged.sort((a, b) => a.date.localeCompare(b.date) || a.titleName.localeCompare(b.titleName));
+  // Sort by date ASC, then title ASC, then titleId for deterministic tiebreak
+  merged.sort(
+    (a, b) =>
+      a.date.localeCompare(b.date) ||
+      a.titleName.localeCompare(b.titleName) ||
+      a.titleId.localeCompare(b.titleId),
+  );
 
   // Collapse batch drops: group 3+ episodes from the same title on the same date into one item
   const collapsed: (RawItem & { episodeCount: number })[] = [];
@@ -452,24 +455,32 @@ export function getUpcomingFeed(
     }
   }
 
-  // Handle cursor deduplication: if cursor has a titleId component, skip items until past it
-  let filtered: typeof collapsed = collapsed;
-  if (cursor && cursor.includes("_")) {
-    const [cursorDate, cursorTitleId] = cursor.split("_", 2);
-    filtered = collapsed.filter(
-      (item) =>
-        item.date > cursorDate! || (item.date === cursorDate && item.titleId > cursorTitleId!),
-    );
+  // Apply cursor: skip items at or before the cursor position.
+  // Cursor is base64-encoded JSON {d, n, i} matching the sort key (date, titleName, titleId).
+  let startIdx = 0;
+  if (cursor) {
+    try {
+      const { d, n, i: cursorId } = JSON.parse(atob(cursor));
+      startIdx = collapsed.findIndex(
+        (item) =>
+          item.date > d ||
+          (item.date === d && item.titleName > n) ||
+          (item.date === d && item.titleName === n && item.titleId > cursorId),
+      );
+      if (startIdx === -1) startIdx = collapsed.length;
+    } catch {
+      // Invalid cursor — start from beginning
+    }
   }
 
-  const hasMore = filtered.length > limit;
-  const pageItems = filtered.slice(0, limit);
+  const pageItems = collapsed.slice(startIdx, startIdx + limit);
+  const hasMore = startIdx + limit < collapsed.length;
 
-  // Compute compound cursor for next page
+  // Compute cursor from the last item on this page
   let nextCursor: string | null = null;
   if (hasMore && pageItems.length > 0) {
     const last = pageItems[pageItems.length - 1]!;
-    nextCursor = `${last.date}_${last.titleId}`;
+    nextCursor = btoa(JSON.stringify({ d: last.date, n: last.titleName, i: last.titleId }));
   }
 
   // Batch-fetch display statuses and streaming providers

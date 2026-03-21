@@ -2,13 +2,14 @@ import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { IconMovie } from "@tabler/icons-react-native";
 import { Link } from "expo-router";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
 
 import { Image } from "@/components/ui/image";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import type { UpcomingItem } from "@sofa/api/schemas";
+import { formatDate } from "@sofa/i18n/format";
 
 const statusColors = {
   in_watchlist: "--color-status-watchlist",
@@ -18,8 +19,7 @@ const statusColors = {
 } as const;
 
 function formatShortDate(dateStr: string): string {
-  const d = new Date(`${dateStr}T00:00:00`);
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return formatDate(dateStr, { month: "short", day: "numeric" });
 }
 
 export function UpcomingRow({ item }: { item: UpcomingItem }) {
@@ -44,7 +44,7 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
 
   return (
     <Link href={`/title/${item.titleId}`} asChild>
-      <View className="flex-row items-center gap-3 px-4 py-2.5">
+      <Pressable className="flex-row items-center gap-3 px-4 py-2.5">
         {/* Poster thumbnail */}
         <View className="overflow-hidden rounded-md" style={{ width: 44, height: 44 }}>
           {item.posterPath ? (
@@ -100,7 +100,7 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
             {formatShortDate(item.date)}
           </Text>
         </View>
-      </View>
+      </Pressable>
     </Link>
   );
 }

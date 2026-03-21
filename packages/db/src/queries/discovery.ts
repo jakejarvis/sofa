@@ -315,12 +315,7 @@ export function getTitleByIdOrNull(titleId: string) {
 
 // ─── Upcoming feed queries ──────────────────────────────────────────
 
-export function getUpcomingEpisodes(
-  userId: string,
-  fromDate: string,
-  toDate: string,
-  limit: number,
-) {
+export function getUpcomingEpisodes(userId: string, fromDate: string, toDate: string) {
   return db
     .select({
       titleId: titles.id,
@@ -342,11 +337,10 @@ export function getUpcomingEpisodes(
     )
     .where(and(gte(episodes.airDate, fromDate), lte(episodes.airDate, toDate)))
     .orderBy(asc(episodes.airDate), asc(titles.title))
-    .limit(limit)
     .all();
 }
 
-export function getUpcomingMovies(userId: string, fromDate: string, toDate: string, limit: number) {
+export function getUpcomingMovies(userId: string, fromDate: string, toDate: string) {
   return db
     .select({
       titleId: titles.id,
@@ -369,7 +363,6 @@ export function getUpcomingMovies(userId: string, fromDate: string, toDate: stri
       ),
     )
     .orderBy(asc(titles.releaseDate), asc(titles.title))
-    .limit(limit)
     .all();
 }
 
