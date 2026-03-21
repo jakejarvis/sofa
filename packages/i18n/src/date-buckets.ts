@@ -1,4 +1,6 @@
-import { formatDate } from "./format";
+import { msg } from "@lingui/core/macro";
+
+import { i18n } from "./index";
 
 export type DateBucket<T> = {
   key: string;
@@ -21,14 +23,12 @@ function addDays(dateStr: string, days: number): string {
 }
 
 function getEndOfWeek(today: string): string {
-  const d = new Date(`${today}T00:00:00`);
-  const dayOfWeek = d.getDay(); // 0=Sun
-  const daysUntilSunday = (7 - dayOfWeek) % 7;
-  return addDays(today, daysUntilSunday);
+  return addDays(today, 6);
 }
 
 function getMonthLabel(dateStr: string): string {
-  return formatDate(dateStr, { month: "long" });
+  const d = new Date(`${dateStr}T00:00:00`);
+  return new Intl.DateTimeFormat(i18n.locale, { month: "long" }).format(d);
 }
 
 type BucketKey = "today" | "tomorrow" | "this_week" | "next_week" | string;
@@ -44,21 +44,18 @@ function getBucketKey(dateStr: string, today: string): BucketKey {
   return `month_${dateStr.slice(0, 7)}`;
 }
 
-function getBucketLabel(key: BucketKey, t: (template: TemplateStringsArray) => string): string {
-  if (key === "today") return t`Today`;
-  if (key === "tomorrow") return t`Tomorrow`;
-  if (key === "this_week") return t`This Week`;
-  if (key === "next_week") return t`Next Week`;
+function getBucketLabel(key: BucketKey): string {
+  if (key === "today") return i18n._(msg`Today`);
+  if (key === "tomorrow") return i18n._(msg`Tomorrow`);
+  if (key === "this_week") return i18n._(msg`This Week`);
+  if (key === "next_week") return i18n._(msg`Next Week`);
   if (key.startsWith("month_")) {
     return getMonthLabel(`${key.slice(6)}-01`);
   }
   return key;
 }
 
-export function groupByDateBucket<T extends { date: string }>(
-  items: T[],
-  t: (template: TemplateStringsArray) => string,
-): DateBucket<T>[] {
+export function groupByDateBucket<T extends { date: string }>(items: T[]): DateBucket<T>[] {
   const today = getToday();
   const bucketMap = new Map<string, { label: string; items: T[] }>();
   const bucketOrder: string[] = [];
@@ -67,7 +64,7 @@ export function groupByDateBucket<T extends { date: string }>(
     const key = getBucketKey(item.date, today);
     let bucket = bucketMap.get(key);
     if (!bucket) {
-      bucket = { label: getBucketLabel(key, t), items: [] };
+      bucket = { label: getBucketLabel(key), items: [] };
       bucketMap.set(key, bucket);
       bucketOrder.push(key);
     }

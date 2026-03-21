@@ -25,7 +25,7 @@ export function UpcomingSection() {
       icon={<IconCalendarEvent className="text-primary size-5" />}
       seeAllLink="/upcoming"
     >
-      <div className="divide-border/50 divide-y">
+      <div className="space-y-2">
         {items.map((item, i) => (
           <UpcomingRow key={`${item.titleId}-${item.date}-${i}`} item={item} />
         ))}

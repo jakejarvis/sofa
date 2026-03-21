@@ -39,7 +39,7 @@ export const Route = createFileRoute("/_app/dashboard")({
 
 function DashboardSkeleton() {
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <div>
         <Skeleton className="h-8 w-64" />
         <Skeleton className="mt-2 h-4 w-48" />
@@ -55,7 +55,7 @@ function DashboardSkeleton() {
 function DashboardPage() {
   const { session } = Route.useRouteContext();
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <WelcomeHeader name={session.user.name} />
       <StatsSection />
       <ContinueWatchingSection />

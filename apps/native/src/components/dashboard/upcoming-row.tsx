@@ -9,7 +9,6 @@ import { Image } from "@/components/ui/image";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import type { UpcomingItem } from "@sofa/api/schemas";
-import { formatDate } from "@sofa/i18n/format";
 
 const statusColors = {
   in_watchlist: "--color-status-watchlist",
@@ -19,7 +18,12 @@ const statusColors = {
 } as const;
 
 function formatShortDate(dateStr: string): string {
-  return formatDate(dateStr, { month: "short", day: "numeric" });
+  const d = new Date(`${dateStr}T00:00:00`);
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(d);
 }
 
 export function UpcomingRow({ item }: { item: UpcomingItem }) {
@@ -44,9 +48,9 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
 
   return (
     <Link href={`/title/${item.titleId}`} asChild>
-      <Pressable className="flex-row items-center gap-3 px-4 py-2.5">
-        {/* Poster thumbnail */}
-        <View className="overflow-hidden rounded-md" style={{ width: 44, height: 44 }}>
+      <Pressable className="bg-card/40 flex-row items-center gap-3 rounded-xl border border-white/[0.06] px-3 py-3">
+        {/* Poster */}
+        <View className="overflow-hidden rounded-lg" style={{ width: 44, height: 66 }}>
           {item.posterPath ? (
             <Image
               source={{ uri: item.posterPath }}
@@ -63,8 +67,16 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
 
         {/* Content */}
         <View className="min-w-0 flex-1">
-          <View className="flex-row items-center gap-1.5">
-            <Text className="flex-shrink text-sm font-medium" numberOfLines={1}>
+          <View className="flex-row items-center gap-2">
+            {/* Status dot with halo */}
+            <View className="relative" style={{ width: 8, height: 8 }}>
+              <View
+                className="absolute inset-0 rounded-full opacity-40"
+                style={{ backgroundColor: statusColor }}
+              />
+              <View className="size-2 rounded-full" style={{ backgroundColor: statusColor }} />
+            </View>
+            <Text className="text-foreground flex-shrink text-sm font-medium" numberOfLines={1}>
               {item.titleName}
             </Text>
             {item.isNewSeason && (
@@ -75,30 +87,36 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
               </View>
             )}
           </View>
-          <View className="mt-0.5 flex-row items-center gap-1">
+          <View className="mt-1 flex-row items-center gap-1">
             {item.titleType === "movie" && (
               <ScaledIcon icon={IconMovie} size={12} color={mutedColor} />
             )}
-            <Text className="text-muted-foreground text-xs" numberOfLines={1}>
+            <Text className="text-muted-foreground flex-shrink text-xs" numberOfLines={1}>
               {subtitle}
             </Text>
-            {item.streamingProvider && (
-              <>
-                <Text className="text-muted-foreground/40 text-xs"> &middot; </Text>
-                <Text className="text-muted-foreground text-xs">
-                  {item.streamingProvider.providerName}
-                </Text>
-              </>
-            )}
           </View>
         </View>
 
-        {/* Status dot + date */}
+        {/* Right column: date + provider logo */}
         <View className="items-end gap-1">
-          <View className="size-2 rounded-full" style={{ backgroundColor: statusColor }} />
-          <Text className="text-muted-foreground/60 text-[10px] font-medium">
-            {formatShortDate(item.date)}
-          </Text>
+          <Text className="text-muted-foreground text-xs">{formatShortDate(item.date)}</Text>
+          {item.streamingProvider &&
+            (item.streamingProvider.logoPath ? (
+              <View
+                className="overflow-hidden rounded-lg border border-white/[0.06]"
+                style={{ width: 28, height: 28 }}
+              >
+                <Image
+                  source={{ uri: item.streamingProvider.logoPath }}
+                  className="size-full"
+                  contentFit="cover"
+                />
+              </View>
+            ) : (
+              <Text className="text-muted-foreground/60 text-[10px]">
+                {item.streamingProvider.providerName}
+              </Text>
+            ))}
         </View>
       </Pressable>
     </Link>

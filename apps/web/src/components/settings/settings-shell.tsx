@@ -15,7 +15,7 @@ const sectionVariants = {
 export function SettingsShell({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
   return (
     <motion.div
-      className="mx-auto max-w-2xl space-y-8"
+      className="mx-auto max-w-2xl space-y-6"
       initial="hidden"
       animate="visible"
       variants={{

@@ -30,14 +30,9 @@ export function UpcomingSection() {
           onSeeAll={() => push("/upcoming")}
         />
       </View>
-      <View className="border-border/50 mx-4 overflow-hidden rounded-xl border">
+      <View className="gap-2 px-4">
         {items.map((item, i) => (
-          <View
-            key={`${item.titleId}-${item.date}-${i}`}
-            className={i > 0 ? "border-border/50 border-t" : ""}
-          >
-            <UpcomingRow item={item} />
-          </View>
+          <UpcomingRow key={`${item.titleId}-${item.date}-${i}`} item={item} />
         ))}
       </View>
     </View>

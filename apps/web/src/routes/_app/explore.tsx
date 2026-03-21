@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_app/explore")({
 
 function ExploreSkeletons() {
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <Skeleton className="-mt-6 mr-[calc(-50vw+50%)] ml-[calc(-50vw+50%)] h-[320px] rounded-none" />
       {[1, 2, 3].map((i) => (
         <div key={i} className="space-y-4">
@@ -122,7 +122,7 @@ function ExplorePage() {
   );
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {hero && (
         <HeroBanner
           id={hero.id}

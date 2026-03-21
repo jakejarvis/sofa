@@ -50,8 +50,6 @@ function UpcomingSkeleton() {
 }
 
 function UpcomingPage() {
-  const { t } = useLingui();
-
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
     orpc.dashboard.upcoming.infiniteOptions({
       input: (pageParam: string | undefined) => ({
@@ -88,17 +86,17 @@ function UpcomingPage() {
     );
   }
 
-  const buckets = groupByDateBucket(allItems, t);
+  const buckets = groupByDateBucket(allItems);
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-2xl space-y-6">
       <UpcomingHeader />
       {buckets.map((bucket) => (
         <section key={bucket.key}>
           <h2 className="font-display text-muted-foreground mb-2 text-sm font-medium tracking-wider uppercase">
             {bucket.label}
           </h2>
-          <div className="divide-border/50 divide-y">
+          <div className="space-y-2">
             {bucket.items.map((item, i) => (
               <UpcomingRow key={`${item.titleId}-${item.date}-${i}`} item={item} />
             ))}

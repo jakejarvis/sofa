@@ -1,5 +1,12 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { IconCompass, IconHome, IconLogout, IconSearch, IconSettings } from "@tabler/icons-react";
+import {
+  IconCalendarEvent,
+  IconCompass,
+  IconHome,
+  IconLogout,
+  IconSearch,
+  IconSettings,
+} from "@tabler/icons-react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useSetAtom } from "jotai";
 import { motion } from "motion/react";
@@ -67,7 +74,6 @@ function useActiveIndicator<T>(
   const instantRef = useRef(true);
 
   useLayoutEffect(() => {
-    instantRef.current = false;
     const update = () => {
       if (activeIndex === -1) {
         setValue(null);
@@ -82,6 +88,8 @@ function useActiveIndicator<T>(
       }
     };
     update();
+    // After the initial measurement, allow subsequent changes to animate
+    instantRef.current = false;
     const container = containerRef.current;
     if (!container) return;
     const observer = new ResizeObserver(() => {
@@ -114,6 +122,7 @@ export function NavBar({
   const navLinks = [
     { href: "/dashboard", label: t`Home` },
     { href: "/explore", label: t`Explore` },
+    { href: "/upcoming", label: t`Upcoming` },
   ] as const;
 
   const initial = userName?.charAt(0).toUpperCase() ?? "?";
@@ -275,6 +284,7 @@ export function MobileTabBar() {
   const mobileTabs = [
     { href: "/dashboard", label: t`Home`, icon: IconHome },
     { href: "/explore", label: t`Explore`, icon: IconCompass },
+    { href: "/upcoming", label: t`Upcoming`, icon: IconCalendarEvent },
     { href: "/settings", label: t`Settings`, icon: IconSettings },
   ] as const;
 

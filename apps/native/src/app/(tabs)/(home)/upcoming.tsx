@@ -39,12 +39,12 @@ export default function UpcomingScreen() {
   const allItems = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
   const sections = useMemo(
     () =>
-      groupByDateBucket(allItems, t).map((b) => ({
+      groupByDateBucket(allItems).map((b) => ({
         key: b.key,
         title: b.label,
         data: b.items,
       })),
-    [allItems, t],
+    [allItems],
   );
 
   const onRefresh = useCallback(() => {
@@ -59,14 +59,19 @@ export default function UpcomingScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: t`Upcoming`,
-          headerTitleStyle: headerTitleStyle as Record<string, unknown>,
-          headerTintColor: tintColor,
-          headerStyle: { backgroundColor },
+      <Stack.Header
+        transparent={process.env.EXPO_OS === "ios"}
+        blurEffect="systemChromeMaterialDark"
+        style={{
+          color: tintColor,
+          shadowColor: "transparent",
+          backgroundColor: process.env.EXPO_OS === "ios" ? undefined : backgroundColor,
         }}
       />
+      <Stack.Screen.Title style={headerTitleStyle as Record<string, unknown>}>
+        {t`Upcoming`}
+      </Stack.Screen.Title>
+      <Stack.Screen.BackButton displayMode="minimal" />
       {!isPending && allItems.length === 0 ? (
         <Animated.View
           entering={FadeInDown.duration(300)}
@@ -81,9 +86,13 @@ export default function UpcomingScreen() {
         <SectionList
           sections={sections}
           keyExtractor={(item, i) => `${item.titleId}-${item.date}-${i}`}
-          renderItem={({ item }) => <UpcomingRow item={item} />}
+          renderItem={({ item }) => (
+            <View className="px-4 py-1">
+              <UpcomingRow item={item} />
+            </View>
+          )}
           renderSectionHeader={({ section: { title } }) => (
-            <View className="bg-background px-4 pt-5 pb-1">
+            <View className="bg-background px-4 pt-4 pb-1">
               <Text className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                 {title}
               </Text>

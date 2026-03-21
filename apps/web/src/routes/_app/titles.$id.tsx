@@ -47,7 +47,7 @@ function TitleDetailPage() {
   const themeStyle = getThemeCssProperties(title.colorPalette);
 
   return (
-    <div className="relative space-y-10" style={themeStyle}>
+    <div className="relative space-y-6" style={themeStyle}>
       <TitleTheme style={themeStyle as Record<string, string>} />
       <TitleProvider
         key={title.id}
@@ -74,7 +74,7 @@ function TitleDetailPage() {
 
 function TitleDetailLoading() {
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <Skeleton className="-mt-6 mr-[calc(-50vw+50%)] ml-[calc(-50vw+50%)] h-80 rounded-none md:h-[28rem]" />
       <div className="flex flex-col gap-4 md:flex-row md:gap-8">
         <Skeleton className="aspect-[2/3] w-[140px] shrink-0 self-center rounded-xl md:w-[220px] md:self-start" />
