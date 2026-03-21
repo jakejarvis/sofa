@@ -19,7 +19,7 @@ const statusColors = {
 } as const;
 
 function formatShortDate(dateStr: string): string {
-  const d = new Date(`${dateStr}T00:00:00`);
+  const d = new Date(`${dateStr}T00:00:00Z`);
   return new Intl.DateTimeFormat(undefined, {
     month: "short",
     day: "numeric",

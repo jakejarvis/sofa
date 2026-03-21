@@ -60,7 +60,7 @@ export default function UpcomingScreen() {
   return (
     <>
       <Stack.Header
-        transparent={process.env.EXPO_OS === "ios"}
+        transparent
         blurEffect="systemChromeMaterialDark"
         style={{
           color: tintColor,

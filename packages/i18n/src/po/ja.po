@@ -413,6 +413,7 @@ msgid "Catch up"
 msgstr "追いつく"
 
 #: apps/native/src/components/titles/status-action-button.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Caught Up"
@@ -514,6 +515,7 @@ msgstr "閉じる"
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Completed"
@@ -1325,6 +1327,7 @@ msgstr "すべて視聴済みにする"
 #~ msgid "Mark as Completed"
 #~ msgstr ""
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 msgid "Mark as Watched"
 msgstr "視聴済みにする"
@@ -1332,6 +1335,10 @@ msgstr "視聴済みにする"
 #: apps/native/src/components/ui/poster-card.tsx
 #~ msgid "Mark as Watching"
 #~ msgstr ""
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+msgid "Mark Episode Watched"
+msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/titles/title-actions.tsx
@@ -1529,6 +1536,7 @@ msgstr "未設定"
 msgid "Not Found"
 msgstr "見つかりません"
 
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 msgid "On Watchlist"
 msgstr "ウォッチリスト内"
@@ -1857,6 +1865,7 @@ msgid "Remove from library"
 msgstr "ライブラリから削除"
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
+#: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 msgid "Remove from Library"
 msgstr "ライブラリから削除"
@@ -2489,6 +2498,8 @@ msgstr "次のエピソード"
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
 #: apps/native/src/components/dashboard/upcoming-section.tsx
 #: apps/web/src/components/dashboard/upcoming-section.tsx
+#: apps/web/src/components/nav-bar.tsx
+#: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "Upcoming"
 msgstr ""
@@ -2611,6 +2622,7 @@ msgid "Watched S{seasonNum} E{epNum}"
 msgstr "S{seasonNum} E{epNum}を視聴済みにしました"
 
 #: apps/native/src/components/titles/status-action-button.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Watching"
