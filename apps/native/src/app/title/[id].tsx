@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
 import {
+  IconAlertTriangle,
   IconBrandAppstore,
   IconBrandGooglePlay,
   IconCheck,
@@ -47,6 +48,7 @@ import { StarRating } from "@/components/ui/star-rating";
 import { Text } from "@/components/ui/text";
 import { useTitleActions } from "@/hooks/use-title-actions";
 import { useTitleTheme } from "@/hooks/use-title-theme";
+import { getAppErrorCode } from "@/lib/error-messages";
 import { orpc } from "@/lib/orpc";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
 
@@ -118,6 +120,7 @@ export default function TitleDetailScreen() {
   });
 
   const title = detail.data?.title;
+  const detailErrorCode = getAppErrorCode(detail.error);
   const palette = title?.colorPalette ?? null;
   useTitleTheme(palette);
   const providerIcon = process.env.EXPO_OS === "ios" ? IconBrandAppstore : IconBrandGooglePlay;
@@ -222,7 +225,7 @@ export default function TitleDetailScreen() {
     );
   }
 
-  if (!title) {
+  if (detail.isError && detailErrorCode === "TITLE_NOT_FOUND") {
     return (
       <ModalLayout>
         <View className="flex-1 items-center justify-center px-6">
@@ -235,6 +238,34 @@ export default function TitleDetailScreen() {
               <Trans>Go back</Trans>
             </Text>
           </Pressable>
+        </View>
+      </ModalLayout>
+    );
+  }
+
+  if (detail.isError || !title) {
+    return (
+      <ModalLayout>
+        <View className="flex-1 items-center justify-center px-6">
+          <IconAlertTriangle size={48} color={mutedForeground} />
+          <Text className="font-display text-foreground mt-3 text-xl">
+            <Trans>Something went wrong</Trans>
+          </Text>
+          <Text className="text-muted-foreground mt-1 text-center text-sm">
+            <Trans>Could not load title details</Trans>
+          </Text>
+          <View className="mt-4 flex-row items-center gap-4">
+            <Pressable onPress={() => void detail.refetch()}>
+              <Text className="text-primary">
+                <Trans>Try again</Trans>
+              </Text>
+            </Pressable>
+            <Pressable onPress={() => back()}>
+              <Text className="text-primary">
+                <Trans>Go back</Trans>
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </ModalLayout>
     );

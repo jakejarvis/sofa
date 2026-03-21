@@ -46,6 +46,10 @@ export function RecentlyViewedList() {
   );
 
   const keyExtractor = useCallback((item: RecentlyViewedItem) => item.id, []);
+  const getItemType = useCallback(
+    (item: RecentlyViewedItem) => (item.type === "person" ? "person" : "title"),
+    [],
+  );
 
   const listHeaderComponent = useMemo(
     () => (
@@ -89,6 +93,7 @@ export function RecentlyViewedList() {
       <FlashList
         data={items}
         keyExtractor={keyExtractor}
+        getItemType={getItemType}
         renderItem={renderItem}
         keyboardShouldPersistTaps="handled"
         contentInsetAdjustmentBehavior="automatic"

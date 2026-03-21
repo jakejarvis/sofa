@@ -89,9 +89,7 @@ function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStat
 
   // Sync local state when prop changes (e.g. after navigation or SWR revalidation)
   useEffect(() => {
-    if (userStatus) {
-      setAddedStatus(userStatus);
-    }
+    setAddedStatus(userStatus ?? null);
   }, [userStatus]);
 
   const quickAddMutation = useMutation(

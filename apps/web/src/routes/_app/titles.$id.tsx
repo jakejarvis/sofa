@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { TitleActions } from "@/components/titles/title-actions";
 import { TitleAvailability } from "@/components/titles/title-availability";
@@ -11,21 +11,29 @@ import { TitleRecommendations } from "@/components/titles/title-recommendations"
 import { TitleSeasons } from "@/components/titles/title-seasons";
 import { TitleTheme } from "@/components/titles/title-theme";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getAppErrorCode } from "@/lib/error-messages";
 import { orpc } from "@/lib/orpc/client";
 import { getThemeCssProperties } from "@/lib/theme";
 
 export const Route = createFileRoute("/_app/titles/$id")({
   staleTime: 60_000,
   loader: async ({ params, context }) => {
-    const [titleResult, userInfo] = await Promise.all([
-      context.queryClient.ensureQueryData(
-        orpc.titles.detail.queryOptions({ input: { id: params.id } }),
-      ),
-      context.queryClient
-        .ensureQueryData(orpc.titles.userInfo.queryOptions({ input: { id: params.id } }))
-        .catch(() => null),
-    ]);
-    return { ...titleResult, userInfo };
+    try {
+      const [titleResult, userInfo] = await Promise.all([
+        context.queryClient.ensureQueryData(
+          orpc.titles.detail.queryOptions({ input: { id: params.id } }),
+        ),
+        context.queryClient
+          .ensureQueryData(orpc.titles.userInfo.queryOptions({ input: { id: params.id } }))
+          .catch(() => null),
+      ]);
+      return { ...titleResult, userInfo };
+    } catch (error) {
+      if (getAppErrorCode(error) === "TITLE_NOT_FOUND") {
+        throw notFound();
+      }
+      throw error;
+    }
   },
   head: ({ loaderData }) => {
     if (!loaderData) return {};

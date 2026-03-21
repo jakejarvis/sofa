@@ -66,6 +66,10 @@ export default function SearchScreen() {
   );
 
   const keyExtractor = useCallback((item: SearchResultItem) => `${item.type}-${item.id}`, []);
+  const getItemType = useCallback(
+    (item: SearchResultItem) => (item.type === "person" ? "person" : "title"),
+    [],
+  );
 
   return (
     <View collapsable={false} className="bg-background flex-1">
@@ -98,6 +102,7 @@ export default function SearchScreen() {
         <FlashList
           data={allResults}
           keyExtractor={keyExtractor}
+          getItemType={getItemType}
           renderItem={renderItem}
           keyboardShouldPersistTaps="handled"
           contentInsetAdjustmentBehavior="automatic"

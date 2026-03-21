@@ -1,25 +1,33 @@
 import { Trans } from "@lingui/react/macro";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { PersonDetailClient, PersonDetailSkeleton } from "@/components/people/person-detail-client";
+import { getAppErrorCode } from "@/lib/error-messages";
 import { orpc } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_app/people/$id")({
   staleTime: 60_000,
   loader: async ({ params, context }) => {
-    const data = await context.queryClient.ensureInfiniteQueryData(
-      orpc.people.detail.infiniteOptions({
-        input: (pageParam: number) => ({
-          id: params.id,
-          page: pageParam,
-          limit: 20,
+    try {
+      const data = await context.queryClient.ensureInfiniteQueryData(
+        orpc.people.detail.infiniteOptions({
+          input: (pageParam: number) => ({
+            id: params.id,
+            page: pageParam,
+            limit: 20,
+          }),
+          initialPageParam: 1,
+          getNextPageParam: (lastPage) =>
+            lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
         }),
-        initialPageParam: 1,
-        getNextPageParam: (lastPage) =>
-          lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-      }),
-    );
-    return { personName: data.pages[0]?.person.name };
+      );
+      return { personName: data.pages[0]?.person.name };
+    } catch (error) {
+      if (getAppErrorCode(error) === "PERSON_NOT_FOUND") {
+        throw notFound();
+      }
+      throw error;
+    }
   },
   head: ({ loaderData }) => {
     if (!loaderData?.personName) return {};
