@@ -15,6 +15,14 @@ export const Route = createFileRoute("/_app/explore")({
   head: () => ({ meta: [{ title: "Explore — Sofa" }] }),
   loader: async ({ context }) => {
     await Promise.all([
+      context.queryClient.ensureInfiniteQueryData(
+        orpc.explore.trending.infiniteOptions({
+          input: (pageParam: number) => ({ type: "all" as const, page: pageParam }),
+          initialPageParam: 1,
+          getNextPageParam: (lastPage) =>
+            lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+        }),
+      ),
       context.queryClient.ensureQueryData(
         orpc.explore.popular.queryOptions({ input: { type: "movie" } }),
       ),

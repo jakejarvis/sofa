@@ -1444,8 +1444,8 @@ msgid "Never run"
 msgstr "מעולם לא הורץ"
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
-msgid "New"
-msgstr ""
+#~ msgid "New"
+#~ msgstr ""
 
 #: apps/native/src/app/(auth)/register.tsx
 msgid "New account creation is currently disabled."
@@ -1468,6 +1468,7 @@ msgstr "סיסמה חדשה"
 msgid "New password must be at least 8 characters"
 msgstr "הסיסמה החדשה חייבת להכיל לפחות 8 תווים"
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
 msgid "New Season"
 msgstr ""

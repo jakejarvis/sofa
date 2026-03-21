@@ -70,7 +70,7 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
             {item.isNewSeason && (
               <View className="bg-primary/15 rounded px-1.5 py-0.5">
                 <Text className="text-primary text-[10px] font-semibold tracking-wider uppercase">
-                  {t`New`}
+                  {t`New Season`}
                 </Text>
               </View>
             )}

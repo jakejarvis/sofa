@@ -1,4 +1,4 @@
-import { formatDate } from "@sofa/i18n/format";
+import { formatDate } from "./format";
 
 export type DateBucket<T> = {
   key: string;
@@ -6,7 +6,7 @@ export type DateBucket<T> = {
   items: T[];
 };
 
-function formatLocalDate(d: Date): string {
+export function formatLocalDate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 

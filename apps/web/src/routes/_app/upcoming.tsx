@@ -6,15 +6,23 @@ import { createFileRoute } from "@tanstack/react-router";
 import { UpcomingRow } from "@/components/dashboard/upcoming-item";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
-import { groupByDateBucket } from "@/lib/date-buckets";
 import { orpc } from "@/lib/orpc/client";
+import { groupByDateBucket } from "@sofa/i18n/date-buckets";
 
 export const Route = createFileRoute("/_app/upcoming")({
   staleTime: 30_000,
   head: () => ({ meta: [{ title: "Upcoming — Sofa" }] }),
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(
-      orpc.dashboard.upcoming.queryOptions({ input: { days: 90, limit: 20 } }),
+    await context.queryClient.ensureInfiniteQueryData(
+      orpc.dashboard.upcoming.infiniteOptions({
+        input: (pageParam: string | undefined) => ({
+          days: 90,
+          limit: 20,
+          cursor: pageParam,
+        }),
+        initialPageParam: undefined as string | undefined,
+        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      }),
     );
   },
   pendingComponent: UpcomingSkeleton,

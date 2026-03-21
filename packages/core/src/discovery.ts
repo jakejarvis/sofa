@@ -27,6 +27,10 @@ import { tmdbImageUrl } from "@sofa/tmdb/image";
 
 import { getDisplayStatusesByTitleIds } from "./tracking";
 
+function formatLocalDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export type TimePeriod = "today" | "this_week" | "this_month" | "this_year";
 
 export function periodStartTimestamp(period: TimePeriod): number {
@@ -380,10 +384,10 @@ export function getUpcomingFeed(
   const { days = 90, limit = 20, cursor } = options;
 
   const now = new Date();
-  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const today = formatLocalDate(now);
   const horizon = new Date();
   horizon.setDate(horizon.getDate() + days);
-  const toDate = `${horizon.getFullYear()}-${String(horizon.getMonth() + 1).padStart(2, "0")}-${String(horizon.getDate()).padStart(2, "0")}`;
+  const toDate = formatLocalDate(horizon);
 
   // Use the cursor date as the lower bound so later pages skip already-seen dates,
   // but don't apply a DB-level LIMIT so same-day items aren't truncated.

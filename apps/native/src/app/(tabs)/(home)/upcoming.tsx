@@ -10,9 +10,9 @@ import { useCSSVariable, useResolveClassNames } from "uniwind";
 import { UpcomingRow } from "@/components/dashboard/upcoming-row";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
-import { groupByDateBucket } from "@/lib/date-buckets";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
+import { groupByDateBucket } from "@sofa/i18n/date-buckets";
 
 const contentContainerStyle = { paddingBottom: 24 };
 
