@@ -8,7 +8,7 @@ msgstr ""
 "Language: he\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-20 23:13\n"
+"PO-Revision-Date: 2026-03-21 16:53\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3;\n"
@@ -1452,7 +1452,7 @@ msgstr "מעולם לא הורץ"
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #~ msgid "New"
-#~ msgstr ""
+#~ msgstr "New"
 
 #: apps/native/src/app/(auth)/register.tsx
 msgid "New account creation is currently disabled."
@@ -1968,7 +1968,7 @@ msgstr "הפעל עכשיו"
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
 #~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
-#~ msgstr ""
+#~ msgstr "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
@@ -2697,3 +2697,4 @@ msgstr "הספרייה שלך ריקה"
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Your name"
 msgstr "שמך"
+
