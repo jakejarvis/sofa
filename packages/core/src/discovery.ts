@@ -385,10 +385,24 @@ export function getUpcomingFeed(
   horizon.setDate(horizon.getDate() + days);
   const toDate = `${horizon.getFullYear()}-${String(horizon.getMonth() + 1).padStart(2, "0")}-${String(horizon.getDate()).padStart(2, "0")}`;
 
-  // Always fetch the full date range — the date window bounds the result set,
-  // and applying a DB-level LIMIT before cursor filtering would truncate same-day items.
-  const episodeRows = getUpcomingEpisodes(userId, today, toDate);
-  const movieRows = getUpcomingMovies(userId, today, toDate);
+  // Use the cursor date as the lower bound so later pages skip already-seen dates,
+  // but don't apply a DB-level LIMIT so same-day items aren't truncated.
+  let cursorDate: string | undefined;
+  let cursorName: string | undefined;
+  let cursorId: string | undefined;
+  if (cursor) {
+    try {
+      const parsed = JSON.parse(atob(cursor));
+      cursorDate = parsed.d;
+      cursorName = parsed.n;
+      cursorId = parsed.i;
+    } catch {
+      // Invalid cursor — ignore
+    }
+  }
+  const fromDate = cursorDate ?? today;
+  const episodeRows = getUpcomingEpisodes(userId, fromDate, toDate);
+  const movieRows = getUpcomingMovies(userId, fromDate, toDate);
 
   // Merge into unified items
   type RawItem = { date: string; titleId: string; titleName: string } & (
@@ -458,19 +472,14 @@ export function getUpcomingFeed(
   // Apply cursor: skip items at or before the cursor position.
   // Cursor is base64-encoded JSON {d, n, i} matching the sort key (date, titleName, titleId).
   let startIdx = 0;
-  if (cursor) {
-    try {
-      const { d, n, i: cursorId } = JSON.parse(atob(cursor));
-      startIdx = collapsed.findIndex(
-        (item) =>
-          item.date > d ||
-          (item.date === d && item.titleName > n) ||
-          (item.date === d && item.titleName === n && item.titleId > cursorId),
-      );
-      if (startIdx === -1) startIdx = collapsed.length;
-    } catch {
-      // Invalid cursor — start from beginning
-    }
+  if (cursorDate && cursorName && cursorId) {
+    startIdx = collapsed.findIndex(
+      (item) =>
+        item.date > cursorDate ||
+        (item.date === cursorDate && item.titleName > cursorName) ||
+        (item.date === cursorDate && item.titleName === cursorName && item.titleId > cursorId),
+    );
+    if (startIdx === -1) startIdx = collapsed.length;
   }
 
   const pageItems = collapsed.slice(startIdx, startIdx + limit);
