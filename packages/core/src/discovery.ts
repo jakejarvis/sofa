@@ -353,6 +353,7 @@ export function getRecommendationsFeed(userId: string) {
 // ─── Upcoming feed ──────────────────────────────────────────────────
 
 export interface UpcomingItem {
+  episodeId: string | null;
   titleId: string;
   titleName: string;
   titleType: "movie" | "tv";
@@ -519,6 +520,7 @@ export function getUpcomingFeed(
       const r = item.row;
       const isCollapsed = item.episodeCount > 1;
       return {
+        episodeId: isCollapsed ? null : r.episodeId,
         titleId: r.titleId,
         titleName: r.titleName,
         titleType: "tv",
@@ -539,6 +541,7 @@ export function getUpcomingFeed(
     }
     const r = item.row;
     return {
+      episodeId: null,
       titleId: r.titleId,
       titleName: r.titleName,
       titleType: "movie",

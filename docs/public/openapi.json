@@ -2909,6 +2909,17 @@
                       "items": {
                         "type": "object",
                         "properties": {
+                          "episodeId": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Episode ID (TV only, null for movies and collapsed batches)"
+                          },
                           "titleId": {
                             "type": "string",
                             "description": "Internal title ID"
@@ -3038,6 +3049,7 @@
                           }
                         },
                         "required": [
+                          "episodeId",
                           "titleId",
                           "titleName",
                           "titleType",

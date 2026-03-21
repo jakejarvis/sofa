@@ -558,6 +558,10 @@ export const UpcomingInput = z
 
 export const UpcomingItemSchema = z
   .object({
+    episodeId: z
+      .string()
+      .nullable()
+      .describe("Episode ID (TV only, null for movies and collapsed batches)"),
     titleId: z.string().describe("Internal title ID"),
     titleName: z.string().describe("Display title"),
     titleType: z.enum(["movie", "tv"]).describe("Media type"),

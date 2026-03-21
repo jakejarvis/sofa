@@ -318,6 +318,7 @@ export function getTitleByIdOrNull(titleId: string) {
 export function getUpcomingEpisodes(userId: string, fromDate: string, toDate: string) {
   return db
     .select({
+      episodeId: episodes.id,
       titleId: titles.id,
       titleName: titles.title,
       posterPath: titles.posterPath,
