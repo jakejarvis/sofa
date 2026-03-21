@@ -16,6 +16,7 @@ import { openApiHandler } from "./orpc/openapi-handler";
 import authRoutes from "./routes/auth";
 import avatarsRoutes from "./routes/avatars";
 import backupsRoutes from "./routes/backups";
+import exportRoutes from "./routes/export";
 import healthRoutes from "./routes/health";
 import imagesRoutes from "./routes/images";
 import listsRoutes from "./routes/lists";
@@ -66,6 +67,7 @@ app.route("/api/health", healthRoutes);
 app.route("/api/auth", authRoutes);
 app.route("/api/avatars", avatarsRoutes);
 app.route("/api/backup", backupsRoutes);
+app.route("/api/export", exportRoutes);
 app.route("/api/webhooks", webhooksRoutes);
 app.route("/api/lists", listsRoutes);
 

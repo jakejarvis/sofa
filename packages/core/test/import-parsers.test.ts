@@ -697,7 +697,8 @@ describe("parseSimklPayload", () => {
       ],
     });
 
-    expect(result.diagnostics?.unresolved).toBe(1);
+    // movie watch + library item, both without IDs
+    expect(result.diagnostics?.unresolved).toBe(2);
   });
 });
 

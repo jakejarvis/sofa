@@ -12,6 +12,7 @@ export {
   parseSimklPayload,
   parseTraktPayload,
 } from "./parsers";
+export { parseSofaExport } from "./sofa-parser";
 export {
   type ImportOptions,
   type ImportResult,

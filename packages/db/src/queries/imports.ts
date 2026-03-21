@@ -30,12 +30,19 @@ export function hasEpisodeWatch(userId: string, episodeId: string): boolean {
 }
 
 export function hasTitleStatus(userId: string, titleId: string): boolean {
+  return !!getTitleStatusValue(userId, titleId);
+}
+
+export function getTitleStatusValue(
+  userId: string,
+  titleId: string,
+): "watchlist" | "in_progress" | "completed" | null {
   const existing = db
     .select({ status: userTitleStatus.status })
     .from(userTitleStatus)
     .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, titleId)))
     .get();
-  return !!existing;
+  return (existing?.status as "watchlist" | "in_progress" | "completed") ?? null;
 }
 
 export function hasRating(userId: string, titleId: string): boolean {

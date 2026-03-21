@@ -6136,7 +6136,7 @@
       "post": {
         "operationId": "imports.parseFile",
         "summary": "Parse import file",
-        "description": "Upload and parse an export file from Trakt, Simkl, or Letterboxd. Returns a preview of items found without importing anything.",
+        "description": "Upload and parse an export file from Trakt, Simkl, Letterboxd, or Sofa. Returns a preview of items found without importing anything.",
         "tags": [
           "Imports"
         ],
@@ -6151,10 +6151,11 @@
                     "enum": [
                       "trakt",
                       "simkl",
-                      "letterboxd"
+                      "letterboxd",
+                      "sofa"
                     ],
                     "type": "string",
-                    "description": "External service to import from"
+                    "description": "Service to import from"
                   },
                   "file": {
                     "type": "string",
@@ -6175,10 +6176,11 @@
                     "enum": [
                       "trakt",
                       "simkl",
-                      "letterboxd"
+                      "letterboxd",
+                      "sofa"
                     ],
                     "type": "string",
-                    "description": "External service to import from"
+                    "description": "Service to import from"
                   },
                   "file": {
                     "type": "string",
@@ -6208,10 +6210,11 @@
                           "enum": [
                             "trakt",
                             "simkl",
-                            "letterboxd"
+                            "letterboxd",
+                            "sofa"
                           ],
                           "type": "string",
-                          "description": "External service to import from"
+                          "description": "Service to import from"
                         },
                         "movies": {
                           "type": "array",
@@ -6320,6 +6323,20 @@
                                   "tv"
                                 ],
                                 "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "watchlist",
+                                  "in_progress",
+                                  "completed"
+                                ],
+                                "type": "string",
+                                "description": "Library status (default: watchlist)"
+                              },
+                              "addedAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "When the item was added to library"
                               }
                             },
                             "required": [
@@ -6548,10 +6565,11 @@
                         "enum": [
                           "trakt",
                           "simkl",
-                          "letterboxd"
+                          "letterboxd",
+                          "sofa"
                         ],
                         "type": "string",
-                        "description": "External service to import from"
+                        "description": "Service to import from"
                       },
                       "movies": {
                         "type": "array",
@@ -6660,6 +6678,20 @@
                                 "tv"
                               ],
                               "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "watchlist",
+                                "in_progress",
+                                "completed"
+                              ],
+                              "type": "string",
+                              "description": "Library status (default: watchlist)"
+                            },
+                            "addedAt": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the item was added to library"
                             }
                           },
                           "required": [
@@ -6750,10 +6782,11 @@
                           "enum": [
                             "trakt",
                             "simkl",
-                            "letterboxd"
+                            "letterboxd",
+                            "sofa"
                           ],
                           "type": "string",
-                          "description": "External service to import from"
+                          "description": "Service to import from"
                         },
                         "movies": {
                           "type": "array",
@@ -6862,6 +6895,20 @@
                                   "tv"
                                 ],
                                 "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "watchlist",
+                                  "in_progress",
+                                  "completed"
+                                ],
+                                "type": "string",
+                                "description": "Library status (default: watchlist)"
+                              },
+                              "addedAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "When the item was added to library"
                               }
                             },
                             "required": [
@@ -7019,10 +7066,11 @@
                         "enum": [
                           "trakt",
                           "simkl",
-                          "letterboxd"
+                          "letterboxd",
+                          "sofa"
                         ],
                         "type": "string",
-                        "description": "External service to import from"
+                        "description": "Service to import from"
                       },
                       "movies": {
                         "type": "array",
@@ -7131,6 +7179,20 @@
                                 "tv"
                               ],
                               "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "watchlist",
+                                "in_progress",
+                                "completed"
+                              ],
+                              "type": "string",
+                              "description": "Library status (default: watchlist)"
+                            },
+                            "addedAt": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the item was added to library"
                             }
                           },
                           "required": [
@@ -7244,10 +7306,11 @@
                       "enum": [
                         "trakt",
                         "simkl",
-                        "letterboxd"
+                        "letterboxd",
+                        "sofa"
                       ],
                       "type": "string",
-                      "description": "External service to import from"
+                      "description": "Service to import from"
                     },
                     "status": {
                       "enum": [
@@ -7525,10 +7588,11 @@
                       "enum": [
                         "trakt",
                         "simkl",
-                        "letterboxd"
+                        "letterboxd",
+                        "sofa"
                       ],
                       "type": "string",
-                      "description": "External service to import from"
+                      "description": "Service to import from"
                     },
                     "status": {
                       "enum": [
@@ -7674,10 +7738,11 @@
                       "enum": [
                         "trakt",
                         "simkl",
-                        "letterboxd"
+                        "letterboxd",
+                        "sofa"
                       ],
                       "type": "string",
-                      "description": "External service to import from"
+                      "description": "Service to import from"
                     },
                     "status": {
                       "enum": [
@@ -7903,10 +7968,11 @@
                                   "enum": [
                                     "trakt",
                                     "simkl",
-                                    "letterboxd"
+                                    "letterboxd",
+                                    "sofa"
                                   ],
                                   "type": "string",
-                                  "description": "External service to import from"
+                                  "description": "Service to import from"
                                 },
                                 "status": {
                                   "enum": [

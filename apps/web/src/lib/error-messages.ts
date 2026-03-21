@@ -33,6 +33,7 @@ export function appErrorMessages(
     IMPORT_ALREADY_RUNNING: t`An import is already in progress`,
     IMPORT_CANNOT_CANCEL: t`This import cannot be cancelled`,
     REGISTRATION_CLOSED: t`Registration is currently closed`,
+    EXPORT_FAILED: t`Failed to export data`,
   };
 }
 

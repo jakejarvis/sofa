@@ -32,6 +32,8 @@ export interface ImportWatchlistItem {
   title: string;
   year?: number;
   type: "movie" | "tv";
+  status?: "watchlist" | "in_progress" | "completed";
+  addedAt?: string;
 }
 
 export interface ImportRating {
@@ -46,7 +48,7 @@ export interface ImportRating {
   ratedOn?: string;
 }
 
-export type ImportSource = "trakt" | "simkl" | "letterboxd";
+export type ImportSource = "trakt" | "simkl" | "letterboxd" | "sofa";
 
 export interface NormalizedImport {
   source: ImportSource;
@@ -314,6 +316,21 @@ interface SimklItem {
   }[];
 }
 
+function mapSimklStatus(status?: string): "watchlist" | "in_progress" | "completed" | undefined {
+  switch (status) {
+    case "plantowatch":
+      return "watchlist";
+    case "watching":
+    case "dropped":
+    case "hold":
+      return "in_progress";
+    case "completed":
+      return "completed";
+    default:
+      return undefined;
+  }
+}
+
 export function parseSimklPayload(data: {
   movies?: SimklItem[];
   shows?: SimklItem[];
@@ -335,15 +352,25 @@ export function parseSimklPayload(data: {
           ? Number(item.ids.tmdb)
           : undefined;
 
-    if (item.status === "plantowatch") {
+    const sofaStatus = mapSimklStatus(item.status);
+    if (sofaStatus) {
       watchlist.push({
         tmdbId: tmdbId ?? undefined,
         imdbId: item.ids?.imdb,
         title: item.title,
         year: item.year,
         type: "movie",
+        status: sofaStatus,
       });
-    } else if (item.status === "completed" || item.status === "watching" || item.last_watched_at) {
+    }
+
+    if (
+      item.status === "completed" ||
+      item.status === "watching" ||
+      item.status === "dropped" ||
+      item.status === "hold" ||
+      item.last_watched_at
+    ) {
       movies.push({
         tmdbId: tmdbId ?? undefined,
         imdbId: item.ids?.imdb,
@@ -385,7 +412,8 @@ export function parseSimklPayload(data: {
           ? Number(item.ids.tvdb)
           : undefined;
 
-    if (item.status === "plantowatch") {
+    const sofaStatus = mapSimklStatus(item.status);
+    if (sofaStatus) {
       watchlist.push({
         tmdbId: tmdbId ?? undefined,
         imdbId: item.ids?.imdb,
@@ -393,6 +421,7 @@ export function parseSimklPayload(data: {
         title: item.title,
         year: item.year,
         type: "tv",
+        status: sofaStatus,
       });
     }
 

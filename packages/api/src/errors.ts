@@ -14,6 +14,7 @@ export const AppErrorCode = {
   IMPORT_ALREADY_RUNNING: "IMPORT_ALREADY_RUNNING",
   IMPORT_CANNOT_CANCEL: "IMPORT_CANNOT_CANCEL",
   REGISTRATION_CLOSED: "REGISTRATION_CLOSED",
+  EXPORT_FAILED: "EXPORT_FAILED",
 } as const;
 
 export type AppErrorCode = (typeof AppErrorCode)[keyof typeof AppErrorCode];

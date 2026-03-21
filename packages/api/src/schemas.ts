@@ -947,8 +947,8 @@ export const AuthConfigOutput = z
 // ─── Imports ──────────────────────────────────────────────────
 
 export const ImportSourceEnum = z
-  .enum(["trakt", "simkl", "letterboxd"])
-  .describe("External service to import from");
+  .enum(["trakt", "simkl", "letterboxd", "sofa"])
+  .describe("Service to import from");
 
 export const ImportMovieSchema = z.object({
   tmdbId: z.number().optional(),
@@ -971,6 +971,8 @@ export const ImportEpisodeSchema = z.object({
   watchedOn: z.string().date().optional(),
 });
 
+export const TitleStatusEnum = z.enum(["watchlist", "in_progress", "completed"]);
+
 export const ImportWatchlistItemSchema = z.object({
   tmdbId: z.number().optional(),
   imdbId: z.string().optional(),
@@ -978,6 +980,12 @@ export const ImportWatchlistItemSchema = z.object({
   title: z.string(),
   year: z.number().optional(),
   type: z.enum(["movie", "tv"]),
+  status: TitleStatusEnum.optional().describe("Library status (default: watchlist)"),
+  addedAt: z
+    .string()
+    .datetime({ offset: true })
+    .optional()
+    .describe("When the item was added to library"),
 });
 
 export const ImportRatingSchema = z.object({
@@ -1069,6 +1077,55 @@ export const ImportJobEvent = z.object({
   type: z.enum(["progress", "complete", "timeout"]),
   job: ImportJobSchema,
 });
+
+// ─── Sofa Export ─────────────────────────────────────────────
+
+const SofaLibraryItemSchema = z.object({
+  tmdbId: z.number(),
+  title: z.string(),
+  year: z.number().optional(),
+  type: z.enum(["movie", "tv"]),
+  status: TitleStatusEnum,
+  addedAt: z.string().datetime({ offset: true }),
+});
+
+const SofaMovieWatchSchema = z.object({
+  tmdbId: z.number(),
+  title: z.string(),
+  year: z.number().optional(),
+  watchedAt: z.string().datetime({ offset: true }),
+});
+
+const SofaEpisodeWatchSchema = z.object({
+  showTmdbId: z.number(),
+  showTitle: z.string(),
+  showYear: z.number().optional(),
+  seasonNumber: z.number().int().min(0),
+  episodeNumber: z.number().int().min(1),
+  episodeName: z.string().optional(),
+  watchedAt: z.string().datetime({ offset: true }),
+});
+
+const SofaRatingSchema = z.object({
+  tmdbId: z.number(),
+  title: z.string(),
+  year: z.number().optional(),
+  type: z.enum(["movie", "tv"]),
+  rating: z.number().int().min(1).max(5),
+  ratedAt: z.string().datetime({ offset: true }),
+});
+
+export const SofaExportSchema = z.object({
+  version: z.literal(1),
+  exportedAt: z.string().datetime({ offset: true }),
+  user: z.object({ name: z.string(), email: z.string() }),
+  library: z.array(SofaLibraryItemSchema).max(50_000),
+  movieWatches: z.array(SofaMovieWatchSchema).max(50_000),
+  episodeWatches: z.array(SofaEpisodeWatchSchema).max(50_000),
+  ratings: z.array(SofaRatingSchema).max(50_000),
+});
+
+export type SofaExport = z.infer<typeof SofaExportSchema>;
 
 // ═══════════════════════════════════════════════════════════════
 // Inferred types — use these instead of hand-written interfaces

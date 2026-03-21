@@ -733,7 +733,7 @@ export const contract = {
         tags: ["Imports"],
         summary: "Parse import file",
         description:
-          "Upload and parse an export file from Trakt, Simkl, or Letterboxd. Returns a preview of items found without importing anything.",
+          "Upload and parse an export file from Trakt, Simkl, Letterboxd, or Sofa. Returns a preview of items found without importing anything.",
         successDescription: "Preview of importable items with counts",
       })
       .input(ParseFileInput)

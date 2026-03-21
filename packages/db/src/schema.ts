@@ -449,7 +449,7 @@ export const importJobs = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     source: text("source", {
-      enum: ["trakt", "simkl", "letterboxd"],
+      enum: ["trakt", "simkl", "letterboxd", "sofa"],
     }).notNull(),
     status: text("status", {
       enum: ["pending", "running", "success", "error", "cancelled"],

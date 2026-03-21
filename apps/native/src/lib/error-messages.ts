@@ -32,6 +32,7 @@ export function appErrorMessages(
     IMPORT_ALREADY_RUNNING: t`Import already running`,
     IMPORT_CANNOT_CANCEL: t`Cannot cancel import`,
     REGISTRATION_CLOSED: t`Registration closed`,
+    EXPORT_FAILED: t`Failed to export data`,
   };
 }
 

@@ -5,7 +5,7 @@ import {
   hasEpisodeWatch,
   hasMovieWatch,
   hasRating,
-  hasTitleStatus,
+  getTitleStatusValue,
   updateImportJobProgress,
 } from "@sofa/db/queries/imports";
 import { findEpisodeBySeasonAndNumber, findSeasonByTitleAndNumber } from "@sofa/db/queries/title";
@@ -187,12 +187,17 @@ async function processWatchlistItem(
     return;
   }
 
-  if (hasTitleStatus(userId, title.id)) {
+  const STATUS_RANK = { watchlist: 0, in_progress: 1, completed: 2 } as const;
+  const targetStatus = item.status ?? "watchlist";
+  const currentStatus = getTitleStatusValue(userId, title.id);
+
+  if (currentStatus && STATUS_RANK[currentStatus] >= STATUS_RANK[targetStatus]) {
     result.skipped++;
     return;
   }
 
-  setTitleStatus(userId, title.id, "watchlist", "import");
+  const addedAt = item.addedAt ? new Date(item.addedAt) : undefined;
+  setTitleStatus(userId, title.id, targetStatus, "import", addedAt);
   result.imported++;
 }
 

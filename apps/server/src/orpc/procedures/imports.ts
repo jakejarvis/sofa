@@ -8,6 +8,7 @@ import {
   insertImportJob,
   parseLetterboxdExport,
   parseSimklPayload,
+  parseSofaExport,
   parseTraktPayload,
   processImportJob,
   readImportJob,
@@ -55,6 +56,19 @@ export const parseFile = os.imports.parseFile.use(authed).handler(async ({ input
         });
       }
       result = parseSimklPayload(json as Parameters<typeof parseSimklPayload>[0]);
+      break;
+    }
+    case "sofa": {
+      let json: unknown;
+      try {
+        json = await file.json();
+      } catch {
+        throw new ORPCError("BAD_REQUEST", {
+          message: "Invalid JSON file",
+          data: { code: AppErrorCode.IMPORT_INVALID_FILE },
+        });
+      }
+      result = parseSofaExport(json);
       break;
     }
   }
