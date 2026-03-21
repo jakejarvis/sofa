@@ -9,6 +9,8 @@ mock.module("@sofa/db/client", () => ({
   optimizeDatabase: () => {},
   vacuumDatabase: () => {},
   closeDatabase: () => {},
+  isDatabaseAccessBlocked: () => false,
+  withDatabaseAccessBlocked: async (fn: () => Promise<unknown> | unknown) => await fn(),
 }));
 
 applyMigrations();

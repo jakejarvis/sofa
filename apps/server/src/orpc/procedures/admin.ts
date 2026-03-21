@@ -20,7 +20,7 @@ import { getSystemHealth } from "@sofa/core/system-health";
 import { isTelemetryEnabled } from "@sofa/core/telemetry";
 import { getCachedUpdateCheck, isUpdateCheckEnabled } from "@sofa/core/update-check";
 
-import { rescheduleBackup, triggerJob as triggerCronJob } from "../../cron";
+import { pauseJobs, rescheduleBackup, resumeJobs, triggerJob as triggerCronJob } from "../../cron";
 import { os } from "../context";
 import { admin } from "../middleware";
 
@@ -60,6 +60,7 @@ export const backupsRestore = os.admin.backups.restore
     // Stream upload to disk to avoid buffering the entire file in memory
     await ensureBackupDir();
     const tmpPath = path.join(BACKUP_DIR, `.upload-${Date.now()}-${crypto.randomUUID()}.db`);
+    pauseJobs();
     try {
       await Bun.write(tmpPath, file);
       await restoreFromBackup(tmpPath);
@@ -73,6 +74,8 @@ export const backupsRestore = os.admin.backups.restore
         message: msg,
         data: { code: AppErrorCode.BACKUP_RESTORE_FAILED },
       });
+    } finally {
+      resumeJobs();
     }
   });
 

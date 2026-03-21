@@ -2,16 +2,16 @@ import { simkl } from "./simkl";
 import { trakt } from "./trakt";
 import type { ImportProvider } from "./types";
 
-const providers: Record<string, ImportProvider> = {
+const importers: Record<string, ImportProvider> = {
   trakt,
   simkl,
 };
 
-export function getProvider(name: string): ImportProvider | undefined {
-  return providers[name];
+export function getImporter(name: string): ImportProvider | undefined {
+  return importers[name];
 }
 
-export function getProviderConfig(name: string): {
+export function getImporterConfig(name: string): {
   clientId: string;
   clientSecret: string;
 } {

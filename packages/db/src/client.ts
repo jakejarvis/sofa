@@ -1,4 +1,5 @@
 import { Database } from "bun:sqlite";
+import { AsyncLocalStorage } from "node:async_hooks";
 
 import type { Logger } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
@@ -16,6 +17,13 @@ const drizzleLogger: Logger = {
   },
 };
 
+export class DatabaseRestoreInProgressError extends Error {
+  constructor(message = "Database is temporarily unavailable during restore") {
+    super(message);
+    this.name = "DatabaseRestoreInProgressError";
+  }
+}
+
 // Lazy-init singleton via globalThis. Next.js evaluates module-level code at
 // build time (when no database exists) and re-imports modules on HMR in dev
 // (which would create duplicate connections). Stashing the instances on
@@ -30,9 +38,19 @@ const drizzleLogger: Logger = {
 const globalForDb = globalThis as unknown as {
   _db: ReturnType<typeof drizzle> | undefined;
   _client: Database | undefined;
+  _accessBlocked: boolean | undefined;
 };
 
+const dbAccessBypass = new AsyncLocalStorage<boolean>();
+
+function assertDatabaseAccessible() {
+  if (globalForDb._accessBlocked && !dbAccessBypass.getStore()) {
+    throw new DatabaseRestoreInProgressError();
+  }
+}
+
 function getClient() {
+  assertDatabaseAccessible();
   if (!globalForDb._client) {
     globalForDb._client = new Database(DATABASE_URL);
     globalForDb._client.run("PRAGMA journal_mode = WAL");
@@ -47,6 +65,7 @@ function getClient() {
 }
 
 function getDb() {
+  assertDatabaseAccessible();
   if (!globalForDb._db) {
     globalForDb._db = drizzle({
       client: getClient(),
@@ -59,6 +78,7 @@ function getDb() {
 
 export const db = new Proxy({} as ReturnType<typeof drizzle>, {
   get(_, prop) {
+    assertDatabaseAccessible();
     return Reflect.get(getDb(), prop);
   },
 });
@@ -70,6 +90,19 @@ export function optimizeDatabase() {
 
 export function vacuumDatabase(into: string): void {
   getClient().run("VACUUM INTO ?", [into.replace(/'/g, "''")]);
+}
+
+export function isDatabaseAccessBlocked(): boolean {
+  return globalForDb._accessBlocked === true;
+}
+
+export async function withDatabaseAccessBlocked<T>(fn: () => Promise<T> | T): Promise<T> {
+  globalForDb._accessBlocked = true;
+  try {
+    return await dbAccessBypass.run(true, fn);
+  } finally {
+    globalForDb._accessBlocked = false;
+  }
 }
 
 /** Close the current connection, and clear singletons so the Proxy re-initializes on next access. */

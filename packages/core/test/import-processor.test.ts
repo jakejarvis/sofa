@@ -344,6 +344,80 @@ describe("processImportJob — state transitions", () => {
   test("readImportJob throws for non-existent job", () => {
     expect(() => readImportJob("non-existent-id")).toThrow("Import job non-existent-id not found");
   });
+
+  test("schema allows only one active import job per user", () => {
+    const userId = insertUser();
+    const createdAt = new Date();
+
+    testDb
+      .insert(importJobs)
+      .values({
+        id: "job-1",
+        userId,
+        source: "trakt",
+        status: "pending",
+        payload: JSON.stringify({
+          source: "trakt",
+          movies: [],
+          episodes: [],
+          watchlist: [],
+          ratings: [],
+        }),
+        importWatches: true,
+        importWatchlist: true,
+        importRatings: true,
+        createdAt,
+      })
+      .run();
+
+    expect(() =>
+      testDb
+        .insert(importJobs)
+        .values({
+          id: "job-2",
+          userId,
+          source: "simkl",
+          status: "running",
+          payload: JSON.stringify({
+            source: "simkl",
+            movies: [],
+            episodes: [],
+            watchlist: [],
+            ratings: [],
+          }),
+          importWatches: true,
+          importWatchlist: true,
+          importRatings: true,
+          createdAt,
+        })
+        .run(),
+    ).toThrow();
+
+    testDb.update(importJobs).set({ status: "success" }).where(eq(importJobs.id, "job-1")).run();
+
+    expect(() =>
+      testDb
+        .insert(importJobs)
+        .values({
+          id: "job-3",
+          userId,
+          source: "letterboxd",
+          status: "pending",
+          payload: JSON.stringify({
+            source: "letterboxd",
+            movies: [],
+            episodes: [],
+            watchlist: [],
+            ratings: [],
+          }),
+          importWatches: true,
+          importWatchlist: true,
+          importRatings: true,
+          createdAt,
+        })
+        .run(),
+    ).not.toThrow();
+  });
 });
 
 // ── Failed Resolution ───────────────────────────────────────────────

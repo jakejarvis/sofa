@@ -1,0 +1,2 @@
+CREATE INDEX `episodes_airDate` ON `episodes` (`airDate`);--> statement-breakpoint
+CREATE UNIQUE INDEX `importJobs_active_user` ON `importJobs` (`userId`) WHERE "importJobs"."status" in ('pending', 'running');

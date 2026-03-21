@@ -124,16 +124,27 @@ export const createJob = os.imports.createJob.use(authed).handler(async ({ input
     }
   }
 
-  const job = insertImportJob({
-    userId: context.user.id,
-    source: data.source,
-    status: "pending",
-    payload: JSON.stringify(data),
-    importWatches: options.importWatches,
-    importWatchlist: options.importWatchlist,
-    importRatings: options.importRatings,
-    createdAt: new Date(),
-  });
+  let job;
+  try {
+    job = insertImportJob({
+      userId: context.user.id,
+      source: data.source,
+      status: "pending",
+      payload: JSON.stringify(data),
+      importWatches: options.importWatches,
+      importWatchlist: options.importWatchlist,
+      importRatings: options.importRatings,
+      createdAt: new Date(),
+    });
+  } catch (err) {
+    if (err instanceof Error && "code" in err && err.code === "SQLITE_CONSTRAINT_UNIQUE") {
+      throw new ORPCError("CONFLICT", {
+        message: "An import is already in progress",
+        data: { code: AppErrorCode.IMPORT_ALREADY_RUNNING },
+      });
+    }
+    throw err;
+  }
 
   // Fire-and-forget processing
   processImportJob(job.id).catch((err) => {

@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { z } from "zod";
 
-import { getProvider, getProviderConfig } from "./providers";
+import { getImporter, getImporterConfig } from "./importers";
 
 const GITHUB_RELEASES_URL = "https://api.github.com/repos/jakejarvis/sofa/releases/latest";
 
@@ -54,8 +54,8 @@ app.post(
       instanceId: z.string().min(1),
       version: z.string().min(1),
       arch: z.string().optional(),
-      users: z.number().optional(),
-      titles: z.number().optional(),
+      users: z.union([z.number(), z.string()]).optional(),
+      titles: z.union([z.number(), z.string()]).optional(),
       features: z.record(z.string(), z.unknown()).optional(),
     }),
   ),
@@ -123,16 +123,16 @@ app.post(
       console.warn("checkRateLimit error (import-device-code):", e);
     }
 
-    const { provider: providerName } = c.req.valid("param");
+    const { provider } = c.req.valid("param");
 
-    const provider = getProvider(providerName);
-    const config = getProviderConfig(providerName);
-    if (!provider || !config.clientId) {
-      return c.json({ error: `${providerName} is not configured` }, 503);
+    const importer = getImporter(provider);
+    const config = getImporterConfig(provider);
+    if (!importer || !config.clientId) {
+      return c.json({ error: `${provider} is not configured` }, 503);
     }
 
     try {
-      const result = await provider.getDeviceCode(config.clientId, config.clientSecret);
+      const result = await importer.getDeviceCode(config.clientId, config.clientSecret);
       return c.json(result);
     } catch (e) {
       return c.json(
@@ -172,17 +172,17 @@ app.post(
       console.warn("checkRateLimit error (import-poll):", e);
     }
 
-    const { provider: providerName } = c.req.valid("param");
+    const { provider } = c.req.valid("param");
     const { device_code } = c.req.valid("json");
 
-    const provider = getProvider(providerName);
-    const config = getProviderConfig(providerName);
-    if (!provider || !config.clientId) {
-      return c.json({ error: `${providerName} is not configured` }, 503);
+    const importer = getImporter(provider);
+    const config = getImporterConfig(provider);
+    if (!importer || !config.clientId) {
+      return c.json({ error: `${provider} is not configured` }, 503);
     }
 
     try {
-      const result = await provider.pollForToken(config.clientId, config.clientSecret, device_code);
+      const result = await importer.pollForToken(config.clientId, config.clientSecret, device_code);
 
       if (result.status !== "authorized") {
         return c.json({ status: result.status });
@@ -190,7 +190,7 @@ app.post(
 
       // Fetch user data and return it inline
       try {
-        const data = await provider.fetchUserData(result.accessToken, config.clientId);
+        const data = await importer.fetchUserData(result.accessToken, config.clientId);
         return c.json({ status: "authorized", data });
       } catch (e) {
         // Auth succeeded but data fetch failed. Return a distinct status so

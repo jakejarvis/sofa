@@ -4,7 +4,7 @@ import { APIError, createAuthMiddleware } from "better-auth/api";
 import { type BetterAuthOptions, betterAuth } from "better-auth/minimal";
 import { admin, genericOAuth } from "better-auth/plugins";
 
-import { getUserCount, isRegistrationOpen, setSetting } from "@sofa/core/settings";
+import { claimInitialAdmin, isRegistrationOpen } from "@sofa/core/settings";
 import { db } from "@sofa/db/client";
 import { createLogger } from "@sofa/logger";
 
@@ -89,25 +89,10 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user) => {
-          // First user becomes admin regardless of auth method
-          const userCount = getUserCount();
-          if (userCount === 0) {
-            return {
-              data: {
-                ...user,
-                role: "admin",
-              },
-            };
-          }
-          return { data: user };
-        },
-        after: async () => {
-          // Auto-close registration after first user
-          const userCount = getUserCount();
-          if (userCount === 1) {
-            setSetting("registrationOpen", "false");
-          }
+        after: async (user) => {
+          // Promote exactly one bootstrap user to admin, even if multiple
+          // sign-ups race during the first-run window.
+          claimInitialAdmin(user.id);
         },
       },
     },

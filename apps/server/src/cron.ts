@@ -306,6 +306,18 @@ export function startJobs() {
   log.info(`Started ${jobs.size} jobs`);
 }
 
+export function pauseJobs() {
+  for (const job of jobs.values()) {
+    job.pause();
+  }
+}
+
+export function resumeJobs() {
+  for (const job of jobs.values()) {
+    job.resume();
+  }
+}
+
 export function stopJobs() {
   for (const job of jobs.values()) {
     job.stop();

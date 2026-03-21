@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { index, int, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 // Helper for UUID primary keys
@@ -472,6 +473,9 @@ export const importJobs = sqliteTable(
   (table) => [
     index("importJobs_userId_createdAt").on(table.userId, table.createdAt),
     index("importJobs_status").on(table.status),
+    uniqueIndex("importJobs_active_user")
+      .on(table.userId)
+      .where(sql`${table.status} in ('pending', 'running')`),
   ],
 );
 

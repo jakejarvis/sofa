@@ -6,7 +6,7 @@ import { CACHE_DIR } from "@sofa/config";
 import { ensureBackupDir } from "@sofa/core/backup";
 import { ensureImageDirs, imageCacheEnabled } from "@sofa/core/image-cache";
 import { registerJobScheduleProvider } from "@sofa/core/system-health";
-import { closeDatabase } from "@sofa/db/client";
+import { closeDatabase, isDatabaseAccessBlocked } from "@sofa/db/client";
 import { runMigrations } from "@sofa/db/migrate";
 import { createLogger } from "@sofa/logger";
 
@@ -53,6 +53,13 @@ app.use(
     maxAge: 86400,
   }),
 );
+
+app.use("*", async (c, next) => {
+  if (isDatabaseAccessBlocked() && c.req.path !== "/api/health") {
+    return c.json({ error: "Service unavailable during database restore" }, 503);
+  }
+  await next();
+});
 
 // Non-RPC routes
 app.route("/api/health", healthRoutes);

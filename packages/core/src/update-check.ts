@@ -74,11 +74,11 @@ export async function performUpdateCheck(): Promise<UpdateCheckResult> {
     });
     if (!res.ok) throw new Error(`Public API ${res.status}`);
 
-    const data = (await res.json()) as { version: string; releaseUrl: string };
+    const data = (await res.json()) as { version: string; release_url: string };
     const version = data.version;
 
     setSetting("updateCheckLatestVersion", version);
-    setSetting("updateCheckReleaseUrl", data.releaseUrl);
+    setSetting("updateCheckReleaseUrl", data.release_url);
     setSetting("updateCheckLastCheckedAt", new Date().toISOString());
 
     log.info(`Update check complete: current=${APP_VERSION}, latest=${version}`);
@@ -87,7 +87,7 @@ export async function performUpdateCheck(): Promise<UpdateCheckResult> {
       updateAvailable: isNewerVersion(version, APP_VERSION),
       currentVersion: APP_VERSION,
       latestVersion: version,
-      releaseUrl: data.releaseUrl,
+      releaseUrl: data.release_url,
       lastCheckedAt: new Date().toISOString(),
     };
   } catch (err) {

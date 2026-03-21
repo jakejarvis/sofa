@@ -1,4 +1,5 @@
 import {
+  claimInitialAdmin as queryClaimInitialAdmin,
   getSettingValue,
   getUserCount as queryGetUserCount,
   upsertSetting,
@@ -14,6 +15,10 @@ export function setSetting(key: string, value: string): void {
 
 export function getUserCount(): number {
   return queryGetUserCount();
+}
+
+export function claimInitialAdmin(userId: string): boolean {
+  return queryClaimInitialAdmin(userId);
 }
 
 export function getInstanceId(): string {

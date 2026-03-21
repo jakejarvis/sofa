@@ -4,7 +4,7 @@ import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { BACKUP_DIR, DATABASE_URL } from "@sofa/config";
-import { closeDatabase, vacuumDatabase } from "@sofa/db/client";
+import { closeDatabase, vacuumDatabase, withDatabaseAccessBlocked } from "@sofa/db/client";
 import { runMigrations } from "@sofa/db/migrate";
 import { createLogger } from "@sofa/logger";
 
@@ -240,15 +240,17 @@ export async function restoreFromBackup(source: Buffer | string): Promise<void> 
       log.info("Creating pre-restore safety backup...");
       await createBackupInternal("pre-restore");
 
-      // Keep the close+replace window synchronous to avoid event-loop interleaving.
-      log.info("Replacing database...");
-      closeDatabase();
-      renameSync(tempPath, DATABASE_URL);
-      unlinkIfExistsSync(`${DATABASE_URL}-wal`);
-      unlinkIfExistsSync(`${DATABASE_URL}-shm`);
+      await withDatabaseAccessBlocked(async () => {
+        // Keep the close+replace window synchronous to avoid event-loop interleaving.
+        log.info("Replacing database...");
+        closeDatabase();
+        renameSync(tempPath, DATABASE_URL);
+        unlinkIfExistsSync(`${DATABASE_URL}-wal`);
+        unlinkIfExistsSync(`${DATABASE_URL}-shm`);
 
-      // Ensure restored backups from older app versions are brought up-to-date.
-      runMigrations();
+        // Ensure restored backups from older app versions are brought up-to-date.
+        runMigrations();
+      });
       log.info("Database restored successfully");
     } finally {
       const tempFile = Bun.file(tempPath);
