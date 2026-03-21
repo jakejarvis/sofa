@@ -2,6 +2,7 @@ import {
   getContinueWatchingFeed,
   getLibraryFeed,
   getRecommendationsFeed,
+  getUpcomingFeed,
   getUserStats,
   getWatchCount,
   getWatchHistory,
@@ -85,6 +86,27 @@ export const recommendations = os.dashboard.recommendations.use(authed).handler(
       voteAverage: t.voteAverage,
     }));
   return { items };
+});
+
+export const upcoming = os.dashboard.upcoming.use(authed).handler(({ input, context }) => {
+  const result = getUpcomingFeed(context.user.id, {
+    days: input.days,
+    limit: input.limit,
+    cursor: input.cursor,
+  });
+  return {
+    items: result.items.map((item) => ({
+      ...item,
+      posterPath: tmdbImageUrl(item.posterPath, "posters"),
+      streamingProvider: item.streamingProvider
+        ? {
+            ...item.streamingProvider,
+            logoPath: tmdbImageUrl(item.streamingProvider.logoPath, "logos"),
+          }
+        : null,
+    })),
+    nextCursor: result.nextCursor,
+  };
 });
 
 export const watchHistory = os.dashboard.watchHistory.use(authed).handler(({ input, context }) => {

@@ -1787,8 +1787,7 @@
                     "anyOf": [
                       {
                         "enum": [
-                          "in_progress",
-                          "completed"
+                          "watchlist"
                         ],
                         "type": "string"
                       },
@@ -1796,13 +1795,13 @@
                         "type": "null"
                       }
                     ],
-                    "description": "Tracking status: in_progress (currently watching), completed (finished), or null to remove from library"
+                    "description": "Set to watchlist to add to library, or null to remove. Other transitions happen via watch endpoints."
                   }
                 },
                 "required": [
                   "status"
                 ],
-                "description": "Update the user's tracking status for a title"
+                "description": "Add a title to the user's watchlist or remove from library"
               }
             }
           }
@@ -1989,8 +1988,9 @@
                       "anyOf": [
                         {
                           "enum": [
-                            "watchlist",
-                            "in_progress",
+                            "in_watchlist",
+                            "watching",
+                            "caught_up",
                             "completed"
                           ],
                           "type": "string"
@@ -1999,7 +1999,7 @@
                           "type": "null"
                         }
                       ],
-                      "description": "User's tracking status, or null if not in library"
+                      "description": "User's display status, or null if not in library"
                     },
                     "rating": {
                       "anyOf": [
@@ -2079,13 +2079,14 @@
                       },
                       "additionalProperties": {
                         "enum": [
-                          "watchlist",
-                          "in_progress",
+                          "in_watchlist",
+                          "watching",
+                          "caught_up",
                           "completed"
                         ],
                         "type": "string"
                       },
-                      "description": "Map of title ID to the user's tracking status"
+                      "description": "Map of title ID to the user's display status"
                     }
                   },
                   "required": [
@@ -2525,13 +2526,14 @@
                       },
                       "additionalProperties": {
                         "enum": [
-                          "watchlist",
-                          "in_progress",
+                          "in_watchlist",
+                          "watching",
+                          "caught_up",
                           "completed"
                         ],
                         "type": "string"
                       },
-                      "description": "Map of title ID to the user's tracking status"
+                      "description": "Map of title ID to the user's display status"
                     },
                     "page": {
                       "type": "number",
@@ -2848,6 +2850,252 @@
         ]
       }
     },
+    "/dashboard/upcoming": {
+      "get": {
+        "operationId": "dashboard.upcoming",
+        "summary": "Get upcoming episodes and movies",
+        "description": "Fetch upcoming episodes and movie releases for titles in the user's library, sorted by date. Supports cursor-based pagination.",
+        "tags": [
+          "Dashboard"
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 90,
+              "default": 90,
+              "description": "How many days into the future to look"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "description": "Maximum items per page"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Pagination cursor"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Upcoming items sorted by date with streaming info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "episodeId": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Episode ID (TV only, null for movies and collapsed batches)"
+                          },
+                          "titleId": {
+                            "type": "string",
+                            "description": "Internal title ID"
+                          },
+                          "titleName": {
+                            "type": "string",
+                            "description": "Display title"
+                          },
+                          "titleType": {
+                            "enum": [
+                              "movie",
+                              "tv"
+                            ],
+                            "type": "string",
+                            "description": "Media type"
+                          },
+                          "posterPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Poster image path"
+                          },
+                          "posterThumbHash": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "ThumbHash blur placeholder"
+                          },
+                          "seasonNumber": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Season number (TV only)"
+                          },
+                          "episodeNumber": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Episode number (TV only)"
+                          },
+                          "episodeName": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Episode title (TV only)"
+                          },
+                          "episodeCount": {
+                            "type": "number",
+                            "description": "Number of episodes (1 for single, >1 for collapsed batch drops)"
+                          },
+                          "date": {
+                            "type": "string",
+                            "description": "Air date or release date (YYYY-MM-DD)"
+                          },
+                          "userStatus": {
+                            "enum": [
+                              "in_watchlist",
+                              "watching",
+                              "caught_up",
+                              "completed"
+                            ],
+                            "type": "string",
+                            "description": "User's display status"
+                          },
+                          "isNewSeason": {
+                            "type": "boolean",
+                            "description": "Whether this is a new season for a completed show"
+                          },
+                          "streamingProvider": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "providerId": {
+                                    "type": "number"
+                                  },
+                                  "providerName": {
+                                    "type": "string"
+                                  },
+                                  "logoPath": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "providerId",
+                                  "providerName",
+                                  "logoPath"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Primary streaming provider, or null"
+                          }
+                        },
+                        "required": [
+                          "episodeId",
+                          "titleId",
+                          "titleName",
+                          "titleType",
+                          "posterPath",
+                          "posterThumbHash",
+                          "seasonNumber",
+                          "episodeNumber",
+                          "episodeName",
+                          "episodeCount",
+                          "date",
+                          "userStatus",
+                          "isNewSeason",
+                          "streamingProvider"
+                        ],
+                        "description": "An upcoming episode or movie release"
+                      }
+                    },
+                    "nextCursor": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Cursor for the next page, or null if no more items"
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "nextCursor"
+                  ],
+                  "description": "Upcoming episodes and movie releases for tracked titles"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/dashboard/library": {
       "get": {
         "operationId": "dashboard.library",
@@ -2976,8 +3224,9 @@
                             "anyOf": [
                               {
                                 "enum": [
-                                  "watchlist",
-                                  "in_progress",
+                                  "in_watchlist",
+                                  "watching",
+                                  "caught_up",
                                   "completed"
                                 ],
                                 "type": "string"
@@ -2986,7 +3235,7 @@
                                 "type": "null"
                               }
                             ],
-                            "description": "User's tracking status"
+                            "description": "User's display status"
                           }
                         },
                         "required": [
@@ -3292,13 +3541,14 @@
                       },
                       "additionalProperties": {
                         "enum": [
-                          "watchlist",
-                          "in_progress",
+                          "in_watchlist",
+                          "watching",
+                          "caught_up",
                           "completed"
                         ],
                         "type": "string"
                       },
-                      "description": "Map of title ID to the user's tracking status"
+                      "description": "Map of title ID to the user's display status"
                     },
                     "episodeProgress": {
                       "type": "object",
@@ -3488,13 +3738,14 @@
                       },
                       "additionalProperties": {
                         "enum": [
-                          "watchlist",
-                          "in_progress",
+                          "in_watchlist",
+                          "watching",
+                          "caught_up",
                           "completed"
                         ],
                         "type": "string"
                       },
-                      "description": "Map of title ID to the user's tracking status"
+                      "description": "Map of title ID to the user's display status"
                     },
                     "episodeProgress": {
                       "type": "object",
@@ -4124,13 +4375,14 @@
                       },
                       "additionalProperties": {
                         "enum": [
-                          "watchlist",
-                          "in_progress",
+                          "in_watchlist",
+                          "watching",
+                          "caught_up",
                           "completed"
                         ],
                         "type": "string"
                       },
-                      "description": "Map of title ID to the user's tracking status"
+                      "description": "Map of title ID to the user's display status"
                     },
                     "episodeProgress": {
                       "type": "object",

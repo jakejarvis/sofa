@@ -413,6 +413,7 @@ msgid "Catch up"
 msgstr "따라잡기"
 
 #: apps/native/src/components/titles/status-action-button.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Caught Up"
@@ -514,6 +515,7 @@ msgstr "닫기"
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Completed"
@@ -837,6 +839,10 @@ msgstr "에피소드 {period}"
 #: apps/web/src/components/dashboard/stats-display.tsx
 msgid "Episodes {select}"
 msgstr "에피소드 {select}"
+
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Episodes and movies coming up in the next 90 days."
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #~ msgid "Episodes this week"
@@ -1321,6 +1327,7 @@ msgstr "모두 시청 완료로 표시"
 #~ msgid "Mark as Completed"
 #~ msgstr ""
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 msgid "Mark as Watched"
 msgstr "시청 완료로 표시"
@@ -1328,6 +1335,10 @@ msgstr "시청 완료로 표시"
 #: apps/native/src/components/ui/poster-card.tsx
 #~ msgid "Mark as Watching"
 #~ msgstr ""
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+msgid "Mark Episode Watched"
+msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/titles/title-actions.tsx
@@ -1439,6 +1450,10 @@ msgstr "없음"
 msgid "Never run"
 msgstr "실행된 적 없음"
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#~ msgid "New"
+#~ msgstr ""
+
 #: apps/native/src/app/(auth)/register.tsx
 msgid "New account creation is currently disabled."
 msgstr "현재 새 계정 생성이 비활성화되어 있습니다."
@@ -1459,6 +1474,11 @@ msgstr "새 비밀번호"
 #: apps/web/src/components/settings/account-section.tsx
 msgid "New password must be at least 8 characters"
 msgstr "새 비밀번호는 최소 8자 이상이어야 합니다"
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+msgid "New Season"
+msgstr ""
 
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
@@ -1501,6 +1521,11 @@ msgstr "결과를 찾을 수 없습니다."
 msgid "No titles found for this genre."
 msgstr "이 장르에 해당하는 작품이 없습니다."
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "No upcoming episodes or releases in the next 90 days."
+msgstr ""
+
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
@@ -1511,6 +1536,7 @@ msgstr "구성되지 않음"
 msgid "Not Found"
 msgstr "찾을 수 없음"
 
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 msgid "On Watchlist"
 msgstr "찜 목록에 있음"
@@ -1839,6 +1865,7 @@ msgid "Remove from library"
 msgstr "라이브러리에서 제거"
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
+#: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 msgid "Remove from Library"
 msgstr "라이브러리에서 제거"
@@ -1938,6 +1965,16 @@ msgstr "찾은 항목을 검토하고 가져올 항목을 선택하세요."
 msgid "Run now"
 msgstr "지금 실행"
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+#~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
+#~ msgstr ""
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+msgid "S{seasonNum} · {epCount, plural, one {# episode} other {# episodes}}"
+msgstr ""
+
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Saturday"
 msgstr "토요일"
@@ -2032,6 +2069,11 @@ msgstr "시즌"
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Security"
 msgstr "보안"
+
+#: apps/native/src/components/ui/section-header.tsx
+#: apps/web/src/components/dashboard/feed-section.tsx
+msgid "See all"
+msgstr ""
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Self-hosted movie & TV tracker"
@@ -2453,6 +2495,15 @@ msgstr "S{seasonNum} E{epNum} 시청 취소됨"
 msgid "Up next"
 msgstr "다음 에피소드"
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/components/dashboard/upcoming-section.tsx
+#: apps/web/src/components/dashboard/upcoming-section.tsx
+#: apps/web/src/components/nav-bar.tsx
+#: apps/web/src/components/nav-bar.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Upcoming"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Update available: {0}"
 #~ msgstr ""
@@ -2571,6 +2622,7 @@ msgid "Watched S{seasonNum} E{epNum}"
 msgstr "S{seasonNum} E{epNum} 시청 완료"
 
 #: apps/native/src/components/titles/status-action-button.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Watching"
@@ -2645,4 +2697,3 @@ msgstr "라이브러리가 비어 있습니다"
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Your name"
 msgstr "이름"
-

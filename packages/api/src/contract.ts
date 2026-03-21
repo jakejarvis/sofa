@@ -57,6 +57,8 @@ import {
   UpdateRatingInput,
   UpdateScheduleInput,
   UpdateStatusInput,
+  UpcomingInput,
+  UpcomingOutput,
   UploadAvatarInput,
   UploadAvatarOutput,
   UserInfoOutput,
@@ -290,6 +292,18 @@ export const contract = {
         successDescription: "Recommended titles",
       })
       .output(DashboardRecommendationsOutput),
+    upcoming: oc
+      .route({
+        method: "GET",
+        path: "/dashboard/upcoming",
+        tags: ["Dashboard"],
+        summary: "Get upcoming episodes and movies",
+        description:
+          "Fetch upcoming episodes and movie releases for titles in the user's library, sorted by date. Supports cursor-based pagination.",
+        successDescription: "Upcoming items sorted by date with streaming info",
+      })
+      .input(UpcomingInput)
+      .output(UpcomingOutput),
     watchHistory: oc
       .route({
         method: "GET",

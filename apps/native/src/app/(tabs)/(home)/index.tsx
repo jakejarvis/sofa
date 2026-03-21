@@ -18,6 +18,7 @@ import { useCSSVariable } from "uniwind";
 import { ContinueWatchingCard } from "@/components/dashboard/continue-watching-card";
 import { HorizontalPosterRow } from "@/components/dashboard/horizontal-poster-row";
 import { StatsCard } from "@/components/dashboard/stats-card";
+import { UpcomingSection } from "@/components/dashboard/upcoming-section";
 import { EmptyState } from "@/components/ui/empty-state";
 import {
   HorizontalListSeparator,
@@ -179,8 +180,13 @@ export default function DashboardScreen() {
           </Animated.View>
         )}
 
+        {/* Upcoming */}
+        <Animated.View entering={FadeInDown.duration(300).delay(250)}>
+          <UpcomingSection />
+        </Animated.View>
+
         {/* Library */}
-        <Animated.View entering={FadeInDown.duration(300).delay(300)}>
+        <Animated.View entering={FadeInDown.duration(300).delay(350)}>
           <View className="px-4">
             <SectionHeader title={t`In Your Library`} icon={IconBooks} />
           </View>
@@ -200,7 +206,7 @@ export default function DashboardScreen() {
 
         {/* Recommendations */}
         {hasRecommendations && (
-          <Animated.View entering={FadeInDown.duration(300).delay(400)}>
+          <Animated.View entering={FadeInDown.duration(300).delay(450)}>
             <View className="px-4">
               <SectionHeader title={t`Recommended for You`} icon={IconThumbUp} />
             </View>

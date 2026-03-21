@@ -413,6 +413,7 @@ msgid "Catch up"
 msgstr "Ponerse al día"
 
 #: apps/native/src/components/titles/status-action-button.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Caught Up"
@@ -514,6 +515,7 @@ msgstr "Cerrar"
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Completed"
@@ -837,6 +839,10 @@ msgstr ""
 #: apps/web/src/components/dashboard/stats-display.tsx
 msgid "Episodes {select}"
 msgstr "Episodios {select}"
+
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Episodes and movies coming up in the next 90 days."
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #~ msgid "Episodes this week"
@@ -1321,6 +1327,7 @@ msgstr "Marcar todos como vistos"
 #~ msgid "Mark as Completed"
 #~ msgstr ""
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 msgid "Mark as Watched"
 msgstr "Marcar como visto"
@@ -1328,6 +1335,10 @@ msgstr "Marcar como visto"
 #: apps/native/src/components/ui/poster-card.tsx
 #~ msgid "Mark as Watching"
 #~ msgstr ""
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+msgid "Mark Episode Watched"
+msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/titles/title-actions.tsx
@@ -1439,6 +1450,10 @@ msgstr "Nunca"
 msgid "Never run"
 msgstr "Nunca ejecutado"
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#~ msgid "New"
+#~ msgstr ""
+
 #: apps/native/src/app/(auth)/register.tsx
 msgid "New account creation is currently disabled."
 msgstr "La creación de nuevas cuentas está desactivada actualmente."
@@ -1459,6 +1474,11 @@ msgstr "Nueva contraseña"
 #: apps/web/src/components/settings/account-section.tsx
 msgid "New password must be at least 8 characters"
 msgstr "La nueva contraseña debe tener al menos 8 caracteres"
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+msgid "New Season"
+msgstr ""
 
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
@@ -1501,6 +1521,11 @@ msgstr "No se encontraron resultados."
 msgid "No titles found for this genre."
 msgstr "No se encontraron títulos para este género."
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "No upcoming episodes or releases in the next 90 days."
+msgstr ""
+
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
@@ -1511,6 +1536,7 @@ msgstr "No configurado"
 msgid "Not Found"
 msgstr "No encontrado"
 
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 msgid "On Watchlist"
 msgstr "En la lista"
@@ -1839,6 +1865,7 @@ msgid "Remove from library"
 msgstr "Eliminar de la biblioteca"
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
+#: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 msgid "Remove from Library"
 msgstr "Eliminar de la biblioteca"
@@ -1938,6 +1965,16 @@ msgstr "Revisa lo encontrado y elige qué importar."
 msgid "Run now"
 msgstr "Ejecutar ahora"
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+#~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
+#~ msgstr ""
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+msgid "S{seasonNum} · {epCount, plural, one {# episode} other {# episodes}}"
+msgstr ""
+
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Saturday"
 msgstr "Sábado"
@@ -2032,6 +2069,11 @@ msgstr "Temporadas"
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Security"
 msgstr "Seguridad"
+
+#: apps/native/src/components/ui/section-header.tsx
+#: apps/web/src/components/dashboard/feed-section.tsx
+msgid "See all"
+msgstr ""
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Self-hosted movie & TV tracker"
@@ -2453,6 +2495,15 @@ msgstr "No visto T{seasonNum} E{epNum}"
 msgid "Up next"
 msgstr "A continuación"
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/components/dashboard/upcoming-section.tsx
+#: apps/web/src/components/dashboard/upcoming-section.tsx
+#: apps/web/src/components/nav-bar.tsx
+#: apps/web/src/components/nav-bar.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Upcoming"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Update available: {0}"
 #~ msgstr ""
@@ -2571,6 +2622,7 @@ msgid "Watched S{seasonNum} E{epNum}"
 msgstr "Visto T{seasonNum} E{epNum}"
 
 #: apps/native/src/components/titles/status-action-button.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Watching"
@@ -2645,4 +2697,3 @@ msgstr "Tu biblioteca está vacía"
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Your name"
 msgstr "Tu nombre"
-

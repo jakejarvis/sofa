@@ -7,6 +7,7 @@ import { RecommendationsSection } from "@/components/dashboard/recommendations-s
 import { StatsSectionSkeleton } from "@/components/dashboard/stats-display";
 import { StatsSection } from "@/components/dashboard/stats-section";
 import { TitleGridSectionSkeleton } from "@/components/dashboard/title-grid";
+import { UpcomingSection } from "@/components/dashboard/upcoming-section";
 import { WelcomeHeader } from "@/components/dashboard/welcome-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
@@ -19,6 +20,17 @@ export const Route = createFileRoute("/_app/dashboard")({
       context.queryClient.ensureQueryData(orpc.dashboard.stats.queryOptions()),
       context.queryClient.ensureQueryData(orpc.dashboard.continueWatching.queryOptions()),
       context.queryClient.ensureQueryData(orpc.dashboard.recommendations.queryOptions()),
+      context.queryClient.ensureQueryData(
+        orpc.dashboard.upcoming.queryOptions({ input: { days: 7, limit: 5 } }),
+      ),
+      context.queryClient.ensureInfiniteQueryData(
+        orpc.dashboard.library.infiniteOptions({
+          input: (pageParam: number) => ({ page: pageParam }),
+          initialPageParam: 1,
+          getNextPageParam: (lastPage) =>
+            lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+        }),
+      ),
     ]);
   },
   pendingComponent: DashboardSkeleton,
@@ -27,7 +39,7 @@ export const Route = createFileRoute("/_app/dashboard")({
 
 function DashboardSkeleton() {
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <div>
         <Skeleton className="h-8 w-64" />
         <Skeleton className="mt-2 h-4 w-48" />
@@ -43,10 +55,11 @@ function DashboardSkeleton() {
 function DashboardPage() {
   const { session } = Route.useRouteContext();
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <WelcomeHeader name={session.user.name} />
       <StatsSection />
       <ContinueWatchingSection />
+      <UpcomingSection />
       <LibrarySection />
       <RecommendationsSection />
     </div>

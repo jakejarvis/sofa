@@ -63,6 +63,9 @@ export function insertTitle(
     tvdbId?: number;
     type?: "movie" | "tv";
     title?: string;
+    releaseDate?: string;
+    posterPath?: string;
+    status?: string;
   } = {},
 ) {
   const id = overrides.id ?? "title-1";
@@ -74,14 +77,30 @@ export function insertTitle(
       tvdbId: overrides.tvdbId,
       type: overrides.type ?? "movie",
       title: overrides.title ?? "Test Movie",
+      releaseDate: overrides.releaseDate,
+      posterPath: overrides.posterPath,
+      status: overrides.status,
     })
     .run();
   return id;
 }
 
-export function insertTvShow(titleId = "tv-1", tmdbId = 99999, seasonCount = 1, epsPerSeason = 3) {
-  insertTitle({ id: titleId, tmdbId, type: "tv", title: "Test Show" });
+export function insertTvShow(
+  titleId = "tv-1",
+  tmdbId = 99999,
+  seasonCount = 1,
+  epsPerSeason = 3,
+  options: { title?: string; airDates?: string[]; status?: string } = {},
+) {
+  insertTitle({
+    id: titleId,
+    tmdbId,
+    type: "tv",
+    title: options.title ?? "Test Show",
+    status: options.status,
+  });
   const episodeIds: string[] = [];
+  let airDateIdx = 0;
   for (let s = 1; s <= seasonCount; s++) {
     const seasonId = `${titleId}-s${s}`;
     testDb.insert(seasons).values({ id: seasonId, titleId, seasonNumber: s }).run();
@@ -94,9 +113,11 @@ export function insertTvShow(titleId = "tv-1", tmdbId = 99999, seasonCount = 1, 
           seasonId,
           episodeNumber: e,
           name: `S${s}E${e}`,
+          airDate: options.airDates?.[airDateIdx],
         })
         .run();
       episodeIds.push(epId);
+      airDateIdx++;
     }
   }
   return { titleId, episodeIds };

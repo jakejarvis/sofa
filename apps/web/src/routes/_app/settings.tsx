@@ -51,7 +51,7 @@ export const Route = createFileRoute("/_app/settings")({
 
 function SettingsSkeleton() {
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
+    <div className="mx-auto max-w-2xl space-y-6">
       <div>
         <div className="flex items-center gap-2">
           <Skeleton className="size-5 rounded" />

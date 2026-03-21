@@ -413,6 +413,7 @@ msgid "Catch up"
 msgstr "追上"
 
 #: apps/native/src/components/titles/status-action-button.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Caught Up"
@@ -514,6 +515,7 @@ msgstr "关闭"
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Completed"
@@ -837,6 +839,10 @@ msgstr "剧集 {period}"
 #: apps/web/src/components/dashboard/stats-display.tsx
 msgid "Episodes {select}"
 msgstr "剧集 {select}"
+
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Episodes and movies coming up in the next 90 days."
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #~ msgid "Episodes this week"
@@ -1321,6 +1327,7 @@ msgstr "全部标记为已观看"
 #~ msgid "Mark as Completed"
 #~ msgstr ""
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 msgid "Mark as Watched"
 msgstr "标记为已观看"
@@ -1328,6 +1335,10 @@ msgstr "标记为已观看"
 #: apps/native/src/components/ui/poster-card.tsx
 #~ msgid "Mark as Watching"
 #~ msgstr ""
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+msgid "Mark Episode Watched"
+msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/titles/title-actions.tsx
@@ -1439,6 +1450,10 @@ msgstr "从未"
 msgid "Never run"
 msgstr "从未运行"
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#~ msgid "New"
+#~ msgstr ""
+
 #: apps/native/src/app/(auth)/register.tsx
 msgid "New account creation is currently disabled."
 msgstr "当前已禁用新账户创建。"
@@ -1459,6 +1474,11 @@ msgstr "新密码"
 #: apps/web/src/components/settings/account-section.tsx
 msgid "New password must be at least 8 characters"
 msgstr "新密码至少需要 8 个字符"
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+msgid "New Season"
+msgstr ""
 
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
@@ -1501,6 +1521,11 @@ msgstr "未找到结果。"
 msgid "No titles found for this genre."
 msgstr "此类型下未找到任何内容。"
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "No upcoming episodes or releases in the next 90 days."
+msgstr ""
+
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
@@ -1511,6 +1536,7 @@ msgstr "未配置"
 msgid "Not Found"
 msgstr "未找到"
 
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 msgid "On Watchlist"
 msgstr "在待看列表中"
@@ -1839,6 +1865,7 @@ msgid "Remove from library"
 msgstr "从媒体库中移除"
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
+#: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 msgid "Remove from Library"
 msgstr "从媒体库中移除"
@@ -1938,6 +1965,16 @@ msgstr "查看已发现的内容，选择要导入的项目。"
 msgid "Run now"
 msgstr "立即运行"
 
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+#~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
+#~ msgstr ""
+
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+msgid "S{seasonNum} · {epCount, plural, one {# episode} other {# episodes}}"
+msgstr ""
+
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Saturday"
 msgstr "星期六"
@@ -2032,6 +2069,11 @@ msgstr "季"
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Security"
 msgstr "安全"
+
+#: apps/native/src/components/ui/section-header.tsx
+#: apps/web/src/components/dashboard/feed-section.tsx
+msgid "See all"
+msgstr ""
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Self-hosted movie & TV tracker"
@@ -2453,6 +2495,15 @@ msgstr "第 {seasonNum} 季第 {epNum} 集已取消标记"
 msgid "Up next"
 msgstr "接下来"
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/components/dashboard/upcoming-section.tsx
+#: apps/web/src/components/dashboard/upcoming-section.tsx
+#: apps/web/src/components/nav-bar.tsx
+#: apps/web/src/components/nav-bar.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Upcoming"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Update available: {0}"
 #~ msgstr ""
@@ -2571,6 +2622,7 @@ msgid "Watched S{seasonNum} E{epNum}"
 msgstr "第 {seasonNum} 季第 {epNum} 集已标记为已看"
 
 #: apps/native/src/components/titles/status-action-button.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Watching"
@@ -2645,4 +2697,3 @@ msgstr "您的媒体库为空"
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Your name"
 msgstr "您的姓名"
-
