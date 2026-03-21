@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, inArray, lte, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 
 import { db } from "../client";
 import {
@@ -340,7 +340,7 @@ export function getUpcomingEpisodes(
       userTitleStatus,
       and(eq(userTitleStatus.titleId, titles.id), eq(userTitleStatus.userId, userId)),
     )
-    .where(and(gt(episodes.airDate, fromDate), lte(episodes.airDate, toDate)))
+    .where(and(gte(episodes.airDate, fromDate), lte(episodes.airDate, toDate)))
     .orderBy(asc(episodes.airDate), asc(titles.title))
     .limit(limit)
     .all();
@@ -364,7 +364,7 @@ export function getUpcomingMovies(userId: string, fromDate: string, toDate: stri
     .where(
       and(
         eq(titles.type, "movie"),
-        gt(titles.releaseDate, fromDate),
+        gte(titles.releaseDate, fromDate),
         lte(titles.releaseDate, toDate),
       ),
     )

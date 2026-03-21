@@ -379,11 +379,12 @@ export function getUpcomingFeed(
 ): UpcomingFeedResult {
   const { days = 90, limit = 20, cursor } = options;
 
-  const today = new Date().toISOString().slice(0, 10);
-  const fromDate = cursor ?? today;
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const fromDate = cursor?.includes("_") ? cursor.split("_", 2)[0]! : (cursor ?? today);
   const horizon = new Date();
   horizon.setDate(horizon.getDate() + days);
-  const toDate = horizon.toISOString().slice(0, 10);
+  const toDate = `${horizon.getFullYear()}-${String(horizon.getMonth() + 1).padStart(2, "0")}-${String(horizon.getDate()).padStart(2, "0")}`;
 
   // Fetch limit + 1 from each to detect if there are more pages
   const fetchLimit = limit + 1;

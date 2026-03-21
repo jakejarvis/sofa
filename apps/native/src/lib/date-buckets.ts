@@ -4,20 +4,24 @@ export type DateBucket<T> = {
   items: T[];
 };
 
+function formatLocalDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function getToday(): string {
-  return new Date().toISOString().slice(0, 10);
+  return formatLocalDate(new Date());
 }
 
 function addDays(dateStr: string, days: number): string {
   const d = new Date(`${dateStr}T00:00:00`);
   d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
+  return formatLocalDate(d);
 }
 
 function getEndOfWeek(today: string): string {
   const d = new Date(`${today}T00:00:00`);
-  const dayOfWeek = d.getDay();
-  const daysUntilSunday = 7 - dayOfWeek;
+  const dayOfWeek = d.getDay(); // 0=Sun
+  const daysUntilSunday = (7 - dayOfWeek) % 7;
   return addDays(today, daysUntilSunday);
 }
 
