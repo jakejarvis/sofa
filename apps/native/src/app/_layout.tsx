@@ -10,11 +10,6 @@ import {
 import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import {
-  getAdvertisingId,
-  getTrackingPermissionsAsync,
-  requestTrackingPermissionsAsync,
-} from "expo-tracking-transparency";
 import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";
 import { useEffect, useRef, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -28,7 +23,7 @@ import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-bann
 import { useServerConnection } from "@/hooks/use-server-connection";
 import { useWidgetRefresh } from "@/hooks/use-widget-refresh";
 import { initLocale } from "@/lib/i18n";
-import { applyTrackingTransparency, posthog } from "@/lib/posthog";
+import { initAnalytics, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
 import { getScopeKey, initialize, onStorageScopeChange, queryPersister } from "@/lib/server";
 import { sofaTheme } from "@/lib/theme";
@@ -67,42 +62,20 @@ function AppContent() {
     localeReady.then(() => setLocaleReady(true)).catch(() => setLocaleReady(true));
   }, []);
 
-  // --- App Tracking Transparency (must resolve before screen tracking) ---
-  const [trackingReady, setTrackingReady] = useState(false);
-
+  // --- Analytics init (sync PostHog opt-in/out from stored preference) ---
   useEffect(() => {
-    (async () => {
-      const { status } = await getTrackingPermissionsAsync();
-      const granted =
-        status === "undetermined"
-          ? (await requestTrackingPermissionsAsync()).granted
-          : status === "granted";
-
-      const enabled = applyTrackingTransparency(granted);
-
-      // Use the platform advertising ID (IDFA / AAID) as the PostHog
-      // distinct ID, but only when the resolved state is actually enabled
-      // (respects both ATT result and the user's settings override).
-      if (enabled && posthog) {
-        const advertisingId = getAdvertisingId();
-        if (advertisingId) {
-          posthog.identify(advertisingId);
-        }
-      }
-
-      setTrackingReady(true);
-    })();
+    initAnalytics();
   }, []);
 
-  // --- PostHog screen tracking (waits for ATT to resolve) ---
+  // --- PostHog screen tracking ---
   const pathname = usePathname();
   const params = useGlobalSearchParams();
 
   useEffect(() => {
-    if (trackingReady && posthog && pathname) {
+    if (posthog && pathname) {
       posthog.screen(pathname, params);
     }
-  }, [trackingReady, pathname, params]);
+  }, [pathname, params]);
 
   useEffect(() => {
     Uniwind.setTheme("dark");

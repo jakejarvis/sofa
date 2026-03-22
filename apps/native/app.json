@@ -109,12 +109,6 @@
       ],
       "expo-localization",
       [
-        "expo-tracking-transparency",
-        {
-          "userTrackingPermission": "This identifier will be used to measure app performance and improve your experience."
-        }
-      ],
-      [
         "expo-widgets",
         {
           "groupIdentifier": "group.com.jakejarvis.sofa",

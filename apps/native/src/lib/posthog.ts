@@ -8,7 +8,6 @@ const host = process.env.EXPO_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
 
 const ANALYTICS_ENABLED_KEY = "sofa_analytics_enabled";
 const ANALYTICS_EXPLICIT_KEY = "sofa_analytics_explicit";
-const ATT_MIGRATED_KEY = "sofa_att_migrated";
 
 const posthogStorage: PostHogCustomStorage = {
   getItem: (key: string) => globalStorage.getString(key) ?? null,
@@ -16,7 +15,7 @@ const posthogStorage: PostHogCustomStorage = {
 };
 
 // PostHog throws if apiKey is empty, so only construct when configured.
-// Start opted-out; the ATT check in root layout will opt in if appropriate.
+// Start opted-out; initAnalytics() in root layout will opt in based on stored preference.
 export const posthog: PostHog | null = posthogApiKey
   ? new PostHog(posthogApiKey, {
       host,
@@ -52,7 +51,7 @@ export function setAnalyticsEnabled(enabled: boolean): void {
 
 /**
  * Sync PostHog opt-in/out state based on the resolved analytics flag.
- * Called after ATT check and from the settings toggle.
+ * Called from initAnalytics() and from the settings toggle.
  */
 export function syncPosthog(enabled: boolean): void {
   if (enabled) {
@@ -63,38 +62,9 @@ export function syncPosthog(enabled: boolean): void {
 }
 
 /**
- * Resolve analytics state after an ATT permission check.
- * If the user has an explicit preference (or a legacy preference from before
- * ATT was introduced), that wins. Otherwise the ATT result is stored as the
- * current default and PostHog is synced.
- *
- * Returns the resolved enabled state so callers can decide whether to proceed
- * with identifying, etc.
+ * Initialize analytics on app startup.
+ * Reads the stored preference and syncs PostHog opt-in/out state.
  */
-export function applyTrackingTransparency(granted: boolean): boolean {
-  // One-time migration: on the first launch after the ATT update, check if
-  // the user had previously toggled analytics via the settings switch (which
-  // was the only way ANALYTICS_ENABLED_KEY got set before ATT). If so,
-  // promote it to an explicit preference so the ATT result doesn't overwrite
-  // it. This runs exactly once — subsequent launches skip it because
-  // ATT_MIGRATED_KEY is set, preventing applyTrackingTransparency's own
-  // writes to ANALYTICS_ENABLED_KEY from being misidentified as legacy.
-  if (!globalStorage.getBoolean(ATT_MIGRATED_KEY)) {
-    globalStorage.set(ATT_MIGRATED_KEY, true);
-    if (globalStorage.getBoolean(ANALYTICS_ENABLED_KEY) !== undefined && !hasExplicitPreference()) {
-      globalStorage.set(ANALYTICS_EXPLICIT_KEY, true);
-    }
-  }
-
-  if (hasExplicitPreference()) {
-    // User already made a choice in settings — honour it.
-    const enabled = isAnalyticsEnabled();
-    syncPosthog(enabled);
-    return enabled;
-  }
-
-  // No explicit preference yet — follow the ATT result.
-  globalStorage.set(ANALYTICS_ENABLED_KEY, granted);
-  syncPosthog(granted);
-  return granted;
+export function initAnalytics(): void {
+  syncPosthog(isAnalyticsEnabled());
 }

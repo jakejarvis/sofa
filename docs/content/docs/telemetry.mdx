@@ -10,11 +10,11 @@ Sofa includes optional, privacy-focused telemetry to help understand how the pro
 
 Sofa has two separate telemetry systems depending on the platform:
 
-|             | Server           | Mobile App        | Web App |
-| ----------- | ---------------- | ----------------- | ------- |
-| **System**  | Custom reporting | PostHog           | None    |
-| **Default** | Disabled         | Disabled          | N/A     |
-| **Opt-in**  | Admin toggle     | User toggle + ATT | N/A     |
+|             | Server           | Mobile App   | Web App |
+| ----------- | ---------------- | ------------ | ------- |
+| **System**  | Custom reporting | PostHog      | None    |
+| **Default** | Disabled         | Disabled     | N/A     |
+| **Opt-in**  | Admin toggle     | User toggle  | N/A     |
 
 The web app has **zero analytics** — no tracking scripts, no third-party services.
 
@@ -81,15 +81,7 @@ The native iOS and Android app uses [PostHog](https://posthog.com/) for anonymou
 
 ### Consent Flow
 
-On iOS, the app follows Apple's App Tracking Transparency (ATT) framework:
-
-1. On first launch, iOS prompts you to allow or deny tracking
-2. If you allow, analytics is enabled by default (you can still disable it in settings)
-3. If you deny, analytics stays disabled
-
-On Android, analytics starts disabled and can be toggled on in settings.
-
-Regardless of platform, you can change your preference at any time in **Settings → Anonymous Usage Reporting**.
+Analytics starts disabled on both iOS and Android. You can enable it in **Settings → Anonymous Usage Reporting** and change your preference at any time.
 
 ### What Gets Tracked
 
@@ -108,13 +100,11 @@ When analytics is enabled:
 
 ### Identification
 
-When analytics is enabled, the app uses your device's platform advertising ID (IDFA on iOS, AAID on Android) as an anonymous identifier. This is the same ID managed by your device's privacy settings — if you've disabled ad tracking at the OS level, the app won't attempt to use it.
-
-No other identifying information is sent.
+PostHog generates an anonymous, random device identifier. No advertising IDs, personal data, or other identifying information is sent.
 
 ### Disabling
 
-Toggle analytics off in **Settings → Anonymous Usage Reporting**. This immediately opts out of PostHog and stops all event collection. Your explicit preference persists even if ATT permissions change later.
+Toggle analytics off in **Settings → Anonymous Usage Reporting**. This immediately opts out of PostHog and stops all event collection.
 
 ---
 

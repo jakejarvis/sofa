@@ -10,7 +10,7 @@ export default function PrivacyPolicyPage() {
   return (
     <article className="prose prose-sm prose-invert [&_a]:text-fd-primary hover:[&_a]:text-fd-primary/80 [&_h2]:font-display [&_h3]:font-display [&_p]:text-fd-muted-foreground [&_li]:text-fd-muted-foreground [&_strong]:text-fd-foreground mx-auto max-w-3xl px-6 py-16 [&_a]:underline [&_a]:underline-offset-4 [&_h2]:mt-10 [&_h2]:mb-4 [&_h2]:border-b [&_h2]:pb-2 [&_h2]:text-2xl [&_h2]:font-semibold [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-xl [&_h3]:font-normal [&_li]:text-[15px] [&_li]:leading-relaxed [&_p]:text-[15px] [&_p]:leading-relaxed [&_strong]:font-medium [&_ul]:space-y-1">
       <h1 className="font-display mb-2 text-3xl font-semibold tracking-tight">Privacy Policy</h1>
-      <p className="text-fd-muted-foreground/60 !mt-0 mb-8 text-sm">Last updated: March 16, 2026</p>
+      <p className="text-fd-muted-foreground/60 !mt-0 mb-8 text-sm">Last updated: March 22, 2026</p>
 
       <p>
         Sofa is a self-hosted application. When you run Sofa, your data lives on your own server and
@@ -109,8 +109,8 @@ export default function PrivacyPolicyPage() {
         The native iOS and Android app includes optional, anonymous analytics powered by PostHog.
         This tracks screen views and app lifecycle events &mdash; no personal data, search queries,
         or watch history is collected. Analytics is <strong>disabled by default</strong> and
-        requires explicit opt-in. On iOS, Apple&rsquo;s App Tracking Transparency prompt is shown
-        first. You can change your preference at any time in the app&rsquo;s settings.
+        requires explicit opt-in. You can change your preference at any time in the app&rsquo;s
+        settings.
       </p>
 
       <h3>Media Server Integrations</h3>
