@@ -1,4 +1,3 @@
-import type { DisplayStatus } from "@sofa/api/display-status";
 import {
   getAllTrackedTitleIds,
   getAvailabilityByTitleIds,
@@ -25,6 +24,7 @@ import {
 } from "@sofa/db/queries/discovery";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 
+import type { DisplayStatus } from "./display-status";
 import { getDisplayStatusesByTitleIds } from "./tracking";
 
 function formatLocalDate(d: Date): string {

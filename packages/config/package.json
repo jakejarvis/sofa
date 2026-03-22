@@ -13,6 +13,7 @@
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
+    "@sofa/tsconfig": "workspace:*",
     "@types/bun": "catalog:",
     "typescript": "catalog:"
   }

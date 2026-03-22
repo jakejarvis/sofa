@@ -1,15 +1,7 @@
 {
+  "extends": "@sofa/tsconfig/base.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "strict": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "types": ["bun"]
+    "jsx": "react-jsx"
   },
-  "include": ["src"]
+  "include": ["src", "test"]
 }

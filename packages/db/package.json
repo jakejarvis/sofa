@@ -25,6 +25,7 @@
     "drizzle-orm": "catalog:"
   },
   "devDependencies": {
+    "@sofa/tsconfig": "workspace:*",
     "@types/bun": "catalog:",
     "drizzle-kit": "catalog:",
     "typescript": "catalog:"

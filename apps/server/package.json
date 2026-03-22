@@ -29,6 +29,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@sofa/tsconfig": "workspace:*",
     "@types/bun": "catalog:",
     "typescript": "catalog:"
   }

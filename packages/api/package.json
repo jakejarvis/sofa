@@ -7,8 +7,7 @@
     "./contract": "./src/contract.ts",
     "./schemas": "./src/schemas.ts",
     "./errors": "./src/errors.ts",
-    "./utils": "./src/utils.ts",
-    "./display-status": "./src/display-status.ts"
+    "./utils": "./src/utils.ts"
   },
   "scripts": {
     "lint": "oxlint",
@@ -21,6 +20,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@sofa/tsconfig": "workspace:*",
     "typescript": "catalog:"
   }
 }

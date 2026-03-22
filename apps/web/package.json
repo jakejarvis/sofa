@@ -49,6 +49,7 @@
   "devDependencies": {
     "@lingui/babel-plugin-lingui-macro": "catalog:",
     "@lingui/vite-plugin": "catalog:",
+    "@sofa/tsconfig": "workspace:*",
     "@tailwindcss/vite": "4.2.2",
     "@tanstack/devtools-vite": "0.6.0",
     "@tanstack/react-devtools": "0.10.0",

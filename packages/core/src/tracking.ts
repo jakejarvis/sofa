@@ -1,5 +1,3 @@
-import type { DisplayStatus } from "@sofa/api/display-status";
-import { getDisplayStatus } from "@sofa/api/display-status";
 import { getTitlesByIds } from "@sofa/db/queries/discovery";
 import { getTitleById } from "@sofa/db/queries/title";
 import {
@@ -24,6 +22,9 @@ import {
   upsertRating,
   upsertTitleStatus,
 } from "@sofa/db/queries/tracking";
+
+import type { DisplayStatus } from "./display-status";
+import { getDisplayStatus } from "./display-status";
 
 export function setTitleStatus(
   userId: string,

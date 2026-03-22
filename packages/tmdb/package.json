@@ -20,6 +20,7 @@
     "openapi-fetch": "0.17.0"
   },
   "devDependencies": {
+    "@sofa/tsconfig": "workspace:*",
     "@types/bun": "catalog:",
     "typescript": "catalog:"
   }

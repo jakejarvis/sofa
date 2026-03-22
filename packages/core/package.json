@@ -11,6 +11,7 @@
     "./credits": "./src/credits.ts",
     "./cron": "./src/cron.ts",
     "./discovery": "./src/discovery.ts",
+    "./display-status": "./src/display-status.ts",
     "./export": "./src/export.ts",
     "./image-cache": "./src/image-cache.ts",
     "./imports": "./src/imports/index.ts",
@@ -49,6 +50,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@sofa/tsconfig": "workspace:*",
     "@types/adm-zip": "0.5.8",
     "@types/bun": "catalog:",
     "typescript": "catalog:",

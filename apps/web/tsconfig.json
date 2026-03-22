@@ -1,18 +1,11 @@
 {
+  "extends": "@sofa/tsconfig/base.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
-    "isolatedModules": true,
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "types": ["bun"]
+    }
   },
   "include": ["src", "vite.config.ts", "../../packages/i18n/src/po.d.ts"],
   "exclude": ["node_modules", "dist"]

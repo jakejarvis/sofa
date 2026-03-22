@@ -14,7 +14,8 @@
     "lint": "oxlint",
     "format": "oxfmt --config ../../.oxfmtrc.json",
     "format:check": "oxfmt --check --config ../../.oxfmtrc.json",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@lingui/core": "catalog:",
@@ -24,8 +25,10 @@
     "@lingui/cli": "catalog:",
     "@lingui/conf": "catalog:",
     "@lingui/format-po": "catalog:",
+    "@sofa/tsconfig": "workspace:*",
     "@types/bun": "catalog:",
     "react": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
