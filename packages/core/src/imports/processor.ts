@@ -363,6 +363,10 @@ export async function processImportJob(jobId: string): Promise<void> {
         if (currentStatus?.status === "cancelled") {
           updateImportJobProgress(jobId, {
             finishedAt: new Date(),
+            processedItems: i,
+            importedCount: result.imported,
+            skippedCount: result.skipped,
+            failedCount: result.failed,
             errors: JSON.stringify(result.errors),
             warnings: JSON.stringify(result.warnings),
             currentMessage: "Import cancelled",

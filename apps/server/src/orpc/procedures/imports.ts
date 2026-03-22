@@ -116,13 +116,19 @@ export const createJob = os.imports.createJob.use(authed).handler(async ({ input
   }
 
   // Prevent concurrent imports per user.
-  // Auto-cancel stale *pending* jobs (server crashed before worker started).
+  // Auto-cancel stale jobs (server crashed before worker started or mid-import).
   const PENDING_STALE_MS = 5 * 60 * 1000; // 5 minutes
+  const RUNNING_STALE_MS = 30 * 60 * 1000; // 30 minutes
   const now = Date.now();
   const existing = getActiveImportJobForUser(context.user.id);
   if (existing) {
     const isPending = existing.status === "pending";
-    const isStale = isPending && now - existing.createdAt.getTime() > PENDING_STALE_MS;
+    const isRunning = existing.status === "running";
+    const age =
+      isRunning && existing.startedAt
+        ? now - existing.startedAt.getTime()
+        : now - existing.createdAt.getTime();
+    const isStale = (isPending && age > PENDING_STALE_MS) || (isRunning && age > RUNNING_STALE_MS);
     if (isStale) {
       updateImportJobProgress(existing.id, {
         status: "cancelled",
@@ -205,7 +211,7 @@ export const jobEvents = os.imports.jobEvents.use(authed).handler(async function
     const startedAt = Date.now();
 
     while (true) {
-      const job = readImportJob(input.id);
+      const job = readImportJob(input.id, context.user.id);
       const isTerminal =
         job.status === "success" || job.status === "error" || job.status === "cancelled";
 
