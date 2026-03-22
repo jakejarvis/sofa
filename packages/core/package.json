@@ -33,7 +33,7 @@
     "format": "oxfmt --config ../../.oxfmtrc.json",
     "format:check": "oxfmt --check --config ../../.oxfmtrc.json",
     "check-types": "tsc --noEmit",
-    "test": "bun test"
+    "test": "vitest run"
   },
   "dependencies": {
     "@sofa/api": "workspace:*",
@@ -50,6 +50,7 @@
   "devDependencies": {
     "@types/adm-zip": "0.5.8",
     "@types/bun": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

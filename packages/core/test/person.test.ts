@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { personFilmography, persons } from "@sofa/db/schema";
-import { clearAllTables, insertTitle, testDb } from "@sofa/db/test-utils";
+import { clearAllTables, insertTitle, testDb } from "@sofa/test/db";
 
 import { getLocalFilmography } from "../src/person";
 

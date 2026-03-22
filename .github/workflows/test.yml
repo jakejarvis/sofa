@@ -23,6 +23,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Install Playwright browsers
+        run: bunx playwright install chromium
+
       - name: Generate Expo types
         run: bunx expo customize tsconfig.json
         working-directory: ./apps/native
@@ -37,4 +40,9 @@ jobs:
         run: bunx turbo run check-types
 
       - name: Run tests
-        run: bunx turbo run test -- --coverage --coverage-reporter=lcov
+        run: bunx turbo run test -- --coverage
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

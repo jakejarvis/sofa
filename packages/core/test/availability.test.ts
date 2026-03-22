@@ -1,19 +1,13 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { availabilityOffers } from "@sofa/db/schema";
-import {
-  clearAllTables,
-  eq,
-  insertAvailabilityOffer,
-  insertTitle,
-  testDb,
-} from "@sofa/db/test-utils";
+import { clearAllTables, eq, insertAvailabilityOffer, insertTitle, testDb } from "@sofa/test/db";
 
-let watchProvidersResponse: { results: Record<string, unknown> } = { results: {} };
+const { getWatchProviders } = vi.hoisted(() => ({
+  getWatchProviders: vi.fn(async () => ({ results: {} as Record<string, unknown> })),
+}));
 
-const getWatchProviders = mock(async () => watchProvidersResponse);
-
-mock.module("@sofa/tmdb/client", () => ({
+vi.mock("@sofa/tmdb/client", () => ({
   getWatchProviders,
 }));
 
@@ -21,7 +15,7 @@ import { refreshAvailability } from "../src/availability";
 
 beforeEach(() => {
   clearAllTables();
-  watchProvidersResponse = { results: {} };
+  getWatchProviders.mockImplementation(async () => ({ results: {} }));
 });
 
 describe("refreshAvailability", () => {

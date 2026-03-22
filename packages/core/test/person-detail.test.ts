@@ -1,15 +1,14 @@
-import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { personFilmography, persons } from "@sofa/db/schema";
-import { clearAllTables, eq, testDb } from "@sofa/db/test-utils";
+import { clearAllTables, eq, testDb } from "@sofa/test/db";
 
 const TINY_PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+X2NDNwAAAABJRU5ErkJggg==",
   "base64",
 );
 
-let nextBuffer: Buffer | null = TINY_PNG;
-let nextPersonDetails = {
+const defaultPersonDetails = {
   id: 100,
   name: "Updated Person",
   biography: "Bio",
@@ -21,8 +20,8 @@ let nextPersonDetails = {
   popularity: 10,
   imdb_id: null,
 };
-let combinedCreditsCalls = 0;
-let nextCombinedCredits = {
+
+const defaultCombinedCredits = {
   cast: [
     {
       id: 501,
@@ -43,62 +42,34 @@ let nextCombinedCredits = {
   crew: [],
 };
 
-mock.module("@sofa/tmdb/client", () => ({
-  getPersonDetails: async () => nextPersonDetails,
-  getPersonCombinedCredits: async () => {
-    combinedCreditsCalls++;
-    return nextCombinedCredits;
-  },
+const { mockGetPersonDetails, mockGetPersonCombinedCredits } = vi.hoisted(() => ({
+  mockGetPersonDetails: vi.fn(),
+  mockGetPersonCombinedCredits: vi.fn(),
+}));
+
+vi.mock("@sofa/tmdb/client", () => ({
+  getPersonDetails: mockGetPersonDetails,
+  getPersonCombinedCredits: mockGetPersonCombinedCredits,
 }));
 
 import { fetchFullFilmography, getOrFetchPerson } from "../src/person";
 
+let combinedCreditsCalls = 0;
+
 beforeEach(() => {
   clearAllTables();
   process.env.IMAGE_CACHE_ENABLED = "false";
-  nextBuffer = TINY_PNG;
-  nextPersonDetails = {
-    id: 100,
-    name: "Updated Person",
-    biography: "Bio",
-    birthday: null,
-    deathday: null,
-    place_of_birth: null,
-    profile_path: "/new-profile.png",
-    known_for_department: "Acting",
-    popularity: 10,
-    imdb_id: null,
-  };
   combinedCreditsCalls = 0;
-  nextCombinedCredits = {
-    cast: [
-      {
-        id: 501,
-        media_type: "movie",
-        title: "Cached Movie",
-        name: undefined,
-        overview: "Overview",
-        release_date: "2024-01-01",
-        first_air_date: undefined,
-        poster_path: "/poster.png",
-        backdrop_path: "/backdrop.png",
-        popularity: 5,
-        vote_average: 7.5,
-        vote_count: 42,
-        character: "Lead",
-      },
-    ],
-    crew: [],
-  };
-  spyOn(globalThis, "fetch").mockImplementation((async (
+  mockGetPersonDetails.mockImplementation(async () => ({ ...defaultPersonDetails }));
+  mockGetPersonCombinedCredits.mockImplementation(async () => {
+    combinedCreditsCalls++;
+    return { cast: [...defaultCombinedCredits.cast], crew: [] };
+  });
+  vi.spyOn(globalThis, "fetch").mockImplementation((async (
     _input: string | URL | Request,
     _init?: RequestInit,
   ) => {
-    if (!nextBuffer) {
-      return new Response(null, { status: 404 });
-    }
-
-    return new Response(nextBuffer, {
+    return new Response(TINY_PNG, {
       status: 200,
       headers: { "content-type": "image/png" },
     });
@@ -107,7 +78,6 @@ beforeEach(() => {
 
 afterEach(() => {
   delete process.env.IMAGE_CACHE_ENABLED;
-  mock.restore();
 });
 
 describe("getOrFetchPerson", () => {
@@ -127,7 +97,7 @@ describe("getOrFetchPerson", () => {
     const person = await getOrFetchPerson("p1");
     const stored = testDb.select().from(persons).where(eq(persons.id, "p1")).get();
 
-    expect(person?.profileThumbHash).toBeString();
+    expect(person?.profileThumbHash).toBeTypeOf("string");
     expect(stored?.profileThumbHash).toBe(person?.profileThumbHash);
   });
 
@@ -148,7 +118,7 @@ describe("getOrFetchPerson", () => {
     const stored = testDb.select().from(persons).where(eq(persons.id, "p1")).get();
 
     expect(stored?.profilePath).toBe("/new-profile.png");
-    expect(person?.profileThumbHash).toBeString();
+    expect(person?.profileThumbHash).toBeTypeOf("string");
     expect(person?.profileThumbHash).not.toBe("stale-hash");
     expect(stored?.profileThumbHash).toBe(person?.profileThumbHash);
   });

@@ -1,8 +1,5 @@
 import packageJson from "../apps/server/package.json" with { type: "json" };
-import {
-  generateOpenApiSpec,
-  openApiTags,
-} from "../apps/server/src/orpc/openapi-spec";
+import { generateOpenApiSpec, openApiTags } from "../apps/server/src/orpc/openapi-spec";
 
 const spec = await generateOpenApiSpec({
   title: "Sofa API",
@@ -54,9 +51,7 @@ for (const pathItem of Object.values(spec.paths ?? {})) {
     const method = pathItem[key];
     if (!method?.requestBody || !("content" in method.requestBody)) continue;
     const content = method.requestBody.content;
-    const unsupported = Object.keys(content).filter(
-      (type) => !supportedMediaTypes.has(type),
-    );
+    const unsupported = Object.keys(content).filter((type) => !supportedMediaTypes.has(type));
     if (unsupported.length > 0) {
       // Replace unsupported types with a single multipart/form-data entry
       for (const type of unsupported) delete content[type];

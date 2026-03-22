@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { user } from "@sofa/db/schema";
-import { clearAllTables, eq, insertUser, testDb } from "@sofa/db/test-utils";
+import { clearAllTables, eq, insertUser, testDb } from "@sofa/test/db";
 
 import {
   claimInitialAdmin,

@@ -1,0 +1,20 @@
+{
+  "name": "@sofa/test",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./setup": "./src/setup.ts",
+    "./db": "./src/db.ts"
+  },
+  "dependencies": {
+    "@sofa/db": "workspace:*",
+    "better-sqlite3": "12.8.0",
+    "drizzle-orm": "catalog:"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "7.6.13",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

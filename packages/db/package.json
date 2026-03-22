@@ -7,7 +7,6 @@
     "./client": "./src/client.ts",
     "./migrate": "./src/migrate.ts",
     "./schema": "./src/schema.ts",
-    "./test-utils": "./src/test-utils.ts",
     "./queries/*": "./src/queries/*.ts"
   },
   "scripts": {
@@ -23,11 +22,11 @@
   "dependencies": {
     "@sofa/config": "workspace:*",
     "@sofa/logger": "workspace:*",
-    "drizzle-orm": "1.0.0-beta.17-67b1795"
+    "drizzle-orm": "catalog:"
   },
   "devDependencies": {
     "@types/bun": "catalog:",
-    "drizzle-kit": "1.0.0-beta.17-67b1795",
+    "drizzle-kit": "catalog:",
     "typescript": "catalog:"
   }
 }

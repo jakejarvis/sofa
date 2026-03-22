@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import {
   userEpisodeWatches,
@@ -14,7 +14,7 @@ import {
   insertTvShow,
   insertUser,
   testDb,
-} from "@sofa/db/test-utils";
+} from "@sofa/test/db";
 
 import {
   getUserTitleInfo,

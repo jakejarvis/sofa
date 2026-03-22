@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { episodes, seasons, titles } from "@sofa/db/schema";
-import { clearAllTables, eq, insertTitle, testDb } from "@sofa/db/test-utils";
+import { clearAllTables, eq, insertTitle, testDb } from "@sofa/test/db";
 
 interface MockSeasonEpisode {
   episode_number: number;
@@ -21,7 +21,7 @@ interface MockSeasonDetails {
   episodes: MockSeasonEpisode[];
 }
 
-let seasonDetails: MockSeasonDetails = {
+const defaultSeasonDetails: MockSeasonDetails = {
   season_number: 1,
   name: "Season 1",
   overview: null,
@@ -39,7 +39,11 @@ let seasonDetails: MockSeasonDetails = {
   ],
 };
 
-mock.module("@sofa/tmdb/client", () => ({
+const { mockGetTvSeasonDetails } = vi.hoisted(() => ({
+  mockGetTvSeasonDetails: vi.fn(),
+}));
+
+vi.mock("@sofa/tmdb/client", () => ({
   getMovieDetails: async () => {
     throw new Error("not used");
   },
@@ -48,7 +52,7 @@ mock.module("@sofa/tmdb/client", () => ({
   getTvDetails: async () => {
     throw new Error("not used");
   },
-  getTvSeasonDetails: async () => seasonDetails,
+  getTvSeasonDetails: mockGetTvSeasonDetails,
   getVideos: async () => ({ results: [] }),
 }));
 
@@ -56,23 +60,10 @@ import { refreshTvChildren, updateTitleWithArtInvalidation } from "../src/metada
 
 beforeEach(() => {
   clearAllTables();
-  seasonDetails = {
-    season_number: 1,
-    name: "Season 1",
-    overview: null,
-    poster_path: "/new-season.png",
-    air_date: null,
-    episodes: [
-      {
-        episode_number: 1,
-        name: "Episode 1",
-        overview: null,
-        still_path: "/new-still.png",
-        air_date: null,
-        runtime: null,
-      },
-    ],
-  };
+  mockGetTvSeasonDetails.mockImplementation(async () => ({
+    ...defaultSeasonDetails,
+    episodes: [...defaultSeasonDetails.episodes],
+  }));
 });
 
 describe("refreshTvChildren", () => {
@@ -132,8 +123,8 @@ describe("refreshTvChildren", () => {
       })
       .run();
 
-    seasonDetails = {
-      ...seasonDetails,
+    mockGetTvSeasonDetails.mockImplementation(async () => ({
+      ...defaultSeasonDetails,
       poster_path: "/season.png",
       episodes: [
         {
@@ -145,7 +136,7 @@ describe("refreshTvChildren", () => {
           runtime: null,
         },
       ],
-    };
+    }));
 
     await refreshTvChildren("tv-1", 10, 1);
 

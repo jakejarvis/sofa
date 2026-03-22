@@ -22,7 +22,7 @@ cd packages/db && bun run db:migrate    # Run Drizzle migrations
 cd packages/db && bun run db:studio     # Open Drizzle Studio (visual DB browser)
 ```
 
-**Use Bun, not Node.js** — `bun <file>`, `bun test`, `bun install`, `bun run <script>`, `bunx <pkg>`. Bun auto-loads `.env`.
+**Use Bun, not Node.js** — `bun <file>`, `bun install`, `bun run <script>`, `bunx <pkg>`. Bun auto-loads `.env`. **Never run `bun test` directly** — always use `bun run test` which runs Vitest via Turborepo.
 
 ## CRITICAL: Pre-commit checks
 
@@ -32,7 +32,7 @@ Before declaring a task is complete, all four commands MUST pass with zero error
 bun run lint
 bun run format:check
 bun run check-types
-bun test
+bun run test
 ```
 
 ## Architecture
@@ -54,6 +54,7 @@ couch-potato/
 │   ├── core/          # @sofa/core — Business logic services (JIT, DB-agnostic)
 │   ├── db/            # @sofa/db — Drizzle schema, client, queries, migrations (JIT)
 │   ├── logger/        # @sofa/logger — Pino-based structured logging (JIT)
+│   ├── test/          # @sofa/test — Vitest setup + in-memory DB test helpers
 │   └── tmdb/          # @sofa/tmdb — TMDB API client + image URL helper (JIT)
 ├── .oxlintrc.json
 ├── .oxfmtrc.json
@@ -81,6 +82,7 @@ All shared packages are JIT (raw TypeScript exports, no build step).
 - **Auth**: Better Auth with Drizzle adapter — email/password + optional OIDC/SSO
 - **Monorepo**: Turborepo with Bun workspaces
 - **Docs**: Fumadocs (Next.js), fumadocs-openapi for API reference
+- **Testing**: Vitest (unit tests on Node.js, browser component tests via Playwright)
 - **Linting**: Oxlint + Oxfmt (2-space indent, organized imports, Tailwind class sorting)
 - **External API**: TMDB (The Movie Database)
 - **Translation**: LingUI + Crowdin
@@ -93,7 +95,8 @@ Cross-package imports:
 
 - `@sofa/api/contract`, `@sofa/api/schemas` — Contract and Zod types
 - `@sofa/db/queries/*` — Query layer (e.g., `@sofa/db/queries/tracking`, `@sofa/db/queries/metadata`)
-- `@sofa/db/client`, `@sofa/db/schema`, `@sofa/db/migrate`, `@sofa/db/test-utils`
+- `@sofa/db/client`, `@sofa/db/schema`, `@sofa/db/migrate`
+- `@sofa/test/setup`, `@sofa/test/db` — Test setup (Vitest) and DB helpers (in-memory SQLite, seed functions)
 - `@sofa/tmdb/client`, `@sofa/tmdb/image`
 - `@sofa/core/metadata`, `@sofa/core/tracking`, `@sofa/core/imports`, etc.
 - `@sofa/auth/server`, `@sofa/auth/config`
@@ -118,7 +121,7 @@ Cross-package imports:
 
 - **JSX text** → `<Trans>` from `@lingui/react/macro`
 - **Strings in hooks/components** → `const { t } = useLingui()` from `@lingui/react/macro`, then `` t`string` ``
-- **Strings outside React** (plain modules) → `import { msg } from "@lingui/core/macro"` + `import { i18n } from "@sofa/i18n"`, then `` i18n._(msg`string`) ``
+- **Strings outside React** (plain modules) → `import { msg } from "@lingui/core/macro"` + `import { i18n } from "@sofa/i18n"`, then ``i18n._(msg`string`)``
 - **Pluralization** → `import { plural } from "@lingui/core/macro"`, use inside `t`: `` t`${plural(count, { one: "# item", other: "# items" })}` ``
 - **DO NOT use** `t(i18n)` — it's deprecated in v5 and removed in v6. Use `i18n._(msg`...`)` instead.
 - **Date/number formatting** → use `formatDate`, `formatRelativeTime`, `formatNumber`, `formatBytes` from `@sofa/i18n/format` (Intl-based, locale-aware). Never use `date-fns` in app code.
@@ -141,7 +144,12 @@ Optional:
 
 ### Testing
 
-Tests live in `packages/core/test/`. `preload.ts` mocks `@sofa/db/client` with in-memory SQLite. Never mock a service module with stubs — `bun`'s `mock.module` persists across test files.
+**Vitest** (not Bun's built-in test runner). Always run tests via `bun run test` (never `bun test`).
+
+- **`@sofa/test`** — Shared test package. `@sofa/test/setup` is the Vitest setup file (mocks `@sofa/db/client` with in-memory SQLite, polyfills `Bun.randomUUIDv7`). `@sofa/test/db` exports the test DB instance, seed helpers (`insertUser`, `insertTitle`, etc.), and `clearAllTables`.
+- **`packages/core/test/`** — Unit tests for business logic. Config: `packages/core/vitest.config.ts`.
+- **`apps/web/`** — Browser component tests via `@vitest/browser` + Playwright. Config: `apps/web/vitest.config.ts`.
+- To add tests to a new package: create a `vitest.config.ts` with `setupFiles: ["@sofa/test/setup"]`, add `"test": "vitest run"` to scripts, and add the project path to the root `vitest.config.ts` `projects` array. Do **not** add `@sofa/test` to the package's `devDependencies` — it resolves via hoisted `node_modules`, and adding it would cause `turbo prune` to pull `better-sqlite3` into Docker builds.
 
 ### Docker
 

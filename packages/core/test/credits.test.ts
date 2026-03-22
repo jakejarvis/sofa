@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { persons, titleCast } from "@sofa/db/schema";
-import { clearAllTables, insertTitle, testDb } from "@sofa/db/test-utils";
+import { clearAllTables, insertTitle, testDb } from "@sofa/test/db";
 
 import { getCastForTitle } from "../src/credits";
 

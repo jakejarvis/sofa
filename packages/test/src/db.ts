@@ -1,9 +1,11 @@
-import { Database } from "bun:sqlite";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 
-import * as schema from "./schema";
+import * as schema from "@sofa/db/schema";
 
 const {
   user,
@@ -20,23 +22,29 @@ const {
 } = schema;
 
 export const testClient = new Database(":memory:");
-testClient.run("PRAGMA foreign_keys = ON");
+testClient.pragma("foreign_keys = ON");
 export const testDb = drizzle({ client: testClient, schema });
 
 export function applyMigrations() {
-  const migrationsFolder = `${import.meta.dir}/../drizzle`;
-  migrate(testDb, { migrationsFolder });
+  const dbPkgDir = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    "..",
+    "..",
+    "db",
+    "drizzle",
+  );
+  migrate(testDb, { migrationsFolder: dbPkgDir });
 }
 
 export function clearAllTables() {
   const tables = testClient
-    .query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '__drizzle%'")
+    .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '__drizzle%'")
     .all() as { name: string }[];
-  testClient.run("PRAGMA foreign_keys = OFF");
+  testClient.pragma("foreign_keys = OFF");
   for (const { name } of tables) {
-    testClient.run(`DELETE FROM "${name}"`);
+    testClient.exec(`DELETE FROM "${name}"`);
   }
-  testClient.run("PRAGMA foreign_keys = ON");
+  testClient.pragma("foreign_keys = ON");
 }
 
 const now = new Date();

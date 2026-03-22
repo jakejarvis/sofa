@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, spyOn, test } from "bun:test";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   importJobs,
@@ -15,7 +15,7 @@ import {
   insertTvShow,
   insertUser,
   testDb,
-} from "@sofa/db/test-utils";
+} from "@sofa/test/db";
 import * as tmdbClient from "@sofa/tmdb/client";
 
 import type { NormalizedImport } from "../src/imports/parsers";
@@ -435,7 +435,7 @@ describe("processImportJob — failed resolution", () => {
     };
 
     // Mock TMDB search to return empty results (no network call)
-    const searchSpy = spyOn(tmdbClient, "searchMovies").mockResolvedValue({
+    const searchSpy = vi.spyOn(tmdbClient, "searchMovies").mockResolvedValue({
       results: [],
     } as never);
 

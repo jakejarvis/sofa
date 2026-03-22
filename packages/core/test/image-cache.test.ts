@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { loadImageBuffer } from "../src/image-cache";
 
@@ -13,7 +13,7 @@ afterEach(() => {
 describe("loadImageBuffer", () => {
   test("uses category-specific TMDB sizes when cache is disabled", async () => {
     const urls: string[] = [];
-    const fetchSpy = spyOn(globalThis, "fetch").mockImplementation((async (
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation((async (
       input: string | URL | Request,
     ) => {
       urls.push(String(input));

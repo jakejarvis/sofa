@@ -1,7 +1,7 @@
-import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { episodes, seasons, titles } from "@sofa/db/schema";
-import { clearAllTables, eq, testDb } from "@sofa/db/test-utils";
+import { clearAllTables, eq, testDb } from "@sofa/test/db";
 
 const TINY_PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+X2NDNwAAAABJRU5ErkJggg==",
@@ -16,7 +16,7 @@ beforeEach(() => {
   clearAllTables();
   process.env.IMAGE_CACHE_ENABLED = "false";
   nextBuffer = TINY_PNG;
-  spyOn(globalThis, "fetch").mockImplementation((async (
+  vi.spyOn(globalThis, "fetch").mockImplementation((async (
     _input: string | URL | Request,
     _init?: RequestInit,
   ) => {
@@ -33,13 +33,12 @@ beforeEach(() => {
 
 afterEach(() => {
   delete process.env.IMAGE_CACHE_ENABLED;
-  mock.restore();
 });
 
 describe("thumbhash generation", () => {
   test("generates a thumbhash from a loaded image buffer", async () => {
     const hash = await generateThumbHash("/poster.png", "posters");
-    expect(hash).toBeString();
+    expect(hash).toBeTypeOf("string");
     expect(hash).not.toBe("");
   });
 

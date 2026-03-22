@@ -1,6 +1,5 @@
-import { describe, expect, test } from "bun:test";
-
 import AdmZip from "adm-zip";
+import { describe, expect, test } from "vitest";
 
 import {
   type ParseResult,

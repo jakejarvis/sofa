@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   clearAllTables,
@@ -6,18 +6,20 @@ import {
   insertStatus,
   insertTitle,
   insertUser,
-} from "@sofa/db/test-utils";
+} from "@sofa/test/db";
 
-import { getRadarrList, getSonarrList, parseStatusParam, resolveListToken } from "../src/lists";
+const { mockGetTvExternalIds } = vi.hoisted(() => ({
+  mockGetTvExternalIds: vi.fn(
+    (): Promise<{ tvdb_id: number | null; imdb_id: string | null }> =>
+      Promise.resolve({ tvdb_id: 55555, imdb_id: "tt9999999" }),
+  ),
+}));
 
-// Mock getTvExternalIds for lazy resolution tests
-const mockGetTvExternalIds = mock(
-  (): Promise<{ tvdb_id: number | null; imdb_id: string | null }> =>
-    Promise.resolve({ tvdb_id: 55555, imdb_id: "tt9999999" }),
-);
-mock.module("@sofa/tmdb/client", () => ({
+vi.mock("@sofa/tmdb/client", () => ({
   getTvExternalIds: mockGetTvExternalIds,
 }));
+
+import { getRadarrList, getSonarrList, parseStatusParam, resolveListToken } from "../src/lists";
 
 beforeEach(() => {
   clearAllTables();

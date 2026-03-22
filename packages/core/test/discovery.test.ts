@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import {
   clearAllTables,
@@ -11,7 +11,7 @@ import {
   insertTitle,
   insertTvShow,
   insertUser,
-} from "@sofa/db/test-utils";
+} from "@sofa/test/db";
 
 import {
   getContinueWatchingFeed,
@@ -82,7 +82,7 @@ describe("getWatchHistory", () => {
     insertMovieWatch("user-1", "m2");
 
     const history = getWatchHistory("user-1", "movies", "this_week");
-    expect(history).toBeArrayOfSize(7);
+    expect(history).toHaveLength(7);
     const totalCount = history.reduce((sum, b) => sum + b.count, 0);
     expect(totalCount).toBe(2);
   });
@@ -90,20 +90,20 @@ describe("getWatchHistory", () => {
   test("returns all-zero buckets when no watches", () => {
     insertUser();
     const history = getWatchHistory("user-1", "movies", "this_month");
-    expect(history).toBeArrayOfSize(30);
+    expect(history).toHaveLength(30);
     expect(history.every((b) => b.count === 0)).toBe(true);
   });
 
   test("returns correct bucket count for today period", () => {
     insertUser();
     const history = getWatchHistory("user-1", "episodes", "today");
-    expect(history).toBeArrayOfSize(24);
+    expect(history).toHaveLength(24);
   });
 
   test("returns correct bucket count for this_year period", () => {
     insertUser();
     const history = getWatchHistory("user-1", "movies", "this_year");
-    expect(history).toBeArrayOfSize(12);
+    expect(history).toHaveLength(12);
   });
 });
 

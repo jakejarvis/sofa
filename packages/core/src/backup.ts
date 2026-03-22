@@ -1,10 +1,14 @@
-import { Database } from "bun:sqlite";
-import { renameSync, unlinkSync, closeSync, openSync, readSync } from "node:fs";
+import { renameSync, unlinkSync } from "node:fs";
 import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { BACKUP_DIR, DATABASE_URL } from "@sofa/config";
-import { closeDatabase, vacuumDatabase, withDatabaseAccessBlocked } from "@sofa/db/client";
+import {
+  closeDatabase,
+  vacuumDatabase,
+  validateBackupDatabase,
+  withDatabaseAccessBlocked,
+} from "@sofa/db/client";
 import { runMigrations } from "@sofa/db/migrate";
 import { createLogger } from "@sofa/logger";
 
@@ -28,26 +32,6 @@ export interface BackupInfo {
   createdAt: string;
   source: BackupSource;
 }
-
-const REQUIRED_TABLES = [
-  "account",
-  "appSettings",
-  "availabilityOffers",
-  "cronRuns",
-  "episodes",
-  "seasons",
-  "session",
-  "titleRecommendations",
-  "titles",
-  "user",
-  "userEpisodeWatches",
-  "userMovieWatches",
-  "userRatings",
-  "userTitleStatus",
-  "verification",
-  "integrations",
-  "integrationEvents",
-] as const;
 
 let backupOpQueue: Promise<void> = Promise.resolve();
 
@@ -93,49 +77,6 @@ function unlinkIfExistsSync(filePath: string): void {
     if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
       throw err;
     }
-  }
-}
-
-const SQLITE_MAGIC = "SQLite format 3\0";
-
-function validateBackupDatabase(filePath: string): void {
-  // Check SQLite magic bytes before opening with Database() to avoid
-  // passing arbitrary files to the SQLite parser.
-  const header = Buffer.alloc(16);
-  const fd = openSync(filePath, "r");
-  try {
-    readSync(fd, header, 0, 16, 0);
-  } finally {
-    closeSync(fd);
-  }
-  if (header.toString("ascii", 0, 16) !== SQLITE_MAGIC) {
-    throw new Error("Not a valid SQLite database file");
-  }
-
-  const testDb = new Database(filePath, { readonly: true });
-  try {
-    const integrityRows = testDb.query("PRAGMA integrity_check").all() as {
-      integrity_check: string;
-    }[];
-    if (integrityRows.length === 0 || integrityRows.some((row) => row.integrity_check !== "ok")) {
-      throw new Error("Database integrity check failed");
-    }
-
-    const foreignKeyErrors = testDb.query("PRAGMA foreign_key_check").all();
-    if (foreignKeyErrors.length > 0) {
-      throw new Error("Database foreign key check failed");
-    }
-
-    const tableRows = testDb.query("SELECT name FROM sqlite_master WHERE type='table'").all() as {
-      name: string;
-    }[];
-    const tableSet = new Set(tableRows.map((row) => row.name));
-    const missing = REQUIRED_TABLES.filter((table) => !tableSet.has(table));
-    if (missing.length > 0) {
-      throw new Error(`Invalid backup: missing required tables (${missing.join(", ")})`);
-    }
-  } finally {
-    testDb.close();
   }
 }
 

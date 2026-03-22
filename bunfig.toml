@@ -1,5 +1,2 @@
 [install]
 linker = "hoisted"
-
-[test]
-preload = ["./packages/core/test/preload.ts"]

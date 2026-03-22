@@ -1,8 +1,11 @@
 import { Database } from "bun:sqlite";
 import { AsyncLocalStorage } from "node:async_hooks";
+import { closeSync, openSync, readSync } from "node:fs";
 
 import type { Logger } from "drizzle-orm";
+import { getTableName } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
+import { SQLiteTable } from "drizzle-orm/sqlite-core";
 
 import { DATABASE_URL } from "@sofa/config";
 import { createLogger } from "@sofa/logger";
@@ -110,4 +113,53 @@ export function closeDatabase() {
   globalForDb._client?.close();
   globalForDb._client = undefined;
   globalForDb._db = undefined;
+}
+
+// ─── Backup validation ──────────────────────────────────────────────
+
+const SQLITE_MAGIC = "SQLite format 3\0";
+
+const REQUIRED_TABLES = Object.values(schema)
+  .filter((v) => v instanceof SQLiteTable)
+  .map((t) => getTableName(t as SQLiteTable));
+
+export function validateBackupDatabase(filePath: string): void {
+  // Check SQLite magic bytes before opening with Database() to avoid
+  // passing arbitrary files to the SQLite parser.
+  const header = Buffer.alloc(16);
+  const fd = openSync(filePath, "r");
+  try {
+    readSync(fd, header, 0, 16, 0);
+  } finally {
+    closeSync(fd);
+  }
+  if (header.toString("ascii", 0, 16) !== SQLITE_MAGIC) {
+    throw new Error("Not a valid SQLite database file");
+  }
+
+  const validationDb = new Database(filePath, { readonly: true });
+  try {
+    const integrityRows = validationDb.query("PRAGMA integrity_check").all() as {
+      integrity_check: string;
+    }[];
+    if (integrityRows.length === 0 || integrityRows.some((row) => row.integrity_check !== "ok")) {
+      throw new Error("Database integrity check failed");
+    }
+
+    const foreignKeyErrors = validationDb.query("PRAGMA foreign_key_check").all();
+    if (foreignKeyErrors.length > 0) {
+      throw new Error("Database foreign key check failed");
+    }
+
+    const tableRows = validationDb
+      .query("SELECT name FROM sqlite_master WHERE type='table'")
+      .all() as { name: string }[];
+    const tableSet = new Set(tableRows.map((row) => row.name));
+    const missing = REQUIRED_TABLES.filter((table) => !tableSet.has(table));
+    if (missing.length > 0) {
+      throw new Error(`Invalid backup: missing required tables (${missing.join(", ")})`);
+    }
+  } finally {
+    validationDb.close();
+  }
 }

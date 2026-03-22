@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, spyOn, test } from "bun:test";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import * as tmdbClient from "@sofa/tmdb/client";
 
@@ -9,9 +9,9 @@ import { resolveMovieTmdbId, resolveShowTmdbId } from "../src/imports/resolve";
 // globalThis.fetch because openapi-fetch captures the fetch reference at
 // module-init time, making globalThis.fetch mocking ineffective.
 
-let findSpy: ReturnType<typeof spyOn>;
-let searchMoviesSpy: ReturnType<typeof spyOn>;
-let searchTvSpy: ReturnType<typeof spyOn>;
+let findSpy: ReturnType<typeof vi.spyOn>;
+let searchMoviesSpy: ReturnType<typeof vi.spyOn>;
+let searchTvSpy: ReturnType<typeof vi.spyOn>;
 
 afterEach(() => {
   findSpy?.mockRestore();
@@ -23,8 +23,8 @@ afterEach(() => {
 
 describe("resolveMovieTmdbId", () => {
   test("returns tmdbId directly when provided", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId");
-    searchMoviesSpy = spyOn(tmdbClient, "searchMovies");
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId");
+    searchMoviesSpy = vi.spyOn(tmdbClient, "searchMovies");
 
     const result = await resolveMovieTmdbId({ tmdbId: 123 });
     expect(result).toBe(123);
@@ -33,7 +33,7 @@ describe("resolveMovieTmdbId", () => {
   });
 
   test("resolves via IMDB ID lookup", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
       movie_results: [{ id: 456 }],
       tv_results: [],
       tv_episode_results: [],
@@ -45,7 +45,7 @@ describe("resolveMovieTmdbId", () => {
   });
 
   test("falls back to TVDB lookup when no IMDB ID", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
       movie_results: [{ id: 789 }],
       tv_results: [],
       tv_episode_results: [],
@@ -58,7 +58,7 @@ describe("resolveMovieTmdbId", () => {
 
   test("IMDB returns no movie, falls back to TVDB", async () => {
     let callIndex = 0;
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockImplementation(async () => {
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockImplementation(async () => {
       callIndex++;
       if (callIndex === 1) {
         // IMDB lookup — no results
@@ -85,7 +85,7 @@ describe("resolveMovieTmdbId", () => {
   });
 
   test("falls back to title search when no IDs available", async () => {
-    searchMoviesSpy = spyOn(tmdbClient, "searchMovies").mockResolvedValue({
+    searchMoviesSpy = vi.spyOn(tmdbClient, "searchMovies").mockResolvedValue({
       results: [{ id: 321, title: "Inception", release_date: "2010-07-16" }],
     } as never);
 
@@ -95,7 +95,7 @@ describe("resolveMovieTmdbId", () => {
   });
 
   test("title search with year prefers matching year", async () => {
-    searchMoviesSpy = spyOn(tmdbClient, "searchMovies").mockResolvedValue({
+    searchMoviesSpy = vi.spyOn(tmdbClient, "searchMovies").mockResolvedValue({
       results: [
         { id: 100, title: "Dune", release_date: "1984-12-14" },
         { id: 200, title: "Dune", release_date: "2021-10-22" },
@@ -107,7 +107,7 @@ describe("resolveMovieTmdbId", () => {
   });
 
   test("title search without year match returns null", async () => {
-    searchMoviesSpy = spyOn(tmdbClient, "searchMovies").mockResolvedValue({
+    searchMoviesSpy = vi.spyOn(tmdbClient, "searchMovies").mockResolvedValue({
       results: [
         { id: 100, title: "Dune", release_date: "1984-12-14" },
         { id: 200, title: "Dune", release_date: "2021-10-22" },
@@ -120,12 +120,12 @@ describe("resolveMovieTmdbId", () => {
   });
 
   test("returns null when all methods fail", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
       movie_results: [],
       tv_results: [],
       tv_episode_results: [],
     } as never);
-    searchMoviesSpy = spyOn(tmdbClient, "searchMovies").mockResolvedValue({
+    searchMoviesSpy = vi.spyOn(tmdbClient, "searchMovies").mockResolvedValue({
       results: [],
     } as never);
 
@@ -137,8 +137,8 @@ describe("resolveMovieTmdbId", () => {
   });
 
   test("returns null when no identifiers at all", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId");
-    searchMoviesSpy = spyOn(tmdbClient, "searchMovies");
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId");
+    searchMoviesSpy = vi.spyOn(tmdbClient, "searchMovies");
 
     const result = await resolveMovieTmdbId({});
     expect(result).toBeNull();
@@ -147,7 +147,7 @@ describe("resolveMovieTmdbId", () => {
   });
 
   test("cache prevents duplicate lookups", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
       movie_results: [{ id: 555 }],
       tv_results: [],
       tv_episode_results: [],
@@ -166,7 +166,7 @@ describe("resolveMovieTmdbId", () => {
   });
 
   test("cache stores null for unresolvable items", async () => {
-    searchMoviesSpy = spyOn(tmdbClient, "searchMovies").mockResolvedValue({
+    searchMoviesSpy = vi.spyOn(tmdbClient, "searchMovies").mockResolvedValue({
       results: [],
     } as never);
 
@@ -186,7 +186,7 @@ describe("resolveMovieTmdbId", () => {
 
 describe("resolveShowTmdbId", () => {
   test("returns tmdbId directly when provided", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId");
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId");
 
     const result = await resolveShowTmdbId({ tmdbId: 42 });
     expect(result).toBe(42);
@@ -194,7 +194,7 @@ describe("resolveShowTmdbId", () => {
   });
 
   test("resolves via IMDB ID — show-level result", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
       movie_results: [],
       tv_results: [{ id: 600, name: "Breaking Bad" }],
       tv_episode_results: [],
@@ -205,7 +205,7 @@ describe("resolveShowTmdbId", () => {
   });
 
   test("resolves via IMDB ID — episode-level result extracts show_id", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
       movie_results: [],
       tv_results: [],
       tv_episode_results: [
@@ -224,7 +224,7 @@ describe("resolveShowTmdbId", () => {
   });
 
   test("falls back to TVDB lookup", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
       movie_results: [],
       tv_results: [{ id: 800 }],
       tv_episode_results: [],
@@ -236,7 +236,7 @@ describe("resolveShowTmdbId", () => {
   });
 
   test("TVDB lookup extracts show_id from episode result", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
       movie_results: [],
       tv_results: [],
       tv_episode_results: [
@@ -255,7 +255,7 @@ describe("resolveShowTmdbId", () => {
   });
 
   test("falls back to title search", async () => {
-    searchTvSpy = spyOn(tmdbClient, "searchTv").mockResolvedValue({
+    searchTvSpy = vi.spyOn(tmdbClient, "searchTv").mockResolvedValue({
       results: [{ id: 900, name: "The Office" }],
     } as never);
 
@@ -265,12 +265,12 @@ describe("resolveShowTmdbId", () => {
   });
 
   test("returns null when all methods fail", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
       movie_results: [],
       tv_results: [],
       tv_episode_results: [],
     } as never);
-    searchTvSpy = spyOn(tmdbClient, "searchTv").mockResolvedValue({
+    searchTvSpy = vi.spyOn(tmdbClient, "searchTv").mockResolvedValue({
       results: [],
     } as never);
 
@@ -282,7 +282,7 @@ describe("resolveShowTmdbId", () => {
   });
 
   test("cache prevents duplicate show lookups", async () => {
-    findSpy = spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
       movie_results: [],
       tv_results: [{ id: 950 }],
       tv_episode_results: [],
