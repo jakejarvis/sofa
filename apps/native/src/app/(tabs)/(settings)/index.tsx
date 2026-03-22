@@ -111,7 +111,7 @@ export default function SettingsScreen() {
     }),
   );
 
-  const uploadAvatar = useMutation(
+  const { mutate: uploadAvatarFile, isPending: isUploadingAvatar } = useMutation(
     orpc.account.uploadAvatar.mutationOptions({
       onSuccess: () => {
         toast.success(t`Profile picture updated`);
@@ -149,8 +149,8 @@ export default function SettingsScreen() {
     const file = new File([blob], asset.fileName ?? "avatar.jpg", {
       type: asset.mimeType ?? "image/jpeg",
     });
-    uploadAvatar.mutate(file);
-  }, [uploadAvatar]);
+    uploadAvatarFile(file);
+  }, [uploadAvatarFile]);
 
   const hasAvatarImage = !!session?.user?.image;
 
@@ -235,7 +235,7 @@ export default function SettingsScreen() {
                     hitSlop={8}
                   >
                     <View className="bg-secondary size-11 overflow-hidden rounded-full">
-                      {uploadAvatar.isPending ? (
+                      {isUploadingAvatar ? (
                         <View className="flex-1 items-center justify-center">
                           <Spinner size="sm" colorClassName="accent-primary" />
                         </View>
@@ -280,7 +280,7 @@ export default function SettingsScreen() {
                 hitSlop={8}
               >
                 <View className="bg-secondary size-11 overflow-hidden rounded-full">
-                  {uploadAvatar.isPending ? (
+                  {isUploadingAvatar ? (
                     <View className="flex-1 items-center justify-center">
                       <Spinner size="sm" colorClassName="accent-primary" />
                     </View>

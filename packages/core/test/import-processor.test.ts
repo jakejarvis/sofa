@@ -391,7 +391,7 @@ describe("processImportJob — state transitions", () => {
           createdAt,
         })
         .run(),
-    ).toThrow();
+    ).toThrow("UNIQUE constraint");
 
     testDb.update(importJobs).set({ status: "success" }).where(eq(importJobs.id, "job-1")).run();
 

@@ -124,7 +124,11 @@ export function BackupScheduleSection() {
     return t`Next backup ${distance}`;
   }
 
-  const updateScheduleMutation = useMutation(
+  const {
+    mutate: updateSchedule,
+    isPending: isUpdatingSchedule,
+    variables: updateScheduleVars,
+  } = useMutation(
     orpc.admin.backups.updateSchedule.mutationOptions({
       onMutate: (input) => {
         const previous = { ...current };
@@ -150,14 +154,12 @@ export function BackupScheduleSection() {
     }),
   );
 
-  const togglingSchedule =
-    updateScheduleMutation.isPending && updateScheduleMutation.variables?.enabled !== undefined;
-  const savingSchedule =
-    updateScheduleMutation.isPending && updateScheduleMutation.variables?.frequency !== undefined;
+  const togglingSchedule = isUpdatingSchedule && updateScheduleVars?.enabled !== undefined;
+  const savingSchedule = isUpdatingSchedule && updateScheduleVars?.frequency !== undefined;
 
   const toggleScheduled = useCallback(
     (checked: boolean) => {
-      updateScheduleMutation.mutate(
+      updateSchedule(
         { enabled: checked },
         {
           onSuccess: () =>
@@ -165,19 +167,19 @@ export function BackupScheduleSection() {
         },
       );
     },
-    [updateScheduleMutation, t],
+    [updateSchedule, t],
   );
 
   const changeMaxRetention = useCallback(
     (value: number) => {
-      updateScheduleMutation.mutate({ maxRetention: value });
+      updateSchedule({ maxRetention: value });
     },
-    [updateScheduleMutation],
+    [updateSchedule],
   );
 
   const changeSchedule = useCallback(
     (newFrequency: BackupFrequency, newTime: string, newDow = current.dow) => {
-      updateScheduleMutation.mutate(
+      updateSchedule(
         {
           frequency: newFrequency,
           time: newTime,
@@ -186,7 +188,7 @@ export function BackupScheduleSection() {
         { onSuccess: () => toast.success(t`Schedule updated`) },
       );
     },
-    [updateScheduleMutation, current.dow, t],
+    [updateSchedule, current.dow, t],
   );
 
   if (isPending) {

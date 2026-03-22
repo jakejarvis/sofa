@@ -1,5 +1,10 @@
 {
   "$schema": "../../node_modules/oxlint/configuration_schema.json",
   "extends": ["../../.oxlintrc.json"],
+  "jsPlugins": ["eslint-plugin-drizzle"],
+  "rules": {
+    "drizzle/enforce-delete-with-where": ["error", { "drizzleObjectName": ["db", "tx"] }],
+    "drizzle/enforce-update-with-where": ["error", { "drizzleObjectName": ["db", "tx"] }]
+  },
   "ignorePatterns": ["node_modules", "dist", "build", "drizzle"]
 }

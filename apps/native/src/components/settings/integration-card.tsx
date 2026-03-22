@@ -90,7 +90,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
     }),
   );
 
-  const deleteMutation = useMutation(
+  const { mutate: deleteIntegration } = useMutation(
     orpc.integrations.delete.mutationOptions({
       onSuccess: () => {
         toast.success(t`${label} disconnected`);
@@ -100,7 +100,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
     }),
   );
 
-  const regenerateMutation = useMutation(
+  const { mutate: regenerateToken, isPending: isRegenerating } = useMutation(
     orpc.integrations.regenerateToken.mutationOptions({
       onSuccess: () => {
         toast.success(t`${label} URL regenerated`);
@@ -136,11 +136,11 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
         {
           text: t`Regenerate`,
           style: "destructive",
-          onPress: () => regenerateMutation.mutate({ provider: providerInput }),
+          onPress: () => regenerateToken({ provider: providerInput }),
         },
       ],
     );
-  }, [label, providerInput, regenerateMutation, t]);
+  }, [label, providerInput, regenerateToken, t]);
 
   const handleDisconnect = useCallback(() => {
     Alert.alert(
@@ -151,11 +151,11 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
         {
           text: t`Disconnect`,
           style: "destructive",
-          onPress: () => deleteMutation.mutate({ provider: providerInput }),
+          onPress: () => deleteIntegration({ provider: providerInput }),
         },
       ],
     );
-  }, [label, providerInput, deleteMutation, t]);
+  }, [label, providerInput, deleteIntegration, t]);
 
   const Icon = config.icon;
 
@@ -249,7 +249,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
               <View className="flex-row gap-2">
                 <Pressable
                   onPress={handleRegenerate}
-                  disabled={regenerateMutation.isPending}
+                  disabled={isRegenerating}
                   className="bg-secondary flex-1 flex-row items-center justify-center gap-1.5 rounded-lg py-2.5 active:opacity-80"
                 >
                   <ScaledIcon icon={IconRefresh} size={14} color={mutedFgColor} />

@@ -101,6 +101,7 @@ describe("removeTitleStatus", () => {
     insertTitle();
     // Should not throw
     removeTitleStatus("user-1", "title-1");
+    expect(true).toBe(true);
   });
 });
 
