@@ -1,12 +1,19 @@
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
+import { titles } from "@sofa/db/schema";
+import { clearAllTables, insertTitle, testDb } from "@sofa/test/db";
 import type { TmdbMovieDetails, TmdbTvDetails, TmdbVideo } from "@sofa/tmdb/client";
 
 import {
+  ensureBrowseTitlesExist,
   extractMovieContentRating,
   extractTvContentRating,
   pickBestTrailer,
 } from "../src/metadata";
+
+beforeEach(() => {
+  clearAllTables();
+});
 
 function makeVideo(overrides: Partial<TmdbVideo> = {}): TmdbVideo {
   return {
@@ -211,5 +218,61 @@ describe("extractTvContentRating", () => {
       },
     } as unknown as TmdbTvDetails;
     expect(extractTvContentRating(show)).toBeNull();
+  });
+});
+
+// ─── ensureBrowseTitlesExist ────────────────────────────────────────
+
+describe("ensureBrowseTitlesExist", () => {
+  test("creates shell titles for new entries", () => {
+    const result = ensureBrowseTitlesExist([
+      { tmdbId: 100, type: "movie", title: "Movie A", posterPath: "/a.jpg" },
+      { tmdbId: 200, type: "tv", title: "Show B", posterPath: "/b.jpg" },
+    ]);
+
+    expect(result.size).toBe(2);
+    expect(result.get("100-movie")).toBeDefined();
+    expect(result.get("200-tv")).toBeDefined();
+
+    const allTitles = testDb.select().from(titles).all();
+    expect(allTitles).toHaveLength(2);
+    // Shell titles have no lastFetchedAt
+    expect(allTitles[0].lastFetchedAt).toBeNull();
+    expect(allTitles[1].lastFetchedAt).toBeNull();
+  });
+
+  test("returns existing titles without creating duplicates", () => {
+    insertTitle({ id: "existing-1", tmdbId: 100, type: "movie", title: "Movie A" });
+
+    const result = ensureBrowseTitlesExist([
+      { tmdbId: 100, type: "movie", title: "Movie A", posterPath: "/a.jpg" },
+    ]);
+
+    expect(result.size).toBe(1);
+    expect(result.get("100-movie")?.id).toBe("existing-1");
+
+    const allTitles = testDb.select().from(titles).all();
+    expect(allTitles).toHaveLength(1);
+  });
+
+  test("handles mix of existing and new titles", () => {
+    insertTitle({ id: "existing-1", tmdbId: 100, type: "movie", title: "Movie A" });
+
+    const result = ensureBrowseTitlesExist([
+      { tmdbId: 100, type: "movie", title: "Movie A", posterPath: "/a.jpg" },
+      { tmdbId: 200, type: "tv", title: "Show B", posterPath: "/b.jpg" },
+    ]);
+
+    expect(result.size).toBe(2);
+    expect(result.get("100-movie")?.id).toBe("existing-1");
+    expect(result.get("200-tv")).toBeDefined();
+
+    const allTitles = testDb.select().from(titles).all();
+    expect(allTitles).toHaveLength(2);
+  });
+
+  test("returns empty map for empty input", () => {
+    const result = ensureBrowseTitlesExist([]);
+    expect(result.size).toBe(0);
   });
 });
