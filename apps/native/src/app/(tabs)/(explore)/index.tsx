@@ -23,6 +23,7 @@ export default function ExploreScreen() {
       initialPageParam: 1,
       getNextPageParam: (lastPage) =>
         lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+      maxPages: 10,
     }),
   );
   const popularMovies = useQuery(orpc.explore.popular.queryOptions({ input: { type: "movie" } }));

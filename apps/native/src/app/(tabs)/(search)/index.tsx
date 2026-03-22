@@ -3,7 +3,7 @@ import { FlashList } from "@shopify/flash-list";
 import { skipToken, useInfiniteQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
 import { RecentlyViewedList } from "@/components/search/recently-viewed-list";
@@ -28,6 +28,7 @@ export default function SearchScreen() {
       initialPageParam: 1,
       getNextPageParam: (lastPage) =>
         lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+      maxPages: 10,
     }),
   });
 
@@ -115,7 +116,7 @@ export default function SearchScreen() {
           ListFooterComponent={
             searchResults.isFetchingNextPage ? (
               <View className="items-center py-4">
-                <ActivityIndicator />
+                <Spinner />
               </View>
             ) : null
           }

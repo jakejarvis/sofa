@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { PersonDetailClient, PersonDetailSkeleton } from "@/components/people/person-detail-client";
+import { RouteError } from "@/components/route-error";
 import { getAppErrorCode } from "@/lib/error-messages";
 import { orpc } from "@/lib/orpc/client";
 
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/_app/people/$id")({
           initialPageParam: 1,
           getNextPageParam: (lastPage) =>
             lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+          maxPages: 10,
         }),
       );
       return { personName: data.pages[0]?.person.name };
@@ -34,6 +36,7 @@ export const Route = createFileRoute("/_app/people/$id")({
     return { meta: [{ title: `${loaderData.personName} — Sofa` }] };
   },
   pendingComponent: () => <PersonDetailSkeleton />,
+  errorComponent: RouteError,
   notFoundComponent: PersonNotFound,
   component: PersonPage,
 });

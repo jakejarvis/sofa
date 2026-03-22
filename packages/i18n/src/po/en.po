@@ -255,6 +255,9 @@ msgid "Admin"
 msgstr ""
 
 #: apps/web/src/routes/_app/settings.tsx
+#: apps/web/src/routes/_app/settings.tsx
+#: apps/web/src/routes/_app/settings.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Admin only"
 msgstr ""
 
@@ -280,6 +283,7 @@ msgstr ""
 msgid "Already have an account? Sign in"
 msgstr ""
 
+#: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
 msgstr ""
@@ -654,6 +658,7 @@ msgstr ""
 msgid "Danger Zone"
 msgstr ""
 
+#: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 #: apps/web/src/routes/_app/people.$id.tsx
 #: apps/web/src/routes/_app/titles.$id.tsx
@@ -2287,6 +2292,7 @@ msgstr ""
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
+#: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "Something went wrong"
@@ -2513,6 +2519,7 @@ msgid "Trigger job"
 msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
+#: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "Try again"
 msgstr ""

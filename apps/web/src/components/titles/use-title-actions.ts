@@ -52,6 +52,7 @@ export function useTitleActions() {
 
   const catchUp = useCallback(
     async (episodeIds: string[]) => {
+      await queryClient.cancelQueries({ queryKey: userInfoKey });
       const prev = getUserInfo();
       const newWatchSet = new Set(prev.episodeWatches);
       for (const id of episodeIds) newWatchSet.add(id);
@@ -83,6 +84,7 @@ export function useTitleActions() {
 
   const handleStatusChange = useCallback(
     async (status: string | null) => {
+      await queryClient.cancelQueries({ queryKey: userInfoKey });
       const prevStatus = getUserInfo().status;
       setUserInfo((old) => ({
         ...old,
@@ -99,11 +101,12 @@ export function useTitleActions() {
         toast.error(t`Failed to update status`);
       }
     },
-    [getUserInfo, setUserInfo, titleId, updateStatus, t],
+    [getUserInfo, setUserInfo, queryClient, userInfoKey, titleId, updateStatus, t],
   );
 
   const handleRating = useCallback(
     async (ratingStars: number) => {
+      await queryClient.cancelQueries({ queryKey: userInfoKey });
       const prevRating = getUserInfo().rating;
       setUserInfo((old) => ({ ...old, rating: ratingStars }));
       try {
@@ -121,10 +124,11 @@ export function useTitleActions() {
         toast.error(t`Failed to update rating`);
       }
     },
-    [getUserInfo, setUserInfo, titleId, updateRating, t],
+    [getUserInfo, setUserInfo, queryClient, userInfoKey, titleId, updateRating, t],
   );
 
   const handleWatchMovie = useCallback(async () => {
+    await queryClient.cancelQueries({ queryKey: userInfoKey });
     const prevStatus = getUserInfo().status;
     setUserInfo((old) => ({ ...old, status: "completed" }));
     try {
@@ -134,10 +138,11 @@ export function useTitleActions() {
       setUserInfo((old) => ({ ...old, status: prevStatus }));
       toast.error(t`Failed to mark as watched`);
     }
-  }, [getUserInfo, setUserInfo, titleId, titleName, watchMovie, t]);
+  }, [getUserInfo, setUserInfo, queryClient, userInfoKey, titleId, titleName, watchMovie, t]);
 
   const handleWatchEpisode = useCallback(
     async (episodeId: string, seasonNum: number, epNum: number, isWatched: boolean) => {
+      await queryClient.cancelQueries({ queryKey: userInfoKey });
       setWatchingEp(episodeId);
 
       if (isWatched) {
@@ -218,11 +223,23 @@ export function useTitleActions() {
 
       setWatchingEp(null);
     },
-    [getUserInfo, setUserInfo, setWatchingEp, seasons, catchUp, unwatchEp, watchEp, t],
+    [
+      getUserInfo,
+      setUserInfo,
+      queryClient,
+      userInfoKey,
+      setWatchingEp,
+      seasons,
+      catchUp,
+      unwatchEp,
+      watchEp,
+      t,
+    ],
   );
 
   const handleMarkSeason = useCallback(
     async (season: Season) => {
+      await queryClient.cancelQueries({ queryKey: userInfoKey });
       const prevWatches = getUserInfo().episodeWatches;
       const prevStatus = getUserInfo().status;
       const watchedSet = new Set(prevWatches);
@@ -284,6 +301,7 @@ export function useTitleActions() {
 
   const handleUnmarkSeason = useCallback(
     async (season: Season) => {
+      await queryClient.cancelQueries({ queryKey: userInfoKey });
       const prevWatches = getUserInfo().episodeWatches;
       const prevStatus = getUserInfo().status;
       const seasonEpIds = new Set(season.episodes.map((ep) => ep.id));
@@ -307,10 +325,11 @@ export function useTitleActions() {
         toast.error(t`Failed to unmark some episodes`);
       }
     },
-    [getUserInfo, setUserInfo, unwatchSeason, t],
+    [getUserInfo, setUserInfo, queryClient, userInfoKey, unwatchSeason, t],
   );
 
   const handleMarkAllWatched = useCallback(async () => {
+    await queryClient.cancelQueries({ queryKey: userInfoKey });
     const prevWatches = getUserInfo().episodeWatches;
     const prevStatus = getUserInfo().status;
     const allEpIds = seasons.flatMap((s) => s.episodes.map((ep) => ep.id));

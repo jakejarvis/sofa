@@ -8,6 +8,7 @@ import {
 } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { RouteError } from "@/components/route-error";
 import { AccountSection } from "@/components/settings/account-section";
 import { BackupRestoreSection } from "@/components/settings/backup-restore-section";
 import { BackupScheduleSection } from "@/components/settings/backup-schedule-section";
@@ -46,6 +47,7 @@ export const Route = createFileRoute("/_app/settings")({
   },
   head: () => ({ meta: [{ title: "Settings — Sofa" }] }),
   pendingComponent: SettingsSkeleton,
+  errorComponent: RouteError,
   component: SettingsPage,
 });
 
@@ -169,7 +171,7 @@ function SettingsPage() {
               <Trans>Security</Trans>
             </h2>
             <span className="bg-primary/10 text-primary rounded-md px-1.5 py-0.5 text-[10px] font-medium">
-              Admin only
+              <Trans>Admin only</Trans>
             </span>
           </div>
           <div className="space-y-3">
@@ -192,7 +194,7 @@ function SettingsPage() {
               <Trans>Backups</Trans>
             </h2>
             <span className="bg-primary/10 text-primary rounded-md px-1.5 py-0.5 text-[10px] font-medium">
-              Admin only
+              <Trans>Admin only</Trans>
             </span>
           </div>
           <div className="space-y-3">
@@ -218,7 +220,7 @@ function SettingsPage() {
               <Trans>Danger Zone</Trans>
             </h2>
             <span className="bg-primary/10 text-primary rounded-md px-1.5 py-0.5 text-[10px] font-medium">
-              Admin only
+              <Trans>Admin only</Trans>
             </span>
           </div>
           <Card className="border-s-primary/30 border-s-2">

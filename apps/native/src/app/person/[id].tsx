@@ -11,7 +11,7 @@ import {
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
-import { ActivityIndicator, Pressable, useWindowDimensions, View } from "react-native";
+import { Pressable, useWindowDimensions, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCSSVariable } from "uniwind";
@@ -23,6 +23,7 @@ import { PosterCard } from "@/components/ui/poster-card";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useTitleActions } from "@/hooks/use-title-actions";
 import { orpc } from "@/lib/orpc";
@@ -75,6 +76,7 @@ export default function PersonDetailScreen() {
         initialPageParam: 1,
         getNextPageParam: (lastPage) =>
           lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+        maxPages: 10,
       }),
     );
 
@@ -310,7 +312,7 @@ export default function PersonDetailScreen() {
         ListFooterComponent={
           isFetchingNextPage ? (
             <View className="items-center py-4">
-              <ActivityIndicator />
+              <Spinner />
             </View>
           ) : null
         }

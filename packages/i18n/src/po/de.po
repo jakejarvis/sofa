@@ -22,6 +22,7 @@ msgstr ""
 #~ msgid "...and {0} more"
 #~ msgstr ""
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "...and {remainingErrors} more"
 msgstr ""
@@ -145,10 +146,12 @@ msgstr "{label} getrennt"
 msgid "{label} URL regenerated"
 msgstr "{label}-URL neu generiert"
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "{movieCount} movies, {episodeCount} episodes"
 msgstr ""
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "{ratingCount} ratings"
 msgstr ""
@@ -185,6 +188,7 @@ msgstr ""
 msgid "{watchedEpisodes}/{totalEpisodes, plural, one {# episode} other {# episodes}}"
 msgstr ""
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "{watchlistCount} items"
 msgstr ""
@@ -251,6 +255,9 @@ msgid "Admin"
 msgstr ""
 
 #: apps/web/src/routes/_app/settings.tsx
+#: apps/web/src/routes/_app/settings.tsx
+#: apps/web/src/routes/_app/settings.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Admin only"
 msgstr "Nur für Admins"
 
@@ -276,6 +283,7 @@ msgstr "Bereits ein Konto?"
 msgid "Already have an account? Sign in"
 msgstr "Bereits ein Konto? Anmelden"
 
+#: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
 msgstr "Beim Laden dieser Seite ist ein unerwarteter Fehler aufgetreten. Du kannst es erneut versuchen oder zum Dashboard zurückkehren."
@@ -384,6 +392,7 @@ msgstr "Server nicht erreichbar"
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/backup-restore-section.tsx
 #: apps/web/src/components/settings/backup-section.tsx
@@ -611,6 +620,10 @@ msgstr "Integrationen konnten nicht geladen werden"
 msgid "Could not load person details"
 msgstr "Personendetails konnten nicht geladen werden"
 
+#: apps/native/src/app/title/[id].tsx
+msgid "Could not load title details"
+msgstr ""
+
 #: apps/web/src/components/auth-form.tsx
 msgid "Create account"
 msgstr "Konto erstellen"
@@ -645,6 +658,7 @@ msgstr "Aktuelles Passwort ist erforderlich"
 msgid "Danger Zone"
 msgstr "Gefahrenzone"
 
+#: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 #: apps/web/src/routes/_app/people.$id.tsx
 #: apps/web/src/routes/_app/titles.$id.tsx
@@ -726,6 +740,7 @@ msgstr "Noch keinen Server?"
 msgid "Don't have an account?"
 msgstr "Noch kein Konto?"
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Done"
 msgstr "Fertig"
@@ -746,6 +761,10 @@ msgstr "Herunterladen"
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Download backup"
 msgstr "Backup herunterladen"
+
+#: apps/web/src/components/settings/account-section.tsx
+msgid "Download your library, watch history, and ratings as JSON"
+msgstr ""
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
@@ -819,6 +838,7 @@ msgstr "Episode als ungesehen markiert"
 msgid "Episode watched"
 msgstr "Episode als gesehen markiert"
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/titles/title-seasons.tsx
 msgid "Episodes"
@@ -857,6 +877,7 @@ msgstr "Fehler"
 #~ msgid "Errors ({0})"
 #~ msgstr ""
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Errors ({errorCount})"
 msgstr ""
@@ -874,6 +895,11 @@ msgstr "Entdecken"
 msgid "Explore titles"
 msgstr "Titel entdecken"
 
+#: apps/web/src/components/settings/account-section.tsx
+msgid "Export"
+msgstr ""
+
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Failed"
 msgstr "Fehlgeschlagen"
@@ -949,6 +975,7 @@ msgstr "Episode konnte nicht markiert werden"
 msgid "Failed to mark some episodes"
 msgstr "Einige Episoden konnten nicht markiert werden"
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Failed to parse file"
 msgstr "Datei konnte nicht verarbeitet werden"
@@ -1063,6 +1090,10 @@ msgstr "Filmografie"
 msgid "Finished importing from {source}."
 msgstr "Import von {source} abgeschlossen."
 
+#: apps/web/src/components/settings/account-section.tsx
+msgid "Finished importing your Sofa export."
+msgstr ""
+
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Free"
 msgstr "Kostenlos"
@@ -1085,6 +1116,7 @@ msgstr "Loslegen"
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/person/[id].tsx
+#: apps/native/src/app/title/[id].tsx
 #: apps/native/src/app/title/[id].tsx
 msgid "Go back"
 msgstr "Zurück"
@@ -1137,18 +1169,22 @@ msgstr "Bild-Cache"
 msgid "Image cache and backup disk usage"
 msgstr "Speichernutzung für Bild-Cache und Backups"
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import"
 msgstr ""
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import {totalItems} items"
 msgstr "{totalItems} Einträge importieren"
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import complete"
 msgstr "Import abgeschlossen"
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import failed"
 msgstr "Import fehlgeschlagen"
@@ -1165,15 +1201,23 @@ msgstr "Von {source} importieren"
 msgid "Import from {sourceLabel}"
 msgstr ""
 
+#: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import is still running in the background. Check back later."
 msgstr "Import läuft noch im Hintergrund. Komm später wieder."
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import options"
 msgstr "Importoptionen"
 
+#: apps/web/src/components/settings/account-section.tsx
+msgid "Import Sofa data"
+msgstr ""
+
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Imported"
 msgstr "Importiert"
@@ -1184,6 +1228,14 @@ msgstr "Importiert"
 
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Imported {importedCount} items from {sourceLabel}"
+msgstr ""
+
+#: apps/web/src/components/settings/account-section.tsx
+msgid "Imported {importedCount} items from Sofa export"
+msgstr ""
+
+#: apps/web/src/components/settings/account-section.tsx
+msgid "Importing data"
 msgstr ""
 
 #: apps/web/src/components/settings/imports-section.tsx
@@ -1292,14 +1344,23 @@ msgstr "Letzter Lauf fehlgeschlagen"
 msgid "Last run succeeded"
 msgstr "Letzter Lauf erfolgreich"
 
+#: apps/web/src/components/settings/account-section.tsx
+msgid "Library"
+msgstr ""
+
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Library refresh"
 msgstr "Bibliothek aktualisieren"
+
+#: apps/web/src/components/settings/account-section.tsx
+msgid "Library statuses"
+msgstr ""
 
 #: apps/web/src/components/auth-form.tsx
 msgid "Loading…"
 msgstr "Lade..."
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Lost connection to import. Check status in settings."
 msgstr "Verbindung zum Import verloren. Status in den Einstellungen prüfen."
@@ -1404,6 +1465,7 @@ msgid "Movie"
 msgstr "Film"
 
 #: apps/web/src/components/people/filmography-grid.tsx
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Movies"
 msgstr "Filme"
@@ -1602,6 +1664,10 @@ msgstr "ODER"
 msgid "Page Not Found"
 msgstr "Seite nicht gefunden"
 
+#: apps/web/src/components/settings/account-section.tsx
+msgid "Parsing file..."
+msgstr ""
+
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Parsing..."
 msgstr "Verarbeite..."
@@ -1649,6 +1715,10 @@ msgstr "Person nicht gefunden"
 #: apps/web/src/components/titles/trailer-dialog.tsx
 msgid "Play trailer"
 msgstr "Trailer abspielen"
+
+#: apps/native/src/hooks/use-server-connection.ts
+msgid "Please sign in again."
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(explore)/index.tsx
 #: apps/web/src/routes/_app/explore.tsx
@@ -1766,6 +1836,8 @@ msgstr "Bewertung"
 msgid "Rating removed"
 msgstr "Bewertung entfernt"
 
+#: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Ratings"
@@ -1934,6 +2006,10 @@ msgstr "Datenbank wiederherstellen?"
 msgid "Restore failed"
 msgstr "Wiederherstellung fehlgeschlagen"
 
+#: apps/web/src/components/settings/account-section.tsx
+msgid "Restore from a Sofa export file"
+msgstr ""
+
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Restoring…"
 msgstr "Stelle wieder her..."
@@ -1957,6 +2033,7 @@ msgstr "Erneut versuchen"
 msgid "Return home"
 msgstr "Zur Startseite"
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Review what was found and choose what to import."
 msgstr "Überprüfe die gefundenen Einträge und wähle aus, was importiert werden soll."
@@ -2091,6 +2168,10 @@ msgstr "Server-Status"
 msgid "Server URL"
 msgstr "Server-URL"
 
+#: apps/native/src/hooks/use-server-connection.ts
+msgid "Session expired"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Set password"
 msgstr "Passwort festlegen"
@@ -2182,6 +2263,7 @@ msgstr "Abmelden"
 msgid "Sign out of other sessions"
 msgstr "Von anderen Sitzungen abmelden"
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Skipped"
 msgstr "Übersprungen"
@@ -2209,6 +2291,8 @@ msgstr "Sofa protokolliert Filme und Episoden automatisch, wenn du sie zu Ende g
 
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
+#: apps/native/src/app/title/[id].tsx
+#: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "Something went wrong"
@@ -2243,6 +2327,7 @@ msgstr "Verfolge deine Sehgewohnheiten"
 msgid "Starting at"
 msgstr "Startzeit"
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Starting import..."
 msgstr "Import wird gestartet..."
@@ -2283,6 +2368,7 @@ msgstr "Die gesuchte Person existiert nicht oder wurde möglicherweise aus der D
 msgid "The title you're looking for doesn't exist or may have been removed from the database."
 msgstr "Der gesuchte Titel existiert nicht oder wurde möglicherweise aus der Datenbank entfernt."
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "This may take a few minutes for large libraries. Please don't close this tab."
 msgstr "Dies kann bei großen Bibliotheken einige Minuten dauern. Bitte schließe diesen Tab nicht."
@@ -2432,6 +2518,8 @@ msgstr "Heute im Trend"
 msgid "Trigger job"
 msgstr "Aufgabe auslösen"
 
+#: apps/native/src/app/title/[id].tsx
+#: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "Try again"
 msgstr "Erneut versuchen"
@@ -2583,6 +2671,7 @@ msgstr "Version ansehen"
 msgid "Waiting for authorization..."
 msgstr "Warte auf Autorisierung..."
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Warnings"
 msgstr "Warnungen"
@@ -2591,6 +2680,7 @@ msgstr "Warnungen"
 #~ msgid "Warnings ({0})"
 #~ msgstr ""
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Warnings ({warningCount})"
 msgstr ""
@@ -2599,10 +2689,12 @@ msgstr ""
 msgid "Watch all"
 msgstr "Alle als gesehen markieren"
 
+#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Watch history"
 msgstr "Verlauf"
 
+#: apps/web/src/components/titles/title-availability.tsx
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Watch on {name}"
 msgstr "Ansehen auf {name}"
@@ -2697,4 +2789,3 @@ msgstr "Deine Bibliothek ist leer"
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Your name"
 msgstr "Dein Name"
-

@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { FilterableTitleRow } from "@/components/explore/filterable-title-row";
 import { HeroBanner } from "@/components/explore/hero-banner";
 import { TitleRow } from "@/components/explore/title-row";
+import { RouteError } from "@/components/route-error";
 import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
 
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/_app/explore")({
           initialPageParam: 1,
           getNextPageParam: (lastPage) =>
             lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+          maxPages: 10,
         }),
       ),
       context.queryClient.ensureQueryData(
@@ -38,6 +40,7 @@ export const Route = createFileRoute("/_app/explore")({
   },
   head: () => ({ meta: [{ title: "Explore — Sofa" }] }),
   pendingComponent: ExploreSkeletons,
+  errorComponent: RouteError,
   component: ExplorePage,
 });
 
@@ -82,6 +85,7 @@ function ExplorePage() {
       initialPageParam: 1,
       getNextPageParam: (lastPage) =>
         lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+      maxPages: 10,
     }),
   );
 

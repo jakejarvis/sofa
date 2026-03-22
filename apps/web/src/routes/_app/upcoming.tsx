@@ -4,6 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { UpcomingRow } from "@/components/dashboard/upcoming-item";
+import { RouteError } from "@/components/route-error";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { orpc } from "@/lib/orpc/client";
@@ -21,11 +22,13 @@ export const Route = createFileRoute("/_app/upcoming")({
         }),
         initialPageParam: undefined as string | undefined,
         getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+        maxPages: 10,
       }),
     );
   },
   head: () => ({ meta: [{ title: "Upcoming — Sofa" }] }),
   pendingComponent: UpcomingSkeleton,
+  errorComponent: RouteError,
   component: UpcomingPage,
 });
 
@@ -59,6 +62,7 @@ function UpcomingPage() {
       }),
       initialPageParam: undefined as string | undefined,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      maxPages: 10,
     }),
   );
 

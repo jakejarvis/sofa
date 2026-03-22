@@ -35,7 +35,7 @@ function ScrollArea({
         className={cn(
           "no-scrollbar focus-visible:ring-ring/50 flex-1 rounded-[inherit] outline-none focus-visible:ring-[3px] focus-visible:outline-1 data-has-overflow-x:overscroll-x-contain",
           scrollFade &&
-            "mask-t-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-y-start)))] mask-r-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-x-end)))] mask-b-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-y-end)))] mask-l-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-x-start)))] [--fade-size:1.5rem]",
+            "mask-t-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-y-start)))] mask-r-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-x-end)))] mask-b-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-y-end)))] mask-l-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-x-start)))] [--fade-size:1.5rem] rtl:mask-r-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-x-start)))] rtl:mask-l-from-[calc(100%-min(var(--fade-size),var(--scroll-area-overflow-x-end)))]",
           scrollbarGutter && "data-has-overflow-x:pb-2.5 data-has-overflow-y:pe-2.5",
         )}
       >

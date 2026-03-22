@@ -6,12 +6,11 @@ import { getIsReachable, isNetworkError } from "@/lib/server";
 import { toast } from "@/lib/toast";
 import { i18n } from "@sofa/i18n";
 
-const ONE_DAY_MS = 1000 * 60 * 60 * 24;
-
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      gcTime: ONE_DAY_MS,
+      staleTime: 60_000,
+      gcTime: 300_000,
       networkMode: "online",
       retry: (failureCount, error) => {
         // Don't retry network errors when server is unreachable — the

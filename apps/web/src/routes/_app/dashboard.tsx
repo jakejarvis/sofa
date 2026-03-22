@@ -9,6 +9,7 @@ import { StatsSection } from "@/components/dashboard/stats-section";
 import { TitleGridSectionSkeleton } from "@/components/dashboard/title-grid";
 import { UpcomingSection } from "@/components/dashboard/upcoming-section";
 import { WelcomeHeader } from "@/components/dashboard/welcome-header";
+import { RouteError } from "@/components/route-error";
 import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
 
@@ -28,12 +29,14 @@ export const Route = createFileRoute("/_app/dashboard")({
           initialPageParam: 1,
           getNextPageParam: (lastPage) =>
             lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+          maxPages: 10,
         }),
       ),
     ]);
   },
   head: () => ({ meta: [{ title: "Dashboard — Sofa" }] }),
   pendingComponent: DashboardSkeleton,
+  errorComponent: RouteError,
   component: DashboardPage,
 });
 
