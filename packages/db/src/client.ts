@@ -89,7 +89,7 @@ export function optimizeDatabase() {
 }
 
 export function vacuumDatabase(into: string): void {
-  getClient().run("VACUUM INTO ?", [into.replace(/'/g, "''")]);
+  getClient().run("VACUUM INTO ?", [into]);
 }
 
 export function isDatabaseAccessBlocked(): boolean {

@@ -218,7 +218,7 @@ async function refreshCreditsJob() {
   for (const titleId of libraryIds) {
     const castEntry = getCastEntryForTitle(titleId);
 
-    const needsRefresh = !castEntry || (castEntry.lastFetchedAt && castEntry.lastFetchedAt < stale);
+    const needsRefresh = !castEntry || !castEntry.lastFetchedAt || castEntry.lastFetchedAt < stale;
 
     if (needsRefresh) {
       await refreshCredits(titleId);
@@ -254,7 +254,7 @@ export function buildBackupCron(
 
   switch (frequency) {
     case "6h":
-      return `${m} */6 * * *`;
+      return `${m} ${h},${(h + 6) % 24},${(h + 12) % 24},${(h + 18) % 24} * * *`;
     case "12h":
       return `${m} ${h},${(h + 12) % 24} * * *`;
     case "7d":

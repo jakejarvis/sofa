@@ -1,4 +1,4 @@
-import { mkdir, rename } from "node:fs/promises";
+import { mkdir, rename, unlink } from "node:fs/promises";
 import path from "node:path";
 
 import { CACHE_DIR, TMDB_IMAGE_BASE_URL } from "@sofa/config";
@@ -101,6 +101,7 @@ export async function downloadAndCacheImage(
     log.debug(`Cached ${category}/${filename} (${buffer.length} bytes)`);
   } catch (err) {
     log.warn(`Failed to write cached image ${filename}:`, err);
+    unlink(tmpPath).catch(() => {});
   }
 
   return buffer;
@@ -132,7 +133,10 @@ export async function fetchAndMaybeCache(
   const tmpPath = `${finalPath}.tmp.${Date.now()}`;
   Bun.write(tmpPath, buffer)
     .then(() => rename(tmpPath, finalPath))
-    .catch((err) => log.warn(`Failed to cache ${category}/${filename}:`, err));
+    .catch((err) => {
+      log.warn(`Failed to cache ${category}/${filename}:`, err);
+      unlink(tmpPath).catch(() => {});
+    });
 
   return { buffer, contentType };
 }

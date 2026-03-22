@@ -88,6 +88,19 @@ export function logEpisodeWatchBatch(
   if (episodeIds.length === 0) return;
 
   batchInsertEpisodeWatchesTransaction(userId, episodeIds, source, watchedAt);
+
+  // Auto-set title status to in_progress for affected titles
+  const titleIds = new Set<string>();
+  for (const episodeId of episodeIds) {
+    const titleId = getEpisodeTitleId(episodeId);
+    if (titleId) titleIds.add(titleId);
+  }
+  for (const titleId of titleIds) {
+    const existing = getTitleStatus(userId, titleId);
+    if (!existing || existing.status === "watchlist") {
+      setTitleStatus(userId, titleId, "in_progress", source);
+    }
+  }
 }
 
 export function markAllEpisodesWatched(

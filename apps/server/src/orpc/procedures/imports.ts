@@ -171,7 +171,7 @@ export const createJob = os.imports.createJob.use(authed).handler(async ({ input
     log.error(`Import job ${job.id} failed:`, err);
   });
 
-  return readImportJob(job.id);
+  return readImportJob(job.id, context.user.id);
 });
 
 export const getJob = os.imports.getJob.use(authed).handler(({ input, context }) => {
@@ -187,7 +187,7 @@ export const cancelJob = os.imports.cancelJob.use(authed).handler(({ input, cont
     });
   }
   updateImportJobProgress(input.id, { status: "cancelled" });
-  return readImportJob(input.id);
+  return readImportJob(input.id, context.user.id);
 });
 
 export const jobEvents = os.imports.jobEvents.use(authed).handler(async function* ({

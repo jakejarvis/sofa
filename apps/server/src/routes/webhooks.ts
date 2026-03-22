@@ -53,7 +53,7 @@ app.post("/:token", async (c) => {
     await processWebhook(connection.id, connection.userId, provider, event);
   } catch (err) {
     // Swallow errors — never return non-200 to media servers
-    log.debug("Webhook processing failed:", err);
+    log.warn("Webhook processing failed:", err);
   }
 
   return c.json({ ok: true });

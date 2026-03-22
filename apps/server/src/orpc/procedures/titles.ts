@@ -13,9 +13,12 @@ import {
   removeTitleStatus,
   setTitleStatus,
 } from "@sofa/core/tracking";
+import { createLogger } from "@sofa/logger";
 
 import { os } from "../context";
 import { authed } from "../middleware";
+
+const log = createLogger("titles");
 
 export const detail = os.titles.detail.use(authed).handler(async ({ input }) => {
   const result = await getOrFetchTitle(input.id);
@@ -77,7 +80,9 @@ export const quickAdd = os.titles.quickAdd.use(authed).handler(async ({ input, c
   }
 
   // Trigger full TMDB import if still a shell (fire-and-forget)
-  getOrFetchTitleByTmdbId(result.tmdbId, result.type as "movie" | "tv").catch(() => {});
+  getOrFetchTitleByTmdbId(result.tmdbId, result.type as "movie" | "tv").catch((err) => {
+    log.warn(`Failed to import ${result.type} TMDB ${result.tmdbId}:`, err);
+  });
 
   return { id: result.id, alreadyAdded: result.alreadyAdded };
 });

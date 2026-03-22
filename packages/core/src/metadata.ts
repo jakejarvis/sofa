@@ -118,15 +118,15 @@ function fireAndForgetEnrichment(
   backdropPath: string | null | undefined,
   type: "movie" | "tv",
 ) {
-  refreshAvailability(titleId).catch((err) => log.debug("Availability enrichment failed:", err));
+  refreshAvailability(titleId).catch((err) => log.warn("Availability enrichment failed:", err));
   refreshRecommendations(titleId).catch((err) =>
-    log.debug("Recommendations enrichment failed:", err),
+    log.warn("Recommendations enrichment failed:", err),
   );
   syncTitleArt(titleId, posterPath, backdropPath, type).catch((err) =>
-    log.debug("Cache/thumbhash failed:", err),
+    log.warn("Cache/thumbhash failed:", err),
   );
-  refreshCredits(titleId).catch((err) => log.debug("Credits enrichment failed:", err));
-  refreshTrailer(titleId).catch((err) => log.debug("Trailer enrichment failed:", err));
+  refreshCredits(titleId).catch((err) => log.warn("Credits enrichment failed:", err));
+  refreshTrailer(titleId).catch((err) => log.warn("Trailer enrichment failed:", err));
 }
 
 type ImportResult = ReturnType<typeof _getOrFetchTitleByTmdbId>;

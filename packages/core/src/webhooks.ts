@@ -6,9 +6,10 @@ import {
   updateIntegrationLastEvent,
 } from "@sofa/db/queries/webhooks";
 import { createLogger } from "@sofa/logger";
+import { getTvDetails } from "@sofa/tmdb/client";
 
 import { resolveMovieTmdbId, resolveShowTmdbId } from "./imports/resolve";
-import { getOrFetchTitleByTmdbId } from "./metadata";
+import { getOrFetchTitleByTmdbId, refreshTvChildren } from "./metadata";
 import { logEpisodeWatch, logMovieWatch } from "./tracking";
 
 const log = createLogger("webhooks");
@@ -265,7 +266,18 @@ export async function processWebhook(
       }
 
       // Find the episode in our DB
-      const season = findSeasonByTitleAndNumber(title.id, resolved.seasonNumber);
+      let season = findSeasonByTitleAndNumber(title.id, resolved.seasonNumber);
+
+      if (!season) {
+        // Season might be newly released — try refreshing from TMDB
+        try {
+          const show = await getTvDetails(resolved.showTmdbId);
+          await refreshTvChildren(title.id, resolved.showTmdbId, show.number_of_seasons);
+          season = findSeasonByTitleAndNumber(title.id, resolved.seasonNumber);
+        } catch (err) {
+          log.warn(`Failed to refresh seasons for TMDB ${resolved.showTmdbId}:`, err);
+        }
+      }
 
       if (!season) {
         logEvent(connectionId, event, "error", `Season ${resolved.seasonNumber} not found`);

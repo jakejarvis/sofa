@@ -1,3 +1,5 @@
+import { ORPCError } from "@orpc/server";
+
 import { type ImportJob, NormalizedImportSchema } from "@sofa/api/schemas";
 import {
   getImportJob,
@@ -254,11 +256,11 @@ export function readImportJob(jobId: string, userId?: string): ImportJob {
   const row = getImportJob(jobId);
 
   if (!row) {
-    throw new Error(`Import job ${jobId} not found`);
+    throw new ORPCError("NOT_FOUND", { message: `Import job ${jobId} not found` });
   }
 
   if (userId && row.userId !== userId) {
-    throw new Error("Not authorized");
+    throw new ORPCError("FORBIDDEN", { message: "Not authorized" });
   }
 
   return {
@@ -285,18 +287,33 @@ export async function processImportJob(jobId: string): Promise<void> {
   const row = getImportJob(jobId);
 
   if (!row) {
-    throw new Error(`Import job ${jobId} not found`);
+    log.error(`Import job ${jobId} not found`);
+    return;
   }
 
   let rawPayload: unknown;
   try {
     rawPayload = JSON.parse(row.payload);
   } catch {
-    throw new Error(`Import job ${jobId} has invalid JSON payload`);
+    updateImportJobProgress(jobId, {
+      status: "error",
+      finishedAt: new Date(),
+      errors: JSON.stringify([`Import job ${jobId} has invalid JSON payload`]),
+      currentMessage: "Import failed",
+    });
+    log.error(`Import job ${jobId} has invalid JSON payload`);
+    return;
   }
   const parsed = NormalizedImportSchema.safeParse(rawPayload);
   if (!parsed.success) {
-    throw new Error(`Import job ${jobId} has malformed payload: ${parsed.error.message}`);
+    updateImportJobProgress(jobId, {
+      status: "error",
+      finishedAt: new Date(),
+      errors: JSON.stringify([`Malformed payload: ${parsed.error.message}`]),
+      currentMessage: "Import failed",
+    });
+    log.error(`Import job ${jobId} has malformed payload: ${parsed.error.message}`);
+    return;
   }
   const data = parsed.data;
   const result: ImportResult = {
@@ -340,6 +357,18 @@ export async function processImportJob(jobId: string): Promise<void> {
         totalItems: 0,
         warnings: JSON.stringify(result.warnings),
       });
+      return;
+    }
+
+    // Check if the job was cancelled while we were preparing
+    const preStartStatus = getImportJobStatus(jobId);
+    if (preStartStatus?.status === "cancelled") {
+      updateImportJobProgress(jobId, {
+        finishedAt: new Date(),
+        totalItems: total,
+        currentMessage: "Import cancelled",
+      });
+      log.info(`Import job ${jobId} was cancelled before processing started`);
       return;
     }
 
