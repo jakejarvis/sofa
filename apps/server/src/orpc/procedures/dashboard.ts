@@ -98,6 +98,7 @@ export const upcoming = os.dashboard.upcoming.use(authed).handler(({ input, cont
     items: result.items.map((item) => ({
       ...item,
       posterPath: tmdbImageUrl(item.posterPath, "posters"),
+      backdropPath: tmdbImageUrl(item.backdropPath, "backdrops"),
       streamingProvider: item.streamingProvider
         ? {
             ...item.streamingProvider,

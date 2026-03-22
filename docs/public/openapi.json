@@ -2958,6 +2958,28 @@
                             ],
                             "description": "ThumbHash blur placeholder"
                           },
+                          "backdropPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Backdrop image path"
+                          },
+                          "backdropThumbHash": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "ThumbHash blur placeholder for backdrop"
+                          },
                           "seasonNumber": {
                             "anyOf": [
                               {
@@ -3055,6 +3077,8 @@
                           "titleType",
                           "posterPath",
                           "posterThumbHash",
+                          "backdropPath",
+                          "backdropThumbHash",
                           "seasonNumber",
                           "episodeNumber",
                           "episodeName",

@@ -11,7 +11,7 @@
       "@orpc/client": "1.13.9",
       "@orpc/contract": "1.13.9",
       "@orpc/tanstack-query": "1.13.9",
-      "@tanstack/react-query": "5.91.3",
+      "@tanstack/react-query": "5.94.5",
       "@types/bun": "1.3.11",
       "@types/node": "25.5.0",
       "@types/react": "19.2.14",
@@ -44,6 +44,7 @@
     "format:check": "turbo run format:check",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
+    "clean": "rm -rf .turbo \"apps/*/.turbo\" \"apps/*/node_modules\" \"apps/*/*.tsbuildinfo\" \"packages/*/.turbo\" \"packages/*/node_modules\" \"packages/*/*.tsbuildinfo\" node_modules bun.lock",
     "generate:openapi": "bun scripts/generate-openapi-spec.ts && cd docs && bun run generate:api-docs",
     "i18n:extract": "lingui extract",
     "i18n:claude": "bun packages/i18n/scripts/claude.ts"

@@ -567,6 +567,8 @@ export const UpcomingItemSchema = z
     titleType: z.enum(["movie", "tv"]).describe("Media type"),
     posterPath: z.string().nullable().describe("Poster image path"),
     posterThumbHash: z.string().nullable().describe("ThumbHash blur placeholder"),
+    backdropPath: z.string().nullable().describe("Backdrop image path"),
+    backdropThumbHash: z.string().nullable().describe("ThumbHash blur placeholder for backdrop"),
     seasonNumber: z.number().nullable().describe("Season number (TV only)"),
     episodeNumber: z.number().nullable().describe("Episode number (TV only)"),
     episodeName: z.string().nullable().describe("Episode title (TV only)"),

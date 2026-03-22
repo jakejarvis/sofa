@@ -3,12 +3,22 @@ import { msg, plural } from "@lingui/core/macro";
 import { client, orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { toast } from "@/lib/toast";
+import { refreshWidgets } from "@/lib/widgets";
 import { i18n } from "@sofa/i18n";
+
+let widgetRefreshTimer: ReturnType<typeof setTimeout> | null = null;
 
 /** Invalidate title + dashboard queries. Used by most title mutations. */
 export function invalidateTitleQueries() {
   queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
   queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
+
+  // Debounce widget refresh to batch rapid mutations (e.g. watching multiple episodes)
+  if (widgetRefreshTimer) clearTimeout(widgetRefreshTimer);
+  widgetRefreshTimer = setTimeout(() => {
+    void refreshWidgets();
+    widgetRefreshTimer = null;
+  }, 2000);
 }
 
 /**

@@ -26,6 +26,7 @@ import { Uniwind, useResolveClassNames } from "uniwind";
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-banner";
 import { useServerConnection } from "@/hooks/use-server-connection";
+import { useWidgetRefresh } from "@/hooks/use-widget-refresh";
 import { initLocale } from "@/lib/i18n";
 import { applyTrackingTransparency, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
@@ -118,6 +119,9 @@ function AppContent() {
       SplashScreen.hideAsync();
     }
   }, [isPending, hasServerUrl, isLocaleReady]);
+
+  // Refresh iOS home screen widgets on foreground and when session becomes ready
+  useWidgetRefresh(!!session);
 
   return (
     <ThemeProvider value={sofaTheme}>

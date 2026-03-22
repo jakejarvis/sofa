@@ -23,6 +23,14 @@
       "package": "com.jakejarvis.sofa"
     },
     "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "16.2"
+          }
+        }
+      ],
       "expo-router",
       "expo-secure-store",
       [
@@ -104,6 +112,27 @@
         "expo-tracking-transparency",
         {
           "userTrackingPermission": "This identifier will be used to measure app performance and improve your experience."
+        }
+      ],
+      [
+        "expo-widgets",
+        {
+          "groupIdentifier": "group.com.jakejarvis.sofa",
+          "bundleIdentifier": "com.jakejarvis.sofa.ExpoWidgetsTarget",
+          "widgets": [
+            {
+              "name": "ContinueWatching",
+              "displayName": "Continue Watching",
+              "description": "Your in-progress TV shows and movies",
+              "supportedFamilies": ["systemSmall"]
+            },
+            {
+              "name": "Upcoming",
+              "displayName": "Upcoming",
+              "description": "Upcoming episodes and movie releases",
+              "supportedFamilies": ["systemSmall"]
+            }
+          ]
         }
       ]
     ],

@@ -323,6 +323,8 @@ export function getUpcomingEpisodes(userId: string, fromDate: string, toDate: st
       titleName: titles.title,
       posterPath: titles.posterPath,
       posterThumbHash: titles.posterThumbHash,
+      backdropPath: titles.backdropPath,
+      backdropThumbHash: titles.backdropThumbHash,
       seasonNumber: seasons.seasonNumber,
       episodeNumber: episodes.episodeNumber,
       episodeName: episodes.name,
@@ -348,6 +350,8 @@ export function getUpcomingMovies(userId: string, fromDate: string, toDate: stri
       titleName: titles.title,
       posterPath: titles.posterPath,
       posterThumbHash: titles.posterThumbHash,
+      backdropPath: titles.backdropPath,
+      backdropThumbHash: titles.backdropThumbHash,
       releaseDate: titles.releaseDate,
       userStatus: userTitleStatus.status,
     })

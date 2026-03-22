@@ -359,6 +359,8 @@ export interface UpcomingItem {
   titleType: "movie" | "tv";
   posterPath: string | null;
   posterThumbHash: string | null;
+  backdropPath: string | null;
+  backdropThumbHash: string | null;
   seasonNumber: number | null;
   episodeNumber: number | null;
   episodeName: string | null;
@@ -526,6 +528,8 @@ export function getUpcomingFeed(
         titleType: "tv",
         posterPath: r.posterPath,
         posterThumbHash: r.posterThumbHash,
+        backdropPath: r.backdropPath ?? null,
+        backdropThumbHash: r.backdropThumbHash ?? null,
         seasonNumber: r.seasonNumber,
         episodeNumber: r.episodeNumber,
         episodeName: isCollapsed ? null : r.episodeName,
@@ -547,6 +551,8 @@ export function getUpcomingFeed(
       titleType: "movie",
       posterPath: r.posterPath,
       posterThumbHash: r.posterThumbHash,
+      backdropPath: r.backdropPath ?? null,
+      backdropThumbHash: r.backdropThumbHash ?? null,
       seasonNumber: null,
       episodeNumber: null,
       episodeName: null,
