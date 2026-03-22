@@ -5,7 +5,7 @@ import { resolveUrl } from "@/lib/server";
 import type { ContinueWatchingProps } from "@/widgets/continue-watching";
 import type { UpcomingProps } from "@/widgets/upcoming";
 
-import { copyBundledAsset, downloadWidgetImage } from "../../modules/widget-images";
+import { copyBundledAsset, downloadWidgetImage } from "../../modules/sofa-widgets-support";
 
 /** Resolve a potentially-relative image path to an absolute URL and download it. */
 async function downloadImage(path: string | null, key: string): Promise<string | null> {

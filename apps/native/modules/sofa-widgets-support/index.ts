@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 
 function getModule() {
-  return require("./src/WidgetImagesModule").default;
+  return require("./src/SofaWidgetsSupportModule").default;
 }
 
 export async function downloadWidgetImage(url: string, key: string): Promise<string | null> {

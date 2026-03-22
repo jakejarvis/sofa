@@ -4,9 +4,9 @@ import UIKit
 private let groupIdentifier = "group.com.jakejarvis.sofa"
 private let imageDirectory = "widget_images"
 
-public class WidgetImagesModule: Module {
+public class SofaWidgetsSupportModule: Module {
   public func definition() -> ModuleDefinition {
-    Name("WidgetImages")
+    Name("SofaWidgetsSupport")
 
     AsyncFunction("downloadWidgetImage") { (url: String, key: String) -> String? in
       guard let imageUrl = URL(string: url) else {
