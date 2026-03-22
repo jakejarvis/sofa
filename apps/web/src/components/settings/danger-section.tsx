@@ -2,6 +2,7 @@ import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconDatabase, IconPhoto, IconTrash } from "@tabler/icons-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -30,6 +31,9 @@ function formatBytes(bytes: number): string {
 export function CacheSection() {
   const { t } = useLingui();
   const queryClient = useQueryClient();
+  const [metadataOpen, setMetadataOpen] = useState(false);
+  const [imagesOpen, setImagesOpen] = useState(false);
+  const [allOpen, setAllOpen] = useState(false);
 
   const invalidateHealth = () =>
     queryClient.invalidateQueries({ queryKey: orpc.admin.systemHealth.key() });
@@ -37,6 +41,7 @@ export function CacheSection() {
   const purgeMetadata = useMutation(
     orpc.admin.purgeMetadataCache.mutationOptions({
       onSuccess: (data) => {
+        setMetadataOpen(false);
         toast.success(
           t`Purged ${plural(data.deletedTitles, { one: "# stale title", other: "# stale titles" })} and ${plural(data.deletedPersons, { one: "# orphaned person", other: "# orphaned persons" })}`,
         );
@@ -49,6 +54,7 @@ export function CacheSection() {
   const purgeImages = useMutation(
     orpc.admin.purgeImageCache.mutationOptions({
       onSuccess: (data) => {
+        setImagesOpen(false);
         const freed = formatBytes(data.freedBytes);
         toast.success(
           t`Deleted ${plural(data.deletedFiles, { one: "# file", other: "# files" })}, freed ${freed}`,
@@ -63,6 +69,7 @@ export function CacheSection() {
     mutationFn: () =>
       Promise.all([client.admin.purgeMetadataCache(), client.admin.purgeImageCache()]),
     onSuccess: ([metaResult, imageResult]) => {
+      setAllOpen(false);
       const freed = formatBytes(imageResult.freedBytes);
       toast.success(
         t`Purged ${plural(metaResult.deletedTitles, { one: "# title", other: "# titles" })}, ${plural(metaResult.deletedPersons, { one: "# person", other: "# persons" })}, ${plural(imageResult.deletedFiles, { one: "# file", other: "# files" })} (${freed} freed)`,
@@ -90,7 +97,7 @@ export function CacheSection() {
 
           <div className="mt-4 flex flex-wrap gap-2">
             {/* Purge metadata */}
-            <AlertDialog>
+            <AlertDialog open={metadataOpen} onOpenChange={setMetadataOpen}>
               <AlertDialogTrigger render={<Button variant="outline" disabled={disabled} />}>
                 {purgeMetadata.isPending ? (
                   <Spinner className="size-3" />
@@ -117,10 +124,15 @@ export function CacheSection() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>
+                  <AlertDialogCancel disabled={purgeMetadata.isPending}>
                     <Trans>Cancel</Trans>
                   </AlertDialogCancel>
-                  <AlertDialogAction variant="destructive" onClick={() => purgeMetadata.mutate()}>
+                  <AlertDialogAction
+                    variant="destructive"
+                    disabled={purgeMetadata.isPending}
+                    onClick={() => purgeMetadata.mutate()}
+                  >
+                    {purgeMetadata.isPending && <Spinner className="size-3" />}
                     <Trans>Purge metadata</Trans>
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -128,7 +140,7 @@ export function CacheSection() {
             </AlertDialog>
 
             {/* Purge images */}
-            <AlertDialog>
+            <AlertDialog open={imagesOpen} onOpenChange={setImagesOpen}>
               <AlertDialogTrigger render={<Button variant="outline" disabled={disabled} />}>
                 {purgeImages.isPending ? (
                   <Spinner className="size-3" />
@@ -150,10 +162,15 @@ export function CacheSection() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>
+                  <AlertDialogCancel disabled={purgeImages.isPending}>
                     <Trans>Cancel</Trans>
                   </AlertDialogCancel>
-                  <AlertDialogAction variant="destructive" onClick={() => purgeImages.mutate()}>
+                  <AlertDialogAction
+                    variant="destructive"
+                    disabled={purgeImages.isPending}
+                    onClick={() => purgeImages.mutate()}
+                  >
+                    {purgeImages.isPending && <Spinner className="size-3" />}
                     <Trans>Purge images</Trans>
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -161,7 +178,7 @@ export function CacheSection() {
             </AlertDialog>
 
             {/* Purge all */}
-            <AlertDialog>
+            <AlertDialog open={allOpen} onOpenChange={setAllOpen}>
               <AlertDialogTrigger render={<Button variant="destructive" disabled={disabled} />}>
                 {purgeAll.isPending ? (
                   <Spinner className="size-3" />
@@ -183,10 +200,15 @@ export function CacheSection() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>
+                  <AlertDialogCancel disabled={purgeAll.isPending}>
                     <Trans>Cancel</Trans>
                   </AlertDialogCancel>
-                  <AlertDialogAction variant="destructive" onClick={() => purgeAll.mutate()}>
+                  <AlertDialogAction
+                    variant="destructive"
+                    disabled={purgeAll.isPending}
+                    onClick={() => purgeAll.mutate()}
+                  >
+                    {purgeAll.isPending && <Spinner className="size-3" />}
                     <Trans>Purge all</Trans>
                   </AlertDialogAction>
                 </AlertDialogFooter>
