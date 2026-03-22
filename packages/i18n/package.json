@@ -25,6 +25,7 @@
     "@lingui/conf": "catalog:",
     "@lingui/format-po": "catalog:",
     "@types/bun": "catalog:",
+    "react": "catalog:",
     "typescript": "catalog:"
   }
 }

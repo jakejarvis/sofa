@@ -36,6 +36,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@orpc/server": "catalog:",
     "@sofa/api": "workspace:*",
     "@sofa/config": "workspace:*",
     "@sofa/db": "workspace:*",

@@ -36,22 +36,7 @@ export const backupsCreate = os.admin.backups.create.use(admin).handler(async ()
 });
 
 export const backupsDelete = os.admin.backups.delete.use(admin).handler(async ({ input }) => {
-  try {
-    await deleteBackup(input.filename);
-  } catch (err) {
-    if (err instanceof ORPCError) throw err;
-    const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes("not found")) {
-      throw new ORPCError("NOT_FOUND", {
-        message: msg,
-        data: { code: AppErrorCode.BACKUP_NOT_FOUND },
-      });
-    }
-    throw new ORPCError("BAD_REQUEST", {
-      message: msg,
-      data: { code: AppErrorCode.BACKUP_DELETE_FAILED },
-    });
-  }
+  await deleteBackup(input.filename);
 });
 
 export const backupsRestore = os.admin.backups.restore

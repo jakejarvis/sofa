@@ -2,6 +2,9 @@ import { renameSync, unlinkSync } from "node:fs";
 import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 
+import { ORPCError } from "@orpc/server";
+
+import { AppErrorCode } from "@sofa/api/errors";
 import { BACKUP_DIR, DATABASE_URL } from "@sofa/config";
 import {
   closeDatabase,
@@ -131,12 +134,18 @@ export async function listBackups(): Promise<BackupInfo[]> {
 
 async function deleteBackupInternal(filename: string): Promise<void> {
   if (!isValidBackupFilename(filename)) {
-    throw new Error("Invalid backup filename");
+    throw new ORPCError("BAD_REQUEST", {
+      message: "Invalid backup filename",
+      data: { code: AppErrorCode.BACKUP_DELETE_FAILED },
+    });
   }
 
   const filePath = path.join(BACKUP_DIR, filename);
   if (!(await Bun.file(filePath).exists())) {
-    throw new Error("Backup not found");
+    throw new ORPCError("NOT_FOUND", {
+      message: "Backup not found",
+      data: { code: AppErrorCode.BACKUP_NOT_FOUND },
+    });
   }
 
   await Bun.file(filePath).delete();
