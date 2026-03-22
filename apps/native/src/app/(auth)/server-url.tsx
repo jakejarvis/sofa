@@ -21,6 +21,8 @@ import { Input } from "@/components/ui/text-field";
 import { getServerUrl, serverManager, type ValidationError } from "@/lib/server";
 import * as Haptics from "@/utils/haptics";
 
+const TRAILING_SLASHES_RE = /\/+$/;
+
 type ConnectionState =
   | { phase: "idle" }
   | { phase: "connecting" }
@@ -91,14 +93,12 @@ export default function ServerUrlScreen() {
   };
 
   const handleConnect = async () => {
-    const trimmed = url.trim().replace(/\/+$/, "");
+    const trimmed = url.trim().replace(TRAILING_SLASHES_RE, "");
     if (!trimmed) return;
 
     const fullUrl = serverManager.normalizeUrl(trimmed);
 
-    try {
-      new URL(fullUrl);
-    } catch {
+    if (!URL.canParse(fullUrl)) {
       setConnection({ phase: "error", error: "invalid_url" });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
@@ -122,16 +122,8 @@ export default function ServerUrlScreen() {
 
   const isConnecting = connection.phase === "connecting";
   const isSuccess = connection.phase === "success";
-  const trimmedUrl = url.trim().replace(/\/+$/, "");
-  const isValidUrl = (() => {
-    if (!trimmedUrl) return false;
-    try {
-      new URL(serverManager.normalizeUrl(trimmedUrl));
-      return true;
-    } catch {
-      return false;
-    }
-  })();
+  const trimmedUrl = url.trim().replace(TRAILING_SLASHES_RE, "");
+  const isValidUrl = !!trimmedUrl && URL.canParse(serverManager.normalizeUrl(trimmedUrl));
   const isDisabled = isConnecting || isSuccess;
 
   return (

@@ -14,7 +14,6 @@ import { orpc } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_app/dashboard")({
   staleTime: 30_000,
-  head: () => ({ meta: [{ title: "Dashboard — Sofa" }] }),
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.ensureQueryData(orpc.dashboard.stats.queryOptions()),
@@ -33,6 +32,7 @@ export const Route = createFileRoute("/_app/dashboard")({
       ),
     ]);
   },
+  head: () => ({ meta: [{ title: "Dashboard — Sofa" }] }),
   pendingComponent: DashboardSkeleton,
   component: DashboardPage,
 });

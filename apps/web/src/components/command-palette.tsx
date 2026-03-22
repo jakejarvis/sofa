@@ -49,6 +49,8 @@ const SHORTCUT_DESCRIPTIONS = [
   { scope: "Global", description: "Keyboard shortcuts", keys: ["?"] },
   { scope: "Navigation", description: "Go to dashboard", keys: ["g", "h"] },
   { scope: "Navigation", description: "Go to explore", keys: ["g", "e"] },
+  { scope: "Navigation", description: "Go to upcoming", keys: ["g", "u"] },
+  { scope: "Navigation", description: "Go to settings", keys: ["g", "s"] },
   { scope: "Title", description: "Cycle status", keys: ["w"] },
   { scope: "Title", description: "Mark watched", keys: ["m"] },
   { scope: "Title", description: "Go back", keys: ["Escape"] },
@@ -95,8 +97,19 @@ export function CommandPalette() {
   const results: SearchResult[] = searchData?.results?.slice(0, 8) ?? [];
   const enabled = !commandPaletteOpen;
 
-  useHotkey("Mod+K", () => setCommandPaletteOpen((prev) => !prev));
-  useHotkey("/", () => setCommandPaletteOpen(true), { enabled });
+  const handleOpenChange = useCallback(
+    (open: boolean | ((prev: boolean) => boolean)) => {
+      setCommandPaletteOpen((prev) => {
+        const next = typeof open === "function" ? open(prev) : open;
+        if (next) setQuery("");
+        return next;
+      });
+    },
+    [setCommandPaletteOpen],
+  );
+
+  useHotkey("Mod+K", () => handleOpenChange((prev) => !prev));
+  useHotkey("/", () => handleOpenChange(true), { enabled });
   useHotkey({ key: "?", shift: true }, () => setHelpOpen(true), { enabled });
   useHotkeySequence(
     ["G", "H"],
@@ -112,13 +125,20 @@ export function CommandPalette() {
     },
     { enabled, timeout: 500 },
   );
-
-  // Reset query when palette opens
-  useEffect(() => {
-    if (commandPaletteOpen) {
-      setQuery("");
-    }
-  }, [commandPaletteOpen]);
+  useHotkeySequence(
+    ["G", "U"],
+    () => {
+      void navigate({ to: "/upcoming" });
+    },
+    { enabled, timeout: 500 },
+  );
+  useHotkeySequence(
+    ["G", "S"],
+    () => {
+      void navigate({ to: "/settings" });
+    },
+    { enabled, timeout: 500 },
+  );
 
   // Save to recent searches after user stops typing for a while
   const saveTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
@@ -170,7 +190,7 @@ export function CommandPalette() {
 
   return (
     <>
-      <Dialog open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen}>
+      <Dialog open={commandPaletteOpen} onOpenChange={handleOpenChange}>
         <DialogHeader className="sr-only">
           <DialogTitle>Command Palette</DialogTitle>
           <DialogDescription>

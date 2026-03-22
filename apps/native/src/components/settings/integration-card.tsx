@@ -124,7 +124,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
     setCopied(true);
     toast.success(t`URL copied to clipboard`);
     if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
-    copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
+    copiedTimerRef.current = setTimeout(setCopied, 2000, false);
   }, [url, t]);
 
   const handleRegenerate = useCallback(() => {

@@ -98,8 +98,12 @@ export function AccountSection({
   });
   const initial = displayName?.charAt(0).toUpperCase() ?? "?";
 
-  const uploadAvatarMutation = useMutation(
-    orpc.account.uploadAvatar.mutationOptions({
+  const uploadAvatarMutation = useMutation(orpc.account.uploadAvatar.mutationOptions());
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    uploadAvatarMutation.mutate(file, {
       onSuccess: (data) => {
         setAvatarUrl(data.imageUrl);
         toast.success(t`Profile picture updated`);
@@ -111,13 +115,7 @@ export function AccountSection({
       onSettled: () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
       },
-    }),
-  );
-
-  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    uploadAvatarMutation.mutate(file);
+    });
   }
 
   const removeAvatarMutation = useMutation(
@@ -579,7 +577,7 @@ function SofaImportDialog() {
                 <>
                   <DialogHeader>
                     <DialogTitle>
-                      <Trans>Import Sofa export</Trans>
+                      <Trans>Import Sofa data</Trans>
                     </DialogTitle>
                     <DialogDescription>
                       <Trans>Review what was found and choose what to import.</Trans>

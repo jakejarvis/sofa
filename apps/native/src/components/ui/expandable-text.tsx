@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import type { NativeSyntheticEvent, TextLayoutEventData } from "react-native";
 import { Platform, Pressable, View } from "react-native";
 
@@ -15,14 +15,15 @@ export function ExpandableText({
   actionColor?: string;
 }) {
   const { t } = useLingui();
-  const prevTextRef = useRef(text);
-  let expanded: boolean;
-  let needsTruncation: boolean;
+  const [prevText, setPrevText] = useState(text);
   const [expandedState, setExpanded] = useState(false);
   const [needsTruncationState, setNeedsTruncation] = useState(false);
 
-  if (prevTextRef.current !== text) {
-    prevTextRef.current = text;
+  let expanded: boolean;
+  let needsTruncation: boolean;
+
+  if (prevText !== text) {
+    setPrevText(text);
     setExpanded(false);
     setNeedsTruncation(false);
     expanded = false;

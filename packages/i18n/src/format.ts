@@ -1,8 +1,10 @@
 import { i18n } from "./index";
 
+const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 /** Whether a string looks like a date-only value (no time component). */
 function isDateOnly(value: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value);
+  return DATE_ONLY_RE.test(value);
 }
 
 function toDate(date: Date | string): Date {

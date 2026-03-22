@@ -224,7 +224,7 @@ export async function cacheProviderLogos(titleId: string) {
     }
   }
   const checks = await Promise.all(
-    [...uniqueLogos.entries()].map(async ([basename, logoPath]) => ({
+    Array.from(uniqueLogos.entries(), async ([basename, logoPath]) => ({
       logoPath,
       cached: await isImageCached("logos", basename),
     })),
@@ -248,7 +248,7 @@ export async function cacheProfilePhotos(titleId: string) {
     }
   }
   const checks = await Promise.all(
-    [...uniqueProfiles.entries()].map(async ([basename, profilePath]) => ({
+    Array.from(uniqueProfiles.entries(), async ([basename, profilePath]) => ({
       profilePath,
       cached: await isImageCached("profiles", basename),
     })),

@@ -12,7 +12,6 @@ import { orpc } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_app/explore")({
   staleTime: 60_000,
-  head: () => ({ meta: [{ title: "Explore — Sofa" }] }),
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.ensureInfiniteQueryData(
@@ -37,6 +36,7 @@ export const Route = createFileRoute("/_app/explore")({
       ),
     ]);
   },
+  head: () => ({ meta: [{ title: "Explore — Sofa" }] }),
   pendingComponent: ExploreSkeletons,
   component: ExplorePage,
 });

@@ -47,13 +47,15 @@ const SERVER_URL_KEY = "sofa_server_url";
 const SERVERS_MAP_KEY = "sofa_servers";
 const CURRENT_INSTANCE_KEY = "sofa_current_instance_id";
 const DEFAULT_URL = process.env.EXPO_PUBLIC_SERVER_URL ?? "https://sofa.example.com";
+const TRAILING_SLASHES_RE = /\/+$/;
+const PROTOCOL_RE = /^(https?:\/\/)(.*)/;
 
 // ---------------------------------------------------------------------------
 // URL helpers
 // ---------------------------------------------------------------------------
 
 export function normalizeUrl(input: string): string {
-  let url = input.trim().replace(/\/+$/, "");
+  let url = input.trim().replace(TRAILING_SLASHES_RE, "");
   if (url && !url.includes("://")) {
     url = `http://${url}`;
   }
@@ -61,7 +63,7 @@ export function normalizeUrl(input: string): string {
 }
 
 export function splitUrl(input: string): { protocol: string; host: string } {
-  const match = input.match(/^(https?:\/\/)(.*)/);
+  const match = input.match(PROTOCOL_RE);
   if (match) {
     return { protocol: match[1], host: match[2] };
   }
@@ -85,7 +87,7 @@ export function getServerUrl(): string {
 }
 
 function setServerUrlInternal(url: string): void {
-  const normalized = url.replace(/\/+$/, "");
+  const normalized = url.replace(TRAILING_SLASHES_RE, "");
   globalStorage.set(SERVER_URL_KEY, normalized);
 }
 
@@ -157,13 +159,7 @@ export async function ensureInstanceId(): Promise<string | null> {
 export async function validateServerUrl(url: string): Promise<ValidationResult> {
   const normalized = normalizeUrl(url);
 
-  if (!normalized || !normalized.includes("://")) {
-    return { status: "error", error: "invalid_url" };
-  }
-
-  try {
-    new URL(normalized);
-  } catch {
+  if (!normalized || !normalized.includes("://") || !URL.canParse(normalized)) {
     return { status: "error", error: "invalid_url" };
   }
 
@@ -309,9 +305,14 @@ export function startReachabilityMonitor(): () => void {
 
 export function useServerReachability() {
   const [reachable, setReachableState] = useState(isReachable);
+  const [prevReachable, setPrevReachable] = useState(isReachable);
+
+  if (isReachable !== prevReachable) {
+    setPrevReachable(isReachable);
+    setReachableState(isReachable);
+  }
 
   useEffect(() => {
-    setReachableState(isReachable);
     return onServerReachabilityChange(setReachableState);
   }, []);
 

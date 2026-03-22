@@ -10,7 +10,7 @@ export function CopyButton({ code }: { code: string }) {
   function handleCopy() {
     navigator.clipboard.writeText(code);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(setCopied, 2000, false);
   }
 
   return (

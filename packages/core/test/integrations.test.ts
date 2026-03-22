@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { clearAllTables, insertUser } from "@sofa/test/db";
 
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}T/;
+
 import {
   createOrUpdateIntegration,
   deleteIntegration,
@@ -82,7 +84,7 @@ describe("listUserIntegrations", () => {
   test("serializes dates as ISO strings", () => {
     createOrUpdateIntegration("user-1", "plex");
     const result = listUserIntegrations("user-1");
-    expect(result.integrations[0].createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(result.integrations[0].createdAt).toMatch(ISO_DATE_RE);
   });
 });
 

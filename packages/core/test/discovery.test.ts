@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   clearAllTables,
@@ -23,6 +23,17 @@ import {
   getWatchCount,
   getWatchHistory,
 } from "../src/discovery";
+
+const TEST_NOW = new Date("2026-03-01T12:00:00Z");
+
+beforeAll(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(TEST_NOW);
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 beforeEach(() => {
   clearAllTables();
@@ -56,7 +67,7 @@ describe("getWatchCount", () => {
     insertUser();
     insertTitle({ id: "m1", tmdbId: 1 });
     // Watch from 2 years ago
-    const oldDate = new Date();
+    const oldDate = new Date(TEST_NOW);
     oldDate.setFullYear(oldDate.getFullYear() - 2);
     insertMovieWatch("user-1", "m1", oldDate);
 

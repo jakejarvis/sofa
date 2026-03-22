@@ -78,11 +78,11 @@ const envSnippets = [
 ];
 
 export const Route = createFileRoute("/setup")({
-  head: () => ({ meta: [{ title: "Setup — Sofa" }] }),
   beforeLoad: async () => {
     const info = await client.system.publicInfo({});
     if (info.tmdbConfigured) throw redirect({ to: "/" });
   },
+  head: () => ({ meta: [{ title: "Setup — Sofa" }] }),
   component: SetupPage,
 });
 

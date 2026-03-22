@@ -80,7 +80,7 @@ export function getJobSchedules(): {
   pattern: string;
   nextRunAt: string | null;
 }[] {
-  return Array.from(jobs.entries()).map(([name, cron]) => ({
+  return Array.from(jobs.entries(), ([name, cron]) => ({
     jobName: name,
     pattern: cron.getPattern() ?? "",
     nextRunAt: cron.nextRun()?.toISOString() ?? null,

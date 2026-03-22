@@ -7,6 +7,7 @@ import { z } from "zod";
 import { getImporter, getImporterConfig } from "./importers";
 
 const GITHUB_RELEASES_URL = "https://api.github.com/repos/jakejarvis/sofa/releases/latest";
+const VERSION_PREFIX_RE = /^v/;
 
 const app = new Hono();
 
@@ -36,7 +37,7 @@ app.get("/v1/version", async (c) => {
     c.header("Cache-Control", "public, s-maxage=900, stale-while-revalidate=3600");
 
     return c.json({
-      version: data.tag_name.replace(/^v/, ""),
+      version: data.tag_name.replace(VERSION_PREFIX_RE, ""),
       release_url: data.html_url,
     });
   } catch (e) {

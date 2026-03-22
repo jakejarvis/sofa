@@ -8,6 +8,8 @@ import { createLogger } from "@sofa/logger";
 import { generateOpenApiSpec, openApiTags, schemaConverters } from "./openapi-spec";
 import { implementedRouter } from "./router";
 
+const TRAILING_SLASH_RE = /\/$/;
+
 const log = createLogger("openapi");
 
 const isSecure = (process.env.BETTER_AUTH_URL ?? "").startsWith("https://");
@@ -79,9 +81,9 @@ export const openApiHandler = new OpenAPIHandler(implementedRouter, {
   ],
   interceptors: [
     async (options) => {
-      const requestPathname = options.request.url.pathname.replace(/\/$/, "") || "/";
-      const prefix = options.prefix?.replace(/\/$/, "") || "";
-      const specPath = `${prefix}/spec.json`.replace(/\/$/, "") || "/";
+      const requestPathname = options.request.url.pathname.replace(TRAILING_SLASH_RE, "") || "/";
+      const prefix = options.prefix?.replace(TRAILING_SLASH_RE, "") || "";
+      const specPath = `${prefix}/spec.json`.replace(TRAILING_SLASH_RE, "") || "/";
 
       if (options.request.method !== "GET" || requestPathname !== specPath) {
         return options.next();

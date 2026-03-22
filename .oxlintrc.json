@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["oxc", "eslint", "typescript", "react", "import", "unicorn", "vitest"],
-  "jsPlugins": ["eslint-plugin-lingui"],
+  "plugins": ["oxc", "eslint", "typescript", "react", "import", "unicorn", "vitest", "jsx-a11y"],
+  "jsPlugins": ["@e18e/eslint-plugin"],
   "env": {
     "builtin": true
   },
@@ -15,6 +15,7 @@
     "react/style-prop-object": "off",
     "import/no-unassigned-import": "off",
     "import/no-named-as-default-member": "off",
+    "oxc/no-barrel-file": ["warn", { "threshold": 0 }],
     "unicorn/no-array-sort": "off",
     "unicorn/consistent-function-scoping": "off",
     "no-new": "off",
@@ -22,20 +23,22 @@
     "react/no-array-index-key": "off",
     "react/jsx-no-useless-fragment": "error",
     "react/rules-of-hooks": "error",
-    "lingui/no-unlocalized-strings": "off",
-    "lingui/t-call-in-function": "error",
-    "lingui/no-single-variables-to-translate": "error",
-    "lingui/no-expression-in-message": "error",
-    "lingui/no-single-tag-to-translate": "error",
-    "lingui/no-trans-inside-trans": "error"
+    "e18e/prefer-array-at": "error",
+    "e18e/prefer-array-fill": "error",
+    "e18e/prefer-array-from-map": "error",
+    "e18e/prefer-array-some": "error",
+    "e18e/prefer-array-to-reversed": "error",
+    "e18e/prefer-array-to-sorted": "error",
+    "e18e/prefer-array-to-spliced": "error",
+    "e18e/prefer-date-now": "error",
+    "e18e/prefer-includes": "error",
+    "e18e/prefer-nullish-coalescing": "error",
+    "e18e/prefer-object-has-own": "error",
+    "e18e/prefer-regex-test": "error",
+    "e18e/prefer-spread-syntax": "off",
+    "e18e/prefer-static-regex": "error",
+    "e18e/prefer-timer-args": "error",
+    "e18e/prefer-url-canparse": "error"
   },
-  "overrides": [
-    {
-      "files": ["apps/web/src/**/*", "apps/native/src/**/*"],
-      "rules": {
-        "lingui/no-unlocalized-strings": "warn"
-      }
-    }
-  ],
   "ignorePatterns": ["node_modules", "dist", "build", "docs", "**/routeTree.gen.ts"]
 }

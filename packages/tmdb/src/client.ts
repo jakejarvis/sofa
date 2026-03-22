@@ -111,6 +111,7 @@ function getApiKey() {
 const DEFAULT_TMDB_BASE = "https://api.themoviedb.org/3";
 const configuredBase = process.env.TMDB_API_BASE_URL || DEFAULT_TMDB_BASE;
 const isCustomBase = configuredBase !== DEFAULT_TMDB_BASE;
+const TMDB_VERSION_PREFIX_RE = /^\/3\//;
 const baseUrl = configuredBase.replace(/\/3\/?$/, "");
 
 const baseUrlRewriteMiddleware: Middleware | null = isCustomBase
@@ -119,7 +120,7 @@ const baseUrlRewriteMiddleware: Middleware | null = isCustomBase
         // Custom proxy: strip the /3 prefix from schema paths so requests
         // go to e.g. https://tmdb.internal/search/multi instead of /3/search/multi
         const url = new URL(request.url);
-        url.pathname = url.pathname.replace(/^\/3\//, "/");
+        url.pathname = url.pathname.replace(TMDB_VERSION_PREFIX_RE, "/");
         return new Request(url.toString(), request);
       },
     }

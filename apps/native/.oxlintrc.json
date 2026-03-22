@@ -1,12 +1,40 @@
 {
   "$schema": "../../node_modules/oxlint/configuration_schema.json",
   "extends": ["../../.oxlintrc.json"],
-  "jsPlugins": ["@tanstack/eslint-plugin-query"],
+  "jsPlugins": [
+    "@tanstack/eslint-plugin-query",
+    "eslint-plugin-lingui",
+    { "name": "react-hooks-js", "specifier": "eslint-plugin-react-hooks" }
+  ],
   "rules": {
     "@tanstack/query/exhaustive-deps": "error",
     "@tanstack/query/no-rest-destructuring": "warn",
     "@tanstack/query/stable-query-client": "error",
-    "@tanstack/query/no-unstable-deps": "error"
+    "@tanstack/query/no-unstable-deps": "error",
+    "lingui/no-unlocalized-strings": "off",
+    "lingui/t-call-in-function": "error",
+    "lingui/no-single-variables-to-translate": "error",
+    "lingui/no-expression-in-message": "error",
+    "lingui/no-single-tag-to-translate": "error",
+    "lingui/no-trans-inside-trans": "error",
+    "react-hooks-js/rules-of-hooks": "off",
+    "react-hooks-js/exhaustive-deps": "off",
+    "react-hooks-js/static-components": "error",
+    "react-hooks-js/use-memo": "error",
+    "react-hooks-js/void-use-memo": "error",
+    "react-hooks-js/component-hook-factories": "error",
+    "react-hooks-js/preserve-manual-memoization": "error",
+    "react-hooks-js/incompatible-library": "warn",
+    "react-hooks-js/immutability": "error",
+    "react-hooks-js/globals": "error",
+    "react-hooks-js/refs": "error",
+    "react-hooks-js/set-state-in-effect": "error",
+    "react-hooks-js/error-boundaries": "error",
+    "react-hooks-js/purity": "error",
+    "react-hooks-js/set-state-in-render": "error",
+    "react-hooks-js/unsupported-syntax": "warn",
+    "react-hooks-js/config": "error",
+    "react-hooks-js/gating": "error"
   },
   "ignorePatterns": ["node_modules", ".expo/types/**/*.ts", "expo-env.d.ts", "uniwind-types.d.ts"]
 }

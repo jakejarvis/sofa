@@ -11,7 +11,6 @@ import { groupByDateBucket } from "@sofa/i18n/date-buckets";
 
 export const Route = createFileRoute("/_app/upcoming")({
   staleTime: 30_000,
-  head: () => ({ meta: [{ title: "Upcoming — Sofa" }] }),
   loader: async ({ context }) => {
     await context.queryClient.ensureInfiniteQueryData(
       orpc.dashboard.upcoming.infiniteOptions({
@@ -25,6 +24,7 @@ export const Route = createFileRoute("/_app/upcoming")({
       }),
     );
   },
+  head: () => ({ meta: [{ title: "Upcoming — Sofa" }] }),
   pendingComponent: UpcomingSkeleton,
   component: UpcomingPage,
 });

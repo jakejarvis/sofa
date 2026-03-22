@@ -70,37 +70,35 @@ function useActiveIndicator<T>(
   itemRefs: React.MutableRefObject<(HTMLElement | null)[]>,
   measure: (itemRect: DOMRect, containerRect: DOMRect) => T,
 ): { value: T | null; instant: boolean } {
-  const [value, setValue] = useState<T | null>(null);
-  const instantRef = useRef(true);
+  const [state, setState] = useState<{ value: T | null; instant: boolean }>({
+    value: null,
+    instant: true,
+  });
 
   useLayoutEffect(() => {
-    const update = () => {
-      if (activeIndex === -1) {
-        setValue(null);
-        return;
-      }
+    const computeValue = (): T | null => {
+      if (activeIndex === -1) return null;
       const item = itemRefs.current[activeIndex];
       const container = containerRef.current;
       if (item && container && container.offsetWidth > 0) {
-        setValue(measure(item.getBoundingClientRect(), container.getBoundingClientRect()));
-      } else {
-        setValue(null);
+        return measure(item.getBoundingClientRect(), container.getBoundingClientRect());
       }
+      return null;
     };
-    update();
-    // After the initial measurement, allow subsequent changes to animate
-    instantRef.current = false;
+    // Initial measurement is instant; subsequent activeIndex changes animate
+    setState({ value: computeValue(), instant: true });
+    // Use microtask to flip instant to false after the synchronous paint
+    queueMicrotask(() => setState((prev) => (prev.instant ? { ...prev, instant: false } : prev)));
     const container = containerRef.current;
     if (!container) return;
     const observer = new ResizeObserver(() => {
-      instantRef.current = true;
-      update();
+      setState({ value: computeValue(), instant: true });
     });
     observer.observe(container);
     return () => observer.disconnect();
   }, [activeIndex, containerRef, itemRefs, measure]);
 
-  return { value, instant: instantRef.current };
+  return state;
 }
 
 export function NavBar({

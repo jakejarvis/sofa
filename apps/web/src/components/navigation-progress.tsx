@@ -61,7 +61,7 @@ export function NavigationProgress() {
 
     finishTimerRef.current = setTimeout(() => {
       setVisible(false);
-      setTimeout(() => setProgress(0), 200);
+      setTimeout(setProgress, 200, 0);
     }, 200);
   });
 

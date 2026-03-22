@@ -25,7 +25,7 @@ import { reloadAppAsync } from "expo";
 import * as Application from "expo-application";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Alert,
   Linking,
@@ -69,11 +69,16 @@ export default function SettingsScreen() {
   const { push } = useRouter();
   const { data: session, refetch: refetchSession } = authClient.useSession();
   const [isEditingName, setIsEditingName] = useState(false);
-  const [nameInput, setNameInput] = useState("");
+  const sessionUserName = session?.user?.name ?? "";
+  const [nameInput, setNameInput] = useState(sessionUserName);
+  const [prevSessionName, setPrevSessionName] = useState(sessionUserName);
 
-  useEffect(() => {
-    if (!isEditingName && session?.user?.name) setNameInput(session.user.name);
-  }, [session?.user?.name, isEditingName]);
+  if (sessionUserName !== prevSessionName) {
+    setPrevSessionName(sessionUserName);
+    if (!isEditingName && sessionUserName) {
+      setNameInput(sessionUserName);
+    }
+  }
 
   const [languageModalOpen, setLanguageModalOpen] = useState(false);
   const languageLabel = LOCALE_INFO.find((o) => o.code === i18n.locale)?.nativeName ?? i18n.locale;
@@ -305,7 +310,6 @@ export default function SettingsScreen() {
                     accessibilityLabel="Display name"
                     onChangeText={setNameInput}
                     className="border-primary text-foreground min-h-10 flex-1 border-b py-2 font-sans text-base"
-                    autoFocus
                   />
                   <Pressable onPress={() => updateName.mutate({ name: nameInput })}>
                     <Text className="text-primary text-sm">

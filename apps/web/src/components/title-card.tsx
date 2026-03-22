@@ -12,7 +12,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { type MotionStyle, type MotionValue, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -85,19 +85,15 @@ function useStatusConfig() {
 function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStatus | null }) {
   const { t } = useLingui();
   const statusConfig = useStatusConfig();
-  const [addedStatus, setAddedStatus] = useState<TitleStatus | null>(userStatus ?? null);
-
-  // Sync local state when prop changes (e.g. after navigation or SWR revalidation)
-  useEffect(() => {
-    setAddedStatus(userStatus ?? null);
-  }, [userStatus]);
+  const [optimisticStatus, setOptimisticStatus] = useState<TitleStatus | null>(null);
 
   const quickAddMutation = useMutation(
     orpc.titles.quickAdd.mutationOptions({
-      onSuccess: () => setAddedStatus("in_watchlist"),
+      onSuccess: () => setOptimisticStatus("in_watchlist"),
     }),
   );
 
+  const addedStatus = optimisticStatus ?? userStatus ?? null;
   const isAdded = addedStatus != null;
   const config = addedStatus ? statusConfig[addedStatus] : null;
 
@@ -282,10 +278,17 @@ export function TitleCard({
   userStatus,
   episodeProgress,
 }: TitleCardProps) {
-  const tilt = useTiltEffect();
+  const {
+    ref: tiltRef,
+    containerStyle,
+    imageStyle,
+    glareBackground,
+    glareOpacity,
+    handlers,
+  } = useTiltEffect();
 
   const cardContent = (
-    <motion.div ref={tilt.ref} style={tilt.containerStyle} {...tilt.handlers}>
+    <motion.div ref={tiltRef} style={containerStyle} {...handlers}>
       <CardInner
         title={title}
         type={type}
@@ -296,9 +299,9 @@ export function TitleCard({
         userStatus={userStatus}
         episodeProgress={episodeProgress}
         tiltStyles={{
-          imageStyle: tilt.imageStyle,
-          glareBackground: tilt.glareBackground,
-          glareOpacity: tilt.glareOpacity,
+          imageStyle,
+          glareBackground,
+          glareOpacity,
         }}
       />
     </motion.div>

@@ -180,22 +180,26 @@ export default function TitleDetailScreen() {
     () => (useAutomaticInsets ? { marginTop: -headerHeight } : undefined),
     [useAutomaticInsets, headerHeight],
   );
+  const darkMuted = palette?.darkMuted;
+  const vibrant = palette?.vibrant;
+  const darkVibrant = palette?.darkVibrant;
+
   const darkMutedOverlayStyle = useMemo(
-    () => (palette?.darkMuted ? { backgroundColor: palette.darkMuted, opacity: 0.2 } : undefined),
-    [palette?.darkMuted],
+    () => (darkMuted ? { backgroundColor: darkMuted, opacity: 0.2 } : undefined),
+    [darkMuted],
   );
   const vibrantOverlayStyle = useMemo(
-    () => (palette?.vibrant ? { backgroundColor: palette.vibrant, opacity: 0.06 } : undefined),
-    [palette?.vibrant],
+    () => (vibrant ? { backgroundColor: vibrant, opacity: 0.06 } : undefined),
+    [vibrant],
   );
   const posterShadowStyle = useMemo(
     () =>
-      palette?.darkVibrant
+      darkVibrant
         ? {
-            boxShadow: `0 12px 28px -8px ${palette.darkVibrant}80`,
+            boxShadow: `0 12px 28px -8px ${darkVibrant}80`,
           }
         : undefined,
-    [palette?.darkVibrant],
+    [darkVibrant],
   );
 
   if (detail.isPending) {

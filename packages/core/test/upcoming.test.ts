@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
   clearAllTables,
@@ -12,8 +12,19 @@ import {
 
 import { getUpcomingFeed } from "../src/discovery";
 
+const TEST_NOW = new Date("2026-03-01T12:00:00Z");
+
+beforeAll(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(TEST_NOW);
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
+
 function daysFromNow(offset: number): string {
-  const d = new Date();
+  const d = new Date(TEST_NOW);
   d.setDate(d.getDate() + offset);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }

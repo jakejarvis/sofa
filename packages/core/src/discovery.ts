@@ -338,7 +338,11 @@ export function getRecommendationsFeed(userId: string) {
     }
   }
 
-  const sorted = [...recs.values()].sort((a, b) => b.score - a.score).slice(0, 20);
+  const sorted = recs
+    .values()
+    .toArray()
+    .toSorted((a, b) => b.score - a.score)
+    .slice(0, 20);
 
   if (sorted.length === 0) return [];
 
@@ -495,7 +499,7 @@ export function getUpcomingFeed(
   // Compute cursor from the last item on this page
   let nextCursor: string | null = null;
   if (hasMore && pageItems.length > 0) {
-    const last = pageItems[pageItems.length - 1]!;
+    const last = pageItems.at(-1)!;
     nextCursor = btoa(JSON.stringify({ d: last.date, n: last.titleName, i: last.titleId }));
   }
 
@@ -579,7 +583,7 @@ export function getRecommendationsForTitle(titleId: string) {
     tmdb_recommendations: 0,
     tmdb_similar: 1,
   } as const;
-  const orderedRecs = [...recs].sort(
+  const orderedRecs = recs.toSorted(
     (a, b) => a.rank - b.rank || sourcePriority[a.source] - sourcePriority[b.source],
   );
 

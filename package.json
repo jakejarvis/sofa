@@ -50,12 +50,13 @@
     "format:check": "turbo run format:check",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
-    "clean": "rm -rf .turbo \"apps/*/.turbo\" \"apps/*/node_modules\" \"apps/*/*.tsbuildinfo\" \"packages/*/.turbo\" \"packages/*/node_modules\" \"packages/*/*.tsbuildinfo\" node_modules bun.lock",
+    "clean": "rm -rf .turbo \"apps/*/.turbo\" \"apps/*/node_modules\" \"apps/*/*.tsbuildinfo\" \"apps/*/dist\" \"packages/*/.turbo\" \"packages/*/node_modules\" \"packages/*/*.tsbuildinfo\" node_modules bun.lock",
     "generate:openapi": "bun scripts/generate-openapi-spec.ts && cd docs && bun run generate:api-docs",
     "i18n:extract": "lingui extract",
     "i18n:claude": "bun packages/i18n/scripts/claude.ts"
   },
   "devDependencies": {
+    "@e18e/eslint-plugin": "0.3.0",
     "@lingui/cli": "catalog:",
     "@lingui/conf": "catalog:",
     "@lingui/format-po": "catalog:",
@@ -66,6 +67,7 @@
     "@vitest/coverage-v8": "catalog:",
     "eslint-plugin-drizzle": "0.2.3",
     "eslint-plugin-lingui": "0.11.0",
+    "eslint-plugin-react-hooks": "7.0.1",
     "oxfmt": "0.41.0",
     "oxlint": "1.56.0",
     "playwright": "1.58.2",

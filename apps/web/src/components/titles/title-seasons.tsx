@@ -151,16 +151,9 @@ export function TitleSeasons({
               key={season.id}
               className="border-border/50 bg-card/50 overflow-hidden rounded-xl border"
             >
-              <div
-                role="button"
-                tabIndex={0}
+              <button
+                type="button"
                 onClick={() => setOpenSeason(isOpen ? null : season.seasonNumber)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setOpenSeason(isOpen ? null : season.seasonNumber);
-                  }
-                }}
                 className="group/season hover:bg-accent/50 flex w-full cursor-pointer items-center justify-between p-4 text-start transition-colors"
               >
                 <div className="flex items-center gap-3">
@@ -217,7 +210,7 @@ export function TitleSeasons({
                     <IconChevronDown aria-hidden={true} className="text-muted-foreground size-4" />
                   )}
                 </div>
-              </div>
+              </button>
 
               <AnimatePresence>
                 {isOpen && (

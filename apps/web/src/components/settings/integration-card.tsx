@@ -135,7 +135,7 @@ export function IntegrationCard({
     if (!url) return;
     await navigator.clipboard.writeText(url);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(setCopied, 2000, false);
   }
 
   return (

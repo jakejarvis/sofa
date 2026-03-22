@@ -1,9 +1,20 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { clearAllTables, insertUser } from "@sofa/test/db";
 
 import { setSetting } from "../src/settings";
 import { isTelemetryEnabled, performTelemetryReport } from "../src/telemetry";
+
+const TEST_NOW = new Date("2026-03-01T12:00:00Z");
+
+beforeAll(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(TEST_NOW);
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 beforeEach(() => {
   clearAllTables();
@@ -60,7 +71,7 @@ describe("performTelemetryReport", () => {
 
   test("respects 24-hour report interval", async () => {
     setSetting("telemetryEnabled", "true");
-    setSetting("telemetryLastReportedAt", new Date().toISOString());
+    setSetting("telemetryLastReportedAt", TEST_NOW.toISOString());
 
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     await performTelemetryReport();
@@ -69,7 +80,7 @@ describe("performTelemetryReport", () => {
 
   test("reports again after interval expires", async () => {
     setSetting("telemetryEnabled", "true");
-    const oldDate = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
+    const oldDate = new Date(TEST_NOW.getTime() - 25 * 60 * 60 * 1000).toISOString();
     setSetting("telemetryLastReportedAt", oldDate);
 
     vi.spyOn(globalThis, "fetch").mockImplementation(

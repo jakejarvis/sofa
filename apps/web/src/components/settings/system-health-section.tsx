@@ -29,6 +29,8 @@ import { useTimeAgo } from "@/hooks/use-time-ago";
 import { orpc } from "@/lib/orpc/client";
 import type { CronJobName, SystemHealthData } from "@sofa/api/schemas";
 
+const DIGITS_ONLY_RE = /^\d+$/;
+
 /** Convert a cron pattern to a short human-readable string */
 function cronToHuman(pattern: string): string {
   const parts = pattern.split(" ");
@@ -50,12 +52,12 @@ function cronToHuman(pattern: string): string {
   }
 
   // Daily at specific time: "0 3 * * *"
-  if (/^\d+$/.test(hour) && /^\d+$/.test(min) && dow === "*") {
+  if (DIGITS_ONLY_RE.test(hour) && DIGITS_ONLY_RE.test(min) && dow === "*") {
     return `Daily at ${hour.padStart(2, "0")}:${min.padStart(2, "0")}`;
   }
 
   // Weekly
-  if (/^\d+$/.test(dow)) {
+  if (DIGITS_ONLY_RE.test(dow)) {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     return `Weekly on ${days[Number(dow)] ?? dow}`;
   }
@@ -326,7 +328,7 @@ function BackgroundJobsCard({
     ? (triggerJobMutation.variables?.name ?? null)
     : null;
 
-  const sortedJobs = [...jobs].sort((a, b) => {
+  const sortedJobs = jobs.toSorted((a, b) => {
     if (a.disabled !== b.disabled) return a.disabled ? 1 : -1;
     if (!a.nextRunAt && !b.nextRunAt) return 0;
     if (!a.nextRunAt) return 1;

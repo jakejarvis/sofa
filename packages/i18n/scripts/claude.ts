@@ -13,6 +13,13 @@
 
 import { resolve } from "node:path";
 
+const SIMPLE_PLACEHOLDER_RE = /^[a-zA-Z0-9_]+$/;
+const ICU_ARG_NAME_RE = /^([a-zA-Z0-9_]+)\s*,/;
+const NUMBERED_TAG_RE = /<\/?\d+\/?>/g;
+const LEADING_WS_RE = /^\s*/;
+const TRAILING_WS_RE = /\s*$/;
+const EDGE_WS_RE = /^\s|\s$/;
+
 import type { CatalogType } from "@lingui/conf";
 import { formatter } from "@lingui/format-po";
 
@@ -198,11 +205,11 @@ function extractSimplePlaceholders(text: string): string[] {
       if (depth === 0 && argStart >= 0) {
         const inner = text.slice(argStart + 1, i);
         // Top-level simple placeholder: just an identifier, no comma (not plural/select)
-        if (/^[a-zA-Z0-9_]+$/.test(inner)) {
+        if (SIMPLE_PLACEHOLDER_RE.test(inner)) {
           results.push(`{${inner}}`);
         } else {
           // Complex ICU argument — extract just the argument name before the comma
-          const argName = inner.match(/^([a-zA-Z0-9_]+)\s*,/)?.[1];
+          const argName = inner.match(ICU_ARG_NAME_RE)?.[1];
           if (argName) results.push(`{${argName}}`);
         }
         argStart = -1;
@@ -215,15 +222,15 @@ function extractSimplePlaceholders(text: string): string[] {
 
 function extractNumberedTags(text: string): string[] {
   // Matches <0>, </0>, <0/>, <12>, </12>, <12/>
-  return [...text.matchAll(/<\/?\d+\/?>/g)].map((m) => m[0]).sort();
+  return Array.from(text.matchAll(NUMBERED_TAG_RE), (m) => m[0]).sort();
 }
 
 function leadingWhitespace(text: string): string {
-  return text.match(/^\s*/)?.[0] ?? "";
+  return text.match(LEADING_WS_RE)?.[0] ?? "";
 }
 
 function trailingWhitespace(text: string): string {
-  return text.match(/\s*$/)?.[0] ?? "";
+  return text.match(TRAILING_WS_RE)?.[0] ?? "";
 }
 
 function validateTranslation(source: string, translated: string): string[] {
@@ -246,7 +253,7 @@ function validateTranslation(source: string, translated: string): string[] {
   }
 
   // Only enforce whitespace when the source has meaningful edge whitespace
-  if (/^\s|\s$/.test(source)) {
+  if (EDGE_WS_RE.test(source)) {
     if (leadingWhitespace(source) !== leadingWhitespace(translated)) {
       issues.push("leading whitespace mismatch");
     }

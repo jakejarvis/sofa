@@ -23,7 +23,14 @@ function ProviderBadge({
       <TooltipTrigger
         {...(watchUrl
           ? {
-              render: <a href={watchUrl} target="_blank" rel="noopener noreferrer" />,
+              render: (
+                <a
+                  href={watchUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={t`Watch on ${name}`}
+                />
+              ),
             }
           : {})}
         className={`border-border/30 bg-card flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border motion-safe:transition-transform motion-safe:hover:scale-105${watchUrl ? "" : "cursor-default"}`}

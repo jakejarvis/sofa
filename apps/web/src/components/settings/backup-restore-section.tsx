@@ -26,8 +26,10 @@ export function BackupRestoreSection() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const restoreMutation = useMutation(
-    orpc.admin.backups.restore.mutationOptions({
+  const restoreMutation = useMutation(orpc.admin.backups.restore.mutationOptions());
+
+  function handleRestore(file: File) {
+    restoreMutation.mutate(file, {
       onSuccess: () => {
         toast.success(t`Database restored. Reloading...`);
         setTimeout(() => window.location.reload(), 1500);
@@ -38,11 +40,7 @@ export function BackupRestoreSection() {
       onSettled: () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
       },
-    }),
-  );
-
-  function handleRestore(file: File) {
-    restoreMutation.mutate(file);
+    });
   }
 
   return (

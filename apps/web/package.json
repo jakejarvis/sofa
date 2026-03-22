@@ -27,7 +27,7 @@
     "@sofa/api": "workspace:*",
     "@sofa/i18n": "workspace:*",
     "@tabler/icons-react": "3.40.0",
-    "@tanstack/react-hotkeys": "0.4.2",
+    "@tanstack/react-hotkeys": "0.5.1",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "1.168.2",
     "better-auth": "catalog:",

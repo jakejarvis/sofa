@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { clearStorageScope, hasScopedStorage, setStorageScope } from "@/lib/mmkv";
 import { queryClient } from "@/lib/query-client";
@@ -94,11 +94,21 @@ export function useServerConnection() {
   // Track whether the session was seeded from cache and hasn't yet been
   // confirmed by the server. Once confirmed, flip to false so explicit
   // sign-outs don't show a misleading "session expired" toast.
-  const hadOptimisticSession = useRef(wasCachedSessionSeeded());
-  const prevSession = useRef(session);
+  const [hadOptimisticSession, setHadOptimisticSession] = useState(wasCachedSessionSeeded);
+  const [prevSession, setPrevSession] = useState(session);
 
-  if (hadOptimisticSession.current && session && !isRefetching) {
-    hadOptimisticSession.current = false;
+  if (hadOptimisticSession && session && !isRefetching) {
+    setHadOptimisticSession(false);
+  }
+
+  // Detect session loss during render so the effect doesn't need to call
+  // setPrevSession (which triggers the set-state-in-effect lint rule).
+  let sessionLost = false;
+  if (prevSession !== session) {
+    if (prevSession && !session) {
+      sessionLost = true;
+    }
+    setPrevSession(session);
   }
 
   const { replace } = useRouter();
@@ -107,19 +117,18 @@ export function useServerConnection() {
   // availability, but enableFreeze can prevent the navigator from
   // transitioning on its own.
   useEffect(() => {
-    if (prevSession.current && !session) {
+    if (sessionLost) {
       const changingServer = consumeServerChangeRequest();
       replace(changingServer ? "/(auth)/server-url" : "/(auth)/login");
 
-      if (hadOptimisticSession.current) {
+      if (hadOptimisticSession) {
         toast.info(i18n._(msg`Session expired`), {
           description: i18n._(msg`Please sign in again.`),
         });
         clearCachedSessionSeeded();
       }
     }
-    prevSession.current = session;
-  }, [session, replace]);
+  }, [sessionLost, replace, hadOptimisticSession]);
 
   return { session, isPending, hasServerUrl, instanceId };
 }

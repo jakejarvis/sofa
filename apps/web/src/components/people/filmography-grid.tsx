@@ -40,7 +40,7 @@ export function FilmographyGrid({ credits, userStatuses }: FilmographyGridProps)
       return true;
     });
 
-    return [...list].sort((a, b) => {
+    return list.toSorted((a, b) => {
       if (sort === "rating") {
         return (b.voteAverage ?? 0) - (a.voteAverage ?? 0);
       }
