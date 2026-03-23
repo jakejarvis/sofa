@@ -31,7 +31,7 @@ const config = {
         source: "/testflight",
         destination: "https://testflight.apple.com/join/tjSddcaZ",
         permanent: false,
-      }
+      },
     ];
   },
   async rewrites() {

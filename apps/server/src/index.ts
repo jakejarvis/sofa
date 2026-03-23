@@ -8,6 +8,7 @@ import { ensureImageDirs, imageCacheEnabled } from "@sofa/core/image-cache";
 import { registerJobScheduleProvider } from "@sofa/core/system-health";
 import { closeDatabase, isDatabaseAccessBlocked } from "@sofa/db/client";
 import { runMigrations } from "@sofa/db/migrate";
+import { recoverStaleImportJobs } from "@sofa/db/queries/imports";
 import { createLogger } from "@sofa/logger";
 
 import { getJobSchedules, startJobs, stopJobs } from "./cron";
@@ -34,6 +35,12 @@ await ensureBackupDir();
 
 // Run database migrations
 runMigrations();
+
+// Recover import jobs left in running/pending state from a previous crash
+const recoveredJobs = recoverStaleImportJobs();
+if (recoveredJobs > 0) {
+  log.info(`Recovered ${recoveredJobs} stale import job(s) from previous shutdown`);
+}
 
 // Wire up job schedule provider for system health
 registerJobScheduleProvider(getJobSchedules);

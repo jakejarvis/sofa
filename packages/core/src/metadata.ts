@@ -63,6 +63,27 @@ import {
 
 const log = createLogger("metadata");
 
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  fn: (item: T) => Promise<R>,
+  concurrency: number,
+): Promise<PromiseSettledResult<R>[]> {
+  const results: PromiseSettledResult<R>[] = Array.from({ length: items.length });
+  let i = 0;
+  async function worker() {
+    while (i < items.length) {
+      const idx = i++;
+      try {
+        results[idx] = { status: "fulfilled", value: await fn(items[idx]) };
+      } catch (reason) {
+        results[idx] = { status: "rejected", reason };
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
+  return results;
+}
+
 export function updateTitleWithArtInvalidation(
   title: Pick<
     typeof titles.$inferSelect,
@@ -340,10 +361,12 @@ export async function refreshTitle(titleId: string) {
 }
 
 export async function refreshTvChildren(titleId: string, tmdbId: number, numberOfSeasons: number) {
-  // Fetch all seasons from TMDB concurrently (~40 req/s rate limit)
+  // Fetch seasons with limited concurrency to stay within TMDB's 40 req/s limit
   const seasonNumbers = Array.from({ length: numberOfSeasons }, (_, i) => i + 1);
-  const fetched = await Promise.allSettled(
-    seasonNumbers.map((sn) => getTvSeasonDetails(tmdbId, sn)),
+  const fetched = await mapWithConcurrency(
+    seasonNumbers,
+    (sn) => getTvSeasonDetails(tmdbId, sn),
+    5,
   );
 
   const now = new Date();

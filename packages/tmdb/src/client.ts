@@ -126,6 +126,25 @@ const baseUrlRewriteMiddleware: Middleware | null = isCustomBase
     }
   : null;
 
+const TMDB_REQUEST_TIMEOUT_MS = 30_000;
+
+const requestTimeouts = new WeakMap<Request, Timer>();
+
+const timeoutMiddleware: Middleware = {
+  async onRequest({ request }) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), TMDB_REQUEST_TIMEOUT_MS);
+    const newRequest = new Request(request, { signal: controller.signal });
+    requestTimeouts.set(newRequest, timeout);
+    return newRequest;
+  },
+  async onResponse({ request }) {
+    const timeout = requestTimeouts.get(request);
+    if (timeout) clearTimeout(timeout);
+    return undefined;
+  },
+};
+
 const authMiddleware: Middleware = {
   async onRequest({ request }) {
     request.headers.set("Authorization", `Bearer ${getApiKey()}`);
@@ -155,7 +174,7 @@ const loggingMiddleware: Middleware = {
 
 const client = createClient<paths>({ baseUrl });
 if (baseUrlRewriteMiddleware) client.use(baseUrlRewriteMiddleware);
-client.use(authMiddleware, loggingMiddleware);
+client.use(timeoutMiddleware, authMiddleware, loggingMiddleware);
 
 // ─── Search ─────────────────────────────────────────────────────────
 

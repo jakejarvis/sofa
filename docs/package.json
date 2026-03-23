@@ -3,15 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "next build",
-    "dev": "next dev",
-    "start": "next start",
+    "build": "bun --bun next build",
+    "dev": "bun --bun next dev",
+    "start": "bun --bun next start",
     "lint": "oxlint",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "check-types": "fumadocs-mdx && next typegen && tsc --noEmit",
+    "check-types": "bun --bun fumadocs-mdx && bun --bun next typegen && tsc --noEmit",
     "generate:api-docs": "bun scripts/generate-api-docs.ts",
-    "postinstall": "fumadocs-mdx"
+    "postinstall": "bun --bun fumadocs-mdx"
   },
   "dependencies": {
     "@takumi-rs/image-response": "^0.73.1",

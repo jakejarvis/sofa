@@ -8,8 +8,9 @@ icon: Compass
 
 The dashboard is your home screen after logging in. It shows a personalized overview of your tracking activity.
 
-- **Stats** — Cards showing movies watched, episodes watched, library size, and completed titles. Each card has a period selector (today, this week, this month, this year).
+- **Stats** — Cards showing movies watched, episodes watched, library size, and completed titles. Each card has a period selector (today, this week, this month, this year) and a sparkline chart of your watch history.
 - **Continue Watching** — TV shows you're currently watching, with the next unwatched episode highlighted. Click a show to jump to its detail page and pick up where you left off.
+- **Upcoming** — Episodes and releases airing in the next 7 days for titles in your library. Click "View all" to open the full upcoming page with episodes grouped by date (Today, Tomorrow, This Week, Later).
 - **In Your Library** — A grid of all titles you're tracking, regardless of status.
 - **Recommended for You** — Personalized suggestions based on titles you've watched and rated highly.
 
@@ -19,23 +20,31 @@ If your library is empty, the dashboard shows an invitation to start exploring.
 
 ### The Status System
 
-Every title in your library has one of three statuses:
+Every title in your library has a status:
 
-| Status          | Meaning                        |
-| --------------- | ------------------------------ |
-| **Watchlist**   | You plan to watch this         |
-| **In Progress** | You're currently watching this |
-| **Completed**   | You've finished watching this  |
+| Status        | Meaning                                                                   |
+| ------------- | ------------------------------------------------------------------------- |
+| **Watchlist** | You plan to watch this                                                    |
+| **Watching**  | You're currently watching this (TV shows only)                            |
+| **Caught Up** | You've watched all aired episodes, but the show is still airing (TV only) |
+| **Completed** | You've finished watching this                                             |
 
-Set a status from any title's detail page by clicking the status button, or press <kbd>W</kbd> to cycle through statuses.
+Click the status button on a title page to add it to your watchlist. If the title is already in your library, hovering the button reveals a "Remove" action. Press <kbd>W</kbd> to toggle the title in or out of your watchlist.
+
+<Callout type="info">
+  **Caught Up** vs **Completed** is automatic — when you've watched every episode of a TV show that
+  is still airing (Returning Series or In Production on TMDB), Sofa shows **Caught Up** instead of
+  **Completed**. Once the show ends, it switches to **Completed** automatically.
+</Callout>
 
 ### Automatic Status Transitions
 
 Sofa automatically updates statuses as you log watches so you don't have to manage them manually:
 
-- **First episode watched** on a TV show → status changes to **In Progress** (if it was on your Watchlist or had no status)
-- **All episodes watched** on a TV show → status changes to **Completed**
-- **Unwatch an episode** on a completed show → status drops back to **In Progress**
+- **First episode watched** on a TV show → status changes to **Watching** (if it was on your Watchlist or had no status)
+- **All episodes watched** on a TV show → status changes to **Caught Up** (if the show is still airing) or **Completed** (if the show has ended)
+- **Unwatch an episode** on a completed show → status drops back to **Watching**
+- **Unwatch all episodes** on a show → status drops back to **Watchlist**
 - **Mark a movie as watched** → status changes to **Completed**
 
 These same transitions apply when watches are logged automatically via [webhook integrations](/docs/integrations) (Plex, Jellyfin, Emby) or [imported from another app](/docs/integrations/import) (Trakt, Simkl, Letterboxd).
@@ -118,7 +127,9 @@ Press <kbd>?</kbd> anywhere in the app to see the full shortcut reference. Here'
 | Global     | `?`          | Show keyboard shortcuts |
 | Navigation | `g` then `h` | Go to dashboard         |
 | Navigation | `g` then `e` | Go to explore           |
-| Title page | `w`          | Cycle watch status      |
+| Navigation | `g` then `u` | Go to upcoming          |
+| Navigation | `g` then `s` | Go to settings          |
+| Title page | `w`          | Toggle watchlist        |
 | Title page | `m`          | Mark movie as watched   |
 | Title page | `Escape`     | Go back                 |
 | Title page | `1`–`5`      | Rate 1–5 stars          |

@@ -86,3 +86,25 @@ export function getActiveImportJobForUser(userId: string) {
     .where(and(eq(importJobs.userId, userId), inArray(importJobs.status, ["pending", "running"])))
     .get();
 }
+
+/** Mark any running/pending import jobs as errored — called on server startup to recover from crashes. */
+export function recoverStaleImportJobs(): number {
+  const stale = db
+    .select({ id: importJobs.id })
+    .from(importJobs)
+    .where(inArray(importJobs.status, ["pending", "running"]))
+    .all();
+  if (stale.length === 0) return 0;
+  const now = new Date();
+  for (const { id } of stale) {
+    db.update(importJobs)
+      .set({
+        status: "error",
+        finishedAt: now,
+        errors: JSON.stringify(["Import interrupted by server restart"]),
+      })
+      .where(eq(importJobs.id, id))
+      .run();
+  }
+  return stale.length;
+}

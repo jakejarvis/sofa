@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNotNull, lt, or } from "drizzle-orm";
+import { and, eq, gte, inArray, isNotNull, lt, or } from "drizzle-orm";
 
 import { db } from "../client";
 import {
@@ -6,6 +6,7 @@ import {
   cronRuns,
   seasons,
   titleCast,
+  titleRecommendations,
   titles,
   userTitleStatus,
 } from "../schema";
@@ -124,4 +125,43 @@ export function getTitleByIdForCron(titleId: string) {
 
 export function getCastEntryForTitle(titleId: string) {
   return db.select().from(titleCast).where(eq(titleCast.titleId, titleId)).limit(1).get();
+}
+
+export function deleteOldCronRuns(beforeDate: Date): number {
+  const old = db
+    .select({ id: cronRuns.id })
+    .from(cronRuns)
+    .where(lt(cronRuns.startedAt, beforeDate))
+    .all();
+  if (old.length === 0) return 0;
+  const ids = old.map((r) => r.id);
+  for (let i = 0; i < ids.length; i += 500) {
+    db.delete(cronRuns)
+      .where(inArray(cronRuns.id, ids.slice(i, i + 500)))
+      .run();
+  }
+  return old.length;
+}
+
+export function getTitlesWithFreshRecommendations(
+  titleIds: string[],
+  sinceDate: Date,
+): Set<string> {
+  if (titleIds.length === 0) return new Set();
+
+  return new Set(
+    db
+      .select({ titleId: titleRecommendations.titleId })
+      .from(titleRecommendations)
+      .where(
+        and(
+          inArray(titleRecommendations.titleId, titleIds),
+          // All recs for a title share the same lastFetchedAt, so any row suffices
+          gte(titleRecommendations.lastFetchedAt, sinceDate),
+        ),
+      )
+      .groupBy(titleRecommendations.titleId)
+      .all()
+      .map((r) => r.titleId),
+  );
 }

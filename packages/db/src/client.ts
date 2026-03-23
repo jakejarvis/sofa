@@ -86,8 +86,9 @@ export const db = new Proxy({} as ReturnType<typeof drizzle>, {
   },
 });
 
-/** Run PRAGMA optimize to refresh query planner statistics. */
+/** Checkpoint the WAL and refresh query planner statistics. */
 export function optimizeDatabase() {
+  getClient().run("PRAGMA wal_checkpoint(TRUNCATE)");
   getClient().run("PRAGMA optimize");
 }
 

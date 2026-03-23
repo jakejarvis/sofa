@@ -1,4 +1,4 @@
-import { and, eq, gte } from "drizzle-orm";
+import { and, eq, gte, inArray, lt } from "drizzle-orm";
 
 import { db } from "../client";
 import { integrationEvents, integrations, userEpisodeWatches, userMovieWatches } from "../schema";
@@ -40,4 +40,20 @@ export function updateIntegrationLastEvent(connectionId: string): void {
     .set({ lastEventAt: new Date() })
     .where(eq(integrations.id, connectionId))
     .run();
+}
+
+export function deleteOldIntegrationEvents(beforeDate: Date): number {
+  const old = db
+    .select({ id: integrationEvents.id })
+    .from(integrationEvents)
+    .where(lt(integrationEvents.receivedAt, beforeDate))
+    .all();
+  if (old.length === 0) return 0;
+  const ids = old.map((r) => r.id);
+  for (let i = 0; i < ids.length; i += 500) {
+    db.delete(integrationEvents)
+      .where(inArray(integrationEvents.id, ids.slice(i, i + 500)))
+      .run();
+  }
+  return old.length;
 }

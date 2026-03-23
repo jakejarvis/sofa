@@ -121,7 +121,11 @@ export function purgeShellTitlesTransaction(): PurgeResult {
 
     // After title cascade deletes, collect orphaned person images then delete persons
     orphanedImages.push(...collectOrphanedPersonImages());
-    return { deletedTitles: toDelete.length, deletedPersons: purgeOrphanedPersons(), orphanedImages };
+    return {
+      deletedTitles: toDelete.length,
+      deletedPersons: purgeOrphanedPersons(),
+      orphanedImages,
+    };
   });
 }
 

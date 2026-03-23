@@ -15,6 +15,7 @@ import {
   getThumbhashBackfillTitleIds,
   getTitleByIdForCron,
   getTitleIdsWithStaleSeasons,
+  getTitlesWithFreshRecommendations,
   startCronRun,
 } from "@sofa/core/cron";
 import {
@@ -87,10 +88,11 @@ export function getJobSchedules(): {
   }));
 }
 
-/** Manually trigger a job by name. Returns false if job not found. */
+/** Manually trigger a job by name. Returns false if job not found or already running. */
 export async function triggerJob(name: string): Promise<boolean> {
   const job = jobs.get(name);
   if (!job) return false;
+  if (job.isBusy()) return false;
   await job.trigger();
   return true;
 }
@@ -139,9 +141,14 @@ async function refreshAvailabilityJob() {
 
 async function refreshRecommendationsJob() {
   const libraryIds = getLibraryTitleIds();
-  log.debug(`Refreshing recommendations for ${libraryIds.length} library titles`);
+  const stale = new Date(Date.now() - 7 * DAY);
+  const fresh = getTitlesWithFreshRecommendations(libraryIds, stale);
+  const staleIds = libraryIds.filter((id) => !fresh.has(id));
+  log.debug(
+    `Refreshing recommendations for ${staleIds.length} of ${libraryIds.length} library titles`,
+  );
 
-  for (const titleId of libraryIds) {
+  for (const titleId of staleIds) {
     await refreshRecommendations(titleId);
     await Bun.sleep(RATE_LIMIT_MS);
   }
@@ -300,6 +307,23 @@ export function startJobs() {
   });
   schedule("optimizeDb", "0 4 * * 0", async () => {
     const { optimizeDatabase } = await import("@sofa/db/client");
+    const { deleteOldCronRuns } = await import("@sofa/db/queries/cron");
+    const { deleteOldIntegrationEvents } = await import("@sofa/db/queries/webhooks");
+    const { deleteExpiredSessions, deleteExpiredVerifications } =
+      await import("@sofa/db/queries/auth-cleanup");
+
+    const retentionDate = new Date(Date.now() - 30 * DAY);
+    const cronDeleted = deleteOldCronRuns(retentionDate);
+    const eventsDeleted = deleteOldIntegrationEvents(retentionDate);
+    const sessionsDeleted = deleteExpiredSessions();
+    const verificationsDeleted = deleteExpiredVerifications();
+
+    if (cronDeleted + eventsDeleted + sessionsDeleted + verificationsDeleted > 0) {
+      log.info(
+        `Pruned ${cronDeleted} cron runs, ${eventsDeleted} integration events, ${sessionsDeleted} sessions, ${verificationsDeleted} verifications`,
+      );
+    }
+
     optimizeDatabase();
   });
 
