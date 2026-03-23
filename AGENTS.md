@@ -122,7 +122,7 @@ Cross-package imports:
 - **JSX text** → `<Trans>` from `@lingui/react/macro`
 - **Strings in hooks/components** → `const { t } = useLingui()` from `@lingui/react/macro`, then `` t`string` ``
 - **Strings outside React** (plain modules) → `import { msg } from "@lingui/core/macro"` + `import { i18n } from "@sofa/i18n"`, then ``i18n._(msg`string`)``
-- **Pluralization** → `import { plural } from "@lingui/core/macro"`, use inside `t`: `` t`${plural(count, { one: "# item", other: "# items" })}` ``
+- **Pluralization** → `import { plural } from "@lingui/core/macro"`. Use standalone when it's the whole string: `plural(count, { one: "# item", other: "# items" })`. Nest inside `t` only when there's surrounding text: `` t`You have ${plural(count, { one: "# item", other: "# items" })} in your cart` ``
 - **DO NOT use** `t(i18n)` — it's deprecated in v5 and removed in v6. Use `i18n._(msg`...`)` instead.
 - **Date/number formatting** → use `formatDate`, `formatRelativeTime`, `formatNumber`, `formatBytes` from `@sofa/i18n/format` (Intl-based, locale-aware). Never use `date-fns` in app code.
 - **Native Intl polyfills** → `@formatjs/intl-*` polyfills loaded in `apps/native/src/lib/intl-polyfills.ts` (strict dependency order, with locale data for all 6 languages).

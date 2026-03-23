@@ -28,6 +28,10 @@ export function NativeTabBar({ showSettingsBadge }: { showSettingsBadge: boolean
         <NativeTabs.Trigger.Label>{t`Home`}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="(library)" disableTransparentOnScrollEdge>
+        <NativeTabs.Trigger.Label>{t`Library`}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="books.vertical" md="local_library" />
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="(explore)" disableTransparentOnScrollEdge>
         <NativeTabs.Trigger.Label>{t`Explore`}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="safari" md="explore" />

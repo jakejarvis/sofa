@@ -196,57 +196,6 @@ export function getNewAvailableFeed(userId: string, _days = 14) {
     .all();
 }
 
-export function getLibraryFeed(userId: string, page = 1, limit = 20) {
-  const offset = (page - 1) * limit;
-
-  const availabilityFilter = sql`EXISTS (SELECT 1 FROM ${availabilityOffers} WHERE ${availabilityOffers.titleId} = ${titles.id})`;
-  const joinCondition = and(
-    eq(userTitleStatus.titleId, titles.id),
-    eq(userTitleStatus.userId, userId),
-  );
-
-  const rows = db
-    .select({
-      titleId: titles.id,
-      title: titles.title,
-      type: titles.type,
-      tmdbId: titles.tmdbId,
-      posterPath: titles.posterPath,
-      posterThumbHash: titles.posterThumbHash,
-      releaseDate: titles.releaseDate,
-      firstAirDate: titles.firstAirDate,
-      voteAverage: titles.voteAverage,
-      popularity: titles.popularity,
-      userStatus: userTitleStatus.status,
-      totalCount: sql<number>`count(*) over()`.as("totalCount"),
-    })
-    .from(titles)
-    .innerJoin(userTitleStatus, joinCondition)
-    .where(availabilityFilter)
-    .orderBy(desc(titles.popularity))
-    .limit(limit)
-    .offset(offset)
-    .all();
-
-  let totalResults = rows[0]?.totalCount ?? 0;
-  if (rows.length === 0 && offset > 0) {
-    const [{ count }] = db
-      .select({ count: sql<number>`count(*)` })
-      .from(titles)
-      .innerJoin(userTitleStatus, joinCondition)
-      .where(availabilityFilter)
-      .all();
-    totalResults = count ?? 0;
-  }
-  const items = rows.map(({ totalCount: _, ...item }) => item);
-  return {
-    items,
-    page,
-    totalPages: Math.max(1, Math.ceil(totalResults / limit)),
-    totalResults,
-  };
-}
-
 export function getEngagedTitleIds(userId: string) {
   return db
     .select({ titleId: userTitleStatus.titleId })
@@ -315,7 +264,22 @@ export function getTitleByIdOrNull(titleId: string) {
 
 // ─── Upcoming feed queries ──────────────────────────────────────────
 
-export function getUpcomingEpisodes(userId: string, fromDate: string, toDate: string) {
+export function getUpcomingEpisodes(
+  userId: string,
+  fromDate: string,
+  toDate: string,
+  statusFilter?: string[],
+) {
+  const conditions = [gte(episodes.airDate, fromDate), lte(episodes.airDate, toDate)];
+  if (statusFilter && statusFilter.length > 0) {
+    conditions.push(
+      sql`${userTitleStatus.status} IN (${sql.join(
+        statusFilter.map((s) => sql`${s}`),
+        sql`, `,
+      )})`,
+    );
+  }
+
   return db
     .select({
       episodeId: episodes.id,
@@ -338,12 +302,31 @@ export function getUpcomingEpisodes(userId: string, fromDate: string, toDate: st
       userTitleStatus,
       and(eq(userTitleStatus.titleId, titles.id), eq(userTitleStatus.userId, userId)),
     )
-    .where(and(gte(episodes.airDate, fromDate), lte(episodes.airDate, toDate)))
+    .where(and(...conditions))
     .orderBy(asc(episodes.airDate), asc(titles.title))
     .all();
 }
 
-export function getUpcomingMovies(userId: string, fromDate: string, toDate: string) {
+export function getUpcomingMovies(
+  userId: string,
+  fromDate: string,
+  toDate: string,
+  statusFilter?: string[],
+) {
+  const conditions = [
+    eq(titles.type, "movie"),
+    gte(titles.releaseDate, fromDate),
+    lte(titles.releaseDate, toDate),
+  ];
+  if (statusFilter && statusFilter.length > 0) {
+    conditions.push(
+      sql`${userTitleStatus.status} IN (${sql.join(
+        statusFilter.map((s) => sql`${s}`),
+        sql`, `,
+      )})`,
+    );
+  }
+
   return db
     .select({
       titleId: titles.id,
@@ -360,13 +343,7 @@ export function getUpcomingMovies(userId: string, fromDate: string, toDate: stri
       userTitleStatus,
       and(eq(userTitleStatus.titleId, titles.id), eq(userTitleStatus.userId, userId)),
     )
-    .where(
-      and(
-        eq(titles.type, "movie"),
-        gte(titles.releaseDate, fromDate),
-        lte(titles.releaseDate, toDate),
-      ),
-    )
+    .where(and(...conditions))
     .orderBy(asc(titles.releaseDate), asc(titles.title))
     .all();
 }

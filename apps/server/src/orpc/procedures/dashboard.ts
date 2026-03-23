@@ -1,13 +1,11 @@
 import {
   getContinueWatchingFeed,
-  getLibraryFeed,
   getRecommendationsFeed,
   getUpcomingFeed,
   getUserStats,
   getWatchCount,
   getWatchHistory,
 } from "@sofa/core/discovery";
-import { getDisplayStatusesByTitleIds } from "@sofa/core/tracking";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 
 import { os } from "../context";
@@ -43,32 +41,6 @@ export const continueWatching = os.dashboard.continueWatching.use(authed).handle
   return { items };
 });
 
-export const library = os.dashboard.library.use(authed).handler(({ input, context }) => {
-  const {
-    items: feed,
-    page,
-    totalPages,
-    totalResults,
-  } = getLibraryFeed(context.user.id, input.page, input.limit);
-
-  const titleIds = feed.map((t) => t.titleId);
-  const displayStatuses = getDisplayStatusesByTitleIds(context.user.id, titleIds);
-
-  const items = feed.map((t) => ({
-    id: t.titleId,
-    tmdbId: t.tmdbId,
-    type: t.type,
-    title: t.title,
-    posterPath: tmdbImageUrl(t.posterPath, "posters"),
-    posterThumbHash: t.posterThumbHash ?? null,
-    releaseDate: t.releaseDate ?? null,
-    firstAirDate: t.firstAirDate ?? null,
-    voteAverage: t.voteAverage,
-    userStatus: displayStatuses[t.titleId] ?? null,
-  }));
-  return { items, page, totalPages, totalResults };
-});
-
 export const recommendations = os.dashboard.recommendations.use(authed).handler(({ context }) => {
   const feed = getRecommendationsFeed(context.user.id);
   const items = feed
@@ -93,6 +65,8 @@ export const upcoming = os.dashboard.upcoming.use(authed).handler(({ input, cont
     days: input.days,
     limit: input.limit,
     cursor: input.cursor,
+    mediaType: input.mediaType,
+    statusFilter: input.statusFilter,
   });
   return {
     items: result.items.map((item) => ({

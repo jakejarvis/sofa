@@ -23,14 +23,8 @@ export const Route = createFileRoute("/_app/dashboard")({
       context.queryClient.ensureQueryData(
         orpc.dashboard.upcoming.queryOptions({ input: { days: 7, limit: 5 } }),
       ),
-      context.queryClient.ensureInfiniteQueryData(
-        orpc.dashboard.library.infiniteOptions({
-          input: (pageParam: number) => ({ page: pageParam }),
-          initialPageParam: 1,
-          getNextPageParam: (lastPage) =>
-            lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-          maxPages: 10,
-        }),
+      context.queryClient.ensureQueryData(
+        orpc.library.list.queryOptions({ input: { page: 1, limit: 10 } }),
       ),
     ]);
   },

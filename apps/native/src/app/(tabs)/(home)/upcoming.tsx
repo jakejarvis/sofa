@@ -2,8 +2,8 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { IconCalendarEvent } from "@tabler/icons-react-native";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router";
-import { useCallback, useMemo } from "react";
-import { RefreshControl, SectionList, View } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { Pressable, RefreshControl, SectionList, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useCSSVariable, useResolveClassNames } from "uniwind";
 
@@ -12,9 +12,38 @@ import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
+import * as Haptics from "@/utils/haptics";
 import { groupByDateBucket } from "@sofa/i18n/date-buckets";
 
 const contentContainerStyle = { paddingBottom: 24 };
+
+function FilterChip({
+  label,
+  isSelected,
+  onPress,
+}: {
+  label: string;
+  isSelected: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress();
+      }}
+      accessibilityRole="button"
+      accessibilityState={{ selected: isSelected }}
+      className={`rounded-full px-3 py-1.5 ${isSelected ? "bg-primary" : "bg-secondary"}`}
+    >
+      <Text
+        className={`font-sans text-xs font-medium ${isSelected ? "text-primary-foreground" : "text-foreground"}`}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
 
 export default function UpcomingScreen() {
   const { t } = useLingui();
@@ -23,6 +52,9 @@ export default function UpcomingScreen() {
   const backgroundColor = useCSSVariable("--color-background") as string;
   const mutedColor = useCSSVariable("--color-muted-foreground") as string;
 
+  const [mediaType, setMediaType] = useState<"all" | "movie" | "tv">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "watching" | "watchlist">("all");
+
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage, isRefetching } =
     useInfiniteQuery(
       orpc.dashboard.upcoming.infiniteOptions({
@@ -30,6 +62,8 @@ export default function UpcomingScreen() {
           days: 90,
           limit: 20,
           cursor: pageParam,
+          mediaType: mediaType !== "all" ? mediaType : undefined,
+          statusFilter: statusFilter !== "all" ? [statusFilter] : undefined,
         }),
         initialPageParam: undefined as string | undefined,
         getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
@@ -73,6 +107,42 @@ export default function UpcomingScreen() {
         {t`Upcoming`}
       </Stack.Screen.Title>
       <Stack.Screen.BackButton displayMode="minimal" />
+      <View className="flex-row flex-wrap gap-2 px-4 pt-2 pb-1">
+        <View className="flex-row gap-1.5">
+          <FilterChip
+            label={t`All`}
+            isSelected={mediaType === "all"}
+            onPress={() => setMediaType("all")}
+          />
+          <FilterChip
+            label={t`Movies`}
+            isSelected={mediaType === "movie"}
+            onPress={() => setMediaType("movie")}
+          />
+          <FilterChip
+            label={t`TV Shows`}
+            isSelected={mediaType === "tv"}
+            onPress={() => setMediaType("tv")}
+          />
+        </View>
+        <View className="flex-row gap-1.5">
+          <FilterChip
+            label={t`All`}
+            isSelected={statusFilter === "all"}
+            onPress={() => setStatusFilter("all")}
+          />
+          <FilterChip
+            label={t`Watching`}
+            isSelected={statusFilter === "watching"}
+            onPress={() => setStatusFilter("watching")}
+          />
+          <FilterChip
+            label={t`Watchlist`}
+            isSelected={statusFilter === "watchlist"}
+            onPress={() => setStatusFilter("watchlist")}
+          />
+        </View>
+      </View>
       {!isPending && allItems.length === 0 ? (
         <Animated.View
           entering={FadeInDown.duration(300)}

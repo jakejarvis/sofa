@@ -14,6 +14,7 @@
     "./display-status": "./src/display-status.ts",
     "./export": "./src/export.ts",
     "./image-cache": "./src/image-cache.ts",
+    "./library": "./src/library.ts",
     "./imports": "./src/imports/index.ts",
     "./imports/parsers": "./src/imports/parsers.ts",
     "./integrations": "./src/integrations.ts",

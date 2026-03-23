@@ -31,6 +31,7 @@
     "@tanstack/react-hotkeys": "0.5.1",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "1.168.3",
+    "@tanstack/zod-adapter": "1.166.9",
     "better-auth": "catalog:",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
