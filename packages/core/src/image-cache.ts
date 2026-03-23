@@ -20,6 +20,12 @@ export function imageCacheEnabled(): boolean {
   return process.env.IMAGE_CACHE_ENABLED !== "false";
 }
 
+export function deleteOrphanedImage(category: ImageCategory, oldPath: string | null): void {
+  if (!oldPath || !imageCacheEnabled()) return;
+  const filePath = getLocalImagePath(category, path.basename(oldPath));
+  unlink(filePath).catch(() => {});
+}
+
 export async function ensureImageDirs() {
   for (const category of Object.keys(IMAGE_CATEGORY_SIZES) as ImageCategory[]) {
     await mkdir(path.join(CACHE_DIR, category), { recursive: true });

@@ -49,6 +49,7 @@ import { getCastForTitle, refreshCredits } from "./credits";
 import {
   cacheEpisodeStills,
   cacheImagesForTitle,
+  deleteOrphanedImage,
   imageCacheEnabled,
   loadImageBuffer,
 } from "./image-cache";
@@ -93,6 +94,9 @@ export function updateTitleWithArtInvalidation(
         }
       : {}),
   });
+
+  if (posterPathChanged) deleteOrphanedImage("posters", title.posterPath);
+  if (backdropPathChanged) deleteOrphanedImage("backdrops", title.backdropPath);
 }
 
 /** @internal */
@@ -388,12 +392,14 @@ export async function refreshTvChildren(titleId: string, tmdbId: number, numberO
     // cache warming, so we only need to null out stale values here.
     if ((existingSeason?.posterPath ?? null) !== (seasonData.poster_path ?? null)) {
       nullifySeasonThumbHash(seasonRow.id);
+      deleteOrphanedImage("posters", existingSeason?.posterPath ?? null);
     }
     const seasonEps = getSeasonEpisodesWithHashes(seasonRow.id);
     for (const ep of seasonEps) {
       const oldStill = oldEpStills.get(ep.episodeNumber);
-      if (oldStill !== ep.stillPath && ep.stillThumbHash) {
-        nullifyEpisodeThumbHash(ep.id);
+      if (oldStill !== ep.stillPath) {
+        if (ep.stillThumbHash) nullifyEpisodeThumbHash(ep.id);
+        deleteOrphanedImage("stills", oldStill ?? null);
       }
     }
   }

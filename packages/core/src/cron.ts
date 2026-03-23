@@ -5,11 +5,7 @@ import {
   getStaleTitles,
   getStaleNonLibraryTitles,
   getTitleByIdForCron,
-  getTitleIdsWithMissingEpisodeThumbhashes,
-  getTitleIdsWithMissingProfileThumbhashes,
-  getTitleIdsWithMissingSeasonThumbhashes,
   getTitleIdsWithStaleSeasons,
-  getTitlesWithMissingThumbhashes,
   getTitlesWithStaleOffers,
   getTitlesWithStaleOffersFetchedBefore,
   insertCronRunReturning,
@@ -35,14 +31,7 @@ export function getLibraryTitleIds(): string[] {
 }
 
 export function getThumbhashBackfillTitleIds(): string[] {
-  const titleIds = new Set(getLibraryTitleIds());
-
-  for (const id of getTitlesWithMissingThumbhashes()) titleIds.add(id);
-  for (const id of getTitleIdsWithMissingSeasonThumbhashes()) titleIds.add(id);
-  for (const id of getTitleIdsWithMissingEpisodeThumbhashes()) titleIds.add(id);
-  for (const id of getTitleIdsWithMissingProfileThumbhashes()) titleIds.add(id);
-
-  return [...titleIds];
+  return getLibraryTitleIds();
 }
 
 export function getStaleLibraryTitles(libraryIds: string[], staleDate: Date) {

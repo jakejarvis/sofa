@@ -5,11 +5,13 @@ import { CACHE_DIR } from "@sofa/config";
 import { purgeShellTitlesTransaction } from "@sofa/db/queries/cache";
 import { createLogger } from "@sofa/logger";
 
+import { deleteOrphanedImage } from "./image-cache";
+
 const log = createLogger("purge");
 
 /**
  * Delete un-enriched "shell" titles that aren't in any user's library,
- * then clean up orphaned person records.
+ * then clean up orphaned person records and their cached images.
  */
 export function purgeMetadataCache(): {
   deletedTitles: number;
@@ -27,7 +29,16 @@ export function purgeMetadataCache(): {
     log.info(`Purged ${result.deletedPersons} orphaned persons`);
   }
 
-  return result;
+  // Fire-and-forget cleanup of cached images for deleted titles/persons
+  for (const img of result.orphanedImages) {
+    deleteOrphanedImage(img.category, img.path);
+  }
+
+  if (result.orphanedImages.length > 0) {
+    log.info(`Queued deletion of ${result.orphanedImages.length} orphaned cached images`);
+  }
+
+  return { deletedTitles: result.deletedTitles, deletedPersons: result.deletedPersons };
 }
 
 /** Image cache subdirectories to scan */

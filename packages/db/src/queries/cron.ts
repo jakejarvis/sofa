@@ -1,11 +1,9 @@
-import { and, eq, inArray, isNotNull, lt, or, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, lt, or } from "drizzle-orm";
 
 import { db } from "../client";
 import {
   availabilityOffers,
   cronRuns,
-  episodes,
-  persons,
   seasons,
   titleCast,
   titles,
@@ -41,52 +39,6 @@ export function getLibraryTitleIds(): string[] {
     .groupBy(userTitleStatus.titleId)
     .all()
     .map((r) => r.titleId);
-}
-
-export function getTitlesWithMissingThumbhashes() {
-  return db
-    .select({ id: titles.id })
-    .from(titles)
-    .where(
-      or(
-        and(isNotNull(titles.posterPath), sql`${titles.posterThumbHash} IS NULL`),
-        and(isNotNull(titles.backdropPath), sql`${titles.backdropThumbHash} IS NULL`),
-      ),
-    )
-    .all()
-    .map((row) => row.id);
-}
-
-export function getTitleIdsWithMissingSeasonThumbhashes() {
-  return db
-    .select({ titleId: seasons.titleId })
-    .from(seasons)
-    .where(and(isNotNull(seasons.posterPath), sql`${seasons.posterThumbHash} IS NULL`))
-    .groupBy(seasons.titleId)
-    .all()
-    .map((row) => row.titleId);
-}
-
-export function getTitleIdsWithMissingEpisodeThumbhashes() {
-  return db
-    .select({ titleId: seasons.titleId })
-    .from(episodes)
-    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
-    .where(and(isNotNull(episodes.stillPath), sql`${episodes.stillThumbHash} IS NULL`))
-    .groupBy(seasons.titleId)
-    .all()
-    .map((row) => row.titleId);
-}
-
-export function getTitleIdsWithMissingProfileThumbhashes() {
-  return db
-    .select({ titleId: titleCast.titleId })
-    .from(titleCast)
-    .innerJoin(persons, eq(titleCast.personId, persons.id))
-    .where(and(isNotNull(persons.profilePath), sql`${persons.profileThumbHash} IS NULL`))
-    .groupBy(titleCast.titleId)
-    .all()
-    .map((row) => row.titleId);
 }
 
 export function getStaleTitles(titleIds: string[], staleDate: Date) {

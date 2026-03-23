@@ -13,7 +13,7 @@ import { createLogger } from "@sofa/logger";
 import { getMovieCredits, getTvAggregateCredits } from "@sofa/tmdb/client";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 
-import { cacheProfilePhotos, imageCacheEnabled } from "./image-cache";
+import { cacheProfilePhotos, deleteOrphanedImage, imageCacheEnabled } from "./image-cache";
 import { generatePersonThumbHash } from "./thumbhash";
 
 const log = createLogger("credits");
@@ -49,6 +49,14 @@ function batchUpsertPersons(people: PersonData[]): Map<number, string> {
   const existingMap = new Map(existing.map((p) => [p.tmdbId, p]));
 
   const idMap = batchUpsertPersonsTransaction(uniquePeople, existingMap);
+
+  // Clean up orphaned profile images when paths change
+  for (const p of uniquePeople) {
+    const prev = existingMap.get(p.tmdbId);
+    if (prev && prev.profilePath && prev.profilePath !== p.profilePath) {
+      deleteOrphanedImage("profiles", prev.profilePath);
+    }
+  }
 
   // One fallback query for any concurrent inserts that conflicted
   const stillMissing = uniquePeople.filter((p) => !idMap.has(p.tmdbId)).map((p) => p.tmdbId);
