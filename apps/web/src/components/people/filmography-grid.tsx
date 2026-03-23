@@ -73,7 +73,7 @@ export function FilmographyGrid({ credits, userStatuses }: FilmographyGridProps)
           value={sort}
           onValueChange={(v) => v && setSort(v as Sort)}
           modal={false}
-          aria-label="Sort filmography"
+          aria-label={t`Sort filmography`}
         >
           <SelectTrigger size="sm">
             <SelectValue>

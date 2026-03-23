@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { useEffect } from "react";
 import type { ViewStyle } from "react-native";
 import Animated, {
@@ -17,6 +18,7 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ width, height = 14, borderRadius = 4, style }: SkeletonProps) {
+  const { t } = useLingui();
   const secondaryColor = useCSSVariable("--color-secondary") as string;
   const reduceMotion = useReducedMotion();
   const opacity = useSharedValue(reduceMotion ? 0.7 : 0.4);
@@ -34,7 +36,7 @@ export function Skeleton({ width, height = 14, borderRadius = 4, style }: Skelet
   return (
     <Animated.View
       accessible
-      accessibilityLabel="Loading"
+      accessibilityLabel={t`Loading`}
       style={[
         {
           width,

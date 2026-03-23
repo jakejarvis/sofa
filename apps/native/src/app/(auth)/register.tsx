@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Pressable, type TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { z } from "zod";
@@ -19,14 +19,29 @@ import { toast } from "@/lib/toast";
 import { getFormErrors } from "@/utils/form-errors";
 import * as Haptics from "@/utils/haptics";
 
-const signUpSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").min(2, "Name must be at least 2 characters"),
-  email: z.string().trim().min(1, "Email is required").email("Enter a valid email address"),
-  password: z.string().min(1, "Password is required").min(8, "Use at least 8 characters"),
-});
-
 export default function RegisterScreen() {
   const { t } = useLingui();
+
+  const signUpSchema = useMemo(
+    () =>
+      z.object({
+        name: z
+          .string()
+          .trim()
+          .min(1, t`Name is required`)
+          .min(2, t`Name must be at least 2 characters`),
+        email: z
+          .string()
+          .trim()
+          .min(1, t`Email is required`)
+          .email(t`Enter a valid email address`),
+        password: z
+          .string()
+          .min(1, t`Password is required`)
+          .min(8, t`Use at least 8 characters`),
+      }),
+    [t],
+  );
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
   const [errorFields, setErrorFields] = useState<Set<string>>(new Set());
@@ -101,7 +116,7 @@ export default function RegisterScreen() {
   }
 
   return (
-    <AuthScreen title={t`Create Account`} subtitle={t`Registering on ${serverHost}`}>
+    <AuthScreen title={t`Create account`} subtitle={t`Registering on ${serverHost}`}>
       <View className="gap-3">
         <Animated.View entering={FadeInDown.duration(300).delay(100)}>
           <form.Field name="name">
@@ -112,7 +127,7 @@ export default function RegisterScreen() {
                 </Label>
                 <Input
                   value={field.state.value}
-                  accessibilityLabel="Name"
+                  accessibilityLabel={t`Name`}
                   onBlur={field.handleBlur}
                   onChangeText={(text) => {
                     field.handleChange(text);
@@ -141,13 +156,13 @@ export default function RegisterScreen() {
                 <Input
                   ref={emailRef}
                   value={field.state.value}
-                  accessibilityLabel="Email"
+                  accessibilityLabel={t`Email`}
                   onBlur={field.handleBlur}
                   onChangeText={(text) => {
                     field.handleChange(text);
                     clearFieldError("email");
                   }}
-                  placeholder="email@example.com"
+                  placeholder="wwhite@graymatter.biz"
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
@@ -172,7 +187,7 @@ export default function RegisterScreen() {
                 <Input
                   ref={passwordRef}
                   value={field.state.value}
-                  accessibilityLabel="Password"
+                  accessibilityLabel={t`Password`}
                   onBlur={field.handleBlur}
                   onChangeText={(text) => {
                     field.handleChange(text);
@@ -197,7 +212,7 @@ export default function RegisterScreen() {
               <Spinner size="sm" />
             ) : (
               <ButtonLabel>
-                <Trans>Create Account</Trans>
+                <Trans>Create account</Trans>
               </ButtonLabel>
             )}
           </Button>

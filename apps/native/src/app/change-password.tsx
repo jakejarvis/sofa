@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
 import { Stack, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Alert, ScrollView, type TextInput, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useResolveClassNames } from "uniwind";
@@ -15,17 +15,6 @@ import { FieldError, Input, Label, TextField } from "@/components/ui/text-field"
 import { authClient } from "@/lib/server";
 import { toast } from "@/lib/toast";
 import * as Haptics from "@/utils/haptics";
-
-const changePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
 
 function formatFormErrors(errors: unknown): string | null {
   if (!errors) return null;
@@ -41,6 +30,21 @@ function formatFormErrors(errors: unknown): string | null {
 
 export default function ChangePasswordScreen() {
   const { t } = useLingui();
+
+  const changePasswordSchema = useMemo(
+    () =>
+      z
+        .object({
+          currentPassword: z.string().min(1, t`Current password is required`),
+          newPassword: z.string().min(8, t`Password must be at least 8 characters`),
+          confirmPassword: z.string().min(1, t`Please confirm your password`),
+        })
+        .refine((data) => data.newPassword === data.confirmPassword, {
+          message: t`Passwords do not match`,
+          path: ["confirmPassword"],
+        }),
+    [t],
+  );
   const { back } = useRouter();
   const newPasswordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
@@ -91,7 +95,7 @@ export default function ChangePasswordScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <Stack.Screen.Title style={headerTitleStyle as Record<string, unknown>}>
-        <Trans>Change Password</Trans>
+        <Trans>Change password</Trans>
       </Stack.Screen.Title>
 
       <form.Subscribe
@@ -117,7 +121,7 @@ export default function ChangePasswordScreen() {
                     </Label>
                     <Input
                       value={field.state.value}
-                      accessibilityLabel="Current password"
+                      accessibilityLabel={t`Current password`}
                       onBlur={field.handleBlur}
                       onChangeText={field.handleChange}
                       placeholder="••••••••"
@@ -143,7 +147,7 @@ export default function ChangePasswordScreen() {
                     <Input
                       ref={newPasswordRef}
                       value={field.state.value}
-                      accessibilityLabel="New password"
+                      accessibilityLabel={t`New password`}
                       onBlur={field.handleBlur}
                       onChangeText={field.handleChange}
                       placeholder="••••••••"
@@ -169,7 +173,7 @@ export default function ChangePasswordScreen() {
                     <Input
                       ref={confirmPasswordRef}
                       value={field.state.value}
-                      accessibilityLabel="Confirm new password"
+                      accessibilityLabel={t`Confirm new password`}
                       onBlur={field.handleBlur}
                       onChangeText={field.handleChange}
                       placeholder="••••••••"
@@ -195,7 +199,7 @@ export default function ChangePasswordScreen() {
               <Switch
                 value={revokeOtherSessions}
                 onValueChange={setRevokeOtherSessions}
-                accessibilityLabel="Sign out of other sessions"
+                accessibilityLabel={t`Sign out of other sessions`}
               />
             </Animated.View>
 
@@ -209,7 +213,7 @@ export default function ChangePasswordScreen() {
                   <Spinner size="sm" />
                 ) : (
                   <ButtonLabel>
-                    <Trans>Update Password</Trans>
+                    <Trans>Update password</Trans>
                   </ButtonLabel>
                 )}
               </Button>

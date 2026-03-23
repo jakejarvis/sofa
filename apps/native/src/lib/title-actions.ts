@@ -112,11 +112,11 @@ export const titleActions = {
     }
   },
 
-  async watchSeason(id: string, seasonName?: string) {
+  async watchSeason(id: string, seasonLabel?: string) {
     try {
       await client.seasons.watch({ id });
       toast.success(
-        seasonName ? i18n._(msg`Watched all of ${seasonName}`) : i18n._(msg`Season watched`),
+        seasonLabel ? i18n._(msg`Watched all of ${seasonLabel}`) : i18n._(msg`Season watched`),
       );
       invalidateTitleQueries();
     } catch {

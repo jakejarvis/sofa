@@ -204,10 +204,10 @@ export default function SettingsScreen() {
   }, []);
 
   const handleSignOut = () => {
-    Alert.alert(t`Sign Out`, t`Are you sure you want to sign out?`, [
+    Alert.alert(t`Sign out`, t`Are you sure you want to sign out?`, [
       { text: t`Cancel`, style: "cancel" },
       {
-        text: t`Sign Out`,
+        text: t`Sign out`,
         style: "destructive",
         onPress: () => {
           authClient.signOut();
@@ -234,8 +234,8 @@ export default function SettingsScreen() {
                 <DropdownMenu.Trigger asChild>
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel="Edit profile photo"
-                    accessibilityHint="Opens options to change or remove your photo"
+                    accessibilityLabel={t`Edit profile photo`}
+                    accessibilityHint={t`Opens options to change or remove your photo`}
                     className="mr-3"
                     hitSlop={8}
                   >
@@ -280,7 +280,7 @@ export default function SettingsScreen() {
               <Pressable
                 onPress={pickAvatar}
                 accessibilityRole="button"
-                accessibilityLabel="Add profile photo"
+                accessibilityLabel={t`Add profile photo`}
                 className="mr-3"
                 hitSlop={8}
               >
@@ -307,7 +307,7 @@ export default function SettingsScreen() {
                 <View className="flex-row items-center gap-2">
                   <TextInput
                     value={nameInput}
-                    accessibilityLabel="Display name"
+                    accessibilityLabel={t`Display name`}
                     onChangeText={setNameInput}
                     className="border-primary text-foreground min-h-10 flex-1 border-b py-2 font-sans text-base"
                   />
@@ -396,7 +396,7 @@ export default function SettingsScreen() {
             right={
               <Switch
                 value={analyticsEnabled}
-                accessibilityLabel="Anonymous usage reporting"
+                accessibilityLabel={t`Anonymous usage reporting`}
                 onValueChange={(enabled) => {
                   setAnalyticsToggle(enabled);
                   setAnalyticsEnabled(enabled);
@@ -440,7 +440,7 @@ export default function SettingsScreen() {
                   icon={IconCloud}
                 />
                 <SettingsRow
-                  label={t`Image Cache`}
+                  label={t`Image cache`}
                   value={
                     systemHealth.data?.imageCache
                       ? plural(systemHealth.data.imageCache.imageCount, {
@@ -467,7 +467,7 @@ export default function SettingsScreen() {
               right={
                 <Switch
                   value={registration.data?.open ?? false}
-                  accessibilityLabel="Open registration"
+                  accessibilityLabel={t`Open registration`}
                   onValueChange={(open) => toggleRegistration.mutate({ open })}
                 />
               }
@@ -478,7 +478,7 @@ export default function SettingsScreen() {
               right={
                 <Switch
                   value={updateCheck.data?.enabled ?? false}
-                  accessibilityLabel="Check for updates"
+                  accessibilityLabel={t`Check for updates`}
                   onValueChange={(enabled) => toggleUpdateCheck.mutate({ enabled })}
                 />
               }

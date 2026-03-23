@@ -78,13 +78,21 @@ export function SeasonAccordion({
     toasts: {
       watchEpisode: ({ id: epId }) => {
         const ep = episodes.find((e) => e.id === epId);
-        return ep ? `Watched S${season.seasonNumber} E${ep.episodeNumber}` : "Episode watched";
+        const sNum = season.seasonNumber;
+        const eNum = ep?.episodeNumber;
+        return ep ? t`Watched S${sNum} E${eNum}` : t`Episode watched`;
       },
       unwatchEpisode: ({ id: epId }) => {
         const ep = episodes.find((e) => e.id === epId);
-        return ep ? `Unwatched S${season.seasonNumber} E${ep.episodeNumber}` : "Episode unwatched";
+        const sNum = season.seasonNumber;
+        const eNum = ep?.episodeNumber;
+        return ep ? t`Unwatched S${sNum} E${eNum}` : t`Episode unwatched`;
       },
-      watchSeason: `Watched all of ${season.name ?? `Season ${season.seasonNumber}`}`,
+      watchSeason: (() => {
+        const sn = season.seasonNumber;
+        const seasonLabel = season.name ?? t`Season ${sn}`;
+        return t`Watched all of ${seasonLabel}`;
+      })(),
     },
   });
 
@@ -113,7 +121,7 @@ export function SeasonAccordion({
       <Pressable
         onPress={toggleExpanded}
         accessibilityRole="button"
-        accessibilityLabel={`${season.name ?? t`Season ${seasonNumber}`}, ${t`${watchedCount} of ${episodeCount} episodes watched`}`}
+        accessibilityLabel={`${season.name ?? t`Season ${seasonNumber}`}, ${t`${watchedCount}/${plural(episodeCount, { one: "# episode", other: "# episodes" })}`}`}
         accessibilityState={{ expanded }}
         className="flex-row items-center justify-between p-4"
       >

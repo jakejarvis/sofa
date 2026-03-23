@@ -55,7 +55,7 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={accessibilityLabel}
-              accessibilityHint="Opens title details"
+              accessibilityHint={t`Opens title details`}
               style={{ flex: 1 }}
             >
               {item.backdropPath && (

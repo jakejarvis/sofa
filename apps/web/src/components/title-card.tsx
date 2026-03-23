@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import {
   IconBookmarkFilled,
@@ -148,7 +149,9 @@ function ProgressBar({ watched, total }: { watched: number; total: number }) {
           style={{ width: `${pct}%` }}
         />
       </TooltipTrigger>
-      <TooltipContent side="top">{t`${watched}/${total} episodes`}</TooltipContent>
+      <TooltipContent side="top">
+        {t`${watched}/${plural(total, { one: "# episode", other: "# episodes" })}`}
+      </TooltipContent>
     </Tooltip>
   );
 }

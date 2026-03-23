@@ -199,7 +199,7 @@ export function BackupScheduleSection() {
     return (
       <CardContent>
         <p className="text-muted-foreground text-sm">
-          <Trans>Failed to load backup schedule settings.</Trans>
+          <Trans>Failed to load backup schedule settings</Trans>
         </p>
       </CardContent>
     );

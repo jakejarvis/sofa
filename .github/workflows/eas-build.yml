@@ -47,6 +47,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Extract i18n template
+        run: bunx lingui extract-template
+
       - name: Build
         working-directory: apps/native
         run: eas build --platform ${{ inputs.platform || 'all' }} --profile ${{ inputs.profile || 'production' }} --non-interactive --no-wait

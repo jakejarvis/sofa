@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconCalendarEvent,
   IconCircleCheck,
@@ -30,6 +30,7 @@ export function TitleHero({
   actions: ReactNode;
   children?: ReactNode;
 }) {
+  const { t } = useLingui();
   const dateStr = title.releaseDate ?? title.firstAirDate;
   const year = dateStr?.slice(0, 4);
   const palette = title.colorPalette;
@@ -175,7 +176,7 @@ export function TitleHero({
                 href={`https://www.themoviedb.org/${title.type === "movie" ? "movie" : "tv"}/${title.tmdbId}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="View on TMDB"
+                aria-label={t`View on TMDB`}
                 className="inline-flex items-center opacity-70 transition-opacity hover:opacity-40"
               >
                 <TmdbLogo className="h-2.5 w-auto" />

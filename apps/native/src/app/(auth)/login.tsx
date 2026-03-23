@@ -3,7 +3,7 @@ import { IconServer2 } from "@tabler/icons-react-native";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Pressable, type TextInput, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
@@ -22,13 +22,21 @@ import { toast } from "@/lib/toast";
 import { getFormErrors } from "@/utils/form-errors";
 import * as Haptics from "@/utils/haptics";
 
-const signInSchema = z.object({
-  email: z.string().trim().min(1, "Email is required").email("Enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
-});
-
 export default function LoginScreen() {
   const { t } = useLingui();
+
+  const signInSchema = useMemo(
+    () =>
+      z.object({
+        email: z
+          .string()
+          .trim()
+          .min(1, t`Email is required`)
+          .email(t`Enter a valid email address`),
+        password: z.string().min(1, t`Password is required`),
+      }),
+    [t],
+  );
   const passwordRef = useRef<TextInput>(null);
   const [errorFields, setErrorFields] = useState<Set<string>>(new Set());
   const [isSignedIn, setIsSignedIn] = useState(false);
@@ -108,7 +116,7 @@ export default function LoginScreen() {
                 <View className="my-4 flex-row items-center">
                   <View className="bg-border h-px flex-1" />
                   <Text className="text-muted-foreground px-3 text-xs">
-                    <Trans>OR</Trans>
+                    <Trans>or</Trans>
                   </Text>
                   <View className="bg-border h-px flex-1" />
                 </View>
@@ -128,7 +136,7 @@ export default function LoginScreen() {
                   </Label>
                   <Input
                     value={field.state.value}
-                    accessibilityLabel="Email"
+                    accessibilityLabel={t`Email`}
                     onBlur={field.handleBlur}
                     onChangeText={(text) => {
                       field.handleChange(text);
@@ -159,7 +167,7 @@ export default function LoginScreen() {
                   <Input
                     ref={passwordRef}
                     value={field.state.value}
-                    accessibilityLabel="Password"
+                    accessibilityLabel={t`Password`}
                     onBlur={field.handleBlur}
                     onChangeText={(text) => {
                       field.handleChange(text);
@@ -184,7 +192,7 @@ export default function LoginScreen() {
                 <Spinner size="sm" />
               ) : (
                 <ButtonLabel>
-                  <Trans>Sign In</Trans>
+                  <Trans>Sign in</Trans>
                 </ButtonLabel>
               )}
             </Button>

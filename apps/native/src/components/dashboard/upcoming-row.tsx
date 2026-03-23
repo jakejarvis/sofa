@@ -128,7 +128,7 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
       <Link.Menu>
         {item.titleType === "movie" && (
           <Link.MenuAction
-            title={t`Mark as Watched`}
+            title={t`Mark Watched`}
             icon="checkmark.circle"
             onPress={() => titleActions.markMovieWatched(item.titleId, item.titleName)}
           />
@@ -141,7 +141,7 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
           />
         )}
         <Link.MenuAction
-          title={t`Remove from Library`}
+          title={t`Remove from library`}
           icon="trash"
           destructive
           onPress={() => titleActions.removeFromLibrary(item.titleId)}

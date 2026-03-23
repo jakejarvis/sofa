@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconCheck,
   IconChecks,
@@ -59,6 +59,7 @@ export function TitleSeasons({
 }: {
   seasons?: Season[];
 } = {}) {
+  const { t } = useLingui();
   const { seasons, setSeasons, watchingEp } = useTitleContext();
   const { episodeWatches, userStatus } = useTitleUserInfo();
 
@@ -228,6 +229,7 @@ export function TitleSeasons({
                     {season.episodes.map((ep) => {
                       const isWatched = watchedSet.has(ep.id);
                       const { stillPath } = ep;
+                      const epNum = ep.episodeNumber;
                       return (
                         <div
                           key={ep.id}
@@ -254,7 +256,11 @@ export function TitleSeasons({
                           <div className="flex gap-3 px-4 py-3">
                             <button
                               type="button"
-                              aria-label={`Mark episode ${ep.episodeNumber} as ${isWatched ? "unwatched" : "watched"}`}
+                              aria-label={
+                                isWatched
+                                  ? t`Unmark episode ${epNum}`
+                                  : t`Mark episode ${epNum} watched`
+                              }
                               onClick={() =>
                                 handleWatchEpisode(
                                   ep.id,

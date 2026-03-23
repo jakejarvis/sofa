@@ -147,7 +147,7 @@ export function NavBar({
           </Link>
           <nav
             ref={navRef}
-            aria-label="Primary"
+            aria-label={t`Primary`}
             className="relative hidden items-center gap-1 sm:flex"
           >
             {navLinks.map((link, i) => {
@@ -205,7 +205,7 @@ export function NavBar({
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger
               className="hover:ring-primary/40 focus-visible:ring-primary/60 hidden cursor-pointer rounded-full ring-2 ring-transparent transition-all outline-none sm:block"
-              aria-label="Account menu"
+              aria-label={t`Account menu`}
             >
               <Avatar>
                 <AvatarImage src={userImage} alt={userName} />
@@ -260,7 +260,7 @@ export function NavBar({
           <Link
             to="/settings"
             className="hover:ring-primary/40 rounded-full ring-2 ring-transparent transition-all sm:hidden"
-            aria-label="Settings"
+            aria-label={t`Settings`}
           >
             <Avatar size="sm">
               <AvatarImage src={userImage} alt={userName} />
@@ -298,7 +298,7 @@ export function MobileTabBar() {
 
   return (
     <nav
-      aria-label="Primary"
+      aria-label={t`Primary`}
       className="border-border/50 bg-background/90 fixed right-0 bottom-0 left-0 z-50 border-t ps-[env(safe-area-inset-left)] pe-[env(safe-area-inset-right)] backdrop-blur-xl sm:hidden"
     >
       <div ref={containerRef} className="relative flex h-14 items-stretch">

@@ -37,7 +37,7 @@ export function StatusButton({ currentStatus, onChange }: StatusButtonProps) {
 
   const statusConfig = {
     in_watchlist: {
-      label: t`In Watchlist`,
+      label: t`On Watchlist`,
       icon: IconBookmarkFilled,
       class: "text-primary",
       bgClass: "bg-primary/10 hover:bg-primary/15",

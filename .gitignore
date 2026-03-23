@@ -50,6 +50,7 @@ coverage
 tmp
 temp
 crowdin-context.jsonl
+messages.pot
 
 # local data
 *.db

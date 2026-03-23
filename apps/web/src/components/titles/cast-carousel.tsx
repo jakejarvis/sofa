@@ -1,4 +1,5 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { plural } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { IconUser, IconUsers } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 
@@ -7,9 +8,11 @@ import { thumbHashToUrl } from "@/lib/thumbhash";
 import type { CastMember } from "@sofa/api/schemas";
 
 function EpisodeCountLabel({ count }: { count: number }) {
-  const { t } = useLingui();
-  const suffix = count !== 1 ? "s" : "";
-  return <p className="text-muted-foreground/70 text-[10px]">{t`${count} ep${suffix}`}</p>;
+  return (
+    <p className="text-muted-foreground/70 text-[10px]">
+      {plural(count, { one: "# ep", other: "# eps" })}
+    </p>
+  );
 }
 
 interface CastCarouselProps {

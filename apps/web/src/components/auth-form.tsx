@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconKey } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
@@ -37,6 +37,7 @@ export function AuthForm({
   mode: "login" | "register";
   authConfig?: AuthConfig;
 }) {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -59,19 +60,19 @@ export function AuthForm({
       if (isRegister) {
         const result = await signUp.email({ name, email, password });
         if (result.error) {
-          setError(result.error.message ?? "Registration failed");
+          setError(result.error.message ?? t`Registration failed`);
           return;
         }
       } else {
         const result = await signIn.email({ email, password });
         if (result.error) {
-          setError(result.error.message ?? "Login failed");
+          setError(result.error.message ?? t`Login failed`);
           return;
         }
       }
       void navigate({ to: "/dashboard" });
     } catch {
-      setError("Something went wrong");
+      setError(t`Something went wrong`);
     } finally {
       setLoading(false);
     }
@@ -86,7 +87,7 @@ export function AuthForm({
         callbackURL: "/dashboard",
       });
     } catch {
-      setError("Failed to start SSO login");
+      setError(t`Failed to start SSO login`);
     } finally {
       setOidcLoading(false);
     }
@@ -181,7 +182,7 @@ export function AuthForm({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className={authInputClass}
-                  placeholder="Your name…"
+                  placeholder={t`Your name…`}
                 />
               </motion.div>
             )}
@@ -216,7 +217,7 @@ export function AuthForm({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={authInputClass}
-                placeholder="Min 8 characters…"
+                placeholder={t`Min 8 characters…`}
               />
             </motion.div>
 

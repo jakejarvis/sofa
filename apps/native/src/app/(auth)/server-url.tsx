@@ -136,8 +136,8 @@ export default function ServerUrlScreen() {
         <Input
           ref={inputRef}
           value={url}
-          accessibilityLabel="Server URL"
-          accessibilityHint="Enter the full URL for your Sofa server"
+          accessibilityLabel={t`Server URL`}
+          accessibilityHint={t`Enter the full URL for your Sofa server`}
           onChangeText={handleChangeText}
           placeholder="https://sofa.example.com"
           placeholderTextColorClassName="accent-muted-foreground/50"

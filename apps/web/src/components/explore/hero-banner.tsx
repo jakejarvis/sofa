@@ -67,7 +67,7 @@ export function HeroBanner({
                     </span>
                   )}
                   <span className="text-muted-foreground text-xs">
-                    <Trans>Trending today</Trans>
+                    <Trans>Trending Today</Trans>
                   </span>
                 </div>
                 <Link to="/titles/$id" params={{ id }} className="group/title text-start">

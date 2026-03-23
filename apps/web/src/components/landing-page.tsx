@@ -165,7 +165,7 @@ export function LandingPage({
                 className="group bg-primary text-primary-foreground hover:shadow-primary/20 relative inline-flex h-12 items-center justify-center overflow-hidden rounded-lg px-8 font-medium transition-shadow hover:shadow-lg"
               >
                 <span className="relative z-10">
-                  <Trans>Sign In</Trans>
+                  <Trans>Sign in</Trans>
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
               </Link>

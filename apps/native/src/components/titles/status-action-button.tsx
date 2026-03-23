@@ -43,7 +43,7 @@ const STATUS_STYLES = {
 function StatusLabel({ status }: { status: TitleStatus }) {
   switch (status) {
     case "in_watchlist":
-      return <Trans>In Watchlist</Trans>;
+      return <Trans>On Watchlist</Trans>;
     case "watching":
       return <Trans>Watching</Trans>;
     case "caught_up":
@@ -77,7 +77,7 @@ export function StatusActionButton({
         }}
         disabled={isPending}
         accessibilityRole="button"
-        accessibilityLabel={t`Add to watchlist`}
+        accessibilityLabel={t`Add to Watchlist`}
         className="border-title-accent/20 bg-title-accent/10 flex-row items-center gap-1.5 rounded-lg border px-4 py-2"
       >
         <ScaledIcon icon={IconPlus} size={14} color={titleAccent} strokeWidth={2.5} />

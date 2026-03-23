@@ -1,3 +1,5 @@
+import { plural } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
 import { IconStar, IconStarFilled } from "@tabler/icons-react-native";
 import { Pressable, View } from "react-native";
 import { useCSSVariable } from "uniwind";
@@ -19,6 +21,7 @@ export function StarRating({
   interactive = true,
   accentColor,
 }: StarRatingProps) {
+  const { t } = useLingui();
   const [defaultPrimary, mutedForeground] = useCSSVariable([
     "--color-primary",
     "--color-muted-foreground",
@@ -29,7 +32,7 @@ export function StarRating({
   return (
     <View
       className="flex-row items-center gap-1"
-      accessibilityLabel={`Rating: ${rating} out of 5 stars`}
+      accessibilityLabel={t`Rating: ${rating} out of 5 stars`}
       accessibilityRole="adjustable"
     >
       {[1, 2, 3, 4, 5].map((star) => (
@@ -37,12 +40,12 @@ export function StarRating({
           key={star}
           disabled={!interactive}
           accessibilityRole="button"
-          accessibilityLabel={`${star} star${star !== 1 ? "s" : ""}`}
+          accessibilityLabel={plural(star, { one: "# star", other: "# stars" })}
           accessibilityHint={
             interactive
               ? star === rating
-                ? "Double tap to clear rating"
-                : `Double tap to rate ${star} star${star !== 1 ? "s" : ""}`
+                ? t`Double tap to clear rating`
+                : t`Double tap to rate ${plural(star, { one: "# star", other: "# stars" })}`
               : undefined
           }
           onPress={() => {

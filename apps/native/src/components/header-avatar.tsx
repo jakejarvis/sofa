@@ -24,7 +24,7 @@ export function HeaderAvatar() {
         <Pressable
           onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
           accessibilityRole="button"
-          accessibilityLabel="User menu"
+          accessibilityLabel={t`User menu`}
           hitSlop={8}
         >
           <View className="size-8 overflow-hidden rounded-full" accessible={false}>
@@ -59,10 +59,10 @@ export function HeaderAvatar() {
           key="sign-out"
           destructive
           onSelect={() => {
-            Alert.alert(t`Sign Out`, t`Are you sure you want to sign out?`, [
+            Alert.alert(t`Sign out`, t`Are you sure you want to sign out?`, [
               { text: t`Cancel`, style: "cancel" },
               {
-                text: t`Sign Out`,
+                text: t`Sign out`,
                 style: "destructive",
                 onPress: () => {
                   authClient.signOut();

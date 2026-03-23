@@ -219,7 +219,7 @@ export const PosterCard = memo(function PosterCard({
               )}
               {type === "movie" && (
                 <Link.MenuAction
-                  title={t`Mark as Watched`}
+                  title={t`Mark Watched`}
                   icon="checkmark.circle"
                   onPress={() => titleActions.markMovieWatched(id, title)}
                 />
@@ -233,7 +233,7 @@ export const PosterCard = memo(function PosterCard({
               )}
               {userStatus && (
                 <Link.MenuAction
-                  title={t`Remove from Library`}
+                  title={t`Remove from library`}
                   icon="trash"
                   destructive
                   onPress={() => titleActions.removeFromLibrary(id)}

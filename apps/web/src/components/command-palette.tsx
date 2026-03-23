@@ -333,7 +333,7 @@ export function CommandPalette() {
                           <span data-slot="command-shortcut" className="ml-auto">
                             <button
                               type="button"
-                              aria-label="Remove from recent searches"
+                              aria-label={t`Remove from recent searches`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemoveRecent(q);

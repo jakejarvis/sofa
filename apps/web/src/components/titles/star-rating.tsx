@@ -1,3 +1,5 @@
+import { plural } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
 import { IconStar, IconStarFilled } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import { useState } from "react";
@@ -14,13 +16,14 @@ interface StarRatingProps {
 }
 
 export function StarRating({ value, onChange }: StarRatingProps) {
+  const { t } = useLingui();
   const [hover, setHover] = useState(0);
 
   return (
     <div
       className="flex items-center gap-0.5"
       role="radiogroup"
-      aria-label="Rating"
+      aria-label={t`Rating`}
       onMouseLeave={() => setHover(0)}
     >
       {[1, 2, 3, 4, 5].map((star) => {
@@ -31,7 +34,7 @@ export function StarRating({ value, onChange }: StarRatingProps) {
             type="button"
             role="radio"
             aria-checked={star === value}
-            aria-label={`Rate ${star} star${star !== 1 ? "s" : ""}`}
+            aria-label={t`Rate ${plural(star, { one: "# star", other: "# stars" })}`}
             onClick={() => onChange(star === value ? 0 : star)}
             onMouseEnter={() => setHover(star)}
             className="p-0.5"

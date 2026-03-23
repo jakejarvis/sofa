@@ -1,3 +1,4 @@
+import { msg, plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconActivity,
@@ -28,6 +29,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useTimeAgo } from "@/hooks/use-time-ago";
 import { orpc } from "@/lib/orpc/client";
 import type { CronJobName, SystemHealthData } from "@sofa/api/schemas";
+import { i18n } from "@sofa/i18n";
 
 const DIGITS_ONLY_RE = /^\d+$/;
 
@@ -40,26 +42,29 @@ function cronToHuman(pattern: string): string {
   // Every N hours: "0 */6 * * *"
   if (hour.startsWith("*/")) {
     const n = Number.parseInt(hour.slice(2), 10);
-    return `Every ${n}h`;
+    return i18n._(msg`Every ${n}h`);
   }
 
   // Twice daily: "0 1,13 * * *"
   if (hour.includes(",") && !hour.includes("/") && !hour.includes("-")) {
     const hours = hour.split(",");
     if (hours.length === 2) {
-      return `Daily at ${hours.map((h) => `${h.padStart(2, "0")}:${min.padStart(2, "0")}`).join(", ")}`;
+      const times = hours.map((h) => `${h.padStart(2, "0")}:${min.padStart(2, "0")}`).join(", ");
+      return i18n._(msg`Daily at ${times}`);
     }
   }
 
   // Daily at specific time: "0 3 * * *"
   if (DIGITS_ONLY_RE.test(hour) && DIGITS_ONLY_RE.test(min) && dow === "*") {
-    return `Daily at ${hour.padStart(2, "0")}:${min.padStart(2, "0")}`;
+    const time = `${hour.padStart(2, "0")}:${min.padStart(2, "0")}`;
+    return i18n._(msg`Daily at ${time}`);
   }
 
-  // Weekly
+  // Weekly — use Intl for locale-aware day name
   if (DIGITS_ONLY_RE.test(dow)) {
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    return `Weekly on ${days[Number(dow)] ?? dow}`;
+    const dayDate = new Date(2024, 0, 7 + Number(dow)); // 2024-01-07 is a Sunday
+    const dayName = new Intl.DateTimeFormat(i18n.locale, { weekday: "short" }).format(dayDate);
+    return i18n._(msg`Weekly on ${dayName}`);
   }
 
   return pattern;
@@ -528,7 +533,7 @@ function StorageCard({
   onRefresh: () => void;
 }) {
   const { t } = useLingui();
-  const cachedImageCount = imageCache.imageCount.toLocaleString();
+  const cachedImageCount = imageCache.imageCount;
   const backupCount = backups.backupCount;
   const lastBackupAt = backups.lastBackupAt;
   return (
@@ -567,7 +572,7 @@ function StorageCard({
         {imageCache.enabled ? (
           <>
             <p className="text-muted-foreground mt-1 text-xs">
-              {t`${cachedImageCount} cached images`}
+              {plural(cachedImageCount, { one: "# cached image", other: "# cached images" })}
             </p>
             <p className="text-muted-foreground/50 mt-0.5 text-[10px] leading-relaxed">
               {Object.entries(imageCache.categories)
@@ -598,7 +603,8 @@ function StorageCard({
         {backupCount > 0 ? (
           <p className="text-muted-foreground mt-1 text-xs">
             <Trans>
-              {backupCount} backups · last <LiveTimeAgo date={lastBackupAt} fallback={t`unknown`} />
+              {plural(backupCount, { one: "# backup", other: "# backups" })} · last{" "}
+              <LiveTimeAgo date={lastBackupAt} fallback={t`unknown`} />
             </Trans>
           </p>
         ) : (

@@ -142,7 +142,7 @@ export default function DashboardScreen() {
             </View>
             <View className="flex-row gap-3">
               <StatsCard
-                label={t`In library`}
+                label={t`In Library`}
                 value={stats.data?.librarySize}
                 icon={IconBooks}
                 color="text-status-watchlist"

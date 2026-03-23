@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Link } from "expo-router";
 import { memo } from "react";
@@ -36,10 +37,12 @@ export const ContinueWatchingCard = memo(function ContinueWatchingCard({
   const { t } = useLingui();
   const { animatedStyle, gesture: tapGesture } = usePressAnimation();
 
-  const progressLabel = `${item.watchedEpisodes} of ${item.totalEpisodes} episodes`;
-  const nextEpLabel = item.nextEpisode
-    ? `Next: Season ${item.nextEpisode.seasonNumber} Episode ${item.nextEpisode.episodeNumber}`
-    : undefined;
+  const watchedEpisodes = item.watchedEpisodes;
+  const totalEpisodes = item.totalEpisodes;
+  const progressLabel = t`${watchedEpisodes}/${plural(totalEpisodes, { one: "# episode", other: "# episodes" })}`;
+  const seasonNum = item.nextEpisode?.seasonNumber;
+  const epNum = item.nextEpisode?.episodeNumber;
+  const nextEpLabel = item.nextEpisode ? t`Next: S${seasonNum} E${epNum}` : undefined;
   const cardLabel = [item.title.title, progressLabel, nextEpLabel].filter(Boolean).join(", ");
 
   return (
@@ -105,7 +108,7 @@ export const ContinueWatchingCard = memo(function ContinueWatchingCard({
           <Link.Preview />
           <Link.Menu>
             <Link.MenuAction
-              title={t`Remove from Library`}
+              title={t`Remove from library`}
               icon="trash"
               destructive
               onPress={() => titleActions.removeFromLibrary(item.title.id)}

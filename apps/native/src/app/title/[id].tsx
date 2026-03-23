@@ -115,7 +115,10 @@ export default function TitleDetailScreen() {
     quickAdd: quickAddMutation,
   } = useTitleActions({
     toasts: {
-      watchMovie: () => (title?.title ? `Marked "${title.title}" as watched` : "Marked as watched"),
+      watchMovie: () => {
+        const name = title?.title;
+        return name ? t`Marked "${name}" as watched` : t`Marked as watched`;
+      },
     },
   });
 
@@ -315,8 +318,8 @@ export default function TitleDetailScreen() {
                 )
               }
               accessibilityRole="button"
-              accessibilityLabel={`Play trailer for ${title.title}`}
-              accessibilityHint="Opens the trailer in YouTube"
+              accessibilityLabel={t`Play trailer for ${titleName}`}
+              accessibilityHint={t`Opens the trailer in YouTube`}
               className="absolute inset-0 items-center justify-center"
             >
               {isLiquidGlassAvailable() ? (
