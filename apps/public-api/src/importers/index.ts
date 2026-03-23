@@ -1,17 +1,21 @@
+import * as z from "zod";
+
 import { simkl } from "./simkl";
 import { trakt } from "./trakt";
 import type { ImportProvider } from "./types";
 
-const importers: Record<string, ImportProvider> = {
+export const ProviderEnum = z.enum(["trakt", "simkl"]);
+
+const importers: Record<z.infer<typeof ProviderEnum>, ImportProvider> = {
   trakt,
   simkl,
 };
 
-export function getImporter(name: string): ImportProvider | undefined {
+export function getImporter(name: z.infer<typeof ProviderEnum>): ImportProvider | undefined {
   return importers[name];
 }
 
-export function getImporterConfig(name: string): {
+export function getImporterConfig(name: z.infer<typeof ProviderEnum>): {
   clientId: string;
   clientSecret: string;
 } {

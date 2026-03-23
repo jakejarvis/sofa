@@ -416,7 +416,10 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         if (data.status === "authorized" && data.data) {
           stopPolling();
           setStep("fetching");
-          parsePayloadMutation.mutate({ data: data.data as NormalizedImport });
+          parsePayloadMutation.mutate({
+            source: config.source as "trakt" | "simkl",
+            rawPayload: data.data,
+          });
         } else if (data.status === "denied") {
           stopPolling();
           setOauthError(t`Authorization was denied. Please try again.`);

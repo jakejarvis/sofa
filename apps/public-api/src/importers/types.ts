@@ -1,7 +1,3 @@
-import type { NormalizedImport } from "@sofa/api/schemas";
-
-export type { NormalizedImport };
-
 export interface DeviceCodeResponse {
   device_code: string;
   user_code: string;
@@ -19,5 +15,5 @@ export type PollResult =
 export interface ImportProvider {
   getDeviceCode(clientId: string, clientSecret: string): Promise<DeviceCodeResponse>;
   pollForToken(clientId: string, clientSecret: string, deviceCode: string): Promise<PollResult>;
-  fetchUserData(accessToken: string, clientId: string): Promise<NormalizedImport>;
+  fetchUserData(accessToken: string, clientId: string): Promise<unknown>;
 }

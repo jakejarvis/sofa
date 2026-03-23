@@ -2,15 +2,17 @@ import { zValidator } from "@hono/zod-validator";
 import { checkRateLimit } from "@vercel/firewall";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { logger } from "hono/logger";
 import { z } from "zod";
 
-import { getImporter, getImporterConfig } from "./importers";
+import { getImporter, getImporterConfig, ProviderEnum } from "./importers";
 
 const GITHUB_RELEASES_URL = "https://api.github.com/repos/jakejarvis/sofa/releases/latest";
 const VERSION_PREFIX_RE = /^v/;
 
 const app = new Hono();
 
+app.use("*", logger());
 app.use("*", cors());
 
 // ─── Version Check ──────────────────────────────────────────
@@ -100,8 +102,6 @@ app.post(
 //   - "import-poll"        — token polling (e.g. 60 req/IP/minute)
 // The self-hosted server also prevents concurrent imports per user
 // via the importJobs table.
-
-const ProviderEnum = z.enum(["trakt", "simkl"]);
 
 app.post(
   "/v1/import/:provider/device-code",

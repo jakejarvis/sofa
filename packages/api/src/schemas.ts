@@ -1048,7 +1048,8 @@ export const ParseFileInput = z.object({
 });
 
 export const ParsePayloadInput = z.object({
-  data: NormalizedImportSchema,
+  source: z.enum(["trakt", "simkl"]).describe("OAuth import provider"),
+  rawPayload: z.unknown().describe("Raw aggregated API response from the OAuth proxy"),
 });
 
 export const ImportJobStatusEnum = z.enum(["pending", "running", "success", "error", "cancelled"]);

@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "PORT=3002 bun --watch src/app.ts",
-    "start": "PORT=3002 bun src/app.ts",
+    "dev": "PORT=3002 bun --hot src/app.ts",
+    "start": "bun src/app.ts",
     "lint": "oxlint",
     "format": "oxfmt --config ../../.oxfmtrc.json",
     "format:check": "oxfmt --check --config ../../.oxfmtrc.json",
@@ -13,10 +13,8 @@
   },
   "dependencies": {
     "@hono/zod-validator": "0.7.6",
-    "@sofa/api": "workspace:*",
-    "@sofa/core": "workspace:*",
     "@vercel/firewall": "1.1.2",
-    "hono": "4.12.8",
+    "hono": "4.12.9",
     "zod": "catalog:"
   },
   "devDependencies": {

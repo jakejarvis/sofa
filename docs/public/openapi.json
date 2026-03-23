@@ -6570,8 +6570,8 @@
     "/imports/parse-payload": {
       "post": {
         "operationId": "imports.parsePayload",
-        "summary": "Preview normalized import data",
-        "description": "Accept pre-normalized import data from the OAuth proxy and return a preview with item counts. No parsing is needed — data is already in NormalizedImport format.",
+        "summary": "Parse raw OAuth import data",
+        "description": "Accept raw API responses from the OAuth proxy, parse them into normalized import format, and return a preview with item counts.",
         "tags": [
           "Imports"
         ],
@@ -6582,210 +6582,20 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "data": {
-                    "type": "object",
-                    "properties": {
-                      "source": {
-                        "enum": [
-                          "trakt",
-                          "simkl",
-                          "letterboxd",
-                          "sofa"
-                        ],
-                        "type": "string",
-                        "description": "Service to import from"
-                      },
-                      "movies": {
-                        "type": "array",
-                        "maxItems": 50000,
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "tmdbId": {
-                              "type": "number"
-                            },
-                            "imdbId": {
-                              "type": "string"
-                            },
-                            "title": {
-                              "type": "string"
-                            },
-                            "year": {
-                              "type": "number"
-                            },
-                            "watchedAt": {
-                              "type": "string",
-                              "format": "date-time",
-                              "description": "ISO 8601 timestamp"
-                            },
-                            "watchedOn": {
-                              "type": "string",
-                              "format": "date",
-                              "description": "YYYY-MM-DD date-only"
-                            }
-                          },
-                          "required": [
-                            "title"
-                          ]
-                        }
-                      },
-                      "episodes": {
-                        "type": "array",
-                        "maxItems": 50000,
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "showTmdbId": {
-                              "type": "number"
-                            },
-                            "imdbId": {
-                              "type": "string"
-                            },
-                            "tvdbId": {
-                              "type": "number"
-                            },
-                            "showTitle": {
-                              "type": "string"
-                            },
-                            "year": {
-                              "type": "number"
-                            },
-                            "seasonNumber": {
-                              "type": "integer",
-                              "minimum": 0,
-                              "maximum": 9007199254740991
-                            },
-                            "episodeNumber": {
-                              "type": "integer",
-                              "minimum": 1,
-                              "maximum": 9007199254740991
-                            },
-                            "watchedAt": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "watchedOn": {
-                              "type": "string",
-                              "format": "date"
-                            }
-                          },
-                          "required": [
-                            "seasonNumber",
-                            "episodeNumber"
-                          ]
-                        }
-                      },
-                      "watchlist": {
-                        "type": "array",
-                        "maxItems": 50000,
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "tmdbId": {
-                              "type": "number"
-                            },
-                            "imdbId": {
-                              "type": "string"
-                            },
-                            "tvdbId": {
-                              "type": "number"
-                            },
-                            "title": {
-                              "type": "string"
-                            },
-                            "year": {
-                              "type": "number"
-                            },
-                            "type": {
-                              "enum": [
-                                "movie",
-                                "tv"
-                              ],
-                              "type": "string"
-                            },
-                            "status": {
-                              "enum": [
-                                "watchlist",
-                                "in_progress",
-                                "completed"
-                              ],
-                              "type": "string",
-                              "description": "Library status (default: watchlist)"
-                            },
-                            "addedAt": {
-                              "type": "string",
-                              "format": "date-time",
-                              "description": "When the item was added to library"
-                            }
-                          },
-                          "required": [
-                            "title",
-                            "type"
-                          ]
-                        }
-                      },
-                      "ratings": {
-                        "type": "array",
-                        "maxItems": 50000,
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "tmdbId": {
-                              "type": "number"
-                            },
-                            "imdbId": {
-                              "type": "string"
-                            },
-                            "tvdbId": {
-                              "type": "number"
-                            },
-                            "title": {
-                              "type": "string"
-                            },
-                            "year": {
-                              "type": "number"
-                            },
-                            "type": {
-                              "enum": [
-                                "movie",
-                                "tv"
-                              ],
-                              "type": "string"
-                            },
-                            "rating": {
-                              "type": "integer",
-                              "minimum": 1,
-                              "maximum": 5,
-                              "description": "Sofa 1-5 star rating"
-                            },
-                            "ratedAt": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "ratedOn": {
-                              "type": "string",
-                              "format": "date"
-                            }
-                          },
-                          "required": [
-                            "title",
-                            "type",
-                            "rating"
-                          ]
-                        }
-                      }
-                    },
-                    "required": [
-                      "source",
-                      "movies",
-                      "episodes",
-                      "watchlist",
-                      "ratings"
-                    ]
+                  "source": {
+                    "enum": [
+                      "trakt",
+                      "simkl"
+                    ],
+                    "type": "string",
+                    "description": "OAuth import provider"
+                  },
+                  "rawPayload": {
+                    "description": "Raw aggregated API response from the OAuth proxy"
                   }
                 },
                 "required": [
-                  "data"
+                  "source"
                 ]
               }
             }

@@ -1,6 +1,4 @@
-import { parseSimklPayload } from "@sofa/core/imports/parsers";
-
-import type { DeviceCodeResponse, ImportProvider, NormalizedImport, PollResult } from "./types";
+import type { DeviceCodeResponse, ImportProvider, PollResult } from "./types";
 
 const API_BASE = "https://api.simkl.com";
 const AUTH_BASE = "https://simkl.com";
@@ -108,7 +106,7 @@ export const simkl: ImportProvider = {
     return { status: "pending" };
   },
 
-  async fetchUserData(accessToken, clientId): Promise<NormalizedImport> {
+  async fetchUserData(accessToken, clientId): Promise<unknown> {
     const headers = simklHeaders(clientId, accessToken);
 
     // Fetch movies, shows, and anime in parallel
@@ -131,14 +129,11 @@ export const simkl: ImportProvider = {
       animeRes.ok ? (animeRes.json() as Promise<SimklApiItem[]>) : ([] as SimklApiItem[]),
     ]);
 
-    // Flatten API's nested movie/show objects into the flat format
-    // the core parser expects, then delegate normalization
-    const result = parseSimklPayload({
+    // Return flattened API response — parsing happens on the self-hosted server
+    return {
       movies: flattenSimklItems(moviesData, "movie"),
       shows: flattenSimklItems(showsData, "show"),
       anime: flattenSimklItems(animeData, "show"),
-    });
-
-    return result.data;
+    };
   },
 };

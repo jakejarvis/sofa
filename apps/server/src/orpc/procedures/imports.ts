@@ -3,7 +3,6 @@ import { ORPCError } from "@orpc/server";
 import { AppErrorCode } from "@sofa/api/errors";
 import type { ParseResult } from "@sofa/core/imports";
 import {
-  countUnresolved,
   getActiveImportJobForUser,
   insertImportJob,
   parseLetterboxdExport,
@@ -87,17 +86,27 @@ export const parseFile = os.imports.parseFile.use(authed).handler(async ({ input
 });
 
 export const parsePayload = os.imports.parsePayload.use(authed).handler(({ input }) => {
-  const { data } = input;
+  const { source, rawPayload } = input;
+
+  let result: ParseResult;
+  switch (source) {
+    case "trakt":
+      result = parseTraktPayload(rawPayload as Parameters<typeof parseTraktPayload>[0]);
+      break;
+    case "simkl":
+      result = parseSimklPayload(rawPayload as Parameters<typeof parseSimklPayload>[0]);
+      break;
+  }
 
   return {
-    data,
-    warnings: [],
-    diagnostics: { unresolved: countUnresolved(data), unsupported: 0 },
+    data: result.data,
+    warnings: result.warnings,
+    diagnostics: result.diagnostics,
     stats: {
-      movies: data.movies.length,
-      episodes: data.episodes.length,
-      watchlist: data.watchlist.length,
-      ratings: data.ratings.length,
+      movies: result.data.movies.length,
+      episodes: result.data.episodes.length,
+      watchlist: result.data.watchlist.length,
+      ratings: result.data.ratings.length,
     },
   };
 });

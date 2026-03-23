@@ -22,6 +22,16 @@ const config = {
         destination: "https://github.com/jakejarvis/sofa/discussions",
         permanent: false,
       },
+      {
+        source: "/ios",
+        destination: "https://apps.apple.com/us/app/sofa-tv-movie-tracker/id6760432427",
+        permanent: false,
+      },
+      {
+        source: "/testflight",
+        destination: "https://testflight.apple.com/join/tjSddcaZ",
+        permanent: false,
+      }
     ];
   },
   async rewrites() {

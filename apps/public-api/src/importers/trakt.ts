@@ -1,6 +1,4 @@
-import { parseTraktPayload } from "@sofa/core/imports/parsers";
-
-import type { DeviceCodeResponse, ImportProvider, NormalizedImport, PollResult } from "./types";
+import type { DeviceCodeResponse, ImportProvider, PollResult } from "./types";
 
 const API_BASE = "https://api.trakt.tv";
 
@@ -55,7 +53,7 @@ export const trakt: ImportProvider = {
     return { status: "expired" };
   },
 
-  async fetchUserData(accessToken, clientId): Promise<NormalizedImport> {
+  async fetchUserData(accessToken, clientId): Promise<unknown> {
     const headers = traktHeaders(clientId, accessToken);
 
     // Fetch all data in parallel
@@ -82,15 +80,11 @@ export const trakt: ImportProvider = {
       ratingsRes.ok ? ratingsRes.json() : [],
     ]);
 
-    // Restructure API response into the format parseTraktPayload expects.
-    // The Trakt API returns the same item shapes as the JSON export format.
-    type TraktPayload = Parameters<typeof parseTraktPayload>[0];
-    const result = parseTraktPayload({
+    // Return raw aggregated API response — parsing happens on the self-hosted server
+    return {
       history: { movies: moviesData, shows: showsData },
       watchlist: watchlistData,
       ratings: ratingsData,
-    } as TraktPayload);
-
-    return result.data;
+    };
   },
 };

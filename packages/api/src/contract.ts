@@ -749,9 +749,9 @@ export const contract = {
         method: "POST",
         path: "/imports/parse-payload",
         tags: ["Imports"],
-        summary: "Preview normalized import data",
+        summary: "Parse raw OAuth import data",
         description:
-          "Accept pre-normalized import data from the OAuth proxy and return a preview with item counts. No parsing is needed — data is already in NormalizedImport format.",
+          "Accept raw API responses from the OAuth proxy, parse them into normalized import format, and return a preview with item counts.",
         successDescription: "Preview of importable items with counts",
       })
       .input(ParsePayloadInput)
