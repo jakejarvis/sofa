@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-21 16:52\n"
+"PO-Revision-Date: 2026-03-23 20:33\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -36,6 +36,11 @@ msgstr "{0, plural, other {# 张图片}}"
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "{0, plural, one {# title} other {# titles}}"
 msgstr "{0, plural, other {# 部}}"
+
+#. placeholder {0}: import { msg, plural } from "@lingui/core/macro"; import { Trans, useLingui } from "@lingui/react/macro"; import { IconActivity, IconAlertTriangle, IconCalendarCheck, IconCheck, IconDatabase, IconPlayerPlay, IconRefresh, } from "@tabler/icons-react"; import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"; import { toast } from "sonner"; import { StatusDot } from "@/components/status-dot"; import { Button } from "@/components/ui/button"; import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card"; import { Skeleton } from "@/components/ui/skeleton"; import { Spinner } from "@/components/ui/spinner"; import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"; import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; import { useTimeAgo } from "@/hooks/use-time-ago"; import { orpc } from "@/lib/orpc/client"; import type { CronJobName, SystemHealthData } from "@sofa/api/schemas"; import { i18n } from "@sofa/i18n"; const DIGITS_ONLY_RE = /^\d+$/; /** Convert a cron pattern to a short human-readable string */ function cronToHuman(pattern: string): string { const parts = pattern.split(" "); if (parts.length !== 5) return pattern; const [min, hour, _dom, _mon, dow] = parts; // Every N hours: "0 */6 * * *" if (hour.startsWith("*/")) { const n = Number.parseInt(hour.slice(2), 10); return i18n._(msg`Every ${n}h`); } // Twice daily: "0 1,13 * * *" if (hour.includes(",") && !hour.includes("/") && !hour.includes("-")) { const hours = hour.split(","); if (hours.length === 2) { const times = hours.map((h) => `${h.padStart(2, "0")}:${min.padStart(2, "0")}`).join(", "); return i18n._(msg`Daily at ${times}`); } } // Daily at specific time: "0 3 * * *" if (DIGITS_ONLY_RE.test(hour) && DIGITS_ONLY_RE.test(min) && dow === "*") { const time = `${hour.padStart(2, "0")}:${min.padStart(2, "0")}`; return i18n._(msg`Daily at ${time}`); } // Weekly — use Intl for locale-aware day name if (DIGITS_ONLY_RE.test(dow)) { const dayDate = new Date(2024, 0, 7 + Number(dow)); // 2024-01-07 is a Sunday const dayName = new Intl.DateTimeFormat(i18n.locale, { weekday: "short" }).format(dayDate); return i18n._(msg`Weekly on ${dayName}`); } return pattern; } function formatBytes(bytes: number): string { if (bytes < 1024) return `${bytes} B`; if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`; if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`; return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`; } function formatDuration(ms: number): string { if (ms < 1000) return `${ms}ms`; if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`; return `${Math.round(ms / 60000)}m`; } export function SkeletonCards() { return ( <div className="space-y-3"> {["status", "jobs", "storage"].map((s) => ( <Card key={s} className="border-s-primary/30 border-s-2"> <CardContent> <div className="flex items-start gap-3"> <Skeleton className="mt-0.5 h-8 w-8 rounded-lg" /> <div className="flex-1 space-y-2"> <Skeleton className="h-4 w-28" /> <Skeleton className="h-3 w-48" /> </div> </div> </CardContent> </Card> ))} </div> ); } /** Inline component that live-updates a relative timestamp */ function LiveTimeAgo({ date, fallback = "", }: { date: string | Date | null | undefined; fallback?: string; }) { const text = useTimeAgo(date, { fallback }); return <span suppressHydrationWarning>{text}</span>; } /** Hydrates system health state and renders the 3 cards */ export function SystemHealthCards() { const queryClient = useQueryClient(); const { data, isPending, isFetching } = useQuery(orpc.admin.systemHealth.queryOptions()); const isRefreshing = isFetching; const refresh = () => queryClient.invalidateQueries({ queryKey: orpc.admin.systemHealth.key() }); if (isPending || !data) return <SkeletonCards />; return ( <div className="space-y-3"> <SystemStatusCard checkedAt={data.checkedAt} database={data.database} tmdb={data.tmdb} environment={data.environment} isRefreshing={isRefreshing} onRefresh={refresh} /> <BackgroundJobsCard jobs={data.jobs} isRefreshing={isRefreshing} onRefresh={refresh} /> <StorageCard imageCache={data.imageCache} backups={data.backups} isRefreshing={isRefreshing} onRefresh={refresh} /> </div> ); } function RefreshButton({ isRefreshing, onRefresh, }: { isRefreshing: boolean; onRefresh: () => void; }) { const { t } = useLingui(); return ( <Tooltip> <TooltipTrigger render={ <Button variant="ghost" size="icon" aria-label={t`Refresh system health`} onClick={onRefresh} disabled={isRefreshing} className="text-muted-foreground" /> } > {isRefreshing ? <Spinner /> : <IconRefresh />} </TooltipTrigger> <TooltipContent> <Trans>Refresh</Trans> </TooltipContent> </Tooltip> ); } function SystemStatusCard({ checkedAt, database, tmdb, environment, isRefreshing, onRefresh, }: Pick<SystemHealthData, "checkedAt" | "database" | "tmdb" | "environment"> & { isRefreshing: boolean; onRefresh: () => void; }) { return ( <Card className="border-s-primary/30 border-s-2"> <CardContent> <div className="flex items-center justify-between gap-4"> <div className="flex items-start gap-3"> <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"> <IconActivity aria-hidden={true} className="text-primary size-4" /> </div> <div> <CardTitle> <Trans>Health status</Trans> </CardTitle> <CardDescription> <Trans> Checked <LiveTimeAgo date={checkedAt} /> </Trans> </CardDescription> </div> </div> <RefreshButton isRefreshing={isRefreshing} onRefresh={onRefresh} /> </div> </CardContent> {/* Database */} <CardContent className="border-border/30 border-t pt-4"> <div className="flex items-center gap-2"> <span className="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase"> <Trans>Database</Trans> </span> <span className="text-muted-foreground font-mono text-[11px]"> {formatBytes(database.dbSizeBytes)} {database.walSizeBytes > 0 && ` + ${formatBytes(database.walSizeBytes)} WAL`} </span> </div> </CardContent> {/* TMDB */} <CardContent className="border-border/30 border-t pt-4"> <div className="flex items-center gap-2"> <span className="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase"> TMDB API </span> {!tmdb.tokenConfigured ? ( <> <StatusDot status="error" /> <span className="text-muted-foreground/50 text-xs"> <Trans>Not configured</Trans> </span> </> ) : tmdb.connected && tmdb.tokenValid ? ( <> <StatusDot status="ok" /> <span className="text-muted-foreground text-xs"> <Trans>Connected</Trans> </span> <span className="text-muted-foreground/80 font-mono text-[11px]"> {tmdb.responseTimeMs}ms </span> </> ) : tmdb.connected && !tmdb.tokenValid ? ( <> <StatusDot status="error" /> <span className="text-destructive text-xs"> <Trans>Invalid token</Trans> </span> </> ) : ( <> <StatusDot status="error" /> <span className="text-destructive text-xs"> <Trans>Unreachable</Trans> </span> {tmdb.error && ( <span className="text-muted-foreground/50 text-[11px]">{tmdb.error}</span> )} </> )} </div> </CardContent> {/* Environment */} <CardContent className="border-border/30 border-t pt-4"> <div className="space-y-2"> <span className="text-muted-foreground/70 inline-flex items-center gap-1.5 text-[11px] font-medium tracking-wider uppercase"> <Trans>Environment</Trans> {environment.dataDirWritable ? ( <IconCheck aria-hidden={true} className="size-3 text-green-500" /> ) : ( <IconAlertTriangle aria-hidden={true} className="text-destructive size-3" /> )} </span> <div className="space-y-1"> {environment.envVars .filter((env) => env.value !== null) .map((env) => ( <div key={env.name} className="flex items-baseline gap-[1px] font-mono text-[11px] leading-relaxed" > <span className="text-muted-foreground/60">{env.name}=</span> <span className="text-muted-foreground break-all">{env.value}</span> </div> ))} </div> </div> </CardContent> </Card> ); } function BackgroundJobsCard({ jobs, isRefreshing, onRefresh, }: Pick<SystemHealthData, "jobs"> & { isRefreshing: boolean; onRefresh: () => void; }) { const { t } = useLingui(); const JOB_LABELS: Record<string, string> = { nightlyRefreshLibrary: t`Library refresh`, refreshAvailability: t`Availability`, refreshRecommendations: t`Recommendations`, refreshTvChildren: t`TV episodes`, cacheImages: t`Image cache`, scheduledBackup: t`Backup`, updateCheck: t`Update check`, }; const triggerJobMutation = useMutation( orpc.admin.triggerJob.mutationOptions({ onSuccess: (_, { name }) => { const jobLabel = JOB_LABELS[name] ?? name; toast.success(t`${jobLabel} triggered`); setTimeout(onRefresh, 1500); }, onError: (err) => { toast.error(err instanceof Error ? err.message : t`Failed to trigger job`); }, }), ); const triggeringJob = triggerJobMutation.isPending ? (triggerJobMutation.variables?.name ?? null) : null; const sortedJobs = jobs.toSorted((a, b) => { if (a.disabled !== b.disabled) return a.disabled ? 1 : -1; if (!a.nextRunAt && !b.nextRunAt) return 0; if (!a.nextRunAt) return 1; if (!b.nextRunAt) return -1; return new Date(a.nextRunAt).getTime() - new Date(b.nextRunAt).getTime(); }); const activeJobs = jobs.filter((j) => !j.disabled); const healthyCount = activeJobs.filter((j) => j.lastStatus === "success").length; const activeJobCount = activeJobs.length; return ( <Card className="border-s-primary/30 border-s-2"> <CardContent> <div className="flex items-center justify-between gap-4"> <div className="flex items-start gap-3"> <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"> <IconCalendarCheck aria-hidden={true} className="text-primary size-4" /> </div> <div> <CardTitle> <Trans>Background jobs</Trans> </CardTitle> <CardDescription> <Trans> {healthyCount} of {activeJobCount} jobs healthy </Trans> </CardDescription> </div> </div> <RefreshButton isRefreshing={isRefreshing} onRefresh={onRefresh} /> </div> </CardContent> <CardContent className="border-border/30 border-t px-0 pt-0 pb-0"> <Table> <TableHeader> <TableRow className="border-b-border/30 hover:bg-transparent"> <TableHead className="text-muted-foreground h-8 ps-5 text-[10px] font-medium tracking-wider uppercase"> <Trans>Job</Trans> </TableHead> <TableHead className="text-muted-foreground h-8 text-[10px] font-medium tracking-wider uppercase"> <Trans>Schedule</Trans> </TableHead> <TableHead className="text-muted-foreground h-8 text-[10px] font-medium tracking-wider uppercase"> <Trans>Last run</Trans> </TableHead> <TableHead className="text-muted-foreground h-8 text-[10px] font-medium tracking-wider uppercase"> <Trans>Next run</Trans> </TableHead> <TableHead className="text-muted-foreground h-8 pe-5 text-end text-[10px] font-medium tracking-wider uppercase"> <span className="sr-only"> <Trans>Actions</Trans> </span> </TableHead> </TableRow> </TableHeader> <TableBody> {sortedJobs.map((job) => { const isTriggering = triggeringJob === job.jobName; const isRunning = job.isCurrentlyRunning || isTriggering; return ( <TableRow key={job.jobName} className="border-b-border/20 hover:bg-muted/30"> {/* Job name + status */} <TableCell className="ps-5"> <div className="flex items-center gap-2"> {job.disabled ? ( <StatusDot status="inactive" label={t`Disabled`} /> ) : isRunning ? ( <Spinner className="size-2.5" /> ) : job.lastStatus === null ? ( <StatusDot status="warn" label={t`Never run`} /> ) : job.lastStatus === "success" ? ( <StatusDot status="ok" label={t`Last run succeeded`} /> ) : ( <StatusDot status="error" label={job.lastError ?? t`Last run failed`} /> )} <span className="text-muted-foreground text-xs"> {JOB_LABELS[job.jobName] ?? job.jobName} </span> </div> </TableCell> {/* Schedule */} <TableCell> {job.cronPattern ? ( <Tooltip> <TooltipTrigger className="cursor-default"> <span className="text-muted-foreground/80 text-xs"> {cronToHuman(job.cronPattern)} </span> </TooltipTrigger> <TooltipContent> <span className="font-mono">{job.cronPattern}</span> </TooltipContent> </Tooltip> ) : ( <span className="text-muted-foreground/50 text-xs">—</span> )} </TableCell> {/* Last run */} <TableCell> {job.lastRunAt ? ( <Tooltip> <TooltipTrigger className="cursor-default"> <div className="flex items-baseline gap-1.5"> <span className="text-muted-foreground/80 text-xs"> <LiveTimeAgo date={job.lastRunAt} /> </span> {job.lastDurationMs !== null && job.lastDurationMs > 0 && ( <span className="text-muted-foreground/50 font-mono text-[10px]"> {formatDuration(job.lastDurationMs)} </span> )} </div> </TooltipTrigger> <TooltipContent> {new Date(job.lastRunAt).toLocaleString()} {job.lastError && ( <div className="text-destructive mt-1">{job.lastError}</div> )} </TooltipContent> </Tooltip> ) : ( <span className="text-muted-foreground/50 text-xs"> <Trans>Never</Trans> </span> )} </TableCell> {/* Next run */} <TableCell> {job.nextRunAt ? ( <Tooltip> <TooltipTrigger className="cursor-default"> <span className="text-muted-foreground/80 text-xs"> <LiveTimeAgo date={job.nextRunAt} /> </span> </TooltipTrigger> <TooltipContent>{new Date(job.nextRunAt).toLocaleString()}</TooltipContent> </Tooltip> ) : ( <span className="text-muted-foreground/50 text-xs">—</span> )} </TableCell> {/* Trigger button */} <TableCell className="pe-5 text-end"> <Tooltip> <TooltipTrigger render={ <Button variant="ghost" size="icon" aria-label={t`Trigger job`} className="size-6" disabled={isRunning || job.disabled} onClick={() => triggerJobMutation.mutate({ name: job.jobName as CronJobName, }) } /> } > {isRunning ? ( <Spinner className="size-3" /> ) : ( <IconPlayerPlay aria-hidden={true} className="text-muted-foreground/70 size-3" /> )} </TooltipTrigger> <TooltipContent> <Trans>Run now</Trans> </TooltipContent> </Tooltip> </TableCell> </TableRow> ); })} </TableBody> </Table> </CardContent> </Card> ); } function StorageCard({ imageCache, backups, isRefreshing, onRefresh, }: Pick<SystemHealthData, "imageCache" | "backups"> & { isRefreshing: boolean; onRefresh: () => void; }) { const { t } = useLingui(); const cachedImageCount = imageCache.imageCount; const backupCount = backups.backupCount; const lastBackupAt = backups.lastBackupAt; return ( <Card className="border-s-primary/30 border-s-2"> <CardContent> <div className="flex items-center justify-between gap-4"> <div className="flex items-start gap-3"> <div className="bg-primary/10 mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"> <IconDatabase aria-hidden={true} className="text-primary size-4" /> </div> <div> <CardTitle> <Trans>Storage</Trans> </CardTitle> <CardDescription> <Trans>Image cache and backup disk usage</Trans> </CardDescription> </div> </div> <RefreshButton isRefreshing={isRefreshing} onRefresh={onRefresh} /> </div> </CardContent> {/* Image cache */} <CardContent className="border-border/30 border-t pt-4"> <div className="flex items-center justify-between"> <span className="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase"> <Trans>Image cache</Trans> </span> {imageCache.enabled ? ( <span className="text-muted-foreground/50 font-mono text-[11px]"> {formatBytes(imageCache.totalSizeBytes)} </span> ) : null} </div> {imageCache.enabled ? ( <> <p className="text-muted-foreground mt-1 text-xs"> {plural(cachedImageCount, { one: "# cached image", other: "# cached images" })} </p> <p className="text-muted-foreground/50 mt-0.5 text-[10px] leading-relaxed"> {Object.entries(imageCache.categories) .map(([name, cat]) => `${name} ${cat.count}`) .join(" · ")} </p> </> ) : ( <p className="text-muted-foreground/50 mt-1 flex items-center gap-1.5 text-xs"> <StatusDot status="inactive" /> <Trans>Disabled</Trans> </p> )} </CardContent> {/* Backup summary */} <CardContent className="border-border/30 border-t pt-4"> <div className="flex items-center justify-between"> <span className="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase"> <Trans>Backups</Trans> </span> {backupCount > 0 && ( <span className="text-muted-foreground/50 font-mono text-[11px]"> {formatBytes(backups.totalSizeBytes)} </span> )} </div> {backupCount > 0 ? ( <p className="text-muted-foreground mt-1 text-xs"> <Trans> {plural(backupCount, { one: "# backup", other: "# backups" })} · last{" "} <LiveTimeAgo date={lastBackupAt} fallback={t`unknown`} /> </Trans> </p> ) : ( <p className="text-muted-foreground/50 mt-1 flex items-center gap-1.5 text-xs"> <StatusDot status="inactive" /> <Trans>No backups yet</Trans> </p> )} </CardContent> </Card> ); } 
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "{0} · last <0/>"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-section.tsx
 #~ msgid "{0} {1, plural, one {backup} other {backups}} stored"
@@ -93,22 +98,34 @@ msgstr "{0, plural, other {# 部}}"
 #~ msgid "{0}/{1} episodes"
 #~ msgstr "{0}/{1} episodes"
 
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "{backupCount, plural, one {# backup} other {# backups}}"
+msgstr ""
+
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "{backupCount, plural, one {# backup} other {# backups}} stored"
 msgstr "{backupCount, plural, other {# 个备份}}已存储"
 
 #: apps/web/src/components/settings/system-health-section.tsx
-msgid "{backupCount} backups · last <0/>"
-msgstr "{backupCount} 个备份 · 最近 <0/>"
+#~ msgid "{backupCount} backups · last <0/>"
+#~ msgstr "{backupCount} backups · last <0/>"
 
 #: apps/web/src/components/settings/system-health-section.tsx
-msgid "{cachedImageCount} cached images"
-msgstr "{cachedImageCount} 张缓存图片"
+msgid "{cachedImageCount, plural, one {# cached image} other {# cached images}}"
+msgstr ""
+
+#: apps/web/src/components/settings/system-health-section.tsx
+#~ msgid "{cachedImageCount} cached images"
+#~ msgstr "{cachedImageCount} cached images"
 
 #: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "{count, plural, one {# earlier episode} other {# earlier episodes}} unwatched"
 msgstr "{count, plural, other {# 集}}更早的剧集未观看"
+
+#: apps/web/src/components/titles/cast-carousel.tsx
+msgid "{count, plural, one {# ep} other {# eps}}"
+msgstr ""
 
 #: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
@@ -116,8 +133,8 @@ msgstr "{count, plural, other {# 集}}更早的剧集未观看"
 #~ msgstr ""
 
 #: apps/web/src/components/titles/cast-carousel.tsx
-msgid "{count} ep{suffix}"
-msgstr "{count} 集{suffix}"
+#~ msgid "{count} ep{suffix}"
+#~ msgstr "{count} ep{suffix}"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 #~ msgid "{healthyCount} of {0} jobs healthy"
@@ -156,21 +173,29 @@ msgstr "{movieCount} 部电影，{episodeCount} 集"
 msgid "{ratingCount} ratings"
 msgstr "{ratingCount} 条评分"
 
+#: apps/native/src/components/ui/star-rating.tsx
+msgid "{star, plural, one {# star} other {# stars}}"
+msgstr ""
+
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "{unresolvedCount} items have no external IDs and will be resolved by title search, which may be less accurate."
 msgstr "{unresolvedCount} 个项目没有外部 ID，将通过标题搜索解析，结果可能不够准确。"
 
 #: apps/web/src/components/title-card.tsx
-msgid "{watched}/{total} episodes"
-msgstr "{watched}/{total} 集"
+msgid "{watched}/{total, plural, one {# episode} other {# episodes}}"
+msgstr ""
+
+#: apps/web/src/components/title-card.tsx
+#~ msgid "{watched}/{total} episodes"
+#~ msgstr ""
 
 #: apps/native/src/components/titles/season-accordion.tsx
 #~ msgid "{watchedCount} of {0} episodes watched"
 #~ msgstr ""
 
 #: apps/native/src/components/titles/season-accordion.tsx
-msgid "{watchedCount} of {episodeCount} episodes watched"
-msgstr "已观看 {watchedCount}/{episodeCount} 集"
+#~ msgid "{watchedCount} of {episodeCount} episodes watched"
+#~ msgstr "{watchedCount} of {episodeCount} episodes watched"
 
 #: apps/native/src/components/titles/season-accordion.tsx
 #~ msgid "{watchedCount}/{0} {1, plural, one {episode} other {episodes}}"
@@ -181,9 +206,11 @@ msgstr "已观看 {watchedCount}/{episodeCount} 集"
 #~ msgstr "{watchedCount}/{0} episodes"
 
 #: apps/native/src/components/titles/season-accordion.tsx
+#: apps/native/src/components/titles/season-accordion.tsx
 msgid "{watchedCount}/{episodeCount, plural, one {# episode} other {# episodes}}"
 msgstr "{watchedCount}/{episodeCount, plural, other {# 集}}"
 
+#: apps/native/src/components/dashboard/continue-watching-card.tsx
 #: apps/web/src/components/dashboard/continue-watching-card.tsx
 msgid "{watchedEpisodes}/{totalEpisodes, plural, one {# episode} other {# episodes}}"
 msgstr "{watchedEpisodes}/{totalEpisodes, plural, other {# 集}}"
@@ -197,6 +224,10 @@ msgstr "{watchlistCount} 个项目"
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Account"
 msgstr "账户"
+
+#: apps/web/src/components/nav-bar.tsx
+msgid "Account menu"
+msgstr ""
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Actions"
@@ -221,15 +252,20 @@ msgstr "添加 <0>Generic Destination</0> 并粘贴上方 URL"
 msgid "Add a new webhook and paste the URL above"
 msgstr "添加新 Webhook 并粘贴上方 URL"
 
+#: apps/native/src/app/(tabs)/(settings)/index.tsx
+msgid "Add profile photo"
+msgstr ""
+
 #: apps/web/src/components/explore/hero-banner.tsx
 msgid "Add to Library"
 msgstr "添加到媒体库"
 
 #: apps/native/src/components/titles/status-action-button.tsx
-msgid "Add to watchlist"
-msgstr "添加到观看列表"
+#~ msgid "Add to watchlist"
+#~ msgstr ""
 
 #: apps/native/src/components/explore/hero-banner.tsx
+#: apps/native/src/components/titles/status-action-button.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 #: apps/web/src/components/title-card.tsx
 msgid "Add to Watchlist"
@@ -288,6 +324,7 @@ msgstr "已有账户？立即登录"
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
 msgstr "加载此页面时发生意外错误。您可以重试或返回主页。"
 
+#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Anonymous usage reporting"
 msgstr "匿名使用报告"
@@ -437,14 +474,15 @@ msgid "Caught up — marked {count, plural, one {# episode} other {# episodes}} 
 msgstr "已追上 — 已标记 {count, plural, other {# 集}}为已观看"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
+#: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Change password"
 msgstr "修改密码"
 
 #: apps/native/src/app/change-password.tsx
-msgid "Change Password"
-msgstr "修改密码"
+#~ msgid "Change Password"
+#~ msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Change Photo"
@@ -458,6 +496,7 @@ msgstr "更换服务器"
 msgid "Check configuration"
 msgstr "检查配置"
 
+#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Check for updates"
 msgstr "检查更新"
@@ -530,6 +569,7 @@ msgstr "关闭"
 msgid "Completed"
 msgstr "已完成"
 
+#: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Confirm new password"
@@ -624,14 +664,16 @@ msgstr "无法加载人物详情"
 msgid "Could not load title details"
 msgstr ""
 
+#: apps/native/src/app/(auth)/register.tsx
+#: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Create account"
 msgstr "创建账户"
 
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/native/src/app/(auth)/register.tsx
-msgid "Create Account"
-msgstr "创建账户"
+#~ msgid "Create Account"
+#~ msgstr ""
 
 #: apps/native/src/app/(auth)/login.tsx
 msgid "Create an account"
@@ -646,13 +688,23 @@ msgid "Creating…"
 msgstr "创建中…"
 
 #: apps/native/src/app/change-password.tsx
+#: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Current password"
 msgstr "当前密码"
 
+#: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Current password is required"
 msgstr "请输入当前密码"
+
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Daily at {time}"
+msgstr ""
+
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Daily at {times}"
+msgstr ""
 
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Danger Zone"
@@ -732,6 +784,10 @@ msgstr "断开连接"
 msgid "Disconnect {label}"
 msgstr "断开 {label} 的连接"
 
+#: apps/native/src/app/(tabs)/(settings)/index.tsx
+msgid "Display name"
+msgstr ""
+
 #: apps/native/src/app/(auth)/server-url.tsx
 msgid "Don't have a server?"
 msgstr "没有服务器？"
@@ -745,6 +801,10 @@ msgstr "没有账户？"
 msgid "Done"
 msgstr "完成"
 
+#: apps/native/src/components/ui/star-rating.tsx
+msgid "Double tap to clear rating"
+msgstr ""
+
 #: apps/native/src/components/explore/genre-chip.tsx
 msgid "Double tap to clear this filter"
 msgstr "双击以清除此筛选条件"
@@ -752,6 +812,10 @@ msgstr "双击以清除此筛选条件"
 #: apps/native/src/components/explore/genre-chip.tsx
 msgid "Double tap to filter by {label}"
 msgstr "双击以按 {label} 筛选"
+
+#: apps/native/src/components/ui/star-rating.tsx
+msgid "Double tap to rate {star, plural, one {# star} other {# stars}}"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-section.tsx
 #: apps/web/src/components/settings/backup-section.tsx
@@ -766,6 +830,10 @@ msgstr "下载备份"
 msgid "Download your library, watch history, and ratings as JSON"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(settings)/index.tsx
+msgid "Edit profile photo"
+msgstr ""
+
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/web/src/components/people/person-hero.tsx
@@ -773,10 +841,17 @@ msgid "Editor"
 msgstr "剪辑师"
 
 #: apps/native/src/app/(auth)/login.tsx
+#: apps/native/src/app/(auth)/login.tsx
+#: apps/native/src/app/(auth)/register.tsx
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Email"
 msgstr "邮箱"
+
+#: apps/native/src/app/(auth)/login.tsx
+#: apps/native/src/app/(auth)/register.tsx
+msgid "Email is required"
+msgstr ""
 
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Enable the \"Playback Stop\" notification type"
@@ -794,9 +869,18 @@ msgstr "启用 <0>Playback Stop</0> 通知类型"
 msgid "Enable the <0>Playback</0> event category"
 msgstr "启用 <0>Playback</0> 事件类别"
 
+#: apps/native/src/app/(auth)/login.tsx
+#: apps/native/src/app/(auth)/register.tsx
+msgid "Enter a valid email address"
+msgstr ""
+
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Enter the code below on {source}'s website to authorize Sofa."
 msgstr "请在 {source} 的网站上输入以下代码以授权 Sofa。"
+
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Enter the full URL for your Sofa server"
+msgstr ""
 
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Enter your current password and choose a new one."
@@ -828,11 +912,13 @@ msgstr "第 {episodeNumber} 集"
 msgid "Episode {episodeNumber}, {episodeLabel}"
 msgstr "第 {episodeNumber} 集，{episodeLabel}"
 
+#: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Episode unwatched"
 msgstr "单集已标为未观看"
 
+#: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Episode watched"
@@ -881,6 +967,10 @@ msgstr "错误"
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Errors ({errorCount})"
 msgstr "错误 ({errorCount})"
+
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Every {n}h"
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(explore)/_layout.tsx
 #: apps/native/src/app/(tabs)/(home)/index.tsx
@@ -945,8 +1035,12 @@ msgid "Failed to disconnect {label}"
 msgstr "断开 {label} 连接失败"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
-msgid "Failed to load backup schedule settings."
-msgstr "加载备份计划设置失败。"
+msgid "Failed to load backup schedule settings"
+msgstr ""
+
+#: apps/web/src/components/settings/backup-schedule-section.tsx
+#~ msgid "Failed to load backup schedule settings."
+#~ msgstr ""
 
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Failed to load title"
@@ -1021,6 +1115,10 @@ msgstr "登录失败"
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Failed to start {sourceLabel} connection"
 msgstr "启动 {sourceLabel} 连接失败"
+
+#: apps/web/src/components/auth-form.tsx
+msgid "Failed to start SSO login"
+msgstr ""
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Failed to trigger job"
@@ -1156,14 +1254,15 @@ msgstr "以下是您的媒体库近况"
 msgid "Home"
 msgstr "首页"
 
+#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Image cache"
 msgstr "图片缓存"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-msgid "Image Cache"
-msgstr "图片缓存"
+#~ msgid "Image Cache"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Image cache and backup disk usage"
@@ -1243,17 +1342,18 @@ msgid "Importing from {source}"
 msgstr "正在从 {source} 导入"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
-msgid "In library"
-msgstr "媒体库中"
+#~ msgid "In library"
+#~ msgstr ""
 
+#: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
 msgid "In Library"
 msgstr "媒体库中"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/titles/status-button.tsx
-msgid "In Watchlist"
-msgstr "在待看列表中"
+#~ msgid "In Watchlist"
+#~ msgstr "In Watchlist"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/web/src/components/dashboard/library-section.tsx
@@ -1356,9 +1456,18 @@ msgstr "媒体库刷新"
 msgid "Library statuses"
 msgstr ""
 
+#: apps/native/src/components/ui/skeleton.tsx
+#: apps/web/src/components/ui/spinner.tsx
+msgid "Loading"
+msgstr ""
+
 #: apps/web/src/components/auth-form.tsx
 msgid "Loading…"
 msgstr "加载中…"
+
+#: apps/web/src/components/auth-form.tsx
+msgid "Login failed"
+msgstr ""
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
@@ -1390,21 +1499,31 @@ msgstr "全部标记为已观看"
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/ui/poster-card.tsx
-msgid "Mark as Watched"
-msgstr "标记为已观看"
+#~ msgid "Mark as Watched"
+#~ msgstr ""
 
 #: apps/native/src/components/ui/poster-card.tsx
 #~ msgid "Mark as Watching"
 #~ msgstr ""
+
+#: apps/web/src/components/titles/title-seasons.tsx
+msgid "Mark episode {epNum} watched"
+msgstr ""
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 msgid "Mark Episode Watched"
 msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/native/src/components/ui/poster-card.tsx
 #: apps/web/src/components/titles/title-actions.tsx
 msgid "Mark Watched"
 msgstr "标记为已观看"
+
+#: apps/native/src/app/title/[id].tsx
+msgid "Marked \"{name}\" as watched"
+msgstr ""
 
 #: apps/native/src/lib/title-actions.ts
 #~ msgid "Marked \"{titleName}\" as completed"
@@ -1429,6 +1548,7 @@ msgstr "已将\"{titleName}\"的所有剧集标记为已观看"
 #~ msgid "Marked as completed"
 #~ msgstr ""
 
+#: apps/native/src/app/title/[id].tsx
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Marked as watched"
@@ -1442,6 +1562,10 @@ msgstr "已标记为已观看"
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Member since {memberSince}"
 msgstr "注册于 {memberSince}"
+
+#: apps/web/src/components/auth-form.tsx
+msgid "Min 8 characters…"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Monday"
@@ -1491,9 +1615,18 @@ msgstr "电影 {select}"
 #~ msgstr ""
 
 #: apps/native/src/app/(auth)/register.tsx
+#: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Name"
 msgstr "名称"
+
+#: apps/native/src/app/(auth)/register.tsx
+msgid "Name is required"
+msgstr ""
+
+#: apps/native/src/app/(auth)/register.tsx
+msgid "Name must be at least 2 characters"
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/account-section.tsx
@@ -1529,6 +1662,7 @@ msgid "New backup"
 msgstr "新建备份"
 
 #: apps/native/src/app/change-password.tsx
+#: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "New password"
 msgstr "新密码"
@@ -1558,6 +1692,10 @@ msgstr "下一集"
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Next run"
 msgstr "下次运行"
+
+#: apps/native/src/components/dashboard/continue-watching-card.tsx
+msgid "Next: S{seasonNum} E{epNum}"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-section.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
@@ -1598,8 +1736,10 @@ msgstr "未配置"
 msgid "Not Found"
 msgstr "未找到"
 
+#: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
 #: apps/web/src/components/title-card.tsx
+#: apps/web/src/components/titles/status-button.tsx
 msgid "On Watchlist"
 msgstr "在待看列表中"
 
@@ -1640,6 +1780,7 @@ msgid "Open Radarr, go to Settings > Import Lists"
 msgstr "打开 Radarr，前往 Settings > Import Lists"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
+#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Open registration"
 msgstr "开放注册"
@@ -1652,13 +1793,26 @@ msgstr "打开 Sonarr，前往 <0>Settings > Import Lists</0>"
 msgid "Open Sonarr, go to Settings > Import Lists"
 msgstr "打开 Sonarr，前往 Settings > Import Lists"
 
+#: apps/native/src/app/(tabs)/(settings)/index.tsx
+msgid "Opens options to change or remove your photo"
+msgstr ""
+
+#: apps/native/src/app/title/[id].tsx
+msgid "Opens the trailer in YouTube"
+msgstr ""
+
+#: apps/native/src/components/explore/hero-banner.tsx
+msgid "Opens title details"
+msgstr ""
+
+#: apps/native/src/app/(auth)/login.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "or"
 msgstr "或"
 
 #: apps/native/src/app/(auth)/login.tsx
-msgid "OR"
-msgstr "或"
+#~ msgid "OR"
+#~ msgstr ""
 
 #: apps/native/src/app/+not-found.tsx
 msgid "Page Not Found"
@@ -1673,16 +1827,28 @@ msgid "Parsing..."
 msgstr "解析中..."
 
 #: apps/native/src/app/(auth)/login.tsx
+#: apps/native/src/app/(auth)/login.tsx
+#: apps/native/src/app/(auth)/register.tsx
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Password"
 msgstr "密码"
+
+#: apps/native/src/app/(auth)/login.tsx
+#: apps/native/src/app/(auth)/register.tsx
+msgid "Password is required"
+msgstr ""
+
+#: apps/native/src/app/change-password.tsx
+msgid "Password must be at least 8 characters"
+msgstr ""
 
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Password updated"
 msgstr "密码已更新"
 
+#: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Passwords do not match"
 msgstr "两次密码不一致"
@@ -1716,6 +1882,14 @@ msgstr "未找到该人物"
 msgid "Play trailer"
 msgstr "播放预告片"
 
+#: apps/native/src/app/title/[id].tsx
+msgid "Play trailer for {titleName}"
+msgstr ""
+
+#: apps/native/src/app/change-password.tsx
+msgid "Please confirm your password"
+msgstr ""
+
 #: apps/native/src/hooks/use-server-connection.ts
 msgid "Please sign in again."
 msgstr ""
@@ -1733,6 +1907,11 @@ msgstr "热门电视剧"
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Pre-restore backup"
 msgstr "还原前备份"
+
+#: apps/web/src/components/nav-bar.tsx
+#: apps/web/src/components/nav-bar.tsx
+msgid "Primary"
+msgstr ""
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
@@ -1804,6 +1983,10 @@ msgstr "快捷操作"
 msgid "Radarr List URL"
 msgstr "Radarr 列表 URL"
 
+#: apps/web/src/components/titles/star-rating.tsx
+msgid "Rate {star, plural, one {# star} other {# stars}}"
+msgstr ""
+
 #: apps/native/src/hooks/use-title-actions.ts
 #~ msgid "Rated {0} {1, plural, one {star} other {stars}}"
 #~ msgstr ""
@@ -1827,6 +2010,7 @@ msgstr "已评 {stars, plural, other {# 星}}"
 
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
+#: apps/web/src/components/titles/star-rating.tsx
 msgid "Rating"
 msgstr "评分"
 
@@ -1835,6 +2019,10 @@ msgstr "评分"
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Rating removed"
 msgstr "评分已删除"
+
+#: apps/native/src/components/ui/star-rating.tsx
+msgid "Rating: {rating} out of 5 stars"
+msgstr ""
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/account-section.tsx
@@ -1920,6 +2108,10 @@ msgstr "注册已关闭"
 msgid "Registration Closed"
 msgstr "注册已关闭"
 
+#: apps/web/src/components/auth-form.tsx
+msgid "Registration failed"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Registration opened"
@@ -1931,7 +2123,10 @@ msgstr "注册已开放"
 msgid "Remove"
 msgstr "移除"
 
+#: apps/native/src/components/dashboard/continue-watching-card.tsx
+#: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
+#: apps/native/src/components/ui/poster-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Remove from library"
 msgstr "从媒体库中移除"
@@ -1939,13 +2134,17 @@ msgstr "从媒体库中移除"
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/ui/poster-card.tsx
-msgid "Remove from Library"
-msgstr "从媒体库中移除"
+#~ msgid "Remove from Library"
+#~ msgstr ""
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Remove from library?"
 msgstr "从媒体库中移除？"
+
+#: apps/web/src/components/command-palette.tsx
+msgid "Remove from recent searches"
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Remove Photo"
@@ -2133,6 +2332,10 @@ msgstr "搜索…"
 msgid "Season {seasonNumber}"
 msgstr "第 {seasonNumber} 季"
 
+#: apps/native/src/components/titles/season-accordion.tsx
+msgid "Season {sn}"
+msgstr ""
+
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Season watched"
@@ -2164,6 +2367,7 @@ msgstr "服务器"
 msgid "Server Health"
 msgstr "服务器健康状态"
 
+#: apps/native/src/app/(auth)/server-url.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Server URL"
 msgstr "服务器 URL"
@@ -2186,6 +2390,7 @@ msgstr "设置您偏好的质量配置和根文件夹"
 #: apps/native/src/app/(tabs)/(settings)/_layout.tsx
 #: apps/native/src/components/header-avatar.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
+#: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/settings-shell.tsx
@@ -2212,15 +2417,17 @@ msgstr "收起"
 msgid "Show more"
 msgstr "展开"
 
+#: apps/native/src/app/(auth)/login.tsx
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/auth-form.tsx
+#: apps/web/src/components/landing-page.tsx
 msgid "Sign in"
 msgstr "登录"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/web/src/components/landing-page.tsx
-msgid "Sign In"
-msgstr "登录"
+#~ msgid "Sign In"
+#~ msgstr ""
 
 #: apps/web/src/routes/_auth/register.tsx
 msgid "Sign in instead"
@@ -2245,6 +2452,10 @@ msgid "Sign in with {providerName}"
 msgstr "使用 {providerName} 登录"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
+#: apps/native/src/app/(tabs)/(settings)/index.tsx
+#: apps/native/src/app/(tabs)/(settings)/index.tsx
+#: apps/native/src/components/header-avatar.tsx
+#: apps/native/src/components/header-avatar.tsx
 #: apps/native/src/components/header-avatar.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/account-section.tsx
@@ -2255,9 +2466,10 @@ msgstr "退出登录"
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/components/header-avatar.tsx
 #: apps/native/src/components/header-avatar.tsx
-msgid "Sign Out"
-msgstr "退出登录"
+#~ msgid "Sign Out"
+#~ msgstr ""
 
+#: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Sign out of other sessions"
@@ -2292,6 +2504,7 @@ msgstr "当您看完电影或剧集时，Sofa 将自动记录"
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
+#: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/routes/__root.tsx
@@ -2310,6 +2523,10 @@ msgstr "出现错误…"
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Sonarr List URL"
 msgstr "Sonarr 列表 URL"
+
+#: apps/web/src/components/people/filmography-grid.tsx
+msgid "Sort filmography"
+msgstr ""
 
 #: apps/web/src/components/dashboard/stats-section.tsx
 msgid "Start exploring"
@@ -2506,10 +2723,11 @@ msgid "Trailer"
 msgstr "预告片"
 
 #: apps/web/src/components/explore/hero-banner.tsx
-msgid "Trending today"
-msgstr "今日热门"
+#~ msgid "Trending today"
+#~ msgstr ""
 
 #: apps/native/src/app/(tabs)/(explore)/index.tsx
+#: apps/web/src/components/explore/hero-banner.tsx
 #: apps/web/src/routes/_app/explore.tsx
 msgid "Trending Today"
 msgstr "今日热门"
@@ -2554,6 +2772,10 @@ msgstr "未知"
 msgid "unlimited"
 msgstr "无限制"
 
+#: apps/web/src/components/titles/title-seasons.tsx
+msgid "Unmark episode {epNum}"
+msgstr ""
+
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Unreachable"
 msgstr "无法访问"
@@ -2577,6 +2799,10 @@ msgstr "已将 {seasonLabel} 全部标记为未看"
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Unwatched S{seasonNum} E{epNum}"
 msgstr "第 {seasonNum} 季第 {epNum} 集已取消标记"
+
+#: apps/native/src/components/titles/season-accordion.tsx
+msgid "Unwatched S{sNum} E{eNum}"
+msgstr ""
 
 #: apps/native/src/components/titles/continue-watching-banner.tsx
 #: apps/web/src/components/dashboard/continue-watching-card.tsx
@@ -2618,13 +2844,14 @@ msgstr "已开启自动更新检查"
 msgid "Update failed"
 msgstr "更新失败"
 
+#: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Update password"
 msgstr "修改密码"
 
 #: apps/native/src/app/change-password.tsx
-msgid "Update Password"
-msgstr "修改密码"
+#~ msgid "Update Password"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
@@ -2663,6 +2890,18 @@ msgstr "上传头像"
 msgid "URL copied to clipboard"
 msgstr "URL 已复制到剪贴板"
 
+#: apps/native/src/app/(auth)/register.tsx
+msgid "Use at least 8 characters"
+msgstr ""
+
+#: apps/native/src/components/header-avatar.tsx
+msgid "User menu"
+msgstr ""
+
+#: apps/web/src/components/titles/title-hero.tsx
+msgid "View on TMDB"
+msgstr ""
+
 #: apps/web/src/components/update-toast.tsx
 msgid "View release"
 msgstr "查看发布说明"
@@ -2699,19 +2938,25 @@ msgstr "观看历史"
 msgid "Watch on {name}"
 msgstr "在 {name} 观看"
 
+#: apps/native/src/components/titles/season-accordion.tsx
+#: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Watched all of {seasonLabel}"
 msgstr "已将 {seasonLabel} 全部标记为已看"
 
 #: apps/native/src/lib/title-actions.ts
-msgid "Watched all of {seasonName}"
-msgstr "已将 {seasonName} 全部标记为已看"
+#~ msgid "Watched all of {seasonName}"
+#~ msgstr ""
 
 #: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Watched S{seasonNum} E{epNum}"
 msgstr "第 {seasonNum} 季第 {epNum} 集已标记为已看"
+
+#: apps/native/src/components/titles/season-accordion.tsx
+msgid "Watched S{sNum} E{eNum}"
+msgstr ""
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
@@ -2740,6 +2985,10 @@ msgstr ""
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Wednesday"
 msgstr "星期三"
+
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Weekly on {dayName}"
+msgstr ""
 
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/dashboard/welcome-header.tsx
@@ -2789,3 +3038,8 @@ msgstr "您的媒体库为空"
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Your name"
 msgstr "您的姓名"
+
+#: apps/web/src/components/auth-form.tsx
+msgid "Your name…"
+msgstr ""
+
