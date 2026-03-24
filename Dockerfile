@@ -36,10 +36,14 @@ RUN bunx turbo run build --filter=@sofa/web --filter=@sofa/server
 FROM base AS runner
 WORKDIR /app
 
+ARG APP_VERSION
+ARG GIT_COMMIT_SHA
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 ENV DATA_DIR=/data
+ENV APP_VERSION=${APP_VERSION}
+ENV GIT_COMMIT_SHA=${GIT_COMMIT_SHA}
 
 # API server + packages
 COPY --from=builder --chown=bun:bun /app/apps/server/ ./apps/server/

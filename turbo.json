@@ -4,7 +4,8 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**"],
+      "env": ["APP_VERSION", "GIT_COMMIT_SHA"]
     },
     "dev": {
       "dependsOn": ["^build"],
