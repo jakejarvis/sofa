@@ -10,6 +10,10 @@
   <a href="https://codecov.io/gh/jakejarvis/sofa"><img alt="Codecov" src="https://img.shields.io/codecov/c/github/jakejarvis/sofa?token=KJIUQAG94F" /></a>
   <a href="https://crowdin.com/project/sofa"><img alt="Crowdin" src="https://badges.crowdin.net/sofa/localized.svg" /></a>
 </p>
+<p align="center">
+  <a href="https://apps.apple.com/us/app/sofa-tv-movie-tracker/id6760432427"><img alt="App Store" src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" /></a><br />
+  <sub>Play Store soon™</sub>
+</p>
 
 [Sofa](https://sofa.watch) is a self-hosted movie and TV tracker for nerds. Track what you've watched, discover what's next, and plug your data into your existing home media stack. All without anything leaving your homelab. 🍿
 
@@ -65,7 +69,9 @@ docker compose up -d
 
 If you prefer to deploy Sofa to the cloud, there are several great options. All you'll need is the ability to run Docker containers and mount some form of persistent storage volume to `/data` within the container.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/AqGBLF?referralCode=4AUONK&utm_medium=integration&utm_source=template&utm_campaign=generic)
+<p align="center">
+  <a href="https://railway.com/deploy/sofa"><img alt="Deploy on Railway" src="https://railway.com/button.svg" /></a>
+</p>
 
 ## Required setup
 

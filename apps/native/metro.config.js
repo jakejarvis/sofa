@@ -1,10 +1,10 @@
 const { getDefaultConfig } = require("expo/metro-config");
-const { withSentryConfig } = require("@sentry/react-native/metro");
+const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const { withUniwindConfig } = require("uniwind/metro");
 const { wrapWithReanimatedMetroConfig } = require("react-native-reanimated/metro-config");
 
 /** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(__dirname);
+const config = getSentryExpoConfig(__dirname, { getDefaultConfig });
 
 config.transformer = {
   ...config.transformer,
@@ -27,9 +27,7 @@ config.resolver = {
   },
 };
 
-module.exports = withSentryConfig(
-  withUniwindConfig(wrapWithReanimatedMetroConfig(config), {
-    cssEntryFile: "./src/global.css",
-    dtsFile: "./uniwind-types.d.ts",
-  }),
-);
+module.exports = withUniwindConfig(wrapWithReanimatedMetroConfig(config), {
+  cssEntryFile: "./src/global.css",
+  dtsFile: "./uniwind-types.d.ts",
+});
