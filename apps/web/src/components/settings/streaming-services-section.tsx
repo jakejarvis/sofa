@@ -15,6 +15,9 @@ export function StreamingServicesSection() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [saved, setSaved] = useState(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const selectedIdsRef = useRef<Set<string>>(selectedIds);
+  const saveCounterRef = useRef(0);
   const initialized = useRef(false);
 
   const platformsQuery = useQuery(orpc.platforms.list.queryOptions());
@@ -23,17 +26,31 @@ export function StreamingServicesSection() {
   // Initialize selected IDs from server data
   useEffect(() => {
     if (userPlatformsQuery.data && !initialized.current) {
-      setSelectedIds(new Set(userPlatformsQuery.data.platformIds));
+      const ids = new Set(userPlatformsQuery.data.platformIds);
+      setSelectedIds(ids);
+      selectedIdsRef.current = ids;
       initialized.current = true;
     }
   }, [userPlatformsQuery.data]);
 
-  const save = useCallback((ids: Set<string>) => {
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout(saveTimerRef.current);
+      clearTimeout(savedTimerRef.current);
+    };
+  }, []);
+
+  const save = useCallback(() => {
     clearTimeout(saveTimerRef.current);
+    const counter = ++saveCounterRef.current;
     saveTimerRef.current = setTimeout(async () => {
+      const ids = selectedIdsRef.current;
       await client.account.updatePlatforms({ platformIds: [...ids] });
+      // Only show "Saved" if no newer save was triggered
+      if (saveCounterRef.current !== counter) return;
       setSaved(true);
-      setTimeout(setSaved, 1500, false);
+      savedTimerRef.current = setTimeout(setSaved, 1500, false);
     }, 500);
   }, []);
 
@@ -46,7 +63,8 @@ export function StreamingServicesSection() {
         } else {
           next.add(id);
         }
-        save(next);
+        selectedIdsRef.current = next;
+        save();
         return next;
       });
     },

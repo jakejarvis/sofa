@@ -44,14 +44,6 @@ export function ensurePlatformForTmdbProvider(
   name: string,
   logoPath: string | null,
 ): string {
-  const existing = db
-    .select({ id: platforms.id })
-    .from(platforms)
-    .where(eq(platforms.tmdbProviderId, tmdbProviderId))
-    .get();
-
-  if (existing) return existing.id;
-
   const row = db
     .insert(platforms)
     .values({

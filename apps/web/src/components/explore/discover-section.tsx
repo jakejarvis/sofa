@@ -184,6 +184,7 @@ export function DiscoverSection() {
               setType(next);
               setGenreId(undefined);
               setProviderId(undefined);
+              setSelectedPlatformId("");
             }
           }}
           variant="outline"

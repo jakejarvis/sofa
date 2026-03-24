@@ -58,10 +58,11 @@ export function hasUserPlatforms(userId: string): boolean {
 
 export function platformIdsExist(platformIds: string[]): boolean {
   if (platformIds.length === 0) return true;
+  const unique = [...new Set(platformIds)];
   const found = db
     .select({ id: platforms.id })
     .from(platforms)
-    .where(inArray(platforms.id, platformIds))
+    .where(inArray(platforms.id, unique))
     .all();
-  return found.length === platformIds.length;
+  return found.length === unique.length;
 }
