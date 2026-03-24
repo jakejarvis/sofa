@@ -261,6 +261,29 @@ export async function getWatchProviders(tmdbId: number, type: "movie" | "tv") {
   return data as TmdbWatchProviderResponse;
 }
 
+export interface TmdbWatchProviderListItem {
+  provider_id: number;
+  provider_name: string;
+  logo_path: string | null;
+  display_priorities: Record<string, number>;
+}
+
+export async function getWatchProviderList(type: "movie" | "tv", watchRegion?: string) {
+  const query = watchRegion ? ({ watch_region: watchRegion } as Record<string, unknown>) : {};
+  if (type === "movie") {
+    const { data, error } = await client.GET("/3/watch/providers/movie", {
+      params: { query },
+    });
+    if (error) throw new Error("TMDB API error: watch/providers/movie");
+    return (data as { results?: TmdbWatchProviderListItem[] }).results ?? [];
+  }
+  const { data, error } = await client.GET("/3/watch/providers/tv", {
+    params: { query },
+  });
+  if (error) throw new Error("TMDB API error: watch/providers/tv");
+  return (data as { results?: TmdbWatchProviderListItem[] }).results ?? [];
+}
+
 // ─── Recommendations & Similar ──────────────────────────────────────
 
 export async function getRecommendations(tmdbId: number, type: "movie" | "tv") {

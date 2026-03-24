@@ -20,8 +20,8 @@ import { authed } from "../middleware";
 
 const log = createLogger("titles");
 
-export const detail = os.titles.detail.use(authed).handler(async ({ input }) => {
-  const result = await getOrFetchTitle(input.id);
+export const detail = os.titles.detail.use(authed).handler(async ({ input, context }) => {
+  const result = await getOrFetchTitle(input.id, context.user.id);
   if (!result)
     throw new ORPCError("NOT_FOUND", {
       message: "Title not found",

@@ -2,7 +2,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vit
 
 import {
   clearAllTables,
-  insertAvailabilityOffer,
+  insertPlatform,
+  insertTitleAvailability,
   insertEpisodeWatch,
   insertMovieWatch,
   insertRating,
@@ -15,7 +16,6 @@ import {
 
 import {
   getContinueWatchingFeed,
-  getLibraryFeed,
   getNewAvailableFeed,
   getRecommendationsFeed,
   getRecommendationsForTitle,
@@ -231,7 +231,8 @@ describe("getNewAvailableFeed", () => {
     insertUser();
     insertTitle({ id: "m1", tmdbId: 1 });
     insertStatus("user-1", "m1", "watchlist");
-    insertAvailabilityOffer("m1");
+    const pId = insertPlatform({ id: "p-m1", tmdbProviderId: 8 });
+    insertTitleAvailability("m1", pId);
 
     const feed = getNewAvailableFeed("user-1");
     expect(feed).toHaveLength(1);
@@ -250,7 +251,8 @@ describe("getNewAvailableFeed", () => {
   test("excludes titles not in user library", () => {
     insertUser();
     insertTitle({ id: "m1", tmdbId: 1 });
-    insertAvailabilityOffer("m1");
+    const pId = insertPlatform({ id: "p-m1", tmdbProviderId: 8 });
+    insertTitleAvailability("m1", pId);
 
     const feed = getNewAvailableFeed("user-1");
     expect(feed).toHaveLength(0);
@@ -371,88 +373,5 @@ describe("getRecommendationsForTitle", () => {
     const recs = getRecommendationsForTitle("m1");
     expect(recs).toHaveLength(2);
     expect(recs.map((rec) => rec.id)).toEqual(["rec1", "rec2"]);
-  });
-});
-
-// ── getLibraryFeed ────────────────────────────────────────────────────
-
-describe("getLibraryFeed", () => {
-  test("returns first page with correct pagination metadata", () => {
-    insertUser();
-    for (let i = 1; i <= 25; i++) {
-      insertTitle({ id: `m${i}`, tmdbId: i });
-      insertStatus("user-1", `m${i}`, "watchlist");
-      insertAvailabilityOffer(`m${i}`);
-    }
-
-    const result = getLibraryFeed("user-1", 1, 20);
-    expect(result.items).toHaveLength(20);
-    expect(result.page).toBe(1);
-    expect(result.totalResults).toBe(25);
-    expect(result.totalPages).toBe(2);
-  });
-
-  test("returns second page with remaining items", () => {
-    insertUser();
-    for (let i = 1; i <= 25; i++) {
-      insertTitle({ id: `m${i}`, tmdbId: i });
-      insertStatus("user-1", `m${i}`, "watchlist");
-      insertAvailabilityOffer(`m${i}`);
-    }
-
-    const result = getLibraryFeed("user-1", 2, 20);
-    expect(result.items).toHaveLength(5);
-    expect(result.page).toBe(2);
-    expect(result.totalResults).toBe(25);
-    expect(result.totalPages).toBe(2);
-  });
-
-  test("custom limit respected", () => {
-    insertUser();
-    for (let i = 1; i <= 10; i++) {
-      insertTitle({ id: `m${i}`, tmdbId: i });
-      insertStatus("user-1", `m${i}`, "watchlist");
-      insertAvailabilityOffer(`m${i}`);
-    }
-
-    const result = getLibraryFeed("user-1", 1, 5);
-    expect(result.items).toHaveLength(5);
-    expect(result.totalPages).toBe(2);
-    expect(result.totalResults).toBe(10);
-  });
-
-  test("empty page beyond total returns empty items", () => {
-    insertUser();
-    for (let i = 1; i <= 5; i++) {
-      insertTitle({ id: `m${i}`, tmdbId: i });
-      insertStatus("user-1", `m${i}`, "watchlist");
-      insertAvailabilityOffer(`m${i}`);
-    }
-
-    const result = getLibraryFeed("user-1", 2, 20);
-    expect(result.items).toHaveLength(0);
-    expect(result.page).toBe(2);
-    expect(result.totalResults).toBe(5);
-  });
-
-  test("pages are disjoint and cover all items", () => {
-    insertUser();
-    for (let i = 1; i <= 4; i++) {
-      insertTitle({ id: `m${i}`, tmdbId: i });
-      insertStatus("user-1", `m${i}`, "watchlist");
-      insertAvailabilityOffer(`m${i}`);
-    }
-
-    const page1 = getLibraryFeed("user-1", 1, 2);
-    const page2 = getLibraryFeed("user-1", 2, 2);
-
-    expect(page1.items).toHaveLength(2);
-    expect(page2.items).toHaveLength(2);
-
-    const allIds = [
-      ...page1.items.map((i) => i.tmdbId),
-      ...page2.items.map((i) => i.tmdbId),
-    ].sort();
-    expect(allIds).toEqual([1, 2, 3, 4]);
   });
 });

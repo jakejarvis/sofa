@@ -177,6 +177,10 @@ msgstr "{ratingCount} ratings"
 msgid "{star, plural, one {# star} other {# stars}}"
 msgstr "{star, plural, one {# star} other {# stars}}"
 
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "{totalResults, plural, one {# result} other {# results}}"
+msgstr "{totalResults, plural, one {# result} other {# results}}"
+
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "{unresolvedCount} items have no external IDs and will be resolved by title search, which may be less accurate."
 msgstr "{unresolvedCount} items have no external IDs and will be resolved by title search, which may be less accurate."
@@ -302,10 +306,35 @@ msgstr ""
 msgid "age {age}"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
 #: apps/native/src/components/explore/filterable-title-row.tsx
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/library/library-filters.tsx
+#: apps/web/src/components/library/library-filters.tsx
+#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
 msgid "All"
 msgstr ""
+
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/library/library-filters.tsx
+#: apps/web/src/components/library/library-filters.tsx
+#: apps/web/src/components/library/library-filters.tsx
+msgid "All genres"
+msgstr "All genres"
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "All providers"
+msgstr "All providers"
 
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Allow new users to create accounts"
@@ -329,6 +358,22 @@ msgstr ""
 msgid "Anonymous usage reporting"
 msgstr ""
 
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Any"
+msgstr "Any"
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Any language"
+msgstr "Any language"
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Any rating"
+msgstr "Any rating"
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Any year"
+msgstr "Any year"
+
 #: apps/web/src/routes/_app/settings.tsx
 msgid "App Settings"
 msgstr ""
@@ -336,6 +381,10 @@ msgstr ""
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Application"
 msgstr ""
+
+#: apps/native/src/components/library/filter-sheet.tsx
+msgid "Apply"
+msgstr "Apply"
 
 #: apps/native/src/components/settings/integration-card.tsx
 msgid "Are you sure you want to disconnect {label}? The current URL will stop working."
@@ -373,6 +422,13 @@ msgstr ""
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Availability"
 msgstr ""
+
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/library/library-filters.tsx
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Available to stream"
+msgstr "Available to stream"
 
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Back to Login"
@@ -458,8 +514,10 @@ msgstr ""
 msgid "Catch up"
 msgstr ""
 
+#: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
+#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Caught Up"
@@ -509,6 +567,10 @@ msgstr ""
 msgid "Checking…"
 msgstr ""
 
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Chinese"
+msgstr "Chinese"
+
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Choose how to import your {0} data."
 #~ msgstr ""
@@ -521,6 +583,7 @@ msgstr "Choose how to import your {sourceLabel} data."
 #~ msgid "Choose your preferred display language"
 #~ msgstr "Choose your preferred display language"
 
+#: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
@@ -529,8 +592,17 @@ msgid "Clear"
 msgstr ""
 
 #: apps/web/src/components/command-palette.tsx
+#: apps/web/src/components/library/library-filters.tsx
 msgid "Clear all"
 msgstr ""
+
+#: apps/web/src/routes/_app/library.tsx
+msgid "Clear all filters"
+msgstr "Clear all filters"
+
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+msgid "Clear filters"
+msgstr "Clear filters"
 
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
@@ -561,9 +633,11 @@ msgid "Close"
 msgstr ""
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
+#: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
+#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Completed"
@@ -630,6 +704,16 @@ msgstr ""
 #: apps/native/src/components/settings/integration-card.tsx
 msgid "Connecting…"
 msgstr ""
+
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Content rating"
+msgstr "Content rating"
+
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Content Rating"
+msgstr "Content Rating"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Continue"
@@ -731,9 +815,22 @@ msgstr ""
 msgid "Database restored. Reloading..."
 msgstr ""
 
+#: apps/native/src/components/library/sort-menu.tsx
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "Date Added"
+msgstr "Date Added"
+
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Day:"
 msgstr ""
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Decade"
+msgstr "Decade"
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Default"
+msgstr "Default"
 
 #: apps/web/src/components/settings/backup-section.tsx
 #: apps/web/src/components/settings/backup-section.tsx
@@ -783,6 +880,10 @@ msgstr ""
 #: apps/native/src/components/settings/integration-card.tsx
 msgid "Disconnect {label}"
 msgstr ""
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Discover"
+msgstr "Discover"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Display name"
@@ -868,6 +969,10 @@ msgstr ""
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Enable the <0>Playback</0> event category"
 msgstr ""
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "English"
+msgstr "English"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
@@ -1184,6 +1289,12 @@ msgstr ""
 msgid "Filmography"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "Filters"
+msgstr "Filters"
+
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Finished importing from {source}."
 msgstr ""
@@ -1200,6 +1311,10 @@ msgstr ""
 msgid "Free up disk space by clearing cached metadata and images"
 msgstr ""
 
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "French"
+msgstr "French"
+
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Frequency"
 msgstr ""
@@ -1207,6 +1322,24 @@ msgstr ""
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Friday"
 msgstr ""
+
+#: apps/web/src/components/library/library-filters.tsx
+msgid "From"
+msgstr "From"
+
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/library/library-filters.tsx
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Genre"
+msgstr "Genre"
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "German"
+msgstr "German"
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Get Started"
@@ -1246,6 +1379,14 @@ msgstr ""
 #: apps/web/src/components/dashboard/welcome-header.tsx
 msgid "Here's what's happening with your library"
 msgstr ""
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Highest rated"
+msgstr "Highest rated"
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Hindi"
+msgstr "Hindi"
 
 #: apps/native/src/app/(tabs)/(home)/_layout.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
@@ -1377,6 +1518,14 @@ msgstr ""
 msgid "Invalid token"
 msgstr ""
 
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Italian"
+msgstr "Italian"
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Japanese"
+msgstr "Japanese"
+
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Job"
 msgstr ""
@@ -1394,8 +1543,15 @@ msgstr "Keeping"
 msgid "Keyboard Shortcuts"
 msgstr ""
 
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Korean"
+msgstr "Korean"
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/settings/language-section.tsx
 msgid "Language"
 msgstr ""
@@ -1444,7 +1600,12 @@ msgstr ""
 msgid "Last run succeeded"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(library)/_layout.tsx
+#: apps/native/src/components/navigation/native-tab-bar.tsx
+#: apps/web/src/components/nav-bar.tsx
+#: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/routes/_app/library.tsx
 msgid "Library"
 msgstr "Library"
 
@@ -1559,13 +1720,31 @@ msgstr ""
 #~ msgid "Marked as watching"
 #~ msgstr ""
 
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Max"
+msgstr "Max"
+
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Maximum rating"
+msgstr "Maximum rating"
+
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Member since {memberSince}"
 msgstr ""
 
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Min"
+msgstr "Min"
+
 #: apps/web/src/components/auth-form.tsx
 msgid "Min 8 characters…"
 msgstr "Min 8 characters…"
+
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Minimum rating"
+msgstr "Minimum rating"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Monday"
@@ -1579,18 +1758,28 @@ msgstr ""
 msgid "More Settings"
 msgstr ""
 
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Most popular"
+msgstr "Most popular"
+
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/native/src/components/search/search-result-row.tsx
 #: apps/native/src/components/search/search-result-row.tsx
+#: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/explore/hero-banner.tsx
+#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/titles/title-hero.tsx
 msgid "Movie"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
 msgid "Movies"
 msgstr ""
 
@@ -1676,6 +1865,7 @@ msgstr ""
 msgid "New Season"
 msgstr "New Season"
 
+#: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 msgid "Newest"
@@ -1708,9 +1898,17 @@ msgstr ""
 msgid "No internet connection"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+msgid "No matching titles"
+msgstr "No matching titles"
+
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 msgid "No results for \"{debouncedQuery}\""
 msgstr ""
+
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+msgid "No results for \"{debouncedSearch}\""
+msgstr "No results for \"{debouncedSearch}\""
 
 #: apps/web/src/components/command-palette.tsx
 msgid "No results found."
@@ -1720,6 +1918,14 @@ msgstr ""
 #: apps/web/src/components/explore/filterable-title-row.tsx
 msgid "No titles found for this genre."
 msgstr ""
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "No titles found. Try adjusting your filters."
+msgstr "No titles found. Try adjusting your filters."
+
+#: apps/web/src/routes/_app/library.tsx
+msgid "No titles match your filters"
+msgstr "No titles match your filters"
 
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
 #: apps/web/src/routes/_app/upcoming.tsx
@@ -1735,6 +1941,14 @@ msgstr ""
 #: apps/native/src/app/+not-found.tsx
 msgid "Not Found"
 msgstr ""
+
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Older"
+msgstr "Older"
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Oldest"
+msgstr "Oldest"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
@@ -1904,6 +2118,20 @@ msgstr ""
 msgid "Popular TV Shows"
 msgstr ""
 
+#: apps/native/src/components/library/sort-menu.tsx
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "Popularity"
+msgstr "Popularity"
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Portuguese"
+msgstr "Portuguese"
+
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Pre-1970"
+msgstr "Pre-1970"
+
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Pre-restore backup"
 msgstr ""
@@ -1928,6 +2156,12 @@ msgstr ""
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Profile picture updated"
 msgstr ""
+
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Provider"
+msgstr "Provider"
 
 #: apps/web/src/components/settings/danger-section.tsx
 #: apps/web/src/components/settings/danger-section.tsx
@@ -2008,6 +2242,10 @@ msgstr "Rated {ratingStars, plural, one {# star} other {# stars}}"
 msgid "Rated {stars, plural, one {# star} other {# stars}}"
 msgstr ""
 
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/titles/star-rating.tsx
@@ -2116,6 +2354,11 @@ msgstr "Registration failed"
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Registration opened"
 msgstr ""
+
+#: apps/native/src/components/library/sort-menu.tsx
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "Release Date"
+msgstr "Release Date"
 
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/titles/status-button.tsx
@@ -2305,6 +2548,14 @@ msgstr ""
 msgid "Search for movies, TV shows, or run commands"
 msgstr ""
 
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "Search library"
+msgstr "Search library"
+
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "Search library..."
+msgstr "Search library..."
+
 #: apps/web/src/components/command-palette.tsx
 msgid "Search movies & TV shows…"
 msgstr ""
@@ -2312,6 +2563,10 @@ msgstr ""
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 msgid "Search movies, shows, people..."
 msgstr ""
+
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+msgid "Search your library..."
+msgstr "Search your library..."
 
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
@@ -2524,15 +2779,28 @@ msgstr ""
 msgid "Sonarr List URL"
 msgstr ""
 
+#: apps/native/src/components/library/sort-menu.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "Sort"
+msgstr "Sort"
+
 #: apps/web/src/components/people/filmography-grid.tsx
 msgid "Sort filmography"
 msgstr "Sort filmography"
+
+#: apps/web/src/components/explore/discover-section.tsx
+msgid "Spanish"
+msgstr "Spanish"
 
 #: apps/web/src/components/dashboard/stats-section.tsx
 msgid "Start exploring"
 msgstr ""
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
+#: apps/native/src/app/(tabs)/(library)/index.tsx
 msgid "Start tracking movies and shows"
 msgstr ""
 
@@ -2549,6 +2817,11 @@ msgstr ""
 msgid "Starting import..."
 msgstr ""
 
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Status"
+msgstr "Status"
+
 #: apps/native/src/hooks/use-title-actions.ts
 msgid "Status updated"
 msgstr ""
@@ -2560,6 +2833,11 @@ msgstr ""
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Stream"
 msgstr ""
+
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Streaming"
+msgstr "Streaming"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Sunday"
@@ -2677,10 +2955,20 @@ msgstr ""
 msgid "Time:"
 msgstr ""
 
+#: apps/native/src/components/library/sort-menu.tsx
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "Title A-Z"
+msgstr "Title A-Z"
+
 #: apps/native/src/app/title/[id].tsx
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Title not found"
 msgstr ""
+
+#: apps/native/src/components/library/sort-menu.tsx
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "Title Z-A"
+msgstr "Title Z-A"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #: apps/web/src/components/settings/integration-configs.tsx
@@ -2691,6 +2979,15 @@ msgstr ""
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
 msgstr ""
+
+#: apps/native/src/components/library/sort-menu.tsx
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "TMDB Rating"
+msgstr "TMDB Rating"
+
+#: apps/web/src/components/library/library-filters.tsx
+msgid "To"
+msgstr "To"
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 msgid "today"
@@ -2736,6 +3033,10 @@ msgstr ""
 msgid "Trigger job"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+msgid "Try adjusting your filters"
+msgstr "Try adjusting your filters"
+
 #: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
@@ -2747,9 +3048,12 @@ msgid "Tuesday"
 msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/native/src/components/search/search-result-row.tsx
+#: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/explore/hero-banner.tsx
+#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/titles/title-hero.tsx
 msgid "TV"
@@ -2762,6 +3066,17 @@ msgstr ""
 #: apps/native/src/components/search/search-result-row.tsx
 msgid "TV show"
 msgstr ""
+
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "TV Shows"
+msgstr "TV Shows"
+
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Type"
+msgstr "Type"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "unknown"
@@ -2898,6 +3213,11 @@ msgstr "Use at least 8 characters"
 msgid "User menu"
 msgstr "User menu"
 
+#: apps/native/src/components/library/sort-menu.tsx
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "User Rating"
+msgstr "User Rating"
+
 #: apps/web/src/components/titles/title-hero.tsx
 msgid "View on TMDB"
 msgstr "View on TMDB"
@@ -2958,17 +3278,27 @@ msgstr ""
 msgid "Watched S{sNum} E{eNum}"
 msgstr "Watched S{sNum} E{eNum}"
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
+#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/status-button.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
 msgid "Watching"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
+#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/titles/status-button.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
 msgid "Watchlist"
 msgstr ""
 
@@ -3014,6 +3344,21 @@ msgstr ""
 msgid "Writer"
 msgstr ""
 
+#: apps/native/src/components/library/filter-sheet.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/explore/discover-section.tsx
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Year"
+msgstr "Year"
+
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Year from"
+msgstr "Year from"
+
+#: apps/web/src/components/library/library-filters.tsx
+msgid "Year to"
+msgstr "Year to"
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "You'll be signed out to change the server URL."
 msgstr ""
@@ -3031,6 +3376,7 @@ msgid "Your code:"
 msgstr ""
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
+#: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/web/src/components/dashboard/stats-section.tsx
 msgid "Your library is empty"
 msgstr ""

@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
+  IconBooks,
   IconCalendarEvent,
   IconCompass,
   IconHome,
@@ -119,6 +120,7 @@ export function NavBar({
 
   const navLinks = [
     { href: "/dashboard", label: t`Home` },
+    { href: "/library", label: t`Library` },
     { href: "/explore", label: t`Explore` },
     { href: "/upcoming", label: t`Upcoming` },
   ] as const;
@@ -281,6 +283,7 @@ export function MobileTabBar() {
 
   const mobileTabs = [
     { href: "/dashboard", label: t`Home`, icon: IconHome },
+    { href: "/library", label: t`Library`, icon: IconBooks },
     { href: "/explore", label: t`Explore`, icon: IconCompass },
     { href: "/upcoming", label: t`Upcoming`, icon: IconCalendarEvent },
     { href: "/settings", label: t`Settings`, icon: IconSettings },

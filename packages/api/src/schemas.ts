@@ -87,7 +87,26 @@ export const SearchInput = z
 export const DiscoverInput = z
   .object({
     type: z.enum(["movie", "tv"]).describe("Media type to discover"),
-    genreId: z.number().int().describe("TMDB genre ID to filter by"),
+    genreId: z.number().int().optional().describe("TMDB genre ID to filter by"),
+    yearMin: z.number().int().min(1900).max(2100).optional().describe("Minimum release year"),
+    yearMax: z.number().int().min(1900).max(2100).optional().describe("Maximum release year"),
+    ratingMin: z.number().min(0).max(10).optional().describe("Minimum TMDB vote average"),
+    sortBy: z
+      .enum([
+        "popularity.desc",
+        "vote_average.desc",
+        "primary_release_date.desc",
+        "primary_release_date.asc",
+      ])
+      .optional()
+      .describe("Sort order for results"),
+    language: z
+      .string()
+      .length(2)
+      .regex(/^[a-z]{2}$/)
+      .optional()
+      .describe("ISO 639-1 original language code"),
+    providerId: z.number().int().optional().describe("TMDB watch provider ID"),
   })
   .merge(PageParam)
   .meta({ description: "Genre-based discovery filters" });
@@ -261,13 +280,38 @@ export const SeasonSchema = z
 
 export const AvailabilityOfferSchema = z
   .object({
-    providerId: z.number().describe("JustWatch provider ID"),
+    platformId: z.string().describe("Platform ID"),
     providerName: z.string().describe("Display name (e.g. Netflix, Hulu)"),
     logoPath: z.string().nullable().describe("Provider logo image path"),
     offerType: z.string().describe("Offer type: flatrate, rent, buy, free, ads"),
     watchUrl: z.string().nullable().describe("Direct link to watch on this provider"),
+    isUserSubscribed: z.boolean().describe("Whether the user subscribes to this platform"),
   })
   .meta({ description: "A streaming availability offer from a provider" });
+
+export const PlatformSchema = z
+  .object({
+    id: z.string().describe("Platform ID"),
+    name: z.string().describe("Display name"),
+    tmdbProviderId: z.number().nullable().describe("TMDB provider ID (null for custom platforms)"),
+    logoPath: z.string().nullable().describe("Logo image path"),
+    displayOrder: z.number().describe("Sort order"),
+  })
+  .meta({ description: "A streaming platform" });
+
+export type Platform = z.infer<typeof PlatformSchema>;
+
+export const PlatformsListOutput = z.object({
+  platforms: z.array(PlatformSchema),
+});
+
+export const UserPlatformsOutput = z.object({
+  platformIds: z.array(z.string()),
+});
+
+export const UpdateUserPlatformsInput = z.object({
+  platformIds: z.array(z.string()).describe("List of platform IDs the user subscribes to"),
+});
 
 export const CastMemberSchema = z
   .object({
@@ -507,7 +551,36 @@ export const ContinueWatchingOutput = z
     description: "TV shows the user is currently watching with next episode info",
   });
 
-export const LibraryOutput = z
+// ─── Library (filtered) ───────────────────────────────────────
+
+export const LibraryListInput = z
+  .object({
+    search: z.string().max(200).optional().describe("Search within library by title name"),
+    statuses: z
+      .array(displayStatusEnum)
+      .optional()
+      .describe("Filter by display statuses (multi-select)"),
+    type: z.enum(["movie", "tv"]).optional().describe("Filter by media type"),
+    genreId: z.number().int().optional().describe("Filter by TMDB genre ID"),
+    ratingMin: z.number().int().min(1).max(5).optional().describe("Minimum user star rating"),
+    ratingMax: z.number().int().min(1).max(5).optional().describe("Maximum user star rating"),
+    yearMin: z.number().int().min(1900).max(2100).optional().describe("Minimum release year"),
+    yearMax: z.number().int().min(1900).max(2100).optional().describe("Maximum release year"),
+    contentRating: z.string().optional().describe("Content rating filter (e.g. PG-13, TV-MA)"),
+    onMyServices: z
+      .boolean()
+      .optional()
+      .describe("Only show titles available on the user's streaming services"),
+    sortBy: z
+      .enum(["title", "added_at", "release_date", "popularity", "user_rating", "vote_average"])
+      .default("added_at")
+      .describe("Sort field"),
+    sortDirection: z.enum(["asc", "desc"]).default("desc").describe("Sort direction"),
+  })
+  .merge(PaginatedInput)
+  .meta({ description: "Filters, sorting, and pagination for the library" });
+
+export const LibraryListOutput = z
   .object({
     items: z.array(
       z
@@ -525,12 +598,36 @@ export const LibraryOutput = z
           firstAirDate: z.string().nullable().describe("First air date (ISO 8601)"),
           voteAverage: z.number().nullable().describe("Average rating (0-10)"),
           userStatus: displayStatusEnum.nullable().describe("User's display status"),
+          userRating: z.number().nullable().describe("User's star rating (1-5), or null"),
         })
-        .meta({ description: "A library item with user status" }),
+        .meta({ description: "A library item with user status and rating" }),
     ),
   })
   .merge(PaginationMeta)
-  .meta({ description: "Paginated titles in the user's library" });
+  .meta({ description: "Filtered and sorted library titles" });
+
+export const LibraryGenresOutput = z
+  .object({
+    genres: z
+      .array(z.object({ id: z.number(), name: z.string() }))
+      .describe("Genres present in the user's library"),
+  })
+  .meta({ description: "Genres that exist in the user's library" });
+
+// ─── Watch providers ──────────────────────────────────────────
+
+export const WatchProvidersOutput = z
+  .object({
+    providers: z.array(
+      z.object({
+        id: z.string().describe("Platform ID"),
+        tmdbProviderId: z.number().nullable().describe("TMDB provider ID"),
+        name: z.string().describe("Provider display name"),
+        logoPath: z.string().nullable().describe("Provider logo image path"),
+      }),
+    ),
+  })
+  .meta({ description: "Available streaming providers for the user's region" });
 
 export const DashboardRecommendationsOutput = z
   .object({
@@ -553,6 +650,14 @@ export const UpcomingInput = z
       .describe("How many days into the future to look"),
     limit: z.number().int().min(1).max(50).default(20).describe("Maximum items per page"),
     cursor: z.string().optional().describe("Pagination cursor"),
+    mediaType: z
+      .enum(["movie", "tv"])
+      .optional()
+      .describe("Filter to only movies or only TV episodes"),
+    statusFilter: z
+      .array(z.enum(["watching", "watchlist"]))
+      .optional()
+      .describe("Filter by user tracking status"),
   })
   .meta({ description: "Filters for the upcoming feed" });
 
@@ -580,7 +685,7 @@ export const UpcomingItemSchema = z
     isNewSeason: z.boolean().describe("Whether this is a new season for a completed show"),
     streamingProvider: z
       .object({
-        providerId: z.number(),
+        platformId: z.string(),
         providerName: z.string(),
         logoPath: z.string().nullable(),
       })

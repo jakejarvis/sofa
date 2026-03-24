@@ -30,6 +30,7 @@ import {
   upsertSeasonReturning,
 } from "@sofa/db/queries/metadata";
 import { getTitleById } from "@sofa/db/queries/title";
+import { getUserPlatformIds } from "@sofa/db/queries/user-platforms";
 import type { titles } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import type { TmdbMovieDetails, TmdbTvDetails, TmdbVideo } from "@sofa/tmdb/client";
@@ -683,17 +684,25 @@ async function ensureEnriched(
   return false;
 }
 
-function readAvailability(titleId: string, titleName: string): AvailabilityOffer[] {
+function readAvailability(
+  titleId: string,
+  titleName: string,
+  userPlatformIds?: Set<string>,
+): AvailabilityOffer[] {
   return getAvailabilityOffersForTitle(titleId).map((a) => ({
-    providerId: a.providerId,
+    platformId: a.platformId,
     providerName: a.providerName,
     logoPath: tmdbImageUrl(a.logoPath, "logos"),
     offerType: a.offerType,
-    watchUrl: generateProviderUrl(a.providerId, titleName),
+    watchUrl: generateProviderUrl(a.urlTemplate, titleName),
+    isUserSubscribed: userPlatformIds ? userPlatformIds.has(a.platformId) : false,
   }));
 }
 
-export async function getOrFetchTitle(id: string): Promise<{
+export async function getOrFetchTitle(
+  id: string,
+  userId?: string,
+): Promise<{
   title: ResolvedTitle;
   seasons: Season[];
   availability: AvailabilityOffer[];
@@ -740,7 +749,8 @@ export async function getOrFetchTitle(id: string): Promise<{
   }
 
   // Read enrichment data, then backfill anything missing
-  let availability = readAvailability(title.id, title.title);
+  const userPlatformIdSet = userId ? new Set(getUserPlatformIds(userId)) : undefined;
+  let availability = readAvailability(title.id, title.title, userPlatformIdSet);
   let cast = getCastForTitle(id);
 
   if (title.lastFetchedAt) {
@@ -751,7 +761,8 @@ export async function getOrFetchTitle(id: string): Promise<{
     if (enriched) {
       // Re-read only what was missing
       if (cast.length === 0) cast = getCastForTitle(id);
-      if (availability.length === 0) availability = readAvailability(title.id, title.title);
+      if (availability.length === 0)
+        availability = readAvailability(title.id, title.title, userPlatformIdSet);
       title = getTitleById(id) ?? title;
     }
   }

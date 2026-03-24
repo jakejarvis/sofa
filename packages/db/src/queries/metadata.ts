@@ -2,10 +2,11 @@ import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 
 import { db } from "../client";
 import {
-  availabilityOffers,
   episodes,
   genres,
+  platforms,
   seasons,
+  titleAvailability,
   titleGenres,
   titleRecommendations,
   titles,
@@ -260,7 +261,19 @@ export function getEpisodesNeedingStillHash(seasonIds: string[]) {
 // ─── Availability ────────────────────────────────────────────────────
 
 export function getAvailabilityOffersForTitle(titleId: string) {
-  return db.select().from(availabilityOffers).where(eq(availabilityOffers.titleId, titleId)).all();
+  return db
+    .select({
+      platformId: platforms.id,
+      providerName: platforms.name,
+      logoPath: platforms.logoPath,
+      urlTemplate: platforms.urlTemplate,
+      tmdbProviderId: platforms.tmdbProviderId,
+      offerType: titleAvailability.offerType,
+    })
+    .from(titleAvailability)
+    .innerJoin(platforms, eq(titleAvailability.platformId, platforms.id))
+    .where(eq(titleAvailability.titleId, titleId))
+    .all();
 }
 
 // ─── Recommendations ─────────────────────────────────────────────────

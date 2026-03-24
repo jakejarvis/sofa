@@ -1569,6 +1569,419 @@
   },
   "openapi": "3.1.1",
   "paths": {
+    "/library": {
+      "get": {
+        "operationId": "library.list",
+        "summary": "List library with filters",
+        "description": "Fetch paginated, filtered, and sorted titles from the user's library. Supports filtering by status, type, genre, rating, year, content rating, and streaming availability.",
+        "tags": [
+          "Library"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200,
+              "description": "Search within library by title name"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "statuses",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "in_watchlist",
+                  "watching",
+                  "caught_up",
+                  "completed"
+                ],
+                "type": "string"
+              },
+              "description": "Filter by display statuses (multi-select)"
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "movie",
+                "tv"
+              ],
+              "type": "string",
+              "description": "Filter by media type"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "genreId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991,
+              "description": "Filter by TMDB genre ID"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "ratingMin",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5,
+              "description": "Minimum user star rating"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "ratingMax",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5,
+              "description": "Maximum user star rating"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "yearMin",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1900,
+              "maximum": 2100,
+              "description": "Minimum release year"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "yearMax",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1900,
+              "maximum": 2100,
+              "description": "Maximum release year"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "contentRating",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Content rating filter (e.g. PG-13, TV-MA)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "availableToStream",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "description": "Only show titles with streaming availability"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "title",
+                "added_at",
+                "release_date",
+                "popularity",
+                "user_rating",
+                "vote_average"
+              ],
+              "type": "string",
+              "default": "added_at",
+              "description": "Sort field"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string",
+              "default": "desc",
+              "description": "Sort direction"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 1,
+              "description": "Page number (1-indexed)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "Results per page (1-100, default 20)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Filtered library items with user statuses and ratings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Title ID"
+                          },
+                          "tmdbId": {
+                            "type": "number",
+                            "description": "TMDB numeric ID"
+                          },
+                          "type": {
+                            "enum": [
+                              "movie",
+                              "tv"
+                            ],
+                            "type": "string",
+                            "description": "Media type"
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Display title"
+                          },
+                          "posterPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Poster image path"
+                          },
+                          "posterThumbHash": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "ThumbHash blur placeholder for the poster"
+                          },
+                          "releaseDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Release date (ISO 8601)"
+                          },
+                          "firstAirDate": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "First air date (ISO 8601)"
+                          },
+                          "voteAverage": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Average rating (0-10)"
+                          },
+                          "userStatus": {
+                            "anyOf": [
+                              {
+                                "enum": [
+                                  "in_watchlist",
+                                  "watching",
+                                  "caught_up",
+                                  "completed"
+                                ],
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "User's display status"
+                          },
+                          "userRating": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "User's star rating (1-5), or null"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "tmdbId",
+                          "type",
+                          "title",
+                          "posterPath",
+                          "posterThumbHash",
+                          "releaseDate",
+                          "firstAirDate",
+                          "voteAverage",
+                          "userStatus",
+                          "userRating"
+                        ],
+                        "description": "A library item with user status and rating"
+                      }
+                    },
+                    "page": {
+                      "type": "number",
+                      "description": "Current page number"
+                    },
+                    "totalPages": {
+                      "type": "number",
+                      "description": "Total number of pages available"
+                    },
+                    "totalResults": {
+                      "type": "number",
+                      "description": "Total number of results across all pages"
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "page",
+                    "totalPages",
+                    "totalResults"
+                  ],
+                  "description": "Filtered and sorted library titles"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/library/genres": {
+      "get": {
+        "operationId": "library.genres",
+        "summary": "List genres in user's library",
+        "description": "Get the distinct genres present in the user's library, ordered alphabetically. Used to populate the genre filter dropdown.",
+        "tags": [
+          "Library"
+        ],
+        "responses": {
+          "200": {
+            "description": "Genres present in the library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "genres": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ]
+                      },
+                      "description": "Genres present in the user's library"
+                    }
+                  },
+                  "required": [
+                    "genres"
+                  ],
+                  "description": "Genres that exist in the user's library"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/titles/{id}": {
       "get": {
         "operationId": "titles.detail",
@@ -2894,6 +3307,39 @@
             },
             "allowEmptyValue": true,
             "allowReserved": true
+          },
+          {
+            "name": "mediaType",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "movie",
+                "tv"
+              ],
+              "type": "string",
+              "description": "Filter to only movies or only TV episodes"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "statusFilter",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "watching",
+                  "watchlist"
+                ],
+                "type": "string"
+              },
+              "description": "Filter by user tracking status"
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
           }
         ],
         "responses": {
@@ -3108,195 +3554,6 @@
                     "nextCursor"
                   ],
                   "description": "Upcoming episodes and movie releases for tracked titles"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/dashboard/library": {
-      "get": {
-        "operationId": "dashboard.library",
-        "summary": "Get user library",
-        "description": "Fetch paginated titles in the user's library with their tracking statuses.",
-        "tags": [
-          "Dashboard"
-        ],
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 500,
-              "default": 1,
-              "description": "Page number (1-indexed)"
-            },
-            "allowEmptyValue": true,
-            "allowReserved": true
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 20,
-              "description": "Results per page (1-100, default 20)"
-            },
-            "allowEmptyValue": true,
-            "allowReserved": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Paginated library items with user statuses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "items": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "description": "Title ID"
-                          },
-                          "tmdbId": {
-                            "type": "number",
-                            "description": "TMDB numeric ID"
-                          },
-                          "type": {
-                            "enum": [
-                              "movie",
-                              "tv"
-                            ],
-                            "type": "string",
-                            "description": "Media type"
-                          },
-                          "title": {
-                            "type": "string",
-                            "description": "Display title"
-                          },
-                          "posterPath": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "Poster image path"
-                          },
-                          "posterThumbHash": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "ThumbHash blur placeholder for the poster"
-                          },
-                          "releaseDate": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "Release date (ISO 8601)"
-                          },
-                          "firstAirDate": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "First air date (ISO 8601)"
-                          },
-                          "voteAverage": {
-                            "anyOf": [
-                              {
-                                "type": "number"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "Average rating (0-10)"
-                          },
-                          "userStatus": {
-                            "anyOf": [
-                              {
-                                "enum": [
-                                  "in_watchlist",
-                                  "watching",
-                                  "caught_up",
-                                  "completed"
-                                ],
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "User's display status"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "tmdbId",
-                          "type",
-                          "title",
-                          "posterPath",
-                          "posterThumbHash",
-                          "releaseDate",
-                          "firstAirDate",
-                          "voteAverage",
-                          "userStatus"
-                        ],
-                        "description": "A library item with user status"
-                      }
-                    },
-                    "page": {
-                      "type": "number",
-                      "description": "Current page number"
-                    },
-                    "totalPages": {
-                      "type": "number",
-                      "description": "Total number of pages available"
-                    },
-                    "totalResults": {
-                      "type": "number",
-                      "description": "Total number of results across all pages"
-                    }
-                  },
-                  "required": [
-                    "items",
-                    "page",
-                    "totalPages",
-                    "totalResults"
-                  ],
-                  "description": "Paginated titles in the user's library"
                 }
               }
             }
@@ -4039,6 +4296,159 @@
         ]
       }
     },
+    "/explore/watch-providers": {
+      "get": {
+        "operationId": "explore.watchProviders",
+        "summary": "List available watch providers",
+        "description": "Fetch the list of streaming providers available in the configured region. Used to populate provider filter dropdowns.",
+        "tags": [
+          "Explore"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "movie",
+                "tv"
+              ],
+              "type": "string",
+              "description": "Media type filter"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Provider list with logos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "providers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number",
+                            "description": "TMDB provider ID"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Provider display name"
+                          },
+                          "logoPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Provider logo image path"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "logoPath"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "providers"
+                  ],
+                  "description": "Available streaming providers for the user's region"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "412",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": true
+                        },
+                        "code": {
+                          "const": "PRECONDITION_FAILED"
+                        },
+                        "status": {
+                          "const": 412
+                        },
+                        "message": {
+                          "type": "string",
+                          "default": "TMDB API key is not configured"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TMDB_NOT_CONFIGURED"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message",
+                        "data"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": false
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {}
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/search": {
       "get": {
         "operationId": "search",
@@ -4353,12 +4763,92 @@
           {
             "name": "genreId",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "integer",
               "minimum": -9007199254740991,
               "maximum": 9007199254740991,
               "description": "TMDB genre ID to filter by"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "yearMin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1900,
+              "maximum": 2100,
+              "description": "Minimum release year"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "yearMax",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1900,
+              "maximum": 2100,
+              "description": "Maximum release year"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "ratingMin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10,
+              "description": "Minimum TMDB vote average"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "popularity.desc",
+                "vote_average.desc",
+                "primary_release_date.desc",
+                "primary_release_date.asc"
+              ],
+              "type": "string",
+              "description": "Sort order for results"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "ISO 639-1 original language code"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "providerId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991,
+              "description": "TMDB watch provider ID"
             },
             "allowEmptyValue": true,
             "allowReserved": true

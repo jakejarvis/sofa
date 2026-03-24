@@ -7,7 +7,8 @@
     "./client": "./src/client.ts",
     "./migrate": "./src/migrate.ts",
     "./schema": "./src/schema.ts",
-    "./queries/*": "./src/queries/*.ts"
+    "./queries/*": "./src/queries/*.ts",
+    "./seed-platforms": "./src/seed-platforms.ts"
   },
   "scripts": {
     "lint": "oxlint",

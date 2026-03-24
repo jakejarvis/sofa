@@ -1,42 +1,31 @@
 import { useLingui } from "@lingui/react/macro";
 import { IconBooks } from "@tabler/icons-react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { orpc } from "@/lib/orpc/client";
 
 import { FeedSection } from "./feed-section";
 import { TitleGrid, TitleGridSectionSkeleton } from "./title-grid";
 
 export function LibrarySection() {
-  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
-    orpc.dashboard.library.infiniteOptions({
-      input: (pageParam: number) => ({ page: pageParam }),
-      initialPageParam: 1,
-      getNextPageParam: (lastPage) =>
-        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-      maxPages: 10,
-    }),
+  const { data, isPending } = useQuery(
+    orpc.library.list.queryOptions({ input: { page: 1, limit: 10 } }),
   );
 
   const { t } = useLingui();
 
-  const sentinelRef = useInfiniteScroll({
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  });
-
   if (isPending) return <TitleGridSectionSkeleton />;
 
-  const items = data?.pages.flatMap((p) => p.items) ?? [];
+  const items = data?.items ?? [];
   if (items.length === 0) return null;
 
   return (
-    <FeedSection title={t`In Your Library`} icon={<IconBooks className="text-primary size-5" />}>
+    <FeedSection
+      title={t`In Your Library`}
+      icon={<IconBooks className="text-primary size-5" />}
+      seeAllLink="/library"
+    >
       <TitleGrid items={items} />
-      <div ref={sentinelRef} />
-      {isFetchingNextPage && <TitleGridSectionSkeleton />}
     </FeedSection>
   );
 }

@@ -23,11 +23,14 @@ import {
   ImportPreviewSchema,
   IntegrationOutput,
   IntegrationsListOutput,
-  LibraryOutput,
+  LibraryGenresOutput,
+  LibraryListInput,
+  LibraryListOutput,
   MediaTypeParam,
   PageParam,
   PaginatedInput,
   ParseFileInput,
+  PlatformsListOutput,
   ParsePayloadInput,
   PersonDetailOutput,
   PopularOutput,
@@ -53,6 +56,7 @@ import {
   TriggerJobInput,
   TriggerJobOutput,
   UpdateCheckOutput,
+  UpdateUserPlatformsInput,
   UpdateNameInput,
   UpdateRatingInput,
   UpdateScheduleInput,
@@ -62,8 +66,10 @@ import {
   UploadAvatarInput,
   UploadAvatarOutput,
   UserInfoOutput,
+  UserPlatformsOutput,
   WatchHistoryInput,
   WatchHistoryOutput,
+  WatchProvidersOutput,
 } from "./schemas";
 
 export const contract = {
@@ -247,6 +253,31 @@ export const contract = {
         },
       }),
   },
+  library: {
+    list: oc
+      .route({
+        method: "GET",
+        path: "/library",
+        tags: ["Library"],
+        summary: "List library with filters",
+        description:
+          "Fetch paginated, filtered, and sorted titles from the user's library. Supports filtering by status, type, genre, rating, year, content rating, and streaming availability.",
+        successDescription: "Filtered library items with user statuses and ratings",
+      })
+      .input(LibraryListInput)
+      .output(LibraryListOutput),
+    genres: oc
+      .route({
+        method: "GET",
+        path: "/library/genres",
+        tags: ["Library"],
+        summary: "List genres in user's library",
+        description:
+          "Get the distinct genres present in the user's library, ordered alphabetically. Used to populate the genre filter dropdown.",
+        successDescription: "Genres present in the library",
+      })
+      .output(LibraryGenresOutput),
+  },
   dashboard: {
     stats: oc
       .route({
@@ -270,17 +301,6 @@ export const contract = {
         successDescription: "In-progress shows with next episode and watch progress",
       })
       .output(ContinueWatchingOutput),
-    library: oc
-      .route({
-        method: "GET",
-        path: "/dashboard/library",
-        tags: ["Dashboard"],
-        summary: "Get user library",
-        description: "Fetch paginated titles in the user's library with their tracking statuses.",
-        successDescription: "Paginated library items with user statuses",
-      })
-      .input(PaginatedInput)
-      .output(LibraryOutput),
     recommendations: oc
       .route({
         method: "GET",
@@ -366,6 +386,24 @@ export const contract = {
       })
       .input(MediaTypeParam)
       .output(GenresOutput)
+      .errors({
+        PRECONDITION_FAILED: {
+          message: "TMDB API key is not configured",
+          data: appErrorData(AppErrorCode.TMDB_NOT_CONFIGURED),
+        },
+      }),
+    watchProviders: oc
+      .route({
+        method: "GET",
+        path: "/explore/watch-providers",
+        tags: ["Explore"],
+        summary: "List available watch providers",
+        description:
+          "Fetch the list of streaming providers available in the configured region. Used to populate provider filter dropdowns.",
+        successDescription: "Provider list with logos",
+      })
+      .input(MediaTypeParam)
+      .output(WatchProvidersOutput)
       .errors({
         PRECONDITION_FAILED: {
           message: "TMDB API key is not configured",
@@ -724,6 +762,38 @@ export const contract = {
       })
       .input(z.void())
       .output(z.void()),
+    platforms: oc
+      .route({
+        method: "GET",
+        path: "/account/platforms",
+        tags: ["Account"],
+        summary: "Get user's streaming platforms",
+        description: "Fetch the current user's subscribed streaming platform IDs.",
+        successDescription: "List of platform IDs",
+      })
+      .output(UserPlatformsOutput),
+    updatePlatforms: oc
+      .route({
+        method: "PUT",
+        path: "/account/platforms",
+        tags: ["Account"],
+        summary: "Update streaming platforms",
+        description: "Set the current user's subscribed streaming platforms.",
+      })
+      .input(UpdateUserPlatformsInput)
+      .output(z.void()),
+  },
+  platforms: {
+    list: oc
+      .route({
+        method: "GET",
+        path: "/platforms",
+        tags: ["Platforms"],
+        summary: "List all platforms",
+        description: "Fetch all available streaming platforms, ordered by popularity.",
+        successDescription: "All platforms with metadata",
+      })
+      .output(PlatformsListOutput),
   },
   imports: {
     parseFile: oc

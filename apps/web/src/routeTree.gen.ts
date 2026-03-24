@@ -17,6 +17,8 @@ import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AppUpcomingRouteImport } from './routes/_app/upcoming'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppOnboardingRouteImport } from './routes/_app/onboarding'
+import { Route as AppLibraryRouteImport } from './routes/_app/library'
 import { Route as AppExploreRouteImport } from './routes/_app/explore'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppTitlesIdRouteImport } from './routes/_app/titles.$id'
@@ -60,6 +62,16 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
+const AppOnboardingRoute = AppOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLibraryRoute = AppLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppExploreRoute = AppExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
@@ -86,6 +98,8 @@ export interface FileRoutesByFullPath {
   '/setup': typeof SetupRoute
   '/dashboard': typeof AppDashboardRoute
   '/explore': typeof AppExploreRoute
+  '/library': typeof AppLibraryRoute
+  '/onboarding': typeof AppOnboardingRoute
   '/settings': typeof AppSettingsRoute
   '/upcoming': typeof AppUpcomingRoute
   '/login': typeof AuthLoginRoute
@@ -98,6 +112,8 @@ export interface FileRoutesByTo {
   '/setup': typeof SetupRoute
   '/dashboard': typeof AppDashboardRoute
   '/explore': typeof AppExploreRoute
+  '/library': typeof AppLibraryRoute
+  '/onboarding': typeof AppOnboardingRoute
   '/settings': typeof AppSettingsRoute
   '/upcoming': typeof AppUpcomingRoute
   '/login': typeof AuthLoginRoute
@@ -113,6 +129,8 @@ export interface FileRoutesById {
   '/setup': typeof SetupRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/explore': typeof AppExploreRoute
+  '/_app/library': typeof AppLibraryRoute
+  '/_app/onboarding': typeof AppOnboardingRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/upcoming': typeof AppUpcomingRoute
   '/_auth/login': typeof AuthLoginRoute
@@ -127,6 +145,8 @@ export interface FileRouteTypes {
     | '/setup'
     | '/dashboard'
     | '/explore'
+    | '/library'
+    | '/onboarding'
     | '/settings'
     | '/upcoming'
     | '/login'
@@ -139,6 +159,8 @@ export interface FileRouteTypes {
     | '/setup'
     | '/dashboard'
     | '/explore'
+    | '/library'
+    | '/onboarding'
     | '/settings'
     | '/upcoming'
     | '/login'
@@ -153,6 +175,8 @@ export interface FileRouteTypes {
     | '/setup'
     | '/_app/dashboard'
     | '/_app/explore'
+    | '/_app/library'
+    | '/_app/onboarding'
     | '/_app/settings'
     | '/_app/upcoming'
     | '/_auth/login'
@@ -226,6 +250,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/onboarding': {
+      id: '/_app/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AppOnboardingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/library': {
+      id: '/_app/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof AppLibraryRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/explore': {
       id: '/_app/explore'
       path: '/explore'
@@ -260,6 +298,8 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppExploreRoute: typeof AppExploreRoute
+  AppLibraryRoute: typeof AppLibraryRoute
+  AppOnboardingRoute: typeof AppOnboardingRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppUpcomingRoute: typeof AppUpcomingRoute
   AppPeopleIdRoute: typeof AppPeopleIdRoute
@@ -269,6 +309,8 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppExploreRoute: AppExploreRoute,
+  AppLibraryRoute: AppLibraryRoute,
+  AppOnboardingRoute: AppOnboardingRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppUpcomingRoute: AppUpcomingRoute,
   AppPeopleIdRoute: AppPeopleIdRoute,

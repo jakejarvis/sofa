@@ -4,6 +4,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
+import { DiscoverSection } from "@/components/explore/discover-section";
 import { FilterableTitleRow } from "@/components/explore/filterable-title-row";
 import { HeroBanner } from "@/components/explore/hero-banner";
 import { TitleRow } from "@/components/explore/title-row";
@@ -170,6 +171,8 @@ function ExplorePage() {
         userStatuses={userStatuses}
         episodeProgress={episodeProgress}
       />
+
+      <DiscoverSection />
     </div>
   );
 }

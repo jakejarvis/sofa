@@ -63,7 +63,7 @@ export default function DashboardScreen() {
     }),
   );
   const continueWatching = useQuery(orpc.dashboard.continueWatching.queryOptions());
-  const library = useQuery(orpc.dashboard.library.queryOptions({ input: {} }));
+  const library = useQuery(orpc.library.list.queryOptions({ input: { page: 1, limit: 10 } }));
   const recommendations = useQuery(orpc.dashboard.recommendations.queryOptions());
 
   const isRefreshing =
@@ -75,6 +75,7 @@ export default function DashboardScreen() {
 
   const onRefresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
+    queryClient.invalidateQueries({ queryKey: orpc.library.key() });
   }, []);
 
   const hasLibrary = (library.data?.items?.length ?? 0) > 0;
@@ -188,7 +189,11 @@ export default function DashboardScreen() {
         {/* Library */}
         <Animated.View entering={FadeInDown.duration(300).delay(350)}>
           <View className="px-4">
-            <SectionHeader title={t`In Your Library`} icon={IconBooks} />
+            <SectionHeader
+              title={t`In Your Library`}
+              icon={IconBooks}
+              onSeeAll={() => push("/(tabs)/(library)")}
+            />
           </View>
           {library.isPending ? (
             <HorizontalPosterRow items={[]} isLoading />

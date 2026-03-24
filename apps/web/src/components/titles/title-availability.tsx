@@ -93,7 +93,7 @@ function OverflowBadge({ offers }: { offers: AvailabilityOffer[] }) {
         {offers.map((offer) =>
           offer.watchUrl ? (
             <a
-              key={offer.providerId}
+              key={offer.platformId}
               href={offer.watchUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -103,7 +103,7 @@ function OverflowBadge({ offers }: { offers: AvailabilityOffer[] }) {
               <span className="text-popover-foreground truncate text-xs">{offer.providerName}</span>
             </a>
           ) : (
-            <div key={offer.providerId} className="flex items-center gap-2.5 px-2 py-1.5">
+            <div key={offer.platformId} className="flex items-center gap-2.5 px-2 py-1.5">
               <OverflowProviderIcon offer={offer} />
               <span className="text-popover-foreground truncate text-xs">{offer.providerName}</span>
             </div>
@@ -111,6 +111,48 @@ function OverflowBadge({ offers }: { offers: AvailabilityOffer[] }) {
         )}
       </PopoverContent>
     </Popover>
+  );
+}
+
+function OffersByType({
+  offers,
+  offerLabels,
+}: {
+  offers: AvailabilityOffer[];
+  offerLabels: Record<string, string>;
+}) {
+  const byType: Record<string, AvailabilityOffer[]> = {};
+  for (const offer of offers) {
+    if (!byType[offer.offerType]) byType[offer.offerType] = [];
+    byType[offer.offerType].push(offer);
+  }
+
+  return (
+    <div className="flex flex-wrap gap-4">
+      {Object.entries(byType).map(([type, typeOffers]) => {
+        const visible = typeOffers.slice(0, MAX_VISIBLE);
+        const overflow = typeOffers.slice(MAX_VISIBLE);
+
+        return (
+          <div key={type} className="space-y-1.5">
+            <span className="text-muted-foreground/60 text-[10px] font-medium tracking-wider uppercase">
+              {offerLabels[type] ?? type}
+            </span>
+            <div className="flex gap-1.5">
+              {visible.map((offer) => (
+                <ProviderBadge
+                  key={offer.platformId}
+                  name={offer.providerName}
+                  logoPath={offer.logoPath}
+                  watchUrl={offer.watchUrl}
+                />
+              ))}
+              {overflow.length > 0 && <OverflowBadge offers={overflow} />}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -123,44 +165,44 @@ export function TitleAvailability({ availability }: { availability: Availability
     free: t`Free`,
     ads: t`With Ads`,
   };
-  const availByType: Record<string, AvailabilityOffer[]> = {};
-  for (const offer of availability) {
-    if (!availByType[offer.offerType]) availByType[offer.offerType] = [];
-    availByType[offer.offerType].push(offer);
+
+  if (availability.length === 0) return null;
+
+  const userOffers = availability.filter((o) => o.isUserSubscribed);
+  const otherOffers = availability.filter((o) => !o.isUserSubscribed);
+
+  // If user has matching subscriptions, show split view
+  if (userOffers.length > 0) {
+    return (
+      <div className="space-y-4 pt-1">
+        <div className="space-y-2">
+          <h2 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+            <Trans>On your services</Trans>
+          </h2>
+          <OffersByType offers={userOffers} offerLabels={offerLabels} />
+        </div>
+
+        {otherOffers.length > 0 && (
+          <div className="border-border/30 space-y-2 border-t pt-3">
+            <h2 className="text-muted-foreground/60 text-[10px] font-medium tracking-wider uppercase">
+              <Trans>Also available on</Trans>
+            </h2>
+            <div className="opacity-60">
+              <OffersByType offers={otherOffers} offerLabels={offerLabels} />
+            </div>
+          </div>
+        )}
+      </div>
+    );
   }
 
-  if (Object.keys(availByType).length === 0) return null;
-
+  // Default: single "Where to Watch" section
   return (
     <div className="space-y-2 pt-1">
       <h2 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
         <Trans>Where to Watch</Trans>
       </h2>
-      <div className="flex flex-wrap gap-4">
-        {Object.entries(availByType).map(([type, offers]) => {
-          const visible = offers.slice(0, MAX_VISIBLE);
-          const overflow = offers.slice(MAX_VISIBLE);
-
-          return (
-            <div key={type} className="space-y-1.5">
-              <span className="text-muted-foreground/60 text-[10px] font-medium tracking-wider uppercase">
-                {offerLabels[type] ?? type}
-              </span>
-              <div className="flex gap-1.5">
-                {visible.map((offer) => (
-                  <ProviderBadge
-                    key={offer.providerId}
-                    name={offer.providerName}
-                    logoPath={offer.logoPath}
-                    watchUrl={offer.watchUrl}
-                  />
-                ))}
-                {overflow.length > 0 && <OverflowBadge offers={overflow} />}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <OffersByType offers={availability} offerLabels={offerLabels} />
     </div>
   );
 }

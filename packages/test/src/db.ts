@@ -16,7 +16,9 @@ const {
   userEpisodeWatches,
   userTitleStatus,
   userRatings,
-  availabilityOffers,
+  platforms,
+  titleAvailability,
+  userPlatforms,
   titleRecommendations,
   integrations,
 } = schema;
@@ -171,23 +173,53 @@ export function insertRating(userId: string, titleId: string, ratingStars: numbe
   testDb.insert(userRatings).values({ userId, titleId, ratingStars, ratedAt: new Date() }).run();
 }
 
-export function insertAvailabilityOffer(
-  titleId: string,
+export function insertPlatform(
   overrides: {
-    providerId?: number;
-    providerName?: string;
+    id?: string;
+    name?: string;
+    tmdbProviderId?: number;
+    logoPath?: string;
+    urlTemplate?: string;
+    displayOrder?: number;
+  } = {},
+) {
+  const id = overrides.id ?? "platform-1";
+  testDb
+    .insert(platforms)
+    .values({
+      id,
+      name: overrides.name ?? "Netflix",
+      tmdbProviderId: overrides.tmdbProviderId ?? 8,
+      logoPath: overrides.logoPath ?? "/logo.png",
+      urlTemplate: overrides.urlTemplate ?? "https://www.netflix.com/search?q={title}",
+      displayOrder: overrides.displayOrder ?? 1,
+    })
+    .run();
+  return id;
+}
+
+export function insertTitleAvailability(
+  titleId: string,
+  platformId: string,
+  overrides: {
     offerType?: "flatrate" | "rent" | "buy" | "free" | "ads";
+    region?: string;
   } = {},
 ) {
   testDb
-    .insert(availabilityOffers)
+    .insert(titleAvailability)
     .values({
       titleId,
-      providerId: overrides.providerId ?? 8,
-      providerName: overrides.providerName ?? "Netflix",
+      platformId,
       offerType: overrides.offerType ?? "flatrate",
+      region: overrides.region ?? "US",
+      lastFetchedAt: new Date(),
     })
     .run();
+}
+
+export function insertUserPlatform(userId: string, platformId: string) {
+  testDb.insert(userPlatforms).values({ userId, platformId }).run();
 }
 
 export function insertIntegration(userId: string, provider: string, token = "test-token") {

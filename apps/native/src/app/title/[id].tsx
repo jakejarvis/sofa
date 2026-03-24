@@ -477,7 +477,7 @@ export default function TitleDetailScreen() {
               contentContainerStyle={titleAvailabilityContentStyle}
             >
               {availability.map((offer) => (
-                <View key={`${offer.providerId}-${offer.offerType}`} className="items-center">
+                <View key={`${offer.platformId}-${offer.offerType}`} className="items-center">
                   {offer.logoPath && (
                     <Image
                       source={{ uri: offer.logoPath }}

@@ -7,7 +7,9 @@ import * as episodes from "./procedures/episodes";
 import * as explore from "./procedures/explore";
 import * as imports from "./procedures/imports";
 import * as integrations from "./procedures/integrations";
+import * as library from "./procedures/library";
 import * as people from "./procedures/people";
+import * as platformProcs from "./procedures/platforms";
 import { search } from "./procedures/search";
 import * as seasons from "./procedures/seasons";
 import * as status from "./procedures/status";
@@ -15,6 +17,10 @@ import * as system from "./procedures/system";
 import * as titles from "./procedures/titles";
 
 export const implementedRouter = {
+  library: {
+    list: library.list,
+    genres: library.genres,
+  },
   titles: {
     detail: titles.detail,
     updateStatus: titles.updateStatus,
@@ -41,7 +47,6 @@ export const implementedRouter = {
     stats: dashboard.stats,
     continueWatching: dashboard.continueWatching,
     upcoming: dashboard.upcoming,
-    library: dashboard.library,
     recommendations: dashboard.recommendations,
     watchHistory: dashboard.watchHistory,
   },
@@ -49,6 +54,7 @@ export const implementedRouter = {
     trending: explore.trending,
     popular: explore.popular,
     genres: explore.genres,
+    watchProviders: explore.watchProviders,
   },
   search,
   discover,
@@ -87,6 +93,11 @@ export const implementedRouter = {
     updateName: account.updateName,
     uploadAvatar: account.uploadAvatar,
     removeAvatar: account.removeAvatar,
+    platforms: account.platforms,
+    updatePlatforms: account.updatePlatformsHandler,
+  },
+  platforms: {
+    list: platformProcs.list,
   },
   imports: {
     parseFile: imports.parseFile,

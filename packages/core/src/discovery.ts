@@ -8,7 +8,6 @@ import {
   getEpisodeWatchHistoryBuckets,
   getHighlyRatedTitleIds,
   getInProgressTitleIds,
-  getLibraryFeed,
   getMovieWatchCountSince,
   getMovieWatchHistoryBuckets,
   getNewAvailableFeed,
@@ -305,8 +304,6 @@ export function getContinueWatchingFeed(userId: string): ContinueWatchingItem[] 
 
 export { getNewAvailableFeed } from "@sofa/db/queries/discovery";
 
-export { getLibraryFeed } from "@sofa/db/queries/discovery";
-
 export function getRecommendationsFeed(userId: string) {
   // Get recommendations from user's highly-rated or completed titles
   const userCompletedOrRated = getEngagedTitleIds(userId);
@@ -373,7 +370,7 @@ export interface UpcomingItem {
   userStatus: DisplayStatus;
   isNewSeason: boolean;
   streamingProvider: {
-    providerId: number;
+    platformId: string;
     providerName: string;
     logoPath: string | null;
   } | null;
@@ -386,9 +383,18 @@ export interface UpcomingFeedResult {
 
 export function getUpcomingFeed(
   userId: string,
-  options: { days?: number; limit?: number; cursor?: string } = {},
+  options: {
+    days?: number;
+    limit?: number;
+    cursor?: string;
+    mediaType?: "movie" | "tv";
+    statusFilter?: ("watching" | "watchlist")[];
+  } = {},
 ): UpcomingFeedResult {
-  const { days = 90, limit = 20, cursor } = options;
+  const { days = 90, limit = 20, cursor, mediaType, statusFilter } = options;
+
+  // Map display status filter to stored statuses for DB query
+  const storedStatuses = statusFilter?.map((s) => (s === "watching" ? "in_progress" : s));
 
   const now = new Date();
   const today = formatLocalDate(now);
@@ -412,8 +418,10 @@ export function getUpcomingFeed(
     }
   }
   const fromDate = cursorDate ?? today;
-  const episodeRows = getUpcomingEpisodes(userId, fromDate, toDate);
-  const movieRows = getUpcomingMovies(userId, fromDate, toDate);
+  const episodeRows =
+    mediaType === "movie" ? [] : getUpcomingEpisodes(userId, fromDate, toDate, storedStatuses);
+  const movieRows =
+    mediaType === "tv" ? [] : getUpcomingMovies(userId, fromDate, toDate, storedStatuses);
 
   // Merge into unified items
   type RawItem = { date: string; titleId: string; titleName: string } & (
@@ -509,12 +517,12 @@ export function getUpcomingFeed(
   const providerRows = getAvailabilityByTitleIds(titleIds);
   const providerMap = new Map<
     string,
-    { providerId: number; providerName: string; logoPath: string | null }
+    { platformId: string; providerName: string; logoPath: string | null }
   >();
   for (const p of providerRows) {
     if (!providerMap.has(p.titleId)) {
       providerMap.set(p.titleId, {
-        providerId: p.providerId,
+        platformId: p.platformId,
         providerName: p.providerName,
         logoPath: p.logoPath,
       });

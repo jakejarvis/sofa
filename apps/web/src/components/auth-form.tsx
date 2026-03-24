@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient, signIn, signUp } from "@/lib/auth/client";
+import { useAppForm } from "@/lib/form";
 
 export interface AuthConfig {
   oidcEnabled: boolean;
@@ -39,11 +40,7 @@ export function AuthForm({
 }) {
   const { t } = useLingui();
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const [oidcLoading, setOidcLoading] = useState(false);
 
   const isRegister = mode === "register";
@@ -51,32 +48,34 @@ export function AuthForm({
   const showPasswordForm = !(authConfig?.passwordLoginDisabled ?? false);
   const oidcProviderName = authConfig?.oidcProviderName || "SSO";
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      if (isRegister) {
-        const result = await signUp.email({ name, email, password });
-        if (result.error) {
-          setError(result.error.message ?? t`Registration failed`);
-          return;
+  const form = useAppForm({
+    defaultValues: { name: "", email: "", password: "" },
+    onSubmit: async ({ value }) => {
+      setError("");
+      try {
+        if (isRegister) {
+          const result = await signUp.email({
+            name: value.name,
+            email: value.email,
+            password: value.password,
+          });
+          if (result.error) {
+            setError(result.error.message ?? t`Registration failed`);
+            return;
+          }
+        } else {
+          const result = await signIn.email({ email: value.email, password: value.password });
+          if (result.error) {
+            setError(result.error.message ?? t`Login failed`);
+            return;
+          }
         }
-      } else {
-        const result = await signIn.email({ email, password });
-        if (result.error) {
-          setError(result.error.message ?? t`Login failed`);
-          return;
-        }
+        void navigate({ to: isRegister ? "/onboarding" : "/dashboard" });
+      } catch {
+        setError(t`Something went wrong`);
       }
-      void navigate({ to: "/dashboard" });
-    } catch {
-      setError(t`Something went wrong`);
-    } finally {
-      setLoading(false);
-    }
-  }
+    },
+  });
 
   async function handleOidcLogin() {
     setError("");
@@ -160,7 +159,10 @@ export function AuthForm({
 
         {showPasswordForm && (
           <motion.form
-            onSubmit={handleSubmit}
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
             className="space-y-4"
             initial="hidden"
             animate="visible"
@@ -170,72 +172,94 @@ export function AuthForm({
             }}
           >
             {isRegister && (
-              <motion.div variants={fieldVariants} className="space-y-1.5">
-                <Label htmlFor="name" className="text-muted-foreground tracking-wider uppercase">
-                  <Trans>Name</Trans>
-                </Label>
-                <Input
-                  id="name"
-                  type="text"
-                  required
-                  autoComplete="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className={authInputClass}
-                  placeholder={t`Your name…`}
-                />
-              </motion.div>
+              <form.Field name="name">
+                {(field) => (
+                  <motion.div variants={fieldVariants} className="space-y-1.5">
+                    <Label
+                      htmlFor="name"
+                      className="text-muted-foreground tracking-wider uppercase"
+                    >
+                      <Trans>Name</Trans>
+                    </Label>
+                    <Input
+                      id="name"
+                      type="text"
+                      required
+                      autoComplete="name"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      className={authInputClass}
+                      placeholder={t`Your name…`}
+                    />
+                  </motion.div>
+                )}
+              </form.Field>
             )}
 
-            <motion.div variants={fieldVariants} className="space-y-1.5">
-              <Label htmlFor="email" className="text-muted-foreground tracking-wider uppercase">
-                <Trans>Email</Trans>
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                autoComplete="email"
-                spellCheck={false}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={authInputClass}
-                placeholder="wwhite@graymatter.biz"
-              />
-            </motion.div>
+            <form.Field name="email">
+              {(field) => (
+                <motion.div variants={fieldVariants} className="space-y-1.5">
+                  <Label htmlFor="email" className="text-muted-foreground tracking-wider uppercase">
+                    <Trans>Email</Trans>
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    spellCheck={false}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className={authInputClass}
+                    placeholder="wwhite@graymatter.biz"
+                  />
+                </motion.div>
+              )}
+            </form.Field>
 
-            <motion.div variants={fieldVariants} className="space-y-1.5">
-              <Label htmlFor="password" className="text-muted-foreground tracking-wider uppercase">
-                <Trans>Password</Trans>
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                minLength={8}
-                autoComplete={mode === "login" ? "current-password" : "new-password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={authInputClass}
-                placeholder={t`Min 8 characters…`}
-              />
-            </motion.div>
+            <form.Field name="password">
+              {(field) => (
+                <motion.div variants={fieldVariants} className="space-y-1.5">
+                  <Label
+                    htmlFor="password"
+                    className="text-muted-foreground tracking-wider uppercase"
+                  >
+                    <Trans>Password</Trans>
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    required
+                    minLength={8}
+                    autoComplete={mode === "login" ? "current-password" : "new-password"}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className={authInputClass}
+                    placeholder={t`Min 8 characters…`}
+                  />
+                </motion.div>
+              )}
+            </form.Field>
 
-            <motion.div variants={fieldVariants}>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="hover:shadow-primary/20 h-11 w-full rounded-lg text-sm hover:shadow-lg"
-              >
-                {loading ? (
-                  <Trans>Loading…</Trans>
-                ) : isRegister ? (
-                  <Trans>Create account</Trans>
-                ) : (
-                  <Trans>Sign in</Trans>
-                )}
-              </Button>
-            </motion.div>
+            <form.Subscribe selector={(state) => state.isSubmitting}>
+              {(isSubmitting) => (
+                <motion.div variants={fieldVariants}>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="hover:shadow-primary/20 h-11 w-full rounded-lg text-sm hover:shadow-lg"
+                  >
+                    {isSubmitting ? (
+                      <Trans>Loading…</Trans>
+                    ) : isRegister ? (
+                      <Trans>Create account</Trans>
+                    ) : (
+                      <Trans>Sign in</Trans>
+                    )}
+                  </Button>
+                </motion.div>
+              )}
+            </form.Subscribe>
           </motion.form>
         )}
 
