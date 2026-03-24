@@ -25,13 +25,15 @@ import { useWidgetRefresh } from "@/hooks/use-widget-refresh";
 import { initLocale } from "@/lib/i18n";
 import { initAnalytics, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
-import { getScopeKey, initialize, onStorageScopeChange, queryPersister } from "@/lib/server";
+import { initSentry, Sentry } from "@/lib/sentry";
+import { getScopeKey, initSession, onStorageScopeChange, queryPersister } from "@/lib/server";
 import { sofaTheme } from "@/lib/theme";
 import { i18n } from "@sofa/i18n";
 
 SplashScreen.preventAutoHideAsync();
 enableFreeze(true);
-initialize();
+initSession();
+initSentry();
 const localeReady = initLocale();
 
 const changePasswordOptions =
@@ -187,7 +189,7 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
 
-export default function RootLayout() {
+function RootLayout() {
   const inner = (
     <I18nProvider i18n={i18n}>
       <QueryProvider>
@@ -210,3 +212,5 @@ export default function RootLayout() {
     </PostHogProvider>
   );
 }
+
+export default Sentry.wrap(RootLayout);

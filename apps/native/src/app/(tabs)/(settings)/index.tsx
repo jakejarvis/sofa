@@ -3,6 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconArrowUpRight,
   IconBrandGithub,
+  IconBug,
   IconCamera,
   IconChartBar,
   IconCloud,
@@ -53,6 +54,7 @@ import { setPersistedLocale } from "@/lib/i18n";
 import { orpc } from "@/lib/orpc";
 import { isAnalyticsEnabled, setAnalyticsEnabled } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
+import { isCrashReportingEnabled, setCrashReportingEnabled } from "@/lib/sentry";
 import { authClient, getServerUrl, requestServerChange } from "@/lib/server";
 import { toast } from "@/lib/toast";
 import { activateLocale, isLocaleRTL, type SupportedLocale } from "@sofa/i18n";
@@ -83,6 +85,7 @@ export default function SettingsScreen() {
   const [languageModalOpen, setLanguageModalOpen] = useState(false);
   const languageLabel = LOCALE_INFO.find((o) => o.code === i18n.locale)?.nativeName ?? i18n.locale;
   const [analyticsEnabled, setAnalyticsToggle] = useState(isAnalyticsEnabled);
+  const [crashReportingEnabled, setCrashReportingToggle] = useState(isCrashReportingEnabled);
 
   const isAdmin = session?.user?.role === "admin";
   const serverUrl = getServerUrl();
@@ -400,6 +403,21 @@ export default function SettingsScreen() {
                 onValueChange={(enabled) => {
                   setAnalyticsToggle(enabled);
                   setAnalyticsEnabled(enabled);
+                }}
+              />
+            }
+          />
+          <SettingsRow
+            label={t`Crash reporting`}
+            icon={IconBug}
+            right={
+              <Switch
+                value={crashReportingEnabled}
+                accessibilityLabel={t`Crash reporting`}
+                onValueChange={(enabled) => {
+                  setCrashReportingToggle(enabled);
+                  setCrashReportingEnabled(enabled);
+                  toast.info(t`Takes effect after restarting the app`);
                 }}
               />
             }

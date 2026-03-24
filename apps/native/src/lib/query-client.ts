@@ -1,4 +1,5 @@
 import { msg } from "@lingui/core/macro";
+import * as Sentry from "@sentry/react-native";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 
 import { posthog } from "@/lib/posthog";
@@ -31,6 +32,7 @@ export const queryClient = new QueryClient({
 
       toast.error(i18n._(msg`Something went wrong\u2026`));
       posthog?.captureException(error, { source: "react-query" });
+      Sentry.captureException(error, { tags: { source: "react-query" } });
     },
   }),
 });

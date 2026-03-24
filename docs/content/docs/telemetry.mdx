@@ -4,17 +4,17 @@ description: How Sofa collects anonymous usage statistics.
 icon: RadioTower
 ---
 
-Sofa includes optional, privacy-focused telemetry to help understand how the project is used. Both systems are **opt-in** and can be disabled at any time.
+Sofa includes optional, privacy-focused telemetry to help understand how the project is used. All systems can be disabled at any time.
 
 ## What We Collect
 
-Sofa has two separate telemetry systems depending on the platform:
+Sofa has three separate telemetry systems depending on the platform:
 
-|             | Server           | Mobile App  | Web App |
-| ----------- | ---------------- | ----------- | ------- |
-| **System**  | Custom reporting | PostHog     | None    |
-| **Default** | Disabled         | Disabled    | N/A     |
-| **Opt-in**  | Admin toggle     | User toggle | N/A     |
+|             | Server           | Mobile Analytics | Mobile Crashes | Web App |
+| ----------- | ---------------- | ---------------- | -------------- | ------- |
+| **System**  | Custom reporting | PostHog          | Sentry         | None    |
+| **Default** | Disabled         | Enabled          | Enabled        | N/A     |
+| **Toggle**  | Admin setting    | User setting     | User setting   | N/A     |
 
 The web app has **zero analytics** — no tracking scripts, no third-party services.
 
@@ -108,9 +108,48 @@ Toggle analytics off in **Settings → Anonymous Usage Reporting**. This immedia
 
 ---
 
+## Mobile App Crash Reporting
+
+The native iOS and Android app uses [Sentry](https://sentry.io/) for crash reporting, separate from the analytics toggle above. It is **enabled by default** and can be disabled in Settings.
+
+### Consent Flow
+
+Crash reporting is enabled by default. You can disable it in **Settings → Crash Reporting**. Changes take effect after restarting the app (native crash handlers must be installed at startup).
+
+### What Gets Sent
+
+When crash reporting is enabled:
+
+- **Crash reports** — stack traces from JavaScript exceptions and native crashes (segfaults, OOM, ANR)
+- **Device info** — OS version, device model, app version (no unique identifiers)
+
+### What Is NOT Sent
+
+- No personal data (name, email, watch history, ratings)
+- No screenshots or view hierarchies
+- No performance traces or profiling data
+- No session replays
+- No navigation history or screen parameters
+- No user identification — Sentry does not create user profiles
+- No breadcrumbs beyond console errors
+
+### Privacy Measures
+
+- `sendDefaultPii: false` — prevents automatic collection of IP addresses and other PII
+- `beforeSend` scrubs any remaining user/request data from JavaScript errors
+- Native crashes bypass `beforeSend` but contain only stack traces and device info — no PII
+- No advertising IDs or device fingerprinting
+
+### Disabling
+
+Toggle crash reporting off in **Settings → Crash Reporting**. The change takes effect after restarting the app.
+
+---
+
 ## Source Code
 
-Both telemetry implementations are fully open source:
+All telemetry implementations are fully open source:
 
 - Server telemetry: [`packages/core/src/telemetry.ts`](https://github.com/jakejarvis/sofa/blob/main/packages/core/src/telemetry.ts)
 - Mobile analytics: [`apps/native/src/lib/posthog.ts`](https://github.com/jakejarvis/sofa/blob/main/apps/native/src/lib/posthog.ts)
+- Crash reporting: [`apps/native/src/lib/sentry.ts`](https://github.com/jakejarvis/sofa/blob/main/apps/native/src/lib/sentry.ts)

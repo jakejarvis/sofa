@@ -32,6 +32,7 @@
     "@react-native-menu/menu": "2.0.0",
     "@react-navigation/elements": "2.9.11",
     "@react-navigation/native": "7.1.34",
+    "@sentry/react-native": "7.11.0",
     "@shopify/flash-list": "2.0.2",
     "@sofa/api": "workspace:*",
     "@sofa/i18n": "workspace:*",

@@ -386,7 +386,7 @@ let _cachedSessionSeeded = false;
  * Seed the Better Auth session atom from SecureStore before React renders.
  * Call at module scope in the root layout. Idempotent.
  */
-export function initialize(): void {
+export function initSession(): void {
   const cached = getCachedSession();
   if (cached) {
     _cachedSessionSeeded = true;
