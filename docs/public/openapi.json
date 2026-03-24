@@ -1695,11 +1695,11 @@
             "allowReserved": true
           },
           {
-            "name": "availableToStream",
+            "name": "onMyServices",
             "in": "query",
             "schema": {
               "type": "boolean",
-              "description": "Only show titles with streaming availability"
+              "description": "Only show titles available on the user's streaming services"
             },
             "allowEmptyValue": true,
             "allowReserved": true
@@ -2025,9 +2025,9 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "providerId": {
-                            "type": "number",
-                            "description": "JustWatch provider ID"
+                          "platformId": {
+                            "type": "string",
+                            "description": "Platform ID"
                           },
                           "providerName": {
                             "type": "string",
@@ -2058,14 +2058,19 @@
                               }
                             ],
                             "description": "Direct link to watch on this provider"
+                          },
+                          "isUserSubscribed": {
+                            "type": "boolean",
+                            "description": "Whether the user subscribes to this platform"
                           }
                         },
                         "required": [
-                          "providerId",
+                          "platformId",
                           "providerName",
                           "logoPath",
                           "offerType",
-                          "watchUrl"
+                          "watchUrl",
+                          "isUserSubscribed"
                         ],
                         "description": "A streaming availability offer from a provider"
                       },
@@ -3486,8 +3491,8 @@
                               {
                                 "type": "object",
                                 "properties": {
-                                  "providerId": {
-                                    "type": "number"
+                                  "platformId": {
+                                    "type": "string"
                                   },
                                   "providerName": {
                                     "type": "string"
@@ -3504,7 +3509,7 @@
                                   }
                                 },
                                 "required": [
-                                  "providerId",
+                                  "platformId",
                                   "providerName",
                                   "logoPath"
                                 ]
@@ -4335,7 +4340,18 @@
                         "type": "object",
                         "properties": {
                           "id": {
-                            "type": "number",
+                            "type": "string",
+                            "description": "Platform ID"
+                          },
+                          "tmdbProviderId": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
                             "description": "TMDB provider ID"
                           },
                           "name": {
@@ -4356,6 +4372,7 @@
                         },
                         "required": [
                           "id",
+                          "tmdbProviderId",
                           "name",
                           "logoPath"
                         ]
@@ -4835,6 +4852,9 @@
             "required": false,
             "schema": {
               "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "pattern": "^[a-z]{2}$",
               "description": "ISO 639-1 original language code"
             },
             "allowEmptyValue": true,
@@ -6637,6 +6657,166 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/account/platforms": {
+      "get": {
+        "operationId": "account.platforms",
+        "summary": "Get user's streaming platforms",
+        "description": "Fetch the current user's subscribed streaming platform IDs.",
+        "tags": [
+          "Account"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of platform IDs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "platformIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "platformIds"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "account.updatePlatforms",
+        "summary": "Update streaming platforms",
+        "description": "Set the current user's subscribed streaming platforms.",
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "platformIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "List of platform IDs the user subscribes to"
+                  }
+                },
+                "required": [
+                  "platformIds"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/platforms": {
+      "get": {
+        "operationId": "platforms.list",
+        "summary": "List all platforms",
+        "description": "Fetch all available streaming platforms, ordered by popularity.",
+        "tags": [
+          "Platforms"
+        ],
+        "responses": {
+          "200": {
+            "description": "All platforms with metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "platforms": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Platform ID"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Display name"
+                          },
+                          "tmdbProviderId": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "TMDB provider ID (null for custom platforms)"
+                          },
+                          "logoPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Logo image path"
+                          },
+                          "displayOrder": {
+                            "type": "number",
+                            "description": "Sort order"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "tmdbProviderId",
+                          "logoPath",
+                          "displayOrder"
+                        ],
+                        "description": "A streaming platform"
+                      }
+                    }
+                  },
+                  "required": [
+                    "platforms"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
