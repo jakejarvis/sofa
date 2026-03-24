@@ -22,7 +22,7 @@ const librarySearchSchema = z.object({
   yearMin: z.number().optional().catch(undefined),
   yearMax: z.number().optional().catch(undefined),
   contentRating: z.string().optional().catch(undefined),
-  availableToStream: z.boolean().optional().catch(undefined),
+  onMyServices: z.boolean().optional().catch(undefined),
   sortBy: z.string().optional().catch(undefined),
   sortDirection: z.enum(["asc", "desc"]).optional().catch(undefined),
 });
@@ -67,13 +67,15 @@ function LibraryPage() {
   const navigate = useNavigate({ from: Route.fullPath });
 
   // Debounced search — update URL 300ms after the user stops typing
+  const [prevSearchParam, setPrevSearchParam] = useState(search.search);
   const [localSearch, setLocalSearch] = useState(search.search ?? "");
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   // Sync localSearch when URL params change externally (back/forward navigation)
-  useEffect(() => {
+  if (prevSearchParam !== search.search) {
+    setPrevSearchParam(search.search);
     setLocalSearch(search.search ?? "");
-  }, [search.search]);
+  }
 
   useEffect(() => {
     return () => {
@@ -135,7 +137,7 @@ function LibraryPage() {
     if (search.yearMin) input.yearMin = search.yearMin;
     if (search.yearMax) input.yearMax = search.yearMax;
     if (search.contentRating) input.contentRating = search.contentRating;
-    if (search.availableToStream) input.availableToStream = true;
+    if (search.onMyServices) input.onMyServices = true;
     if (search.sortBy) input.sortBy = search.sortBy;
     if (search.sortDirection) input.sortDirection = search.sortDirection;
     return input;
@@ -168,7 +170,7 @@ function LibraryPage() {
     search.ratingMin || search.ratingMax ? 1 : 0,
     search.yearMin || search.yearMax ? 1 : 0,
     search.contentRating ? 1 : 0,
-    search.availableToStream ? 1 : 0,
+    search.onMyServices ? 1 : 0,
   ].reduce((a, b) => a + b, 0);
 
   return (
@@ -196,7 +198,7 @@ function LibraryPage() {
           yearMin: search.yearMin,
           yearMax: search.yearMax,
           contentRating: search.contentRating,
-          availableToStream: search.availableToStream,
+          onMyServices: search.onMyServices,
         }}
         onFilterChange={handleFilterChange}
         onClearAll={handleClearAll}

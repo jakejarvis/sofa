@@ -23,7 +23,7 @@ export interface LibraryFilters {
   yearMin?: number;
   yearMax?: number;
   contentRating?: string;
-  availableToStream?: boolean;
+  onMyServices?: boolean;
 }
 
 interface FilterSheetProps {
@@ -202,12 +202,7 @@ export function FilterSheet({ open, onOpenChange, filters, onApply }: FilterShee
 
   return (
     <>
-      <Modal
-        visible={open}
-        transparent
-        animationType="slide"
-        onRequestClose={() => handleClose()}
-      >
+      <Modal visible={open} transparent animationType="slide" onRequestClose={() => handleClose()}>
         <Pressable className="flex-1 justify-end bg-black/60" onPress={() => handleClose()}>
           <Pressable
             className="bg-card max-h-[85%] rounded-t-2xl"
@@ -340,16 +335,16 @@ export function FilterSheet({ open, onOpenChange, filters, onApply }: FilterShee
                 <View>
                   <SectionLabel>{t`Streaming`}</SectionLabel>
                   <View className="flex-row items-center justify-between">
-                    <Text className="text-foreground text-sm">{t`Available to stream`}</Text>
+                    <Text className="text-foreground text-sm">{t`On my services`}</Text>
                     <Switch
-                      value={local.availableToStream ?? false}
+                      value={local.onMyServices ?? false}
                       onValueChange={(checked) =>
                         setLocal((prev) => ({
                           ...prev,
-                          availableToStream: checked || undefined,
+                          onMyServices: checked || undefined,
                         }))
                       }
-                      accessibilityLabel={t`Available to stream`}
+                      accessibilityLabel={t`On my services`}
                     />
                   </View>
                 </View>

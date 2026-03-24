@@ -21,6 +21,7 @@
     "./lists": "./src/lists.ts",
     "./metadata": "./src/metadata.ts",
     "./person": "./src/person.ts",
+    "./platforms": "./src/platforms.ts",
     "./providers": "./src/providers.ts",
     "./settings": "./src/settings.ts",
     "./system-health": "./src/system-health.ts",

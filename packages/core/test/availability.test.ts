@@ -1,7 +1,14 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { availabilityOffers } from "@sofa/db/schema";
-import { clearAllTables, eq, insertAvailabilityOffer, insertTitle, testDb } from "@sofa/test/db";
+import { titleAvailability } from "@sofa/db/schema";
+import {
+  clearAllTables,
+  eq,
+  insertPlatform,
+  insertTitle,
+  insertTitleAvailability,
+  testDb,
+} from "@sofa/test/db";
 
 const { getWatchProviders } = vi.hoisted(() => ({
   getWatchProviders: vi.fn(async () => ({ results: {} as Record<string, unknown> })),
@@ -21,14 +28,15 @@ beforeEach(() => {
 describe("refreshAvailability", () => {
   test("clears stale US offers when TMDB returns no US availability", async () => {
     insertTitle({ id: "movie-1", tmdbId: 101, type: "movie", title: "Movie" });
-    insertAvailabilityOffer("movie-1");
+    const platformId = insertPlatform({ id: "p-1", tmdbProviderId: 8 });
+    insertTitleAvailability("movie-1", platformId);
 
     await refreshAvailability("movie-1");
 
     const offers = testDb
       .select()
-      .from(availabilityOffers)
-      .where(eq(availabilityOffers.titleId, "movie-1"))
+      .from(titleAvailability)
+      .where(eq(titleAvailability.titleId, "movie-1"))
       .all();
 
     expect(offers).toHaveLength(0);

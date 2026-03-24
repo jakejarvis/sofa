@@ -1,11 +1,12 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { IconFilter, IconSearch, IconSortDescending } from "@tabler/icons-react";
-import { useMemo } from "react";
+import { IconChevronDown, IconFilter, IconSearch, IconSortDescending } from "@tabler/icons-react";
+import { useMemo, useState } from "react";
 
 import { LibraryFilters, type LibraryFiltersProps } from "@/components/library/library-filters";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export interface LibraryToolbarProps {
   search: string;
@@ -41,6 +41,7 @@ export function LibraryToolbar({
   activeFilterCount,
 }: LibraryToolbarProps) {
   const { t } = useLingui();
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const sortOptions = useMemo(
     () => [
@@ -56,29 +57,29 @@ export function LibraryToolbar({
   );
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="relative flex-1 sm:max-w-xs">
-        <IconSearch
-          aria-hidden={true}
-          className="text-muted-foreground pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2"
-        />
-        <Input
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder={t`Search library...`}
-          className="pl-7"
-          aria-label={t`Search library`}
-        />
-      </div>
+    <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative flex-1 sm:max-w-xs">
+          <IconSearch
+            aria-hidden={true}
+            className="text-muted-foreground pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2"
+          />
+          <Input
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder={t`Search library...`}
+            className="pl-7"
+            aria-label={t`Search library`}
+          />
+        </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-muted-foreground text-sm">
-          {plural(totalResults, { one: "# result", other: "# results" })}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground text-sm">
+            {plural(totalResults, { one: "# result", other: "# results" })}
+          </span>
 
-        {/* Filter popover */}
-        <Popover>
-          <PopoverTrigger
+          {/* Filter toggle */}
+          <CollapsibleTrigger
             render={
               <Button variant="outline" size="sm">
                 <IconFilter aria-hidden={true} className="size-3.5" />
@@ -88,44 +89,55 @@ export function LibraryToolbar({
                     {activeFilterCount}
                   </Badge>
                 )}
+                <IconChevronDown
+                  aria-hidden={true}
+                  className={`text-muted-foreground size-3 transition-transform duration-200 ${filtersOpen ? "rotate-180" : ""}`}
+                />
               </Button>
             }
           />
-          <PopoverContent align="end" className="w-80">
-            <LibraryFilters
-              filters={filters}
-              onFilterChange={onFilterChange}
-              onClearAll={onClearAll}
-            />
-          </PopoverContent>
-        </Popover>
 
-        {/* Sort dropdown */}
-        <DropdownMenu modal={false}>
-          <DropdownMenuTrigger
-            render={
-              <Button variant="outline" size="sm">
-                <IconSortDescending aria-hidden={true} className="size-3.5" />
-                {t`Sort`}
-              </Button>
-            }
-          />
-          <DropdownMenuContent align="end">
-            {sortOptions.map((option) => {
-              const isActive = sortBy === option.sortBy && sortDirection === option.direction;
-              return (
-                <DropdownMenuItem
-                  key={`${option.sortBy}-${option.direction}`}
-                  className="cursor-pointer"
-                  onClick={() => onSortChange(option.sortBy, option.direction)}
-                >
-                  <span className={isActive ? "text-primary font-medium" : ""}>{option.label}</span>
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          {/* Sort dropdown */}
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="outline" size="sm">
+                  <IconSortDescending aria-hidden={true} className="size-3.5" />
+                  {t`Sort`}
+                </Button>
+              }
+            />
+            <DropdownMenuContent align="end">
+              {sortOptions.map((option) => {
+                const isActive = sortBy === option.sortBy && sortDirection === option.direction;
+                return (
+                  <DropdownMenuItem
+                    key={`${option.sortBy}-${option.direction}`}
+                    className="cursor-pointer"
+                    onClick={() => onSortChange(option.sortBy, option.direction)}
+                  >
+                    <span className={isActive ? "text-primary font-medium" : ""}>
+                      {option.label}
+                    </span>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
-    </div>
+
+      {/* Collapsible filter strip */}
+      <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
+        <div className="border-border/15 border-b pt-3 pb-3">
+          <LibraryFilters
+            filters={filters}
+            onFilterChange={onFilterChange}
+            onClearAll={onClearAll}
+            activeFilterCount={activeFilterCount}
+          />
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }

@@ -15,7 +15,7 @@ export const list = os.library.list.use(authed).handler(({ input, context }) => 
     yearMin: input.yearMin,
     yearMax: input.yearMax,
     contentRating: input.contentRating,
-    availableToStream: input.availableToStream,
+    onMyServices: input.onMyServices,
     sortBy: input.sortBy,
     sortDirection: input.sortDirection,
     page: input.page,

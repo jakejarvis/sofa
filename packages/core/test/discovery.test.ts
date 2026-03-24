@@ -2,7 +2,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vit
 
 import {
   clearAllTables,
-  insertAvailabilityOffer,
+  insertPlatform,
+  insertTitleAvailability,
   insertEpisodeWatch,
   insertMovieWatch,
   insertRating,
@@ -230,7 +231,8 @@ describe("getNewAvailableFeed", () => {
     insertUser();
     insertTitle({ id: "m1", tmdbId: 1 });
     insertStatus("user-1", "m1", "watchlist");
-    insertAvailabilityOffer("m1");
+    const pId = insertPlatform({ id: "p-m1", tmdbProviderId: 8 });
+    insertTitleAvailability("m1", pId);
 
     const feed = getNewAvailableFeed("user-1");
     expect(feed).toHaveLength(1);
@@ -249,7 +251,8 @@ describe("getNewAvailableFeed", () => {
   test("excludes titles not in user library", () => {
     insertUser();
     insertTitle({ id: "m1", tmdbId: 1 });
-    insertAvailabilityOffer("m1");
+    const pId = insertPlatform({ id: "p-m1", tmdbProviderId: 8 });
+    insertTitleAvailability("m1", pId);
 
     const feed = getNewAvailableFeed("user-1");
     expect(feed).toHaveLength(0);

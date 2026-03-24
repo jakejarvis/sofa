@@ -2,7 +2,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vit
 
 import {
   clearAllTables,
-  insertAvailabilityOffer,
+  insertPlatform,
+  insertTitleAvailability,
   insertEpisodeWatch,
   insertStatus,
   insertTitle,
@@ -282,13 +283,14 @@ describe("streaming provider", () => {
     const tomorrow = daysFromNow(1);
     insertTvShow("tv-1", 100, 1, 1, { airDates: [tomorrow] });
     insertStatus("user-1", "tv-1", "in_progress");
-    insertAvailabilityOffer("tv-1", { providerName: "Netflix", providerId: 8 });
+    const pId = insertPlatform({ id: "p-netflix", name: "Netflix", tmdbProviderId: 8 });
+    insertTitleAvailability("tv-1", pId, { offerType: "flatrate" });
 
     const result = getUpcomingFeed("user-1", { days: 7 });
     expect(result.items[0].streamingProvider).toEqual({
-      providerId: 8,
+      platformId: "p-netflix",
       providerName: "Netflix",
-      logoPath: null,
+      logoPath: "/logo.png",
     });
   });
 
@@ -296,7 +298,8 @@ describe("streaming provider", () => {
     const tomorrow = daysFromNow(1);
     insertTvShow("tv-1", 100, 1, 1, { airDates: [tomorrow] });
     insertStatus("user-1", "tv-1", "in_progress");
-    insertAvailabilityOffer("tv-1", { offerType: "rent" });
+    const pId = insertPlatform({ id: "p-rent", tmdbProviderId: 99 });
+    insertTitleAvailability("tv-1", pId, { offerType: "rent" });
 
     const result = getUpcomingFeed("user-1", { days: 7 });
     expect(result.items[0].streamingProvider).toBeNull();

@@ -2,9 +2,9 @@ import { and, eq, gte, inArray, isNotNull, lt, or } from "drizzle-orm";
 
 import { db } from "../client";
 import {
-  availabilityOffers,
   cronRuns,
   seasons,
+  titleAvailability,
   titleCast,
   titleRecommendations,
   titles,
@@ -64,10 +64,10 @@ export function getTitlesWithStaleOffers(titleIds: string[]) {
   if (titleIds.length === 0) return new Set<string>();
   return new Set(
     db
-      .select({ titleId: availabilityOffers.titleId })
-      .from(availabilityOffers)
-      .where(inArray(availabilityOffers.titleId, titleIds))
-      .groupBy(availabilityOffers.titleId)
+      .select({ titleId: titleAvailability.titleId })
+      .from(titleAvailability)
+      .where(inArray(titleAvailability.titleId, titleIds))
+      .groupBy(titleAvailability.titleId)
       .all()
       .map((r) => r.titleId),
   );
@@ -77,15 +77,15 @@ export function getTitlesWithStaleOffersFetchedBefore(titleIds: string[], staleD
   if (titleIds.length === 0) return new Set<string>();
   return new Set(
     db
-      .select({ titleId: availabilityOffers.titleId })
-      .from(availabilityOffers)
+      .select({ titleId: titleAvailability.titleId })
+      .from(titleAvailability)
       .where(
         and(
-          inArray(availabilityOffers.titleId, titleIds),
-          lt(availabilityOffers.lastFetchedAt, staleDate),
+          inArray(titleAvailability.titleId, titleIds),
+          lt(titleAvailability.lastFetchedAt, staleDate),
         ),
       )
-      .groupBy(availabilityOffers.titleId)
+      .groupBy(titleAvailability.titleId)
       .all()
       .map((r) => r.titleId),
   );

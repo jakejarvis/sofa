@@ -1,10 +1,10 @@
 import { ORPCError } from "@orpc/server";
 
 import { AppErrorCode } from "@sofa/api/errors";
-import { WATCH_REGION } from "@sofa/config";
 import { ensureBrowseTitlesExist } from "@sofa/core/metadata";
+import { listPlatforms } from "@sofa/core/platforms";
 import { getEpisodeProgressByTitleIds, getDisplayStatusesByTitleIds } from "@sofa/core/tracking";
-import { getGenres, getPopular, getTrending, getWatchProviderList } from "@sofa/tmdb/client";
+import { getGenres, getPopular, getTrending } from "@sofa/tmdb/client";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 
@@ -163,14 +163,14 @@ export const genres = os.explore.genres.use(authed).handler(async ({ input }) =>
   };
 });
 
-export const watchProviders = os.explore.watchProviders.use(authed).handler(async ({ input }) => {
-  requireTmdb();
-  const results = await getWatchProviderList(input.type, WATCH_REGION);
+export const watchProviders = os.explore.watchProviders.use(authed).handler(async () => {
+  const allPlatforms = listPlatforms();
   return {
-    providers: results.map((p) => ({
-      id: p.provider_id,
-      name: p.provider_name ?? "",
-      logoPath: tmdbImageUrl(p.logo_path, "logos"),
+    providers: allPlatforms.map((p) => ({
+      id: p.id,
+      tmdbProviderId: p.tmdbProviderId,
+      name: p.name,
+      logoPath: tmdbImageUrl(p.logoPath, "logos"),
     })),
   };
 });

@@ -2,9 +2,10 @@ import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 
 import { db } from "../client";
 import {
-  availabilityOffers,
   episodes,
+  platforms,
   seasons,
+  titleAvailability,
   titleRecommendations,
   titles,
   userEpisodeWatches,
@@ -189,7 +190,7 @@ export function getNewAvailableFeed(userId: string, _days = 14) {
       and(eq(userTitleStatus.titleId, titles.id), eq(userTitleStatus.userId, userId)),
     )
     .where(
-      sql`EXISTS (SELECT 1 FROM ${availabilityOffers} WHERE ${availabilityOffers.titleId} = ${titles.id})`,
+      sql`EXISTS (SELECT 1 FROM ${titleAvailability} WHERE ${titleAvailability.titleId} = ${titles.id})`,
     )
     .orderBy(desc(titles.popularity))
     .limit(20)
@@ -352,16 +353,17 @@ export function getAvailabilityByTitleIds(titleIds: string[]) {
   if (titleIds.length === 0) return [];
   return db
     .select({
-      titleId: availabilityOffers.titleId,
-      providerId: availabilityOffers.providerId,
-      providerName: availabilityOffers.providerName,
-      logoPath: availabilityOffers.logoPath,
+      titleId: titleAvailability.titleId,
+      platformId: platforms.id,
+      providerName: platforms.name,
+      logoPath: platforms.logoPath,
     })
-    .from(availabilityOffers)
+    .from(titleAvailability)
+    .innerJoin(platforms, eq(titleAvailability.platformId, platforms.id))
     .where(
       and(
-        inArray(availabilityOffers.titleId, titleIds),
-        eq(availabilityOffers.offerType, "flatrate"),
+        inArray(titleAvailability.titleId, titleIds),
+        eq(titleAvailability.offerType, "flatrate"),
       ),
     )
     .all();

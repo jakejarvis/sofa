@@ -68,11 +68,10 @@ export function DiscoverSection() {
   const [sortBy, setSortBy] = useState<DiscoverSortBy | undefined>(undefined);
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [providerId, setProviderId] = useState<number | undefined>(undefined);
+  const [selectedPlatformId, setSelectedPlatformId] = useState("");
 
   const { data: genreData } = useQuery(orpc.explore.genres.queryOptions({ input: { type } }));
-  const { data: providerData } = useQuery(
-    orpc.explore.watchProviders.queryOptions({ input: { type } }),
-  );
+  const { data: providerData } = useQuery(orpc.platforms.list.queryOptions());
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteQuery(
     orpc.discover.infiniteOptions({
@@ -103,7 +102,7 @@ export function DiscoverSection() {
   const items = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data?.pages]);
 
   const genres = genreData?.genres ?? [];
-  const providers = providerData?.providers ?? [];
+  const providers = providerData?.platforms ?? [];
 
   const sortLabels: Record<string, string> = {
     "popularity.desc": t`Most popular`,
@@ -155,11 +154,14 @@ export function DiscoverSection() {
   }
 
   function handleProviderChange(value: string | null) {
+    setSelectedPlatformId(value ?? "");
     if (!value) {
       setProviderId(undefined);
       return;
     }
-    setProviderId(Number(value));
+    // Resolve platform UUID to TMDB provider ID for the discover API
+    const platform = providers.find((p) => p.id === value);
+    setProviderId(platform?.tmdbProviderId ?? undefined);
   }
 
   function handleGenreChange(value: string | null) {
@@ -172,7 +174,7 @@ export function DiscoverSection() {
 
   return (
     <FeedSection title={t`Discover`} icon={<IconSearch className="text-primary size-5" />}>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {/* Type toggle: Movie | TV */}
         <ToggleGroup
           value={[type]}
@@ -191,6 +193,9 @@ export function DiscoverSection() {
           <ToggleGroupItem value="tv">{t`TV`}</ToggleGroupItem>
         </ToggleGroup>
 
+        {/* Divider */}
+        <div className="bg-border/30 mx-0.5 hidden h-5 w-px sm:block" />
+
         {/* Genre select */}
         <Select
           value={genreId != null ? String(genreId) : ""}
@@ -198,7 +203,11 @@ export function DiscoverSection() {
           modal={false}
           aria-label={t`Genre`}
         >
-          <SelectTrigger size="sm">
+          <SelectTrigger
+            size="sm"
+            data-active={genreId != null ? "" : undefined}
+            className="data-[active]:border-primary/40 data-[active]:text-foreground"
+          >
             <SelectValue>
               {(value: string | null) => {
                 if (!value) return t`Genre`;
@@ -224,7 +233,11 @@ export function DiscoverSection() {
           modal={false}
           aria-label={t`Decade`}
         >
-          <SelectTrigger size="sm">
+          <SelectTrigger
+            size="sm"
+            data-active={yearMin != null ? "" : undefined}
+            className="data-[active]:border-primary/40 data-[active]:text-foreground"
+          >
             <SelectValue>
               {(value: string | null) => {
                 if (!value) return t`Year`;
@@ -251,7 +264,11 @@ export function DiscoverSection() {
           modal={false}
           aria-label={t`Rating`}
         >
-          <SelectTrigger size="sm">
+          <SelectTrigger
+            size="sm"
+            data-active={ratingMin != null ? "" : undefined}
+            className="data-[active]:border-primary/40 data-[active]:text-foreground"
+          >
             <SelectValue>
               {(value: string | null) => {
                 if (!value) return t`Rating`;
@@ -276,7 +293,11 @@ export function DiscoverSection() {
           modal={false}
           aria-label={t`Sort`}
         >
-          <SelectTrigger size="sm">
+          <SelectTrigger
+            size="sm"
+            data-active={sortBy ? "" : undefined}
+            className="data-[active]:border-primary/40 data-[active]:text-foreground"
+          >
             <SelectValue>
               {(value: string | null) => {
                 if (!value) return t`Sort`;
@@ -301,7 +322,11 @@ export function DiscoverSection() {
           modal={false}
           aria-label={t`Language`}
         >
-          <SelectTrigger size="sm">
+          <SelectTrigger
+            size="sm"
+            data-active={language ? "" : undefined}
+            className="data-[active]:border-primary/40 data-[active]:text-foreground"
+          >
             <SelectValue>
               {(value: string | null) => {
                 if (!value) return t`Language`;
@@ -321,27 +346,33 @@ export function DiscoverSection() {
 
         {/* Provider select */}
         <Select
-          value={providerId != null ? String(providerId) : ""}
+          value={selectedPlatformId}
           onValueChange={handleProviderChange}
           modal={false}
           aria-label={t`Provider`}
         >
-          <SelectTrigger size="sm">
+          <SelectTrigger
+            size="sm"
+            data-active={selectedPlatformId ? "" : undefined}
+            className="data-[active]:border-primary/40 data-[active]:text-foreground"
+          >
             <SelectValue>
               {(value: string | null) => {
                 if (!value) return t`Provider`;
-                const provider = providers.find((p) => String(p.id) === value);
-                return provider?.name ?? t`Provider`;
+                const platform = providers.find((p) => p.id === value);
+                return platform?.name ?? t`Provider`;
               }}
             </SelectValue>
           </SelectTrigger>
           <SelectContent alignItemWithTrigger={false} className="p-1">
             <SelectItem value="">{t`All providers`}</SelectItem>
-            {providers.map((provider) => (
-              <SelectItem key={provider.id} value={String(provider.id)}>
-                {provider.name}
-              </SelectItem>
-            ))}
+            {providers
+              .filter((p) => p.tmdbProviderId != null)
+              .map((platform) => (
+                <SelectItem key={platform.id} value={platform.id}>
+                  {platform.name}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </div>

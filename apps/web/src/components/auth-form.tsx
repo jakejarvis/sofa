@@ -70,7 +70,7 @@ export function AuthForm({
           return;
         }
       }
-      void navigate({ to: "/dashboard" });
+      void navigate({ to: isRegister ? "/onboarding" : "/dashboard" });
     } catch {
       setError(t`Something went wrong`);
     } finally {

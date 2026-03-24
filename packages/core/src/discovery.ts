@@ -370,7 +370,7 @@ export interface UpcomingItem {
   userStatus: DisplayStatus;
   isNewSeason: boolean;
   streamingProvider: {
-    providerId: number;
+    platformId: string;
     providerName: string;
     logoPath: string | null;
   } | null;
@@ -517,12 +517,12 @@ export function getUpcomingFeed(
   const providerRows = getAvailabilityByTitleIds(titleIds);
   const providerMap = new Map<
     string,
-    { providerId: number; providerName: string; logoPath: string | null }
+    { platformId: string; providerName: string; logoPath: string | null }
   >();
   for (const p of providerRows) {
     if (!providerMap.has(p.titleId)) {
       providerMap.set(p.titleId, {
-        providerId: p.providerId,
+        platformId: p.platformId,
         providerName: p.providerName,
         logoPath: p.logoPath,
       });

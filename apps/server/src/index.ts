@@ -9,6 +9,7 @@ import { registerJobScheduleProvider } from "@sofa/core/system-health";
 import { closeDatabase, isDatabaseAccessBlocked } from "@sofa/db/client";
 import { runMigrations } from "@sofa/db/migrate";
 import { recoverStaleImportJobs } from "@sofa/db/queries/imports";
+import { seedPlatforms } from "@sofa/db/seed-platforms";
 import { createLogger } from "@sofa/logger";
 
 import { getJobSchedules, startJobs, stopJobs } from "./cron";
@@ -35,6 +36,9 @@ await ensureBackupDir();
 
 // Run database migrations
 runMigrations();
+
+// Seed streaming platforms (idempotent upsert)
+seedPlatforms();
 
 // Recover import jobs left in running/pending state from a previous crash
 const recoveredJobs = recoverStaleImportJobs();

@@ -30,6 +30,7 @@ import {
   PageParam,
   PaginatedInput,
   ParseFileInput,
+  PlatformsListOutput,
   ParsePayloadInput,
   PersonDetailOutput,
   PopularOutput,
@@ -55,6 +56,7 @@ import {
   TriggerJobInput,
   TriggerJobOutput,
   UpdateCheckOutput,
+  UpdateUserPlatformsInput,
   UpdateNameInput,
   UpdateRatingInput,
   UpdateScheduleInput,
@@ -64,6 +66,7 @@ import {
   UploadAvatarInput,
   UploadAvatarOutput,
   UserInfoOutput,
+  UserPlatformsOutput,
   WatchHistoryInput,
   WatchHistoryOutput,
   WatchProvidersOutput,
@@ -759,6 +762,38 @@ export const contract = {
       })
       .input(z.void())
       .output(z.void()),
+    platforms: oc
+      .route({
+        method: "GET",
+        path: "/account/platforms",
+        tags: ["Account"],
+        summary: "Get user's streaming platforms",
+        description: "Fetch the current user's subscribed streaming platform IDs.",
+        successDescription: "List of platform IDs",
+      })
+      .output(UserPlatformsOutput),
+    updatePlatforms: oc
+      .route({
+        method: "PUT",
+        path: "/account/platforms",
+        tags: ["Account"],
+        summary: "Update streaming platforms",
+        description: "Set the current user's subscribed streaming platforms.",
+      })
+      .input(UpdateUserPlatformsInput)
+      .output(z.void()),
+  },
+  platforms: {
+    list: oc
+      .route({
+        method: "GET",
+        path: "/platforms",
+        tags: ["Platforms"],
+        summary: "List all platforms",
+        description: "Fetch all available streaming platforms, ordered by popularity.",
+        successDescription: "All platforms with metadata",
+      })
+      .output(PlatformsListOutput),
   },
   imports: {
     parseFile: oc

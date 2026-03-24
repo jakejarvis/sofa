@@ -2,13 +2,14 @@ import { and, asc, countDistinct, desc, eq, gte, isNotNull, lte, sql } from "dri
 
 import { db } from "../client";
 import {
-  availabilityOffers,
   episodes,
   genres,
   seasons,
+  titleAvailability,
   titleGenres,
   titles,
   userEpisodeWatches,
+  userPlatforms,
   userRatings,
   userTitleStatus,
 } from "../schema";
@@ -87,7 +88,7 @@ export interface LibraryFilters {
   yearMin?: number;
   yearMax?: number;
   contentRating?: string;
-  availableToStream?: boolean;
+  onMyServices?: boolean;
   sortBy: string;
   sortDirection: "asc" | "desc";
   page: number;
@@ -144,10 +145,30 @@ export function getFilteredLibrary(userId: string, filters: LibraryFilters) {
     conditions.push(eq(titles.contentRating, filters.contentRating));
   }
 
-  if (filters.availableToStream) {
-    conditions.push(
-      sql`EXISTS (SELECT 1 FROM ${availabilityOffers} WHERE ${availabilityOffers.titleId} = ${titles.id})`,
-    );
+  if (filters.onMyServices) {
+    // Check if user has platforms set; if so, filter to titles available on their services
+    const userHasPlatforms =
+      db
+        .select({ platformId: userPlatforms.platformId })
+        .from(userPlatforms)
+        .where(eq(userPlatforms.userId, userId))
+        .limit(1)
+        .get() != null;
+
+    if (userHasPlatforms) {
+      conditions.push(
+        sql`EXISTS (
+          SELECT 1 FROM ${titleAvailability} ta
+          JOIN ${userPlatforms} up ON ta.platformId = up.platformId
+          WHERE ta.titleId = ${titles.id} AND up.userId = ${userId}
+        )`,
+      );
+    } else {
+      // Fallback: any availability
+      conditions.push(
+        sql`EXISTS (SELECT 1 FROM ${titleAvailability} WHERE ${titleAvailability.titleId} = ${titles.id})`,
+      );
+    }
   }
 
   // Status filtering: optimize simple cases

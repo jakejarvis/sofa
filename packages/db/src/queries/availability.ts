@@ -1,24 +1,74 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 import { db } from "../client";
-import { availabilityOffers } from "../schema";
+import { platforms, titleAvailability } from "../schema";
 
 export function replaceAvailabilityTransaction(
   titleId: string,
   region: string,
-  offers: (typeof availabilityOffers.$inferInsert)[],
+  offers: (typeof titleAvailability.$inferInsert)[],
 ): void {
   db.transaction((tx) => {
-    tx.delete(availabilityOffers)
-      .where(and(eq(availabilityOffers.titleId, titleId), eq(availabilityOffers.region, region)))
+    tx.delete(titleAvailability)
+      .where(and(eq(titleAvailability.titleId, titleId), eq(titleAvailability.region, region)))
       .run();
 
     if (offers.length > 0) {
-      tx.insert(availabilityOffers).values(offers).onConflictDoNothing().run();
+      tx.insert(titleAvailability).values(offers).onConflictDoNothing().run();
     }
   });
 }
 
-export function getAvailabilityOffers(titleId: string) {
-  return db.select().from(availabilityOffers).where(eq(availabilityOffers.titleId, titleId)).all();
+export function getAvailabilityForTitle(titleId: string) {
+  return db
+    .select({
+      platformId: platforms.id,
+      providerName: platforms.name,
+      logoPath: platforms.logoPath,
+      urlTemplate: platforms.urlTemplate,
+      tmdbProviderId: platforms.tmdbProviderId,
+      offerType: titleAvailability.offerType,
+    })
+    .from(titleAvailability)
+    .innerJoin(platforms, eq(titleAvailability.platformId, platforms.id))
+    .where(eq(titleAvailability.titleId, titleId))
+    .all();
+}
+
+/**
+ * Ensure a platform row exists for a TMDB provider. Upserts by tmdbProviderId.
+ * Returns the platform ID.
+ */
+export function ensurePlatformForTmdbProvider(
+  tmdbProviderId: number,
+  name: string,
+  logoPath: string | null,
+): string {
+  const existing = db
+    .select({ id: platforms.id })
+    .from(platforms)
+    .where(eq(platforms.tmdbProviderId, tmdbProviderId))
+    .get();
+
+  if (existing) return existing.id;
+
+  const row = db
+    .insert(platforms)
+    .values({
+      tmdbProviderId,
+      name,
+      logoPath,
+      displayOrder: 999,
+    })
+    .onConflictDoUpdate({
+      target: platforms.tmdbProviderId,
+      set: {
+        name: sql`excluded.name`,
+        logoPath: sql`excluded.logoPath`,
+      },
+    })
+    .returning({ id: platforms.id })
+    .get();
+
+  return row!.id;
 }

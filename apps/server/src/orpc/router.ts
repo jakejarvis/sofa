@@ -9,6 +9,7 @@ import * as imports from "./procedures/imports";
 import * as integrations from "./procedures/integrations";
 import * as library from "./procedures/library";
 import * as people from "./procedures/people";
+import * as platformProcs from "./procedures/platforms";
 import { search } from "./procedures/search";
 import * as seasons from "./procedures/seasons";
 import * as status from "./procedures/status";
@@ -92,6 +93,11 @@ export const implementedRouter = {
     updateName: account.updateName,
     uploadAvatar: account.uploadAvatar,
     removeAvatar: account.removeAvatar,
+    platforms: account.platforms,
+    updatePlatforms: account.updatePlatformsHandler,
+  },
+  platforms: {
+    list: platformProcs.list,
   },
   imports: {
     parseFile: imports.parseFile,

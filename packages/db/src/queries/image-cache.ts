@@ -1,7 +1,15 @@
 import { eq, inArray } from "drizzle-orm";
 
 import { db } from "../client";
-import { availabilityOffers, episodes, persons, seasons, titleCast, titles } from "../schema";
+import {
+  episodes,
+  persons,
+  platforms,
+  seasons,
+  titleAvailability,
+  titleCast,
+  titles,
+} from "../schema";
 
 // ─── Title image paths ───────────────────────────────────────────────
 
@@ -51,9 +59,10 @@ export function getEpisodeStillsForTitle(titleId: string) {
 
 export function getAvailabilityLogosForTitle(titleId: string) {
   return db
-    .select({ logoPath: availabilityOffers.logoPath })
-    .from(availabilityOffers)
-    .where(eq(availabilityOffers.titleId, titleId))
+    .select({ logoPath: platforms.logoPath })
+    .from(titleAvailability)
+    .innerJoin(platforms, eq(titleAvailability.platformId, platforms.id))
+    .where(eq(titleAvailability.titleId, titleId))
     .all();
 }
 

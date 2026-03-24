@@ -280,13 +280,38 @@ export const SeasonSchema = z
 
 export const AvailabilityOfferSchema = z
   .object({
-    providerId: z.number().describe("JustWatch provider ID"),
+    platformId: z.string().describe("Platform ID"),
     providerName: z.string().describe("Display name (e.g. Netflix, Hulu)"),
     logoPath: z.string().nullable().describe("Provider logo image path"),
     offerType: z.string().describe("Offer type: flatrate, rent, buy, free, ads"),
     watchUrl: z.string().nullable().describe("Direct link to watch on this provider"),
+    isUserSubscribed: z.boolean().describe("Whether the user subscribes to this platform"),
   })
   .meta({ description: "A streaming availability offer from a provider" });
+
+export const PlatformSchema = z
+  .object({
+    id: z.string().describe("Platform ID"),
+    name: z.string().describe("Display name"),
+    tmdbProviderId: z.number().nullable().describe("TMDB provider ID (null for custom platforms)"),
+    logoPath: z.string().nullable().describe("Logo image path"),
+    displayOrder: z.number().describe("Sort order"),
+  })
+  .meta({ description: "A streaming platform" });
+
+export type Platform = z.infer<typeof PlatformSchema>;
+
+export const PlatformsListOutput = z.object({
+  platforms: z.array(PlatformSchema),
+});
+
+export const UserPlatformsOutput = z.object({
+  platformIds: z.array(z.string()),
+});
+
+export const UpdateUserPlatformsInput = z.object({
+  platformIds: z.array(z.string()).describe("List of platform IDs the user subscribes to"),
+});
 
 export const CastMemberSchema = z
   .object({
@@ -542,10 +567,10 @@ export const LibraryListInput = z
     yearMin: z.number().int().min(1900).max(2100).optional().describe("Minimum release year"),
     yearMax: z.number().int().min(1900).max(2100).optional().describe("Maximum release year"),
     contentRating: z.string().optional().describe("Content rating filter (e.g. PG-13, TV-MA)"),
-    availableToStream: z
+    onMyServices: z
       .boolean()
       .optional()
-      .describe("Only show titles with streaming availability"),
+      .describe("Only show titles available on the user's streaming services"),
     sortBy: z
       .enum(["title", "added_at", "release_date", "popularity", "user_rating", "vote_average"])
       .default("added_at")
@@ -595,7 +620,8 @@ export const WatchProvidersOutput = z
   .object({
     providers: z.array(
       z.object({
-        id: z.number().describe("TMDB provider ID"),
+        id: z.string().describe("Platform ID"),
+        tmdbProviderId: z.number().nullable().describe("TMDB provider ID"),
         name: z.string().describe("Provider display name"),
         logoPath: z.string().nullable().describe("Provider logo image path"),
       }),
@@ -659,7 +685,7 @@ export const UpcomingItemSchema = z
     isNewSeason: z.boolean().describe("Whether this is a new season for a completed show"),
     streamingProvider: z
       .object({
-        providerId: z.number(),
+        platformId: z.string(),
         providerName: z.string(),
         logoPath: z.string().nullable(),
       })

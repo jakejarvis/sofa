@@ -19,6 +19,7 @@ import { IntegrationsSection } from "@/components/settings/integrations-section"
 import { LanguageSection } from "@/components/settings/language-section";
 import { RegistrationSection } from "@/components/settings/registration-section";
 import { SettingsShell } from "@/components/settings/settings-shell";
+import { StreamingServicesSection } from "@/components/settings/streaming-services-section";
 import { SystemHealthCards } from "@/components/settings/system-health-section";
 import { UpdateCheckSection } from "@/components/settings/update-check-section";
 import { TmdbLogo } from "@/components/tmdb-logo";
@@ -34,6 +35,8 @@ export const Route = createFileRoute("/_app/settings")({
     const promises: Promise<unknown>[] = [
       context.queryClient.ensureQueryData(orpc.integrations.list.queryOptions()),
       context.queryClient.ensureQueryData(orpc.system.status.queryOptions()),
+      context.queryClient.ensureQueryData(orpc.platforms.list.queryOptions()),
+      context.queryClient.ensureQueryData(orpc.account.platforms.queryOptions()),
     ];
     const isAdmin = context.session.user.role === "admin";
     if (isAdmin) {
@@ -140,6 +143,7 @@ function SettingsPage() {
           </h2>
         </div>
         <LanguageSection />
+        <StreamingServicesSection />
       </div>
 
       <IntegrationsSection />

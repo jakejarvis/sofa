@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { auth } from "@sofa/auth/server";
 import { AVATAR_DIR } from "@sofa/config";
+import { getUserPlatformIdList, updateUserPlatforms } from "@sofa/core/platforms";
 
 import { os } from "../context";
 import { authed } from "../middleware";
@@ -64,3 +65,13 @@ export const removeAvatar = os.account.removeAvatar.use(authed).handler(async ({
     headers: context.headers,
   });
 });
+
+export const platforms = os.account.platforms.use(authed).handler(async ({ context }) => {
+  return { platformIds: getUserPlatformIdList(context.user.id) };
+});
+
+export const updatePlatformsHandler = os.account.updatePlatforms
+  .use(authed)
+  .handler(async ({ input, context }) => {
+    updateUserPlatforms(context.user.id, input.platformIds);
+  });

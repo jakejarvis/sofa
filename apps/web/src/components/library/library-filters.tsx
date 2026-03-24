@@ -1,9 +1,11 @@
+import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
+import { IconCheck, IconChevronDown } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -24,10 +26,11 @@ export interface LibraryFiltersProps {
     yearMin?: number;
     yearMax?: number;
     contentRating?: string;
-    availableToStream?: boolean;
+    onMyServices?: boolean;
   };
   onFilterChange: (key: string, value: unknown) => void;
   onClearAll: () => void;
+  activeFilterCount: number;
 }
 
 const DECADES = [
@@ -52,7 +55,16 @@ const CONTENT_RATINGS = [
   "TV-MA",
 ];
 
-export function LibraryFilters({ filters, onFilterChange, onClearAll }: LibraryFiltersProps) {
+function Divider() {
+  return <div className="bg-border/30 mx-1 hidden h-5 w-px sm:block" />;
+}
+
+export function LibraryFilters({
+  filters,
+  onFilterChange,
+  onClearAll,
+  activeFilterCount,
+}: LibraryFiltersProps) {
   const { t } = useLingui();
   const { data: genreData } = useQuery(orpc.library.genres.queryOptions());
 
@@ -75,18 +87,6 @@ export function LibraryFilters({ filters, onFilterChange, onClearAll }: LibraryF
     [t],
   );
 
-  const ratingOptions = useMemo(
-    () => [
-      { value: "", label: t`Any` },
-      { value: "1", label: "1\u2605" },
-      { value: "2", label: "2\u2605" },
-      { value: "3", label: "3\u2605" },
-      { value: "4", label: "4\u2605" },
-      { value: "5", label: "5\u2605" },
-    ],
-    [t],
-  );
-
   function toggleStatus(status: string) {
     const current = filters.statuses ?? [];
     const next = current.includes(status)
@@ -95,262 +95,233 @@ export function LibraryFilters({ filters, onFilterChange, onClearAll }: LibraryF
     onFilterChange("statuses", next.length > 0 ? next : undefined);
   }
 
+  // Status dropdown label
+  const statusLabel = useMemo(() => {
+    const selected = filters.statuses ?? [];
+    if (selected.length === 0) return t`Status`;
+    if (selected.length === 1) {
+      return statuses.find((s) => s.value === selected[0])?.label ?? t`Status`;
+    }
+    return plural(selected.length, { one: "# status", other: "# statuses" });
+  }, [filters.statuses, statuses, t]);
+
+  // Year dropdown value
   const activeDecade = DECADES.find(
     (d) => filters.yearMin === d.yearMin && filters.yearMax === d.yearMax,
   );
-
   const isOlderActive = filters.yearMax === 1979 && filters.yearMin === undefined;
+  const yearValue = activeDecade ? String(activeDecade.yearMin) : isOlderActive ? "older" : "";
 
-  function selectDecade(decade: (typeof DECADES)[number]) {
-    if (activeDecade === decade) {
+  function handleYearChange(value: string | null) {
+    if (!value) {
       onFilterChange("yearMin", undefined);
       onFilterChange("yearMax", undefined);
-    } else {
+      return;
+    }
+    if (value === "older") {
+      onFilterChange("yearMin", undefined);
+      onFilterChange("yearMax", 1979);
+      return;
+    }
+    const decade = DECADES.find((d) => String(d.yearMin) === value);
+    if (decade) {
       onFilterChange("yearMin", decade.yearMin);
       onFilterChange("yearMax", decade.yearMax);
     }
   }
 
-  function selectOlder() {
-    if (isOlderActive) {
-      onFilterChange("yearMin", undefined);
-      onFilterChange("yearMax", undefined);
-    } else {
-      onFilterChange("yearMin", undefined);
-      onFilterChange("yearMax", 1979);
-    }
-  }
-
-  function handleCustomYear(key: "yearMin" | "yearMax", raw: string) {
-    const num = raw === "" ? undefined : Number(raw);
-    onFilterChange(key, num);
-  }
-
-  const hasCustomYear =
-    !activeDecade &&
-    !isOlderActive &&
-    (filters.yearMin !== undefined || filters.yearMax !== undefined);
-
   return (
-    <div className="flex flex-col gap-4">
-      {/* Status */}
-      <div className="space-y-1.5">
-        <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-          {t`Status`}
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          {statuses.map((s) => (
-            <Button
-              key={s.value}
-              variant={(filters.statuses ?? []).includes(s.value) ? "default" : "outline"}
-              size="sm"
-              className="rounded-full"
-              onClick={() => toggleStatus(s.value)}
-            >
-              {s.label}
-            </Button>
-          ))}
-        </div>
-      </div>
+    <div className="flex flex-wrap items-center gap-2 py-1">
+      {/* Type pills */}
+      {types.map((typ) => (
+        <Button
+          key={typ.value ?? "all"}
+          variant={filters.type === typ.value ? "default" : "outline"}
+          size="sm"
+          className="rounded-full"
+          onClick={() => onFilterChange("type", typ.value)}
+        >
+          {typ.label}
+        </Button>
+      ))}
 
-      {/* Type */}
-      <div className="space-y-1.5">
-        <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-          {t`Type`}
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          {types.map((typ) => (
+      <Divider />
+
+      {/* Status — multi-select dropdown */}
+      <Popover>
+        <PopoverTrigger
+          render={
             <Button
-              key={typ.value ?? "all"}
-              variant={filters.type === typ.value ? "default" : "outline"}
+              variant="outline"
               size="sm"
-              className="rounded-full"
-              onClick={() => onFilterChange("type", typ.value)}
+              data-active={(filters.statuses ?? []).length > 0 ? "" : undefined}
+              className="data-[active]:border-primary/40 data-[active]:text-foreground"
             >
-              {typ.label}
+              {statusLabel}
+              <IconChevronDown aria-hidden={true} className="text-muted-foreground size-3" />
             </Button>
-          ))}
-        </div>
-      </div>
+          }
+        />
+        <PopoverContent className="w-44 p-1">
+          {statuses.map((s) => {
+            const isActive = (filters.statuses ?? []).includes(s.value);
+            return (
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => toggleStatus(s.value)}
+                className="hover:bg-muted/50 flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm"
+              >
+                <div
+                  className={`flex size-3.5 items-center justify-center rounded border transition-colors ${
+                    isActive ? "border-primary bg-primary text-primary-foreground" : "border-border"
+                  }`}
+                >
+                  {isActive && <IconCheck className="size-2.5" strokeWidth={3} />}
+                </div>
+                {s.label}
+              </button>
+            );
+          })}
+        </PopoverContent>
+      </Popover>
 
       {/* Genre */}
-      <div className="space-y-1.5">
-        <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-          {t`Genre`}
-        </p>
-        <Select
-          value={filters.genreId !== undefined ? String(filters.genreId) : ""}
-          onValueChange={(v) => onFilterChange("genreId", v === "" ? undefined : Number(v))}
-          modal={false}
-          aria-label={t`Genre`}
+      <Select
+        value={filters.genreId !== undefined ? String(filters.genreId) : ""}
+        onValueChange={(v) => onFilterChange("genreId", v === "" ? undefined : Number(v))}
+        modal={false}
+        aria-label={t`Genre`}
+      >
+        <SelectTrigger
+          size="sm"
+          data-active={filters.genreId != null ? "" : undefined}
+          className="data-[active]:border-primary/40 data-[active]:text-foreground"
         >
-          <SelectTrigger size="sm">
-            <SelectValue>
-              {(value: string | null) => {
-                if (!value) return t`All genres`;
-                const genre = genreData?.genres.find((g) => String(g.id) === value);
-                return genre?.name ?? t`All genres`;
-              }}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent alignItemWithTrigger={false} className="p-1">
-            <SelectItem value="">{t`All genres`}</SelectItem>
-            {genreData?.genres.map((genre) => (
-              <SelectItem key={genre.id} value={String(genre.id)}>
-                {genre.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          <SelectValue>
+            {(value: string | null) => {
+              if (!value) return t`Genre`;
+              const genre = genreData?.genres.find((g) => String(g.id) === value);
+              return genre?.name ?? t`Genre`;
+            }}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent alignItemWithTrigger={false} className="p-1">
+          <SelectItem value="">{t`All genres`}</SelectItem>
+          {genreData?.genres.map((genre) => (
+            <SelectItem key={genre.id} value={String(genre.id)}>
+              {genre.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       {/* Rating */}
-      <div className="space-y-1.5">
-        <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-          {t`Rating`}
-        </p>
-        <div className="flex items-center gap-2">
-          <Select
-            value={filters.ratingMin !== undefined ? String(filters.ratingMin) : ""}
-            onValueChange={(v) => onFilterChange("ratingMin", v === "" ? undefined : Number(v))}
-            modal={false}
-            aria-label={t`Minimum rating`}
-          >
-            <SelectTrigger size="sm">
-              <SelectValue>
-                {(value: string | null) => {
-                  if (!value) return t`Min`;
-                  return `${value}\u2605`;
-                }}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent alignItemWithTrigger={false} className="p-1">
-              {ratingOptions.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <span className="text-muted-foreground text-xs">&ndash;</span>
-          <Select
-            value={filters.ratingMax !== undefined ? String(filters.ratingMax) : ""}
-            onValueChange={(v) => onFilterChange("ratingMax", v === "" ? undefined : Number(v))}
-            modal={false}
-            aria-label={t`Maximum rating`}
-          >
-            <SelectTrigger size="sm">
-              <SelectValue>
-                {(value: string | null) => {
-                  if (!value) return t`Max`;
-                  return `${value}\u2605`;
-                }}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent alignItemWithTrigger={false} className="p-1">
-              {ratingOptions.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      <Select
+        value={filters.ratingMin !== undefined ? String(filters.ratingMin) : ""}
+        onValueChange={(v) => onFilterChange("ratingMin", v === "" ? undefined : Number(v))}
+        modal={false}
+        aria-label={t`Rating`}
+      >
+        <SelectTrigger
+          size="sm"
+          data-active={filters.ratingMin != null ? "" : undefined}
+          className="data-[active]:border-primary/40 data-[active]:text-foreground"
+        >
+          <SelectValue>
+            {(value: string | null) => {
+              if (!value) return t`Rating`;
+              return `${value}\u2605+`;
+            }}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent alignItemWithTrigger={false} className="p-1">
+          <SelectItem value="">{t`Any`}</SelectItem>
+          <SelectItem value="1">1★+</SelectItem>
+          <SelectItem value="2">2★+</SelectItem>
+          <SelectItem value="3">3★+</SelectItem>
+          <SelectItem value="4">4★+</SelectItem>
+          <SelectItem value="5">5★</SelectItem>
+        </SelectContent>
+      </Select>
 
       {/* Year */}
-      <div className="space-y-1.5">
-        <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-          {t`Year`}
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          {DECADES.map((decade) => (
-            <Button
-              key={decade.label}
-              variant={activeDecade === decade ? "default" : "outline"}
-              size="sm"
-              className="rounded-full"
-              onClick={() => selectDecade(decade)}
-            >
-              {decade.label}
-            </Button>
+      <Select value={yearValue} onValueChange={handleYearChange} modal={false} aria-label={t`Year`}>
+        <SelectTrigger
+          size="sm"
+          data-active={yearValue ? "" : undefined}
+          className="data-[active]:border-primary/40 data-[active]:text-foreground"
+        >
+          <SelectValue>
+            {(value: string | null) => {
+              if (!value) return t`Year`;
+              if (value === "older") return t`Pre-1980`;
+              const decade = DECADES.find((d) => String(d.yearMin) === value);
+              return decade?.label ?? t`Year`;
+            }}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent alignItemWithTrigger={false} className="p-1">
+          <SelectItem value="">{t`Any year`}</SelectItem>
+          {DECADES.map((d) => (
+            <SelectItem key={d.yearMin} value={String(d.yearMin)}>
+              {d.label}
+            </SelectItem>
           ))}
-          <Button
-            variant={isOlderActive ? "default" : "outline"}
-            size="sm"
-            className="rounded-full"
-            onClick={selectOlder}
-          >
-            {t`Older`}
-          </Button>
-        </div>
-        <div className="flex items-center gap-2">
-          <Input
-            type="number"
-            placeholder={t`From`}
-            value={hasCustomYear && filters.yearMin !== undefined ? filters.yearMin : ""}
-            onChange={(e) => handleCustomYear("yearMin", e.target.value)}
-            className="w-20"
-            aria-label={t`Year from`}
-          />
-          <span className="text-muted-foreground text-xs">&ndash;</span>
-          <Input
-            type="number"
-            placeholder={t`To`}
-            value={hasCustomYear && filters.yearMax !== undefined ? filters.yearMax : ""}
-            onChange={(e) => handleCustomYear("yearMax", e.target.value)}
-            className="w-20"
-            aria-label={t`Year to`}
-          />
-        </div>
-      </div>
+          <SelectItem value="older">{t`Pre-1980`}</SelectItem>
+        </SelectContent>
+      </Select>
 
       {/* Content Rating */}
-      <div className="space-y-1.5">
-        <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-          {t`Content Rating`}
-        </p>
-        <Select
-          value={filters.contentRating ?? ""}
-          onValueChange={(v) => onFilterChange("contentRating", v === "" ? undefined : v)}
-          modal={false}
-          aria-label={t`Content rating`}
+      <Select
+        value={filters.contentRating ?? ""}
+        onValueChange={(v) => onFilterChange("contentRating", v === "" ? undefined : v)}
+        modal={false}
+        aria-label={t`Content rating`}
+      >
+        <SelectTrigger
+          size="sm"
+          data-active={filters.contentRating ? "" : undefined}
+          className="data-[active]:border-primary/40 data-[active]:text-foreground"
         >
-          <SelectTrigger size="sm">
-            <SelectValue>{(value: string | null) => (value ? value : t`All`)}</SelectValue>
-          </SelectTrigger>
-          <SelectContent alignItemWithTrigger={false} className="p-1">
-            <SelectItem value="">{t`All`}</SelectItem>
-            {CONTENT_RATINGS.map((rating) => (
-              <SelectItem key={rating} value={rating}>
-                {rating}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          <SelectValue>{(value: string | null) => (value ? value : t`Age`)}</SelectValue>
+        </SelectTrigger>
+        <SelectContent alignItemWithTrigger={false} className="p-1">
+          <SelectItem value="">{t`All`}</SelectItem>
+          {CONTENT_RATINGS.map((rating) => (
+            <SelectItem key={rating} value={rating}>
+              {rating}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-      {/* Available to Stream */}
-      <div className="space-y-1.5">
-        <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-          {t`Streaming`}
-        </p>
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={filters.availableToStream ?? false}
-            onCheckedChange={(checked) => onFilterChange("availableToStream", checked || undefined)}
-            aria-label={t`Available to stream`}
-          />
-          <span className="text-xs">{t`Available to stream`}</span>
-        </div>
-      </div>
+      <Divider />
 
-      {/* Clear all */}
-      <div className="flex justify-end">
-        <Button variant="link" size="sm" onClick={onClearAll}>
-          {t`Clear all`}
-        </Button>
-      </div>
+      {/* On my services */}
+      <label className="flex cursor-pointer items-center gap-1.5">
+        <Switch
+          size="sm"
+          checked={filters.onMyServices ?? false}
+          onCheckedChange={(checked) => onFilterChange("onMyServices", checked || undefined)}
+          aria-label={t`On my services`}
+        />
+        <span className="text-muted-foreground text-[11px]">{t`On my services`}</span>
+      </label>
+
+      {/* Clear */}
+      {activeFilterCount > 0 && (
+        <>
+          <div className="flex-1" />
+          <button
+            type="button"
+            onClick={onClearAll}
+            className="text-muted-foreground hover:text-foreground text-xs transition-colors"
+          >
+            {t`Clear`}
+          </button>
+        </>
+      )}
     </div>
   );
 }

@@ -249,29 +249,64 @@ export const userRatings = sqliteTable(
   (table) => [uniqueIndex("userRatings_userId_titleId").on(table.userId, table.titleId)],
 );
 
-export const availabilityOffers = sqliteTable(
-  "availabilityOffers",
+// ─── Platforms & Availability ────────────────────────────────────────
+
+export const platforms = sqliteTable(
+  "platforms",
+  {
+    id: uuidPk(),
+    name: text("name").notNull(),
+    tmdbProviderId: int("tmdbProviderId"),
+    logoPath: text("logoPath"),
+    urlTemplate: text("urlTemplate"),
+    displayOrder: int("displayOrder").notNull().default(0),
+  },
+  (table) => [
+    uniqueIndex("platforms_tmdbProviderId_unique").on(table.tmdbProviderId),
+    index("platforms_displayOrder").on(table.displayOrder),
+  ],
+);
+
+export const titleAvailability = sqliteTable(
+  "titleAvailability",
   {
     titleId: text("titleId")
       .notNull()
       .references(() => titles.id, { onDelete: "cascade" }),
-    region: text("region").notNull().default("US"),
-    providerId: int("providerId").notNull(),
-    providerName: text("providerName").notNull(),
-    logoPath: text("logoPath"),
+    platformId: text("platformId")
+      .notNull()
+      .references(() => platforms.id, { onDelete: "cascade" }),
     offerType: text("offerType", {
       enum: ["flatrate", "rent", "buy", "free", "ads"],
     }).notNull(),
-    link: text("link"),
+    region: text("region").notNull().default("US"),
     lastFetchedAt: int("lastFetchedAt", { mode: "timestamp" }),
   },
   (table) => [
-    uniqueIndex("availabilityOffers_unique").on(
+    uniqueIndex("titleAvailability_unique").on(
       table.titleId,
-      table.region,
-      table.providerId,
+      table.platformId,
       table.offerType,
+      table.region,
     ),
+    index("titleAvailability_titleId").on(table.titleId),
+    index("titleAvailability_platformId").on(table.platformId),
+  ],
+);
+
+export const userPlatforms = sqliteTable(
+  "userPlatforms",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    platformId: text("platformId")
+      .notNull()
+      .references(() => platforms.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    uniqueIndex("userPlatforms_userId_platformId").on(table.userId, table.platformId),
+    index("userPlatforms_userId").on(table.userId),
   ],
 );
 

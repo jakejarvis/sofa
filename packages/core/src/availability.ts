@@ -1,9 +1,10 @@
 import {
-  getAvailabilityOffers,
+  ensurePlatformForTmdbProvider,
+  getAvailabilityForTitle,
   replaceAvailabilityTransaction,
 } from "@sofa/db/queries/availability";
 import { getTitleById } from "@sofa/db/queries/title";
-import type { availabilityOffers } from "@sofa/db/schema";
+import type { titleAvailability } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 import { getWatchProviders } from "@sofa/tmdb/client";
 
@@ -18,21 +19,22 @@ export async function refreshAvailability(titleId: string) {
   const now = new Date();
   const offerTypes = ["flatrate", "rent", "buy", "free", "ads"] as const;
 
-  // Collect all offer rows, then batch insert in a single transaction
-  const allOfferRows: (typeof availabilityOffers.$inferInsert)[] = [];
+  const allOfferRows: (typeof titleAvailability.$inferInsert)[] = [];
   if (us) {
     for (const offerType of offerTypes) {
       const providers = us[offerType];
       if (!providers) continue;
       for (const p of providers) {
+        const platformId = ensurePlatformForTmdbProvider(
+          p.provider_id,
+          p.provider_name ?? "",
+          p.logo_path ?? null,
+        );
         allOfferRows.push({
           titleId,
-          region: "US",
-          providerId: p.provider_id,
-          providerName: p.provider_name ?? "",
-          logoPath: p.logo_path ?? "",
+          platformId,
           offerType,
-          link: us.link ?? null,
+          region: "US",
           lastFetchedAt: now,
         });
       }
@@ -51,5 +53,5 @@ export async function refreshAvailability(titleId: string) {
 }
 
 export function getAvailability(titleId: string) {
-  return getAvailabilityOffers(titleId);
+  return getAvailabilityForTitle(titleId);
 }

@@ -66,7 +66,7 @@ export default function LibraryScreen() {
     if (filters.ratingMin !== undefined || filters.ratingMax !== undefined) count++;
     if (filters.yearMin !== undefined || filters.yearMax !== undefined) count++;
     if (filters.contentRating) count++;
-    if (filters.availableToStream) count++;
+    if (filters.onMyServices) count++;
     return count;
   }, [filters]);
 
@@ -85,7 +85,7 @@ export default function LibraryScreen() {
         yearMin: filters.yearMin,
         yearMax: filters.yearMax,
         contentRating: filters.contentRating,
-        availableToStream: filters.availableToStream,
+        onMyServices: filters.onMyServices,
         sortBy,
         sortDirection,
         page: pageParam,
