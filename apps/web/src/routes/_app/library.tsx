@@ -108,7 +108,9 @@ function LibraryPage() {
 
   const handleFilterChange = useCallback(
     (key: string, value: unknown) => {
-      const updates: Partial<LibrarySearch> = { [key]: value || undefined };
+      const updates: Partial<LibrarySearch> = {
+        [key]: value === "" || value === false ? undefined : value,
+      };
       // Clear ratingMax when ratingMin changes (UI only exposes ratingMin now)
       if (key === "ratingMin") updates.ratingMax = undefined;
       updateSearch(updates);

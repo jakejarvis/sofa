@@ -50,6 +50,7 @@ export function StreamingServicesSection() {
       // Only show "Saved" if no newer save was triggered
       if (saveCounterRef.current !== counter) return;
       setSaved(true);
+      clearTimeout(savedTimerRef.current);
       savedTimerRef.current = setTimeout(setSaved, 1500, false);
     }, 500);
   }, []);
