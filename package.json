@@ -23,6 +23,7 @@
       "@orpc/server": "1.13.9",
       "@orpc/tanstack-query": "1.13.9",
       "@orpc/zod": "1.13.9",
+      "@tanstack/react-form": "1.28.5",
       "@tanstack/react-query": "5.95.2",
       "@types/bun": "1.3.11",
       "@types/node": "25.5.0",

@@ -16,8 +16,9 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -41,6 +42,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { authClient, signOut } from "@/lib/auth/client";
 import { getErrorMessage } from "@/lib/error-messages";
+import { useAppForm } from "@/lib/form";
 import { client, orpc } from "@/lib/orpc/client";
 import type { NormalizedImport } from "@sofa/api/schemas";
 import { formatDate } from "@sofa/i18n/format";
@@ -788,60 +790,57 @@ function ImportOptionCheckbox({
 function ChangePasswordDialog() {
   const { t } = useLingui();
   const [open, setOpen] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);
   const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function resetForm() {
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setRevokeOtherSessions(false);
-    setError("");
-  }
+  const changePasswordSchema = useMemo(
+    () =>
+      z
+        .object({
+          currentPassword: z.string().min(1, t`Current password is required`),
+          newPassword: z.string().min(8, t`New password must be at least 8 characters`),
+          confirmPassword: z.string().min(1, t`Please confirm your password`),
+          revokeOtherSessions: z.boolean(),
+        })
+        .refine((data) => data.newPassword === data.confirmPassword, {
+          message: t`Passwords do not match`,
+          path: ["confirmPassword"],
+        }),
+    [t],
+  );
+
+  const form = useAppForm({
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+      revokeOtherSessions: false,
+    },
+    validators: { onSubmit: changePasswordSchema },
+    onSubmit: async ({ value }) => {
+      setError("");
+      try {
+        const result = await authClient.changePassword({
+          currentPassword: value.currentPassword,
+          newPassword: value.newPassword,
+          revokeOtherSessions: value.revokeOtherSessions,
+        });
+        if (result.error) {
+          setError(t`Failed to change password`);
+          return;
+        }
+        toast.success(t`Password updated`);
+        handleOpenChange(false);
+      } catch {
+        setError(t`Something went wrong`);
+      }
+    },
+  });
 
   function handleOpenChange(nextOpen: boolean) {
     setOpen(nextOpen);
-    if (!nextOpen) resetForm();
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-
-    if (!currentPassword) {
-      setError(t`Current password is required`);
-      return;
-    }
-    if (newPassword.length < 8) {
-      setError(t`New password must be at least 8 characters`);
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setError(t`Passwords do not match`);
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const result = await authClient.changePassword({
-        currentPassword,
-        newPassword,
-        revokeOtherSessions,
-      });
-      if (result.error) {
-        setError(t`Failed to change password`);
-        return;
-      }
-      toast.success(t`Password updated`);
-      handleOpenChange(false);
-    } catch {
-      setError(t`Something went wrong`);
-    } finally {
-      setIsSubmitting(false);
+    if (!nextOpen) {
+      form.reset();
+      setError("");
     }
   }
 
@@ -861,7 +860,13 @@ function ChangePasswordDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="grid gap-3">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+          className="grid gap-3"
+        >
           {error && (
             <Alert variant="destructive">
               <IconAlertTriangle />
@@ -869,69 +874,114 @@ function ChangePasswordDialog() {
             </Alert>
           )}
 
-          <div className="grid gap-1.5">
-            <Label htmlFor="current-password">
-              <Trans>Current password</Trans>
-            </Label>
-            <Input
-              id="current-password"
-              type="password"
-              autoComplete="current-password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              disabled={isSubmitting}
-            />
-          </div>
+          <form.Field name="currentPassword">
+            {(field) => (
+              <div className="grid gap-1.5">
+                <Label htmlFor="current-password">
+                  <Trans>Current password</Trans>
+                </Label>
+                <Input
+                  id="current-password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  aria-invalid={field.state.meta.errors.length > 0 || undefined}
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-destructive text-xs">
+                    {field.state.meta.errors
+                      .map((e) => (typeof e === "string" ? e : ""))
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
 
-          <div className="grid gap-1.5">
-            <Label htmlFor="new-password">
-              <Trans>New password</Trans>
-            </Label>
-            <Input
-              id="new-password"
-              type="password"
-              autoComplete="new-password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              disabled={isSubmitting}
-            />
-          </div>
+          <form.Field name="newPassword">
+            {(field) => (
+              <div className="grid gap-1.5">
+                <Label htmlFor="new-password">
+                  <Trans>New password</Trans>
+                </Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  aria-invalid={field.state.meta.errors.length > 0 || undefined}
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-destructive text-xs">
+                    {field.state.meta.errors
+                      .map((e) => (typeof e === "string" ? e : ""))
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
 
-          <div className="grid gap-1.5">
-            <Label htmlFor="confirm-password">
-              <Trans>Confirm new password</Trans>
-            </Label>
-            <Input
-              id="confirm-password"
-              type="password"
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={isSubmitting}
-            />
-          </div>
+          <form.Field name="confirmPassword">
+            {(field) => (
+              <div className="grid gap-1.5">
+                <Label htmlFor="confirm-password">
+                  <Trans>Confirm new password</Trans>
+                </Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  aria-invalid={field.state.meta.errors.length > 0 || undefined}
+                />
+                {field.state.meta.errors.length > 0 && (
+                  <p className="text-destructive text-xs">
+                    {field.state.meta.errors
+                      .map((e) => (typeof e === "string" ? e : ""))
+                      .join(", ")}
+                  </p>
+                )}
+              </div>
+            )}
+          </form.Field>
 
-          <div className="flex items-center gap-2 pt-1">
-            <Checkbox
-              id="revoke-sessions"
-              checked={revokeOtherSessions}
-              onCheckedChange={(checked) => setRevokeOtherSessions(checked === true)}
-              disabled={isSubmitting}
-            />
-            <Label htmlFor="revoke-sessions" className="cursor-pointer">
-              <Trans>Sign out of other sessions</Trans>
-            </Label>
-          </div>
+          <form.Field name="revokeOtherSessions">
+            {(field) => (
+              <div className="flex items-center gap-2 pt-1">
+                <Checkbox
+                  id="revoke-sessions"
+                  checked={field.state.value}
+                  onCheckedChange={field.handleChange}
+                />
+                <Label htmlFor="revoke-sessions" className="cursor-pointer">
+                  <Trans>Sign out of other sessions</Trans>
+                </Label>
+              </div>
+            )}
+          </form.Field>
 
-          <DialogFooter className="pt-2">
-            <DialogClose render={<Button variant="outline" />}>
-              <Trans>Cancel</Trans>
-            </DialogClose>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <Spinner className="size-3.5" />}
-              <Trans>Update password</Trans>
-            </Button>
-          </DialogFooter>
+          <form.Subscribe
+            selector={(state) => ({ canSubmit: state.canSubmit, isSubmitting: state.isSubmitting })}
+          >
+            {({ canSubmit, isSubmitting }) => (
+              <DialogFooter className="pt-2">
+                <DialogClose render={<Button variant="outline" />}>
+                  <Trans>Cancel</Trans>
+                </DialogClose>
+                <Button type="submit" disabled={!canSubmit || isSubmitting}>
+                  {isSubmitting && <Spinner className="size-3.5" />}
+                  <Trans>Update password</Trans>
+                </Button>
+              </DialogFooter>
+            )}
+          </form.Subscribe>
         </form>
       </DialogContent>
     </Dialog>
