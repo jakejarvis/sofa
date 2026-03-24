@@ -14,20 +14,19 @@ import { createWidget, type WidgetEnvironment } from "expo-widgets";
 export type ContinueWatchingProps = {
   titleId: string;
   titleName: string;
-  imageFilePath: string | null;
-  iconFilePath: string | null;
+  imageFilePath: string;
+  iconFilePath: string;
   seasonNumber?: number;
   episodeNumber?: number;
   watchedEpisodes: number;
   totalEpisodes: number;
   isMovie: boolean;
-  isEmpty: boolean;
 };
 
 const ContinueWatchingWidget = (props: ContinueWatchingProps, _env: WidgetEnvironment) => {
   "widget";
 
-  if (props.isEmpty) {
+  if (!props.titleName) {
     return (
       <VStack
         modifiers={[

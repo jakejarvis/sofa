@@ -1,8 +1,11 @@
 import ExpoModulesCore
+import Foundation
 import UIKit
 
-private let groupIdentifier = "group.com.jakejarvis.sofa"
 private let imageDirectory = "widget_images"
+private let widgetIconKey = "sofa_icon.png"
+private let infoPlistAppGroupKey = "ExpoWidgetsAppGroupIdentifier"
+private let logPrefix = "[SofaWidgetsSupport]"
 
 public class SofaWidgetsSupportModule: Module {
   public func definition() -> ModuleDefinition {
@@ -10,20 +13,20 @@ public class SofaWidgetsSupportModule: Module {
 
     AsyncFunction("downloadWidgetImage") { (url: String, key: String) -> String? in
       guard let imageUrl = URL(string: url) else {
+        self.log("Invalid widget image URL: \(url)")
         return nil
       }
 
-      guard let directoryUrl = self.ensureImageDirectory() else {
+      guard let destinationUrl = self.destinationURL(for: key) else {
         return nil
       }
-
-      let destinationUrl = directoryUrl.appendingPathComponent(key)
 
       let (data, response) = try await URLSession.shared.data(from: imageUrl)
 
       guard let httpResponse = response as? HTTPURLResponse,
             httpResponse.statusCode == 200
       else {
+        self.log("Failed to download widget image: \(url)")
         return nil
       }
 
@@ -43,46 +46,97 @@ public class SofaWidgetsSupportModule: Module {
       return destinationUrl.absoluteString
     }
 
-    AsyncFunction("copyBundledAsset") { (assetName: String, key: String) -> String? in
-      guard let directoryUrl = self.ensureImageDirectory() else {
+    AsyncFunction("copyBundledAsset") { (assetUri: String, key: String) -> String? in
+      guard let destinationUrl = self.destinationURL(for: key) else {
         return nil
       }
-
-      let destinationUrl = directoryUrl.appendingPathComponent(key)
 
       // Skip if already copied
       if FileManager.default.fileExists(atPath: destinationUrl.path) {
         return destinationUrl.absoluteString
       }
 
-      guard let image = UIImage(named: assetName) else {
+      guard let sourceUrl = self.resolveAssetURL(assetUri) else {
+        self.log("Unable to resolve widget asset URI: \(assetUri)")
         return nil
       }
 
-      guard let pngData = image.pngData() else {
-        return nil
+      let data: Data
+      if sourceUrl.isFileURL {
+        data = try Data(contentsOf: sourceUrl)
+      } else {
+        let (downloadedData, response) = try await URLSession.shared.data(from: sourceUrl)
+        if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+          self.log("Failed to download widget asset: \(assetUri)")
+          return nil
+        }
+        data = downloadedData
       }
 
-      try pngData.write(to: destinationUrl, options: .atomic)
+      try data.write(to: destinationUrl, options: .atomic)
       return destinationUrl.absoluteString
     }
 
     AsyncFunction("clearWidgetImages") {
-      guard let containerUrl = FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: groupIdentifier
-      ) else {
+      guard let directoryUrl = self.imageDirectoryURL() else {
         return
       }
 
-      let directoryUrl = containerUrl.appendingPathComponent(imageDirectory)
       try? FileManager.default.removeItem(at: directoryUrl)
+    }
+
+    AsyncFunction("pruneWidgetImages") { (maxAgeSeconds: Double) in
+      guard maxAgeSeconds > 0 else {
+        return
+      }
+
+      guard let directoryUrl = self.imageDirectoryURL() else {
+        return
+      }
+
+      let fileManager = FileManager.default
+      let cutoffDate = Date().addingTimeInterval(-maxAgeSeconds)
+      let resourceKeys: Set<URLResourceKey> = [.contentModificationDateKey]
+
+      let fileUrls = try fileManager.contentsOfDirectory(
+        at: directoryUrl,
+        includingPropertiesForKeys: Array(resourceKeys),
+        options: [.skipsHiddenFiles]
+      )
+
+      for fileUrl in fileUrls {
+        if fileUrl.lastPathComponent == widgetIconKey {
+          continue
+        }
+
+        let modifiedAt = try fileUrl.resourceValues(forKeys: resourceKeys).contentModificationDate
+          ?? .distantPast
+        if modifiedAt < cutoffDate {
+          try? fileManager.removeItem(at: fileUrl)
+        }
+      }
     }
   }
 
-  private func ensureImageDirectory() -> URL? {
+  private func appGroupIdentifier() -> String? {
+    guard let identifier = Bundle.main.object(
+      forInfoDictionaryKey: infoPlistAppGroupKey
+    ) as? String, !identifier.isEmpty else {
+      log("Missing \(infoPlistAppGroupKey) in Info.plist")
+      return nil
+    }
+    return identifier
+  }
+
+  private func imageDirectoryURL() -> URL? {
+    guard let groupIdentifier = appGroupIdentifier() else {
+      return nil
+    }
+
     guard let containerUrl = FileManager.default.containerURL(
       forSecurityApplicationGroupIdentifier: groupIdentifier
     ) else {
+      log("Unable to access app group container: \(groupIdentifier)")
       return nil
     }
 
@@ -92,6 +146,40 @@ public class SofaWidgetsSupportModule: Module {
       withIntermediateDirectories: true
     )
     return directoryUrl
+  }
+
+  private func destinationURL(for key: String) -> URL? {
+    guard let directoryUrl = imageDirectoryURL() else {
+      return nil
+    }
+
+    return directoryUrl.appendingPathComponent(normalizedFileName(key))
+  }
+
+  private func resolveAssetURL(_ assetUri: String) -> URL? {
+    if assetUri.isEmpty {
+      return nil
+    }
+
+    if let url = URL(string: assetUri), url.scheme != nil {
+      return url
+    }
+
+    return URL(fileURLWithPath: assetUri)
+  }
+
+  private func normalizedFileName(_ key: String) -> String {
+    let fallback = UUID().uuidString
+    let source = key.isEmpty ? fallback : key
+    let allowedCharacters = CharacterSet.alphanumerics.union(
+      CharacterSet(charactersIn: "._-")
+    )
+    let normalized = source.components(separatedBy: allowedCharacters.inverted).joined(separator: "_")
+    return normalized.isEmpty ? fallback : normalized
+  }
+
+  private func log(_ message: String) {
+    print("\(logPrefix) \(message)")
   }
 
   private func resizeImage(_ image: UIImage, maxDimension: CGFloat) -> UIImage {

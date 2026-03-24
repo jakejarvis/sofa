@@ -9,12 +9,17 @@ export async function downloadWidgetImage(url: string, key: string): Promise<str
   return getModule().downloadWidgetImage(url, key);
 }
 
-export async function copyBundledAsset(assetName: string, key: string): Promise<string | null> {
+export async function copyBundledAsset(assetUri: string, key: string): Promise<string | null> {
   if (Platform.OS !== "ios") return null;
-  return getModule().copyBundledAsset(assetName, key);
+  return getModule().copyBundledAsset(assetUri, key);
 }
 
 export async function clearWidgetImages(): Promise<void> {
   if (Platform.OS !== "ios") return;
   return getModule().clearWidgetImages();
+}
+
+export async function pruneWidgetImages(maxAgeSeconds: number): Promise<void> {
+  if (Platform.OS !== "ios") return;
+  return getModule().pruneWidgetImages(maxAgeSeconds);
 }

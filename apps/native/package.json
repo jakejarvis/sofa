@@ -12,7 +12,8 @@
     "lint": "oxlint",
     "format": "oxfmt --config ../../.oxfmtrc.json",
     "format:check": "oxfmt --check --config ../../.oxfmtrc.json",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@better-auth/expo": "catalog:",

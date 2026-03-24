@@ -14,21 +14,20 @@ import { createWidget, type WidgetEnvironment } from "expo-widgets";
 export type UpcomingProps = {
   titleId: string;
   titleName: string;
-  imageFilePath: string | null;
-  iconFilePath: string | null;
+  imageFilePath: string;
+  iconFilePath: string;
   titleType: "movie" | "tv";
-  seasonNumber?: number | null;
-  episodeNumber?: number | null;
+  seasonNumber?: number;
+  episodeNumber?: number;
   episodeCount: number;
   dateLabel: string;
   episodeLabel: string;
-  isEmpty: boolean;
 };
 
 const UpcomingWidget = (props: UpcomingProps, _env: WidgetEnvironment) => {
   "widget";
 
-  if (props.isEmpty) {
+  if (!props.titleName) {
     return (
       <VStack
         modifiers={[
