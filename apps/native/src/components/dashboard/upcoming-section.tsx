@@ -30,7 +30,7 @@ export function UpcomingSection() {
           onSeeAll={() => push("/upcoming")}
         />
       </View>
-      <View className="gap-2 px-4">
+      <View className="gap-1 px-4">
         {items.map((item, i) => (
           <UpcomingRow key={`${item.titleId}-${item.date}-${i}`} item={item} />
         ))}

@@ -3,7 +3,7 @@ import { IconCalendarEvent } from "@tabler/icons-react-native";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { Pressable, RefreshControl, SectionList, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, SectionList, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useCSSVariable, useResolveClassNames } from "uniwind";
 
@@ -92,6 +92,41 @@ export default function UpcomingScreen() {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  const filterChips = (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{ paddingHorizontal: 16, gap: 6, paddingTop: 10, paddingBottom: 6 }}
+    >
+      <FilterChip
+        label={t`All`}
+        isSelected={mediaType === "all"}
+        onPress={() => setMediaType("all")}
+      />
+      <FilterChip
+        label={t`Movies`}
+        isSelected={mediaType === "movie"}
+        onPress={() => setMediaType("movie")}
+      />
+      <FilterChip
+        label={t`TV`}
+        isSelected={mediaType === "tv"}
+        onPress={() => setMediaType("tv")}
+      />
+      <View className="bg-border/30 mx-1 w-px self-stretch" />
+      <FilterChip
+        label={t`Watching`}
+        isSelected={statusFilter === "watching"}
+        onPress={() => setStatusFilter(statusFilter === "watching" ? "all" : "watching")}
+      />
+      <FilterChip
+        label={t`Watchlist`}
+        isSelected={statusFilter === "watchlist"}
+        onPress={() => setStatusFilter(statusFilter === "watchlist" ? "all" : "watchlist")}
+      />
+    </ScrollView>
+  );
+
   return (
     <>
       <Stack.Header
@@ -107,63 +142,31 @@ export default function UpcomingScreen() {
         {t`Upcoming`}
       </Stack.Screen.Title>
       <Stack.Screen.BackButton displayMode="minimal" />
-      <View className="flex-row flex-wrap gap-2 px-4 pt-2 pb-1">
-        <View className="flex-row gap-1.5">
-          <FilterChip
-            label={t`All`}
-            isSelected={mediaType === "all"}
-            onPress={() => setMediaType("all")}
-          />
-          <FilterChip
-            label={t`Movies`}
-            isSelected={mediaType === "movie"}
-            onPress={() => setMediaType("movie")}
-          />
-          <FilterChip
-            label={t`TV Shows`}
-            isSelected={mediaType === "tv"}
-            onPress={() => setMediaType("tv")}
-          />
-        </View>
-        <View className="flex-row gap-1.5">
-          <FilterChip
-            label={t`All`}
-            isSelected={statusFilter === "all"}
-            onPress={() => setStatusFilter("all")}
-          />
-          <FilterChip
-            label={t`Watching`}
-            isSelected={statusFilter === "watching"}
-            onPress={() => setStatusFilter("watching")}
-          />
-          <FilterChip
-            label={t`Watchlist`}
-            isSelected={statusFilter === "watchlist"}
-            onPress={() => setStatusFilter("watchlist")}
-          />
-        </View>
-      </View>
       {!isPending && allItems.length === 0 ? (
         <Animated.View
           entering={FadeInDown.duration(300)}
           className="flex-1 items-center justify-center px-4"
         >
-          <ScaledIcon icon={IconCalendarEvent} size={48} color={`${mutedColor}66`} />
-          <Text className="text-muted-foreground mt-4 text-center text-sm">
-            <Trans>No upcoming episodes or releases in the next 90 days.</Trans>
-          </Text>
+          {filterChips}
+          <View className="flex-1 items-center justify-center">
+            <ScaledIcon icon={IconCalendarEvent} size={48} color={`${mutedColor}66`} />
+            <Text className="text-muted-foreground mt-4 text-center text-sm">
+              <Trans>No upcoming episodes or releases in the next 90 days.</Trans>
+            </Text>
+          </View>
         </Animated.View>
       ) : (
         <SectionList
           sections={sections}
           keyExtractor={(item, i) => `${item.titleId}-${item.date}-${i}`}
+          ListHeaderComponent={filterChips}
           renderItem={({ item }) => (
             <View className="px-4 py-1">
               <UpcomingRow item={item} />
             </View>
           )}
           renderSectionHeader={({ section: { title } }) => (
-            <View className="bg-background px-4 pt-4 pb-1">
+            <View className="bg-background px-4 pt-3 pb-1">
               <Text className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                 {title}
               </Text>
