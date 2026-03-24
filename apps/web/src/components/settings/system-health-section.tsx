@@ -602,9 +602,10 @@ function StorageCard({
         </div>
         {backupCount > 0 ? (
           <p className="text-muted-foreground mt-1 text-xs">
+            {plural(backupCount, { one: "# backup", other: "# backups" })}
+            {" · "}
             <Trans>
-              {plural(backupCount, { one: "# backup", other: "# backups" })} · last{" "}
-              <LiveTimeAgo date={lastBackupAt} fallback={t`unknown`} />
+              last <LiveTimeAgo date={lastBackupAt} fallback={t`unknown`} />
             </Trans>
           </p>
         ) : (

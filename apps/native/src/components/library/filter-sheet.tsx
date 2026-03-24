@@ -34,11 +34,11 @@ interface FilterSheetProps {
 }
 
 const DECADES = [
-  { label: "2020s", yearMin: 2020, yearMax: 2029 },
-  { label: "2010s", yearMin: 2010, yearMax: 2019 },
-  { label: "2000s", yearMin: 2000, yearMax: 2009 },
-  { label: "90s", yearMin: 1990, yearMax: 1999 },
-  { label: "80s", yearMin: 1980, yearMax: 1989 },
+  { yearMin: 2020, yearMax: 2029 },
+  { yearMin: 2010, yearMax: 2019 },
+  { yearMin: 2000, yearMax: 2009 },
+  { yearMin: 1990, yearMax: 1999 },
+  { yearMin: 1980, yearMax: 1989 },
 ] as const;
 
 const CONTENT_RATINGS = [
@@ -197,6 +197,14 @@ export function FilterSheet({ open, onOpenChange, filters, onApply }: FilterShee
     onOpenChange(false);
   }
 
+  const decadeLabels: Record<number, string> = {
+    2020: t`2020s`,
+    2010: t`2010s`,
+    2000: t`2000s`,
+    1990: t`90s`,
+    1980: t`80s`,
+  };
+
   const selectedGenreLabel =
     genreData?.genres.find((g) => g.id === local.genreId)?.name ?? t`All genres`;
 
@@ -308,8 +316,8 @@ export function FilterSheet({ open, onOpenChange, filters, onApply }: FilterShee
                   <View className="flex-row flex-wrap gap-2">
                     {DECADES.map((decade) => (
                       <Chip
-                        key={decade.label}
-                        label={decade.label}
+                        key={decade.yearMin}
+                        label={decadeLabels[decade.yearMin]}
                         isSelected={activeDecade === decade}
                         onPress={() => selectDecade(decade)}
                       />

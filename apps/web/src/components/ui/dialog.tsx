@@ -1,4 +1,5 @@
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
+import { Trans } from "@lingui/react/macro";
 import { IconX } from "@tabler/icons-react";
 import type * as React from "react";
 
@@ -60,7 +61,9 @@ function DialogContent({
             render={<Button variant="ghost" className="absolute end-2 top-2" size="icon-sm" />}
           >
             <IconX />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">
+              <Trans>Close</Trans>
+            </span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>
@@ -90,7 +93,9 @@ function DialogFooter({
     >
       {children}
       {showCloseButton && (
-        <DialogPrimitive.Close render={<Button variant="outline" />}>Close</DialogPrimitive.Close>
+        <DialogPrimitive.Close render={<Button variant="outline" />}>
+          <Trans>Close</Trans>
+        </DialogPrimitive.Close>
       )}
     </div>
   );

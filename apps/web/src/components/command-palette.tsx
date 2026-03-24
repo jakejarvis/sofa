@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconDeviceTv,
@@ -41,31 +42,41 @@ import {
   recentSearchesAtom,
 } from "@/lib/atoms/command-palette";
 import { orpc } from "@/lib/orpc/client";
+import { i18n } from "@sofa/i18n";
 
-// Static shortcut descriptions for the help dialog.
+// Static shortcut descriptions for the help dialog, pre-grouped by scope.
 // TanStack's HotkeyManager/SequenceManager handle all actual key listening.
-const SHORTCUT_DESCRIPTIONS = [
-  { scope: "Global", description: "Search", keys: ["/"] },
-  { scope: "Global", description: "Keyboard shortcuts", keys: ["?"] },
-  { scope: "Navigation", description: "Go to dashboard", keys: ["g", "h"] },
-  { scope: "Navigation", description: "Go to explore", keys: ["g", "e"] },
-  { scope: "Navigation", description: "Go to upcoming", keys: ["g", "u"] },
-  { scope: "Navigation", description: "Go to settings", keys: ["g", "s"] },
-  { scope: "Title", description: "Cycle status", keys: ["w"] },
-  { scope: "Title", description: "Mark watched", keys: ["m"] },
-  { scope: "Title", description: "Go back", keys: ["Escape"] },
-  { scope: "Title", description: "Rate 1 star", keys: ["1"] },
-  { scope: "Title", description: "Rate 2 stars", keys: ["2"] },
-  { scope: "Title", description: "Rate 3 stars", keys: ["3"] },
-  { scope: "Title", description: "Rate 4 stars", keys: ["4"] },
-  { scope: "Title", description: "Rate 5 stars", keys: ["5"] },
-] as const;
-
-const groupedShortcuts: Record<string, { description: string; keys: readonly string[] }[]> = {};
-for (const entry of SHORTCUT_DESCRIPTIONS) {
-  if (!groupedShortcuts[entry.scope]) groupedShortcuts[entry.scope] = [];
-  groupedShortcuts[entry.scope].push(entry);
-}
+const SHORTCUT_GROUPS = [
+  {
+    scope: msg`Global`,
+    shortcuts: [
+      { description: msg`Search`, keys: ["/"] },
+      { description: msg`Keyboard shortcuts`, keys: ["?"] },
+    ],
+  },
+  {
+    scope: msg`Navigation`,
+    shortcuts: [
+      { description: msg`Go to dashboard`, keys: ["g", "h"] },
+      { description: msg`Go to explore`, keys: ["g", "e"] },
+      { description: msg`Go to upcoming`, keys: ["g", "u"] },
+      { description: msg`Go to settings`, keys: ["g", "s"] },
+    ],
+  },
+  {
+    scope: msg`Title`,
+    shortcuts: [
+      { description: msg`Cycle status`, keys: ["w"] },
+      { description: msg`Mark watched`, keys: ["m"] },
+      { description: msg`Go back`, keys: ["Escape"] },
+      { description: msg`Rate 1 star`, keys: ["1"] },
+      { description: msg`Rate 2 stars`, keys: ["2"] },
+      { description: msg`Rate 3 stars`, keys: ["3"] },
+      { description: msg`Rate 4 stars`, keys: ["4"] },
+      { description: msg`Rate 5 stars`, keys: ["5"] },
+    ],
+  },
+];
 
 interface SearchResult {
   id?: string;
@@ -192,7 +203,9 @@ export function CommandPalette() {
     <>
       <Dialog open={commandPaletteOpen} onOpenChange={handleOpenChange}>
         <DialogHeader className="sr-only">
-          <DialogTitle>Command Palette</DialogTitle>
+          <DialogTitle>
+            <Trans>Command Palette</Trans>
+          </DialogTitle>
           <DialogDescription>
             <Trans>Search for movies, TV shows, or run commands</Trans>
           </DialogDescription>
@@ -286,7 +299,9 @@ export function CommandPalette() {
                           ) : (
                             <IconDeviceTv aria-hidden={true} className="size-[11px]" />
                           )}
-                          <span className="uppercase">{r.type}</span>
+                          <span className="uppercase">
+                            {r.type === "movie" ? t`movie` : r.type === "tv" ? t`tv` : t`person`}
+                          </span>
                           {r.type !== "person" && r.releaseDate && (
                             <span>{r.releaseDate.slice(0, 4)}</span>
                           )}
@@ -395,23 +410,25 @@ export function CommandPalette() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-5 py-2">
-            {Object.entries(groupedShortcuts).map(([scope, items]) => (
-              <div key={scope} className="space-y-2">
+            {SHORTCUT_GROUPS.map((group) => (
+              <div key={i18n._(group.scope)} className="space-y-2">
                 <h3 className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
-                  {scope}
+                  {i18n._(group.scope)}
                 </h3>
                 <div className="space-y-1">
-                  {items.map((item) => (
+                  {group.shortcuts.map((item) => (
                     <div
-                      key={item.description}
+                      key={i18n._(item.description)}
                       className="flex items-center justify-between rounded-md px-2 py-1.5"
                     >
-                      <span className="text-foreground text-xs">{item.description}</span>
+                      <span className="text-foreground text-xs">{i18n._(item.description)}</span>
                       <div className="flex items-center gap-1">
                         {item.keys.map((key, i) => (
                           <span key={key} className="flex items-center gap-1">
                             {i > 0 && (
-                              <span className="text-muted-foreground text-[10px]">then</span>
+                              <span className="text-muted-foreground text-[10px]">
+                                <Trans>then</Trans>
+                              </span>
                             )}
                             <Kbd>{formatKey(key)}</Kbd>
                           </span>

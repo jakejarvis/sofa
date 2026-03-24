@@ -171,7 +171,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
       <Pressable
         onPress={toggleExpanded}
         accessibilityRole="button"
-        accessibilityLabel={`${label}, ${connection ? config.connectedStatus(connection.lastEventAt) : "Not configured"}`}
+        accessibilityLabel={`${label}, ${connection ? config.connectedStatus(connection.lastEventAt) : t`Not configured`}`}
         accessibilityState={{ expanded }}
         className="flex-row items-center justify-between p-3"
       >
@@ -232,7 +232,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                   <Pressable
                     onPress={handleCopy}
                     accessibilityRole="button"
-                    accessibilityLabel={copied ? "Copied" : "Copy URL"}
+                    accessibilityLabel={copied ? t`Copied` : t`Copy URL`}
                     className="ml-2 active:opacity-60"
                     hitSlop={8}
                   >

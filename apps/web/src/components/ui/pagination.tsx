@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconChevronLeft, IconChevronRight, IconDots } from "@tabler/icons-react";
 import type * as React from "react";
 
@@ -56,35 +57,37 @@ function PaginationLink({ className, isActive, size = "icon", ...props }: Pagina
 
 function PaginationPrevious({
   className,
-  text = "Previous",
+  text,
   ...props
 }: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
+  const { t } = useLingui();
   return (
     <PaginationLink
-      aria-label="Go to previous page"
+      aria-label={t`Go to previous page`}
       size="default"
       className={cn("ps-2!", className)}
       {...props}
     >
       <IconChevronLeft data-icon="inline-start" />
-      <span className="hidden sm:block">{text}</span>
+      <span className="hidden sm:block">{text ?? t`Previous`}</span>
     </PaginationLink>
   );
 }
 
 function PaginationNext({
   className,
-  text = "Next",
+  text,
   ...props
 }: React.ComponentProps<typeof PaginationLink> & { text?: string }) {
+  const { t } = useLingui();
   return (
     <PaginationLink
-      aria-label="Go to next page"
+      aria-label={t`Go to next page`}
       size="default"
       className={cn("pe-2!", className)}
       {...props}
     >
-      <span className="hidden sm:block">{text}</span>
+      <span className="hidden sm:block">{text ?? t`Next`}</span>
       <IconChevronRight data-icon="inline-end" />
     </PaginationLink>
   );
@@ -102,7 +105,9 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<"span"
       {...props}
     >
       <IconDots />
-      <span className="sr-only">More pages</span>
+      <span className="sr-only">
+        <Trans>More pages</Trans>
+      </span>
     </span>
   );
 }

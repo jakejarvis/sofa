@@ -1,5 +1,6 @@
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
+import { Trans } from "@lingui/react/macro";
 import { IconChevronRight, IconDots } from "@tabler/icons-react";
 import type * as React from "react";
 
@@ -88,7 +89,9 @@ function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<"span"
       {...props}
     >
       <IconDots />
-      <span className="sr-only">More</span>
+      <span className="sr-only">
+        <Trans>More</Trans>
+      </span>
     </span>
   );
 }

@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconExternalLink, IconKey } from "@tabler/icons-react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
@@ -7,59 +7,8 @@ import { RefreshButton } from "@/components/setup/refresh-button";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { client } from "@/lib/orpc/client";
 
-const steps = [
-  {
-    number: "1",
-    title: "Create a TMDB account",
-    description: (
-      <>
-        Head to{" "}
-        <a
-          href="https://www.themoviedb.org/signup"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary decoration-primary/30 hover:decoration-primary inline-flex items-center gap-1 font-medium underline underline-offset-2 transition-colors"
-        >
-          themoviedb.org
-          <IconExternalLink
-            aria-hidden={true}
-            className="text-muted-foreground size-3.5 translate-y-[-1px]"
-          />
-        </a>{" "}
-        and sign up for a free account.
-      </>
-    ),
-  },
-  {
-    number: "2",
-    title: "Request an API key",
-    description: (
-      <>
-        Go to{" "}
-        <a
-          href="https://www.themoviedb.org/settings/api"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary decoration-primary/30 hover:decoration-primary inline-flex items-center gap-1 font-medium underline underline-offset-2 transition-colors"
-        >
-          Settings &rarr; API
-          <IconExternalLink
-            aria-hidden={true}
-            className="text-muted-foreground size-3.5 translate-y-[-1px]"
-          />
-        </a>{" "}
-        and request an API key. Choose &ldquo;Developer&rdquo; when asked. You need the{" "}
-        <span className="text-primary font-mono text-xs">API Read Access Token</span> (the long
-        one).
-      </>
-    ),
-  },
-  {
-    number: "3",
-    title: "Add it to your environment",
-    description: "Set the TMDB_API_READ_ACCESS_TOKEN environment variable and restart Sofa.",
-  },
-];
+const LINK_CLASS =
+  "text-primary decoration-primary/30 hover:decoration-primary inline-flex items-center gap-1 font-medium underline underline-offset-2 transition-colors";
 
 const envSnippets = [
   {
@@ -87,6 +36,63 @@ export const Route = createFileRoute("/setup")({
 });
 
 function SetupPage() {
+  const { t } = useLingui();
+
+  const linkIcon = (
+    <IconExternalLink
+      aria-hidden={true}
+      className="text-muted-foreground size-3.5 translate-y-[-1px]"
+    />
+  );
+
+  const steps = [
+    {
+      number: "1",
+      title: t`Create a TMDB account`,
+      description: (
+        <Trans>
+          Head to{" "}
+          <a
+            href="https://www.themoviedb.org/signup"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={LINK_CLASS}
+          >
+            themoviedb.org
+            {linkIcon}
+          </a>{" "}
+          and sign up for a free account.
+        </Trans>
+      ),
+    },
+    {
+      number: "2",
+      title: t`Request an API key`,
+      description: (
+        <Trans>
+          Go to{" "}
+          <a
+            href="https://www.themoviedb.org/settings/api"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={LINK_CLASS}
+          >
+            Settings &rarr; API
+            {linkIcon}
+          </a>{" "}
+          and request an API key. Choose &ldquo;Developer&rdquo; when asked. You need the{" "}
+          <span className="text-primary font-mono text-xs">API Read Access Token</span> (the long
+          one).
+        </Trans>
+      ),
+    },
+    {
+      number: "3",
+      title: t`Add it to your environment`,
+      description: t`Set the TMDB_API_READ_ACCESS_TOKEN environment variable and restart Sofa.`,
+    },
+  ];
+
   return (
     <div className="mx-auto my-10 max-w-2xl space-y-10">
       {/* Header */}
@@ -99,21 +105,20 @@ function SetupPage() {
           <Trans>Connect to TMDB</Trans>
         </h1>
         <p className="text-muted-foreground max-w-lg leading-relaxed">
-          Sofa uses{" "}
-          <a
-            href="https://www.themoviedb.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary decoration-primary/30 hover:decoration-primary inline-flex items-center gap-1 font-medium underline underline-offset-2 transition-colors"
-          >
-            The Movie Database
-            <IconExternalLink
-              aria-hidden={true}
-              className="text-muted-foreground size-3.5 translate-y-[-1px]"
-            />
-          </a>{" "}
-          for movie & TV metadata, posters, and streaming availability. You&apos;ll need a free API
-          key to get started.
+          <Trans>
+            Sofa uses{" "}
+            <a
+              href="https://www.themoviedb.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={LINK_CLASS}
+            >
+              The Movie Database
+              {linkIcon}
+            </a>{" "}
+            for movie & TV metadata, posters, and streaming availability. You&apos;ll need a free
+            API key to get started.
+          </Trans>
         </p>
       </div>
 
@@ -160,9 +165,11 @@ function SetupPage() {
       <div className="border-border/50 bg-card/40 rounded-xl border p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-0.5">
-            <p className="text-sm font-medium">After setting the key and restarting:</p>
+            <p className="text-sm font-medium">
+              <Trans>After setting the key and restarting:</Trans>
+            </p>
             <p className="text-muted-foreground text-xs">
-              Click the button to verify your configuration
+              <Trans>Click the button to verify your configuration</Trans>
             </p>
           </div>
           <RefreshButton />

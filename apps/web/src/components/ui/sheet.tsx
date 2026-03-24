@@ -1,4 +1,5 @@
 import { Dialog as SheetPrimitive } from "@base-ui/react/dialog";
+import { Trans } from "@lingui/react/macro";
 import { IconX } from "@tabler/icons-react";
 import type * as React from "react";
 
@@ -63,7 +64,9 @@ function SheetContent({
             render={<Button variant="ghost" className="absolute end-4 top-4" size="icon-sm" />}
           >
             <IconX />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">
+              <Trans>Close</Trans>
+            </span>
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Popup>

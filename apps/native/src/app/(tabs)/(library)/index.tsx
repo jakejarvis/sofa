@@ -167,11 +167,11 @@ export default function LibraryScreen() {
   const ratingOptions = useMemo(
     () => [
       { value: "", label: t`Any` },
-      { value: "1", label: "1\u2605+" },
-      { value: "2", label: "2\u2605+" },
-      { value: "3", label: "3\u2605+" },
-      { value: "4", label: "4\u2605+" },
-      { value: "5", label: "5\u2605" },
+      { value: "1", label: t`1★+` },
+      { value: "2", label: t`2★+` },
+      { value: "3", label: t`3★+` },
+      { value: "4", label: t`4★+` },
+      { value: "5", label: t`5★` },
     ],
     [t],
   );
@@ -179,11 +179,11 @@ export default function LibraryScreen() {
   const yearOptions = useMemo(
     () => [
       { value: "", label: t`Any year` },
-      { value: "2020", label: "2020s" },
-      { value: "2010", label: "2010s" },
-      { value: "2000", label: "2000s" },
-      { value: "1990", label: "1990s" },
-      { value: "1980", label: "1980s" },
+      { value: "2020", label: t`2020s` },
+      { value: "2010", label: t`2010s` },
+      { value: "2000", label: t`2000s` },
+      { value: "1990", label: t`1990s` },
+      { value: "1980", label: t`1980s` },
       { value: "older", label: t`Pre-1980` },
     ],
     [t],
