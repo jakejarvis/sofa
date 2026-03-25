@@ -224,6 +224,10 @@ export function getFilteredLibrary(userId: string, filters: LibraryFilters) {
 
   // Build query with display status when needed for filtering
   if (needsDisplayStatus) {
+    // Filter by display status in SQL so pagination works at the DB level
+    const statusValues = filters.statuses!.map((s) => sql`${s}`);
+    conditions.push(sql`(${displayStatusExpr()}) IN (${sql.join(statusValues, sql`, `)})`);
+
     const rows = db
       .select({
         titleId: titles.id,
@@ -239,6 +243,7 @@ export function getFilteredLibrary(userId: string, filters: LibraryFilters) {
         userStatus: userTitleStatus.status,
         userRating: userRatings.ratingStars,
         displayStatus: displayStatusExpr().as("display_status"),
+        totalCount: sql<number>`count(*) over()`.as("totalCount"),
       })
       .from(titles)
       .innerJoin(
@@ -251,18 +256,15 @@ export function getFilteredLibrary(userId: string, filters: LibraryFilters) {
       )
       .where(and(...conditions))
       .orderBy(...sortExpressions)
+      .limit(filters.limit)
+      .offset(offset)
       .all();
 
-    // Post-filter by display status
-    const filtered = rows.filter((r) => filters.statuses!.includes(r.displayStatus));
-    const totalResults = filtered.length;
-    const paged = filtered.slice(offset, offset + filters.limit);
+    const totalResults = rows[0]?.totalCount ?? 0;
+    const items = rows.map(({ totalCount: _, ...item }) => item);
 
     return {
-      items: paged.map((row) => {
-        const { displayStatus, ...item } = row;
-        return Object.assign(item, { displayStatus });
-      }),
+      items,
       page: filters.page,
       totalPages: Math.max(1, Math.ceil(totalResults / filters.limit)),
       totalResults,

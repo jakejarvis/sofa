@@ -2,8 +2,7 @@ import { access, constants, readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { CACHE_DIR, DATA_DIR, DATABASE_URL, TMDB_API_BASE_URL } from "@sofa/config";
-import { getLatestCronRun, getTableCounts } from "@sofa/db/queries/system-health";
-import type { cronRuns } from "@sofa/db/schema";
+import { getLatestCronRuns, getTableCounts } from "@sofa/db/queries/system-health";
 
 import { listBackups } from "./backup";
 import { imageCacheEnabled } from "./image-cache";
@@ -153,12 +152,7 @@ function getJobsHealth(): SystemHealthData["jobs"] {
   const schedules = _getJobSchedules?.() ?? [];
   const scheduleMap = new Map(schedules.map((s) => [s.jobName, s]));
 
-  // Fetch only the latest cron run per job (index-optimized LIMIT 1 each)
-  const latestByJob = new Map<string, typeof cronRuns.$inferSelect>();
-  for (const jobName of JOB_NAMES) {
-    const latest = getLatestCronRun(jobName);
-    if (latest) latestByJob.set(jobName, latest);
-  }
+  const latestByJob = getLatestCronRuns([...JOB_NAMES]);
 
   return JOB_NAMES.map((jobName) => {
     const latest = latestByJob.get(jobName);

@@ -58,14 +58,14 @@ function schedule(name: string, cron: string, handler: () => Promise<void>) {
   jobs.set(
     name,
     new Cron(cron, { name, protect: true }, async () => {
-      log.info(`Running job: ${name}`);
+      log.debug(`Running job: ${name}`);
       const startMs = performance.now();
       const run = startCronRun(name);
       try {
         await handler();
         const durationMs = Math.round(performance.now() - startMs);
         completeCronRun(run.id, durationMs);
-        log.info(`Completed job: ${name} (${durationMs}ms)`);
+        log.debug(`Completed job: ${name} (${durationMs}ms)`);
       } catch (err) {
         const durationMs = Math.round(performance.now() - startMs);
         failCronRun(run.id, durationMs, err);
@@ -285,7 +285,7 @@ export function rescheduleBackup() {
     jobs.delete("scheduledBackup");
   }
   const cron = getBackupCronFromSettings();
-  log.info(`Rescheduling backup job with cron: ${cron}`);
+  log.debug(`Rescheduling backup job with cron: ${cron}`);
   schedule("scheduledBackup", cron, scheduledBackupJob);
 }
 
@@ -327,7 +327,7 @@ export function startJobs() {
     optimizeDatabase();
   });
 
-  log.info(`Started ${jobs.size} jobs`);
+  log.debug(`Registered ${jobs.size} scheduled jobs`);
 }
 
 export function pauseJobs() {

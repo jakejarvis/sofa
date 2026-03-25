@@ -251,19 +251,25 @@ export const userRatings = sqliteTable(
 
 // ─── Platforms & Availability ────────────────────────────────────────
 
-export const platforms = sqliteTable(
-  "platforms",
+export const platforms = sqliteTable("platforms", {
+  id: uuidPk(),
+  name: text("name").notNull(),
+  logoPath: text("logoPath"),
+  urlTemplate: text("urlTemplate"),
+  isSubscription: int("isSubscription", { mode: "boolean" }).notNull().default(true),
+});
+
+export const platformTmdbIds = sqliteTable(
+  "platformTmdbIds",
   {
-    id: uuidPk(),
-    name: text("name").notNull(),
-    tmdbProviderId: int("tmdbProviderId"),
-    logoPath: text("logoPath"),
-    urlTemplate: text("urlTemplate"),
-    displayOrder: int("displayOrder").notNull().default(0),
+    platformId: text("platformId")
+      .notNull()
+      .references(() => platforms.id, { onDelete: "cascade" }),
+    tmdbProviderId: int("tmdbProviderId").notNull(),
   },
   (table) => [
-    uniqueIndex("platforms_tmdbProviderId_unique").on(table.tmdbProviderId),
-    index("platforms_displayOrder").on(table.displayOrder),
+    uniqueIndex("platformTmdbIds_tmdbProviderId_unique").on(table.tmdbProviderId),
+    index("platformTmdbIds_platformId").on(table.platformId),
   ],
 );
 

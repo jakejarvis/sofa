@@ -69,6 +69,17 @@ export function getEpisodeTitleId(episodeId: string): string | null {
   return row?.titleId ?? null;
 }
 
+export function getEpisodeTitleIds(episodeIds: string[]): Map<string, string> {
+  if (episodeIds.length === 0) return new Map();
+  const rows = db
+    .select({ episodeId: episodes.id, titleId: seasons.titleId })
+    .from(episodes)
+    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
+    .where(inArray(episodes.id, episodeIds))
+    .all();
+  return new Map(rows.map((r) => [r.episodeId, r.titleId]));
+}
+
 export function batchInsertEpisodeWatchesTransaction(
   userId: string,
   episodeIds: string[],
@@ -168,7 +179,7 @@ export function batchInsertMissingEpisodeWatches(
 
 export function countDistinctEpisodeWatches(userId: string, episodeIds: string[]): number {
   if (episodeIds.length === 0) return 0;
-  const [result] = db
+  const result = db
     .select({
       count: sql<number>`count(distinct ${userEpisodeWatches.episodeId})`,
     })
@@ -176,8 +187,8 @@ export function countDistinctEpisodeWatches(userId: string, episodeIds: string[]
     .where(
       and(eq(userEpisodeWatches.userId, userId), inArray(userEpisodeWatches.episodeId, episodeIds)),
     )
-    .all();
-  return result.count;
+    .get();
+  return result?.count ?? 0;
 }
 
 export function upsertRating(
@@ -275,6 +286,15 @@ export function getUserTitleInfo(userId: string, titleId: string) {
 
 export function getSeasonEpisodes(seasonId: string) {
   return db.select().from(episodes).where(eq(episodes.seasonId, seasonId)).all();
+}
+
+export function getSeasonEpisodeIds(seasonId: string): string[] {
+  return db
+    .select({ id: episodes.id })
+    .from(episodes)
+    .where(eq(episodes.seasonId, seasonId))
+    .all()
+    .map((e) => e.id);
 }
 
 export function getSeasonById(seasonId: string) {

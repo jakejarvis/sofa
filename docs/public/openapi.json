@@ -2046,7 +2046,7 @@
                           },
                           "offerType": {
                             "type": "string",
-                            "description": "Offer type: flatrate, rent, buy, free, ads"
+                            "description": "Offer category: stream or purchase"
                           },
                           "watchUrl": {
                             "anyOf": [
@@ -4343,16 +4343,12 @@
                             "type": "string",
                             "description": "Platform ID"
                           },
-                          "tmdbProviderId": {
-                            "anyOf": [
-                              {
-                                "type": "number"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "TMDB provider ID"
+                          "tmdbProviderIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            },
+                            "description": "TMDB provider IDs"
                           },
                           "name": {
                             "type": "string",
@@ -4372,7 +4368,7 @@
                         },
                         "required": [
                           "id",
-                          "tmdbProviderId",
+                          "tmdbProviderIds",
                           "name",
                           "logoPath"
                         ]
@@ -4861,14 +4857,12 @@
             "allowReserved": true
           },
           {
-            "name": "providerId",
+            "name": "platformId",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
-              "minimum": -9007199254740991,
-              "maximum": 9007199254740991,
-              "description": "TMDB watch provider ID"
+              "type": "string",
+              "description": "Platform ID to filter by"
             },
             "allowEmptyValue": true,
             "allowReserved": true
@@ -6773,16 +6767,12 @@
                             "type": "string",
                             "description": "Display name"
                           },
-                          "tmdbProviderId": {
-                            "anyOf": [
-                              {
-                                "type": "number"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "TMDB provider ID (null for custom platforms)"
+                          "tmdbProviderIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            },
+                            "description": "TMDB provider IDs mapped to this platform"
                           },
                           "logoPath": {
                             "anyOf": [
@@ -6795,17 +6785,17 @@
                             ],
                             "description": "Logo image path"
                           },
-                          "displayOrder": {
-                            "type": "number",
-                            "description": "Sort order"
+                          "isSubscription": {
+                            "type": "boolean",
+                            "description": "True for subscription services, false for purchase/rental stores"
                           }
                         },
                         "required": [
                           "id",
                           "name",
-                          "tmdbProviderId",
+                          "tmdbProviderIds",
                           "logoPath",
-                          "displayOrder"
+                          "isSubscription"
                         ],
                         "description": "A streaming platform"
                       }

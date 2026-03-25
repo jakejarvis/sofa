@@ -1,7 +1,7 @@
-import { eq, inArray } from "drizzle-orm";
+import { asc, desc, eq, inArray } from "drizzle-orm";
 
 import { db } from "../client";
-import { platforms, userPlatforms } from "../schema";
+import { platformTmdbIds, platforms, userPlatforms } from "../schema";
 
 export function getUserPlatformIds(userId: string): string[] {
   return db
@@ -17,15 +17,14 @@ export function getUserPlatforms(userId: string) {
     .select({
       id: platforms.id,
       name: platforms.name,
-      tmdbProviderId: platforms.tmdbProviderId,
       logoPath: platforms.logoPath,
       urlTemplate: platforms.urlTemplate,
-      displayOrder: platforms.displayOrder,
+      isSubscription: platforms.isSubscription,
     })
     .from(userPlatforms)
     .innerJoin(platforms, eq(userPlatforms.platformId, platforms.id))
     .where(eq(userPlatforms.userId, userId))
-    .orderBy(platforms.displayOrder)
+    .orderBy(desc(platforms.isSubscription), asc(platforms.name))
     .all();
 }
 
@@ -42,7 +41,11 @@ export function setUserPlatforms(userId: string, platformIds: string[]): void {
 }
 
 export function getAllPlatforms() {
-  return db.select().from(platforms).orderBy(platforms.displayOrder).all();
+  return db
+    .select()
+    .from(platforms)
+    .orderBy(desc(platforms.isSubscription), asc(platforms.name))
+    .all();
 }
 
 export function hasUserPlatforms(userId: string): boolean {
@@ -65,4 +68,33 @@ export function platformIdsExist(platformIds: string[]): boolean {
     .where(inArray(platforms.id, unique))
     .all();
   return found.length === unique.length;
+}
+
+export function getTmdbProviderIdsForPlatform(platformId: string): number[] {
+  return db
+    .select({ tmdbProviderId: platformTmdbIds.tmdbProviderId })
+    .from(platformTmdbIds)
+    .where(eq(platformTmdbIds.platformId, platformId))
+    .all()
+    .map((r) => r.tmdbProviderId);
+}
+
+export function getTmdbProviderIdsByPlatformIds(platformIds: string[]): Map<string, number[]> {
+  if (platformIds.length === 0) return new Map();
+  const rows = db
+    .select({
+      platformId: platformTmdbIds.platformId,
+      tmdbProviderId: platformTmdbIds.tmdbProviderId,
+    })
+    .from(platformTmdbIds)
+    .where(inArray(platformTmdbIds.platformId, platformIds))
+    .all();
+
+  const map = new Map<string, number[]>();
+  for (const row of rows) {
+    const arr = map.get(row.platformId) ?? [];
+    arr.push(row.tmdbProviderId);
+    map.set(row.platformId, arr);
+  }
+  return map;
 }

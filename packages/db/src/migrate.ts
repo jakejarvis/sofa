@@ -9,7 +9,7 @@ import { db } from "./client";
 const log = createLogger("db");
 
 export function runMigrations(migrationsFolder = path.join(import.meta.dir, "../drizzle")) {
-  log.info("Running database migrations...");
+  log.debug("Running database migrations...");
   migrate(db, { migrationsFolder });
-  log.info("Database migrations complete");
+  log.debug("Database migrations complete");
 }

@@ -2,7 +2,7 @@ import { ORPCError } from "@orpc/server";
 
 import { AppErrorCode } from "@sofa/api/errors";
 import { ensureBrowseTitlesExist } from "@sofa/core/metadata";
-import { listPlatforms } from "@sofa/core/platforms";
+import { getPlatformTmdbIdMap, listPlatforms } from "@sofa/core/platforms";
 import { getEpisodeProgressByTitleIds, getDisplayStatusesByTitleIds } from "@sofa/core/tracking";
 import { getGenres, getPopular, getTrending } from "@sofa/tmdb/client";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
@@ -165,10 +165,11 @@ export const genres = os.explore.genres.use(authed).handler(async ({ input }) =>
 
 export const watchProviders = os.explore.watchProviders.use(authed).handler(async () => {
   const allPlatforms = listPlatforms();
+  const tmdbIdsMap = getPlatformTmdbIdMap(allPlatforms.map((p) => p.id));
   return {
     providers: allPlatforms.map((p) => ({
       id: p.id,
-      tmdbProviderId: p.tmdbProviderId,
+      tmdbProviderIds: tmdbIdsMap.get(p.id) ?? [],
       name: p.name,
       logoPath: tmdbImageUrl(p.logoPath, "logos"),
     })),

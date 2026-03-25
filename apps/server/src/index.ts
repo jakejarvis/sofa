@@ -43,7 +43,7 @@ seedPlatforms();
 // Recover import jobs left in running/pending state from a previous crash
 const recoveredJobs = recoverStaleImportJobs();
 if (recoveredJobs > 0) {
-  log.info(`Recovered ${recoveredJobs} stale import job(s) from previous shutdown`);
+  log.warn(`Recovered ${recoveredJobs} stale import job(s) from previous shutdown`);
 }
 
 // Wire up job schedule provider for system health
@@ -157,9 +157,17 @@ process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
 
 const port = Number(process.env.PORT || process.env.API_PORT || 3001);
-log.info(`API server listening on port ${port}`);
-
-export default {
+const server = Bun.serve({
   port,
   fetch: app.fetch,
-};
+});
+
+log.info(
+  `🍿 Sofa${process.env.APP_VERSION ? ` v${process.env.APP_VERSION}` : ""}: Now playing at ${server.url.origin}`,
+  {
+    address: server.hostname,
+    port: server.port,
+  },
+);
+
+export default server;

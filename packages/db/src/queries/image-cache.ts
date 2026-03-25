@@ -1,4 +1,4 @@
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import { db } from "../client";
 import {
@@ -39,19 +39,11 @@ export function getSeasonPostersForTitle(titleId: string) {
 // ─── Episode stills ──────────────────────────────────────────────────
 
 export function getEpisodeStillsForTitle(titleId: string) {
-  const allSeasons = db
-    .select({ id: seasons.id })
-    .from(seasons)
-    .where(eq(seasons.titleId, titleId))
-    .all();
-
-  const seasonIds = allSeasons.map((s) => s.id);
-  if (seasonIds.length === 0) return [];
-
   return db
     .select({ stillPath: episodes.stillPath })
     .from(episodes)
-    .where(inArray(episodes.seasonId, seasonIds))
+    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
+    .where(eq(seasons.titleId, titleId))
     .all();
 }
 

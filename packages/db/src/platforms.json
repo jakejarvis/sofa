@@ -1,0 +1,275 @@
+[
+  {
+    "tmdbProviderIds": [8, 175, 1796],
+    "name": "Netflix",
+    "logoPath": "/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg",
+    "urlTemplate": "https://www.netflix.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [9, 119, 2100],
+    "name": "Amazon Prime Video",
+    "logoPath": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+    "urlTemplate": "https://www.amazon.com/s?i=instant-video&k={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [10],
+    "name": "Amazon Video",
+    "logoPath": "/seGSXajazLMCKGB5hnRCidtjay1.jpg",
+    "urlTemplate": "https://www.amazon.com/s?i=instant-video&k={title}",
+    "isSubscription": false
+  },
+  {
+    "tmdbProviderIds": [337, 2739],
+    "name": "Disney+",
+    "logoPath": "/97yvRBw1GzX7fXprcF80er19ot.jpg",
+    "urlTemplate": "https://www.disneyplus.com/search/{title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [350],
+    "name": "Apple TV+",
+    "logoPath": "/SPnB1qiCkYfirS2it3hZORwGVn.jpg",
+    "urlTemplate": "https://tv.apple.com/search?term={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [2],
+    "name": "Apple TV Store",
+    "logoPath": "/mcbz1LgtErU9p4UdbZ0rG6RTWHX.jpg",
+    "urlTemplate": "https://tv.apple.com/search?term={title}",
+    "isSubscription": false
+  },
+  {
+    "tmdbProviderIds": [384, 1825, 1899],
+    "name": "HBO Max",
+    "logoPath": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+    "urlTemplate": "https://play.max.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [15],
+    "name": "Hulu",
+    "logoPath": "/bxBlRPEPpMVDc4jMhSrTf2339DW.jpg",
+    "urlTemplate": "https://www.hulu.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [531, 582, 633, 1770, 1853, 2303, 2616, 37],
+    "name": "Paramount+",
+    "logoPath": "/fts6X10Jn4QT0X6ac3udKEn2tJA.jpg",
+    "urlTemplate": "https://www.paramountplus.com/search/?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [386, 387],
+    "name": "Peacock",
+    "logoPath": "/2aGrp1xw3qhwCYvNGAJZPdjfeeX.jpg",
+    "urlTemplate": "https://www.peacocktv.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [3],
+    "name": "Google Play Movies",
+    "logoPath": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+    "urlTemplate": "https://play.google.com/store/search?q={title}&c=movies",
+    "isSubscription": false
+  },
+  {
+    "tmdbProviderIds": [7, 332],
+    "name": "Fandango at Home",
+    "logoPath": "/19fkcOz0xeUgCVW8tO85uOYnYK9.jpg",
+    "urlTemplate": "https://www.vudu.com/content/movies/search?searchString={title}",
+    "isSubscription": false
+  },
+  {
+    "tmdbProviderIds": [68],
+    "name": "Microsoft Store",
+    "logoPath": "/shq88b09gTBYC4hA7K7MUL8Q4zP.jpg",
+    "urlTemplate": "https://www.microsoft.com/en-us/store/movies-and-tv",
+    "isSubscription": false
+  },
+  {
+    "tmdbProviderIds": [188, 192],
+    "name": "YouTube",
+    "logoPath": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+    "urlTemplate": "https://www.youtube.com/results?search_query={title}",
+    "isSubscription": false
+  },
+  {
+    "tmdbProviderIds": [2528],
+    "name": "YouTube TV",
+    "logoPath": "/x9zOHTUkQzt3PgPVKbMH9CKBwLK.jpg",
+    "urlTemplate": "https://tv.youtube.com/",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [283, 1968],
+    "name": "Crunchyroll",
+    "logoPath": "/fzN5Jok5Ig1eJ7gyNGoMhnLSCfh.jpg",
+    "urlTemplate": "https://www.crunchyroll.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [43, 634, 1794, 1855],
+    "name": "Starz",
+    "logoPath": "/yIKwylTLP1u8gl84Is7FItpYLGL.jpg",
+    "urlTemplate": "https://www.starz.com/search?query={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [526, 528, 635, 1854, 352],
+    "name": "AMC+",
+    "logoPath": "/ovmu6uot1XVvsemM2dDySXLiX57.jpg",
+    "urlTemplate": "https://www.amcplus.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [520, 584],
+    "name": "Discovery+",
+    "logoPath": "/eMTnWwNVtThkjvQA6zwxaoJG9NE.jpg",
+    "urlTemplate": "https://www.discoveryplus.com/search/{title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [11, 201],
+    "name": "MUBI",
+    "logoPath": "/x570VpH2C9EKDf1riP83rYc5dnL.jpg",
+    "urlTemplate": "https://mubi.com/search?query={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [99, 204],
+    "name": "Shudder",
+    "logoPath": "/vEtdiYRPRbDCp1Tcn3BEPF1Ni76.jpg",
+    "urlTemplate": "https://www.shudder.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [151, 1852, 197],
+    "name": "BritBox",
+    "logoPath": "/8oA7IcDNNUtBa9JYB5kQ8hrDz5o.jpg",
+    "urlTemplate": "https://www.britbox.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [87, 196],
+    "name": "Acorn TV",
+    "logoPath": "/doCc555FPPgGtuaZJxf9QZVpIp5.jpg",
+    "urlTemplate": "https://acorn.tv/search/?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [190],
+    "name": "Curiosity Stream",
+    "logoPath": "/oR1aNm1Qu9jQBkW4VrGPWhqbC3P.jpg",
+    "urlTemplate": "https://curiositystream.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [34, 583, 636],
+    "name": "MGM+",
+    "logoPath": "/ctiRpS16dlaTXQBSsiFncMrgWmh.jpg",
+    "urlTemplate": "https://www.mgmplus.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [143, 205],
+    "name": "Sundance Now",
+    "logoPath": "/1Edma9SrJnqkQW3BqFd2rJNHZvX.jpg",
+    "urlTemplate": "https://www.sundancenow.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [251, 343],
+    "name": "ALLBLK",
+    "logoPath": "/4cKdiYEPW1BsWLb9UmNzAyUlD5p.jpg",
+    "urlTemplate": "https://www.allblk.tv/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [73],
+    "name": "Tubi",
+    "logoPath": "/zLYr7OPvpskMA4S79E3vlCi71iC.jpg",
+    "urlTemplate": "https://tubitv.com/search/{title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [300],
+    "name": "Pluto TV",
+    "logoPath": "/dB8G41Q6tSL5NBisrIeqByfepBc.jpg",
+    "urlTemplate": "https://pluto.tv/search/details?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [257],
+    "name": "fuboTV",
+    "logoPath": "/9BgaNQRMDvVlji1JBZi6tcfxpKx.jpg",
+    "urlTemplate": "https://www.fubo.tv/search/{title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [2383],
+    "name": "Philo",
+    "logoPath": "/ptmbGSttkyzawLbxx9MElmxKuVo.jpg",
+    "urlTemplate": "https://www.philo.com/",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [191],
+    "name": "Kanopy",
+    "logoPath": "/rcBwnERpNfPfWB5DaSTyEMCZbCA.jpg",
+    "urlTemplate": "https://www.kanopy.com/search?q={title}",
+    "isSubscription": false
+  },
+  {
+    "tmdbProviderIds": [212],
+    "name": "Hoopla",
+    "logoPath": "/j7D006Uy3UWwZ6G0xH6BMgIWTzH.jpg",
+    "urlTemplate": "https://www.hoopladigital.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [207],
+    "name": "The Roku Channel",
+    "logoPath": "/wQzSN83BnWVgO7xEh0SeTVqtrFv.jpg",
+    "urlTemplate": "https://therokuchannel.roku.com/search/{title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [258],
+    "name": "Criterion Channel",
+    "logoPath": "/yhrtzYd43pFIhRq0ruO8umJPuyn.jpg",
+    "urlTemplate": "https://www.criterionchannel.com/search?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [83],
+    "name": "The CW",
+    "logoPath": "/spcwROYevucLluqZZ8Fv75UuTBt.jpg",
+    "urlTemplate": "https://www.cwtv.com/search/?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [209, 293, 294],
+    "name": "PBS",
+    "logoPath": "/iLjStQKQwzyxXJb3jyNpvDmW9mx.jpg",
+    "urlTemplate": "https://www.pbs.org/search/?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [538, 2077],
+    "name": "Plex",
+    "logoPath": "/vLZKlXUNDcZR7ilvfY9Wr9k80FZ.jpg",
+    "urlTemplate": "https://www.plex.tv/search/?q={title}",
+    "isSubscription": true
+  },
+  {
+    "tmdbProviderIds": [457],
+    "name": "ViX",
+    "logoPath": "/jwRPknT20dfU1GeVqbcDXFyvtdG.jpg",
+    "urlTemplate": "https://vix.com/es-es/search?q={title}",
+    "isSubscription": true
+  }
+]

@@ -53,7 +53,7 @@ export function getStaleTitles(titleIds: string[], staleDate: Date) {
 
 export function getStaleNonLibraryTitles(staleDate: Date, limit: number) {
   return db
-    .select()
+    .select({ id: titles.id })
     .from(titles)
     .where(and(isNotNull(titles.lastFetchedAt), lt(titles.lastFetchedAt, staleDate)))
     .limit(limit)
@@ -94,7 +94,7 @@ export function getTitlesWithStaleOffersFetchedBefore(titleIds: string[], staleD
 export function getReturningTvShows() {
   const returningStatuses = ["Returning Series", "In Production"];
   return db
-    .select()
+    .select({ id: titles.id, tmdbId: titles.tmdbId })
     .from(titles)
     .where(
       and(
@@ -128,19 +128,11 @@ export function getCastEntryForTitle(titleId: string) {
 }
 
 export function deleteOldCronRuns(beforeDate: Date): number {
-  const old = db
-    .select({ id: cronRuns.id })
-    .from(cronRuns)
+  return db
+    .delete(cronRuns)
     .where(lt(cronRuns.startedAt, beforeDate))
-    .all();
-  if (old.length === 0) return 0;
-  const ids = old.map((r) => r.id);
-  for (let i = 0; i < ids.length; i += 500) {
-    db.delete(cronRuns)
-      .where(inArray(cronRuns.id, ids.slice(i, i + 500)))
-      .run();
-  }
-  return old.length;
+    .returning({ id: cronRuns.id })
+    .all().length;
 }
 
 export function getTitlesWithFreshRecommendations(

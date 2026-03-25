@@ -10,7 +10,6 @@ import {
   IconLogout,
   IconPencil,
   IconTrash,
-  IconUser,
   IconX,
 } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
@@ -164,208 +163,197 @@ export function AccountSection({
   }
 
   return (
-    <div>
-      <div className="mb-3 flex items-center gap-2">
-        <IconUser aria-hidden={true} className="text-muted-foreground size-4" />
-        <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-          <Trans>Account</Trans>
-        </h2>
-      </div>
-      <Card className="pb-0">
-        <CardContent className="flex items-center gap-4">
-          {/* Avatar: click to upload (no avatar) or remove (has avatar) */}
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <button
-                  type="button"
-                  onClick={avatarUrl ? handleRemoveAvatar : () => fileInputRef.current?.click()}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                  disabled={isAvatarPending}
-                />
-              }
-              className="focus-visible:ring-ring focus-visible:ring-offset-background relative shrink-0 cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-              aria-label={avatarUrl ? t`Remove profile picture` : t`Upload profile picture`}
-            >
-              <Avatar className="size-12 overflow-hidden">
-                <AvatarImage src={isAvatarPending ? undefined : avatarUrl} alt={displayName} />
-                <AvatarFallback className="bg-primary/10 font-display text-primary text-lg">
-                  {initial}
-                </AvatarFallback>
-              </Avatar>
+    <Card className="pb-0">
+      <CardContent className="flex items-center gap-4">
+        {/* Avatar: click to upload (no avatar) or remove (has avatar) */}
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <button
+                type="button"
+                onClick={avatarUrl ? handleRemoveAvatar : () => fileInputRef.current?.click()}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                disabled={isAvatarPending}
+              />
+            }
+            className="focus-visible:ring-ring focus-visible:ring-offset-background relative shrink-0 cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            aria-label={avatarUrl ? t`Remove profile picture` : t`Upload profile picture`}
+          >
+            <Avatar className="size-12 overflow-hidden">
+              <AvatarImage src={isAvatarPending ? undefined : avatarUrl} alt={displayName} />
+              <AvatarFallback className="bg-primary/10 font-display text-primary text-lg">
+                {initial}
+              </AvatarFallback>
+            </Avatar>
 
-              <AnimatePresence>
-                {(isHovered || isAvatarPending) && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className={`text-foreground/70 absolute inset-0 flex items-center justify-center rounded-full backdrop-blur-sm ${
-                      avatarUrl && !isAvatarPending ? "bg-destructive/40" : "bg-black/50"
-                    }`}
-                  >
-                    {isAvatarPending ? (
-                      <Spinner className="size-4.5" />
-                    ) : avatarUrl ? (
-                      <IconTrash className="size-4.5" />
-                    ) : (
-                      <IconCamera className="size-4.5" />
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </TooltipTrigger>
-            <TooltipContent>
-              {avatarUrl ? <Trans>Remove picture</Trans> : <Trans>Upload picture</Trans>}
-            </TooltipContent>
-          </Tooltip>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            className="hidden"
-            onChange={handleFileSelect}
-          />
-
-          <div className="min-w-0 flex-1">
-            <CardTitle className="mb-0.5">
-              <AnimatePresence mode="wait" initial={false}>
-                {isEditingName ? (
-                  <motion.div
-                    key="editing"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.1 }}
-                    className="flex items-center gap-1.5"
-                  >
-                    <div className="relative inline-grid items-center">
-                      <span
-                        className="invisible col-start-1 row-start-1 text-sm font-medium whitespace-pre"
-                        aria-hidden="true"
-                      >
-                        {editValue || " "}
-                      </span>
-                      <input
-                        ref={nameInputRef}
-                        type="text"
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        onKeyDown={handleNameKeyDown}
-                        onBlur={handleNameSave}
-                        disabled={isNamePending}
-                        maxLength={100}
-                        className="border-primary/40 focus:border-primary col-start-1 row-start-1 min-w-4 border-0 border-b border-dashed bg-transparent text-sm font-medium transition-colors outline-none"
-                      />
-                    </div>
-                    {isNamePending ? (
-                      <Spinner className="text-muted-foreground size-3.5 shrink-0" />
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            handleNameSave();
-                          }}
-                          className="text-muted-foreground hover:text-primary shrink-0 rounded-md p-0.5 transition-colors"
-                          aria-label={t`Save name`}
-                        >
-                          <IconCheck className="size-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            handleNameCancel();
-                          }}
-                          className="text-muted-foreground hover:text-destructive shrink-0 rounded-md p-0.5 transition-colors"
-                          aria-label={t`Cancel editing`}
-                        >
-                          <IconX className="size-3.5" />
-                        </button>
-                      </>
-                    )}
-                  </motion.div>
-                ) : (
-                  <motion.button
-                    key="display"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.1 }}
-                    type="button"
-                    onClick={() => setIsEditingName(true)}
-                    className="group/name hover:text-primary inline-flex items-center gap-1.5 rounded-md px-0 text-start transition-colors"
-                  >
-                    {displayName}
-                    <IconPencil className="group-hover/name:text-muted-foreground size-3 text-transparent transition-colors" />
-                  </motion.button>
-                )}
-              </AnimatePresence>
-            </CardTitle>
-            <CardDescription>
-              {user.email}
-              {user.role === "admin" && (
-                <Badge className="bg-primary/10 text-primary ms-1.5 rounded-md border-0 align-middle">
-                  <Trans>Admin</Trans>
-                </Badge>
+            <AnimatePresence>
+              {(isHovered || isAvatarPending) && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className={`text-foreground/70 absolute inset-0 flex items-center justify-center rounded-full backdrop-blur-sm ${
+                    avatarUrl && !isAvatarPending ? "bg-destructive/40" : "bg-black/50"
+                  }`}
+                >
+                  {isAvatarPending ? (
+                    <Spinner className="size-4.5" />
+                  ) : avatarUrl ? (
+                    <IconTrash className="size-4.5" />
+                  ) : (
+                    <IconCamera className="size-4.5" />
+                  )}
+                </motion.div>
               )}
-            </CardDescription>
-            <p className="text-muted-foreground/60 mt-0.5 text-xs">
-              <Trans>Member since {memberSince}</Trans>
+            </AnimatePresence>
+          </TooltipTrigger>
+          <TooltipContent>
+            {avatarUrl ? <Trans>Remove picture</Trans> : <Trans>Upload picture</Trans>}
+          </TooltipContent>
+        </Tooltip>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          className="hidden"
+          onChange={handleFileSelect}
+        />
+
+        <div className="min-w-0 flex-1">
+          <CardTitle className="mb-0.5">
+            <AnimatePresence mode="wait" initial={false}>
+              {isEditingName ? (
+                <motion.div
+                  key="editing"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.1 }}
+                  className="flex items-center gap-1.5"
+                >
+                  <div className="relative inline-grid items-center">
+                    <span
+                      className="invisible col-start-1 row-start-1 text-sm font-medium whitespace-pre"
+                      aria-hidden="true"
+                    >
+                      {editValue || " "}
+                    </span>
+                    <input
+                      ref={nameInputRef}
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onKeyDown={handleNameKeyDown}
+                      onBlur={handleNameSave}
+                      disabled={isNamePending}
+                      maxLength={100}
+                      className="border-primary/40 focus:border-primary col-start-1 row-start-1 min-w-4 border-0 border-b border-dashed bg-transparent text-sm font-medium transition-colors outline-none"
+                    />
+                  </div>
+                  {isNamePending ? (
+                    <Spinner className="text-muted-foreground size-3.5 shrink-0" />
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleNameSave();
+                        }}
+                        className="text-muted-foreground hover:text-primary shrink-0 rounded-md p-0.5 transition-colors"
+                        aria-label={t`Save name`}
+                      >
+                        <IconCheck className="size-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleNameCancel();
+                        }}
+                        className="text-muted-foreground hover:text-destructive shrink-0 rounded-md p-0.5 transition-colors"
+                        aria-label={t`Cancel editing`}
+                      >
+                        <IconX className="size-3.5" />
+                      </button>
+                    </>
+                  )}
+                </motion.div>
+              ) : (
+                <motion.button
+                  key="display"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.1 }}
+                  type="button"
+                  onClick={() => setIsEditingName(true)}
+                  className="group/name hover:text-primary inline-flex items-center gap-1.5 rounded-md px-0 text-start transition-colors"
+                >
+                  {displayName}
+                  <IconPencil className="group-hover/name:text-muted-foreground size-3 text-transparent transition-colors" />
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </CardTitle>
+          <CardDescription>
+            {user.email}
+            {user.role === "admin" && (
+              <Badge className="bg-primary/10 text-primary ms-1.5 rounded-md border-0 align-middle">
+                <Trans>Admin</Trans>
+              </Badge>
+            )}
+          </CardDescription>
+          <p className="text-muted-foreground/60 mt-0.5 text-xs">
+            <Trans>Member since {memberSince}</Trans>
+          </p>
+        </div>
+
+        <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+          <ChangePasswordDialog />
+          <Button
+            variant="destructive"
+            onClick={async () => {
+              await signOut();
+              void navigate({ to: "/" });
+            }}
+          >
+            <IconLogout aria-hidden={true} />
+            <Trans>Sign out</Trans>
+          </Button>
+        </div>
+      </CardContent>
+
+      <div className="border-border/30 space-y-px border-t">
+        <button
+          type="button"
+          onClick={() => {
+            window.location.href = "/api/export/user-data";
+          }}
+          className="group hover:bg-muted/40 flex w-full items-center gap-3 px-4 py-3 text-start transition-colors"
+        >
+          <div className="bg-muted group-hover:bg-primary/10 flex size-7.5 shrink-0 items-center justify-center rounded-lg">
+            <IconCloudDownload
+              aria-hidden={true}
+              className="text-muted-foreground group-hover:text-primary size-3.5"
+            />
+          </div>
+          <div className="min-w-0 flex-1 space-y-0.5">
+            <p className="text-[13px] leading-none font-medium">
+              <Trans>Export</Trans>
+            </p>
+            <p className="text-muted-foreground text-[11px]">
+              <Trans>Download your library, watch history, and ratings as JSON</Trans>
             </p>
           </div>
-
-          <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
-            <ChangePasswordDialog />
-            <Button
-              variant="destructive"
-              onClick={async () => {
-                await signOut();
-                void navigate({ to: "/" });
-              }}
-            >
-              <IconLogout aria-hidden={true} />
-              <Trans>Sign out</Trans>
-            </Button>
-          </div>
-        </CardContent>
-
-        <div className="border-border/30 space-y-px border-t">
-          <button
-            type="button"
-            onClick={() => {
-              window.location.href = "/api/export/user-data";
-            }}
-            className="group hover:bg-muted/40 flex w-full items-center gap-3 px-4 py-3 text-start transition-colors"
-          >
-            <div className="bg-muted group-hover:bg-primary/10 flex size-7.5 shrink-0 items-center justify-center rounded-lg">
-              <IconCloudDownload
-                aria-hidden={true}
-                className="text-muted-foreground group-hover:text-primary size-3.5"
-              />
-            </div>
-            <div className="min-w-0 flex-1 space-y-0.5">
-              <p className="text-[13px] leading-none font-medium">
-                <Trans>Export</Trans>
-              </p>
-              <p className="text-muted-foreground text-[11px]">
-                <Trans>Download your library, watch history, and ratings as JSON</Trans>
-              </p>
-            </div>
-            <IconArrowRight
-              aria-hidden={true}
-              className="text-muted-foreground size-3.5 shrink-0"
-            />
-          </button>
-          <SofaImportDialog />
-        </div>
-      </Card>
-    </div>
+          <IconArrowRight aria-hidden={true} className="text-muted-foreground size-3.5 shrink-0" />
+        </button>
+        <SofaImportDialog />
+      </div>
+    </Card>
   );
 }
 

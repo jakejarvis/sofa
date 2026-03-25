@@ -34,9 +34,9 @@ function collectTitleImagePaths(titleIds: string[]): OrphanedImage[] {
       if (r.backdropPath) images.push({ category: "backdrops", path: r.backdropPath });
     }
 
-    // Season posters
+    // Season posters + IDs
     const seasonRows = db
-      .select({ posterPath: seasons.posterPath })
+      .select({ id: seasons.id, posterPath: seasons.posterPath })
       .from(seasons)
       .where(inArray(seasons.titleId, batch))
       .all();
@@ -45,12 +45,7 @@ function collectTitleImagePaths(titleIds: string[]): OrphanedImage[] {
     }
 
     // Episode stills (via seasons)
-    const seasonIds = db
-      .select({ id: seasons.id })
-      .from(seasons)
-      .where(inArray(seasons.titleId, batch))
-      .all()
-      .map((s) => s.id);
+    const seasonIds = seasonRows.map((s) => s.id);
 
     for (let j = 0; j < seasonIds.length; j += BATCH_SIZE) {
       const sBatch = seasonIds.slice(j, j + BATCH_SIZE);
@@ -68,19 +63,44 @@ function collectTitleImagePaths(titleIds: string[]): OrphanedImage[] {
   return images;
 }
 
-/** Collect profile paths for persons that will be orphaned (no remaining titleCast). */
-function collectOrphanedPersonImages(): OrphanedImage[] {
-  const orphaned = db
-    .select({ profilePath: persons.profilePath })
+/** Find person IDs that have no remaining titleCast entries. */
+function getOrphanedPersonIds(): string[] {
+  return db
+    .select({ id: persons.id })
     .from(persons)
     .where(
       notInArray(persons.id, db.selectDistinct({ personId: titleCast.personId }).from(titleCast)),
     )
-    .all();
+    .all()
+    .map((p) => p.id);
+}
 
-  return orphaned
-    .filter((p): p is { profilePath: string } => p.profilePath != null)
-    .map((p) => ({ category: "profiles" as const, path: p.profilePath }));
+/** Collect profile paths for a set of orphaned person IDs. */
+function collectOrphanedPersonImages(orphanedIds: string[]): OrphanedImage[] {
+  if (orphanedIds.length === 0) return [];
+  const images: OrphanedImage[] = [];
+  for (let i = 0; i < orphanedIds.length; i += BATCH_SIZE) {
+    const batch = orphanedIds.slice(i, i + BATCH_SIZE);
+    const rows = db
+      .select({ profilePath: persons.profilePath })
+      .from(persons)
+      .where(inArray(persons.id, batch))
+      .all();
+    for (const r of rows) {
+      if (r.profilePath) images.push({ category: "profiles", path: r.profilePath });
+    }
+  }
+  return images;
+}
+
+/** Delete orphaned persons by IDs, returning the count deleted. */
+function deleteOrphanedPersons(orphanedIds: string[]): number {
+  if (orphanedIds.length === 0) return 0;
+  for (let i = 0; i < orphanedIds.length; i += BATCH_SIZE) {
+    const batch = orphanedIds.slice(i, i + BATCH_SIZE);
+    db.delete(persons).where(inArray(persons.id, batch)).run();
+  }
+  return orphanedIds.length;
 }
 
 export function purgeShellTitlesTransaction(): PurgeResult {
@@ -92,8 +112,13 @@ export function purgeShellTitlesTransaction(): PurgeResult {
       .all();
 
     if (shellTitles.length === 0) {
-      const orphanedImages = collectOrphanedPersonImages();
-      return { deletedTitles: 0, deletedPersons: purgeOrphanedPersons(), orphanedImages };
+      const orphanedIds = getOrphanedPersonIds();
+      const orphanedImages = collectOrphanedPersonImages(orphanedIds);
+      return {
+        deletedTitles: 0,
+        deletedPersons: deleteOrphanedPersons(orphanedIds),
+        orphanedImages,
+      };
     }
 
     const libraryTitleIds = new Set(
@@ -107,8 +132,13 @@ export function purgeShellTitlesTransaction(): PurgeResult {
     const toDelete = shellTitles.map((t) => t.id).filter((id) => !libraryTitleIds.has(id));
 
     if (toDelete.length === 0) {
-      const orphanedImages = collectOrphanedPersonImages();
-      return { deletedTitles: 0, deletedPersons: purgeOrphanedPersons(), orphanedImages };
+      const orphanedIds = getOrphanedPersonIds();
+      const orphanedImages = collectOrphanedPersonImages(orphanedIds);
+      return {
+        deletedTitles: 0,
+        deletedPersons: deleteOrphanedPersons(orphanedIds),
+        orphanedImages,
+      };
     }
 
     // Collect image paths BEFORE cascade-deleting the title rows
@@ -119,32 +149,17 @@ export function purgeShellTitlesTransaction(): PurgeResult {
       db.delete(titles).where(inArray(titles.id, batch)).run();
     }
 
-    // After title cascade deletes, collect orphaned person images then delete persons
-    orphanedImages.push(...collectOrphanedPersonImages());
+    // After title cascade deletes, find orphaned persons once and use for both operations
+    const orphanedIds = getOrphanedPersonIds();
+    orphanedImages.push(...collectOrphanedPersonImages(orphanedIds));
     return {
       deletedTitles: toDelete.length,
-      deletedPersons: purgeOrphanedPersons(),
+      deletedPersons: deleteOrphanedPersons(orphanedIds),
       orphanedImages,
     };
   });
 }
 
 export function purgeOrphanedPersons(): number {
-  const orphanedPersons = db
-    .select({ id: persons.id })
-    .from(persons)
-    .where(
-      notInArray(persons.id, db.selectDistinct({ personId: titleCast.personId }).from(titleCast)),
-    )
-    .all();
-
-  if (orphanedPersons.length === 0) return 0;
-
-  const ids = orphanedPersons.map((p) => p.id);
-  for (let i = 0; i < ids.length; i += BATCH_SIZE) {
-    const batch = ids.slice(i, i + BATCH_SIZE);
-    db.delete(persons).where(inArray(persons.id, batch)).run();
-  }
-
-  return ids.length;
+  return deleteOrphanedPersons(getOrphanedPersonIds());
 }

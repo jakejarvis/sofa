@@ -106,7 +106,7 @@ export const DiscoverInput = z
       .regex(/^[a-z]{2}$/)
       .optional()
       .describe("ISO 639-1 original language code"),
-    providerId: z.number().int().optional().describe("TMDB watch provider ID"),
+    platformId: z.string().optional().describe("Platform ID to filter by"),
   })
   .merge(PageParam)
   .meta({ description: "Genre-based discovery filters" });
@@ -283,7 +283,7 @@ export const AvailabilityOfferSchema = z
     platformId: z.string().describe("Platform ID"),
     providerName: z.string().describe("Display name (e.g. Netflix, Hulu)"),
     logoPath: z.string().nullable().describe("Provider logo image path"),
-    offerType: z.string().describe("Offer type: flatrate, rent, buy, free, ads"),
+    offerType: z.string().describe("Offer category: stream or purchase"),
     watchUrl: z.string().nullable().describe("Direct link to watch on this provider"),
     isUserSubscribed: z.boolean().describe("Whether the user subscribes to this platform"),
   })
@@ -293,9 +293,11 @@ export const PlatformSchema = z
   .object({
     id: z.string().describe("Platform ID"),
     name: z.string().describe("Display name"),
-    tmdbProviderId: z.number().nullable().describe("TMDB provider ID (null for custom platforms)"),
+    tmdbProviderIds: z.array(z.number()).describe("TMDB provider IDs mapped to this platform"),
     logoPath: z.string().nullable().describe("Logo image path"),
-    displayOrder: z.number().describe("Sort order"),
+    isSubscription: z
+      .boolean()
+      .describe("True for subscription services, false for purchase/rental stores"),
   })
   .meta({ description: "A streaming platform" });
 
@@ -621,7 +623,7 @@ export const WatchProvidersOutput = z
     providers: z.array(
       z.object({
         id: z.string().describe("Platform ID"),
-        tmdbProviderId: z.number().nullable().describe("TMDB provider ID"),
+        tmdbProviderIds: z.array(z.number()).describe("TMDB provider IDs"),
         name: z.string().describe("Provider display name"),
         logoPath: z.string().nullable().describe("Provider logo image path"),
       }),

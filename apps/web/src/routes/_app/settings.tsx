@@ -2,9 +2,11 @@ import { Trans } from "@lingui/react/macro";
 import {
   IconAlertTriangle,
   IconDatabaseExport,
-  IconDeviceDesktopCog,
+  IconFileImport,
   IconServer2,
   IconShieldLock,
+  IconUser,
+  IconWebhook,
 } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -77,78 +79,50 @@ function SettingsPage() {
   const isAdmin = session.user.role === "admin";
 
   return (
-    <SettingsShell
-      footer={
-        <footer className="border-border/50 text-muted-foreground border-t pt-6 pb-2 text-center text-xs">
-          <p>
-            <a
-              href="https://sofa.watch"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary/80 hover:text-primary font-medium transition-colors"
-            >
-              Sofa
-            </a>{" "}
-            v{__APP_VERSION__}
-            {__GIT_COMMIT_SHA__ && (
-              <>
-                {" "}
-                (
-                <a
-                  href={`https://github.com/${GITHUB_REPO}/commit/${__GIT_COMMIT_SHA__}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary font-mono transition-colors"
-                >
-                  {__GIT_COMMIT_SHA__}
-                </a>
-                )
-              </>
-            )}
-          </p>
-          <div className="mt-4 flex flex-col items-center gap-2">
-            <a
-              href="https://www.themoviedb.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-opacity hover:opacity-70"
-            >
-              <TmdbLogo className="h-3" />
-            </a>
-            <p className="text-muted-foreground text-[10px] leading-relaxed">
-              <Trans>
-                This product uses the TMDB API but is not endorsed or certified by TMDB.
-              </Trans>
-            </p>
-          </div>
-        </footer>
-      }
-    >
-      <AccountSection
-        user={{
-          name: session.user.name,
-          email: session.user.email,
-          image: session.user.image || undefined,
-          createdAt: new Date(session.user.createdAt).toISOString(),
-          role: session.user.role ?? undefined,
-        }}
-      />
-
-      {/* App Settings */}
+    <SettingsShell>
       <div>
         <div className="mb-3 flex items-center gap-2">
-          <IconDeviceDesktopCog aria-hidden={true} className="text-muted-foreground size-4" />
+          <IconUser aria-hidden={true} className="text-muted-foreground size-4" />
           <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-            <Trans>App Settings</Trans>
+            <Trans>Account</Trans>
           </h2>
         </div>
-        <LanguageSection />
-        <StreamingServicesSection />
+        <div className="space-y-2.5">
+          <AccountSection
+            user={{
+              name: session.user.name,
+              email: session.user.email,
+              image: session.user.image || undefined,
+              createdAt: new Date(session.user.createdAt).toISOString(),
+              role: session.user.role ?? undefined,
+            }}
+          />
+          <StreamingServicesSection />
+          <LanguageSection />
+        </div>
       </div>
 
-      <IntegrationsSection />
+      {/* Integrations */}
+      <div>
+        <div className="mb-3 flex items-center gap-2">
+          <IconWebhook aria-hidden={true} className="text-muted-foreground size-4" />
+          <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
+            <Trans>Integrations</Trans>
+          </h2>
+        </div>
+        <IntegrationsSection />
+      </div>
 
-      <ImportsSection />
+      {/* Import */}
+      <div>
+        <div className="mb-3 flex items-center gap-2">
+          <IconFileImport aria-hidden className="text-muted-foreground size-4" />
+          <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
+            <Trans>Import</Trans>
+          </h2>
+        </div>
+        <ImportsSection />
+      </div>
 
       {/* Server health */}
       {isAdmin && (
@@ -178,7 +152,7 @@ function SettingsPage() {
               <Trans>Admin only</Trans>
             </span>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             <Card className="border-s-primary/30 border-s-2">
               <RegistrationSection />
             </Card>
@@ -201,7 +175,7 @@ function SettingsPage() {
               <Trans>Admin only</Trans>
             </span>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             <Card className="border-s-primary/30 border-s-2">
               <BackupSection />
             </Card>
@@ -232,6 +206,48 @@ function SettingsPage() {
           </Card>
         </div>
       )}
+
+      <footer className="border-border/50 text-muted-foreground border-t pt-6 pb-2 text-center text-xs">
+        <p>
+          <a
+            href="https://sofa.watch"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary/80 hover:text-primary font-medium transition-colors"
+          >
+            Sofa
+          </a>{" "}
+          v{__APP_VERSION__}
+          {__GIT_COMMIT_SHA__ && (
+            <>
+              {" "}
+              (
+              <a
+                href={`https://github.com/${GITHUB_REPO}/commit/${__GIT_COMMIT_SHA__}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-primary font-mono transition-colors"
+              >
+                {__GIT_COMMIT_SHA__}
+              </a>
+              )
+            </>
+          )}
+        </p>
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <a
+            href="https://www.themoviedb.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-opacity hover:opacity-70"
+          >
+            <TmdbLogo className="h-3" />
+          </a>
+          <p className="text-muted-foreground text-[10px] leading-relaxed">
+            <Trans>This product uses the TMDB API but is not endorsed or certified by TMDB.</Trans>
+          </p>
+        </div>
+      </footer>
     </SettingsShell>
   );
 }

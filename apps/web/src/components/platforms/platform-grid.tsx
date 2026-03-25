@@ -25,7 +25,7 @@ export function PlatformGrid({ platforms, selectedIds, onToggle }: PlatformGridP
             className={`group relative flex flex-col items-center gap-2 rounded-xl border p-3 motion-safe:transition-colors motion-safe:duration-150 ${
               isSelected
                 ? "border-primary/50 bg-primary/8"
-                : "border-border/20 hover:border-primary/30 hover:bg-primary/5"
+                : "border-border/50 hover:border-primary/30 hover:bg-primary/5"
             }`}
             aria-label={(() => {
               const name = platform.name;

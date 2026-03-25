@@ -233,7 +233,7 @@ export function BackupScheduleSection() {
                           }
                         </SelectValue>
                       </SelectTrigger>
-                      <SelectContent align="start" alignItemWithTrigger={false} className="p-1">
+                      <SelectContent align="start" className="p-1">
                         {[3, 5, 7, 14, 30, 0].map((n) => (
                           <SelectItem key={n} value={String(n)}>
                             {n === 0 ? t`unlimited` : t`last ${n}`}
@@ -319,7 +319,7 @@ export function BackupScheduleSection() {
                             }
                           </SelectValue>
                         </SelectTrigger>
-                        <SelectContent align="start" alignItemWithTrigger={false} className="p-1">
+                        <SelectContent align="start" className="p-1">
                           {DAYS_OF_WEEK.map((day, i) => (
                             <SelectItem key={day} value={String(i)}>
                               {day}
@@ -368,7 +368,7 @@ export function BackupScheduleSection() {
                             }
                           </SelectValue>
                         </SelectTrigger>
-                        <SelectContent align="start" alignItemWithTrigger={false} className="p-1">
+                        <SelectContent align="start" className="p-1">
                           {HOURS.map((h) => {
                             const val = `${String(h).padStart(2, "0")}:00`;
                             return (

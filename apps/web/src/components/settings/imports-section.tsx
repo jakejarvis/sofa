@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { IconCloudUpload, IconFileImport, IconLink } from "@tabler/icons-react";
+import { IconCloudUpload, IconLink } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -99,7 +99,7 @@ const SOURCES: SourceConfig[] = [
   {
     source: "trakt",
     label: "Trakt",
-    description: "Connect your Trakt account or upload a JSON export.",
+    description: "Connect your Trakt account or upload a JSON export",
     accept: ".json",
     icon: <TraktLogo className="text-primary size-4" />,
     supportsOAuth: true,
@@ -107,7 +107,7 @@ const SOURCES: SourceConfig[] = [
   {
     source: "simkl",
     label: "Simkl",
-    description: "Connect your Simkl account or upload a JSON export.",
+    description: "Connect your Simkl account or upload a JSON export",
     accept: ".json",
     icon: <SimklLogo className="text-primary size-4" />,
     supportsOAuth: true,
@@ -115,7 +115,7 @@ const SOURCES: SourceConfig[] = [
   {
     source: "letterboxd",
     label: "Letterboxd",
-    description: "Upload the ZIP export from your Letterboxd account settings.",
+    description: "Upload the ZIP export from your Letterboxd account settings",
     accept: ".zip",
     icon: <LetterboxdLogo className="text-primary size-4" />,
     supportsOAuth: false,
@@ -168,18 +168,10 @@ type DialogStep =
 
 export function ImportsSection() {
   return (
-    <div>
-      <div className="mb-3 flex items-center gap-2">
-        <IconFileImport aria-hidden className="text-muted-foreground size-4" />
-        <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-          <Trans>Import</Trans>
-        </h2>
-      </div>
-      <div className="space-y-2.5">
-        {SOURCES.map((config) => (
-          <ImportSourceCard key={config.source} config={config} />
-        ))}
-      </div>
+    <div className="space-y-2.5">
+      {SOURCES.map((config) => (
+        <ImportSourceCard key={config.source} config={config} />
+      ))}
     </div>
   );
 }

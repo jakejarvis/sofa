@@ -17,6 +17,18 @@ export function getRecentEventsForIntegration(integrationId: string, limit = 10)
     .all();
 }
 
+export function getRecentEventsForIntegrations(integrationIds: string[], limit = 10) {
+  if (integrationIds.length === 0)
+    return new Map<string, ReturnType<typeof getRecentEventsForIntegration>>();
+
+  const result = new Map<string, ReturnType<typeof getRecentEventsForIntegration>>();
+  for (const integrationId of integrationIds) {
+    const events = getRecentEventsForIntegration(integrationId, limit);
+    if (events.length > 0) result.set(integrationId, events);
+  }
+  return result;
+}
+
 export function getIntegrationByUserAndProvider(userId: string, provider: string) {
   return db
     .select()

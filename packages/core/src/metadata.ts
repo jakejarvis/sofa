@@ -684,19 +684,66 @@ async function ensureEnriched(
   return false;
 }
 
+const STREAM_TYPES = new Set(["flatrate", "free", "ads"]);
+const STREAM_PRIORITY: Record<string, number> = { flatrate: 0, free: 1, ads: 2 };
+const PURCHASE_PRIORITY: Record<string, number> = { rent: 0, buy: 1 };
+
 function readAvailability(
   titleId: string,
   titleName: string,
   userPlatformIds?: Set<string>,
 ): AvailabilityOffer[] {
-  return getAvailabilityOffersForTitle(titleId).map((a) => ({
-    platformId: a.platformId,
-    providerName: a.providerName,
-    logoPath: tmdbImageUrl(a.logoPath, "logos"),
-    offerType: a.offerType,
-    watchUrl: generateProviderUrl(a.urlTemplate, titleName),
-    isUserSubscribed: userPlatformIds ? userPlatformIds.has(a.platformId) : false,
-  }));
+  const raw = getAvailabilityOffersForTitle(titleId);
+
+  // Group by platformId to deduplicate
+  const byPlatform = new Map<string, (typeof raw)[number][]>();
+  for (const offer of raw) {
+    let list = byPlatform.get(offer.platformId);
+    if (!list) {
+      list = [];
+      byPlatform.set(offer.platformId, list);
+    }
+    list.push(offer);
+  }
+
+  const result: AvailabilityOffer[] = [];
+
+  for (const [platformId, offers] of byPlatform) {
+    const streamOffers = offers.filter((o) => STREAM_TYPES.has(o.offerType));
+    const purchaseOffers = offers.filter((o) => !STREAM_TYPES.has(o.offerType));
+
+    // Emit one "stream" entry per platform (best offer type wins)
+    if (streamOffers.length > 0) {
+      const best = streamOffers.sort(
+        (a, b) => (STREAM_PRIORITY[a.offerType] ?? 99) - (STREAM_PRIORITY[b.offerType] ?? 99),
+      )[0];
+      result.push({
+        platformId,
+        providerName: best.providerName,
+        logoPath: tmdbImageUrl(best.logoPath, "logos"),
+        offerType: "stream",
+        watchUrl: generateProviderUrl(best.urlTemplate, titleName),
+        isUserSubscribed: userPlatformIds ? userPlatformIds.has(platformId) : false,
+      });
+    }
+
+    // Emit one "purchase" entry per platform (rent preferred over buy)
+    if (purchaseOffers.length > 0) {
+      const best = purchaseOffers.sort(
+        (a, b) => (PURCHASE_PRIORITY[a.offerType] ?? 99) - (PURCHASE_PRIORITY[b.offerType] ?? 99),
+      )[0];
+      result.push({
+        platformId,
+        providerName: best.providerName,
+        logoPath: tmdbImageUrl(best.logoPath, "logos"),
+        offerType: "purchase",
+        watchUrl: generateProviderUrl(best.urlTemplate, titleName),
+        isUserSubscribed: userPlatformIds ? userPlatformIds.has(platformId) : false,
+      });
+    }
+  }
+
+  return result;
 }
 
 export async function getOrFetchTitle(

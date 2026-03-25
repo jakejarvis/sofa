@@ -108,7 +108,7 @@ function PeriodSelect({
           {(value: TimePeriod | null) => (value ? periodLabels[value] : null)}
         </SelectValue>
       </SelectTrigger>
-      <SelectContent align="start" alignItemWithTrigger={false} className="p-1">
+      <SelectContent align="start" className="p-1">
         {periods.map((p) => (
           <SelectItem key={p} value={p}>
             {periodLabels[p]}

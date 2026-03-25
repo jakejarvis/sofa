@@ -125,7 +125,7 @@ export function SystemHealthCards() {
   if (isPending || !data) return <SkeletonCards />;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       <SystemStatusCard
         checkedAt={data.checkedAt}
         database={data.database}

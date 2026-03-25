@@ -2,7 +2,7 @@ import {
   deleteIntegrationByUserAndProvider,
   getIntegrationByToken,
   getIntegrationByUserAndProvider,
-  getRecentEventsForIntegration,
+  getRecentEventsForIntegrations,
   getUserIntegrations,
   insertIntegration,
   regenerateIntegrationToken,
@@ -38,11 +38,8 @@ function serializeIntegration(row: {
 export function listUserIntegrations(userId: string) {
   const userIntegrations = getUserIntegrations(userId);
 
-  const eventsByIntegration = new Map<string, ReturnType<typeof getRecentEventsForIntegration>>();
-  for (const integration of userIntegrations) {
-    const events = getRecentEventsForIntegration(integration.id);
-    eventsByIntegration.set(integration.id, events);
-  }
+  const integrationIds = userIntegrations.map((i) => i.id);
+  const eventsByIntegration = getRecentEventsForIntegrations(integrationIds);
 
   const result = userIntegrations.map((integration) => {
     const events = eventsByIntegration.get(integration.id) ?? [];

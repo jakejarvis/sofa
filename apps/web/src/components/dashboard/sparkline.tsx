@@ -109,8 +109,6 @@ export function Sparkline({ data, color }: SparklineProps) {
     return computeMonotonePath(points, size.height);
   }, [data, size.width, size.height]);
 
-  if (!data.some((d) => d.count > 0)) return null;
-
   return (
     <div
       ref={containerRef}

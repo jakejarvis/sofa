@@ -3,6 +3,7 @@ import { ORPCError } from "@orpc/server";
 import { AppErrorCode } from "@sofa/api/errors";
 import { WATCH_REGION } from "@sofa/config";
 import { ensureBrowseTitlesExist } from "@sofa/core/metadata";
+import { getPlatformTmdbIds } from "@sofa/core/platforms";
 import { getEpisodeProgressByTitleIds, getDisplayStatusesByTitleIds } from "@sofa/core/tracking";
 import { discover as discoverTmdb } from "@sofa/tmdb/client";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
@@ -34,9 +35,12 @@ export const discover = os.discover.use(authed).handler(async ({ input, context 
   }
   if (input.ratingMin != null) params["vote_average.gte"] = String(input.ratingMin);
   if (input.language) params.with_original_language = input.language;
-  if (input.providerId) {
-    params.with_watch_providers = String(input.providerId);
-    params.watch_region = WATCH_REGION;
+  if (input.platformId) {
+    const tmdbIds = getPlatformTmdbIds(input.platformId);
+    if (tmdbIds.length > 0) {
+      params.with_watch_providers = tmdbIds.join("|");
+      params.watch_region = WATCH_REGION;
+    }
   }
 
   const results = await discoverTmdb(input.type, params, input.page);

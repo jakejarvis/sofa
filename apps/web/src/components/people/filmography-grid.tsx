@@ -82,7 +82,7 @@ export function FilmographyGrid({ credits, userStatuses }: FilmographyGridProps)
               }
             </SelectValue>
           </SelectTrigger>
-          <SelectContent align="end" alignItemWithTrigger={false} className="p-1">
+          <SelectContent align="end" className="p-1">
             <SelectItem value="newest">
               <Trans>Newest</Trans>
             </SelectItem>

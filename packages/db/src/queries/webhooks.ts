@@ -1,4 +1,4 @@
-import { and, eq, gte, inArray, lt } from "drizzle-orm";
+import { and, eq, gte, lt } from "drizzle-orm";
 
 import { db } from "../client";
 import { integrationEvents, integrations, userEpisodeWatches, userMovieWatches } from "../schema";
@@ -31,29 +31,23 @@ export function getRecentEpisodeWatch(userId: string, episodeId: string, since: 
     .get();
 }
 
-export function insertIntegrationEvent(values: typeof integrationEvents.$inferInsert): void {
-  db.insert(integrationEvents).values(values).run();
-}
-
-export function updateIntegrationLastEvent(connectionId: string): void {
-  db.update(integrations)
-    .set({ lastEventAt: new Date() })
-    .where(eq(integrations.id, connectionId))
-    .run();
+export function insertIntegrationEventTransaction(
+  values: typeof integrationEvents.$inferInsert,
+  connectionId: string,
+): void {
+  db.transaction((tx) => {
+    tx.insert(integrationEvents).values(values).run();
+    tx.update(integrations)
+      .set({ lastEventAt: new Date() })
+      .where(eq(integrations.id, connectionId))
+      .run();
+  });
 }
 
 export function deleteOldIntegrationEvents(beforeDate: Date): number {
-  const old = db
-    .select({ id: integrationEvents.id })
-    .from(integrationEvents)
+  return db
+    .delete(integrationEvents)
     .where(lt(integrationEvents.receivedAt, beforeDate))
-    .all();
-  if (old.length === 0) return 0;
-  const ids = old.map((r) => r.id);
-  for (let i = 0; i < ids.length; i += 500) {
-    db.delete(integrationEvents)
-      .where(inArray(integrationEvents.id, ids.slice(i, i + 500)))
-      .run();
-  }
-  return old.length;
+    .returning({ id: integrationEvents.id })
+    .all().length;
 }

@@ -206,7 +206,7 @@ export function LibraryFilters({
             }}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent alignItemWithTrigger={false} className="p-1">
+        <SelectContent className="p-1">
           <SelectItem value="">{t`All genres`}</SelectItem>
           {genreData?.genres.map((genre) => (
             <SelectItem key={genre.id} value={String(genre.id)}>
@@ -235,7 +235,7 @@ export function LibraryFilters({
             }}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent alignItemWithTrigger={false} className="p-1">
+        <SelectContent className="p-1">
           <SelectItem value="">{t`Any`}</SelectItem>
           <SelectItem value="1">1★+</SelectItem>
           <SelectItem value="2">2★+</SelectItem>
@@ -261,14 +261,14 @@ export function LibraryFilters({
             }}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent alignItemWithTrigger={false} className="p-1">
+        <SelectContent className="p-1">
           <SelectItem value="">{t`Any year`}</SelectItem>
           {DECADES.map((d) => (
             <SelectItem key={d.yearMin} value={String(d.yearMin)}>
               {d.label}
             </SelectItem>
           ))}
-          <SelectItem value="older">{t`Pre-1980`}</SelectItem>
+          <SelectItem value="older">{t`70s and earlier`}</SelectItem>
         </SelectContent>
       </Select>
 
@@ -286,7 +286,7 @@ export function LibraryFilters({
         >
           <SelectValue>{(value: string | null) => (value ? value : t`Age`)}</SelectValue>
         </SelectTrigger>
-        <SelectContent alignItemWithTrigger={false} className="p-1">
+        <SelectContent className="p-1">
           <SelectItem value="">{t`All`}</SelectItem>
           {CONTENT_RATINGS.map((rating) => (
             <SelectItem key={rating} value={rating}>

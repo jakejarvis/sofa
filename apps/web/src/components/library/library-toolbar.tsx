@@ -68,20 +68,20 @@ export function LibraryToolbar({
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t`Search library...`}
-            className="pl-7"
+            className="py-3 pl-7"
             aria-label={t`Search library`}
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground text-sm">
+          <span className="text-muted-foreground text-[13px]">
             {plural(totalResults, { one: "# result", other: "# results" })}
           </span>
 
           {/* Filter toggle */}
           <CollapsibleTrigger
             render={
-              <Button variant="outline" size="sm">
+              <Button variant="outline">
                 <IconFilter aria-hidden={true} className="size-3.5" />
                 {t`Filters`}
                 {activeFilterCount > 0 && (
@@ -101,7 +101,7 @@ export function LibraryToolbar({
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger
               render={
-                <Button variant="outline" size="sm">
+                <Button variant="outline">
                   <IconSortDescending aria-hidden={true} className="size-3.5" />
                   {t`Sort`}
                 </Button>

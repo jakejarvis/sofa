@@ -2,8 +2,7 @@ import { findEpisodeBySeasonAndNumber, findSeasonByTitleAndNumber } from "@sofa/
 import {
   getRecentEpisodeWatch,
   getRecentMovieWatch,
-  insertIntegrationEvent,
-  updateIntegrationLastEvent,
+  insertIntegrationEventTransaction,
 } from "@sofa/db/queries/webhooks";
 import { createLogger } from "@sofa/logger";
 import { getTvDetails } from "@sofa/tmdb/client";
@@ -189,22 +188,23 @@ function logEvent(
   status: "success" | "ignored" | "error",
   errorMessage?: string,
 ) {
-  insertIntegrationEvent({
-    integrationId: connectionId,
-    eventType:
-      event?.provider === "plex"
-        ? "media.scrobble"
-        : event?.provider === "emby"
-          ? "playback.stop"
-          : "PlaybackStop",
-    mediaType: event?.mediaType ?? null,
-    mediaTitle: event?.title ?? null,
-    status,
-    errorMessage: errorMessage ?? null,
-    receivedAt: new Date(),
-  });
-
-  updateIntegrationLastEvent(connectionId);
+  insertIntegrationEventTransaction(
+    {
+      integrationId: connectionId,
+      eventType:
+        event?.provider === "plex"
+          ? "media.scrobble"
+          : event?.provider === "emby"
+            ? "playback.stop"
+            : "PlaybackStop",
+      mediaType: event?.mediaType ?? null,
+      mediaTitle: event?.title ?? null,
+      status,
+      errorMessage: errorMessage ?? null,
+      receivedAt: new Date(),
+    },
+    connectionId,
+  );
 }
 
 // ─── Main Processing ────────────────────────────────────────────────

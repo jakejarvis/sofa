@@ -1,5 +1,3 @@
-import { Trans } from "@lingui/react/macro";
-import { IconWebhook } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -25,35 +23,24 @@ export function IntegrationsSection() {
     });
   }
 
-  return (
-    <div>
-      <div className="mb-3 flex items-center gap-2">
-        <IconWebhook aria-hidden={true} className="text-muted-foreground size-4" />
-        <h2 className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-          <Trans>Integrations</Trans>
-        </h2>
-      </div>
-      {isPending ? (
-        <div className="space-y-2.5">
-          {INTEGRATION_CONFIGS.map((c) => (
-            <Skeleton key={c.provider} className="h-20 w-full rounded-xl" />
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-2.5">
-          {INTEGRATION_CONFIGS.map((config) => (
-            <IntegrationCard
-              key={config.provider}
-              config={config}
-              connection={
-                connections.find((c: IntegrationConnection) => c.provider === config.provider) ??
-                null
-              }
-              setConnections={handleSetConnections}
-            />
-          ))}
-        </div>
-      )}
+  return isPending ? (
+    <div className="space-y-2.5">
+      {INTEGRATION_CONFIGS.map((c) => (
+        <Skeleton key={c.provider} className="h-20 w-full rounded-xl" />
+      ))}
+    </div>
+  ) : (
+    <div className="space-y-2.5">
+      {INTEGRATION_CONFIGS.map((config) => (
+        <IntegrationCard
+          key={config.provider}
+          config={config}
+          connection={
+            connections.find((c: IntegrationConnection) => c.provider === config.provider) ?? null
+          }
+          setConnections={handleSetConnections}
+        />
+      ))}
     </div>
   );
 }

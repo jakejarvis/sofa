@@ -67,8 +67,7 @@ export function DiscoverSection() {
     | "primary_release_date.asc";
   const [sortBy, setSortBy] = useState<DiscoverSortBy | undefined>(undefined);
   const [language, setLanguage] = useState<string | undefined>(undefined);
-  const [providerId, setProviderId] = useState<number | undefined>(undefined);
-  const [selectedPlatformId, setSelectedPlatformId] = useState("");
+  const [platformId, setPlatformId] = useState<string | undefined>(undefined);
 
   const { data: genreData } = useQuery(orpc.explore.genres.queryOptions({ input: { type } }));
   const { data: providerData } = useQuery(orpc.platforms.list.queryOptions());
@@ -83,7 +82,7 @@ export function DiscoverSection() {
         ratingMin,
         sortBy,
         language,
-        providerId,
+        platformId,
         page: pageParam,
       }),
       initialPageParam: 1,
@@ -154,14 +153,7 @@ export function DiscoverSection() {
   }
 
   function handleProviderChange(value: string | null) {
-    setSelectedPlatformId(value ?? "");
-    if (!value) {
-      setProviderId(undefined);
-      return;
-    }
-    // Resolve platform UUID to TMDB provider ID for the discover API
-    const platform = providers.find((p) => p.id === value);
-    setProviderId(platform?.tmdbProviderId ?? undefined);
+    setPlatformId(value || undefined);
   }
 
   function handleGenreChange(value: string | null) {
@@ -183,8 +175,7 @@ export function DiscoverSection() {
             if (next === "movie" || next === "tv") {
               setType(next);
               setGenreId(undefined);
-              setProviderId(undefined);
-              setSelectedPlatformId("");
+              setPlatformId(undefined);
             }
           }}
           variant="outline"
@@ -217,7 +208,7 @@ export function DiscoverSection() {
               }}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent alignItemWithTrigger={false} className="p-1">
+          <SelectContent className="p-1">
             <SelectItem value="">{t`All genres`}</SelectItem>
             {genres.map((genre) => (
               <SelectItem key={genre.id} value={String(genre.id)}>
@@ -248,7 +239,7 @@ export function DiscoverSection() {
               }}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent alignItemWithTrigger={false} className="p-1">
+          <SelectContent className="p-1">
             <SelectItem value="">{t`Any year`}</SelectItem>
             {DECADE_PRESETS.map((d) => (
               <SelectItem key={d.min} value={String(d.min)}>
@@ -277,7 +268,7 @@ export function DiscoverSection() {
               }}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent alignItemWithTrigger={false} className="p-1">
+          <SelectContent className="p-1">
             <SelectItem value="">{t`Any rating`}</SelectItem>
             {RATING_PRESETS.map((r) => (
               <SelectItem key={r.value} value={String(r.value)}>
@@ -306,7 +297,7 @@ export function DiscoverSection() {
               }}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent alignItemWithTrigger={false} className="p-1">
+          <SelectContent className="p-1">
             <SelectItem value="">{t`Default`}</SelectItem>
             {SORT_OPTIONS.map((s) => (
               <SelectItem key={s.value} value={s.value}>
@@ -335,7 +326,7 @@ export function DiscoverSection() {
               }}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent alignItemWithTrigger={false} className="p-1">
+          <SelectContent className="p-1">
             <SelectItem value="">{t`Any language`}</SelectItem>
             {LANGUAGE_OPTIONS.map((lang) => (
               <SelectItem key={lang.code} value={lang.code}>
@@ -347,14 +338,14 @@ export function DiscoverSection() {
 
         {/* Provider select */}
         <Select
-          value={selectedPlatformId}
+          value={platformId ?? ""}
           onValueChange={handleProviderChange}
           modal={false}
           aria-label={t`Provider`}
         >
           <SelectTrigger
             size="sm"
-            data-active={selectedPlatformId ? "" : undefined}
+            data-active={platformId ? "" : undefined}
             className="data-[active]:border-primary/40 data-[active]:text-foreground"
           >
             <SelectValue>
@@ -365,10 +356,10 @@ export function DiscoverSection() {
               }}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent alignItemWithTrigger={false} className="p-1">
+          <SelectContent className="p-1">
             <SelectItem value="">{t`All providers`}</SelectItem>
             {providers
-              .filter((p) => p.tmdbProviderId != null)
+              .filter((p) => p.tmdbProviderIds.length > 0)
               .map((platform) => (
                 <SelectItem key={platform.id} value={platform.id}>
                   {platform.name}

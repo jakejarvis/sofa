@@ -471,30 +471,76 @@ export default function TitleDetailScreen() {
                 iconColor={titleAccent}
               />
             </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={titleAvailabilityContentStyle}
-            >
-              {availability.map((offer) => (
-                <View key={`${offer.platformId}-${offer.offerType}`} className="items-center">
-                  {offer.logoPath && (
-                    <Image
-                      source={{ uri: offer.logoPath }}
-                      style={titleDetailStyles.providerLogo}
-                      contentFit="cover"
-                    />
+            {(() => {
+              const stream = availability.filter((o) => o.offerType === "stream");
+              const purchase = availability.filter((o) => o.offerType === "purchase");
+              return (
+                <View className="gap-3">
+                  {stream.length > 0 && (
+                    <View>
+                      <Text className="text-muted-foreground/60 mb-1.5 px-4 text-[10px] font-medium tracking-wider uppercase">
+                        {t`Stream`}
+                      </Text>
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={titleAvailabilityContentStyle}
+                      >
+                        {stream.map((offer) => (
+                          <View key={offer.platformId} className="items-center">
+                            {offer.logoPath && (
+                              <Image
+                                source={{ uri: offer.logoPath }}
+                                style={titleDetailStyles.providerLogo}
+                                contentFit="cover"
+                              />
+                            )}
+                            <Text
+                              maxFontSizeMultiplier={1.0}
+                              className="text-muted-foreground mt-1 max-w-[60px] text-center text-xs"
+                              numberOfLines={1}
+                            >
+                              {offer.providerName}
+                            </Text>
+                          </View>
+                        ))}
+                      </ScrollView>
+                    </View>
                   )}
-                  <Text
-                    maxFontSizeMultiplier={1.0}
-                    className="text-muted-foreground mt-1 max-w-[60px] text-center text-xs"
-                    numberOfLines={1}
-                  >
-                    {offer.providerName}
-                  </Text>
+                  {purchase.length > 0 && (
+                    <View>
+                      <Text className="text-muted-foreground/60 mb-1.5 px-4 text-[10px] font-medium tracking-wider uppercase">
+                        {t`Buy or Rent`}
+                      </Text>
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={titleAvailabilityContentStyle}
+                      >
+                        {purchase.map((offer) => (
+                          <View key={offer.platformId} className="items-center">
+                            {offer.logoPath && (
+                              <Image
+                                source={{ uri: offer.logoPath }}
+                                style={titleDetailStyles.providerLogo}
+                                contentFit="cover"
+                              />
+                            )}
+                            <Text
+                              maxFontSizeMultiplier={1.0}
+                              className="text-muted-foreground mt-1 max-w-[60px] text-center text-xs"
+                              numberOfLines={1}
+                            >
+                              {offer.providerName}
+                            </Text>
+                          </View>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
                 </View>
-              ))}
-            </ScrollView>
+              );
+            })()}
           </Animated.View>
         )}
 

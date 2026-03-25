@@ -267,7 +267,6 @@ export function getAvailabilityOffersForTitle(titleId: string) {
       providerName: platforms.name,
       logoPath: platforms.logoPath,
       urlTemplate: platforms.urlTemplate,
-      tmdbProviderId: platforms.tmdbProviderId,
       offerType: titleAvailability.offerType,
     })
     .from(titleAvailability)

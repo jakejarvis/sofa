@@ -351,6 +351,7 @@ export function getUpcomingMovies(
 
 export function getAvailabilityByTitleIds(titleIds: string[]) {
   if (titleIds.length === 0) return [];
+  // Order by offerType so flatrate is picked first when the caller deduplicates
   return db
     .select({
       titleId: titleAvailability.titleId,
@@ -363,8 +364,11 @@ export function getAvailabilityByTitleIds(titleIds: string[]) {
     .where(
       and(
         inArray(titleAvailability.titleId, titleIds),
-        eq(titleAvailability.offerType, "flatrate"),
+        inArray(titleAvailability.offerType, ["flatrate", "free", "ads"]),
       ),
+    )
+    .orderBy(
+      sql`CASE ${titleAvailability.offerType} WHEN 'flatrate' THEN 0 WHEN 'free' THEN 1 ELSE 2 END`,
     )
     .all();
 }

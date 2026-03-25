@@ -11,9 +11,10 @@ import {
   getAllEpisodeIdsForTitle,
   getEpisodeProgressByTitleIds as getEpisodeProgressByTitleIdsQuery,
   getEpisodeTitleId,
+  getEpisodeTitleIds,
   getExistingEpisodeWatchIds,
   getSeasonById,
-  getSeasonEpisodes,
+  getSeasonEpisodeIds,
   getTitleStatus,
   getUserStatusesByTitleIds as getUserStatusesByTitleIdsQuery,
   getUserTitleInfo as getUserTitleInfoQuery,
@@ -91,11 +92,8 @@ export function logEpisodeWatchBatch(
   batchInsertEpisodeWatchesTransaction(userId, episodeIds, source, watchedAt);
 
   // Auto-set title status to in_progress for affected titles
-  const titleIds = new Set<string>();
-  for (const episodeId of episodeIds) {
-    const titleId = getEpisodeTitleId(episodeId);
-    if (titleId) titleIds.add(titleId);
-  }
+  const episodeTitleMap = getEpisodeTitleIds(episodeIds);
+  const titleIds = new Set(episodeTitleMap.values());
   for (const titleId of titleIds) {
     const existing = getTitleStatus(userId, titleId);
     if (!existing || existing.status === "watchlist") {
@@ -140,9 +138,7 @@ export function unwatchEpisode(userId: string, episodeId: string) {
 }
 
 export function unwatchSeason(userId: string, seasonId: string) {
-  const seasonEps = getSeasonEpisodes(seasonId);
-
-  const epIds = seasonEps.map((ep) => ep.id);
+  const epIds = getSeasonEpisodeIds(seasonId);
   if (epIds.length > 0) {
     deleteEpisodeWatches(userId, epIds);
   }
@@ -271,9 +267,5 @@ export function quickAddTitle(
 }
 
 export function watchSeason(userId: string, seasonId: string): void {
-  const seasonEps = getSeasonEpisodes(seasonId);
-  logEpisodeWatchBatch(
-    userId,
-    seasonEps.map((ep) => ep.id),
-  );
+  logEpisodeWatchBatch(userId, getSeasonEpisodeIds(seasonId));
 }

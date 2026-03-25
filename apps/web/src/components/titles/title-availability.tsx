@@ -17,19 +17,13 @@ function ProviderBadge({
   logoPath: string | null;
   watchUrl: string | null;
 }) {
-  const { t } = useLingui();
   return (
     <Tooltip>
       <TooltipTrigger
         {...(watchUrl
           ? {
               render: (
-                <a
-                  href={watchUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={t`Watch on ${name}`}
-                />
+                <a href={watchUrl} target="_blank" rel="noopener noreferrer" aria-label={name} />
               ),
             }
           : {})}
@@ -50,7 +44,7 @@ function ProviderBadge({
         )}
       </TooltipTrigger>
       <TooltipContent className="bg-popover text-popover-foreground px-2 py-1 text-[10px] font-medium shadow-md [&>:last-child]:hidden">
-        {watchUrl ? t`Watch on ${name}` : name}
+        {name}
       </TooltipContent>
     </Tooltip>
   );
@@ -159,11 +153,8 @@ function OffersByType({
 export function TitleAvailability({ availability }: { availability: AvailabilityOffer[] }) {
   const { t } = useLingui();
   const offerLabels: Record<string, string> = {
-    flatrate: t`Stream`,
-    rent: t`Rent`,
-    buy: t`Buy`,
-    free: t`Free`,
-    ads: t`With Ads`,
+    stream: t`Stream`,
+    purchase: t`Buy or Rent`,
   };
 
   if (availability.length === 0) return null;

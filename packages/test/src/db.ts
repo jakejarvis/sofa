@@ -16,6 +16,7 @@ const {
   userEpisodeWatches,
   userTitleStatus,
   userRatings,
+  platformTmdbIds,
   platforms,
   titleAvailability,
   userPlatforms,
@@ -178,9 +179,9 @@ export function insertPlatform(
     id?: string;
     name?: string;
     tmdbProviderId?: number;
+    tmdbProviderIds?: number[];
     logoPath?: string;
     urlTemplate?: string;
-    displayOrder?: number;
   } = {},
 ) {
   const id = overrides.id ?? "platform-1";
@@ -189,12 +190,15 @@ export function insertPlatform(
     .values({
       id,
       name: overrides.name ?? "Netflix",
-      tmdbProviderId: overrides.tmdbProviderId ?? 8,
       logoPath: overrides.logoPath ?? "/logo.png",
       urlTemplate: overrides.urlTemplate ?? "https://www.netflix.com/search?q={title}",
-      displayOrder: overrides.displayOrder ?? 1,
     })
     .run();
+
+  const tmdbIds = overrides.tmdbProviderIds ?? [overrides.tmdbProviderId ?? 8];
+  for (const tmdbId of tmdbIds) {
+    testDb.insert(platformTmdbIds).values({ platformId: id, tmdbProviderId: tmdbId }).run();
+  }
   return id;
 }
 

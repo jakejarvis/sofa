@@ -294,7 +294,35 @@ describe("streaming provider", () => {
     });
   });
 
-  test("returns null when no flatrate provider exists", () => {
+  test("attaches ads-supported streaming provider", () => {
+    const tomorrow = daysFromNow(1);
+    insertTvShow("tv-1", 100, 1, 1, { airDates: [tomorrow] });
+    insertStatus("user-1", "tv-1", "in_progress");
+    const pId = insertPlatform({ id: "p-tubi", name: "Tubi", tmdbProviderId: 73 });
+    insertTitleAvailability("tv-1", pId, { offerType: "ads" });
+
+    const result = getUpcomingFeed("user-1", { days: 7 });
+    expect(result.items[0].streamingProvider).toEqual({
+      platformId: "p-tubi",
+      providerName: "Tubi",
+      logoPath: "/logo.png",
+    });
+  });
+
+  test("prefers flatrate over ads when both exist", () => {
+    const tomorrow = daysFromNow(1);
+    insertTvShow("tv-1", 100, 1, 1, { airDates: [tomorrow] });
+    insertStatus("user-1", "tv-1", "in_progress");
+    const pAds = insertPlatform({ id: "p-tubi", name: "Tubi", tmdbProviderId: 73 });
+    const pFlat = insertPlatform({ id: "p-netflix", name: "Netflix", tmdbProviderId: 8 });
+    insertTitleAvailability("tv-1", pAds, { offerType: "ads" });
+    insertTitleAvailability("tv-1", pFlat, { offerType: "flatrate" });
+
+    const result = getUpcomingFeed("user-1", { days: 7 });
+    expect(result.items[0].streamingProvider!.platformId).toBe("p-netflix");
+  });
+
+  test("returns null when only purchase providers exist", () => {
     const tomorrow = daysFromNow(1);
     insertTvShow("tv-1", 100, 1, 1, { airDates: [tomorrow] });
     insertStatus("user-1", "tv-1", "in_progress");

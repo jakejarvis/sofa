@@ -4,25 +4,17 @@ import { db } from "../client";
 import { session, verification } from "../schema";
 
 export function deleteExpiredSessions(): number {
-  const now = new Date();
-  const count = db
-    .select({ id: session.id })
-    .from(session)
-    .where(lt(session.expiresAt, now))
+  return db
+    .delete(session)
+    .where(lt(session.expiresAt, new Date()))
+    .returning({ id: session.id })
     .all().length;
-  if (count === 0) return 0;
-  db.delete(session).where(lt(session.expiresAt, now)).run();
-  return count;
 }
 
 export function deleteExpiredVerifications(): number {
-  const now = new Date();
-  const count = db
-    .select({ id: verification.id })
-    .from(verification)
-    .where(lt(verification.expiresAt, now))
+  return db
+    .delete(verification)
+    .where(lt(verification.expiresAt, new Date()))
+    .returning({ id: verification.id })
     .all().length;
-  if (count === 0) return 0;
-  db.delete(verification).where(lt(verification.expiresAt, now)).run();
-  return count;
 }

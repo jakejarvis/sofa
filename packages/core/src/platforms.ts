@@ -1,5 +1,7 @@
 import {
   getAllPlatforms,
+  getTmdbProviderIdsByPlatformIds,
+  getTmdbProviderIdsForPlatform,
   getUserPlatformIds,
   getUserPlatforms,
   hasUserPlatforms,
@@ -28,4 +30,12 @@ export function updateUserPlatforms(userId: string, platformIds: string[]): void
 
 export function hasUserSetPlatforms(userId: string): boolean {
   return hasUserPlatforms(userId);
+}
+
+export function getPlatformTmdbIds(platformId: string): number[] {
+  return getTmdbProviderIdsForPlatform(platformId);
+}
+
+export function getPlatformTmdbIdMap(platformIds: string[]): Map<string, number[]> {
+  return getTmdbProviderIdsByPlatformIds(platformIds);
 }
