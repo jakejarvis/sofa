@@ -8,7 +8,7 @@ msgstr ""
 "Language: he\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-24 20:03\n"
+"PO-Revision-Date: 2026-03-25 01:01\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3;\n"
@@ -275,6 +275,10 @@ msgstr ""
 msgid "5★"
 msgstr ""
 
+#: apps/web/src/components/library/library-filters.tsx
+msgid "70s and earlier"
+msgstr ""
+
 #: apps/native/src/components/library/filter-sheet.tsx
 msgid "80s"
 msgstr "שנות ה-80"
@@ -284,7 +288,7 @@ msgid "90s"
 msgstr "שנות ה-90"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Account"
 msgstr "חשבון"
 
@@ -451,8 +455,8 @@ msgid "Any year"
 msgstr "כל שנה"
 
 #: apps/web/src/routes/_app/settings.tsx
-msgid "App Settings"
-msgstr "הגדרות אפליקציה"
+#~ msgid "App Settings"
+#~ msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Application"
@@ -540,8 +544,13 @@ msgid "backups."
 msgstr "גיבויים."
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Buy"
-msgstr "רכישה"
+#~ msgid "Buy"
+#~ msgstr ""
+
+#: apps/native/src/app/title/[id].tsx
+#: apps/web/src/components/titles/title-availability.tsx
+msgid "Buy or Rent"
+msgstr ""
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Cache management"
@@ -661,8 +670,12 @@ msgstr "בחר כיצד לייבא את נתוני {sourceLabel} שלך."
 #~ msgstr "Choose your preferred display language"
 
 #: apps/web/src/components/settings/streaming-services-section.tsx
-msgid "Choose your subscriptions"
-msgstr "בחר את המנויים שלך"
+msgid "Choose your preferred streaming platforms"
+msgstr ""
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+#~ msgid "Choose your subscriptions"
+#~ msgstr "Choose your subscriptions"
 
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
@@ -1427,8 +1440,8 @@ msgid "Finished importing your Sofa export."
 msgstr "ייבוא הנתונים מ-Sofa שלך הושלם."
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Free"
-msgstr "חינם"
+#~ msgid "Free"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Free up disk space by clearing cached metadata and images"
@@ -1573,7 +1586,7 @@ msgid "Image cache and backup disk usage"
 msgstr "שימוש בדיסק של מטמון תמונות וגיבויים"
 
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Import"
 msgstr "ייבוא"
 
@@ -1673,7 +1686,7 @@ msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "התקן את תוסף ה-Webhook מקטלוג התוספים של Jellyfin"
 
 #: apps/native/src/components/settings/integrations-section.tsx
-#: apps/web/src/components/settings/integrations-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Integrations"
 msgstr "אינטגרציות"
 
@@ -2346,7 +2359,6 @@ msgstr "לפני 1970"
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/web/src/components/library/library-filters.tsx
-#: apps/web/src/components/library/library-filters.tsx
 msgid "Pre-1980"
 msgstr "לפני 1980"
 
@@ -2653,8 +2665,8 @@ msgid "Removed from library"
 msgstr "הוסר מהספרייה"
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Rent"
-msgstr "השכרה"
+#~ msgid "Rent"
+#~ msgstr ""
 
 #: apps/web/src/routes/setup.tsx
 msgid "Request an API key"
@@ -3114,6 +3126,7 @@ msgstr "הסטטוס עודכן"
 msgid "Storage"
 msgstr "אחסון"
 
+#: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Stream"
 msgstr "סטרימינג"
@@ -3123,8 +3136,16 @@ msgid "Streaming"
 msgstr "סטרימינג"
 
 #: apps/web/src/components/settings/streaming-services-section.tsx
-msgid "Streaming Services"
-msgstr "שירותי סטרימינג"
+msgid "Streaming data provided by <0/><1>JustWatch</1>"
+msgstr ""
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+#~ msgid "Streaming Services"
+#~ msgstr "Streaming Services"
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+msgid "Subscriptions"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Sunday"
@@ -3567,8 +3588,8 @@ msgstr "היסטוריית צפייה"
 
 #: apps/web/src/components/titles/title-availability.tsx
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Watch on {name}"
-msgstr "צפה ב-{name}"
+#~ msgid "Watch on {name}"
+#~ msgstr ""
 
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/lib/title-actions.ts
@@ -3651,8 +3672,8 @@ msgid "Where to Watch"
 msgstr "היכן לצפות"
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "With Ads"
-msgstr "עם פרסומות"
+#~ msgid "With Ads"
+#~ msgstr ""
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx

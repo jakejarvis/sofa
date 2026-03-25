@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-24 20:03\n"
+"PO-Revision-Date: 2026-03-25 01:01\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -275,6 +275,10 @@ msgstr ""
 msgid "5★"
 msgstr ""
 
+#: apps/web/src/components/library/library-filters.tsx
+msgid "70s and earlier"
+msgstr ""
+
 #: apps/native/src/components/library/filter-sheet.tsx
 msgid "80s"
 msgstr "80年代"
@@ -284,7 +288,7 @@ msgid "90s"
 msgstr "90年代"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Account"
 msgstr "账户"
 
@@ -451,8 +455,8 @@ msgid "Any year"
 msgstr "任意年份"
 
 #: apps/web/src/routes/_app/settings.tsx
-msgid "App Settings"
-msgstr "应用设置"
+#~ msgid "App Settings"
+#~ msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Application"
@@ -540,8 +544,13 @@ msgid "backups."
 msgstr "个备份。"
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Buy"
-msgstr "购买"
+#~ msgid "Buy"
+#~ msgstr ""
+
+#: apps/native/src/app/title/[id].tsx
+#: apps/web/src/components/titles/title-availability.tsx
+msgid "Buy or Rent"
+msgstr ""
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Cache management"
@@ -661,8 +670,12 @@ msgstr "选择导入 {sourceLabel} 数据的方式。"
 #~ msgstr "Choose your preferred display language"
 
 #: apps/web/src/components/settings/streaming-services-section.tsx
-msgid "Choose your subscriptions"
-msgstr "选择您的订阅频道"
+msgid "Choose your preferred streaming platforms"
+msgstr ""
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+#~ msgid "Choose your subscriptions"
+#~ msgstr "Choose your subscriptions"
 
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
@@ -1427,8 +1440,8 @@ msgid "Finished importing your Sofa export."
 msgstr "已完成导入您的 Sofa 导出文件。"
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Free"
-msgstr "免费"
+#~ msgid "Free"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Free up disk space by clearing cached metadata and images"
@@ -1573,7 +1586,7 @@ msgid "Image cache and backup disk usage"
 msgstr "图片缓存与备份磁盘用量"
 
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Import"
 msgstr "导入"
 
@@ -1673,7 +1686,7 @@ msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "从 Jellyfin 的插件目录安装 Webhook 插件"
 
 #: apps/native/src/components/settings/integrations-section.tsx
-#: apps/web/src/components/settings/integrations-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Integrations"
 msgstr "集成"
 
@@ -2346,7 +2359,6 @@ msgstr "1970 年前"
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/web/src/components/library/library-filters.tsx
-#: apps/web/src/components/library/library-filters.tsx
 msgid "Pre-1980"
 msgstr "1980 年前"
 
@@ -2653,8 +2665,8 @@ msgid "Removed from library"
 msgstr "已从媒体库中移除"
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Rent"
-msgstr "租借"
+#~ msgid "Rent"
+#~ msgstr ""
 
 #: apps/web/src/routes/setup.tsx
 msgid "Request an API key"
@@ -3114,6 +3126,7 @@ msgstr "状态已更新"
 msgid "Storage"
 msgstr "存储"
 
+#: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Stream"
 msgstr "流媒体"
@@ -3123,8 +3136,16 @@ msgid "Streaming"
 msgstr "流媒体"
 
 #: apps/web/src/components/settings/streaming-services-section.tsx
-msgid "Streaming Services"
-msgstr "流媒体服务"
+msgid "Streaming data provided by <0/><1>JustWatch</1>"
+msgstr ""
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+#~ msgid "Streaming Services"
+#~ msgstr "Streaming Services"
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+msgid "Subscriptions"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Sunday"
@@ -3567,8 +3588,8 @@ msgstr "观看历史"
 
 #: apps/web/src/components/titles/title-availability.tsx
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Watch on {name}"
-msgstr "在 {name} 观看"
+#~ msgid "Watch on {name}"
+#~ msgstr ""
 
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/lib/title-actions.ts
@@ -3651,8 +3672,8 @@ msgid "Where to Watch"
 msgstr "观看渠道"
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "With Ads"
-msgstr "含广告"
+#~ msgid "With Ads"
+#~ msgstr ""
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
