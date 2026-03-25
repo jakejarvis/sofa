@@ -8,7 +8,7 @@ msgstr ""
 "Language: ar\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-24 20:03\n"
+"PO-Revision-Date: 2026-03-25 01:01\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
@@ -275,6 +275,10 @@ msgstr ""
 msgid "5★"
 msgstr ""
 
+#: apps/web/src/components/library/library-filters.tsx
+msgid "70s and earlier"
+msgstr ""
+
 #: apps/native/src/components/library/filter-sheet.tsx
 msgid "80s"
 msgstr ""
@@ -284,7 +288,7 @@ msgid "90s"
 msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Account"
 msgstr "الحساب"
 
@@ -451,8 +455,8 @@ msgid "Any year"
 msgstr "أي سنة"
 
 #: apps/web/src/routes/_app/settings.tsx
-msgid "App Settings"
-msgstr "إعدادات التطبيق"
+#~ msgid "App Settings"
+#~ msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Application"
@@ -540,8 +544,13 @@ msgid "backups."
 msgstr "نسخ احتياطية."
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Buy"
-msgstr "شراء"
+#~ msgid "Buy"
+#~ msgstr ""
+
+#: apps/native/src/app/title/[id].tsx
+#: apps/web/src/components/titles/title-availability.tsx
+msgid "Buy or Rent"
+msgstr ""
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Cache management"
@@ -661,8 +670,12 @@ msgstr "اختر طريقة استيراد بيانات {sourceLabel} الخاص
 #~ msgstr "Choose your preferred display language"
 
 #: apps/web/src/components/settings/streaming-services-section.tsx
-msgid "Choose your subscriptions"
-msgstr "اختر اشتراكاتك"
+msgid "Choose your preferred streaming platforms"
+msgstr ""
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+#~ msgid "Choose your subscriptions"
+#~ msgstr "Choose your subscriptions"
 
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
@@ -1427,8 +1440,8 @@ msgid "Finished importing your Sofa export."
 msgstr "تم الانتهاء من استيراد ملف تصدير Sofa."
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Free"
-msgstr "مجاناً"
+#~ msgid "Free"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Free up disk space by clearing cached metadata and images"
@@ -1573,7 +1586,7 @@ msgid "Image cache and backup disk usage"
 msgstr "استخدام القرص لذاكرة التخزين المؤقت للصور والنسخ الاحتياطية"
 
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Import"
 msgstr "الاستيراد"
 
@@ -1673,7 +1686,7 @@ msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "ثبّت إضافة Webhook من كتالوج إضافات Jellyfin"
 
 #: apps/native/src/components/settings/integrations-section.tsx
-#: apps/web/src/components/settings/integrations-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Integrations"
 msgstr "التكاملات"
 
@@ -2346,7 +2359,6 @@ msgstr "قبل 1970"
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/web/src/components/library/library-filters.tsx
-#: apps/web/src/components/library/library-filters.tsx
 msgid "Pre-1980"
 msgstr "قبل 1980"
 
@@ -2653,8 +2665,8 @@ msgid "Removed from library"
 msgstr "تمت الإزالة من المكتبة"
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Rent"
-msgstr "استئجار"
+#~ msgid "Rent"
+#~ msgstr ""
 
 #: apps/web/src/routes/setup.tsx
 msgid "Request an API key"
@@ -3114,6 +3126,7 @@ msgstr "تم تحديث الحالة"
 msgid "Storage"
 msgstr "التخزين"
 
+#: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Stream"
 msgstr "بث"
@@ -3123,8 +3136,16 @@ msgid "Streaming"
 msgstr "البث"
 
 #: apps/web/src/components/settings/streaming-services-section.tsx
-msgid "Streaming Services"
-msgstr "خدمات البث"
+msgid "Streaming data provided by <0/><1>JustWatch</1>"
+msgstr ""
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+#~ msgid "Streaming Services"
+#~ msgstr "Streaming Services"
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+msgid "Subscriptions"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Sunday"
@@ -3567,8 +3588,8 @@ msgstr "سجل المشاهدة"
 
 #: apps/web/src/components/titles/title-availability.tsx
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Watch on {name}"
-msgstr "مشاهدة على {name}"
+#~ msgid "Watch on {name}"
+#~ msgstr ""
 
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/lib/title-actions.ts
@@ -3651,8 +3672,8 @@ msgid "Where to Watch"
 msgstr "أين تشاهد"
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "With Ads"
-msgstr "مع إعلانات"
+#~ msgid "With Ads"
+#~ msgstr ""
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx

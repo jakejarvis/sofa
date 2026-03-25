@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-24 20:03\n"
+"PO-Revision-Date: 2026-03-25 01:01\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -275,6 +275,10 @@ msgstr ""
 msgid "5★"
 msgstr ""
 
+#: apps/web/src/components/library/library-filters.tsx
+msgid "70s and earlier"
+msgstr ""
+
 #: apps/native/src/components/library/filter-sheet.tsx
 msgid "80s"
 msgstr "80년대"
@@ -284,7 +288,7 @@ msgid "90s"
 msgstr "90년대"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Account"
 msgstr "계정"
 
@@ -451,8 +455,8 @@ msgid "Any year"
 msgstr "모든 연도"
 
 #: apps/web/src/routes/_app/settings.tsx
-msgid "App Settings"
-msgstr "앱 설정"
+#~ msgid "App Settings"
+#~ msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Application"
@@ -540,8 +544,13 @@ msgid "backups."
 msgstr "백업."
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Buy"
-msgstr "구매"
+#~ msgid "Buy"
+#~ msgstr ""
+
+#: apps/native/src/app/title/[id].tsx
+#: apps/web/src/components/titles/title-availability.tsx
+msgid "Buy or Rent"
+msgstr ""
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Cache management"
@@ -661,8 +670,12 @@ msgstr "{sourceLabel} 데이터 가져오기 방법을 선택하세요."
 #~ msgstr "Choose your preferred display language"
 
 #: apps/web/src/components/settings/streaming-services-section.tsx
-msgid "Choose your subscriptions"
-msgstr "구독 서비스를 선택하세요"
+msgid "Choose your preferred streaming platforms"
+msgstr ""
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+#~ msgid "Choose your subscriptions"
+#~ msgstr "Choose your subscriptions"
 
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
@@ -1427,8 +1440,8 @@ msgid "Finished importing your Sofa export."
 msgstr "Sofa 내보내기 가져오기가 완료되었습니다."
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Free"
-msgstr "무료"
+#~ msgid "Free"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Free up disk space by clearing cached metadata and images"
@@ -1573,7 +1586,7 @@ msgid "Image cache and backup disk usage"
 msgstr "이미지 캐시 및 백업 디스크 사용량"
 
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Import"
 msgstr "가져오기"
 
@@ -1673,7 +1686,7 @@ msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "Jellyfin 플러그인 카탈로그에서 Webhook 플러그인을 설치하세요"
 
 #: apps/native/src/components/settings/integrations-section.tsx
-#: apps/web/src/components/settings/integrations-section.tsx
+#: apps/web/src/routes/_app/settings.tsx
 msgid "Integrations"
 msgstr "통합"
 
@@ -2346,7 +2359,6 @@ msgstr "1970년 이전"
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/web/src/components/library/library-filters.tsx
-#: apps/web/src/components/library/library-filters.tsx
 msgid "Pre-1980"
 msgstr "1980년 이전"
 
@@ -2653,8 +2665,8 @@ msgid "Removed from library"
 msgstr "라이브러리에서 제거되었습니다"
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Rent"
-msgstr "대여"
+#~ msgid "Rent"
+#~ msgstr ""
 
 #: apps/web/src/routes/setup.tsx
 msgid "Request an API key"
@@ -3114,6 +3126,7 @@ msgstr "상태가 업데이트되었습니다"
 msgid "Storage"
 msgstr "저장공간"
 
+#: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Stream"
 msgstr "스트리밍"
@@ -3123,8 +3136,16 @@ msgid "Streaming"
 msgstr "스트리밍"
 
 #: apps/web/src/components/settings/streaming-services-section.tsx
-msgid "Streaming Services"
-msgstr "스트리밍 서비스"
+msgid "Streaming data provided by <0/><1>JustWatch</1>"
+msgstr ""
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+#~ msgid "Streaming Services"
+#~ msgstr "Streaming Services"
+
+#: apps/web/src/components/settings/streaming-services-section.tsx
+msgid "Subscriptions"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Sunday"
@@ -3567,8 +3588,8 @@ msgstr "시청 기록"
 
 #: apps/web/src/components/titles/title-availability.tsx
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "Watch on {name}"
-msgstr "{name}에서 시청"
+#~ msgid "Watch on {name}"
+#~ msgstr ""
 
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/lib/title-actions.ts
@@ -3651,8 +3672,8 @@ msgid "Where to Watch"
 msgstr "시청 가능한 곳"
 
 #: apps/web/src/components/titles/title-availability.tsx
-msgid "With Ads"
-msgstr "광고 포함"
+#~ msgid "With Ads"
+#~ msgstr ""
 
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
