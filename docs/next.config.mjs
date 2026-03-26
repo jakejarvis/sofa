@@ -13,6 +13,11 @@ const config = {
   async redirects() {
     return [
       {
+        source: "/docs/api",
+        destination: "/docs/api/account/account.integrations.create",
+        permanent: false,
+      },
+      {
         source: "/support",
         destination: "https://github.com/jakejarvis/sofa/discussions",
         permanent: false,
@@ -27,6 +32,11 @@ const config = {
         destination: "https://testflight.apple.com/join/tjSddcaZ",
         permanent: false,
       },
+      {
+        source: "/android",
+        destination: "https://play.google.com/store/apps/details?id=com.jakejarvis.sofa",
+        permanent: false,
+      }
     ];
   },
   async rewrites() {

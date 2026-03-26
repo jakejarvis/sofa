@@ -11,8 +11,8 @@
   <a href="https://crowdin.com/project/sofa"><img alt="Crowdin" src="https://badges.crowdin.net/sofa/localized.svg" /></a>
 </p>
 <p align="center">
-  <a href="https://apps.apple.com/us/app/sofa-tv-movie-tracker/id6760432427"><img alt="App Store" src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" /></a><br />
-  <sub>Play Store soon™</sub>
+  <a href="https://apps.apple.com/us/app/sofa-tv-movie-tracker/id6760432427"><img alt="App Store" src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="40" width="120" /></a>
+  <a href="https://play.google.com/store/apps/details?id=com.jakejarvis.sofa"><img alt="GetItOnGooglePlay_Badge_Web_color_English" src="https://github.com/user-attachments/assets/f04efab4-a129-4392-be95-90c97372231f" height="40" width="135" /></a>
 </p>
 
 [Sofa](https://sofa.watch) is a self-hosted movie and TV tracker for nerds. Track what you've watched, discover what's next, and plug your data into your existing home media stack. All without anything leaving your homelab. 🍿
