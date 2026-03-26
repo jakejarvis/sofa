@@ -57,7 +57,7 @@ export default function UpcomingScreen() {
 
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage, isRefetching } =
     useInfiniteQuery(
-      orpc.dashboard.upcoming.infiniteOptions({
+      orpc.library.upcoming.infiniteOptions({
         input: (pageParam: string | undefined) => ({
           days: 90,
           limit: 20,
@@ -83,7 +83,7 @@ export default function UpcomingScreen() {
   );
 
   const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: orpc.dashboard.upcoming.key() });
+    queryClient.invalidateQueries({ queryKey: orpc.library.upcoming.key() });
   }, []);
 
   const onEndReached = useCallback(() => {

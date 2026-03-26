@@ -4,8 +4,10 @@ import {
   batchInsertEpisodeWatchesTransaction,
   batchInsertMissingEpisodeWatches,
   countDistinctEpisodeWatches,
+  deleteAllEpisodeWatchesForTitle,
   deleteEpisodeWatch,
   deleteEpisodeWatches,
+  deleteMovieWatches,
   deleteRating,
   deleteTitleStatus,
   getAllEpisodeIdsForTitle,
@@ -154,6 +156,24 @@ export function unwatchSeason(userId: string, seasonId: string) {
   const watchCount = countDistinctEpisodeWatches(userId, allEpIds);
   if (watchCount === 0) {
     setTitleStatus(userId, season.titleId, "watchlist");
+  }
+}
+
+export function unwatchMovie(userId: string, titleId: string) {
+  deleteMovieWatches(userId, titleId);
+
+  const existing = getTitleStatus(userId, titleId);
+  if (existing?.status === "completed") {
+    setTitleStatus(userId, titleId, "watchlist");
+  }
+}
+
+export function unwatchSeries(userId: string, titleId: string) {
+  deleteAllEpisodeWatchesForTitle(userId, titleId);
+
+  const existing = getTitleStatus(userId, titleId);
+  if (existing && existing.status !== "watchlist") {
+    setTitleStatus(userId, titleId, "watchlist");
   }
 }
 

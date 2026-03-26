@@ -104,9 +104,9 @@ export default function TitleDetailScreen() {
     "--color-title-accent-foreground",
   ]) as [string, string, string];
 
-  const detail = useQuery(orpc.titles.detail.queryOptions({ input: { id } }));
-  const userInfo = useQuery(orpc.titles.userInfo.queryOptions({ input: { id } }));
-  const recommendations = useQuery(orpc.titles.recommendations.queryOptions({ input: { id } }));
+  const detail = useQuery(orpc.titles.get.queryOptions({ input: { id } }));
+  const userInfo = useQuery(orpc.tracking.userInfo.queryOptions({ input: { id } }));
+  const recommendations = useQuery(orpc.titles.similar.queryOptions({ input: { id } }));
 
   const {
     updateStatus,
@@ -425,7 +425,7 @@ export default function TitleDetailScreen() {
 
             {title.type === "movie" && (
               <Pressable
-                onPress={() => watchMovie.mutate({ id })}
+                onPress={() => watchMovie.mutate({ scope: "movie", ids: [id] })}
                 disabled={watchMovie.isPending}
                 className="bg-title-accent flex-row items-center gap-1.5 rounded-lg px-4 py-2"
               >

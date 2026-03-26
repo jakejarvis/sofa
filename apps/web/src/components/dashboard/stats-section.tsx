@@ -8,7 +8,7 @@ import { orpc } from "@/lib/orpc/client";
 import { StatsDisplay, StatsSectionSkeleton } from "./stats-display";
 
 export function StatsSection() {
-  const { data: stats, isPending } = useQuery(orpc.dashboard.stats.queryOptions());
+  const { data: stats, isPending } = useQuery(orpc.tracking.stats.queryOptions());
 
   if (isPending) return <StatsSectionSkeleton />;
   if (!stats) return null;

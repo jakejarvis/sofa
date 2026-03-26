@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_app/people/$id")({
   loader: async ({ params, context }) => {
     try {
       const data = await context.queryClient.ensureInfiniteQueryData(
-        orpc.people.detail.infiniteOptions({
+        orpc.people.get.infiniteOptions({
           input: (pageParam: number) => ({
             id: params.id,
             page: pageParam,

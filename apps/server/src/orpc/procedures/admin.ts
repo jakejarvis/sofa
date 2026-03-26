@@ -24,7 +24,44 @@ import { pauseJobs, rescheduleBackup, resumeJobs, triggerJob as triggerCronJob }
 import { os } from "../context";
 import { admin } from "../middleware";
 
-// ─── Backups ───────────────────────────────────────────────────
+// ─── Settings (consolidated) ──────────────────────────────────
+
+export const settingsGet = os.admin.settings.get.use(admin).handler(() => {
+  const updateCheckEnabled = isUpdateCheckEnabled();
+  const check = updateCheckEnabled ? getCachedUpdateCheck() : null;
+
+  return {
+    registration: {
+      open: getSetting("registrationOpen") === "true",
+    },
+    updateCheck: {
+      enabled: updateCheckEnabled,
+      updateAvailable: check?.updateAvailable ?? null,
+      currentVersion: check?.currentVersion ?? null,
+      latestVersion: check?.latestVersion ?? null,
+      releaseUrl: check?.releaseUrl ?? null,
+      lastCheckedAt: check?.lastCheckedAt ?? null,
+    },
+    telemetry: {
+      enabled: isTelemetryEnabled(),
+      lastReportedAt: getSetting("telemetryLastReportedAt") ?? null,
+    },
+  };
+});
+
+export const settingsUpdate = os.admin.settings.update.use(admin).handler(({ input }) => {
+  if (input.registration) {
+    setSetting("registrationOpen", String(input.registration.open));
+  }
+  if (input.updateCheck) {
+    setSetting("updateCheckEnabled", String(input.updateCheck.enabled));
+  }
+  if (input.telemetry) {
+    setSetting("telemetryEnabled", String(input.telemetry.enabled));
+  }
+});
+
+// ─── Backups ──────────────────────────────────────────────────
 
 export const backupsList = os.admin.backups.list.use(admin).handler(async () => {
   const backups = await listBackups();
@@ -42,7 +79,6 @@ export const backupsDelete = os.admin.backups.delete.use(admin).handler(async ({
 export const backupsRestore = os.admin.backups.restore
   .use(admin)
   .handler(async ({ input: file }) => {
-    // Stream upload to disk to avoid buffering the entire file in memory
     await ensureBackupDir();
     const tmpPath = path.join(BACKUP_DIR, `.upload-${Date.now()}-${crypto.randomUUID()}.db`);
     pauseJobs();
@@ -50,7 +86,6 @@ export const backupsRestore = os.admin.backups.restore
       await Bun.write(tmpPath, file);
       await restoreFromBackup(tmpPath);
     } catch (err) {
-      // Clean up the upload file if restoreFromBackup didn't consume it
       const f = Bun.file(tmpPath);
       if (await f.exists()) await f.delete();
       if (err instanceof ORPCError) throw err;
@@ -89,42 +124,7 @@ export const backupsUpdateSchedule = os.admin.backups.updateSchedule
     }
   });
 
-// ─── Registration ──────────────────────────────────────────────
-
-export const registration = os.admin.registration.use(admin).handler(() => {
-  return { open: getSetting("registrationOpen") === "true" };
-});
-
-export const toggleRegistration = os.admin.toggleRegistration.use(admin).handler(({ input }) => {
-  setSetting("registrationOpen", String(input.open));
-});
-
-// ─── Update Check ──────────────────────────────────────────────
-
-export const updateCheck = os.admin.updateCheck.use(admin).handler(() => {
-  const enabled = isUpdateCheckEnabled();
-  const check = enabled ? getCachedUpdateCheck() : null;
-  return { enabled, updateCheck: check };
-});
-
-export const toggleUpdateCheck = os.admin.toggleUpdateCheck.use(admin).handler(({ input }) => {
-  setSetting("updateCheckEnabled", String(input.enabled));
-});
-
-// ─── Telemetry ────────────────────────────────────────────────
-
-export const telemetry = os.admin.telemetry.use(admin).handler(() => {
-  return {
-    enabled: isTelemetryEnabled(),
-    lastReportedAt: getSetting("telemetryLastReportedAt"),
-  };
-});
-
-export const toggleTelemetry = os.admin.toggleTelemetry.use(admin).handler(({ input }) => {
-  setSetting("telemetryEnabled", String(input.enabled));
-});
-
-// ─── Jobs ──────────────────────────────────────────────────────
+// ─── Jobs ─────────────────────────────────────────────────────
 
 export const triggerJob = os.admin.triggerJob.use(admin).handler(async ({ input }) => {
   const triggered = await triggerCronJob(input.name);
@@ -147,7 +147,7 @@ export const purgeImageCache = os.admin.purgeImageCache
   .use(admin)
   .handler(async () => purgeImagesFn());
 
-// ─── System Health ───────────────────────────────────────────────
+// ─── System Health ────────────────────────────────────────────
 
 export const systemHealth = os.admin.systemHealth.use(admin).handler(async () => {
   return await getSystemHealth();

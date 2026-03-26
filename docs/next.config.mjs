@@ -13,11 +13,6 @@ const config = {
   async redirects() {
     return [
       {
-        source: "/docs/api",
-        destination: "/docs/api/account/account.removeAvatar",
-        permanent: false,
-      },
-      {
         source: "/support",
         destination: "https://github.com/jakejarvis/sofa/discussions",
         permanent: false,

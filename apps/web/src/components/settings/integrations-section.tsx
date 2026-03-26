@@ -8,7 +8,7 @@ import { IntegrationCard, type IntegrationConnection } from "./integration-card"
 import { INTEGRATION_CONFIGS } from "./integration-configs";
 
 export function IntegrationsSection() {
-  const { data, isPending } = useQuery(orpc.integrations.list.queryOptions());
+  const { data, isPending } = useQuery(orpc.account.integrations.list.queryOptions());
   const [localConnections, setLocalConnections] = useState<IntegrationConnection[] | null>(null);
 
   // Use local state if user has modified connections, else use query data

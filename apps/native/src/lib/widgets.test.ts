@@ -33,7 +33,7 @@ vi.mock("@/lib/widget-assets", () => ({
 
 vi.mock("@/lib/orpc", () => ({
   client: {
-    dashboard: {
+    library: {
       continueWatching,
       upcoming,
     },

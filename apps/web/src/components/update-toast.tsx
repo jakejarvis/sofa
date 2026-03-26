@@ -4,9 +4,9 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 import { updateToastDismissedVersionAtom } from "@/lib/atoms/update-check";
-import type { UpdateCheckResult } from "@sofa/api/schemas";
+import type { AdminSettings } from "@sofa/api/schemas";
 
-export function UpdateToast({ data }: { data: UpdateCheckResult | null }) {
+export function UpdateToast({ data }: { data: AdminSettings["updateCheck"] | null }) {
   const { t } = useLingui();
   const [dismissedVersion, setDismissedVersion] = useAtom(updateToastDismissedVersionAtom);
 

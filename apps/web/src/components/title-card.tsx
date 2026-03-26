@@ -89,7 +89,7 @@ function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStat
   const [optimisticStatus, setOptimisticStatus] = useState<TitleStatus | null>(null);
 
   const quickAddMutation = useMutation(
-    orpc.titles.quickAdd.mutationOptions({
+    orpc.tracking.quickAdd.mutationOptions({
       onSuccess: () => setOptimisticStatus("in_watchlist"),
     }),
   );

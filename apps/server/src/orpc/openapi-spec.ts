@@ -21,21 +21,15 @@ import { implementedRouter } from "./router";
 
 export const schemaConverters = [new ZodToJsonSchemaConverter()];
 export const openApiTags = [
-  { name: "Titles", description: "Movie and TV show management" },
-  { name: "Episodes", description: "Episode watch tracking" },
-  { name: "Seasons", description: "Season watch tracking" },
+  { name: "Titles", description: "Movie and TV show metadata" },
+  { name: "Tracking", description: "Watch tracking, ratings, and status management" },
+  { name: "Library", description: "User library browsing and feeds" },
+  { name: "Discover", description: "Search, trending, and content discovery" },
   { name: "People", description: "Cast and crew information" },
-  { name: "Dashboard", description: "User dashboard data" },
-  { name: "Explore", description: "Discover trending and popular content" },
-  { name: "Search", description: "Search for movies and TV shows" },
-  {
-    name: "Discover",
-    description: "Advanced content discovery with filters",
-  },
+  { name: "Account", description: "User account and integrations" },
   { name: "System", description: "Server status and configuration" },
-  { name: "Integrations", description: "Media server integrations" },
   { name: "Admin", description: "Server administration" },
-  { name: "Account", description: "User account management" },
+  { name: "Imports", description: "Data import from external services" },
 ] as const;
 
 const generator = new OpenAPIGenerator({

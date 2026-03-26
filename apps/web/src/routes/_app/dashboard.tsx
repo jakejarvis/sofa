@@ -17,11 +17,11 @@ export const Route = createFileRoute("/_app/dashboard")({
   staleTime: 30_000,
   loader: async ({ context }) => {
     await Promise.all([
-      context.queryClient.ensureQueryData(orpc.dashboard.stats.queryOptions()),
-      context.queryClient.ensureQueryData(orpc.dashboard.continueWatching.queryOptions()),
-      context.queryClient.ensureQueryData(orpc.dashboard.recommendations.queryOptions()),
+      context.queryClient.ensureQueryData(orpc.tracking.stats.queryOptions()),
+      context.queryClient.ensureQueryData(orpc.library.continueWatching.queryOptions()),
+      context.queryClient.ensureQueryData(orpc.discover.recommendations.queryOptions()),
       context.queryClient.ensureQueryData(
-        orpc.dashboard.upcoming.queryOptions({ input: { days: 7, limit: 5 } }),
+        orpc.library.upcoming.queryOptions({ input: { days: 7, limit: 5 } }),
       ),
       context.queryClient.ensureQueryData(
         orpc.library.list.queryOptions({ input: { page: 1, limit: 10 } }),

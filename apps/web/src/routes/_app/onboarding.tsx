@@ -11,7 +11,7 @@ import { client, orpc } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_app/onboarding")({
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(orpc.platforms.list.queryOptions());
+    await context.queryClient.ensureQueryData(orpc.discover.platforms.queryOptions());
   },
   head: () => ({ meta: [{ title: "Get Started — Sofa" }] }),
   errorComponent: RouteError,
@@ -23,7 +23,7 @@ function OnboardingPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
 
-  const platformsQuery = useQuery(orpc.platforms.list.queryOptions());
+  const platformsQuery = useQuery(orpc.discover.platforms.queryOptions());
   const platforms = platformsQuery.data?.platforms ?? [];
 
   const handleToggle = useCallback((id: string) => {

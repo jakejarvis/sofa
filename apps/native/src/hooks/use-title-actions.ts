@@ -18,15 +18,20 @@ function resolveToast<TInput>(
   return typeof override === "function" ? override(input) : override;
 }
 
+interface WatchInput {
+  scope: string;
+  ids: string[];
+}
+
 interface UseTitleActionsOptions {
   toasts?: {
     quickAdd?: ToastOverride<{ id: string }>;
     updateStatus?: ToastOverride<{ id: string; status: string | null }>;
-    watchMovie?: ToastOverride<{ id: string }>;
+    watchMovie?: ToastOverride<WatchInput>;
     updateRating?: ToastOverride<{ id: string; stars: number }>;
-    watchEpisode?: ToastOverride<{ id: string }>;
-    unwatchEpisode?: ToastOverride<{ id: string }>;
-    watchSeason?: ToastOverride<{ id: string }>;
+    watchEpisode?: ToastOverride<WatchInput>;
+    unwatchEpisode?: ToastOverride<WatchInput>;
+    watchSeason?: ToastOverride<WatchInput>;
   };
 }
 
@@ -39,7 +44,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   const toastOverrides = options?.toasts;
 
   const quickAdd = useMutation(
-    orpc.titles.quickAdd.mutationOptions({
+    orpc.tracking.quickAdd.mutationOptions({
       onSuccess: (_data, input) => {
         toast.success(resolveToast(toastOverrides?.quickAdd, t`Added to watchlist`, input));
         invalidateTitleQueries();
@@ -53,7 +58,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   );
 
   const updateStatus = useMutation(
-    orpc.titles.updateStatus.mutationOptions({
+    orpc.tracking.updateStatus.mutationOptions({
       onSuccess: (_data, input) => {
         const statusMessages: Record<string, string> = {
           watchlist: t`Added to watchlist`,
@@ -69,7 +74,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   );
 
   const watchMovie = useMutation(
-    orpc.titles.watchMovie.mutationOptions({
+    orpc.tracking.watch.mutationOptions({
       onSuccess: (_data, input) => {
         toast.success(resolveToast(toastOverrides?.watchMovie, t`Marked as watched`, input));
         invalidateTitleQueries();
@@ -79,7 +84,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   );
 
   const updateRating = useMutation(
-    orpc.titles.updateRating.mutationOptions({
+    orpc.tracking.rate.mutationOptions({
       onSuccess: (_data, input) => {
         const stars = input.stars;
         const defaultMsg =
@@ -87,7 +92,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
             ? t`Rated ${plural(stars, { one: "# star", other: "# stars" })}`
             : t`Rating removed`;
         toast.success(resolveToast(toastOverrides?.updateRating, defaultMsg, input));
-        // Rating only invalidates title queries, not dashboard
+        // Rating only invalidates title queries, not tracking
         queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
       },
       onError: () => toast.error(t`Failed to update rating`),
@@ -95,7 +100,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   );
 
   const watchEpisode = useMutation(
-    orpc.episodes.watch.mutationOptions({
+    orpc.tracking.watch.mutationOptions({
       onSuccess: (_data, input) => {
         toast.success(resolveToast(toastOverrides?.watchEpisode, t`Episode watched`, input));
         invalidateTitleQueries();
@@ -105,7 +110,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   );
 
   const unwatchEpisode = useMutation(
-    orpc.episodes.unwatch.mutationOptions({
+    orpc.tracking.unwatch.mutationOptions({
       onSuccess: (_data, input) => {
         toast.success(resolveToast(toastOverrides?.unwatchEpisode, t`Episode unwatched`, input));
         invalidateTitleQueries();
@@ -115,7 +120,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   );
 
   const watchSeason = useMutation(
-    orpc.seasons.watch.mutationOptions({
+    orpc.tracking.watch.mutationOptions({
       onSuccess: (_data, input) => {
         toast.success(resolveToast(toastOverrides?.watchSeason, t`Season watched`, input));
         invalidateTitleQueries();

@@ -71,7 +71,7 @@ export default function PersonDetailScreen() {
 
   const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(
-      orpc.people.detail.infiniteOptions({
+      orpc.people.get.infiniteOptions({
         input: (pageParam: number) => ({ id, page: pageParam, limit: 20 }),
         initialPageParam: 1,
         getNextPageParam: (lastPage) =>

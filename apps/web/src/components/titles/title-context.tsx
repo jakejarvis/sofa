@@ -27,7 +27,7 @@ export function useTitleUserInfo() {
   const { titleId } = useTitleContext();
   const { data: session } = useSession();
   const { data } = useQuery({
-    ...orpc.titles.userInfo.queryOptions({ input: { id: titleId } }),
+    ...orpc.tracking.userInfo.queryOptions({ input: { id: titleId } }),
     enabled: !!session,
   });
   return {

@@ -48,7 +48,7 @@ export function FilterableTitleRow({
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
 
   const discover = useInfiniteQuery({
-    ...orpc.discover.infiniteOptions({
+    ...orpc.discover.browse.infiniteOptions({
       input:
         selectedGenre != null
           ? (pageParam: number) => ({

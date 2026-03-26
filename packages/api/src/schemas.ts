@@ -65,11 +65,23 @@ export const UpdateRatingInput = z
   })
   .meta({ description: "Set or clear a star rating for a title" });
 
-export const BatchWatchInput = z
+export const WatchScope = z
+  .enum(["movie", "episode", "season", "series"])
+  .describe("What the IDs refer to: movie title, episode, season, or entire TV series");
+
+export const WatchInput = z
   .object({
-    episodeIds: z.array(z.string()).min(1).describe("List of episode IDs to mark as watched"),
+    scope: WatchScope,
+    ids: z.array(z.string().min(1)).min(1).describe("IDs to mark as watched"),
   })
-  .meta({ description: "Batch of episode IDs to mark as watched" });
+  .meta({ description: "Mark one or more items as watched" });
+
+export const UnwatchInput = z
+  .object({
+    scope: WatchScope,
+    ids: z.array(z.string().min(1)).min(1).describe("IDs to unwatch"),
+  })
+  .meta({ description: "Remove watch records for one or more items" });
 
 // ─── Search / Discover inputs ──────────────────────────────────
 
@@ -138,24 +150,42 @@ export const CreateIntegrationInput = z
 
 // ─── Admin inputs ──────────────────────────────────────────────
 
-export const ToggleRegistrationInput = z.object({
-  open: z.boolean().describe("Whether new user registration is allowed"),
-});
-export const ToggleUpdateCheckInput = z.object({
-  enabled: z.boolean().describe("Whether automatic update checks are enabled"),
-});
-export const ToggleTelemetryInput = z.object({
-  enabled: z.boolean().describe("Whether anonymous telemetry reporting is enabled"),
-});
-export const TelemetryOutput = z
+export const AdminSettingsOutput = z
   .object({
-    enabled: z.boolean().describe("Whether telemetry is currently enabled"),
-    lastReportedAt: z
-      .string()
-      .nullable()
-      .describe("ISO 8601 timestamp of the last telemetry report, or null if never sent"),
+    registration: z.object({
+      open: z.boolean().describe("Whether new user registration is open"),
+    }),
+    updateCheck: z.object({
+      enabled: z.boolean().describe("Whether automatic update checks are enabled"),
+      updateAvailable: z.boolean().nullable().describe("Whether a newer version is available"),
+      currentVersion: z.string().nullable().describe("Currently running version"),
+      latestVersion: z.string().nullable().describe("Latest available version"),
+      releaseUrl: z.string().nullable().describe("URL to the latest release page"),
+      lastCheckedAt: z.string().nullable().describe("When the last check was performed (ISO 8601)"),
+    }),
+    telemetry: z.object({
+      enabled: z.boolean().describe("Whether anonymous telemetry is enabled"),
+      lastReportedAt: z
+        .string()
+        .nullable()
+        .describe("ISO 8601 timestamp of the last telemetry report"),
+    }),
   })
-  .meta({ description: "Telemetry configuration and last report time" });
+  .meta({ description: "Combined admin settings for registration, update checks, and telemetry" });
+
+export const AdminSettingsUpdateInput = z
+  .object({
+    registration: z
+      .object({ open: z.boolean().describe("Whether new user registration is allowed") })
+      .optional(),
+    updateCheck: z
+      .object({ enabled: z.boolean().describe("Whether automatic update checks are enabled") })
+      .optional(),
+    telemetry: z
+      .object({ enabled: z.boolean().describe("Whether anonymous telemetry is enabled") })
+      .optional(),
+  })
+  .meta({ description: "Partial update to admin settings" });
 
 const cronJobName = z.enum([
   "scheduledBackup",
@@ -616,27 +646,12 @@ export const LibraryGenresOutput = z
   })
   .meta({ description: "Genres that exist in the user's library" });
 
-// ─── Watch providers ──────────────────────────────────────────
-
-export const WatchProvidersOutput = z
-  .object({
-    providers: z.array(
-      z.object({
-        id: z.string().describe("Platform ID"),
-        tmdbProviderIds: z.array(z.number()).describe("TMDB provider IDs"),
-        name: z.string().describe("Provider display name"),
-        logoPath: z.string().nullable().describe("Provider logo image path"),
-      }),
-    ),
-  })
-  .meta({ description: "Available streaming providers for the user's region" });
-
-export const DashboardRecommendationsOutput = z
+export const DiscoverRecommendationsOutput = z
   .object({
     items: z.array(RecommendationItemSchema),
   })
   .meta({
-    description: "Personalized title recommendations for the dashboard",
+    description: "Personalized title recommendations based on the user's library",
   });
 
 // ─── Upcoming outputs ─────────────────────────────────────────
@@ -965,34 +980,6 @@ export const BackupScheduleOutput = z
   })
   .meta({ description: "Automated backup schedule configuration" });
 
-export const RegistrationOutput = z
-  .object({
-    open: z.boolean().describe("Whether new user registration is open"),
-  })
-  .meta({ description: "User registration status" });
-
-const UpdateCheckResultSchema = z
-  .object({
-    updateAvailable: z.boolean().describe("Whether a newer version is available"),
-    currentVersion: z.string().describe("Currently running version"),
-    latestVersion: z
-      .string()
-      .nullable()
-      .describe("Latest available version, or null if check failed"),
-    releaseUrl: z.string().nullable().describe("URL to the latest release page"),
-    lastCheckedAt: z.string().nullable().describe("When the last check was performed (ISO 8601)"),
-  })
-  .meta({ description: "Result of an update availability check" });
-
-export const UpdateCheckOutput = z
-  .object({
-    enabled: z.boolean().describe("Whether automatic update checks are enabled"),
-    updateCheck: UpdateCheckResultSchema.nullable().describe(
-      "Latest check result, or null if checks are disabled or never ran",
-    ),
-  })
-  .meta({ description: "Update check configuration and latest result" });
-
 export const TriggerJobOutput = z.object({
   ok: z.literal(true).describe("Always true on success"),
 });
@@ -1033,24 +1020,15 @@ export const PublicInfoOutput = z
     userCount: z.number().describe("Number of registered users"),
     registrationOpen: z.boolean().describe("Whether new user registration is open"),
     posterUrls: z.array(z.string()).describe("Poster image URLs for the login screen collage"),
-  })
-  .meta({
-    description: "Public instance information shown on the login/setup screen",
-  });
-
-export const AuthConfigOutput = z
-  .object({
     oidcEnabled: z.boolean().describe("Whether OIDC/SSO login is available"),
     oidcProviderName: z
       .string()
       .nullable()
       .describe("Display name of the OIDC provider (e.g. Authelia, Keycloak)"),
     passwordLoginDisabled: z.boolean().describe("Whether password-based login is disabled"),
-    registrationOpen: z.boolean().describe("Whether new user registration is open"),
-    userCount: z.number().describe("Number of registered users"),
   })
   .meta({
-    description: "Authentication provider configuration",
+    description: "Public instance information and authentication configuration",
   });
 
 // ─── Imports ──────────────────────────────────────────────────
@@ -1261,4 +1239,5 @@ export type TimePeriod = z.infer<typeof WatchHistoryInput>["period"];
 export type ImportJob = z.infer<typeof ImportJobSchema>;
 export type NormalizedImport = z.infer<typeof NormalizedImportSchema>;
 export type UpcomingItem = z.infer<typeof UpcomingItemSchema>;
-export type UpdateCheckResult = z.infer<typeof UpdateCheckResultSchema>;
+export type AdminSettings = z.infer<typeof AdminSettingsOutput>;
+export type WatchScopeType = z.infer<typeof WatchScope>;

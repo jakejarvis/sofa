@@ -158,12 +158,12 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
   const [episodePeriod, setEpisodePeriod] = useState<TimePeriod>("this_week");
 
   const { data: movieStats } = useQuery(
-    orpc.dashboard.watchHistory.queryOptions({
+    orpc.tracking.history.queryOptions({
       input: { type: "movie", period: moviePeriod },
     }),
   );
   const { data: episodeStats } = useQuery(
-    orpc.dashboard.watchHistory.queryOptions({
+    orpc.tracking.history.queryOptions({
       input: { type: "episode", period: episodePeriod },
     }),
   );

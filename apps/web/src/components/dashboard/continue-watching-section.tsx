@@ -8,7 +8,7 @@ import { ContinueWatchingList, ContinueWatchingSectionSkeleton } from "./continu
 import { FeedSection } from "./feed-section";
 
 export function ContinueWatchingSection() {
-  const { data, isPending } = useQuery(orpc.dashboard.continueWatching.queryOptions());
+  const { data, isPending } = useQuery(orpc.library.continueWatching.queryOptions());
 
   const { t } = useLingui();
 

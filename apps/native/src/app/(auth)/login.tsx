@@ -41,7 +41,7 @@ export default function LoginScreen() {
   const [errorFields, setErrorFields] = useState<Set<string>>(new Set());
   const [isSignedIn, setIsSignedIn] = useState(false);
 
-  const authConfig = useQuery(orpc.system.authConfig.queryOptions());
+  const publicInfo = useQuery(orpc.system.publicInfo.queryOptions());
 
   const form = useForm({
     defaultValues: { email: "", password: "" },
@@ -76,9 +76,9 @@ export default function LoginScreen() {
   const statusCompletedColor = useCSSVariable("--color-status-completed") as string;
   const serverHost = splitUrl(getServerUrl()).host;
 
-  const showPasswordLogin = !authConfig.data?.passwordLoginDisabled;
-  const showOidc = authConfig.data?.oidcEnabled;
-  const showRegister = authConfig.data?.registrationOpen;
+  const showPasswordLogin = !publicInfo.data?.passwordLoginDisabled;
+  const showOidc = publicInfo.data?.oidcEnabled;
+  const showRegister = publicInfo.data?.registrationOpen;
 
   const clearFieldError = (name: string) => {
     if (errorFields.has(name)) {
@@ -94,7 +94,7 @@ export default function LoginScreen() {
     <AuthScreen title="Sofa" subtitle={t`Sign in to continue`}>
       {showOidc &&
         (() => {
-          const providerName = authConfig.data?.oidcProviderName ?? "SSO";
+          const providerName = publicInfo.data?.oidcProviderName ?? "SSO";
           return (
             <Animated.View entering={FadeInDown.duration(300).delay(100)} className="mb-4">
               <Button

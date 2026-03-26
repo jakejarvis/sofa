@@ -3,18 +3,18 @@ import { z } from "zod";
 
 import { AppErrorCode, appErrorData } from "./errors";
 import {
-  AuthConfigOutput,
+  AdminSettingsOutput,
+  AdminSettingsUpdateInput,
   BackupCreateOutput,
   BackupScheduleOutput,
   BackupsListOutput,
-  BatchWatchInput,
   ContinueWatchingOutput,
   CreateImportJobInput,
   CreateIntegrationInput,
-  DashboardRecommendationsOutput,
   DashboardStatsOutput,
   DiscoverInput,
   DiscoverOutput,
+  DiscoverRecommendationsOutput,
   FilenameParam,
   GenresOutput,
   IdParam,
@@ -30,37 +30,32 @@ import {
   PageParam,
   PaginatedInput,
   ParseFileInput,
-  PlatformsListOutput,
   ParsePayloadInput,
   PersonDetailOutput,
+  PlatformsListOutput,
   PopularOutput,
   ProviderParam,
   PublicInfoOutput,
   PurgeImageCacheOutput,
   PurgeMetadataCacheOutput,
   QuickAddOutput,
-  RegistrationOutput,
   RestoreBackupInput,
   SearchInput,
   SearchOutput,
   SystemHealthOutput,
   SystemStatusOutput,
-  TelemetryOutput,
   TitleDetailOutput,
   TitleRecommendationsOutput,
-  ToggleRegistrationInput,
-  ToggleTelemetryInput,
-  ToggleUpdateCheckInput,
   TrendingOutput,
   TrendingTypeParam,
   TriggerJobInput,
   TriggerJobOutput,
-  UpdateCheckOutput,
-  UpdateUserPlatformsInput,
+  UnwatchInput,
   UpdateNameInput,
   UpdateRatingInput,
   UpdateScheduleInput,
   UpdateStatusInput,
+  UpdateUserPlatformsInput,
   UpcomingInput,
   UpcomingOutput,
   UploadAvatarInput,
@@ -69,12 +64,20 @@ import {
   UserPlatformsOutput,
   WatchHistoryInput,
   WatchHistoryOutput,
-  WatchProvidersOutput,
+  WatchInput,
 } from "./schemas";
 
+const tmdbNotConfiguredError = {
+  PRECONDITION_FAILED: {
+    message: "TMDB API key is not configured",
+    data: appErrorData(AppErrorCode.TMDB_NOT_CONFIGURED),
+  },
+} as const;
+
 export const contract = {
+  // ─── Titles ─────────────────────────────────────────────────
   titles: {
-    detail: oc
+    get: oc
       .route({
         method: "GET",
         path: "/titles/{id}",
@@ -92,77 +95,82 @@ export const contract = {
           data: appErrorData(AppErrorCode.TITLE_NOT_FOUND),
         },
       }),
+    similar: oc
+      .route({
+        method: "GET",
+        path: "/titles/{id}/similar",
+        tags: ["Titles"],
+        summary: "Get similar titles",
+        description:
+          "Fetch similar titles based on locally cached recommendation data, along with the user's statuses for each.",
+        successDescription: "Similar titles with user statuses",
+      })
+      .input(IdParam)
+      .output(TitleRecommendationsOutput),
+  },
+
+  // ─── Tracking ───────────────────────────────────────────────
+  tracking: {
+    watch: oc
+      .route({
+        method: "POST",
+        path: "/tracking/watch",
+        tags: ["Tracking"],
+        summary: "Mark items as watched",
+        description:
+          "Mark one or more items as watched. Use scope to indicate what the IDs refer to: movie (title IDs), episode (episode IDs), season (season IDs), or series (title IDs to mark all episodes).",
+      })
+      .input(WatchInput)
+      .output(z.void()),
+    unwatch: oc
+      .route({
+        method: "POST",
+        path: "/tracking/unwatch",
+        tags: ["Tracking"],
+        summary: "Remove watch records",
+        description:
+          "Remove watch records for one or more items. Use scope to indicate what the IDs refer to: movie, episode, season, or series.",
+      })
+      .input(UnwatchInput)
+      .output(z.void()),
     updateStatus: oc
       .route({
         method: "PUT",
-        path: "/titles/{id}/status",
-        tags: ["Titles"],
+        path: "/tracking/titles/{id}/status",
+        tags: ["Tracking"],
         summary: "Update tracking status",
         description:
           "Set the user's tracking status for a title. Use null to remove the title from the library entirely.",
       })
       .input(UpdateStatusInput)
       .output(z.void()),
-    updateRating: oc
+    rate: oc
       .route({
         method: "PUT",
-        path: "/titles/{id}/rating",
-        tags: ["Titles"],
+        path: "/tracking/titles/{id}/rating",
+        tags: ["Tracking"],
         summary: "Rate a title",
         description: "Set a 0-5 star rating for a title. Use 0 to clear the rating.",
       })
       .input(UpdateRatingInput)
       .output(z.void()),
-    watchMovie: oc
-      .route({
-        method: "POST",
-        path: "/titles/{id}/watch",
-        tags: ["Titles"],
-        summary: "Mark movie as watched",
-        description: "Log a watch event for a movie. Automatically sets status to completed.",
-      })
-      .input(IdParam)
-      .output(z.void()),
-    watchAll: oc
-      .route({
-        method: "POST",
-        path: "/titles/{id}/watch-all",
-        tags: ["Titles"],
-        summary: "Mark all episodes watched",
-        description:
-          "Mark every episode of a TV show as watched. Requires seasons to be hydrated first.",
-      })
-      .input(IdParam)
-      .output(z.void()),
     userInfo: oc
       .route({
         method: "GET",
-        path: "/titles/{id}/user-info",
-        tags: ["Titles"],
-        summary: "Get user's title info",
+        path: "/tracking/titles/{id}",
+        tags: ["Tracking"],
+        summary: "Get user's tracking info for a title",
         description:
           "Fetch the current user's tracking status, rating, and watched episode IDs for a title.",
         successDescription: "User's status, rating, and list of watched episode IDs",
       })
       .input(IdParam)
       .output(UserInfoOutput),
-    recommendations: oc
-      .route({
-        method: "GET",
-        path: "/titles/{id}/recommendations",
-        tags: ["Titles"],
-        summary: "Get title recommendations",
-        description:
-          "Fetch similar titles based on locally cached recommendation data, along with the user's statuses for each.",
-        successDescription: "Recommended titles with user statuses",
-      })
-      .input(IdParam)
-      .output(TitleRecommendationsOutput),
     quickAdd: oc
       .route({
         method: "POST",
-        path: "/titles/{id}/quick-add",
-        tags: ["Titles"],
+        path: "/tracking/titles/{id}/quick-add",
+        tags: ["Tracking"],
         summary: "Quick add title to library",
         description:
           "Add a title to the user's watchlist and trigger a full TMDB import if needed. If the title already exists in the user's library, returns alreadyAdded: true.",
@@ -176,83 +184,32 @@ export const contract = {
           data: appErrorData(AppErrorCode.TITLE_NOT_FOUND),
         },
       }),
-  },
-  episodes: {
-    watch: oc
-      .route({
-        method: "POST",
-        path: "/episodes/{id}/watch",
-        tags: ["Episodes"],
-        summary: "Mark episode watched",
-        description: "Record a watch event for a single TV episode.",
-      })
-      .input(IdParam)
-      .output(z.void()),
-    unwatch: oc
-      .route({
-        method: "POST",
-        path: "/episodes/{id}/unwatch",
-        tags: ["Episodes"],
-        summary: "Mark episode unwatched",
-        description: "Remove the watch record for a single TV episode.",
-      })
-      .input(IdParam)
-      .output(z.void()),
-    batchWatch: oc
-      .route({
-        method: "POST",
-        path: "/episodes/batch-watch",
-        tags: ["Episodes"],
-        summary: "Batch mark episodes watched",
-        description:
-          "Record watch events for multiple episodes at once. Useful for marking a range of episodes as watched.",
-      })
-      .input(BatchWatchInput)
-      .output(z.void()),
-  },
-  seasons: {
-    watch: oc
-      .route({
-        method: "POST",
-        path: "/seasons/{id}/watch",
-        tags: ["Seasons"],
-        summary: "Mark season watched",
-        description: "Mark all episodes in a season as watched in a single operation.",
-      })
-      .input(IdParam)
-      .output(z.void()),
-    unwatch: oc
-      .route({
-        method: "POST",
-        path: "/seasons/{id}/unwatch",
-        tags: ["Seasons"],
-        summary: "Mark season unwatched",
-        description: "Remove all watch records for episodes in a season in a single operation.",
-      })
-      .input(IdParam)
-      .output(z.void()),
-  },
-  people: {
-    detail: oc
+    stats: oc
       .route({
         method: "GET",
-        path: "/people/{id}",
-        tags: ["People"],
-        summary: "Get person details",
+        path: "/tracking/stats",
+        tags: ["Tracking"],
+        summary: "Get watch statistics",
         description:
-          "Fetch a person's profile and paginated filmography. Imports from TMDB on first access if not yet cached locally.",
-        successDescription:
-          "Person profile, paginated filmography credits, and user statuses for their titles",
+          "Fetch summary counts for the current user: movies watched this month, episodes this week, library size, and completed titles.",
+        successDescription: "Aggregate watch statistics",
       })
-      .input(IdParam.merge(PaginatedInput))
-      .output(PersonDetailOutput)
-      .errors({
-        NOT_FOUND: {
-          message: "Person not found",
-          data: appErrorData(AppErrorCode.PERSON_NOT_FOUND),
-        },
-      }),
+      .output(DashboardStatsOutput),
+    history: oc
+      .route({
+        method: "GET",
+        path: "/tracking/history",
+        tags: ["Tracking"],
+        summary: "Get watch history",
+        description:
+          "Fetch the user's watch counts grouped by time period. Useful for rendering activity charts.",
+        successDescription: "Watch counts bucketed by time period",
+      })
+      .input(WatchHistoryInput)
+      .output(WatchHistoryOutput),
   },
+
+  // ─── Library ────────────────────────────────────────────────
   library: {
     list: oc
       .route({
@@ -277,46 +234,22 @@ export const contract = {
         successDescription: "Genres present in the library",
       })
       .output(LibraryGenresOutput),
-  },
-  dashboard: {
-    stats: oc
-      .route({
-        method: "GET",
-        path: "/dashboard/stats",
-        tags: ["Dashboard"],
-        summary: "Get dashboard statistics",
-        description:
-          "Fetch summary counts for the current user: movies watched this month, episodes this week, library size, and completed titles.",
-        successDescription: "Aggregate watch statistics",
-      })
-      .output(DashboardStatsOutput),
     continueWatching: oc
       .route({
         method: "GET",
-        path: "/dashboard/continue-watching",
-        tags: ["Dashboard"],
+        path: "/library/continue-watching",
+        tags: ["Library"],
         summary: "Get continue watching list",
         description:
           "Fetch TV shows the user is currently watching, with the next unwatched episode and progress for each.",
         successDescription: "In-progress shows with next episode and watch progress",
       })
       .output(ContinueWatchingOutput),
-    recommendations: oc
-      .route({
-        method: "GET",
-        path: "/dashboard/recommendations",
-        tags: ["Dashboard"],
-        summary: "Get personalized recommendations",
-        description:
-          "Fetch personalized title recommendations based on the user's library and watch history.",
-        successDescription: "Recommended titles",
-      })
-      .output(DashboardRecommendationsOutput),
     upcoming: oc
       .route({
         method: "GET",
-        path: "/dashboard/upcoming",
-        tags: ["Dashboard"],
+        path: "/library/upcoming",
+        tags: ["Library"],
         summary: "Get upcoming episodes and movies",
         description:
           "Fetch upcoming episodes and movie releases for titles in the user's library, sorted by date. Supports cursor-based pagination.",
@@ -324,25 +257,15 @@ export const contract = {
       })
       .input(UpcomingInput)
       .output(UpcomingOutput),
-    watchHistory: oc
-      .route({
-        method: "GET",
-        path: "/dashboard/watch-history",
-        tags: ["Dashboard"],
-        summary: "Get watch history",
-        description:
-          "Fetch the user's watch counts grouped by time period. Useful for rendering activity charts.",
-        successDescription: "Watch counts bucketed by time period",
-      })
-      .input(WatchHistoryInput)
-      .output(WatchHistoryOutput),
   },
-  explore: {
+
+  // ─── Discover ───────────────────────────────────────────────
+  discover: {
     trending: oc
       .route({
         method: "GET",
-        path: "/explore/trending",
-        tags: ["Explore"],
+        path: "/discover/trending",
+        tags: ["Discover"],
         summary: "Get trending titles",
         description:
           "Fetch today's trending movies and/or TV shows from TMDB, including a featured hero title and the user's statuses.",
@@ -350,17 +273,12 @@ export const contract = {
       })
       .input(TrendingTypeParam.merge(PageParam))
       .output(TrendingOutput)
-      .errors({
-        PRECONDITION_FAILED: {
-          message: "TMDB API key is not configured",
-          data: appErrorData(AppErrorCode.TMDB_NOT_CONFIGURED),
-        },
-      }),
+      .errors(tmdbNotConfiguredError),
     popular: oc
       .route({
         method: "GET",
-        path: "/explore/popular",
-        tags: ["Explore"],
+        path: "/discover/popular",
+        tags: ["Discover"],
         summary: "Get popular titles",
         description:
           "Fetch currently popular movies or TV shows from TMDB with the user's tracking statuses.",
@@ -368,17 +286,38 @@ export const contract = {
       })
       .input(MediaTypeParam.merge(PageParam))
       .output(PopularOutput)
-      .errors({
-        PRECONDITION_FAILED: {
-          message: "TMDB API key is not configured",
-          data: appErrorData(AppErrorCode.TMDB_NOT_CONFIGURED),
-        },
-      }),
+      .errors(tmdbNotConfiguredError),
+    search: oc
+      .route({
+        method: "GET",
+        path: "/discover/search",
+        tags: ["Discover"],
+        summary: "Search movies, TV shows, and people",
+        description:
+          "Full-text search across movies, TV shows, and people via TMDB. Optionally filter by media type.",
+        successDescription: "Search results with metadata",
+      })
+      .input(SearchInput)
+      .output(SearchOutput)
+      .errors(tmdbNotConfiguredError),
+    browse: oc
+      .route({
+        method: "GET",
+        path: "/discover/browse",
+        tags: ["Discover"],
+        summary: "Browse titles with filters",
+        description:
+          "Browse movies or TV shows filtered by genre, sorted by popularity. Returns user statuses and episode progress.",
+        successDescription: "Filtered titles with user statuses",
+      })
+      .input(DiscoverInput)
+      .output(DiscoverOutput)
+      .errors(tmdbNotConfiguredError),
     genres: oc
       .route({
         method: "GET",
-        path: "/explore/genres",
-        tags: ["Explore"],
+        path: "/discover/genres",
+        tags: ["Discover"],
         summary: "List genres",
         description:
           "Fetch the list of TMDB genres for movies or TV shows. Used to populate genre filters for discovery.",
@@ -386,64 +325,164 @@ export const contract = {
       })
       .input(MediaTypeParam)
       .output(GenresOutput)
-      .errors({
-        PRECONDITION_FAILED: {
-          message: "TMDB API key is not configured",
-          data: appErrorData(AppErrorCode.TMDB_NOT_CONFIGURED),
-        },
-      }),
-    watchProviders: oc
+      .errors(tmdbNotConfiguredError),
+    platforms: oc
       .route({
         method: "GET",
-        path: "/explore/watch-providers",
-        tags: ["Explore"],
-        summary: "List available watch providers",
+        path: "/discover/platforms",
+        tags: ["Discover"],
+        summary: "List available streaming platforms",
         description:
-          "Fetch the list of streaming providers available in the configured region. Used to populate provider filter dropdowns.",
-        successDescription: "Provider list with logos",
+          "Fetch all available streaming platforms, ordered by popularity. Includes subscription status for filtering.",
+        successDescription: "Platform list with logos and metadata",
       })
-      .input(MediaTypeParam)
-      .output(WatchProvidersOutput)
+      .output(PlatformsListOutput),
+    recommendations: oc
+      .route({
+        method: "GET",
+        path: "/discover/recommendations",
+        tags: ["Discover"],
+        summary: "Get personalized recommendations",
+        description:
+          "Fetch personalized title recommendations based on the user's library and watch history.",
+        successDescription: "Recommended titles",
+      })
+      .output(DiscoverRecommendationsOutput),
+  },
+
+  // ─── People ─────────────────────────────────────────────────
+  people: {
+    get: oc
+      .route({
+        method: "GET",
+        path: "/people/{id}",
+        tags: ["People"],
+        summary: "Get person details",
+        description:
+          "Fetch a person's profile and paginated filmography. Imports from TMDB on first access if not yet cached locally.",
+        successDescription:
+          "Person profile, paginated filmography credits, and user statuses for their titles",
+      })
+      .input(IdParam.merge(PaginatedInput))
+      .output(PersonDetailOutput)
       .errors({
-        PRECONDITION_FAILED: {
-          message: "TMDB API key is not configured",
-          data: appErrorData(AppErrorCode.TMDB_NOT_CONFIGURED),
+        NOT_FOUND: {
+          message: "Person not found",
+          data: appErrorData(AppErrorCode.PERSON_NOT_FOUND),
         },
       }),
   },
-  search: oc
-    .route({
-      method: "GET",
-      path: "/search",
-      tags: ["Search"],
-      summary: "Search movies, TV shows, and people",
-      description:
-        "Full-text search across movies, TV shows, and people via TMDB. Optionally filter by media type.",
-      successDescription: "Search results with metadata",
-    })
-    .input(SearchInput)
-    .output(SearchOutput)
-    .errors({
-      PRECONDITION_FAILED: { message: "TMDB API key is not configured" },
-    }),
-  discover: oc
-    .route({
-      method: "GET",
-      path: "/discover",
-      tags: ["Discover"],
-      summary: "Discover titles by genre",
-      description:
-        "Browse movies or TV shows filtered by genre, sorted by popularity. Returns user statuses and episode progress.",
-      successDescription: "Filtered titles with user statuses",
-    })
-    .input(DiscoverInput)
-    .output(DiscoverOutput)
-    .errors({
-      PRECONDITION_FAILED: {
-        message: "TMDB API key is not configured",
-        data: appErrorData(AppErrorCode.TMDB_NOT_CONFIGURED),
-      },
-    }),
+
+  // ─── Account ────────────────────────────────────────────────
+  account: {
+    updateName: oc
+      .route({
+        method: "PUT",
+        path: "/account/name",
+        tags: ["Account"],
+        summary: "Update display name",
+        description: "Change the current user's display name.",
+      })
+      .input(UpdateNameInput)
+      .output(z.void()),
+    uploadAvatar: oc
+      .route({
+        method: "POST",
+        path: "/account/avatar",
+        tags: ["Account"],
+        summary: "Upload avatar",
+        description:
+          "Upload a new profile avatar image. Accepts JPEG, PNG, WebP, or GIF up to 2 MB.",
+        successDescription: "URL of the uploaded avatar image",
+      })
+      .input(UploadAvatarInput)
+      .output(UploadAvatarOutput),
+    removeAvatar: oc
+      .route({
+        method: "DELETE",
+        path: "/account/avatar",
+        tags: ["Account"],
+        summary: "Remove avatar",
+        description: "Delete the current user's profile avatar, reverting to the default.",
+      })
+      .input(z.void())
+      .output(z.void()),
+    platforms: oc
+      .route({
+        method: "GET",
+        path: "/account/platforms",
+        tags: ["Account"],
+        summary: "Get user's streaming platforms",
+        description: "Fetch the current user's subscribed streaming platform IDs.",
+        successDescription: "List of platform IDs",
+      })
+      .output(UserPlatformsOutput),
+    updatePlatforms: oc
+      .route({
+        method: "PUT",
+        path: "/account/platforms",
+        tags: ["Account"],
+        summary: "Update streaming platforms",
+        description: "Set the current user's subscribed streaming platforms.",
+      })
+      .input(UpdateUserPlatformsInput)
+      .output(z.void()),
+    integrations: {
+      list: oc
+        .route({
+          method: "GET",
+          path: "/account/integrations",
+          tags: ["Account"],
+          summary: "List integrations",
+          description:
+            "Fetch all configured media server integrations for the current user, including recent webhook/sync events for each.",
+          successDescription: "Integrations with their recent events",
+        })
+        .output(IntegrationsListOutput),
+      create: oc
+        .route({
+          method: "POST",
+          path: "/account/integrations",
+          tags: ["Account"],
+          summary: "Create or update integration",
+          description:
+            "Create a new media server integration or update an existing one. Generates a unique webhook token for the provider.",
+          successDescription: "Created or updated integration with token",
+        })
+        .input(CreateIntegrationInput)
+        .output(IntegrationOutput),
+      delete: oc
+        .route({
+          method: "DELETE",
+          path: "/account/integrations/{provider}",
+          tags: ["Account"],
+          summary: "Delete integration",
+          description: "Remove a media server integration and all its event history.",
+        })
+        .input(ProviderParam)
+        .output(z.void()),
+      regenerateToken: oc
+        .route({
+          method: "POST",
+          path: "/account/integrations/{provider}/regenerate-token",
+          tags: ["Account"],
+          summary: "Regenerate webhook token",
+          description:
+            "Generate a new webhook token for an integration. The old token is immediately invalidated.",
+          successDescription: "Integration with new token",
+        })
+        .input(ProviderParam)
+        .output(IntegrationOutput)
+        .errors({
+          NOT_FOUND: {
+            message: "Integration not found",
+            data: appErrorData(AppErrorCode.INTEGRATION_NOT_FOUND),
+          },
+        }),
+    },
+  },
+
+  // ─── System ─────────────────────────────────────────────────
   system: {
     publicInfo: oc
       .route({
@@ -452,21 +491,10 @@ export const contract = {
         tags: ["System"],
         summary: "Get public instance info",
         description:
-          "Fetch public information about this Sofa instance. Does not require authentication. Used by the login screen to display instance details.",
-        successDescription: "Instance configuration and status",
+          "Fetch public information about this Sofa instance including authentication configuration. Does not require authentication.",
+        successDescription: "Instance configuration, auth settings, and status",
       })
       .output(PublicInfoOutput),
-    authConfig: oc
-      .route({
-        method: "GET",
-        path: "/system/auth-config",
-        tags: ["System"],
-        summary: "Get authentication config",
-        description:
-          "Fetch the authentication configuration including OIDC availability, password login status, and registration state. Does not require authentication.",
-        successDescription: "Authentication provider configuration",
-      })
-      .output(AuthConfigOutput),
     status: oc
       .route({
         method: "GET",
@@ -479,60 +507,33 @@ export const contract = {
       })
       .output(SystemStatusOutput),
   },
-  integrations: {
-    list: oc
-      .route({
-        method: "GET",
-        path: "/integrations",
-        tags: ["Integrations"],
-        summary: "List integrations",
-        description:
-          "Fetch all configured media server integrations for the current user, including recent webhook/sync events for each.",
-        successDescription: "Integrations with their recent events",
-      })
-      .output(IntegrationsListOutput),
-    create: oc
-      .route({
-        method: "POST",
-        path: "/integrations",
-        tags: ["Integrations"],
-        summary: "Create or update integration",
-        description:
-          "Create a new media server integration or update an existing one. Generates a unique webhook token for the provider.",
-        successDescription: "Created or updated integration with token",
-      })
-      .input(CreateIntegrationInput)
-      .output(IntegrationOutput),
-    delete: oc
-      .route({
-        method: "DELETE",
-        path: "/integrations/{provider}",
-        tags: ["Integrations"],
-        summary: "Delete integration",
-        description: "Remove a media server integration and all its event history.",
-      })
-      .input(ProviderParam)
-      .output(z.void()),
-    regenerateToken: oc
-      .route({
-        method: "POST",
-        path: "/integrations/{provider}/regenerate-token",
-        tags: ["Integrations"],
-        summary: "Regenerate webhook token",
-        description:
-          "Generate a new webhook token for an integration. The old token is immediately invalidated.",
-        successDescription: "Integration with new token",
-      })
-      .input(ProviderParam)
-      .output(IntegrationOutput)
-      .errors({
-        NOT_FOUND: {
-          message: "Integration not found",
-          data: appErrorData(AppErrorCode.INTEGRATION_NOT_FOUND),
-        },
-      }),
-  },
+
+  // ─── Admin ──────────────────────────────────────────────────
   admin: {
+    settings: {
+      get: oc
+        .route({
+          method: "GET",
+          path: "/admin/settings",
+          tags: ["Admin"],
+          summary: "Get admin settings",
+          description:
+            "Fetch all admin-configurable settings: registration, update checks, and telemetry.",
+          successDescription: "Current admin settings",
+        })
+        .output(AdminSettingsOutput),
+      update: oc
+        .route({
+          method: "PATCH",
+          path: "/admin/settings",
+          tags: ["Admin"],
+          summary: "Update admin settings",
+          description:
+            "Partially update admin settings. Only provided sections are changed; omitted sections keep their current values.",
+        })
+        .input(AdminSettingsUpdateInput)
+        .output(z.void()),
+    },
     backups: {
       list: oc
         .route({
@@ -615,68 +616,6 @@ export const contract = {
         .input(UpdateScheduleInput)
         .output(z.void()),
     },
-    registration: oc
-      .route({
-        method: "GET",
-        path: "/admin/registration",
-        tags: ["Admin"],
-        summary: "Get registration status",
-        description: "Check whether new user registration is currently open or closed.",
-        successDescription: "Registration open/closed state",
-      })
-      .output(RegistrationOutput),
-    toggleRegistration: oc
-      .route({
-        method: "PUT",
-        path: "/admin/registration",
-        tags: ["Admin"],
-        summary: "Toggle registration",
-        description: "Open or close new user registration.",
-      })
-      .input(ToggleRegistrationInput)
-      .output(z.void()),
-    updateCheck: oc
-      .route({
-        method: "GET",
-        path: "/admin/update-check",
-        tags: ["Admin"],
-        summary: "Get update check status",
-        description:
-          "Fetch whether automatic update checks are enabled, and the latest cached check result if available.",
-        successDescription: "Update check configuration and latest result",
-      })
-      .output(UpdateCheckOutput),
-    toggleUpdateCheck: oc
-      .route({
-        method: "PUT",
-        path: "/admin/update-check",
-        tags: ["Admin"],
-        summary: "Toggle update checks",
-        description: "Enable or disable automatic update checks against the public API.",
-      })
-      .input(ToggleUpdateCheckInput)
-      .output(z.void()),
-    telemetry: oc
-      .route({
-        method: "GET",
-        path: "/admin/telemetry",
-        tags: ["Admin"],
-        summary: "Get telemetry status",
-        description:
-          "Fetch whether anonymous telemetry is enabled and when the last report was sent.",
-        successDescription: "Telemetry configuration and last report time",
-      })
-      .output(TelemetryOutput),
-    toggleTelemetry: oc
-      .route({
-        method: "PUT",
-        path: "/admin/telemetry",
-        tags: ["Admin"],
-        summary: "Toggle telemetry",
-        description: "Enable or disable anonymous telemetry reporting.",
-      })
-      .input(ToggleTelemetryInput)
-      .output(z.void()),
     triggerJob: oc
       .route({
         method: "POST",
@@ -729,72 +668,8 @@ export const contract = {
       })
       .output(SystemHealthOutput),
   },
-  account: {
-    updateName: oc
-      .route({
-        method: "PUT",
-        path: "/account/name",
-        tags: ["Account"],
-        summary: "Update display name",
-        description: "Change the current user's display name.",
-      })
-      .input(UpdateNameInput)
-      .output(z.void()),
-    uploadAvatar: oc
-      .route({
-        method: "POST",
-        path: "/account/avatar",
-        tags: ["Account"],
-        summary: "Upload avatar",
-        description:
-          "Upload a new profile avatar image. Accepts JPEG, PNG, WebP, or GIF up to 2 MB.",
-        successDescription: "URL of the uploaded avatar image",
-      })
-      .input(UploadAvatarInput)
-      .output(UploadAvatarOutput),
-    removeAvatar: oc
-      .route({
-        method: "DELETE",
-        path: "/account/avatar",
-        tags: ["Account"],
-        summary: "Remove avatar",
-        description: "Delete the current user's profile avatar, reverting to the default.",
-      })
-      .input(z.void())
-      .output(z.void()),
-    platforms: oc
-      .route({
-        method: "GET",
-        path: "/account/platforms",
-        tags: ["Account"],
-        summary: "Get user's streaming platforms",
-        description: "Fetch the current user's subscribed streaming platform IDs.",
-        successDescription: "List of platform IDs",
-      })
-      .output(UserPlatformsOutput),
-    updatePlatforms: oc
-      .route({
-        method: "PUT",
-        path: "/account/platforms",
-        tags: ["Account"],
-        summary: "Update streaming platforms",
-        description: "Set the current user's subscribed streaming platforms.",
-      })
-      .input(UpdateUserPlatformsInput)
-      .output(z.void()),
-  },
-  platforms: {
-    list: oc
-      .route({
-        method: "GET",
-        path: "/platforms",
-        tags: ["Platforms"],
-        summary: "List all platforms",
-        description: "Fetch all available streaming platforms, ordered by popularity.",
-        successDescription: "All platforms with metadata",
-      })
-      .output(PlatformsListOutput),
-  },
+
+  // ─── Imports ────────────────────────────────────────────────
   imports: {
     parseFile: oc
       .route({

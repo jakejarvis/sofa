@@ -9,7 +9,7 @@ import { UpcomingRow } from "./upcoming-item";
 
 export function UpcomingSection() {
   const { data, isPending } = useQuery(
-    orpc.dashboard.upcoming.queryOptions({ input: { days: 7, limit: 5 } }),
+    orpc.library.upcoming.queryOptions({ input: { days: 7, limit: 5 } }),
   );
 
   const { t } = useLingui();

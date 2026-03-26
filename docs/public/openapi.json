@@ -26,51 +26,39 @@
   "tags": [
     {
       "name": "Titles",
-      "description": "Movie and TV show management"
+      "description": "Movie and TV show metadata"
     },
     {
-      "name": "Episodes",
-      "description": "Episode watch tracking"
+      "name": "Tracking",
+      "description": "Watch tracking, ratings, and status management"
     },
     {
-      "name": "Seasons",
-      "description": "Season watch tracking"
+      "name": "Library",
+      "description": "User library browsing and feeds"
+    },
+    {
+      "name": "Discover",
+      "description": "Search, trending, and content discovery"
     },
     {
       "name": "People",
       "description": "Cast and crew information"
     },
     {
-      "name": "Dashboard",
-      "description": "User dashboard data"
-    },
-    {
-      "name": "Explore",
-      "description": "Discover trending and popular content"
-    },
-    {
-      "name": "Search",
-      "description": "Search for movies and TV shows"
-    },
-    {
-      "name": "Discover",
-      "description": "Advanced content discovery with filters"
+      "name": "Account",
+      "description": "User account and integrations"
     },
     {
       "name": "System",
       "description": "Server status and configuration"
     },
     {
-      "name": "Integrations",
-      "description": "Media server integrations"
-    },
-    {
       "name": "Admin",
       "description": "Server administration"
     },
     {
-      "name": "Account",
-      "description": "User account management"
+      "name": "Imports",
+      "description": "Data import from external services"
     }
   ],
   "components": {
@@ -1569,6 +1557,857 @@
   },
   "openapi": "3.1.1",
   "paths": {
+    "/titles/{id}": {
+      "get": {
+        "operationId": "titles.get",
+        "summary": "Get title details",
+        "description": "Fetch full title metadata including seasons, cast, and streaming availability. Imports from TMDB on first access if not yet cached locally.",
+        "tags": [
+          "Titles"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Internal UUIDv7 identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Full title with seasons, cast, and availability offers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "$ref": "#/components/schemas/Title"
+                    },
+                    "seasons": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Season"
+                      },
+                      "description": "TV seasons (empty for movies)"
+                    },
+                    "availability": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "platformId": {
+                            "type": "string",
+                            "description": "Platform ID"
+                          },
+                          "providerName": {
+                            "type": "string",
+                            "description": "Display name (e.g. Netflix, Hulu)"
+                          },
+                          "logoPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Provider logo image path"
+                          },
+                          "offerType": {
+                            "type": "string",
+                            "description": "Offer category: stream or purchase"
+                          },
+                          "watchUrl": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Direct link to watch on this provider"
+                          },
+                          "isUserSubscribed": {
+                            "type": "boolean",
+                            "description": "Whether the user subscribes to this platform"
+                          }
+                        },
+                        "required": [
+                          "platformId",
+                          "providerName",
+                          "logoPath",
+                          "offerType",
+                          "watchUrl",
+                          "isUserSubscribed"
+                        ],
+                        "description": "A streaming availability offer from a provider"
+                      },
+                      "description": "Streaming availability offers"
+                    },
+                    "cast": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CastMember"
+                      },
+                      "description": "Cast and crew credits"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "seasons",
+                    "availability",
+                    "cast"
+                  ],
+                  "description": "Full title details with seasons, cast, and streaming availability"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": true
+                        },
+                        "code": {
+                          "const": "NOT_FOUND"
+                        },
+                        "status": {
+                          "const": 404
+                        },
+                        "message": {
+                          "type": "string",
+                          "default": "Title not found"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TITLE_NOT_FOUND"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message",
+                        "data"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": false
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {}
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/titles/{id}/similar": {
+      "get": {
+        "operationId": "titles.similar",
+        "summary": "Get similar titles",
+        "description": "Fetch similar titles based on locally cached recommendation data, along with the user's statuses for each.",
+        "tags": [
+          "Titles"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Internal UUIDv7 identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Similar titles with user statuses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "recommendations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Recommendation"
+                      }
+                    },
+                    "userStatuses": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "enum": [
+                          "in_watchlist",
+                          "watching",
+                          "caught_up",
+                          "completed"
+                        ],
+                        "type": "string"
+                      },
+                      "description": "Map of title ID to the user's display status"
+                    }
+                  },
+                  "required": [
+                    "recommendations",
+                    "userStatuses"
+                  ],
+                  "description": "Recommended titles with the user's statuses"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/tracking/watch": {
+      "post": {
+        "operationId": "tracking.watch",
+        "summary": "Mark items as watched",
+        "description": "Mark one or more items as watched. Use scope to indicate what the IDs refer to: movie (title IDs), episode (episode IDs), season (season IDs), or series (title IDs to mark all episodes).",
+        "tags": [
+          "Tracking"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "scope": {
+                    "enum": [
+                      "movie",
+                      "episode",
+                      "season",
+                      "series"
+                    ],
+                    "type": "string",
+                    "description": "What the IDs refer to: movie title, episode, season, or entire TV series"
+                  },
+                  "ids": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": "IDs to mark as watched"
+                  }
+                },
+                "required": [
+                  "scope",
+                  "ids"
+                ],
+                "description": "Mark one or more items as watched"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/tracking/unwatch": {
+      "post": {
+        "operationId": "tracking.unwatch",
+        "summary": "Remove watch records",
+        "description": "Remove watch records for one or more items. Use scope to indicate what the IDs refer to: movie, episode, season, or series.",
+        "tags": [
+          "Tracking"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "scope": {
+                    "enum": [
+                      "movie",
+                      "episode",
+                      "season",
+                      "series"
+                    ],
+                    "type": "string",
+                    "description": "What the IDs refer to: movie title, episode, season, or entire TV series"
+                  },
+                  "ids": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": "IDs to unwatch"
+                  }
+                },
+                "required": [
+                  "scope",
+                  "ids"
+                ],
+                "description": "Remove watch records for one or more items"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/tracking/titles/{id}/status": {
+      "put": {
+        "operationId": "tracking.updateStatus",
+        "summary": "Update tracking status",
+        "description": "Set the user's tracking status for a title. Use null to remove the title from the library entirely.",
+        "tags": [
+          "Tracking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Title ID"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "watchlist"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Set to watchlist to add to library, or null to remove. Other transitions happen via watch endpoints."
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "description": "Add a title to the user's watchlist or remove from library"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/tracking/titles/{id}/rating": {
+      "put": {
+        "operationId": "tracking.rate",
+        "summary": "Rate a title",
+        "description": "Set a 0-5 star rating for a title. Use 0 to clear the rating.",
+        "tags": [
+          "Tracking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Title ID"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "stars": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 5,
+                    "description": "Star rating from 0 (clear) to 5"
+                  }
+                },
+                "required": [
+                  "stars"
+                ],
+                "description": "Set or clear a star rating for a title"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/tracking/titles/{id}": {
+      "get": {
+        "operationId": "tracking.userInfo",
+        "summary": "Get user's tracking info for a title",
+        "description": "Fetch the current user's tracking status, rating, and watched episode IDs for a title.",
+        "tags": [
+          "Tracking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Internal UUIDv7 identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's status, rating, and list of watched episode IDs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "in_watchlist",
+                            "watching",
+                            "caught_up",
+                            "completed"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "User's display status, or null if not in library"
+                    },
+                    "rating": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "User's star rating (0-5), or null if unrated"
+                    },
+                    "episodeWatches": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "IDs of episodes the user has watched"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "rating",
+                    "episodeWatches"
+                  ],
+                  "description": "The current user's tracking info for a title"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/tracking/titles/{id}/quick-add": {
+      "post": {
+        "operationId": "tracking.quickAdd",
+        "summary": "Quick add title to library",
+        "description": "Add a title to the user's watchlist and trigger a full TMDB import if needed. If the title already exists in the user's library, returns alreadyAdded: true.",
+        "tags": [
+          "Tracking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Internal UUIDv7 identifier"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Title ID and whether it was already in the library",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Internal title ID"
+                    },
+                    "alreadyAdded": {
+                      "type": "boolean",
+                      "description": "True if the title was already in the user's library"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "alreadyAdded"
+                  ],
+                  "description": "Result of a quick-add operation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": true
+                        },
+                        "code": {
+                          "const": "NOT_FOUND"
+                        },
+                        "status": {
+                          "const": 404
+                        },
+                        "message": {
+                          "type": "string",
+                          "default": "Title not found"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TITLE_NOT_FOUND"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message",
+                        "data"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": false
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {}
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/tracking/stats": {
+      "get": {
+        "operationId": "tracking.stats",
+        "summary": "Get watch statistics",
+        "description": "Fetch summary counts for the current user: movies watched this month, episodes this week, library size, and completed titles.",
+        "tags": [
+          "Tracking"
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregate watch statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "moviesThisMonth": {
+                      "type": "number",
+                      "description": "Movies watched in the current calendar month"
+                    },
+                    "episodesThisWeek": {
+                      "type": "number",
+                      "description": "Episodes watched in the current calendar week"
+                    },
+                    "librarySize": {
+                      "type": "number",
+                      "description": "Total titles in the user's library"
+                    },
+                    "completed": {
+                      "type": "number",
+                      "description": "Total titles with completed status"
+                    }
+                  },
+                  "required": [
+                    "moviesThisMonth",
+                    "episodesThisWeek",
+                    "librarySize",
+                    "completed"
+                  ],
+                  "description": "Aggregate watch statistics for the dashboard"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/tracking/history": {
+      "get": {
+        "operationId": "tracking.history",
+        "summary": "Get watch history",
+        "description": "Fetch the user's watch counts grouped by time period. Useful for rendering activity charts.",
+        "tags": [
+          "Tracking"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "movie",
+                "episode"
+              ],
+              "type": "string",
+              "description": "What to count: movie watches or episode watches"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "today",
+                "this_week",
+                "this_month",
+                "this_year"
+              ],
+              "type": "string",
+              "description": "Time range for the histogram"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Watch counts bucketed by time period",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number",
+                      "description": "Total watches in the selected period"
+                    },
+                    "history": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "bucket": {
+                            "type": "string",
+                            "description": "Time period label (e.g. date or week)"
+                          },
+                          "count": {
+                            "type": "number",
+                            "description": "Number of watches in this bucket"
+                          }
+                        },
+                        "required": [
+                          "bucket",
+                          "count"
+                        ],
+                        "description": "A single time-bucketed watch count"
+                      },
+                      "description": "Watch counts bucketed by time period"
+                    }
+                  },
+                  "required": [
+                    "count",
+                    "history"
+                  ],
+                  "description": "Watch history with time-bucketed counts"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/library": {
       "get": {
         "operationId": "library.list",
@@ -1982,1141 +2821,13 @@
         ]
       }
     },
-    "/titles/{id}": {
+    "/library/continue-watching": {
       "get": {
-        "operationId": "titles.detail",
-        "summary": "Get title details",
-        "description": "Fetch full title metadata including seasons, cast, and streaming availability. Imports from TMDB on first access if not yet cached locally.",
-        "tags": [
-          "Titles"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Full title with seasons, cast, and availability offers",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "title": {
-                      "$ref": "#/components/schemas/Title"
-                    },
-                    "seasons": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Season"
-                      },
-                      "description": "TV seasons (empty for movies)"
-                    },
-                    "availability": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "platformId": {
-                            "type": "string",
-                            "description": "Platform ID"
-                          },
-                          "providerName": {
-                            "type": "string",
-                            "description": "Display name (e.g. Netflix, Hulu)"
-                          },
-                          "logoPath": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "Provider logo image path"
-                          },
-                          "offerType": {
-                            "type": "string",
-                            "description": "Offer category: stream or purchase"
-                          },
-                          "watchUrl": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "Direct link to watch on this provider"
-                          },
-                          "isUserSubscribed": {
-                            "type": "boolean",
-                            "description": "Whether the user subscribes to this platform"
-                          }
-                        },
-                        "required": [
-                          "platformId",
-                          "providerName",
-                          "logoPath",
-                          "offerType",
-                          "watchUrl",
-                          "isUserSubscribed"
-                        ],
-                        "description": "A streaming availability offer from a provider"
-                      },
-                      "description": "Streaming availability offers"
-                    },
-                    "cast": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/CastMember"
-                      },
-                      "description": "Cast and crew credits"
-                    }
-                  },
-                  "required": [
-                    "title",
-                    "seasons",
-                    "availability",
-                    "cast"
-                  ],
-                  "description": "Full title details with seasons, cast, and streaming availability"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "404",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_FOUND"
-                        },
-                        "status": {
-                          "const": 404
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Title not found"
-                        },
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "code": {
-                              "const": "TITLE_NOT_FOUND"
-                            }
-                          },
-                          "required": [
-                            "code"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message",
-                        "data"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/titles/{id}/status": {
-      "put": {
-        "operationId": "titles.updateStatus",
-        "summary": "Update tracking status",
-        "description": "Set the user's tracking status for a title. Use null to remove the title from the library entirely.",
-        "tags": [
-          "Titles"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Title ID"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "status": {
-                    "anyOf": [
-                      {
-                        "enum": [
-                          "watchlist"
-                        ],
-                        "type": "string"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ],
-                    "description": "Set to watchlist to add to library, or null to remove. Other transitions happen via watch endpoints."
-                  }
-                },
-                "required": [
-                  "status"
-                ],
-                "description": "Add a title to the user's watchlist or remove from library"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/titles/{id}/rating": {
-      "put": {
-        "operationId": "titles.updateRating",
-        "summary": "Rate a title",
-        "description": "Set a 0-5 star rating for a title. Use 0 to clear the rating.",
-        "tags": [
-          "Titles"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Title ID"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "stars": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 5,
-                    "description": "Star rating from 0 (clear) to 5"
-                  }
-                },
-                "required": [
-                  "stars"
-                ],
-                "description": "Set or clear a star rating for a title"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/titles/{id}/watch": {
-      "post": {
-        "operationId": "titles.watchMovie",
-        "summary": "Mark movie as watched",
-        "description": "Log a watch event for a movie. Automatically sets status to completed.",
-        "tags": [
-          "Titles"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/titles/{id}/watch-all": {
-      "post": {
-        "operationId": "titles.watchAll",
-        "summary": "Mark all episodes watched",
-        "description": "Mark every episode of a TV show as watched. Requires seasons to be hydrated first.",
-        "tags": [
-          "Titles"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/titles/{id}/user-info": {
-      "get": {
-        "operationId": "titles.userInfo",
-        "summary": "Get user's title info",
-        "description": "Fetch the current user's tracking status, rating, and watched episode IDs for a title.",
-        "tags": [
-          "Titles"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "User's status, rating, and list of watched episode IDs",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "anyOf": [
-                        {
-                          "enum": [
-                            "in_watchlist",
-                            "watching",
-                            "caught_up",
-                            "completed"
-                          ],
-                          "type": "string"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ],
-                      "description": "User's display status, or null if not in library"
-                    },
-                    "rating": {
-                      "anyOf": [
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ],
-                      "description": "User's star rating (0-5), or null if unrated"
-                    },
-                    "episodeWatches": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "description": "IDs of episodes the user has watched"
-                    }
-                  },
-                  "required": [
-                    "status",
-                    "rating",
-                    "episodeWatches"
-                  ],
-                  "description": "The current user's tracking info for a title"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/titles/{id}/recommendations": {
-      "get": {
-        "operationId": "titles.recommendations",
-        "summary": "Get title recommendations",
-        "description": "Fetch similar titles based on locally cached recommendation data, along with the user's statuses for each.",
-        "tags": [
-          "Titles"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Recommended titles with user statuses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "recommendations": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Recommendation"
-                      }
-                    },
-                    "userStatuses": {
-                      "type": "object",
-                      "propertyNames": {
-                        "type": "string"
-                      },
-                      "additionalProperties": {
-                        "enum": [
-                          "in_watchlist",
-                          "watching",
-                          "caught_up",
-                          "completed"
-                        ],
-                        "type": "string"
-                      },
-                      "description": "Map of title ID to the user's display status"
-                    }
-                  },
-                  "required": [
-                    "recommendations",
-                    "userStatuses"
-                  ],
-                  "description": "Recommended titles with the user's statuses"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/titles/{id}/quick-add": {
-      "post": {
-        "operationId": "titles.quickAdd",
-        "summary": "Quick add title to library",
-        "description": "Add a title to the user's watchlist and trigger a full TMDB import if needed. If the title already exists in the user's library, returns alreadyAdded: true.",
-        "tags": [
-          "Titles"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Title ID and whether it was already in the library",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "Internal title ID"
-                    },
-                    "alreadyAdded": {
-                      "type": "boolean",
-                      "description": "True if the title was already in the user's library"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "alreadyAdded"
-                  ],
-                  "description": "Result of a quick-add operation"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "404",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_FOUND"
-                        },
-                        "status": {
-                          "const": 404
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Title not found"
-                        },
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "code": {
-                              "const": "TITLE_NOT_FOUND"
-                            }
-                          },
-                          "required": [
-                            "code"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message",
-                        "data"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/episodes/{id}/watch": {
-      "post": {
-        "operationId": "episodes.watch",
-        "summary": "Mark episode watched",
-        "description": "Record a watch event for a single TV episode.",
-        "tags": [
-          "Episodes"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/episodes/{id}/unwatch": {
-      "post": {
-        "operationId": "episodes.unwatch",
-        "summary": "Mark episode unwatched",
-        "description": "Remove the watch record for a single TV episode.",
-        "tags": [
-          "Episodes"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/episodes/batch-watch": {
-      "post": {
-        "operationId": "episodes.batchWatch",
-        "summary": "Batch mark episodes watched",
-        "description": "Record watch events for multiple episodes at once. Useful for marking a range of episodes as watched.",
-        "tags": [
-          "Episodes"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "episodeIds": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "List of episode IDs to mark as watched"
-                  }
-                },
-                "required": [
-                  "episodeIds"
-                ],
-                "description": "Batch of episode IDs to mark as watched"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/seasons/{id}/watch": {
-      "post": {
-        "operationId": "seasons.watch",
-        "summary": "Mark season watched",
-        "description": "Mark all episodes in a season as watched in a single operation.",
-        "tags": [
-          "Seasons"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/seasons/{id}/unwatch": {
-      "post": {
-        "operationId": "seasons.unwatch",
-        "summary": "Mark season unwatched",
-        "description": "Remove all watch records for episodes in a season in a single operation.",
-        "tags": [
-          "Seasons"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/people/{id}": {
-      "get": {
-        "operationId": "people.detail",
-        "summary": "Get person details",
-        "description": "Fetch a person's profile and paginated filmography. Imports from TMDB on first access if not yet cached locally.",
-        "tags": [
-          "People"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 500,
-              "default": 1,
-              "description": "Page number (1-indexed)"
-            },
-            "allowEmptyValue": true,
-            "allowReserved": true
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 20,
-              "description": "Results per page (1-100, default 20)"
-            },
-            "allowEmptyValue": true,
-            "allowReserved": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Person profile, paginated filmography credits, and user statuses for their titles",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "person": {
-                      "$ref": "#/components/schemas/Person"
-                    },
-                    "filmography": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/PersonCredit"
-                      },
-                      "description": "Credits for this person (paginated)"
-                    },
-                    "userStatuses": {
-                      "type": "object",
-                      "propertyNames": {
-                        "type": "string"
-                      },
-                      "additionalProperties": {
-                        "enum": [
-                          "in_watchlist",
-                          "watching",
-                          "caught_up",
-                          "completed"
-                        ],
-                        "type": "string"
-                      },
-                      "description": "Map of title ID to the user's display status"
-                    },
-                    "page": {
-                      "type": "number",
-                      "description": "Current page number"
-                    },
-                    "totalPages": {
-                      "type": "number",
-                      "description": "Total number of pages available"
-                    },
-                    "totalResults": {
-                      "type": "number",
-                      "description": "Total number of results across all pages"
-                    }
-                  },
-                  "required": [
-                    "person",
-                    "filmography",
-                    "userStatuses",
-                    "page",
-                    "totalPages",
-                    "totalResults"
-                  ],
-                  "description": "Person profile with paginated filmography and user's statuses for their titles"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "404",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_FOUND"
-                        },
-                        "status": {
-                          "const": 404
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Person not found"
-                        },
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "code": {
-                              "const": "PERSON_NOT_FOUND"
-                            }
-                          },
-                          "required": [
-                            "code"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message",
-                        "data"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/dashboard/stats": {
-      "get": {
-        "operationId": "dashboard.stats",
-        "summary": "Get dashboard statistics",
-        "description": "Fetch summary counts for the current user: movies watched this month, episodes this week, library size, and completed titles.",
-        "tags": [
-          "Dashboard"
-        ],
-        "responses": {
-          "200": {
-            "description": "Aggregate watch statistics",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "moviesThisMonth": {
-                      "type": "number",
-                      "description": "Movies watched in the current calendar month"
-                    },
-                    "episodesThisWeek": {
-                      "type": "number",
-                      "description": "Episodes watched in the current calendar week"
-                    },
-                    "librarySize": {
-                      "type": "number",
-                      "description": "Total titles in the user's library"
-                    },
-                    "completed": {
-                      "type": "number",
-                      "description": "Total titles with completed status"
-                    }
-                  },
-                  "required": [
-                    "moviesThisMonth",
-                    "episodesThisWeek",
-                    "librarySize",
-                    "completed"
-                  ],
-                  "description": "Aggregate watch statistics for the dashboard"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/dashboard/continue-watching": {
-      "get": {
-        "operationId": "dashboard.continueWatching",
+        "operationId": "library.continueWatching",
         "summary": "Get continue watching list",
         "description": "Fetch TV shows the user is currently watching, with the next unwatched episode and progress for each.",
         "tags": [
-          "Dashboard"
+          "Library"
         ],
         "responses": {
           "200": {
@@ -3268,13 +2979,13 @@
         ]
       }
     },
-    "/dashboard/upcoming": {
+    "/library/upcoming": {
       "get": {
-        "operationId": "dashboard.upcoming",
+        "operationId": "library.upcoming",
         "summary": "Get upcoming episodes and movies",
         "description": "Fetch upcoming episodes and movie releases for titles in the user's library, sorted by date. Supports cursor-based pagination.",
         "tags": [
-          "Dashboard"
+          "Library"
         ],
         "parameters": [
           {
@@ -3571,146 +3282,13 @@
         ]
       }
     },
-    "/dashboard/recommendations": {
+    "/discover/trending": {
       "get": {
-        "operationId": "dashboard.recommendations",
-        "summary": "Get personalized recommendations",
-        "description": "Fetch personalized title recommendations based on the user's library and watch history.",
-        "tags": [
-          "Dashboard"
-        ],
-        "responses": {
-          "200": {
-            "description": "Recommended titles",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "items": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Recommendation"
-                      }
-                    }
-                  },
-                  "required": [
-                    "items"
-                  ],
-                  "description": "Personalized title recommendations for the dashboard"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/dashboard/watch-history": {
-      "get": {
-        "operationId": "dashboard.watchHistory",
-        "summary": "Get watch history",
-        "description": "Fetch the user's watch counts grouped by time period. Useful for rendering activity charts.",
-        "tags": [
-          "Dashboard"
-        ],
-        "parameters": [
-          {
-            "name": "type",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "enum": [
-                "movie",
-                "episode"
-              ],
-              "type": "string",
-              "description": "What to count: movie watches or episode watches"
-            },
-            "allowEmptyValue": true,
-            "allowReserved": true
-          },
-          {
-            "name": "period",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "enum": [
-                "today",
-                "this_week",
-                "this_month",
-                "this_year"
-              ],
-              "type": "string",
-              "description": "Time range for the histogram"
-            },
-            "allowEmptyValue": true,
-            "allowReserved": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Watch counts bucketed by time period",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "count": {
-                      "type": "number",
-                      "description": "Total watches in the selected period"
-                    },
-                    "history": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "bucket": {
-                            "type": "string",
-                            "description": "Time period label (e.g. date or week)"
-                          },
-                          "count": {
-                            "type": "number",
-                            "description": "Number of watches in this bucket"
-                          }
-                        },
-                        "required": [
-                          "bucket",
-                          "count"
-                        ],
-                        "description": "A single time-bucketed watch count"
-                      },
-                      "description": "Watch counts bucketed by time period"
-                    }
-                  },
-                  "required": [
-                    "count",
-                    "history"
-                  ],
-                  "description": "Watch history with time-bucketed counts"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/explore/trending": {
-      "get": {
-        "operationId": "explore.trending",
+        "operationId": "discover.trending",
         "summary": "Get trending titles",
         "description": "Fetch today's trending movies and/or TV shows from TMDB, including a featured hero title and the user's statuses.",
         "tags": [
-          "Explore"
+          "Discover"
         ],
         "parameters": [
           {
@@ -3964,13 +3542,13 @@
         ]
       }
     },
-    "/explore/popular": {
+    "/discover/popular": {
       "get": {
-        "operationId": "explore.popular",
+        "operationId": "discover.popular",
         "summary": "Get popular titles",
         "description": "Fetch currently popular movies or TV shows from TMDB with the user's tracking statuses.",
         "tags": [
-          "Explore"
+          "Discover"
         ],
         "parameters": [
           {
@@ -4160,315 +3738,13 @@
         ]
       }
     },
-    "/explore/genres": {
+    "/discover/search": {
       "get": {
-        "operationId": "explore.genres",
-        "summary": "List genres",
-        "description": "Fetch the list of TMDB genres for movies or TV shows. Used to populate genre filters for discovery.",
-        "tags": [
-          "Explore"
-        ],
-        "parameters": [
-          {
-            "name": "type",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "enum": [
-                "movie",
-                "tv"
-              ],
-              "type": "string",
-              "description": "Media type filter"
-            },
-            "allowEmptyValue": true,
-            "allowReserved": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Genre ID/name pairs",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "genres": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "number",
-                            "description": "TMDB genre ID"
-                          },
-                          "name": {
-                            "type": "string",
-                            "description": "Genre display name"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "name"
-                        ]
-                      }
-                    }
-                  },
-                  "required": [
-                    "genres"
-                  ],
-                  "description": "Available genres for filtering"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "412",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "PRECONDITION_FAILED"
-                        },
-                        "status": {
-                          "const": 412
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "TMDB API key is not configured"
-                        },
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "code": {
-                              "const": "TMDB_NOT_CONFIGURED"
-                            }
-                          },
-                          "required": [
-                            "code"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message",
-                        "data"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/explore/watch-providers": {
-      "get": {
-        "operationId": "explore.watchProviders",
-        "summary": "List available watch providers",
-        "description": "Fetch the list of streaming providers available in the configured region. Used to populate provider filter dropdowns.",
-        "tags": [
-          "Explore"
-        ],
-        "parameters": [
-          {
-            "name": "type",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "enum": [
-                "movie",
-                "tv"
-              ],
-              "type": "string",
-              "description": "Media type filter"
-            },
-            "allowEmptyValue": true,
-            "allowReserved": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Provider list with logos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "providers": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "description": "Platform ID"
-                          },
-                          "tmdbProviderIds": {
-                            "type": "array",
-                            "items": {
-                              "type": "number"
-                            },
-                            "description": "TMDB provider IDs"
-                          },
-                          "name": {
-                            "type": "string",
-                            "description": "Provider display name"
-                          },
-                          "logoPath": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "Provider logo image path"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "tmdbProviderIds",
-                          "name",
-                          "logoPath"
-                        ]
-                      }
-                    }
-                  },
-                  "required": [
-                    "providers"
-                  ],
-                  "description": "Available streaming providers for the user's region"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "412",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "PRECONDITION_FAILED"
-                        },
-                        "status": {
-                          "const": 412
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "TMDB API key is not configured"
-                        },
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "code": {
-                              "const": "TMDB_NOT_CONFIGURED"
-                            }
-                          },
-                          "required": [
-                            "code"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message",
-                        "data"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/search": {
-      "get": {
-        "operationId": "search",
+        "operationId": "discover.search",
         "summary": "Search movies, TV shows, and people",
         "description": "Full-text search across movies, TV shows, and people via TMDB. Optionally filter by media type.",
         "tags": [
-          "Search"
+          "Discover"
         ],
         "parameters": [
           {
@@ -4703,13 +3979,24 @@
                           "type": "string",
                           "default": "TMDB API key is not configured"
                         },
-                        "data": {}
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TMDB_NOT_CONFIGURED"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
                       },
                       "required": [
                         "defined",
                         "code",
                         "status",
-                        "message"
+                        "message",
+                        "data"
                       ]
                     },
                     {
@@ -4749,10 +4036,10 @@
         ]
       }
     },
-    "/discover": {
+    "/discover/browse": {
       "get": {
-        "operationId": "discover",
-        "summary": "Discover titles by genre",
+        "operationId": "discover.browse",
+        "summary": "Browse titles with filters",
         "description": "Browse movies or TV shows filtered by genre, sorted by popularity. Returns user statuses and episode progress.",
         "tags": [
           "Discover"
@@ -5039,145 +4326,135 @@
         ]
       }
     },
-    "/system/public-info": {
+    "/discover/genres": {
       "get": {
-        "operationId": "system.publicInfo",
-        "summary": "Get public instance info",
-        "description": "Fetch public information about this Sofa instance. Does not require authentication. Used by the login screen to display instance details.",
+        "operationId": "discover.genres",
+        "summary": "List genres",
+        "description": "Fetch the list of TMDB genres for movies or TV shows. Used to populate genre filters for discovery.",
         "tags": [
-          "System"
+          "Discover"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "movie",
+                "tv"
+              ],
+              "type": "string",
+              "description": "Media type filter"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
         ],
         "responses": {
           "200": {
-            "description": "Instance configuration and status",
+            "description": "Genre ID/name pairs",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "instanceId": {
-                      "type": "string",
-                      "description": "Unique instance identifier"
-                    },
-                    "tmdbConfigured": {
-                      "type": "boolean",
-                      "description": "Whether TMDB API is configured"
-                    },
-                    "userCount": {
-                      "type": "number",
-                      "description": "Number of registered users"
-                    },
-                    "registrationOpen": {
-                      "type": "boolean",
-                      "description": "Whether new user registration is open"
-                    },
-                    "posterUrls": {
+                    "genres": {
                       "type": "array",
                       "items": {
-                        "type": "string"
-                      },
-                      "description": "Poster image URLs for the login screen collage"
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "number",
+                            "description": "TMDB genre ID"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Genre display name"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ]
+                      }
                     }
                   },
                   "required": [
-                    "instanceId",
-                    "tmdbConfigured",
-                    "userCount",
-                    "registrationOpen",
-                    "posterUrls"
+                    "genres"
                   ],
-                  "description": "Public instance information shown on the login/setup screen"
+                  "description": "Available genres for filtering"
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/system/auth-config": {
-      "get": {
-        "operationId": "system.authConfig",
-        "summary": "Get authentication config",
-        "description": "Fetch the authentication configuration including OIDC availability, password login status, and registration state. Does not require authentication.",
-        "tags": [
-          "System"
-        ],
-        "responses": {
-          "200": {
-            "description": "Authentication provider configuration",
+          },
+          "412": {
+            "description": "412",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "oidcEnabled": {
-                      "type": "boolean",
-                      "description": "Whether OIDC/SSO login is available"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": true
+                        },
+                        "code": {
+                          "const": "PRECONDITION_FAILED"
+                        },
+                        "status": {
+                          "const": 412
+                        },
+                        "message": {
+                          "type": "string",
+                          "default": "TMDB API key is not configured"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TMDB_NOT_CONFIGURED"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message",
+                        "data"
+                      ]
                     },
-                    "oidcProviderName": {
-                      "anyOf": [
-                        {
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": false
+                        },
+                        "code": {
                           "type": "string"
                         },
-                        {
-                          "type": "null"
-                        }
-                      ],
-                      "description": "Display name of the OIDC provider (e.g. Authelia, Keycloak)"
-                    },
-                    "passwordLoginDisabled": {
-                      "type": "boolean",
-                      "description": "Whether password-based login is disabled"
-                    },
-                    "registrationOpen": {
-                      "type": "boolean",
-                      "description": "Whether new user registration is open"
-                    },
-                    "userCount": {
-                      "type": "number",
-                      "description": "Number of registered users"
+                        "status": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {}
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message"
+                      ]
                     }
-                  },
-                  "required": [
-                    "oidcEnabled",
-                    "oidcProviderName",
-                    "passwordLoginDisabled",
-                    "registrationOpen",
-                    "userCount"
-                  ],
-                  "description": "Authentication provider configuration"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/system/status": {
-      "get": {
-        "operationId": "system.status",
-        "summary": "Get internal system config",
-        "description": "Returns internal configuration such as the public API URL. Requires authentication.",
-        "tags": [
-          "System"
-        ],
-        "responses": {
-          "200": {
-            "description": "Internal system configuration",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "publicApiUrl": {
-                      "type": "string",
-                      "description": "Base URL of the centralized public API"
-                    }
-                  },
-                  "required": [
-                    "publicApiUrl"
-                  ],
-                  "description": "Internal system configuration for authenticated clients"
+                  ]
                 }
               }
             }
@@ -5190,13 +4467,509 @@
         ]
       }
     },
-    "/integrations": {
+    "/discover/platforms": {
       "get": {
-        "operationId": "integrations.list",
+        "operationId": "discover.platforms",
+        "summary": "List available streaming platforms",
+        "description": "Fetch all available streaming platforms, ordered by popularity. Includes subscription status for filtering.",
+        "tags": [
+          "Discover"
+        ],
+        "responses": {
+          "200": {
+            "description": "Platform list with logos and metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "platforms": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Platform ID"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Display name"
+                          },
+                          "tmdbProviderIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            },
+                            "description": "TMDB provider IDs mapped to this platform"
+                          },
+                          "logoPath": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Logo image path"
+                          },
+                          "isSubscription": {
+                            "type": "boolean",
+                            "description": "True for subscription services, false for purchase/rental stores"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "tmdbProviderIds",
+                          "logoPath",
+                          "isSubscription"
+                        ],
+                        "description": "A streaming platform"
+                      }
+                    }
+                  },
+                  "required": [
+                    "platforms"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/discover/recommendations": {
+      "get": {
+        "operationId": "discover.recommendations",
+        "summary": "Get personalized recommendations",
+        "description": "Fetch personalized title recommendations based on the user's library and watch history.",
+        "tags": [
+          "Discover"
+        ],
+        "responses": {
+          "200": {
+            "description": "Recommended titles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Recommendation"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "description": "Personalized title recommendations based on the user's library"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/people/{id}": {
+      "get": {
+        "operationId": "people.get",
+        "summary": "Get person details",
+        "description": "Fetch a person's profile and paginated filmography. Imports from TMDB on first access if not yet cached locally.",
+        "tags": [
+          "People"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Internal UUIDv7 identifier"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 1,
+              "description": "Page number (1-indexed)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "Results per page (1-100, default 20)"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Person profile, paginated filmography credits, and user statuses for their titles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "person": {
+                      "$ref": "#/components/schemas/Person"
+                    },
+                    "filmography": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PersonCredit"
+                      },
+                      "description": "Credits for this person (paginated)"
+                    },
+                    "userStatuses": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "enum": [
+                          "in_watchlist",
+                          "watching",
+                          "caught_up",
+                          "completed"
+                        ],
+                        "type": "string"
+                      },
+                      "description": "Map of title ID to the user's display status"
+                    },
+                    "page": {
+                      "type": "number",
+                      "description": "Current page number"
+                    },
+                    "totalPages": {
+                      "type": "number",
+                      "description": "Total number of pages available"
+                    },
+                    "totalResults": {
+                      "type": "number",
+                      "description": "Total number of results across all pages"
+                    }
+                  },
+                  "required": [
+                    "person",
+                    "filmography",
+                    "userStatuses",
+                    "page",
+                    "totalPages",
+                    "totalResults"
+                  ],
+                  "description": "Person profile with paginated filmography and user's statuses for their titles"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": true
+                        },
+                        "code": {
+                          "const": "NOT_FOUND"
+                        },
+                        "status": {
+                          "const": 404
+                        },
+                        "message": {
+                          "type": "string",
+                          "default": "Person not found"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "PERSON_NOT_FOUND"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message",
+                        "data"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": false
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {}
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/account/name": {
+      "put": {
+        "operationId": "account.updateName",
+        "summary": "Update display name",
+        "description": "Change the current user's display name.",
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "description": "New display name"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/account/avatar": {
+      "post": {
+        "operationId": "account.uploadAvatar",
+        "summary": "Upload avatar",
+        "description": "Upload a new profile avatar image. Accepts JPEG, PNG, WebP, or GIF up to 2 MB.",
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "URL of the uploaded avatar image",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "imageUrl": {
+                      "type": "string",
+                      "description": "URL of the uploaded avatar image"
+                    }
+                  },
+                  "required": [
+                    "imageUrl"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "account.removeAvatar",
+        "summary": "Remove avatar",
+        "description": "Delete the current user's profile avatar, reverting to the default.",
+        "tags": [
+          "Account"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/account/platforms": {
+      "get": {
+        "operationId": "account.platforms",
+        "summary": "Get user's streaming platforms",
+        "description": "Fetch the current user's subscribed streaming platform IDs.",
+        "tags": [
+          "Account"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of platform IDs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "platformIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "platformIds"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "account.updatePlatforms",
+        "summary": "Update streaming platforms",
+        "description": "Set the current user's subscribed streaming platforms.",
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "platformIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "List of platform IDs the user subscribes to"
+                  }
+                },
+                "required": [
+                  "platformIds"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/account/integrations": {
+      "get": {
+        "operationId": "account.integrations.list",
         "summary": "List integrations",
         "description": "Fetch all configured media server integrations for the current user, including recent webhook/sync events for each.",
         "tags": [
-          "Integrations"
+          "Account"
         ],
         "responses": {
           "200": {
@@ -5287,11 +5060,11 @@
         ]
       },
       "post": {
-        "operationId": "integrations.create",
+        "operationId": "account.integrations.create",
         "summary": "Create or update integration",
         "description": "Create a new media server integration or update an existing one. Generates a unique webhook token for the provider.",
         "tags": [
-          "Integrations"
+          "Account"
         ],
         "requestBody": {
           "required": true,
@@ -5343,13 +5116,13 @@
         ]
       }
     },
-    "/integrations/{provider}": {
+    "/account/integrations/{provider}": {
       "delete": {
-        "operationId": "integrations.delete",
+        "operationId": "account.integrations.delete",
         "summary": "Delete integration",
         "description": "Remove a media server integration and all its event history.",
         "tags": [
-          "Integrations"
+          "Account"
         ],
         "parameters": [
           {
@@ -5391,13 +5164,13 @@
         ]
       }
     },
-    "/integrations/{provider}/regenerate-token": {
+    "/account/integrations/{provider}/regenerate-token": {
       "post": {
-        "operationId": "integrations.regenerateToken",
+        "operationId": "account.integrations.regenerateToken",
         "summary": "Regenerate webhook token",
         "description": "Generate a new webhook token for an integration. The old token is immediately invalidated.",
         "tags": [
-          "Integrations"
+          "Account"
         ],
         "parameters": [
           {
@@ -5508,6 +5281,330 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/system/public-info": {
+      "get": {
+        "operationId": "system.publicInfo",
+        "summary": "Get public instance info",
+        "description": "Fetch public information about this Sofa instance including authentication configuration. Does not require authentication.",
+        "tags": [
+          "System"
+        ],
+        "responses": {
+          "200": {
+            "description": "Instance configuration, auth settings, and status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "instanceId": {
+                      "type": "string",
+                      "description": "Unique instance identifier"
+                    },
+                    "tmdbConfigured": {
+                      "type": "boolean",
+                      "description": "Whether TMDB API is configured"
+                    },
+                    "userCount": {
+                      "type": "number",
+                      "description": "Number of registered users"
+                    },
+                    "registrationOpen": {
+                      "type": "boolean",
+                      "description": "Whether new user registration is open"
+                    },
+                    "posterUrls": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Poster image URLs for the login screen collage"
+                    },
+                    "oidcEnabled": {
+                      "type": "boolean",
+                      "description": "Whether OIDC/SSO login is available"
+                    },
+                    "oidcProviderName": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Display name of the OIDC provider (e.g. Authelia, Keycloak)"
+                    },
+                    "passwordLoginDisabled": {
+                      "type": "boolean",
+                      "description": "Whether password-based login is disabled"
+                    }
+                  },
+                  "required": [
+                    "instanceId",
+                    "tmdbConfigured",
+                    "userCount",
+                    "registrationOpen",
+                    "posterUrls",
+                    "oidcEnabled",
+                    "oidcProviderName",
+                    "passwordLoginDisabled"
+                  ],
+                  "description": "Public instance information and authentication configuration"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/status": {
+      "get": {
+        "operationId": "system.status",
+        "summary": "Get internal system config",
+        "description": "Returns internal configuration such as the public API URL. Requires authentication.",
+        "tags": [
+          "System"
+        ],
+        "responses": {
+          "200": {
+            "description": "Internal system configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "publicApiUrl": {
+                      "type": "string",
+                      "description": "Base URL of the centralized public API"
+                    }
+                  },
+                  "required": [
+                    "publicApiUrl"
+                  ],
+                  "description": "Internal system configuration for authenticated clients"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/admin/settings": {
+      "get": {
+        "operationId": "admin.settings.get",
+        "summary": "Get admin settings",
+        "description": "Fetch all admin-configurable settings: registration, update checks, and telemetry.",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Current admin settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "registration": {
+                      "type": "object",
+                      "properties": {
+                        "open": {
+                          "type": "boolean",
+                          "description": "Whether new user registration is open"
+                        }
+                      },
+                      "required": [
+                        "open"
+                      ]
+                    },
+                    "updateCheck": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean",
+                          "description": "Whether automatic update checks are enabled"
+                        },
+                        "updateAvailable": {
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "description": "Whether a newer version is available"
+                        },
+                        "currentVersion": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "description": "Currently running version"
+                        },
+                        "latestVersion": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "description": "Latest available version"
+                        },
+                        "releaseUrl": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "description": "URL to the latest release page"
+                        },
+                        "lastCheckedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "description": "When the last check was performed (ISO 8601)"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "updateAvailable",
+                        "currentVersion",
+                        "latestVersion",
+                        "releaseUrl",
+                        "lastCheckedAt"
+                      ]
+                    },
+                    "telemetry": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean",
+                          "description": "Whether anonymous telemetry is enabled"
+                        },
+                        "lastReportedAt": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "description": "ISO 8601 timestamp of the last telemetry report"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "lastReportedAt"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "registration",
+                    "updateCheck",
+                    "telemetry"
+                  ],
+                  "description": "Combined admin settings for registration, update checks, and telemetry"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "admin.settings.update",
+        "summary": "Update admin settings",
+        "description": "Partially update admin settings. Only provided sections are changed; omitted sections keep their current values.",
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "registration": {
+                    "type": "object",
+                    "properties": {
+                      "open": {
+                        "type": "boolean",
+                        "description": "Whether new user registration is allowed"
+                      }
+                    },
+                    "required": [
+                      "open"
+                    ]
+                  },
+                  "updateCheck": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean",
+                        "description": "Whether automatic update checks are enabled"
+                      }
+                    },
+                    "required": [
+                      "enabled"
+                    ]
+                  },
+                  "telemetry": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean",
+                        "description": "Whether anonymous telemetry is enabled"
+                      }
+                    },
+                    "required": [
+                      "enabled"
+                    ]
+                  }
+                },
+                "description": "Partial update to admin settings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         },
         "security": [
@@ -6000,303 +6097,6 @@
         ]
       }
     },
-    "/admin/registration": {
-      "get": {
-        "operationId": "admin.registration",
-        "summary": "Get registration status",
-        "description": "Check whether new user registration is currently open or closed.",
-        "tags": [
-          "Admin"
-        ],
-        "responses": {
-          "200": {
-            "description": "Registration open/closed state",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "open": {
-                      "type": "boolean",
-                      "description": "Whether new user registration is open"
-                    }
-                  },
-                  "required": [
-                    "open"
-                  ],
-                  "description": "User registration status"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      },
-      "put": {
-        "operationId": "admin.toggleRegistration",
-        "summary": "Toggle registration",
-        "description": "Open or close new user registration.",
-        "tags": [
-          "Admin"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "open": {
-                    "type": "boolean",
-                    "description": "Whether new user registration is allowed"
-                  }
-                },
-                "required": [
-                  "open"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/admin/update-check": {
-      "get": {
-        "operationId": "admin.updateCheck",
-        "summary": "Get update check status",
-        "description": "Fetch whether automatic update checks are enabled, and the latest cached check result if available.",
-        "tags": [
-          "Admin"
-        ],
-        "responses": {
-          "200": {
-            "description": "Update check configuration and latest result",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "enabled": {
-                      "type": "boolean",
-                      "description": "Whether automatic update checks are enabled"
-                    },
-                    "updateCheck": {
-                      "anyOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "updateAvailable": {
-                              "type": "boolean",
-                              "description": "Whether a newer version is available"
-                            },
-                            "currentVersion": {
-                              "type": "string",
-                              "description": "Currently running version"
-                            },
-                            "latestVersion": {
-                              "anyOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ],
-                              "description": "Latest available version, or null if check failed"
-                            },
-                            "releaseUrl": {
-                              "anyOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ],
-                              "description": "URL to the latest release page"
-                            },
-                            "lastCheckedAt": {
-                              "anyOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ],
-                              "description": "When the last check was performed (ISO 8601)"
-                            }
-                          },
-                          "required": [
-                            "updateAvailable",
-                            "currentVersion",
-                            "latestVersion",
-                            "releaseUrl",
-                            "lastCheckedAt"
-                          ],
-                          "description": "Result of an update availability check"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ],
-                      "description": "Latest check result, or null if checks are disabled or never ran"
-                    }
-                  },
-                  "required": [
-                    "enabled",
-                    "updateCheck"
-                  ],
-                  "description": "Update check configuration and latest result"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      },
-      "put": {
-        "operationId": "admin.toggleUpdateCheck",
-        "summary": "Toggle update checks",
-        "description": "Enable or disable automatic update checks against the public API.",
-        "tags": [
-          "Admin"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "type": "boolean",
-                    "description": "Whether automatic update checks are enabled"
-                  }
-                },
-                "required": [
-                  "enabled"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/admin/telemetry": {
-      "get": {
-        "operationId": "admin.telemetry",
-        "summary": "Get telemetry status",
-        "description": "Fetch whether anonymous telemetry is enabled and when the last report was sent.",
-        "tags": [
-          "Admin"
-        ],
-        "responses": {
-          "200": {
-            "description": "Telemetry configuration and last report time",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "enabled": {
-                      "type": "boolean",
-                      "description": "Whether telemetry is currently enabled"
-                    },
-                    "lastReportedAt": {
-                      "anyOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ],
-                      "description": "ISO 8601 timestamp of the last telemetry report, or null if never sent"
-                    }
-                  },
-                  "required": [
-                    "enabled",
-                    "lastReportedAt"
-                  ],
-                  "description": "Telemetry configuration and last report time"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      },
-      "put": {
-        "operationId": "admin.toggleTelemetry",
-        "summary": "Toggle telemetry",
-        "description": "Enable or disable anonymous telemetry reporting.",
-        "tags": [
-          "Admin"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "type": "boolean",
-                    "description": "Whether anonymous telemetry reporting is enabled"
-                  }
-                },
-                "required": [
-                  "enabled"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
     "/admin/jobs/trigger": {
       "post": {
         "operationId": "admin.triggerJob",
@@ -6534,276 +6334,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SystemHealth"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/account/name": {
-      "put": {
-        "operationId": "account.updateName",
-        "summary": "Update display name",
-        "description": "Change the current user's display name.",
-        "tags": [
-          "Account"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 100,
-                    "description": "New display name"
-                  }
-                },
-                "required": [
-                  "name"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/account/avatar": {
-      "post": {
-        "operationId": "account.uploadAvatar",
-        "summary": "Upload avatar",
-        "description": "Upload a new profile avatar image. Accepts JPEG, PNG, WebP, or GIF up to 2 MB.",
-        "tags": [
-          "Account"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                },
-                "required": [
-                  "file"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "URL of the uploaded avatar image",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "imageUrl": {
-                      "type": "string",
-                      "description": "URL of the uploaded avatar image"
-                    }
-                  },
-                  "required": [
-                    "imageUrl"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      },
-      "delete": {
-        "operationId": "account.removeAvatar",
-        "summary": "Remove avatar",
-        "description": "Delete the current user's profile avatar, reverting to the default.",
-        "tags": [
-          "Account"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/account/platforms": {
-      "get": {
-        "operationId": "account.platforms",
-        "summary": "Get user's streaming platforms",
-        "description": "Fetch the current user's subscribed streaming platform IDs.",
-        "tags": [
-          "Account"
-        ],
-        "responses": {
-          "200": {
-            "description": "List of platform IDs",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "platformIds": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "required": [
-                    "platformIds"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      },
-      "put": {
-        "operationId": "account.updatePlatforms",
-        "summary": "Update streaming platforms",
-        "description": "Set the current user's subscribed streaming platforms.",
-        "tags": [
-          "Account"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "platformIds": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "List of platform IDs the user subscribes to"
-                  }
-                },
-                "required": [
-                  "platformIds"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/platforms": {
-      "get": {
-        "operationId": "platforms.list",
-        "summary": "List all platforms",
-        "description": "Fetch all available streaming platforms, ordered by popularity.",
-        "tags": [
-          "Platforms"
-        ],
-        "responses": {
-          "200": {
-            "description": "All platforms with metadata",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "platforms": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "description": "Platform ID"
-                          },
-                          "name": {
-                            "type": "string",
-                            "description": "Display name"
-                          },
-                          "tmdbProviderIds": {
-                            "type": "array",
-                            "items": {
-                              "type": "number"
-                            },
-                            "description": "TMDB provider IDs mapped to this platform"
-                          },
-                          "logoPath": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ],
-                            "description": "Logo image path"
-                          },
-                          "isSubscription": {
-                            "type": "boolean",
-                            "description": "True for subscription services, false for purchase/rental stores"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "name",
-                          "tmdbProviderIds",
-                          "logoPath",
-                          "isSubscription"
-                        ],
-                        "description": "A streaming platform"
-                      }
-                    }
-                  },
-                  "required": [
-                    "platforms"
-                  ]
                 }
               }
             }

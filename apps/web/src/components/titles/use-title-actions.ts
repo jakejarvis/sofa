@@ -19,7 +19,7 @@ export function useTitleActions() {
   const { t } = useLingui();
   const { titleId, titleName, seasons, setWatchingEp } = useTitleContext();
   const queryClient = useQueryClient();
-  const userInfoKey = orpc.titles.userInfo.queryKey({ input: { id: titleId } });
+  const userInfoKey = orpc.tracking.userInfo.queryKey({ input: { id: titleId } });
 
   const getUserInfo = useCallback(
     () =>
@@ -40,15 +40,10 @@ export function useTitleActions() {
     [queryClient, userInfoKey],
   );
 
-  const { mutateAsync: batchWatch } = useMutation(orpc.episodes.batchWatch.mutationOptions());
-  const { mutateAsync: updateStatus } = useMutation(orpc.titles.updateStatus.mutationOptions());
-  const { mutateAsync: updateRating } = useMutation(orpc.titles.updateRating.mutationOptions());
-  const { mutateAsync: watchMovie } = useMutation(orpc.titles.watchMovie.mutationOptions());
-  const { mutateAsync: unwatchEp } = useMutation(orpc.episodes.unwatch.mutationOptions());
-  const { mutateAsync: watchEp } = useMutation(orpc.episodes.watch.mutationOptions());
-  const { mutateAsync: watchSeason } = useMutation(orpc.seasons.watch.mutationOptions());
-  const { mutateAsync: unwatchSeason } = useMutation(orpc.seasons.unwatch.mutationOptions());
-  const { mutateAsync: watchAll } = useMutation(orpc.titles.watchAll.mutationOptions());
+  const { mutateAsync: watch } = useMutation(orpc.tracking.watch.mutationOptions());
+  const { mutateAsync: unwatch } = useMutation(orpc.tracking.unwatch.mutationOptions());
+  const { mutateAsync: updateStatus } = useMutation(orpc.tracking.updateStatus.mutationOptions());
+  const { mutateAsync: updateRating } = useMutation(orpc.tracking.rate.mutationOptions());
 
   const catchUp = useCallback(
     async (episodeIds: string[]) => {
@@ -64,7 +59,7 @@ export function useTitleActions() {
       }));
 
       try {
-        await batchWatch({ episodeIds });
+        await watch({ scope: "episode", ids: episodeIds });
         await queryClient.invalidateQueries({ queryKey: userInfoKey });
         const count = episodeIds.length;
         toast.success(
@@ -79,7 +74,7 @@ export function useTitleActions() {
         toast.error(t`Failed to catch up`);
       }
     },
-    [getUserInfo, setUserInfo, batchWatch, queryClient, userInfoKey, t],
+    [getUserInfo, setUserInfo, watch, queryClient, userInfoKey, t],
   );
 
   const handleStatusChange = useCallback(
@@ -132,13 +127,13 @@ export function useTitleActions() {
     const prevStatus = getUserInfo().status;
     setUserInfo((old) => ({ ...old, status: "completed" }));
     try {
-      await watchMovie({ id: titleId });
+      await watch({ scope: "movie", ids: [titleId] });
       toast.success(t`Marked "${titleName}" as watched`);
     } catch {
       setUserInfo((old) => ({ ...old, status: prevStatus }));
       toast.error(t`Failed to mark as watched`);
     }
-  }, [getUserInfo, setUserInfo, queryClient, userInfoKey, titleId, titleName, watchMovie, t]);
+  }, [getUserInfo, setUserInfo, queryClient, userInfoKey, titleId, titleName, watch, t]);
 
   const handleWatchEpisode = useCallback(
     async (episodeId: string, seasonNum: number, epNum: number, isWatched: boolean) => {
@@ -156,7 +151,7 @@ export function useTitleActions() {
         }));
 
         try {
-          await unwatchEp({ id: episodeId });
+          await unwatch({ scope: "episode", ids: [episodeId] });
           toast.success(t`Unwatched S${seasonNum} E${epNum}`);
         } catch {
           setUserInfo((old) => ({
@@ -181,7 +176,7 @@ export function useTitleActions() {
         }));
 
         try {
-          await watchEp({ id: episodeId });
+          await watch({ scope: "episode", ids: [episodeId] });
 
           const watchedSet = new Set(getUserInfo().episodeWatches);
           const previousUnwatched: string[] = [];
@@ -231,8 +226,8 @@ export function useTitleActions() {
       setWatchingEp,
       seasons,
       catchUp,
-      unwatchEp,
-      watchEp,
+      unwatch,
+      watch,
       t,
     ],
   );
@@ -257,7 +252,7 @@ export function useTitleActions() {
       }));
 
       try {
-        await watchSeason({ id: season.id });
+        await watch({ scope: "season", ids: [season.id] });
         await queryClient.invalidateQueries({ queryKey: userInfoKey });
 
         const currentWatchSet = new Set(getUserInfo().episodeWatches);
@@ -296,7 +291,7 @@ export function useTitleActions() {
         toast.error(t`Failed to mark some episodes`);
       }
     },
-    [getUserInfo, setUserInfo, seasons, catchUp, watchSeason, queryClient, userInfoKey, t],
+    [getUserInfo, setUserInfo, seasons, catchUp, watch, queryClient, userInfoKey, t],
   );
 
   const handleUnmarkSeason = useCallback(
@@ -312,7 +307,7 @@ export function useTitleActions() {
       }));
 
       try {
-        await unwatchSeason({ id: season.id });
+        await unwatch({ scope: "season", ids: [season.id] });
         const seasonNumber = season.seasonNumber;
         const seasonLabel = season.name ?? t`Season ${seasonNumber}`;
         toast.success(t`Unwatched all of ${seasonLabel}`);
@@ -325,7 +320,7 @@ export function useTitleActions() {
         toast.error(t`Failed to unmark some episodes`);
       }
     },
-    [getUserInfo, setUserInfo, queryClient, userInfoKey, unwatchSeason, t],
+    [getUserInfo, setUserInfo, queryClient, userInfoKey, unwatch, t],
   );
 
   const handleMarkAllWatched = useCallback(async () => {
@@ -339,7 +334,7 @@ export function useTitleActions() {
       status: old.status ?? "watching",
     }));
     try {
-      await watchAll({ id: titleId });
+      await watch({ scope: "series", ids: [titleId] });
       // Refresh to get server-derived display status (caught_up / completed)
       await queryClient.invalidateQueries({ queryKey: userInfoKey });
       toast.success(t`Marked all episodes as watched`);
@@ -351,7 +346,7 @@ export function useTitleActions() {
       }));
       toast.error(t`Failed to mark all episodes as watched`);
     }
-  }, [getUserInfo, setUserInfo, seasons, titleId, watchAll, queryClient, userInfoKey, t]);
+  }, [getUserInfo, setUserInfo, seasons, titleId, watch, queryClient, userInfoKey, t]);
 
   return {
     handleStatusChange,

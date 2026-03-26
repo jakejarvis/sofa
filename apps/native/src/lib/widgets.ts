@@ -140,7 +140,7 @@ async function refreshContinueWatching(
   iconFilePath: string,
 ): Promise<void> {
   try {
-    const { items } = await client.dashboard.continueWatching();
+    const { items } = await client.library.continueWatching();
 
     if (items.length === 0) {
       widget.updateSnapshot(
@@ -200,7 +200,7 @@ async function refreshUpcoming(
   iconFilePath: string,
 ): Promise<void> {
   try {
-    const { items } = await client.dashboard.upcoming({
+    const { items } = await client.library.upcoming({
       days: 30,
       limit: 5,
     });

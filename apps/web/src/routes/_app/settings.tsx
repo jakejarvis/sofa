@@ -35,9 +35,9 @@ export const Route = createFileRoute("/_app/settings")({
   staleTime: 30_000,
   loader: async ({ context }) => {
     const promises: Promise<unknown>[] = [
-      context.queryClient.ensureQueryData(orpc.integrations.list.queryOptions()),
+      context.queryClient.ensureQueryData(orpc.account.integrations.list.queryOptions()),
       context.queryClient.ensureQueryData(orpc.system.status.queryOptions()),
-      context.queryClient.ensureQueryData(orpc.platforms.list.queryOptions()),
+      context.queryClient.ensureQueryData(orpc.discover.platforms.queryOptions()),
       context.queryClient.ensureQueryData(orpc.account.platforms.queryOptions()),
     ];
     const isAdmin = context.session.user.role === "admin";

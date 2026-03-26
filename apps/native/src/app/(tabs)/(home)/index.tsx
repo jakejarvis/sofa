@@ -51,20 +51,20 @@ export default function DashboardScreen() {
     "--color-status-completed",
   ]) as [string, string, string, string];
 
-  const stats = useQuery(orpc.dashboard.stats.queryOptions());
+  const stats = useQuery(orpc.tracking.stats.queryOptions());
   const movieHistory = useQuery(
-    orpc.dashboard.watchHistory.queryOptions({
+    orpc.tracking.history.queryOptions({
       input: { type: "movie", period: moviePeriod },
     }),
   );
   const episodeHistory = useQuery(
-    orpc.dashboard.watchHistory.queryOptions({
+    orpc.tracking.history.queryOptions({
       input: { type: "episode", period: episodePeriod },
     }),
   );
-  const continueWatching = useQuery(orpc.dashboard.continueWatching.queryOptions());
+  const continueWatching = useQuery(orpc.library.continueWatching.queryOptions());
   const library = useQuery(orpc.library.list.queryOptions({ input: { page: 1, limit: 10 } }));
-  const recommendations = useQuery(orpc.dashboard.recommendations.queryOptions());
+  const recommendations = useQuery(orpc.discover.recommendations.queryOptions());
 
   const isRefreshing =
     stats.isRefetching ||
@@ -74,7 +74,7 @@ export default function DashboardScreen() {
     episodeHistory.isRefetching;
 
   const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
+    queryClient.invalidateQueries({ queryKey: orpc.tracking.key() });
     queryClient.invalidateQueries({ queryKey: orpc.library.key() });
   }, []);
 

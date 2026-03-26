@@ -20,7 +20,7 @@ export function StreamingServicesSection() {
   const saveCounterRef = useRef(0);
   const initialized = useRef(false);
 
-  const platformsQuery = useQuery(orpc.platforms.list.queryOptions());
+  const platformsQuery = useQuery(orpc.discover.platforms.queryOptions());
   const userPlatformsQuery = useQuery(orpc.account.platforms.queryOptions());
 
   // Initialize selected IDs from server data

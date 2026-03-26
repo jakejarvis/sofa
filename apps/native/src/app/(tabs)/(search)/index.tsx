@@ -20,7 +20,7 @@ export default function SearchScreen() {
   const debouncedQuery = useDebounce(query.trim(), 300);
 
   const searchResults = useInfiniteQuery({
-    ...orpc.search.infiniteOptions({
+    ...orpc.discover.search.infiniteOptions({
       input:
         debouncedQuery.length > 0
           ? (pageParam: number) => ({ query: debouncedQuery, page: pageParam })

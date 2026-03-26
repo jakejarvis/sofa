@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_app/explore")({
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.ensureInfiniteQueryData(
-        orpc.explore.trending.infiniteOptions({
+        orpc.discover.trending.infiniteOptions({
           input: (pageParam: number) => ({ type: "all" as const, page: pageParam }),
           initialPageParam: 1,
           getNextPageParam: (lastPage) =>
@@ -26,16 +26,16 @@ export const Route = createFileRoute("/_app/explore")({
         }),
       ),
       context.queryClient.ensureQueryData(
-        orpc.explore.popular.queryOptions({ input: { type: "movie" } }),
+        orpc.discover.popular.queryOptions({ input: { type: "movie" } }),
       ),
       context.queryClient.ensureQueryData(
-        orpc.explore.popular.queryOptions({ input: { type: "tv" } }),
+        orpc.discover.popular.queryOptions({ input: { type: "tv" } }),
       ),
       context.queryClient.ensureQueryData(
-        orpc.explore.genres.queryOptions({ input: { type: "movie" } }),
+        orpc.discover.genres.queryOptions({ input: { type: "movie" } }),
       ),
       context.queryClient.ensureQueryData(
-        orpc.explore.genres.queryOptions({ input: { type: "tv" } }),
+        orpc.discover.genres.queryOptions({ input: { type: "tv" } }),
       ),
     ]);
   },
@@ -81,7 +81,7 @@ function ExplorePage() {
     hasNextPage: hasNextTrending,
     isFetchingNextPage: isFetchingNextTrending,
   } = useInfiniteQuery(
-    orpc.explore.trending.infiniteOptions({
+    orpc.discover.trending.infiniteOptions({
       input: (pageParam: number) => ({ type: "all" as const, page: pageParam }),
       initialPageParam: 1,
       getNextPageParam: (lastPage) =>
@@ -91,16 +91,16 @@ function ExplorePage() {
   );
 
   const { data: popularMoviesData, isPending: moviesPending } = useQuery(
-    orpc.explore.popular.queryOptions({ input: { type: "movie" } }),
+    orpc.discover.popular.queryOptions({ input: { type: "movie" } }),
   );
   const { data: popularTvData, isPending: tvPending } = useQuery(
-    orpc.explore.popular.queryOptions({ input: { type: "tv" } }),
+    orpc.discover.popular.queryOptions({ input: { type: "tv" } }),
   );
   const { data: movieGenreData } = useQuery(
-    orpc.explore.genres.queryOptions({ input: { type: "movie" } }),
+    orpc.discover.genres.queryOptions({ input: { type: "movie" } }),
   );
   const { data: tvGenreData } = useQuery(
-    orpc.explore.genres.queryOptions({ input: { type: "tv" } }),
+    orpc.discover.genres.queryOptions({ input: { type: "tv" } }),
   );
 
   const isPending = trendingPending || moviesPending || tvPending;
