@@ -163,7 +163,7 @@ export function unwatchMovie(userId: string, titleId: string) {
   deleteMovieWatches(userId, titleId);
 
   const existing = getTitleStatus(userId, titleId);
-  if (existing?.status === "completed") {
+  if (existing && existing.status !== "watchlist") {
     setTitleStatus(userId, titleId, "watchlist");
   }
 }

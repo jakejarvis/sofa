@@ -3,7 +3,6 @@ import { useLingui } from "@lingui/react/macro";
 import { useMutation } from "@tanstack/react-query";
 
 import { orpc } from "@/lib/orpc";
-import { queryClient } from "@/lib/query-client";
 import { invalidateTitleQueries } from "@/lib/title-actions";
 import { toast } from "@/lib/toast";
 
@@ -25,7 +24,6 @@ interface WatchInput {
 
 interface UseTitleActionsOptions {
   toasts?: {
-    quickAdd?: ToastOverride<{ id: string }>;
     updateStatus?: ToastOverride<{ id: string; status: string | null }>;
     watchMovie?: ToastOverride<WatchInput>;
     updateRating?: ToastOverride<{ id: string; stars: number }>;
@@ -42,20 +40,6 @@ interface UseTitleActionsOptions {
 export function useTitleActions(options?: UseTitleActionsOptions) {
   const { t } = useLingui();
   const toastOverrides = options?.toasts;
-
-  const quickAdd = useMutation(
-    orpc.tracking.quickAdd.mutationOptions({
-      onSuccess: (_data, input) => {
-        toast.success(resolveToast(toastOverrides?.quickAdd, t`Added to watchlist`, input));
-        invalidateTitleQueries();
-      },
-      onError: () => {
-        toast.error(t`Failed to add to watchlist`);
-        // Refetch so optimistic local status reverts on failure
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-      },
-    }),
-  );
 
   const updateStatus = useMutation(
     orpc.tracking.updateStatus.mutationOptions({
@@ -92,8 +76,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
             ? t`Rated ${plural(stars, { one: "# star", other: "# stars" })}`
             : t`Rating removed`;
         toast.success(resolveToast(toastOverrides?.updateRating, defaultMsg, input));
-        // Rating only invalidates title queries, not tracking
-        queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+        invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to update rating`),
     }),
@@ -130,7 +113,6 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   );
 
   return {
-    quickAdd,
     updateStatus,
     watchMovie,
     updateRating,

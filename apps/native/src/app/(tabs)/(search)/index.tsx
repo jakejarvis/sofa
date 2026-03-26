@@ -32,13 +32,13 @@ export default function SearchScreen() {
     }),
   });
 
-  const { quickAdd: quickAddMutation } = useTitleActions();
+  const { updateStatus } = useTitleActions();
 
   const handleQuickAdd = useCallback(
     (id: string) => {
-      quickAddMutation.mutate({ id });
+      updateStatus.mutate({ id, status: "watchlist" });
     },
-    [quickAddMutation],
+    [updateStatus],
   );
 
   // Memoize mapped results to maintain stable references
@@ -57,7 +57,7 @@ export default function SearchScreen() {
     [searchResults.data?.pages],
   );
 
-  const addingId = quickAddMutation.isPending ? (quickAddMutation.variables?.id ?? null) : null;
+  const addingId = updateStatus.isPending ? (updateStatus.variables?.id ?? null) : null;
 
   const renderItem = useCallback(
     ({ item }: { item: SearchResultItem }) => (

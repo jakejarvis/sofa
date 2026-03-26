@@ -11,7 +11,6 @@ import {
   ContinueWatchingOutput,
   CreateImportJobInput,
   CreateIntegrationInput,
-  DashboardStatsOutput,
   DiscoverInput,
   DiscoverOutput,
   DiscoverRecommendationsOutput,
@@ -26,6 +25,7 @@ import {
   LibraryGenresOutput,
   LibraryListInput,
   LibraryListOutput,
+  LibraryStatsOutput,
   MediaTypeParam,
   PageParam,
   PaginatedInput,
@@ -38,7 +38,6 @@ import {
   PublicInfoOutput,
   PurgeImageCacheOutput,
   PurgeMetadataCacheOutput,
-  QuickAddOutput,
   RestoreBackupInput,
   SearchInput,
   SearchOutput,
@@ -166,24 +165,6 @@ export const contract = {
       })
       .input(IdParam)
       .output(UserInfoOutput),
-    quickAdd: oc
-      .route({
-        method: "POST",
-        path: "/tracking/titles/{id}/quick-add",
-        tags: ["Tracking"],
-        summary: "Quick add title to library",
-        description:
-          "Add a title to the user's watchlist and trigger a full TMDB import if needed. If the title already exists in the user's library, returns alreadyAdded: true.",
-        successDescription: "Title ID and whether it was already in the library",
-      })
-      .input(IdParam)
-      .output(QuickAddOutput)
-      .errors({
-        NOT_FOUND: {
-          message: "Title not found",
-          data: appErrorData(AppErrorCode.TITLE_NOT_FOUND),
-        },
-      }),
     stats: oc
       .route({
         method: "GET",
@@ -191,18 +172,7 @@ export const contract = {
         tags: ["Tracking"],
         summary: "Get watch statistics",
         description:
-          "Fetch summary counts for the current user: movies watched this month, episodes this week, library size, and completed titles.",
-        successDescription: "Aggregate watch statistics",
-      })
-      .output(DashboardStatsOutput),
-    history: oc
-      .route({
-        method: "GET",
-        path: "/tracking/history",
-        tags: ["Tracking"],
-        summary: "Get watch history",
-        description:
-          "Fetch the user's watch counts grouped by time period. Useful for rendering activity charts.",
+          "Fetch the user's watch counts grouped by time period. Useful for rendering activity charts and dashboard counters.",
         successDescription: "Watch counts bucketed by time period",
       })
       .input(WatchHistoryInput)
@@ -234,6 +204,16 @@ export const contract = {
         successDescription: "Genres present in the library",
       })
       .output(LibraryGenresOutput),
+    stats: oc
+      .route({
+        method: "GET",
+        path: "/library/stats",
+        tags: ["Library"],
+        summary: "Get library statistics",
+        description: "Fetch aggregate library counts: total titles and completed titles.",
+        successDescription: "Library size and completed count",
+      })
+      .output(LibraryStatsOutput),
     continueWatching: oc
       .route({
         method: "GET",

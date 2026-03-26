@@ -62,12 +62,12 @@ export default function PersonDetailScreen() {
   const mutedForeground = useCSSVariable("--color-muted-foreground") as string;
   const primaryColor = useCSSVariable("--color-primary") as string;
 
-  const { quickAdd } = useTitleActions();
+  const { updateStatus } = useTitleActions();
   const handleQuickAdd = useCallback(
-    (titleId: string) => quickAdd.mutate({ id: titleId }),
-    [quickAdd],
+    (titleId: string) => updateStatus.mutate({ id: titleId, status: "watchlist" }),
+    [updateStatus],
   );
-  const addingKey = quickAdd.isPending ? (quickAdd.variables?.id ?? null) : null;
+  const addingKey = updateStatus.isPending ? (updateStatus.variables?.id ?? null) : null;
 
   const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(

@@ -131,7 +131,7 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
             <Link.MenuAction
               title={t`Add to Watchlist`}
               icon="bookmark"
-              onPress={() => titleActions.quickAdd(item.id, item.title)}
+              onPress={() => titleActions.addToWatchlist(item.id, item.title)}
             />
           </Link.Menu>
         </Link>

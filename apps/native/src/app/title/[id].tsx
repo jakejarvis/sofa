@@ -108,12 +108,7 @@ export default function TitleDetailScreen() {
   const userInfo = useQuery(orpc.tracking.userInfo.queryOptions({ input: { id } }));
   const recommendations = useQuery(orpc.titles.similar.queryOptions({ input: { id } }));
 
-  const {
-    updateStatus,
-    updateRating,
-    watchMovie,
-    quickAdd: quickAddMutation,
-  } = useTitleActions({
+  const { updateStatus, updateRating, watchMovie } = useTitleActions({
     toasts: {
       watchMovie: () => {
         const name = title?.title;
@@ -413,14 +408,12 @@ export default function TitleDetailScreen() {
               currentStatus={userInfo.data?.status ?? null}
               onStatusChange={(status) => {
                 if (status === "in_watchlist") {
-                  quickAddMutation.mutate({ id });
+                  updateStatus.mutate({ id, status: "watchlist" });
                 } else {
                   updateStatus.mutate({ id, status: null });
                 }
               }}
-              isPending={
-                updateStatus.isPending || quickAddMutation.isPending || watchMovie.isPending
-              }
+              isPending={updateStatus.isPending || watchMovie.isPending}
             />
 
             {title.type === "movie" && (

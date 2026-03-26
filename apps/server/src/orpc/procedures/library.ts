@@ -1,4 +1,4 @@
-import { getContinueWatchingFeed, getUpcomingFeed } from "@sofa/core/discovery";
+import { getContinueWatchingFeed, getUserStats, getUpcomingFeed } from "@sofa/core/discovery";
 import { getFilteredLibraryFeed, getLibraryGenresList } from "@sofa/core/library";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 
@@ -45,6 +45,11 @@ export const list = os.library.list.use(authed).handler(({ input, context }) => 
 
 export const genres = os.library.genres.use(authed).handler(({ context }) => {
   return { genres: getLibraryGenresList(context.user.id) };
+});
+
+export const stats = os.library.stats.use(authed).handler(({ context }) => {
+  const userStats = getUserStats(context.user.id);
+  return { size: userStats.librarySize, completed: userStats.completed };
 });
 
 export const continueWatching = os.library.continueWatching.use(authed).handler(({ context }) => {

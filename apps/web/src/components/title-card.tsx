@@ -88,8 +88,8 @@ function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStat
   const statusConfig = useStatusConfig();
   const [optimisticStatus, setOptimisticStatus] = useState<TitleStatus | null>(null);
 
-  const quickAddMutation = useMutation(
-    orpc.tracking.quickAdd.mutationOptions({
+  const addToWatchlistMutation = useMutation(
+    orpc.tracking.updateStatus.mutationOptions({
       onSuccess: () => setOptimisticStatus("in_watchlist"),
     }),
   );
@@ -101,8 +101,8 @@ function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStat
   function handleClick(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (quickAddMutation.isPending || isAdded) return;
-    quickAddMutation.mutate({ id });
+    if (addToWatchlistMutation.isPending || isAdded) return;
+    addToWatchlistMutation.mutate({ id, status: "watchlist" });
   }
 
   if (isAdded && config) {
@@ -127,8 +127,8 @@ function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStat
         className="absolute end-2 top-2 z-10 flex size-8 items-center justify-center rounded-full bg-black/50 text-white opacity-60 backdrop-blur-sm transition-opacity hover:bg-black/70 focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
         render={<button type="button" />}
       >
-        {!quickAddMutation.isPending && <IconPlus className="size-4" />}
-        {quickAddMutation.isPending && <IconLoader className="size-4 animate-spin" />}
+        {!addToWatchlistMutation.isPending && <IconPlus className="size-4" />}
+        {addToWatchlistMutation.isPending && <IconLoader className="size-4 animate-spin" />}
       </TooltipTrigger>
       <TooltipContent side="bottom">{t`Add to Watchlist`}</TooltipContent>
     </Tooltip>

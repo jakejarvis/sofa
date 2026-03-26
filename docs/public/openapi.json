@@ -2127,198 +2127,11 @@
         ]
       }
     },
-    "/tracking/titles/{id}/quick-add": {
-      "post": {
-        "operationId": "tracking.quickAdd",
-        "summary": "Quick add title to library",
-        "description": "Add a title to the user's watchlist and trigger a full TMDB import if needed. If the title already exists in the user's library, returns alreadyAdded: true.",
-        "tags": [
-          "Tracking"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Internal UUIDv7 identifier"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Title ID and whether it was already in the library",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "Internal title ID"
-                    },
-                    "alreadyAdded": {
-                      "type": "boolean",
-                      "description": "True if the title was already in the user's library"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "alreadyAdded"
-                  ],
-                  "description": "Result of a quick-add operation"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "404",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": true
-                        },
-                        "code": {
-                          "const": "NOT_FOUND"
-                        },
-                        "status": {
-                          "const": 404
-                        },
-                        "message": {
-                          "type": "string",
-                          "default": "Title not found"
-                        },
-                        "data": {
-                          "type": "object",
-                          "properties": {
-                            "code": {
-                              "const": "TITLE_NOT_FOUND"
-                            }
-                          },
-                          "required": [
-                            "code"
-                          ]
-                        }
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message",
-                        "data"
-                      ]
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "defined": {
-                          "const": false
-                        },
-                        "code": {
-                          "type": "string"
-                        },
-                        "status": {
-                          "type": "number"
-                        },
-                        "message": {
-                          "type": "string"
-                        },
-                        "data": {}
-                      },
-                      "required": [
-                        "defined",
-                        "code",
-                        "status",
-                        "message"
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
     "/tracking/stats": {
       "get": {
         "operationId": "tracking.stats",
         "summary": "Get watch statistics",
-        "description": "Fetch summary counts for the current user: movies watched this month, episodes this week, library size, and completed titles.",
-        "tags": [
-          "Tracking"
-        ],
-        "responses": {
-          "200": {
-            "description": "Aggregate watch statistics",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "moviesThisMonth": {
-                      "type": "number",
-                      "description": "Movies watched in the current calendar month"
-                    },
-                    "episodesThisWeek": {
-                      "type": "number",
-                      "description": "Episodes watched in the current calendar week"
-                    },
-                    "librarySize": {
-                      "type": "number",
-                      "description": "Total titles in the user's library"
-                    },
-                    "completed": {
-                      "type": "number",
-                      "description": "Total titles with completed status"
-                    }
-                  },
-                  "required": [
-                    "moviesThisMonth",
-                    "episodesThisWeek",
-                    "librarySize",
-                    "completed"
-                  ],
-                  "description": "Aggregate watch statistics for the dashboard"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ]
-      }
-    },
-    "/tracking/history": {
-      "get": {
-        "operationId": "tracking.history",
-        "summary": "Get watch history",
-        "description": "Fetch the user's watch counts grouped by time period. Useful for rendering activity charts.",
+        "description": "Fetch the user's watch counts grouped by time period. Useful for rendering activity charts and dashboard counters.",
         "tags": [
           "Tracking"
         ],
@@ -2809,6 +2622,48 @@
                     "genres"
                   ],
                   "description": "Genres that exist in the user's library"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/library/stats": {
+      "get": {
+        "operationId": "library.stats",
+        "summary": "Get library statistics",
+        "description": "Fetch aggregate library counts: total titles and completed titles.",
+        "tags": [
+          "Library"
+        ],
+        "responses": {
+          "200": {
+            "description": "Library size and completed count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "size": {
+                      "type": "number",
+                      "description": "Total titles in the user's library"
+                    },
+                    "completed": {
+                      "type": "number",
+                      "description": "Total titles with completed status"
+                    }
+                  },
+                  "required": [
+                    "size",
+                    "completed"
+                  ],
+                  "description": "Aggregate library statistics"
                 }
               }
             }

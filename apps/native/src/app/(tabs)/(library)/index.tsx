@@ -246,9 +246,12 @@ export default function LibraryScreen() {
     enabled: true,
   });
 
-  const { quickAdd } = useTitleActions();
-  const handleQuickAdd = useCallback((id: string) => quickAdd.mutate({ id }), [quickAdd]);
-  const addingId = quickAdd.isPending ? (quickAdd.variables?.id ?? null) : null;
+  const { updateStatus } = useTitleActions();
+  const handleQuickAdd = useCallback(
+    (id: string) => updateStatus.mutate({ id, status: "watchlist" }),
+    [updateStatus],
+  );
+  const addingId = updateStatus.isPending ? (updateStatus.variables?.id ?? null) : null;
 
   const allItems = useMemo(
     () => libraryQuery.data?.pages.flatMap((page) => page.items) ?? [],

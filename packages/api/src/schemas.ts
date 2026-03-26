@@ -537,14 +537,12 @@ export const PersonDetailOutput = z
 
 // ─── Dashboard outputs ─────────────────────────────────────────
 
-export const DashboardStatsOutput = z
+export const LibraryStatsOutput = z
   .object({
-    moviesThisMonth: z.number().describe("Movies watched in the current calendar month"),
-    episodesThisWeek: z.number().describe("Episodes watched in the current calendar week"),
-    librarySize: z.number().describe("Total titles in the user's library"),
+    size: z.number().describe("Total titles in the user's library"),
     completed: z.number().describe("Total titles with completed status"),
   })
-  .meta({ description: "Aggregate watch statistics for the dashboard" });
+  .meta({ description: "Aggregate library statistics" });
 
 export const ContinueWatchingOutput = z
   .object({
@@ -1000,17 +998,6 @@ export const PurgeImageCacheOutput = z
   })
   .meta({ description: "Result of purging the image cache from disk" });
 
-// ─── Quick add output ──────────────────────────────────────────
-
-export const QuickAddOutput = z
-  .object({
-    id: z.string().describe("Internal title ID"),
-    alreadyAdded: z.boolean().describe("True if the title was already in the user's library"),
-  })
-  .meta({
-    description: "Result of a quick-add operation",
-  });
-
 // ─── System outputs ───────────────────────────────────────────
 
 export const PublicInfoOutput = z
@@ -1225,7 +1212,7 @@ export type BackupInfo = z.infer<typeof BackupSchema>;
 export type CastMember = z.infer<typeof CastMemberSchema>;
 export type ColorPalette = z.infer<typeof ColorPaletteSchema>;
 export type CronJobName = z.infer<typeof cronJobName>;
-export type DashboardStats = z.infer<typeof DashboardStatsOutput>;
+export type LibraryStats = z.infer<typeof LibraryStatsOutput>;
 export type Episode = z.infer<typeof EpisodeSchema>;
 export type HistoryBucket = z.infer<typeof HistoryBucketSchema>;
 export type PersonCredit = z.infer<typeof PersonCreditSchema>;

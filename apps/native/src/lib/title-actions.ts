@@ -27,9 +27,9 @@ export function invalidateTitleQueries() {
  * Each method calls the RPC, shows a toast, and invalidates the relevant queries.
  */
 export const titleActions = {
-  async quickAdd(id: string, titleName?: string) {
+  async addToWatchlist(id: string, titleName?: string) {
     try {
-      await client.tracking.quickAdd({ id });
+      await client.tracking.updateStatus({ id, status: "watchlist" });
       toast.success(
         titleName
           ? i18n._(msg`Added "${titleName}" to watchlist`)

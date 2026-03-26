@@ -51,14 +51,14 @@ export default function DashboardScreen() {
     "--color-status-completed",
   ]) as [string, string, string, string];
 
-  const stats = useQuery(orpc.tracking.stats.queryOptions());
+  const libraryStats = useQuery(orpc.library.stats.queryOptions());
   const movieHistory = useQuery(
-    orpc.tracking.history.queryOptions({
+    orpc.tracking.stats.queryOptions({
       input: { type: "movie", period: moviePeriod },
     }),
   );
   const episodeHistory = useQuery(
-    orpc.tracking.history.queryOptions({
+    orpc.tracking.stats.queryOptions({
       input: { type: "episode", period: episodePeriod },
     }),
   );
@@ -67,7 +67,7 @@ export default function DashboardScreen() {
   const recommendations = useQuery(orpc.discover.recommendations.queryOptions());
 
   const isRefreshing =
-    stats.isRefetching ||
+    libraryStats.isRefetching ||
     continueWatching.isRefetching ||
     library.isRefetching ||
     movieHistory.isRefetching ||
@@ -82,8 +82,8 @@ export default function DashboardScreen() {
   const hasContinueWatching = (continueWatching.data?.items?.length ?? 0) > 0;
   const hasRecommendations = (recommendations.data?.items?.length ?? 0) > 0;
 
-  const movieCount = movieHistory.data?.count ?? stats.data?.moviesThisMonth;
-  const episodeCount = episodeHistory.data?.count ?? stats.data?.episodesThisWeek;
+  const movieCount = movieHistory.data?.count;
+  const episodeCount = episodeHistory.data?.count;
 
   const periodLabels: Record<TimePeriod, string> = {
     today: t`today`,
@@ -144,7 +144,7 @@ export default function DashboardScreen() {
             <View className="flex-row gap-3">
               <StatsCard
                 label={t`In Library`}
-                value={stats.data?.librarySize}
+                value={libraryStats.data?.size}
                 icon={IconBooks}
                 color="text-status-watchlist"
                 tintColor={watchlistColor}
@@ -152,7 +152,7 @@ export default function DashboardScreen() {
               />
               <StatsCard
                 label={t`Completed`}
-                value={stats.data?.completed}
+                value={libraryStats.data?.completed}
                 icon={IconCheck}
                 color="text-status-completed"
                 tintColor={completedColor}

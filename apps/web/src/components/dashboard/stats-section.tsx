@@ -8,20 +8,34 @@ import { orpc } from "@/lib/orpc/client";
 import { StatsDisplay, StatsSectionSkeleton } from "./stats-display";
 
 export function StatsSection() {
-  const { data: stats, isPending } = useQuery(orpc.tracking.stats.queryOptions());
+  const { data: movieStats, isPending: moviesPending } = useQuery(
+    orpc.tracking.stats.queryOptions({ input: { type: "movie", period: "this_month" } }),
+  );
+  const { data: episodeStats, isPending: episodesPending } = useQuery(
+    orpc.tracking.stats.queryOptions({ input: { type: "episode", period: "this_week" } }),
+  );
+  const { data: libraryStats, isPending: libraryPending } = useQuery(
+    orpc.library.stats.queryOptions(),
+  );
+
+  const isPending = moviesPending || episodesPending || libraryPending;
 
   if (isPending) return <StatsSectionSkeleton />;
-  if (!stats) return null;
+  if (!movieStats || !episodeStats || !libraryStats) return null;
 
   const isEmpty =
-    stats.moviesThisMonth === 0 &&
-    stats.episodesThisWeek === 0 &&
-    stats.librarySize === 0 &&
-    stats.completed === 0;
+    movieStats.count === 0 &&
+    episodeStats.count === 0 &&
+    libraryStats.size === 0 &&
+    libraryStats.completed === 0;
 
   return (
     <>
-      <StatsDisplay stats={stats} />
+      <StatsDisplay
+        movieStats={movieStats}
+        episodeStats={episodeStats}
+        libraryStats={libraryStats}
+      />
       {isEmpty && (
         <div className="border-border/50 flex flex-col items-center gap-4 rounded-xl border border-dashed py-16 text-center">
           <div className="bg-primary/10 rounded-full p-4">

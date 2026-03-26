@@ -1,8 +1,5 @@
-import { ORPCError } from "@orpc/server";
-
-import { AppErrorCode } from "@sofa/api/errors";
 import type { WatchScopeType } from "@sofa/api/schemas";
-import { getUserStats, getWatchCount, getWatchHistory } from "@sofa/core/discovery";
+import { getWatchCount, getWatchHistory } from "@sofa/core/discovery";
 import { getOrFetchTitleByTmdbId } from "@sofa/core/metadata";
 import {
   getDisplayStatusesByTitleIds,
@@ -14,7 +11,6 @@ import {
   quickAddTitle,
   rateTitleStars,
   removeTitleStatus,
-  setTitleStatus,
   unwatchEpisode,
   unwatchMovie,
   unwatchSeason,
@@ -32,6 +28,8 @@ const watchHistoryTypeMap = { movie: "movies", episode: "episodes" } as const;
 
 // ─── Watch handlers by scope ──────────────────────────────────
 
+// All tracking core functions are synchronous (bun:sqlite). If any become
+// async, these loops need to be awaited to surface errors properly.
 function handleWatch(userId: string, scope: WatchScopeType, ids: string[]) {
   switch (scope) {
     case "movie":
@@ -80,13 +78,22 @@ export const unwatch = os.tracking.unwatch.use(authed).handler(({ input, context
   handleUnwatch(context.user.id, input.scope, input.ids);
 });
 
-export const updateStatus = os.tracking.updateStatus.use(authed).handler(({ input, context }) => {
-  if (input.status === null) {
-    removeTitleStatus(context.user.id, input.id);
-  } else {
-    setTitleStatus(context.user.id, input.id, input.status);
-  }
-});
+export const updateStatus = os.tracking.updateStatus
+  .use(authed)
+  .handler(async ({ input, context }) => {
+    if (input.status === null) {
+      removeTitleStatus(context.user.id, input.id);
+      return;
+    }
+
+    // Auto-import from TMDB if the title is a shell (absorbs quickAdd logic)
+    const result = quickAddTitle(context.user.id, input.id);
+    if (result && !result.alreadyAdded) {
+      getOrFetchTitleByTmdbId(result.tmdbId, result.type as "movie" | "tv").catch((err) => {
+        log.warn(`Failed to import ${result.type} TMDB ${result.tmdbId}:`, err);
+      });
+    }
+  });
 
 export const rate = os.tracking.rate.use(authed).handler(({ input, context }) => {
   rateTitleStars(context.user.id, input.id, input.stars);
@@ -100,30 +107,9 @@ export const userInfo = os.tracking.userInfo.use(authed).handler(({ input, conte
   return { ...info, status: displayStatuses[input.id] ?? null };
 });
 
-export const quickAdd = os.tracking.quickAdd.use(authed).handler(async ({ input, context }) => {
-  const result = quickAddTitle(context.user.id, input.id);
-  if (!result) {
-    throw new ORPCError("NOT_FOUND", {
-      message: "Title not found",
-      data: { code: AppErrorCode.TITLE_NOT_FOUND },
-    });
-  }
-
-  // Trigger full TMDB import if still a shell (fire-and-forget)
-  getOrFetchTitleByTmdbId(result.tmdbId, result.type as "movie" | "tv").catch((err) => {
-    log.warn(`Failed to import ${result.type} TMDB ${result.tmdbId}:`, err);
-  });
-
-  return { id: result.id, alreadyAdded: result.alreadyAdded };
-});
-
-export const stats = os.tracking.stats.use(authed).handler(({ context }) => {
-  return getUserStats(context.user.id);
-});
-
-export const history = os.tracking.history.use(authed).handler(({ input, context }) => {
+export const stats = os.tracking.stats.use(authed).handler(({ input, context }) => {
   const coreType = watchHistoryTypeMap[input.type];
   const count = getWatchCount(context.user.id, coreType, input.period);
-  const watchHistory = getWatchHistory(context.user.id, coreType, input.period);
-  return { count, history: watchHistory };
+  const history = getWatchHistory(context.user.id, coreType, input.period);
+  return { count, history };
 });

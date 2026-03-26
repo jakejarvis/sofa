@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { orpc } from "@/lib/orpc/client";
-import type { DashboardStats, HistoryBucket, TimePeriod } from "@sofa/api/schemas";
+import type { HistoryBucket, LibraryStats, TimePeriod } from "@sofa/api/schemas";
 
 import { Sparkline } from "./sparkline";
 
@@ -152,27 +152,38 @@ function PeriodSelector({
   );
 }
 
-export function StatsDisplay({ stats }: { stats: DashboardStats }) {
+interface WatchStats {
+  count: number;
+  history: HistoryBucket[];
+}
+
+interface StatsDisplayProps {
+  movieStats: WatchStats;
+  episodeStats: WatchStats;
+  libraryStats: LibraryStats;
+}
+
+export function StatsDisplay({ movieStats, episodeStats, libraryStats }: StatsDisplayProps) {
   const { t } = useLingui();
   const [moviePeriod, setMoviePeriod] = useState<TimePeriod>("this_month");
   const [episodePeriod, setEpisodePeriod] = useState<TimePeriod>("this_week");
 
-  const { data: movieStats } = useQuery(
-    orpc.tracking.history.queryOptions({
+  const { data: moviePeriodStats } = useQuery(
+    orpc.tracking.stats.queryOptions({
       input: { type: "movie", period: moviePeriod },
     }),
   );
-  const { data: episodeStats } = useQuery(
-    orpc.tracking.history.queryOptions({
+  const { data: episodePeriodStats } = useQuery(
+    orpc.tracking.stats.queryOptions({
       input: { type: "episode", period: episodePeriod },
     }),
   );
 
-  const movieCount = movieStats?.count ?? stats.moviesThisMonth;
-  const movieHistory = movieStats?.history;
+  const movieCount = moviePeriodStats?.count ?? movieStats.count;
+  const movieHistory = moviePeriodStats?.history ?? movieStats.history;
 
-  const episodeCount = episodeStats?.count ?? stats.episodesThisWeek;
-  const episodeHistory = episodeStats?.history;
+  const episodeCount = episodePeriodStats?.count ?? episodeStats.count;
+  const episodeHistory = episodePeriodStats?.history ?? episodeStats.history;
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -206,7 +217,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         icon={IconBooks}
         color="text-status-watchlist"
         bgColor="bg-status-watchlist/10"
-        value={stats.librarySize}
+        value={libraryStats.size}
         index={2}
         label={t`In Library`}
       />
@@ -214,7 +225,7 @@ export function StatsDisplay({ stats }: { stats: DashboardStats }) {
         icon={IconCheck}
         color="text-status-completed"
         bgColor="bg-status-completed/10"
-        value={stats.completed}
+        value={libraryStats.completed}
         index={3}
         label={t`Completed`}
       />
