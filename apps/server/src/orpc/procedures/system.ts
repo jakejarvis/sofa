@@ -4,6 +4,7 @@ import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
 
 import { os } from "../context";
+import { authed } from "../middleware";
 
 // Well-known TMDB poster paths for the background collage
 const posterPaths = [
@@ -26,22 +27,20 @@ export const publicInfo = os.system.publicInfo.handler(async () => {
     .map((p) => tmdbImageUrl(p, "posters", "w300"))
     .filter(Boolean) as string[];
 
+  const oidcEnabled = isOidcConfigured();
+
   return {
     instanceId: getInstanceId(),
     tmdbConfigured: isTmdbConfigured(),
     userCount: getUserCount(),
     registrationOpen: isRegistrationOpen(),
     posterUrls,
-  };
-});
-
-export const authConfig = os.system.authConfig.handler(async () => {
-  const oidcEnabled = isOidcConfigured();
-  return {
     oidcEnabled,
     oidcProviderName: oidcEnabled ? getOidcProviderName() : null,
     passwordLoginDisabled: isPasswordLoginDisabled(),
-    registrationOpen: isRegistrationOpen(),
-    userCount: getUserCount(),
   };
+});
+
+export const status = os.system.status.use(authed).handler(() => {
+  return { publicApiUrl: process.env.PUBLIC_API_URL ?? "https://public-api.sofa.watch" };
 });

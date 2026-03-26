@@ -90,7 +90,7 @@ export default function SettingsScreen() {
   const isAdmin = session?.user?.role === "admin";
   const serverUrl = getServerUrl();
 
-  const authConfig = useQuery(orpc.system.authConfig.queryOptions());
+  const publicInfo = useQuery(orpc.system.publicInfo.queryOptions());
   const { data: accounts } = useQuery({
     queryKey: ["auth", "listAccounts"],
     queryFn: async () => {
@@ -100,7 +100,7 @@ export default function SettingsScreen() {
   });
   const hasPassword =
     accounts?.some((a: { providerId: string }) => a.providerId === "credential") ?? false;
-  const showPasswordOption = hasPassword && !(authConfig.data?.passwordLoginDisabled ?? true);
+  const showPasswordOption = hasPassword && !(publicInfo.data?.passwordLoginDisabled ?? true);
 
   const systemHealth = useQuery({
     ...orpc.admin.systemHealth.queryOptions(),
@@ -162,39 +162,47 @@ export default function SettingsScreen() {
 
   const hasAvatarImage = !!session?.user?.image;
 
-  const registration = useQuery({
-    ...orpc.admin.registration.queryOptions(),
+  const adminSettings = useQuery({
+    ...orpc.admin.settings.get.queryOptions(),
     enabled: isAdmin,
   });
 
-  const toggleRegistration = useMutation(
-    orpc.admin.toggleRegistration.mutationOptions({
-      onSuccess: (_data, { open }) => {
-        toast.success(open ? t`Registration opened` : t`Registration closed`);
+  const updateAdminSettings = useMutation(
+    orpc.admin.settings.update.mutationOptions({
+      onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: orpc.admin.registration.key(),
-        });
-      },
-      onError: () => toast.error(t`Failed to update registration setting`),
-    }),
-  );
-
-  const updateCheck = useQuery({
-    ...orpc.admin.updateCheck.queryOptions(),
-    enabled: isAdmin,
-  });
-
-  const toggleUpdateCheck = useMutation(
-    orpc.admin.toggleUpdateCheck.mutationOptions({
-      onSuccess: (_data, { enabled }) => {
-        toast.success(enabled ? t`Update checks enabled` : t`Update checks disabled`);
-        queryClient.invalidateQueries({
-          queryKey: orpc.admin.updateCheck.key(),
+          queryKey: orpc.admin.settings.key(),
         });
       },
       onError: () => toast.error(t`Failed to update setting`),
     }),
   );
+
+  const toggleRegistration = {
+    mutate: ({ open }: { open: boolean }) => {
+      updateAdminSettings.mutate(
+        { registration: { open } },
+        {
+          onSuccess: () => {
+            toast.success(open ? t`Registration opened` : t`Registration closed`);
+          },
+        },
+      );
+    },
+  };
+
+  const toggleUpdateCheck = {
+    mutate: ({ enabled }: { enabled: boolean }) => {
+      updateAdminSettings.mutate(
+        { updateCheck: { enabled } },
+        {
+          onSuccess: () => {
+            toast.success(enabled ? t`Update checks enabled` : t`Update checks disabled`);
+          },
+        },
+      );
+    },
+  };
 
   const primaryFgColor = useCSSVariable("--color-primary-foreground") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
@@ -484,7 +492,7 @@ export default function SettingsScreen() {
               icon={IconUserPlus}
               right={
                 <Switch
-                  value={registration.data?.open ?? false}
+                  value={adminSettings.data?.registration?.open ?? false}
                   accessibilityLabel={t`Open registration`}
                   onValueChange={(open) => toggleRegistration.mutate({ open })}
                 />
@@ -495,15 +503,15 @@ export default function SettingsScreen() {
               icon={IconCloud}
               right={
                 <Switch
-                  value={updateCheck.data?.enabled ?? false}
+                  value={adminSettings.data?.updateCheck?.enabled ?? false}
                   accessibilityLabel={t`Check for updates`}
                   onValueChange={(enabled) => toggleUpdateCheck.mutate({ enabled })}
                 />
               }
             />
             {(() => {
-              const latestVersion = updateCheck.data?.updateCheck?.latestVersion;
-              return updateCheck.data?.updateCheck?.updateAvailable ? (
+              const latestVersion = adminSettings.data?.updateCheck?.latestVersion;
+              return adminSettings.data?.updateCheck?.updateAvailable ? (
                 <View className="py-3.5">
                   <Text className="text-status-completed font-sans text-sm font-medium">
                     <Trans>Update available: {latestVersion}</Trans>
@@ -567,8 +575,8 @@ export default function SettingsScreen() {
           Native
           {Application.nativeApplicationVersion ? ` v${Application.nativeApplicationVersion}` : ""}
           {Application.nativeBuildVersion ? ` (${Application.nativeBuildVersion})` : ""}
-          {updateCheck.data?.updateCheck?.currentVersion
-            ? ` · Server v${updateCheck.data.updateCheck.currentVersion}`
+          {adminSettings.data?.updateCheck?.currentVersion
+            ? ` · Server v${adminSettings.data.updateCheck.currentVersion}`
             : ""}
         </Text>
       </Animated.View>

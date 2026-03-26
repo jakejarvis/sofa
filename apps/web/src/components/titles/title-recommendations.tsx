@@ -27,7 +27,7 @@ function RecommendationsSkeleton() {
 
 export function TitleRecommendations({ titleId }: { titleId: string }) {
   const { data, isLoading } = useQuery(
-    orpc.titles.recommendations.queryOptions({ input: { id: titleId } }),
+    orpc.titles.similar.queryOptions({ input: { id: titleId } }),
   );
 
   if (isLoading) return <RecommendationsSkeleton />;

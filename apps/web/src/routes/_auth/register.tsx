@@ -7,17 +7,17 @@ import { client } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_auth/register")({
   beforeLoad: async () => {
-    const authConfig = await client.system.authConfig({});
-    return { authConfig };
+    const publicInfo = await client.system.publicInfo({});
+    return { publicInfo };
   },
   head: () => ({ meta: [{ title: "Create account — Sofa" }] }),
   component: RegisterPage,
 });
 
 function RegisterPage() {
-  const { authConfig } = Route.useRouteContext();
+  const { publicInfo } = Route.useRouteContext();
 
-  if (!authConfig.registrationOpen) {
+  if (!publicInfo.registrationOpen) {
     return (
       <div className="relative mx-auto w-full max-w-sm">
         <div className="bg-primary/3 absolute -inset-4 rounded-2xl blur-2xl" />
@@ -50,9 +50,9 @@ function RegisterPage() {
     <AuthForm
       mode="register"
       authConfig={{
-        oidcEnabled: authConfig.oidcEnabled,
-        oidcProviderName: authConfig.oidcProviderName,
-        passwordLoginDisabled: authConfig.passwordLoginDisabled,
+        oidcEnabled: publicInfo.oidcEnabled,
+        oidcProviderName: publicInfo.oidcProviderName,
+        passwordLoginDisabled: publicInfo.passwordLoginDisabled,
       }}
     />
   );

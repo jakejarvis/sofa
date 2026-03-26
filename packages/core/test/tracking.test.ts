@@ -26,7 +26,9 @@ import {
   removeTitleStatus,
   setTitleStatus,
   unwatchEpisode,
+  unwatchMovie,
   unwatchSeason,
+  unwatchSeries,
 } from "../src/tracking";
 
 beforeEach(() => {
@@ -494,6 +496,93 @@ describe("unwatchSeason", () => {
 });
 
 // ── rateTitleStars ──────────────────────────────────────────────────
+
+// ── unwatchMovie ─────────────────────────────────────────────────────
+
+describe("unwatchMovie", () => {
+  test("removes movie watch records and reverts completed to watchlist", () => {
+    insertUser();
+    insertTitle();
+    logMovieWatch("user-1", "title-1");
+
+    // Verify completed status
+    const before = testDb
+      .select()
+      .from(userTitleStatus)
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "title-1")))
+      .get();
+    expect(before?.status).toBe("completed");
+
+    unwatchMovie("user-1", "title-1");
+
+    // Watch records removed
+    const watches = testDb
+      .select()
+      .from(userMovieWatches)
+      .where(and(eq(userMovieWatches.userId, "user-1"), eq(userMovieWatches.titleId, "title-1")))
+      .all();
+    expect(watches).toHaveLength(0);
+
+    // Status reverted to watchlist
+    const after = testDb
+      .select()
+      .from(userTitleStatus)
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "title-1")))
+      .get();
+    expect(after?.status).toBe("watchlist");
+  });
+
+  test("no-op when movie was not watched", () => {
+    insertUser();
+    insertTitle();
+    setTitleStatus("user-1", "title-1", "watchlist");
+
+    unwatchMovie("user-1", "title-1");
+
+    const row = testDb
+      .select()
+      .from(userTitleStatus)
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "title-1")))
+      .get();
+    expect(row?.status).toBe("watchlist");
+  });
+});
+
+// ── unwatchSeries ────────────────────────────────────────────────────
+
+describe("unwatchSeries", () => {
+  test("removes all episode watches and reverts status to watchlist", () => {
+    const { episodeIds } = insertTvShow("tv-1");
+    insertUser();
+    logEpisodeWatch("user-1", episodeIds[0]);
+    logEpisodeWatch("user-1", episodeIds[1]);
+
+    const before = testDb
+      .select()
+      .from(userEpisodeWatches)
+      .where(eq(userEpisodeWatches.userId, "user-1"))
+      .all();
+    expect(before.length).toBeGreaterThan(0);
+
+    unwatchSeries("user-1", "tv-1");
+
+    const after = testDb
+      .select()
+      .from(userEpisodeWatches)
+      .where(eq(userEpisodeWatches.userId, "user-1"))
+      .all();
+    expect(after).toHaveLength(0);
+
+    const statusRow = testDb
+      .select()
+      .from(userTitleStatus)
+      .where(and(eq(userTitleStatus.userId, "user-1"), eq(userTitleStatus.titleId, "tv-1")))
+      .get();
+    expect(statusRow?.status).toBe("watchlist");
+  });
+});
+
+// ── rateTitleStars ───────────────────────────────────────────────────
 
 describe("rateTitleStars", () => {
   test("sets rating", () => {

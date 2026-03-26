@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_app/upcoming")({
   staleTime: 30_000,
   loader: async ({ context }) => {
     await context.queryClient.ensureInfiniteQueryData(
-      orpc.dashboard.upcoming.infiniteOptions({
+      orpc.library.upcoming.infiniteOptions({
         input: (pageParam: string | undefined) => ({
           days: 90,
           limit: 20,
@@ -70,7 +70,7 @@ function UpcomingPage() {
   const statusFilter = search.status ?? "all";
 
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
-    orpc.dashboard.upcoming.infiniteOptions({
+    orpc.library.upcoming.infiniteOptions({
       input: (pageParam: string | undefined) => ({
         days: 90,
         limit: 20,

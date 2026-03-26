@@ -11,12 +11,12 @@ import { orpc } from "@/lib/orpc/client";
 
 export function UpdateCheckSection() {
   const { t } = useLingui();
-  const { data, isPending: isLoading } = useQuery(orpc.admin.updateCheck.queryOptions());
+  const { data, isPending: isLoading } = useQuery(orpc.admin.settings.get.queryOptions());
   const [localEnabled, setLocalEnabled] = useState<boolean | null>(null);
-  const currentEnabled = localEnabled ?? data?.enabled ?? true;
+  const currentEnabled = localEnabled ?? data?.updateCheck.enabled ?? true;
   const [optimisticEnabled, setOptimisticEnabled] = useOptimistic(currentEnabled);
   const [isPending, startTransition] = useTransition();
-  const toggleMutation = useMutation(orpc.admin.toggleUpdateCheck.mutationOptions());
+  const toggleMutation = useMutation(orpc.admin.settings.update.mutationOptions());
 
   if (isLoading) {
     return (
@@ -30,7 +30,7 @@ export function UpdateCheckSection() {
     startTransition(async () => {
       setOptimisticEnabled(checked);
       try {
-        await toggleMutation.mutateAsync({ enabled: checked });
+        await toggleMutation.mutateAsync({ updateCheck: { enabled: checked } });
         setLocalEnabled(checked);
         toast.success(checked ? t`Update checks enabled` : t`Update checks disabled`);
       } catch {

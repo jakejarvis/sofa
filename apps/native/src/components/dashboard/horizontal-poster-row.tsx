@@ -29,9 +29,12 @@ export function HorizontalPosterRow({
   items: PosterRowItem[];
   isLoading?: boolean;
 }) {
-  const { quickAdd } = useTitleActions();
-  const handleQuickAdd = useCallback((id: string) => quickAdd.mutate({ id }), [quickAdd]);
-  const addingKey = quickAdd.isPending ? (quickAdd.variables?.id ?? null) : null;
+  const { updateStatus } = useTitleActions();
+  const handleQuickAdd = useCallback(
+    (id: string) => updateStatus.mutate({ id, status: "watchlist" }),
+    [updateStatus],
+  );
+  const addingKey = updateStatus.isPending ? (updateStatus.variables?.id ?? null) : null;
   const keyExtractor = useCallback((item: PosterRowItem) => item.id, []);
   const renderItem = useCallback(
     ({ item }: { item: PosterRowItem }) => (

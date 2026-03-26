@@ -8,7 +8,7 @@ import { FeedSection } from "./feed-section";
 import { TitleGrid, TitleGridSectionSkeleton } from "./title-grid";
 
 export function RecommendationsSection() {
-  const { data, isPending } = useQuery(orpc.dashboard.recommendations.queryOptions());
+  const { data, isPending } = useQuery(orpc.discover.recommendations.queryOptions());
 
   const { t } = useLingui();
 

@@ -54,7 +54,7 @@ export function FilterableTitleRow({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    orpc.discover.infiniteOptions({
+    orpc.discover.browse.infiniteOptions({
       input:
         selectedGenre != null
           ? (pageParam: number) => ({

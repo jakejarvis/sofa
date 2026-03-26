@@ -76,13 +76,15 @@ export function SeasonAccordion({
 
   const { watchEpisode, unwatchEpisode, watchSeason } = useTitleActions({
     toasts: {
-      watchEpisode: ({ id: epId }) => {
+      watchEpisode: ({ ids }) => {
+        const epId = ids[0];
         const ep = episodes.find((e) => e.id === epId);
         const sNum = season.seasonNumber;
         const eNum = ep?.episodeNumber;
         return ep ? t`Watched S${sNum} E${eNum}` : t`Episode watched`;
       },
-      unwatchEpisode: ({ id: epId }) => {
+      unwatchEpisode: ({ ids }) => {
+        const epId = ids[0];
         const ep = episodes.find((e) => e.id === epId);
         const sNum = season.seasonNumber;
         const eNum = ep?.episodeNumber;
@@ -99,9 +101,9 @@ export function SeasonAccordion({
   const handleEpisodeToggle = useCallback(
     (episodeId: string) => {
       if (watchedEpisodeIds.has(episodeId)) {
-        unwatchEpisode.mutate({ id: episodeId });
+        unwatchEpisode.mutate({ scope: "episode", ids: [episodeId] });
       } else {
-        watchEpisode.mutate({ id: episodeId });
+        watchEpisode.mutate({ scope: "episode", ids: [episodeId] });
       }
     },
     [watchedEpisodeIds, unwatchEpisode, watchEpisode],
@@ -156,7 +158,7 @@ export function SeasonAccordion({
         <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(150)}>
           {watchedCount < episodes.length && (
             <Pressable
-              onPress={() => watchSeason.mutate({ id: season.id })}
+              onPress={() => watchSeason.mutate({ scope: "season", ids: [season.id] })}
               className="bg-secondary mx-4 mb-2 flex-row items-center justify-center rounded-lg py-2"
             >
               <Text className="text-title-accent font-sans text-xs font-medium">

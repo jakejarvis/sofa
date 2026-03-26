@@ -69,11 +69,11 @@ export function DiscoverSection() {
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [platformId, setPlatformId] = useState<string | undefined>(undefined);
 
-  const { data: genreData } = useQuery(orpc.explore.genres.queryOptions({ input: { type } }));
-  const { data: providerData } = useQuery(orpc.platforms.list.queryOptions());
+  const { data: genreData } = useQuery(orpc.discover.genres.queryOptions({ input: { type } }));
+  const { data: providerData } = useQuery(orpc.discover.platforms.queryOptions());
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteQuery(
-    orpc.discover.infiniteOptions({
+    orpc.discover.browse.infiniteOptions({
       input: (pageParam: number) => ({
         type,
         genreId,

@@ -101,7 +101,7 @@ export function CommandPalette() {
   const debouncedQuery = useDebounce(query, 300);
   const trimmedQuery = debouncedQuery.trim();
   const { data: searchData, isLoading: loading } = useQuery(
-    orpc.search.queryOptions({
+    orpc.discover.search.queryOptions({
       input: trimmedQuery ? { query: trimmedQuery } : skipToken,
     }),
   );

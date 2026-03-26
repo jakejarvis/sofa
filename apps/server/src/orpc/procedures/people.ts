@@ -7,7 +7,7 @@ import { getDisplayStatusesByTitleIds } from "@sofa/core/tracking";
 import { os } from "../context";
 import { authed } from "../middleware";
 
-export const detail = os.people.detail.use(authed).handler(async ({ input, context }) => {
+export const get = os.people.get.use(authed).handler(async ({ input, context }) => {
   const person = await getOrFetchPerson(input.id);
   if (!person)
     throw new ORPCError("NOT_FOUND", {

@@ -21,10 +21,10 @@ export const Route = createFileRoute("/_app/titles/$id")({
     try {
       const [titleResult, userInfo] = await Promise.all([
         context.queryClient.ensureQueryData(
-          orpc.titles.detail.queryOptions({ input: { id: params.id } }),
+          orpc.titles.get.queryOptions({ input: { id: params.id } }),
         ),
         context.queryClient
-          .ensureQueryData(orpc.titles.userInfo.queryOptions({ input: { id: params.id } }))
+          .ensureQueryData(orpc.tracking.userInfo.queryOptions({ input: { id: params.id } }))
           .catch(() => null),
       ]);
       return { ...titleResult, userInfo };

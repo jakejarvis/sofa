@@ -13,7 +13,7 @@ export function UpcomingSection() {
   const { t } = useLingui();
   const { push } = useRouter();
   const { data, isPending } = useQuery(
-    orpc.dashboard.upcoming.queryOptions({ input: { days: 7, limit: 5 } }),
+    orpc.library.upcoming.queryOptions({ input: { days: 7, limit: 5 } }),
   );
 
   if (isPending) return null;

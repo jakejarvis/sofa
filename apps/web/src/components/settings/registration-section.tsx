@@ -11,12 +11,12 @@ import { orpc } from "@/lib/orpc/client";
 
 export function RegistrationSection() {
   const { t } = useLingui();
-  const { data, isPending: isLoading } = useQuery(orpc.admin.registration.queryOptions());
+  const { data, isPending: isLoading } = useQuery(orpc.admin.settings.get.queryOptions());
   const [registrationOpen, setRegistrationOpen] = useState<boolean | null>(null);
-  const currentOpen = registrationOpen ?? data?.open ?? false;
+  const currentOpen = registrationOpen ?? data?.registration.open ?? false;
   const [optimisticOpen, setOptimisticOpen] = useOptimistic(currentOpen);
   const [isPending, startTransition] = useTransition();
-  const toggleMutation = useMutation(orpc.admin.toggleRegistration.mutationOptions());
+  const toggleMutation = useMutation(orpc.admin.settings.update.mutationOptions());
 
   if (isLoading) {
     return (
@@ -30,7 +30,7 @@ export function RegistrationSection() {
     startTransition(async () => {
       setOptimisticOpen(checked);
       try {
-        await toggleMutation.mutateAsync({ open: checked });
+        await toggleMutation.mutateAsync({ registration: { open: checked } });
         setRegistrationOpen(checked);
         toast.success(checked ? t`Registration opened` : t`Registration closed`);
       } catch {

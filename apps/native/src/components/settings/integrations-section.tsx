@@ -14,7 +14,7 @@ import { orpc } from "@/lib/orpc";
 export function IntegrationsSection() {
   const { t, i18n } = useLingui();
   const configs = getIntegrationConfigs(i18n);
-  const integrations = useQuery(orpc.integrations.list.queryOptions());
+  const integrations = useQuery(orpc.account.integrations.list.queryOptions());
 
   return (
     <View className="mb-6">

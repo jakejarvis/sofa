@@ -1,8 +1,18 @@
 import { mkdir, rename } from "node:fs/promises";
 import path from "node:path";
 
+import { ORPCError } from "@orpc/server";
+
+import { AppErrorCode } from "@sofa/api/errors";
 import { auth } from "@sofa/auth/server";
 import { AVATAR_DIR } from "@sofa/config";
+import {
+  createOrUpdateIntegration,
+  deleteIntegration as coreDeleteIntegration,
+  listUserIntegrations,
+  regenerateToken as coreRegenerateToken,
+  serializeIntegration,
+} from "@sofa/core/integrations";
 import { getUserPlatformIdList, updateUserPlatforms } from "@sofa/core/platforms";
 
 import { os } from "../context";
@@ -27,7 +37,6 @@ export const uploadAvatar = os.account.uploadAvatar
   .handler(async ({ input: file, context }) => {
     await mkdir(AVATAR_DIR, { recursive: true });
 
-    // Write new avatar first (atomic: temp file + rename)
     const ext = MIME_TO_EXT[file.type] || "jpg";
     const filename = `${context.user.id}.${ext}`;
     const filePath = path.join(AVATAR_DIR, filename);
@@ -35,7 +44,6 @@ export const uploadAvatar = os.account.uploadAvatar
     await Bun.write(tmpPath, file);
     await rename(tmpPath, filePath);
 
-    // Remove any previous avatar with a different extension
     const glob = new Bun.Glob(`${context.user.id}.*`);
     const existing = await Array.fromAsync(glob.scan(AVATAR_DIR));
     for (const match of existing) {
@@ -44,7 +52,6 @@ export const uploadAvatar = os.account.uploadAvatar
       }
     }
 
-    // Update user via Better Auth
     const imageUrl = `/api/avatars/${context.user.id}?v=${Date.now()}`;
     await auth.api.updateUser({
       body: { image: imageUrl },
@@ -74,4 +81,37 @@ export const updatePlatformsHandler = os.account.updatePlatforms
   .use(authed)
   .handler(async ({ input, context }) => {
     updateUserPlatforms(context.user.id, input.platformIds);
+  });
+
+// ─── Integrations ─────────────────────────────────────────────
+
+export const integrationsList = os.account.integrations.list.use(authed).handler(({ context }) => {
+  return listUserIntegrations(context.user.id);
+});
+
+export const integrationsCreate = os.account.integrations.create
+  .use(authed)
+  .handler(({ input, context }) => {
+    return createOrUpdateIntegration(context.user.id, input.provider, input.enabled);
+  });
+
+export const integrationsDelete = os.account.integrations.delete
+  .use(authed)
+  .handler(({ input, context }) => {
+    coreDeleteIntegration(context.user.id, input.provider);
+  });
+
+export const integrationsRegenerateToken = os.account.integrations.regenerateToken
+  .use(authed)
+  .handler(({ input, context }) => {
+    const row = coreRegenerateToken(context.user.id, input.provider);
+
+    if (!row) {
+      throw new ORPCError("NOT_FOUND", {
+        message: "Integration not found",
+        data: { code: AppErrorCode.INTEGRATION_NOT_FOUND },
+      });
+    }
+
+    return serializeIntegration(row);
   });

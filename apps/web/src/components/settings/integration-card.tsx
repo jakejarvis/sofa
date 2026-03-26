@@ -83,7 +83,7 @@ export function IntegrationCard({
   const providerInput = provider as "plex" | "jellyfin" | "emby" | "sonarr" | "radarr";
 
   const connectMutation = useMutation(
-    orpc.integrations.create.mutationOptions({
+    orpc.account.integrations.create.mutationOptions({
       onSuccess: (result) => {
         setConnections((prev) => [...prev, { ...result, recentEvents: [] }]);
         toast.success(t`${label} connected`);
@@ -93,7 +93,7 @@ export function IntegrationCard({
   );
 
   const deleteMutation = useMutation(
-    orpc.integrations.delete.mutationOptions({
+    orpc.account.integrations.delete.mutationOptions({
       onMutate: () => {
         let previous: IntegrationConnection[] = [];
         setConnections((prev) => {
@@ -111,7 +111,7 @@ export function IntegrationCard({
   );
 
   const regenerateTokenMutation = useMutation(
-    orpc.integrations.regenerateToken.mutationOptions({
+    orpc.account.integrations.regenerateToken.mutationOptions({
       onSuccess: (result) => {
         setConnections((prev) =>
           prev.map((c) => (c.provider === provider ? { ...c, token: result.token } : c)),

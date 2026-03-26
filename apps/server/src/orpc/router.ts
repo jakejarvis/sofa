@@ -1,75 +1,68 @@
 import { os } from "./context";
 import * as account from "./procedures/account";
 import * as admin from "./procedures/admin";
-import * as dashboard from "./procedures/dashboard";
-import { discover } from "./procedures/discover";
-import * as episodes from "./procedures/episodes";
-import * as explore from "./procedures/explore";
+import * as discover from "./procedures/discover";
 import * as imports from "./procedures/imports";
-import * as integrations from "./procedures/integrations";
 import * as library from "./procedures/library";
 import * as people from "./procedures/people";
-import * as platformProcs from "./procedures/platforms";
-import { search } from "./procedures/search";
-import * as seasons from "./procedures/seasons";
-import * as status from "./procedures/status";
 import * as system from "./procedures/system";
 import * as titles from "./procedures/titles";
+import * as tracking from "./procedures/tracking";
 
 export const implementedRouter = {
+  titles: {
+    get: titles.get,
+    similar: titles.similar,
+  },
+  tracking: {
+    watch: tracking.watch,
+    unwatch: tracking.unwatch,
+    updateStatus: tracking.updateStatus,
+    rate: tracking.rate,
+    userInfo: tracking.userInfo,
+    stats: tracking.stats,
+  },
   library: {
     list: library.list,
     genres: library.genres,
+    stats: library.stats,
+    continueWatching: library.continueWatching,
+    upcoming: library.upcoming,
   },
-  titles: {
-    detail: titles.detail,
-    updateStatus: titles.updateStatus,
-    updateRating: titles.updateRating,
-    watchMovie: titles.watchMovie,
-    watchAll: titles.watchAll,
-    userInfo: titles.userInfo,
-    recommendations: titles.recommendations,
-    quickAdd: titles.quickAdd,
-  },
-  episodes: {
-    watch: episodes.watch,
-    unwatch: episodes.unwatch,
-    batchWatch: episodes.batchWatch,
-  },
-  seasons: {
-    watch: seasons.watch,
-    unwatch: seasons.unwatch,
+  discover: {
+    trending: discover.trending,
+    popular: discover.popular,
+    search: discover.search,
+    browse: discover.browse,
+    genres: discover.genres,
+    platforms: discover.platforms,
+    recommendations: discover.recommendations,
   },
   people: {
-    detail: people.detail,
+    get: people.get,
   },
-  dashboard: {
-    stats: dashboard.stats,
-    continueWatching: dashboard.continueWatching,
-    upcoming: dashboard.upcoming,
-    recommendations: dashboard.recommendations,
-    watchHistory: dashboard.watchHistory,
+  account: {
+    updateName: account.updateName,
+    uploadAvatar: account.uploadAvatar,
+    removeAvatar: account.removeAvatar,
+    platforms: account.platforms,
+    updatePlatforms: account.updatePlatformsHandler,
+    integrations: {
+      list: account.integrationsList,
+      create: account.integrationsCreate,
+      delete: account.integrationsDelete,
+      regenerateToken: account.integrationsRegenerateToken,
+    },
   },
-  explore: {
-    trending: explore.trending,
-    popular: explore.popular,
-    genres: explore.genres,
-    watchProviders: explore.watchProviders,
-  },
-  search,
-  discover,
   system: {
     publicInfo: system.publicInfo,
-    authConfig: system.authConfig,
-    status: status.status,
-  },
-  integrations: {
-    list: integrations.list,
-    create: integrations.create,
-    delete: integrations.deleteIntegration,
-    regenerateToken: integrations.regenerateToken,
+    status: system.status,
   },
   admin: {
+    settings: {
+      get: admin.settingsGet,
+      update: admin.settingsUpdate,
+    },
     backups: {
       list: admin.backupsList,
       create: admin.backupsCreate,
@@ -78,26 +71,10 @@ export const implementedRouter = {
       schedule: admin.backupsSchedule,
       updateSchedule: admin.backupsUpdateSchedule,
     },
-    registration: admin.registration,
-    toggleRegistration: admin.toggleRegistration,
-    updateCheck: admin.updateCheck,
-    toggleUpdateCheck: admin.toggleUpdateCheck,
-    telemetry: admin.telemetry,
-    toggleTelemetry: admin.toggleTelemetry,
     triggerJob: admin.triggerJob,
     purgeMetadataCache: admin.purgeMetadataCache,
     purgeImageCache: admin.purgeImageCache,
     systemHealth: admin.systemHealth,
-  },
-  account: {
-    updateName: account.updateName,
-    uploadAvatar: account.uploadAvatar,
-    removeAvatar: account.removeAvatar,
-    platforms: account.platforms,
-    updatePlatforms: account.updatePlatformsHandler,
-  },
-  platforms: {
-    list: platformProcs.list,
   },
   imports: {
     parseFile: imports.parseFile,

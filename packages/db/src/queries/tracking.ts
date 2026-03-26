@@ -315,3 +315,22 @@ export function deleteEpisodeWatch(userId: string, episodeId: string): void {
     .where(and(eq(userEpisodeWatches.userId, userId), eq(userEpisodeWatches.episodeId, episodeId)))
     .run();
 }
+
+export function deleteMovieWatches(userId: string, titleId: string): void {
+  db.delete(userMovieWatches)
+    .where(and(eq(userMovieWatches.userId, userId), eq(userMovieWatches.titleId, titleId)))
+    .run();
+}
+
+export function deleteAllEpisodeWatchesForTitle(userId: string, titleId: string): void {
+  const titleEpisodeIds = db
+    .select({ id: episodes.id })
+    .from(episodes)
+    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
+    .where(eq(seasons.titleId, titleId))
+    .all()
+    .map((r) => r.id);
+
+  if (titleEpisodeIds.length === 0) return;
+  deleteEpisodeWatches(userId, titleEpisodeIds);
+}

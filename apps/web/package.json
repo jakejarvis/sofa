@@ -29,9 +29,9 @@
     "@sofa/i18n": "workspace:*",
     "@tabler/icons-react": "3.40.0",
     "@tanstack/react-form": "catalog:",
-    "@tanstack/react-hotkeys": "0.6.0",
+    "@tanstack/react-hotkeys": "0.8.1",
     "@tanstack/react-query": "catalog:",
-    "@tanstack/react-router": "1.168.3",
+    "@tanstack/react-router": "1.168.5",
     "@tanstack/zod-adapter": "1.166.9",
     "better-auth": "catalog:",
     "class-variance-authority": "0.7.1",
@@ -57,7 +57,7 @@
     "@tanstack/react-devtools": "0.10.0",
     "@tanstack/react-query-devtools": "5.95.2",
     "@tanstack/react-router-devtools": "1.166.11",
-    "@tanstack/router-plugin": "1.167.4",
+    "@tanstack/router-plugin": "1.167.6",
     "@types/bun": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
@@ -68,7 +68,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vite": "8.0.2",
+    "vite": "8.0.3",
     "vitest": "catalog:"
   }
 }

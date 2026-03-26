@@ -14,7 +14,7 @@ const config = {
     return [
       {
         source: "/docs/api",
-        destination: "/docs/api/account/account.removeAvatar",
+        destination: "/docs/api/account/account.integrations.create",
         permanent: false,
       },
       {
@@ -32,6 +32,11 @@ const config = {
         destination: "https://testflight.apple.com/join/tjSddcaZ",
         permanent: false,
       },
+      {
+        source: "/android",
+        destination: "https://play.google.com/store/apps/details?id=com.jakejarvis.sofa",
+        permanent: false,
+      }
     ];
   },
   async rewrites() {

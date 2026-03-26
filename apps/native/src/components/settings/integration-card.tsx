@@ -81,30 +81,30 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
   const toggleSetup = useCallback(() => setSetupOpen((v) => !v), []);
 
   const connectMutation = useMutation(
-    orpc.integrations.create.mutationOptions({
+    orpc.account.integrations.create.mutationOptions({
       onSuccess: () => {
         toast.success(t`${label} connected`);
-        queryClient.invalidateQueries({ queryKey: orpc.integrations.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.account.integrations.key() });
       },
       onError: () => toast.error(t`Failed to connect ${label}`),
     }),
   );
 
   const { mutate: deleteIntegration } = useMutation(
-    orpc.integrations.delete.mutationOptions({
+    orpc.account.integrations.delete.mutationOptions({
       onSuccess: () => {
         toast.success(t`${label} disconnected`);
-        queryClient.invalidateQueries({ queryKey: orpc.integrations.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.account.integrations.key() });
       },
       onError: () => toast.error(t`Failed to disconnect ${label}`),
     }),
   );
 
   const { mutate: regenerateToken, isPending: isRegenerating } = useMutation(
-    orpc.integrations.regenerateToken.mutationOptions({
+    orpc.account.integrations.regenerateToken.mutationOptions({
       onSuccess: () => {
         toast.success(t`${label} URL regenerated`);
-        queryClient.invalidateQueries({ queryKey: orpc.integrations.key() });
+        queryClient.invalidateQueries({ queryKey: orpc.account.integrations.key() });
       },
       onError: () => toast.error(t`Failed to regenerate ${label} URL`),
     }),

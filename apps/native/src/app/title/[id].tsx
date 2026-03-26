@@ -104,16 +104,11 @@ export default function TitleDetailScreen() {
     "--color-title-accent-foreground",
   ]) as [string, string, string];
 
-  const detail = useQuery(orpc.titles.detail.queryOptions({ input: { id } }));
-  const userInfo = useQuery(orpc.titles.userInfo.queryOptions({ input: { id } }));
-  const recommendations = useQuery(orpc.titles.recommendations.queryOptions({ input: { id } }));
+  const detail = useQuery(orpc.titles.get.queryOptions({ input: { id } }));
+  const userInfo = useQuery(orpc.tracking.userInfo.queryOptions({ input: { id } }));
+  const recommendations = useQuery(orpc.titles.similar.queryOptions({ input: { id } }));
 
-  const {
-    updateStatus,
-    updateRating,
-    watchMovie,
-    quickAdd: quickAddMutation,
-  } = useTitleActions({
+  const { updateStatus, updateRating, watchMovie } = useTitleActions({
     toasts: {
       watchMovie: () => {
         const name = title?.title;
@@ -413,19 +408,17 @@ export default function TitleDetailScreen() {
               currentStatus={userInfo.data?.status ?? null}
               onStatusChange={(status) => {
                 if (status === "in_watchlist") {
-                  quickAddMutation.mutate({ id });
+                  updateStatus.mutate({ id, status: "watchlist" });
                 } else {
                   updateStatus.mutate({ id, status: null });
                 }
               }}
-              isPending={
-                updateStatus.isPending || quickAddMutation.isPending || watchMovie.isPending
-              }
+              isPending={updateStatus.isPending || watchMovie.isPending}
             />
 
             {title.type === "movie" && (
               <Pressable
-                onPress={() => watchMovie.mutate({ id })}
+                onPress={() => watchMovie.mutate({ scope: "movie", ids: [id] })}
                 disabled={watchMovie.isPending}
                 className="bg-title-accent flex-row items-center gap-1.5 rounded-lg px-4 py-2"
               >

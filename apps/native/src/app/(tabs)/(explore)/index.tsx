@@ -18,7 +18,7 @@ const exploreContentContainerStyle = {
 export default function ExploreScreen() {
   const { t } = useLingui();
   const trending = useInfiniteQuery(
-    orpc.explore.trending.infiniteOptions({
+    orpc.discover.trending.infiniteOptions({
       input: (pageParam: number) => ({ type: "all" as const, page: pageParam }),
       initialPageParam: 1,
       getNextPageParam: (lastPage) =>
@@ -26,16 +26,15 @@ export default function ExploreScreen() {
       maxPages: 10,
     }),
   );
-  const popularMovies = useQuery(orpc.explore.popular.queryOptions({ input: { type: "movie" } }));
-  const popularTv = useQuery(orpc.explore.popular.queryOptions({ input: { type: "tv" } }));
-  const movieGenres = useQuery(orpc.explore.genres.queryOptions({ input: { type: "movie" } }));
-  const tvGenres = useQuery(orpc.explore.genres.queryOptions({ input: { type: "tv" } }));
+  const popularMovies = useQuery(orpc.discover.popular.queryOptions({ input: { type: "movie" } }));
+  const popularTv = useQuery(orpc.discover.popular.queryOptions({ input: { type: "tv" } }));
+  const movieGenres = useQuery(orpc.discover.genres.queryOptions({ input: { type: "movie" } }));
+  const tvGenres = useQuery(orpc.discover.genres.queryOptions({ input: { type: "tv" } }));
 
   const isRefreshing =
     trending.isRefetching || popularMovies.isRefetching || popularTv.isRefetching;
 
   const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: orpc.explore.key() });
     queryClient.invalidateQueries({ queryKey: orpc.discover.key() });
   }, []);
 

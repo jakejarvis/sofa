@@ -8,10 +8,11 @@ import { i18n } from "@sofa/i18n";
 
 let widgetRefreshTimer: ReturnType<typeof setTimeout> | null = null;
 
-/** Invalidate title + dashboard queries. Used by most title mutations. */
+/** Invalidate title + tracking + library queries. Used by most title mutations. */
 export function invalidateTitleQueries() {
   queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-  queryClient.invalidateQueries({ queryKey: orpc.dashboard.key() });
+  queryClient.invalidateQueries({ queryKey: orpc.tracking.key() });
+  queryClient.invalidateQueries({ queryKey: orpc.library.key() });
 
   // Debounce widget refresh to batch rapid mutations (e.g. watching multiple episodes)
   if (widgetRefreshTimer) clearTimeout(widgetRefreshTimer);
@@ -26,9 +27,9 @@ export function invalidateTitleQueries() {
  * Each method calls the RPC, shows a toast, and invalidates the relevant queries.
  */
 export const titleActions = {
-  async quickAdd(id: string, titleName?: string) {
+  async addToWatchlist(id: string, titleName?: string) {
     try {
-      await client.titles.quickAdd({ id });
+      await client.tracking.updateStatus({ id, status: "watchlist" });
       toast.success(
         titleName
           ? i18n._(msg`Added "${titleName}" to watchlist`)
@@ -44,7 +45,7 @@ export const titleActions = {
 
   async markMovieWatched(id: string, titleName?: string) {
     try {
-      await client.titles.watchMovie({ id });
+      await client.tracking.watch({ scope: "movie", ids: [id] });
       toast.success(
         titleName ? i18n._(msg`Marked "${titleName}" as watched`) : i18n._(msg`Marked as watched`),
       );
@@ -56,7 +57,7 @@ export const titleActions = {
 
   async removeFromLibrary(id: string) {
     try {
-      await client.titles.updateStatus({ id, status: null });
+      await client.tracking.updateStatus({ id, status: null });
       toast.success(i18n._(msg`Removed from library`));
       invalidateTitleQueries();
     } catch {
@@ -66,13 +67,13 @@ export const titleActions = {
 
   async rate(id: string, stars: number) {
     try {
-      await client.titles.updateRating({ id, stars });
+      await client.tracking.rate({ id, stars });
       toast.success(
         stars > 0
           ? i18n._(msg`Rated ${plural(stars, { one: "# star", other: "# stars" })}`)
           : i18n._(msg`Rating removed`),
       );
-      queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+      invalidateTitleQueries();
     } catch {
       toast.error(i18n._(msg`Failed to update rating`));
     }
@@ -80,7 +81,7 @@ export const titleActions = {
 
   async watchEpisode(id: string) {
     try {
-      await client.episodes.watch({ id });
+      await client.tracking.watch({ scope: "episode", ids: [id] });
       toast.success(i18n._(msg`Episode watched`));
       invalidateTitleQueries();
     } catch {
@@ -90,7 +91,7 @@ export const titleActions = {
 
   async unwatchEpisode(id: string) {
     try {
-      await client.episodes.unwatch({ id });
+      await client.tracking.unwatch({ scope: "episode", ids: [id] });
       toast.success(i18n._(msg`Episode unwatched`));
       invalidateTitleQueries();
     } catch {
@@ -100,7 +101,7 @@ export const titleActions = {
 
   async markAllWatched(id: string, titleName?: string) {
     try {
-      await client.titles.watchAll({ id });
+      await client.tracking.watch({ scope: "series", ids: [id] });
       toast.success(
         titleName
           ? i18n._(msg`Marked all episodes of "${titleName}" as watched`)
@@ -114,7 +115,7 @@ export const titleActions = {
 
   async watchSeason(id: string, seasonLabel?: string) {
     try {
-      await client.seasons.watch({ id });
+      await client.tracking.watch({ scope: "season", ids: [id] });
       toast.success(
         seasonLabel ? i18n._(msg`Watched all of ${seasonLabel}`) : i18n._(msg`Season watched`),
       );
