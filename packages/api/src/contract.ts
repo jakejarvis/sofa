@@ -142,7 +142,13 @@ export const contract = {
           "Set the user's tracking status for a title. Use null to remove the title from the library entirely.",
       })
       .input(UpdateStatusInput)
-      .output(z.void()),
+      .output(z.void())
+      .errors({
+        NOT_FOUND: {
+          message: "Title not found",
+          data: appErrorData(AppErrorCode.TITLE_NOT_FOUND),
+        },
+      }),
     rate: oc
       .route({
         method: "PUT",

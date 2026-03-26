@@ -73,7 +73,7 @@ export const titleActions = {
           ? i18n._(msg`Rated ${plural(stars, { one: "# star", other: "# stars" })}`)
           : i18n._(msg`Rating removed`),
       );
-      queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+      invalidateTitleQueries();
     } catch {
       toast.error(i18n._(msg`Failed to update rating`));
     }

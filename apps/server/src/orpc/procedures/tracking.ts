@@ -1,3 +1,6 @@
+import { ORPCError } from "@orpc/server";
+
+import { AppErrorCode } from "@sofa/api/errors";
 import type { WatchScopeType } from "@sofa/api/schemas";
 import { getWatchCount, getWatchHistory } from "@sofa/core/discovery";
 import { getOrFetchTitleByTmdbId } from "@sofa/core/metadata";
@@ -88,7 +91,13 @@ export const updateStatus = os.tracking.updateStatus
 
     // Auto-import from TMDB if the title is a shell (absorbs quickAdd logic)
     const result = quickAddTitle(context.user.id, input.id);
-    if (result && !result.alreadyAdded) {
+    if (!result) {
+      throw new ORPCError("NOT_FOUND", {
+        message: "Title not found",
+        data: { code: AppErrorCode.TITLE_NOT_FOUND },
+      });
+    }
+    if (!result.alreadyAdded) {
       getOrFetchTitleByTmdbId(result.tmdbId, result.type as "movie" | "tv").catch((err) => {
         log.warn(`Failed to import ${result.type} TMDB ${result.tmdbId}:`, err);
       });
