@@ -68,7 +68,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vite": "8.0.3",
+    "vite": "8.0.5",
     "vitest": "catalog:"
   }
 }
