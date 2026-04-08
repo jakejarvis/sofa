@@ -14,7 +14,7 @@
   "dependencies": {
     "@hono/zod-validator": "0.7.6",
     "@vercel/firewall": "1.1.2",
-    "hono": "4.12.9",
+    "hono": "4.12.12",
     "zod": "catalog:"
   },
   "devDependencies": {
