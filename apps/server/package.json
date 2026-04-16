@@ -25,7 +25,7 @@
     "@sofa/logger": "workspace:*",
     "@sofa/tmdb": "workspace:*",
     "croner": "10.0.2-dev.2",
-    "hono": "4.12.9",
+    "hono": "4.12.14",
     "zod": "catalog:"
   },
   "devDependencies": {
