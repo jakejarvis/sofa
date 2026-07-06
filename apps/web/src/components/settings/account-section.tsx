@@ -179,7 +179,6 @@ export function AccountSection({
               />
             }
             className="focus-visible:ring-ring focus-visible:ring-offset-background relative shrink-0 cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-            aria-label={avatarUrl ? t`Remove profile picture` : t`Upload profile picture`}
           >
             <Avatar className="size-12 overflow-hidden">
               <AvatarImage src={isAvatarPending ? undefined : avatarUrl} alt={displayName} />
