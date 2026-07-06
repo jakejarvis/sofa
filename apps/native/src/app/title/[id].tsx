@@ -12,6 +12,7 @@ import {
   IconStarFilled,
   IconThumbUp,
   IconUsers,
+  IconX,
 } from "@tabler/icons-react-native";
 import { useQuery } from "@tanstack/react-query";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
@@ -98,21 +99,26 @@ export default function TitleDetailScreen() {
   const { back } = useRouter();
   const useAutomaticInsets = process.env.EXPO_OS === "ios";
 
-  const [titleAccent, mutedForeground, titleAccentForeground] = useCSSVariable([
+  const [titleAccent, mutedForeground, titleAccentForeground, destructiveColor] = useCSSVariable([
     "--color-title-accent",
     "--color-muted-foreground",
     "--color-title-accent-foreground",
-  ]) as [string, string, string];
+    "--color-destructive",
+  ]) as [string, string, string, string];
 
   const detail = useQuery(orpc.titles.get.queryOptions({ input: { id } }));
   const userInfo = useQuery(orpc.tracking.userInfo.queryOptions({ input: { id } }));
   const recommendations = useQuery(orpc.titles.similar.queryOptions({ input: { id } }));
 
-  const { updateStatus, updateRating, watchMovie } = useTitleActions({
+  const { updateStatus, updateRating, watchMovie, unwatchMovie } = useTitleActions({
     toasts: {
       watchMovie: () => {
         const name = title?.title;
         return name ? t`Marked "${name}" as watched` : t`Marked as watched`;
+      },
+      unwatchMovie: () => {
+        const name = title?.title;
+        return name ? t`Marked "${name}" as unwatched` : t`Marked as unwatched`;
       },
     },
   });
@@ -147,6 +153,7 @@ export default function TitleDetailScreen() {
     () => new Set(userInfo.data?.episodeWatches ?? []),
     [userInfo.data?.episodeWatches],
   );
+  const isMovieWatched = userInfo.data?.status === "completed";
 
   const recItems = useMemo<PosterRowItem[]>(
     () =>
@@ -413,17 +420,34 @@ export default function TitleDetailScreen() {
                   updateStatus.mutate({ id, status: null });
                 }
               }}
-              isPending={updateStatus.isPending || watchMovie.isPending}
+              isPending={updateStatus.isPending || watchMovie.isPending || unwatchMovie.isPending}
             />
 
             {title.type === "movie" && (
               <Pressable
-                onPress={() => watchMovie.mutate({ scope: "movie", ids: [id] })}
-                disabled={watchMovie.isPending}
-                className="bg-title-accent flex-row items-center gap-1.5 rounded-lg px-4 py-2"
+                onPress={() => {
+                  if (isMovieWatched) {
+                    unwatchMovie.mutate({ scope: "movie", ids: [id] });
+                  } else {
+                    watchMovie.mutate({ scope: "movie", ids: [id] });
+                  }
+                }}
+                disabled={watchMovie.isPending || unwatchMovie.isPending}
+                className={
+                  isMovieWatched
+                    ? "border-destructive/20 bg-destructive/10 flex-row items-center gap-1.5 rounded-lg border px-4 py-2"
+                    : "bg-title-accent flex-row items-center gap-1.5 rounded-lg px-4 py-2"
+                }
               >
-                {watchMovie.isPending ? (
+                {watchMovie.isPending || unwatchMovie.isPending ? (
                   <Spinner size="sm" />
+                ) : isMovieWatched ? (
+                  <>
+                    <ScaledIcon icon={IconX} size={16} color={destructiveColor} />
+                    <Text className="text-destructive font-sans text-sm font-medium">
+                      <Trans>Mark Unwatched</Trans>
+                    </Text>
+                  </>
                 ) : (
                   <>
                     <ScaledIcon icon={IconCheck} size={16} color={titleAccentForeground} />

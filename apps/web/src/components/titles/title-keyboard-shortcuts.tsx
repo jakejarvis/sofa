@@ -9,7 +9,8 @@ import { useTitleActions } from "./use-title-actions";
 export function TitleKeyboardShortcuts() {
   const { titleType } = useTitleContext();
   const { userStatus } = useTitleUserInfo();
-  const { handleStatusChange, handleRating, handleWatchMovie } = useTitleActions();
+  const { handleStatusChange, handleRating, handleWatchMovie, handleUnwatchMovie } =
+    useTitleActions();
 
   const commandPaletteOpen = useAtomValue(commandPaletteOpenAtom);
   const enabled = !commandPaletteOpen;
@@ -21,7 +22,13 @@ export function TitleKeyboardShortcuts() {
   useHotkey(
     "M",
     () => {
-      if (titleType === "movie") handleWatchMovie();
+      if (titleType === "movie") {
+        if (userStatus === "completed") {
+          handleUnwatchMovie();
+        } else {
+          handleWatchMovie();
+        }
+      }
     },
     { enabled },
   );
