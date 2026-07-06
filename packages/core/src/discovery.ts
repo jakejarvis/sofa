@@ -10,7 +10,6 @@ import {
   getInProgressTitleIds,
   getMovieWatchCountSince,
   getMovieWatchHistoryBuckets,
-  getNewAvailableFeed,
   getRecommendationRows,
   getRecommendationRowsForTitle,
   getSeasonsByTitleIds,

@@ -26,7 +26,7 @@ const {
 
 export const testClient = new Database(":memory:");
 testClient.pragma("foreign_keys = ON");
-export const testDb = drizzle({ client: testClient, schema });
+export const testDb = drizzle({ client: testClient });
 
 export function applyMigrations() {
   const dbPkgDir = path.resolve(

@@ -15,6 +15,10 @@
     "react/style-prop-object": "off",
     "import/no-unassigned-import": "off",
     "import/no-named-as-default-member": "off",
+    "no-underscore-dangle": [
+      "warn",
+      { "allow": ["__APP_VERSION__", "__GIT_COMMIT_SHA__"] }
+    ],
     "oxc/no-barrel-file": ["warn", { "threshold": 0 }],
     "unicorn/no-array-sort": "off",
     "unicorn/consistent-function-scoping": "off",

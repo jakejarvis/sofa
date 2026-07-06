@@ -51,18 +51,18 @@ export function SeasonAccordion({
   const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH);
 
   useEffect(() => {
-    if (expanded) {
-      setVisibleCount(INITIAL_BATCH);
-      if (episodes.length > INITIAL_BATCH) {
-        const task = InteractionManager.runAfterInteractions(() => {
-          setVisibleCount(episodes.length);
-        });
-        return () => task.cancel();
-      }
+    if (expanded && episodes.length > INITIAL_BATCH) {
+      const task = InteractionManager.runAfterInteractions(() => {
+        setVisibleCount(episodes.length);
+      });
+      return () => task.cancel();
     }
   }, [expanded, episodes.length]);
 
-  const toggleExpanded = useCallback(() => setExpanded((v) => !v), []);
+  const toggleExpanded = useCallback(() => {
+    if (!expanded) setVisibleCount(INITIAL_BATCH);
+    setExpanded((v) => !v);
+  }, [expanded]);
 
   useEffect(() => {
     chevronRotation.set(

@@ -171,6 +171,7 @@ export function AccountSection({
             render={
               <button
                 type="button"
+                aria-label={avatarUrl ? t`Remove profile picture` : t`Upload profile picture`}
                 onClick={avatarUrl ? handleRemoveAvatar : () => fileInputRef.current?.click()}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}

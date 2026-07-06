@@ -141,15 +141,15 @@ type JobSchedule = {
   nextRunAt: string | null;
 };
 
-let _getJobSchedules: (() => JobSchedule[]) | null = null;
+let jobScheduleProvider: (() => JobSchedule[]) | null = null;
 
 /** Register the job schedule provider (called by the API server on startup). */
 export function registerJobScheduleProvider(fn: () => JobSchedule[]) {
-  _getJobSchedules = fn;
+  jobScheduleProvider = fn;
 }
 
 function getJobsHealth(): SystemHealthData["jobs"] {
-  const schedules = _getJobSchedules?.() ?? [];
+  const schedules = jobScheduleProvider?.() ?? [];
   const scheduleMap = new Map(schedules.map((s) => [s.jobName, s]));
 
   const latestByJob = getLatestCronRuns([...JOB_NAMES]);

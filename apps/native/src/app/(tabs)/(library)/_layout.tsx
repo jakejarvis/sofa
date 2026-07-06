@@ -27,6 +27,20 @@ function LibraryHeaderRight() {
   );
 }
 
+function renderLibraryHeaderRight() {
+  return <LibraryHeaderRight />;
+}
+
+function getLibraryHeaderRightItems() {
+  return [
+    {
+      type: "custom" as const,
+      element: <LibraryHeaderRight />,
+      hidesSharedBackground: true,
+    },
+  ];
+}
+
 export default function LibraryLayout() {
   const { t } = useLingui();
   const contentStyle = useResolveClassNames("bg-background");
@@ -40,13 +54,7 @@ export default function LibraryLayout() {
       <Stack
         screenOptions={{
           contentStyle,
-          unstable_headerRightItems: () => [
-            {
-              type: "custom" as const,
-              element: <LibraryHeaderRight />,
-              hidesSharedBackground: true,
-            },
-          ],
+          unstable_headerRightItems: getLibraryHeaderRightItems,
         }}
       >
         <Stack.Screen name="index">
@@ -76,7 +84,7 @@ export default function LibraryLayout() {
       screenOptions={{
         contentStyle,
         headerTitleAlign: "left",
-        headerRight: () => <LibraryHeaderRight />,
+        headerRight: renderLibraryHeaderRight,
       }}
     >
       <Stack.Screen name="index">
