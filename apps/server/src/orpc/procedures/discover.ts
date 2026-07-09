@@ -16,6 +16,7 @@ import {
   searchMulti,
   searchPerson,
   searchTv,
+  findByExternalId,
 } from "@sofa/tmdb/client";
 import { isTmdbConfigured } from "@sofa/tmdb/config";
 import { tmdbImageUrl } from "@sofa/tmdb/image";
@@ -30,6 +31,40 @@ function requireTmdb() {
       data: { code: AppErrorCode.TMDB_NOT_CONFIGURED },
     });
   }
+}
+
+
+// ─── SEARCH BY IMDB ID ─────────────────────────────────────────────────
+const IMDB_ID_REGEX = /^tt\d{7,10}$/i;
+
+function isImdbIdSearch(query: string) {
+  return IMDB_ID_REGEX.test(query.trim());
+
+}
+
+async function searchByImdbId(query: string) {
+  const findResult = await findByExternalId(query.toLowerCase(), "imdb_id");
+
+  // result of all movies found
+  const movieResults = (findResult.movie_results ?? []).map((r) => ({
+    ...r,
+    media_type: "movie" as const,
+  }));
+
+  // result of all shows found
+  const tvResults = (findResult.tv_results ?? []).map((r) => ({
+    ...r,
+    media_type: "tv" as const,
+  }));
+  
+  // join all the results
+  const results = [...movieResults, ...tvResults];
+  return {
+    page: 1,
+    total_pages: results.length > 0 ? 1 : 0,
+    total_results: results.length,
+    results,
+  };
 }
 
 // ─── Trending ─────────────────────────────────────────────────
@@ -219,12 +254,21 @@ export const search = os.discover.search.use(authed).handler(async ({ input }) =
     };
   }
 
-  const raw =
-    type === "movie"
+  // Old Results without seach by imdb id
+  // const raw =
+  //   type === "movie"
+  //     ? await searchMovies(query, input.page)
+  //     : type === "tv"
+  //       ? await searchTv(query, input.page)
+  //       : await searchMulti(query, input.page);
+
+  const raw = isImdbIdSearch(query)
+    ? await searchByImdbId(query)
+    : type === "movie"
       ? await searchMovies(query, input.page)
       : type === "tv"
         ? await searchTv(query, input.page)
-        : await searchMulti(query, input.page);
+      : await searchMulti(query, input.page);
 
   type SearchResult = {
     id: number;
