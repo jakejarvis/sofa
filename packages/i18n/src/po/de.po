@@ -347,7 +347,6 @@ msgid "Added \"{titleName}\" to watchlist"
 msgstr "\"{titleName}\" zur Merkliste hinzugefügt"
 
 #: apps/native/src/hooks/use-title-actions.ts
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Added to watchlist"
@@ -1236,7 +1235,6 @@ msgstr "Exportieren"
 msgid "Failed"
 msgstr "Fehlgeschlagen"
 
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to add to watchlist"
 msgstr "Konnte nicht zur Merkliste hinzugefügt werden"
@@ -1386,7 +1384,6 @@ msgstr "Name konnte nicht aktualisiert werden"
 msgid "Failed to update rating"
 msgstr "Bewertung konnte nicht aktualisiert werden"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Failed to update registration setting"
 msgstr "Registrierungseinstellung konnte nicht aktualisiert werden"
@@ -2089,6 +2086,10 @@ msgstr "Nächste Episode"
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Next run"
 msgstr "Nächster Lauf"
+
+#: packages/i18n/src/date-buckets.ts
+msgid "Next Week"
+msgstr ""
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 msgid "Next: S{seasonNum} E{epNum}"
@@ -3214,6 +3215,7 @@ msgstr "diese Woche"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "This Week"
 msgstr "Diese Woche"
 
@@ -3315,6 +3317,7 @@ msgstr "heute"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "Today"
 msgstr "Heute"
 
@@ -3339,6 +3342,10 @@ msgstr "Geplante Backups umschalten"
 #: apps/web/src/components/ui/sidebar.tsx
 msgid "Toggle Sidebar"
 msgstr "Seitenleiste umschalten"
+
+#: packages/i18n/src/date-buckets.ts
+msgid "Tomorrow"
+msgstr ""
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Track what you watch. Know what's next.<0/>Your library, your data, your rules."
@@ -3730,4 +3737,3 @@ msgstr "Dein Name"
 #: apps/web/src/components/auth-form.tsx
 msgid "Your name…"
 msgstr "Dein Name…"
-

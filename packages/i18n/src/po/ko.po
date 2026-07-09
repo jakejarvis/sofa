@@ -347,7 +347,6 @@ msgid "Added \"{titleName}\" to watchlist"
 msgstr "\"{titleName}\"를 찜 목록에 추가했습니다"
 
 #: apps/native/src/hooks/use-title-actions.ts
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Added to watchlist"
@@ -1236,7 +1235,6 @@ msgstr "내보내기"
 msgid "Failed"
 msgstr "실패"
 
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to add to watchlist"
 msgstr "찜 목록에 추가 실패"
@@ -1386,7 +1384,6 @@ msgstr "이름 업데이트 실패"
 msgid "Failed to update rating"
 msgstr "평점 업데이트 실패"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Failed to update registration setting"
 msgstr "회원가입 설정 업데이트 실패"
@@ -2089,6 +2086,10 @@ msgstr "다음 에피소드"
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Next run"
 msgstr "다음 실행"
+
+#: packages/i18n/src/date-buckets.ts
+msgid "Next Week"
+msgstr ""
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 msgid "Next: S{seasonNum} E{epNum}"
@@ -3214,6 +3215,7 @@ msgstr "이번 주"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "This Week"
 msgstr "이번 주"
 
@@ -3315,6 +3317,7 @@ msgstr "오늘"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "Today"
 msgstr "오늘"
 
@@ -3339,6 +3342,10 @@ msgstr "예약 백업 토글"
 #: apps/web/src/components/ui/sidebar.tsx
 msgid "Toggle Sidebar"
 msgstr "사이드바 토글"
+
+#: packages/i18n/src/date-buckets.ts
+msgid "Tomorrow"
+msgstr ""
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Track what you watch. Know what's next.<0/>Your library, your data, your rules."
@@ -3730,4 +3737,3 @@ msgstr "이름"
 #: apps/web/src/components/auth-form.tsx
 msgid "Your name…"
 msgstr "이름…"
-
