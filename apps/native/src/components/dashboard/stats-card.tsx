@@ -1,7 +1,7 @@
+import { MenuView } from "@expo/ui/community/menu";
 import { useLingui } from "@lingui/react/macro";
 import type { Icon } from "@tabler/icons-react-native";
 import { Pressable, View } from "react-native";
-import * as DropdownMenu from "zeego/dropdown-menu";
 
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Sparkline } from "@/components/ui/sparkline";
@@ -86,29 +86,25 @@ export function StatsCard(props: StatsCardProps) {
 
   return (
     <View style={cardStyle}>
-      <DropdownMenu.Root>
-        <DropdownMenu.Trigger asChild>
-          <Pressable
-            onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
-            accessibilityRole="button"
-          >
-            <CardInner {...props} />
-          </Pressable>
-        </DropdownMenu.Trigger>
-
-        <DropdownMenu.Content>
-          {periods.map((p) => (
-            <DropdownMenu.CheckboxItem
-              key={p}
-              value={p === period ? "on" : "off"}
-              onValueChange={() => onPeriodChange(p)}
-            >
-              <DropdownMenu.ItemIndicator />
-              <DropdownMenu.ItemTitle>{periodLabels[p]}</DropdownMenu.ItemTitle>
-            </DropdownMenu.CheckboxItem>
-          ))}
-        </DropdownMenu.Content>
-      </DropdownMenu.Root>
+      <MenuView
+        actions={periods.map((value) => ({
+          id: value,
+          title: periodLabels[value],
+          state: value === period ? "on" : "off",
+        }))}
+        onOpenMenu={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+        onPressAction={({ nativeEvent }) => {
+          const nextPeriod = periods.find((value) => value === nativeEvent.event);
+          if (nextPeriod) onPeriodChange(nextPeriod);
+        }}
+      >
+        <Pressable
+          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+          accessibilityRole="button"
+        >
+          <CardInner {...props} />
+        </Pressable>
+      </MenuView>
     </View>
   );
 }

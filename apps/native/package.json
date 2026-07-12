@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@better-auth/expo": "catalog:",
+    "@expo/material-symbols": "0.1.1",
     "@expo/metro-runtime": "~57.0.3",
     "@expo/ui": "~57.0.4",
     "@formatjs/intl-datetimeformat": "7.4.9",
@@ -30,7 +31,6 @@
     "@orpc/client": "catalog:",
     "@orpc/contract": "catalog:",
     "@orpc/tanstack-query": "catalog:",
-    "@react-native-menu/menu": "2.0.0",
     "@sentry/react-native": "~8.18.0",
     "@shopify/flash-list": "2.0.2",
     "@sofa/api": "workspace:*",
@@ -70,11 +70,9 @@
     "react-dom": "catalog:",
     "react-native": "0.86.0",
     "react-native-gesture-handler": "~2.32.0",
-    "react-native-ios-context-menu": "3.2.0",
-    "react-native-ios-utilities": "5.2.0",
     "react-native-keyboard-controller": "1.21.9",
-    "react-native-mmkv": "4.3.2",
-    "react-native-nitro-modules": "0.36.1",
+    "react-native-mmkv": "~4.3.2",
+    "react-native-nitro-modules": "~0.36.1",
     "react-native-reanimated": "4.5.0",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "4.25.2",
@@ -83,7 +81,6 @@
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",
     "uniwind": "1.10.0",
-    "zeego": "3.0.6",
     "zod": "catalog:"
   },
   "devDependencies": {

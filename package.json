@@ -62,7 +62,6 @@
     "sync:providers": "bun scripts/sync-tmdb-providers.ts"
   },
   "devDependencies": {
-    "@e18e/eslint-plugin": "0.5.1",
     "@lingui/cli": "catalog:",
     "@lingui/conf": "catalog:",
     "@lingui/format-po": "catalog:",

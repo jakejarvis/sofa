@@ -1,8 +1,8 @@
+import { MenuView } from "@expo/ui/community/menu";
 import { useLingui } from "@lingui/react/macro";
 import { IconArrowsSort } from "@tabler/icons-react-native";
 import { Pressable } from "react-native";
 import { useCSSVariable } from "uniwind";
-import * as DropdownMenu from "zeego/dropdown-menu";
 
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import * as Haptics from "@/utils/haptics";
@@ -37,33 +37,28 @@ export function SortMenu({ sortBy, sortDirection, onSortChange }: SortMenuProps)
   ];
 
   return (
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger asChild>
-        <Pressable
-          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
-          accessibilityRole="button"
-          accessibilityLabel={t`Sort`}
-          hitSlop={8}
-        >
-          <ScaledIcon icon={IconArrowsSort} size={22} color={foregroundColor} />
-        </Pressable>
-      </DropdownMenu.Trigger>
-
-      <DropdownMenu.Content>
-        {sortOptions.map((option) => {
-          const isSelected = option.sortBy === sortBy && option.sortDirection === sortDirection;
-          return (
-            <DropdownMenu.CheckboxItem
-              key={`${option.sortBy}-${option.sortDirection}`}
-              value={isSelected ? "on" : "off"}
-              onValueChange={() => onSortChange(option.sortBy, option.sortDirection)}
-            >
-              <DropdownMenu.ItemIndicator />
-              <DropdownMenu.ItemTitle>{option.label}</DropdownMenu.ItemTitle>
-            </DropdownMenu.CheckboxItem>
-          );
-        })}
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
+    <MenuView
+      actions={sortOptions.map((option) => ({
+        id: `${option.sortBy}-${option.sortDirection}`,
+        title: option.label,
+        state: option.sortBy === sortBy && option.sortDirection === sortDirection ? "on" : "off",
+      }))}
+      onOpenMenu={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+      onPressAction={({ nativeEvent }) => {
+        const option = sortOptions.find(
+          (candidate) => `${candidate.sortBy}-${candidate.sortDirection}` === nativeEvent.event,
+        );
+        if (option) onSortChange(option.sortBy, option.sortDirection);
+      }}
+    >
+      <Pressable
+        onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+        accessibilityRole="button"
+        accessibilityLabel={t`Sort`}
+        hitSlop={8}
+      >
+        <ScaledIcon icon={IconArrowsSort} size={22} color={foregroundColor} />
+      </Pressable>
+    </MenuView>
   );
 }
