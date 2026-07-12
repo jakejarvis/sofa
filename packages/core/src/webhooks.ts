@@ -13,6 +13,10 @@ import { logEpisodeWatch, logMovieWatch } from "./tracking";
 
 const log = createLogger("webhooks");
 
+const IMDB_GUID_PREFIX = "imdb://";
+const TMDB_GUID_PREFIX = "tmdb://";
+const TVDB_GUID_PREFIX = "tvdb://";
+
 // ─── Types ──────────────────────────────────────────────────────────
 
 export interface WebhookEvent {
@@ -71,9 +75,14 @@ export function parsePlexPayload(formData: FormData): WebhookEvent | null {
   if (Array.isArray(guids)) {
     for (const g of guids) {
       const id = g.id ?? "";
-      if (id.startsWith("tmdb://")) tmdbId = toOptionalInt(id.slice(7));
-      else if (id.startsWith("imdb://")) imdbId = id.slice(7);
-      else if (id.startsWith("tvdb://")) tvdbId = id.slice(7);
+      if (id.startsWith(TMDB_GUID_PREFIX)) {
+        // Plex episode TMDB GUIDs identify episodes, not series.
+        if (isMovie) tmdbId = toOptionalInt(id.slice(TMDB_GUID_PREFIX.length));
+      } else if (id.startsWith(IMDB_GUID_PREFIX)) {
+        imdbId = id.slice(IMDB_GUID_PREFIX.length);
+      } else if (id.startsWith(TVDB_GUID_PREFIX)) {
+        tvdbId = id.slice(TVDB_GUID_PREFIX.length);
+      }
     }
   }
 

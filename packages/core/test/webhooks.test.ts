@@ -54,6 +54,12 @@ beforeEach(() => {
   mockGetTvDetails.mockReset().mockResolvedValue({ number_of_seasons: 1 });
 });
 
+function makePlexForm(payload: Record<string, unknown>): FormData {
+  const form = new FormData();
+  form.set("payload", JSON.stringify(payload));
+  return form;
+}
+
 // ─── toOptionalInt ──────────────────────────────────────────────────
 
 describe("toOptionalInt", () => {
@@ -86,12 +92,6 @@ describe("toOptionalInt", () => {
 // ─── parsePlexPayload ───────────────────────────────────────────────
 
 describe("parsePlexPayload", () => {
-  function makePlexForm(payload: Record<string, unknown>): FormData {
-    const form = new FormData();
-    form.set("payload", JSON.stringify(payload));
-    return form;
-  }
-
   test("parses a movie scrobble event", () => {
     const result = parsePlexPayload(
       makePlexForm({
@@ -140,6 +140,33 @@ describe("parsePlexPayload", () => {
       seasonNumber: 1,
       episodeNumber: 1,
       showTitle: "Breaking Bad",
+    });
+  });
+
+  test("ignores episode-level Plex TMDB GUIDs", () => {
+    const result = parsePlexPayload(
+      makePlexForm({
+        event: "media.scrobble",
+        Metadata: {
+          type: "episode",
+          title: "Episode Title",
+          grandparentTitle: "The Pitt",
+          parentIndex: 1,
+          index: 14,
+          Guid: [{ id: "imdb://tt35740476" }, { id: "tmdb://6951292" }, { id: "tvdb://11560129" }],
+        },
+      }),
+    );
+    expect(result).toEqual({
+      provider: "plex",
+      mediaType: "episode",
+      title: "Episode Title",
+      tmdbId: undefined,
+      imdbId: "tt35740476",
+      tvdbId: "11560129",
+      seasonNumber: 1,
+      episodeNumber: 14,
+      showTitle: "The Pitt",
     });
   });
 
@@ -449,6 +476,38 @@ describe("processWebhook", () => {
 
     const result = await processWebhook(connectionId, userId, "jellyfin", event);
     expect(result.status).toBe("success");
+  });
+
+  test("resolves parsed Plex episodes without passing the episode TMDB ID", async () => {
+    mockResolveShowTmdbId.mockResolvedValue(1396);
+    const { titleId } = insertTvShow("tv-1", 1396, 1, 14, { title: "The Pitt" });
+    mockGetOrFetchTitleByTmdbId.mockResolvedValue({ id: titleId });
+
+    const event = parsePlexPayload(
+      makePlexForm({
+        event: "media.scrobble",
+        Metadata: {
+          type: "episode",
+          title: "Episode Title",
+          grandparentTitle: "The Pitt",
+          parentIndex: 1,
+          index: 14,
+          Guid: [{ id: "imdb://tt35740476" }, { id: "tmdb://6951292" }, { id: "tvdb://11560129" }],
+        },
+      }),
+    );
+    expect(event).not.toBeNull();
+    if (!event) throw new Error("Expected Plex episode event");
+
+    const result = await processWebhook(connectionId, userId, "plex", event);
+
+    expect(result.status).toBe("success");
+    expect(mockResolveShowTmdbId).toHaveBeenCalledWith({
+      tmdbId: undefined,
+      imdbId: "tt35740476",
+      tvdbId: "11560129",
+      title: "The Pitt",
+    });
   });
 
   test("returns error when episode cannot be resolved", async () => {
