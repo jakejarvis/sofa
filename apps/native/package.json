@@ -18,7 +18,7 @@
   "dependencies": {
     "@better-auth/expo": "catalog:",
     "@expo/metro-runtime": "~57.0.3",
-    "@expo/ui": "~57.0.3",
+    "@expo/ui": "~57.0.4",
     "@formatjs/intl-datetimeformat": "7.4.9",
     "@formatjs/intl-getcanonicallocales": "3.2.10",
     "@formatjs/intl-locale": "5.3.9",
@@ -31,7 +31,7 @@
     "@orpc/contract": "catalog:",
     "@orpc/tanstack-query": "catalog:",
     "@react-native-menu/menu": "2.0.0",
-    "@sentry/react-native": "~8.17.2",
+    "@sentry/react-native": "~8.18.0",
     "@shopify/flash-list": "2.0.2",
     "@sofa/api": "workspace:*",
     "@sofa/i18n": "workspace:*",
@@ -42,7 +42,7 @@
     "@tanstack/react-query-persist-client": "5.101.2",
     "better-auth": "catalog:",
     "burnt": "0.13.0",
-    "expo": "^57.0.0",
+    "expo": "~57.0.4",
     "expo-application": "~57.0.0",
     "expo-clipboard": "~57.0.0",
     "expo-constants": "~57.0.3",
@@ -54,18 +54,18 @@
     "expo-image": "~57.0.0",
     "expo-image-picker": "~57.0.2",
     "expo-linear-gradient": "~57.0.0",
-    "expo-linking": "~57.0.1",
+    "expo-linking": "~57.0.2",
     "expo-localization": "~57.0.0",
     "expo-network": "~57.0.0",
-    "expo-router": "~57.0.3",
+    "expo-router": "~57.0.4",
     "expo-secure-store": "~57.0.0",
     "expo-splash-screen": "~57.0.2",
     "expo-status-bar": "~57.0.0",
     "expo-system-ui": "~57.0.0",
     "expo-updates": "~57.0.6",
     "expo-web-browser": "~57.0.0",
-    "expo-widgets": "~57.0.2",
-    "posthog-react-native": "4.54.4",
+    "expo-widgets": "~57.0.3",
+    "posthog-react-native": "4.55.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-native": "0.86.0",
@@ -92,5 +92,12 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "typescript": "catalog:"
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "@sentry/react-native"
+      ]
+    }
   }
 }
