@@ -3,6 +3,7 @@ import type { StyleProp, ViewStyle } from "react-native";
 import { ScrollView } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, { FadeIn } from "react-native-reanimated";
+import type { AnimatedStyle } from "react-native-reanimated";
 
 import { SofaLogo } from "@/components/ui/sofa-logo";
 import { Text } from "@/components/ui/text";
@@ -10,7 +11,7 @@ import { Text } from "@/components/ui/text";
 interface AuthScreenProps {
   title: string;
   subtitle?: string;
-  logoStyle?: StyleProp<ViewStyle>;
+  logoStyle?: StyleProp<AnimatedStyle<ViewStyle>>;
   children: ReactNode;
 }
 

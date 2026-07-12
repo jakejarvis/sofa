@@ -18,8 +18,8 @@ import {
 } from "../src/webhooks";
 
 const { mockResolveMovieTmdbId, mockResolveShowTmdbId } = vi.hoisted(() => ({
-  mockResolveMovieTmdbId: vi.fn(async () => null as number | null),
-  mockResolveShowTmdbId: vi.fn(async () => null as number | null),
+  mockResolveMovieTmdbId: vi.fn<() => Promise<number | null>>(async () => null),
+  mockResolveShowTmdbId: vi.fn<() => Promise<number | null>>(async () => null),
 }));
 
 vi.mock("../src/imports/resolve", () => ({
@@ -28,8 +28,8 @@ vi.mock("../src/imports/resolve", () => ({
 }));
 
 const { mockGetOrFetchTitleByTmdbId, mockRefreshTvChildren } = vi.hoisted(() => ({
-  mockGetOrFetchTitleByTmdbId: vi.fn(async () => null as { id: string } | null),
-  mockRefreshTvChildren: vi.fn(async () => {}),
+  mockGetOrFetchTitleByTmdbId: vi.fn<() => Promise<{ id: string } | null>>(async () => null),
+  mockRefreshTvChildren: vi.fn<() => Promise<void>>(async () => {}),
 }));
 
 vi.mock("../src/metadata", () => ({
@@ -38,7 +38,9 @@ vi.mock("../src/metadata", () => ({
 }));
 
 const { mockGetTvDetails } = vi.hoisted(() => ({
-  mockGetTvDetails: vi.fn(async () => ({ number_of_seasons: 1 })),
+  mockGetTvDetails: vi.fn<() => Promise<{ number_of_seasons: number }>>(async () => ({
+    number_of_seasons: 1,
+  })),
 }));
 
 vi.mock("@sofa/tmdb/client", () => ({

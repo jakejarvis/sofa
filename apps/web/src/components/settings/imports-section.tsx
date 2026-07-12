@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconCloudUpload, IconLink } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -209,9 +209,6 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
       onError: (err) => {
         toast.error(getErrorMessage(err, t, t`Failed to parse file`));
       },
-      onSettled: () => {
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      },
     }),
   );
 
@@ -236,7 +233,14 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
   } | null>(null);
 
   function handleFileSelect(file: File) {
-    parseMutation.mutate({ source: config.source, file });
+    parseMutation.mutate(
+      { source: config.source, file },
+      {
+        onSettled: () => {
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        },
+      },
+    );
   }
 
   async function handleImport() {
@@ -323,13 +327,12 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
   }
 
   // Clean up poll timer on unmount or dialog close
-  const stopPollingRef = useRef(() => {
+  const stopPolling = useCallback(() => {
     if (pollTimerRef.current) {
       clearInterval(pollTimerRef.current);
       pollTimerRef.current = null;
     }
-  });
-  const stopPolling = stopPollingRef.current;
+  }, []);
 
   function handleClose() {
     stopPolling();

@@ -45,9 +45,9 @@
     "@sofa/db": "workspace:*",
     "@sofa/logger": "workspace:*",
     "@sofa/tmdb": "workspace:*",
-    "adm-zip": "0.5.16",
+    "adm-zip": "0.5.18",
     "node-vibrant": "4.0.4",
-    "sharp": "0.34.5",
+    "sharp": "0.35.3",
     "thumbhash": "catalog:",
     "zod": "catalog:"
   },

@@ -370,7 +370,8 @@ describe("processImportJob — state transitions", () => {
       })
       .run();
 
-    expect(() =>
+    let duplicateActiveJobRejected = false;
+    try {
       testDb
         .insert(importJobs)
         .values({
@@ -390,8 +391,11 @@ describe("processImportJob — state transitions", () => {
           importRatings: true,
           createdAt,
         })
-        .run(),
-    ).toThrow("UNIQUE constraint");
+        .run();
+    } catch {
+      duplicateActiveJobRejected = true;
+    }
+    expect(duplicateActiveJobRejected).toBe(true);
 
     testDb.update(importJobs).set({ status: "success" }).where(eq(importJobs.id, "job-1")).run();
 

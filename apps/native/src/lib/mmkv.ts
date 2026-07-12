@@ -5,33 +5,33 @@ import { createMMKV } from "react-native-mmkv";
 export const globalStorage = createMMKV();
 
 // Server+user scoped storage — switches when scope changes
-let _scopedStore: ReturnType<typeof createMMKV> | null = null;
-let _currentScopeKey: string | null = null;
+let scopedStore: ReturnType<typeof createMMKV> | null = null;
+let currentScopeKey: string | null = null;
 
 const scopeChangeListeners: Array<() => void> = [];
 
 export function scopedStorage() {
-  if (!_scopedStore) throw new Error("Scoped storage not initialized");
-  return _scopedStore;
+  if (!scopedStore) throw new Error("Scoped storage not initialized");
+  return scopedStore;
 }
 
 export function hasScopedStorage(): boolean {
-  return _scopedStore !== null;
+  return scopedStore !== null;
 }
 
 export function getScopeKey(): string | null {
-  return _currentScopeKey;
+  return currentScopeKey;
 }
 
 export function setStorageScope(instanceId: string, userId: string) {
-  _currentScopeKey = `${instanceId}_${userId}`;
-  _scopedStore = createMMKV({ id: _currentScopeKey });
+  currentScopeKey = `${instanceId}_${userId}`;
+  scopedStore = createMMKV({ id: currentScopeKey });
   for (const listener of scopeChangeListeners) listener();
 }
 
 export function clearStorageScope() {
-  _currentScopeKey = null;
-  _scopedStore = null;
+  currentScopeKey = null;
+  scopedStore = null;
   for (const listener of scopeChangeListeners) listener();
 }
 
@@ -43,11 +43,11 @@ export function onStorageScopeChange(callback: () => void): () => void {
   };
 }
 
-// Query persister — reads/writes through _scopedStore via closure
+// Query persister — reads/writes through scopedStore via closure
 const scopedMmkvStorage = {
-  getItem: (key: string) => _scopedStore?.getString(key) ?? null,
-  setItem: (key: string, value: string) => _scopedStore?.set(key, value),
-  removeItem: (key: string) => void _scopedStore?.remove(key),
+  getItem: (key: string) => scopedStore?.getString(key) ?? null,
+  setItem: (key: string, value: string) => scopedStore?.set(key, value),
+  removeItem: (key: string) => void scopedStore?.remove(key),
 };
 
 export const QUERY_CACHE_KEY = "REACT_QUERY_OFFLINE_CACHE";

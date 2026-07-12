@@ -25,6 +25,8 @@ interface TitleRowItem {
 }
 
 type TitleStatus = "in_watchlist" | "watching" | "caught_up" | "completed";
+const EMPTY_STATUSES: Record<string, TitleStatus> = {};
+const EMPTY_PROGRESS: Record<string, { watched: number; total: number }> = {};
 
 interface FilterableTitleRowProps {
   heading: string;
@@ -42,8 +44,8 @@ export function FilterableTitleRow({
   mediaType,
   defaultItems,
   genres,
-  userStatuses: initialStatuses = {},
-  episodeProgress: initialProgress = {},
+  userStatuses: initialStatuses = EMPTY_STATUSES,
+  episodeProgress: initialProgress = EMPTY_PROGRESS,
 }: FilterableTitleRowProps) {
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);

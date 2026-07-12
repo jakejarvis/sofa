@@ -11,7 +11,9 @@ import {
 } from "@sofa/test/db";
 
 const { getWatchProviders } = vi.hoisted(() => ({
-  getWatchProviders: vi.fn(async () => ({ results: {} as Record<string, unknown> })),
+  getWatchProviders: vi.fn<() => Promise<{ results: Record<string, unknown> }>>(async () => ({
+    results: {},
+  })),
 }));
 
 vi.mock("@sofa/tmdb/client", () => ({

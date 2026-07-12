@@ -155,7 +155,7 @@ function fireAndForgetEnrichment(
   refreshTrailer(titleId).catch((err) => log.warn("Trailer enrichment failed:", err));
 }
 
-type ImportResult = ReturnType<typeof _getOrFetchTitleByTmdbId>;
+type ImportResult = ReturnType<typeof fetchTitleByTmdbId>;
 
 /** In-flight import promises keyed by `${tmdbId}-${type}` — coalesces concurrent calls */
 const inflightImports = new Map<string, ImportResult>();
@@ -168,14 +168,14 @@ export function getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv"): I
     return inflight;
   }
 
-  const promise = _getOrFetchTitleByTmdbId(tmdbId, type).finally(() => {
+  const promise = fetchTitleByTmdbId(tmdbId, type).finally(() => {
     inflightImports.delete(key);
   }) as ImportResult;
   inflightImports.set(key, promise);
   return promise;
 }
 
-async function _getOrFetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
+async function fetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
   log.debug(`Importing ${type} TMDB ${tmdbId}`);
 
   const existing = getTitleByTmdbIdAndType(tmdbId, type);

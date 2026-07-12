@@ -4,11 +4,15 @@ import { persons, titleCast } from "@sofa/db/schema";
 import { clearAllTables, eq, insertTitle, testDb } from "@sofa/test/db";
 
 const { mockGetMovieCredits, mockGetTvAggregateCredits } = vi.hoisted(() => ({
-  mockGetMovieCredits: vi.fn(async () => ({
+  mockGetMovieCredits: vi.fn<
+    () => Promise<{ cast: Record<string, unknown>[]; crew: Record<string, unknown>[] }>
+  >(async () => ({
     cast: [] as Record<string, unknown>[],
     crew: [] as Record<string, unknown>[],
   })),
-  mockGetTvAggregateCredits: vi.fn(async () => ({
+  mockGetTvAggregateCredits: vi.fn<
+    () => Promise<{ cast: Record<string, unknown>[]; crew: Record<string, unknown>[] }>
+  >(async () => ({
     cast: [] as Record<string, unknown>[],
     crew: [] as Record<string, unknown>[],
   })),

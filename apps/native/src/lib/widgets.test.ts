@@ -1,23 +1,33 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 const CACHED_WIDGET_IMAGE_RE = /^file:\/\/\/group\/cw_/;
+type LibraryResult = { items: Array<Record<string, unknown>> };
+type SnapshotProps = Record<string, unknown>;
+type TimelineEntry = { props?: Record<string, unknown> };
+
 const platform = { OS: "ios" };
-const resolveAssetSource = vi.fn(() => ({ uri: "file:///tmp/sofa-icon.png" }));
-const continueWatching = vi.fn();
-const upcoming = vi.fn();
-const downloadWidgetImage = vi.fn(async (_url: string, key: string) => `file:///group/${key}`);
-const copyBundledAsset = vi.fn(async (_assetUri: string, key: string) => `file:///group/${key}`);
-const pruneWidgetImages = vi.fn(async () => undefined);
-const getWidgetIconAsset = vi.fn(() => "widget-icon-asset");
+const resolveAssetSource = vi.fn<() => { uri: string }>(() => ({
+  uri: "file:///tmp/sofa-icon.png",
+}));
+const continueWatching = vi.fn<() => Promise<LibraryResult>>();
+const upcoming = vi.fn<() => Promise<LibraryResult>>();
+const downloadWidgetImage = vi.fn<(url: string, key: string) => Promise<string>>(
+  async (_url: string, key: string) => `file:///group/${key}`,
+);
+const copyBundledAsset = vi.fn<(assetUri: string, key: string) => Promise<string>>(
+  async (_assetUri: string, key: string) => `file:///group/${key}`,
+);
+const pruneWidgetImages = vi.fn<() => Promise<void>>(async () => undefined);
+const getWidgetIconAsset = vi.fn<() => string>(() => "widget-icon-asset");
 
 const continueWatchingWidget = {
-  updateSnapshot: vi.fn(),
-  updateTimeline: vi.fn(),
+  updateSnapshot: vi.fn<(props: SnapshotProps) => void>(),
+  updateTimeline: vi.fn<(entries: TimelineEntry[]) => void>(),
 };
 
 const upcomingWidget = {
-  updateSnapshot: vi.fn(),
-  updateTimeline: vi.fn(),
+  updateSnapshot: vi.fn<(props: SnapshotProps) => void>(),
+  updateTimeline: vi.fn<(entries: TimelineEntry[]) => void>(),
 };
 
 vi.mock("react-native", () => ({

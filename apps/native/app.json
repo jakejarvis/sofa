@@ -10,6 +10,7 @@
       "config": {
         "usesNonExemptEncryption": false
       },
+      "deploymentTarget": "16.4",
       "icon": "./assets/images/sofa.icon",
       "bundleIdentifier": "com.jakejarvis.sofa",
       "appleTeamId": "B5ZWKBCUTU",
@@ -65,14 +66,6 @@
       "package": "com.jakejarvis.sofa"
     },
     "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "deploymentTarget": "16.2"
-          }
-        }
-      ],
       "expo-router",
       "expo-secure-store",
       [

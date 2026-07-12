@@ -40,7 +40,7 @@ const defaultSeasonDetails: MockSeasonDetails = {
 };
 
 const { mockGetTvSeasonDetails } = vi.hoisted(() => ({
-  mockGetTvSeasonDetails: vi.fn(),
+  mockGetTvSeasonDetails: vi.fn<() => Promise<MockSeasonDetails>>(),
 }));
 
 vi.mock("@sofa/tmdb/client", () => ({
