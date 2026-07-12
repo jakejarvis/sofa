@@ -347,7 +347,6 @@ msgid "Added \"{titleName}\" to watchlist"
 msgstr "\"{titleName}\" נוסף לרשימת הצפייה"
 
 #: apps/native/src/hooks/use-title-actions.ts
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Added to watchlist"
@@ -1236,7 +1235,6 @@ msgstr "ייצוא"
 msgid "Failed"
 msgstr "נכשל"
 
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to add to watchlist"
 msgstr "הוספה לרשימת הצפייה נכשלה"
@@ -1386,7 +1384,6 @@ msgstr "עדכון השם נכשל"
 msgid "Failed to update rating"
 msgstr "עדכון הדירוג נכשל"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Failed to update registration setting"
 msgstr "עדכון הגדרת ההרשמה נכשל"
@@ -2089,6 +2086,10 @@ msgstr "פרק הבא"
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Next run"
 msgstr "הרצה הבאה"
+
+#: packages/i18n/src/date-buckets.ts
+msgid "Next Week"
+msgstr ""
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 msgid "Next: S{seasonNum} E{epNum}"
@@ -3214,6 +3215,7 @@ msgstr "השבוע"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "This Week"
 msgstr "השבוע"
 
@@ -3315,6 +3317,7 @@ msgstr "היום"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "Today"
 msgstr "היום"
 
@@ -3339,6 +3342,10 @@ msgstr "הפעל/כבה גיבויים מתוזמנים"
 #: apps/web/src/components/ui/sidebar.tsx
 msgid "Toggle Sidebar"
 msgstr "החלף סרגל צד"
+
+#: packages/i18n/src/date-buckets.ts
+msgid "Tomorrow"
+msgstr ""
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Track what you watch. Know what's next.<0/>Your library, your data, your rules."
@@ -3730,4 +3737,3 @@ msgstr "שמך"
 #: apps/web/src/components/auth-form.tsx
 msgid "Your name…"
 msgstr "השם שלך…"
-

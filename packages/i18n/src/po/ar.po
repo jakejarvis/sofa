@@ -347,7 +347,6 @@ msgid "Added \"{titleName}\" to watchlist"
 msgstr "تمت إضافة \"{titleName}\" إلى قائمة المشاهدة"
 
 #: apps/native/src/hooks/use-title-actions.ts
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Added to watchlist"
@@ -1236,7 +1235,6 @@ msgstr "تصدير"
 msgid "Failed"
 msgstr "فشل"
 
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to add to watchlist"
 msgstr "فشل الإضافة إلى قائمة المشاهدة"
@@ -1386,7 +1384,6 @@ msgstr "فشل تحديث الاسم"
 msgid "Failed to update rating"
 msgstr "فشل تحديث التقييم"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Failed to update registration setting"
 msgstr "فشل تحديث إعداد التسجيل"
@@ -2089,6 +2086,10 @@ msgstr "الحلقة التالية"
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Next run"
 msgstr "التشغيل التالي"
+
+#: packages/i18n/src/date-buckets.ts
+msgid "Next Week"
+msgstr ""
 
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 msgid "Next: S{seasonNum} E{epNum}"
@@ -3214,6 +3215,7 @@ msgstr "هذا الأسبوع"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "This Week"
 msgstr "هذا الأسبوع"
 
@@ -3315,6 +3317,7 @@ msgstr "اليوم"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "Today"
 msgstr "اليوم"
 
@@ -3339,6 +3342,10 @@ msgstr "تبديل النسخ الاحتياطية المجدولة"
 #: apps/web/src/components/ui/sidebar.tsx
 msgid "Toggle Sidebar"
 msgstr "تبديل الشريط الجانبي"
+
+#: packages/i18n/src/date-buckets.ts
+msgid "Tomorrow"
+msgstr ""
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Track what you watch. Know what's next.<0/>Your library, your data, your rules."
@@ -3730,4 +3737,3 @@ msgstr "اسمك"
 #: apps/web/src/components/auth-form.tsx
 msgid "Your name…"
 msgstr "اسمك…"
-
