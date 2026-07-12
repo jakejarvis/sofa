@@ -126,7 +126,14 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
       <Link.Trigger withAppleZoom>{rowContent}</Link.Trigger>
       <Link.Preview />
       <Link.Menu>
-        {item.titleType === "movie" && (
+        {item.titleType === "movie" && item.userStatus === "completed" && (
+          <Link.MenuAction
+            title={t`Mark Unwatched`}
+            icon="xmark.circle"
+            onPress={() => titleActions.unwatchMovie(item.titleId, item.titleName)}
+          />
+        )}
+        {item.titleType === "movie" && item.userStatus !== "completed" && (
           <Link.MenuAction
             title={t`Mark Watched`}
             icon="checkmark.circle"

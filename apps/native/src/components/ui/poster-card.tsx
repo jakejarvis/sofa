@@ -217,7 +217,14 @@ export const PosterCard = memo(function PosterCard({
                   onPress={handleQuickAddPress}
                 />
               )}
-              {type === "movie" && (
+              {type === "movie" && userStatus === "completed" && (
+                <Link.MenuAction
+                  title={t`Mark Unwatched`}
+                  icon="xmark.circle"
+                  onPress={() => titleActions.unwatchMovie(id, title)}
+                />
+              )}
+              {type === "movie" && userStatus !== "completed" && (
                 <Link.MenuAction
                   title={t`Mark Watched`}
                   icon="checkmark.circle"

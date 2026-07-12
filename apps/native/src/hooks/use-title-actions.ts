@@ -26,6 +26,7 @@ interface UseTitleActionsOptions {
   toasts?: {
     updateStatus?: ToastOverride<{ id: string; status: string | null }>;
     watchMovie?: ToastOverride<WatchInput>;
+    unwatchMovie?: ToastOverride<WatchInput>;
     updateRating?: ToastOverride<{ id: string; stars: number }>;
     watchEpisode?: ToastOverride<WatchInput>;
     unwatchEpisode?: ToastOverride<WatchInput>;
@@ -64,6 +65,16 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
         invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to mark as watched`),
+    }),
+  );
+
+  const unwatchMovie = useMutation(
+    orpc.tracking.unwatch.mutationOptions({
+      onSuccess: (_data, input) => {
+        toast.success(resolveToast(toastOverrides?.unwatchMovie, t`Marked as unwatched`, input));
+        invalidateTitleQueries();
+      },
+      onError: () => toast.error(t`Failed to mark as unwatched`),
     }),
   );
 
@@ -115,6 +126,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
   return {
     updateStatus,
     watchMovie,
+    unwatchMovie,
     updateRating,
     watchEpisode,
     unwatchEpisode,

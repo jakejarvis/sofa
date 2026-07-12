@@ -55,6 +55,20 @@ export const titleActions = {
     }
   },
 
+  async unwatchMovie(id: string, titleName?: string) {
+    try {
+      await client.tracking.unwatch({ scope: "movie", ids: [id] });
+      toast.success(
+        titleName
+          ? i18n._(msg`Marked "${titleName}" as unwatched`)
+          : i18n._(msg`Marked as unwatched`),
+      );
+      invalidateTitleQueries();
+    } catch {
+      toast.error(i18n._(msg`Failed to mark as unwatched`));
+    }
+  },
+
   async removeFromLibrary(id: string) {
     try {
       await client.tracking.updateStatus({ id, status: null });

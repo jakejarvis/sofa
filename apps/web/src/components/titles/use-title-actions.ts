@@ -135,6 +135,19 @@ export function useTitleActions() {
     }
   }, [getUserInfo, setUserInfo, queryClient, userInfoKey, titleId, titleName, watch, t]);
 
+  const handleUnwatchMovie = useCallback(async () => {
+    await queryClient.cancelQueries({ queryKey: userInfoKey });
+    const prevStatus = getUserInfo().status;
+    setUserInfo((old) => ({ ...old, status: "in_watchlist" }));
+    try {
+      await unwatch({ scope: "movie", ids: [titleId] });
+      toast.success(t`Marked "${titleName}" as unwatched`);
+    } catch {
+      setUserInfo((old) => ({ ...old, status: prevStatus }));
+      toast.error(t`Failed to mark as unwatched`);
+    }
+  }, [getUserInfo, setUserInfo, queryClient, userInfoKey, titleId, titleName, unwatch, t]);
+
   const handleWatchEpisode = useCallback(
     async (episodeId: string, seasonNum: number, epNum: number, isWatched: boolean) => {
       await queryClient.cancelQueries({ queryKey: userInfoKey });
@@ -352,6 +365,7 @@ export function useTitleActions() {
     handleStatusChange,
     handleRating,
     handleWatchMovie,
+    handleUnwatchMovie,
     handleWatchEpisode,
     handleMarkSeason,
     handleUnmarkSeason,
