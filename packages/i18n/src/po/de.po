@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-25 01:01\n"
+"PO-Revision-Date: 2026-07-12 21:31\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -346,7 +346,6 @@ msgstr "Zur Merkliste hinzufügen"
 msgid "Added \"{titleName}\" to watchlist"
 msgstr "\"{titleName}\" zur Merkliste hinzugefügt"
 
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
@@ -1236,7 +1235,6 @@ msgstr "Exportieren"
 msgid "Failed"
 msgstr "Fehlgeschlagen"
 
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to add to watchlist"
 msgstr "Konnte nicht zur Merkliste hinzugefügt werden"
@@ -1292,6 +1290,12 @@ msgstr "Titel konnte nicht geladen werden"
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark all episodes as watched"
 msgstr "Nicht alle Episoden konnten als gesehen markiert werden"
+
+#: apps/native/src/hooks/use-title-actions.ts
+#: apps/native/src/lib/title-actions.ts
+#: apps/web/src/components/titles/use-title-actions.ts
+msgid "Failed to mark as unwatched"
+msgstr ""
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -1386,7 +1390,6 @@ msgstr "Name konnte nicht aktualisiert werden"
 msgid "Failed to update rating"
 msgstr "Bewertung konnte nicht aktualisiert werden"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Failed to update registration setting"
 msgstr "Registrierungseinstellung konnte nicht aktualisiert werden"
@@ -1860,6 +1863,13 @@ msgstr "Episode {epNum} als gesehen markieren"
 msgid "Mark Episode Watched"
 msgstr "Episode als gesehen markieren"
 
+#: apps/native/src/app/title/[id].tsx
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/native/src/components/ui/poster-card.tsx
+#: apps/web/src/components/titles/title-actions.tsx
+msgid "Mark Unwatched"
+msgstr ""
+
 #: apps/web/src/components/command-palette.tsx
 msgid "Mark watched"
 msgstr "Als gesehen markieren"
@@ -1872,12 +1882,21 @@ msgid "Mark Watched"
 msgstr "Als gesehen markieren"
 
 #: apps/native/src/app/title/[id].tsx
+msgid "Marked \"{name}\" as unwatched"
+msgstr ""
+
+#: apps/native/src/app/title/[id].tsx
 msgid "Marked \"{name}\" as watched"
 msgstr "„{name}“ als gesehen markiert"
 
 #: apps/native/src/lib/title-actions.ts
 #~ msgid "Marked \"{titleName}\" as completed"
 #~ msgstr ""
+
+#: apps/native/src/lib/title-actions.ts
+#: apps/web/src/components/titles/use-title-actions.ts
+msgid "Marked \"{titleName}\" as unwatched"
+msgstr ""
 
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
@@ -1897,6 +1916,12 @@ msgstr "Alle Folgen von \"{titleName}\" als gesehen markiert"
 #: apps/native/src/lib/title-actions.ts
 #~ msgid "Marked as completed"
 #~ msgstr ""
+
+#: apps/native/src/app/title/[id].tsx
+#: apps/native/src/hooks/use-title-actions.ts
+#: apps/native/src/lib/title-actions.ts
+msgid "Marked as unwatched"
+msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/native/src/hooks/use-title-actions.ts

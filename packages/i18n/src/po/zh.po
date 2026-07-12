@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-03-25 01:01\n"
+"PO-Revision-Date: 2026-07-12 21:31\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -346,7 +346,6 @@ msgstr "添加到观看列表"
 msgid "Added \"{titleName}\" to watchlist"
 msgstr "已将“{titleName}”添加到观看列表"
 
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
@@ -1236,7 +1235,6 @@ msgstr "导出"
 msgid "Failed"
 msgstr "失败"
 
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to add to watchlist"
 msgstr "添加到待看列表失败"
@@ -1292,6 +1290,12 @@ msgstr "加载影视内容失败"
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark all episodes as watched"
 msgstr "标记所有剧集为已观看失败"
+
+#: apps/native/src/hooks/use-title-actions.ts
+#: apps/native/src/lib/title-actions.ts
+#: apps/web/src/components/titles/use-title-actions.ts
+msgid "Failed to mark as unwatched"
+msgstr ""
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -1386,7 +1390,6 @@ msgstr "更新名称失败"
 msgid "Failed to update rating"
 msgstr "更新评分失败"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Failed to update registration setting"
 msgstr "更新注册设置失败"
@@ -1860,6 +1863,13 @@ msgstr "将第 {epNum} 集标记为已观看"
 msgid "Mark Episode Watched"
 msgstr "标记剧集为已观看"
 
+#: apps/native/src/app/title/[id].tsx
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/native/src/components/ui/poster-card.tsx
+#: apps/web/src/components/titles/title-actions.tsx
+msgid "Mark Unwatched"
+msgstr ""
+
 #: apps/web/src/components/command-palette.tsx
 msgid "Mark watched"
 msgstr "标记为已观看"
@@ -1872,12 +1882,21 @@ msgid "Mark Watched"
 msgstr "标记为已观看"
 
 #: apps/native/src/app/title/[id].tsx
+msgid "Marked \"{name}\" as unwatched"
+msgstr ""
+
+#: apps/native/src/app/title/[id].tsx
 msgid "Marked \"{name}\" as watched"
 msgstr "已将“{name}”标记为已观看"
 
 #: apps/native/src/lib/title-actions.ts
 #~ msgid "Marked \"{titleName}\" as completed"
 #~ msgstr ""
+
+#: apps/native/src/lib/title-actions.ts
+#: apps/web/src/components/titles/use-title-actions.ts
+msgid "Marked \"{titleName}\" as unwatched"
+msgstr ""
 
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
@@ -1897,6 +1916,12 @@ msgstr "已将\"{titleName}\"的所有剧集标记为已观看"
 #: apps/native/src/lib/title-actions.ts
 #~ msgid "Marked as completed"
 #~ msgstr ""
+
+#: apps/native/src/app/title/[id].tsx
+#: apps/native/src/hooks/use-title-actions.ts
+#: apps/native/src/lib/title-actions.ts
+msgid "Marked as unwatched"
+msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/native/src/hooks/use-title-actions.ts
