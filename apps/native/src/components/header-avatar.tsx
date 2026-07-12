@@ -39,7 +39,6 @@ export function HeaderAvatar() {
           attributes: { destructive: true },
         },
       ]}
-      onOpenMenu={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
       onPressAction={({ nativeEvent }) => {
         if (nativeEvent.event === "settings") {
           navigate("/(tabs)/(settings)");

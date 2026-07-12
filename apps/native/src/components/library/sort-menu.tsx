@@ -43,7 +43,6 @@ export function SortMenu({ sortBy, sortDirection, onSortChange }: SortMenuProps)
         title: option.label,
         state: option.sortBy === sortBy && option.sortDirection === sortDirection ? "on" : "off",
       }))}
-      onOpenMenu={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
       onPressAction={({ nativeEvent }) => {
         const option = sortOptions.find(
           (candidate) => `${candidate.sortBy}-${candidate.sortDirection}` === nativeEvent.event,

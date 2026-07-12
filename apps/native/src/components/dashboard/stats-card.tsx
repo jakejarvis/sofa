@@ -92,7 +92,6 @@ export function StatsCard(props: StatsCardProps) {
           title: periodLabels[value],
           state: value === period ? "on" : "off",
         }))}
-        onOpenMenu={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
         onPressAction={({ nativeEvent }) => {
           const nextPeriod = periods.find((value) => value === nativeEvent.event);
           if (nextPeriod) onPeriodChange(nextPeriod);
