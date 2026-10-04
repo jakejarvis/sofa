@@ -190,7 +190,15 @@ async function processWatchlistItem(
   }
 
   const STATUS_RANK = { watchlist: 0, in_progress: 1, completed: 2 } as const;
-  const targetStatus = item.status ?? "watchlist";
+  // Stored-status invariants (see migration sour_harry_osborn): TV never stores
+  // 'completed' (derived from episode progress) and movies never store 'in_progress'.
+  const requested = item.status ?? "watchlist";
+  const targetStatus =
+    title.type === "tv" && requested === "completed"
+      ? "in_progress"
+      : title.type === "movie" && requested === "in_progress"
+        ? "watchlist"
+        : requested;
   const currentStatus = getTitleStatusValue(userId, title.id);
 
   if (currentStatus && STATUS_RANK[currentStatus] >= STATUS_RANK[targetStatus]) {

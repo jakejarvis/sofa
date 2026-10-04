@@ -1,3 +1,7 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import {
@@ -12,8 +16,11 @@ import {
   clearAllTables,
   eq,
   insertMovieWatch,
+  insertStatus,
+  insertTitle,
   insertTvShow,
   insertUser,
+  testClient,
   testDb,
 } from "@sofa/test/db";
 import * as tmdbClient from "@sofa/tmdb/client";
@@ -236,6 +243,94 @@ describe("processImportJob — watchlist", () => {
     expect(statusRow).toHaveLength(1);
     expect(statusRow[0].status).toBe("watchlist");
     expect(statusRow[0].titleId).toBe("movie-wl");
+  });
+});
+
+// ── Status Normalization ────────────────────────────────────────────
+
+describe("processImportJob — status normalization", () => {
+  const watchlistOnly = {
+    importWatches: false,
+    importWatchlist: true,
+    importRatings: false,
+  };
+
+  test("stores TV 'completed' as 'in_progress'", async () => {
+    const userId = insertUser();
+    insertTvShowWithFetchedAt("tv-c", 500);
+
+    const payload: NormalizedImport = {
+      source: "simkl",
+      movies: [],
+      episodes: [],
+      watchlist: [{ tmdbId: 500, title: "Test Show", type: "tv", status: "completed" }],
+      ratings: [],
+    };
+
+    const jobId = createJob(userId, payload, watchlistOnly);
+    await processImportJob(jobId);
+
+    const rows = testDb
+      .select()
+      .from(userTitleStatus)
+      .where(eq(userTitleStatus.userId, userId))
+      .all();
+    expect(rows).toHaveLength(1);
+    expect(rows[0].titleId).toBe("tv-c");
+    expect(rows[0].status).toBe("in_progress");
+  });
+
+  test("stores movie 'in_progress' as 'watchlist'", async () => {
+    const userId = insertUser();
+    insertMovieTitle("m-ip", 501);
+
+    const payload: NormalizedImport = {
+      source: "simkl",
+      movies: [],
+      episodes: [],
+      watchlist: [{ tmdbId: 501, title: "Test Movie", type: "movie", status: "in_progress" }],
+      ratings: [],
+    };
+
+    const jobId = createJob(userId, payload, watchlistOnly);
+    await processImportJob(jobId);
+
+    const rows = testDb
+      .select()
+      .from(userTitleStatus)
+      .where(eq(userTitleStatus.userId, userId))
+      .all();
+    expect(rows).toHaveLength(1);
+    expect(rows[0].titleId).toBe("m-ip");
+    expect(rows[0].status).toBe("watchlist");
+  });
+});
+
+// ── Migration: normalize_imported_statuses ──────────────────────────
+
+describe("normalize_imported_statuses migration", () => {
+  test("repairs TV 'completed' and movie 'in_progress' rows", () => {
+    const dir = fileURLToPath(new URL("../../db/drizzle", import.meta.url));
+    const folder = readdirSync(dir).find((d) => d.endsWith("_normalize_imported_statuses"));
+    expect(folder).toBeDefined();
+
+    const userId = insertUser();
+    insertTitle({ id: "mig-tv", tmdbId: 7001, type: "tv", title: "Mig Show" });
+    insertTitle({ id: "mig-watched", tmdbId: 7002, type: "movie", title: "Mig Watched" });
+    insertTitle({ id: "mig-unwatched", tmdbId: 7003, type: "movie", title: "Mig Unwatched" });
+    insertStatus(userId, "mig-tv", "completed");
+    insertStatus(userId, "mig-watched", "in_progress");
+    insertStatus(userId, "mig-unwatched", "in_progress");
+    insertMovieWatch(userId, "mig-watched");
+
+    testClient.exec(readFileSync(join(dir, folder!, "migration.sql"), "utf8"));
+
+    const statusOf = (titleId: string) =>
+      testDb.select().from(userTitleStatus).where(eq(userTitleStatus.titleId, titleId)).get()
+        ?.status;
+    expect(statusOf("mig-tv")).toBe("in_progress");
+    expect(statusOf("mig-watched")).toBe("completed");
+    expect(statusOf("mig-unwatched")).toBe("watchlist");
   });
 });
 

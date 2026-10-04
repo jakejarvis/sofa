@@ -348,6 +348,34 @@ describe("parseTraktPayload", () => {
     expect(result.data.watchlist[0].type).toBe("tv");
   });
 
+  test("maps season and episode watchlist items to their show", () => {
+    const result = parseTraktPayload({
+      watchlist: [
+        { type: "season", show: { title: "Show S", ids: { tmdb: 10 } } },
+        { type: "episode", show: { title: "Show E", ids: { tmdb: 11 } } },
+      ],
+    });
+
+    expect(result.data.watchlist).toHaveLength(2);
+    expect(result.data.watchlist.map((w) => w.type)).toEqual(["tv", "tv"]);
+    expect(result.data.watchlist.map((w) => w.tmdbId)).toEqual([10, 11]);
+  });
+
+  test("skips season and episode ratings as unsupported", () => {
+    const result = parseTraktPayload({
+      ratings: [
+        { type: "episode", rating: 8, show: { title: "Show", ids: { tmdb: 12 } } },
+        { type: "season", rating: 6, show: { title: "Show", ids: { tmdb: 12 } } },
+        { type: "movie", rating: 10, movie: { title: "M", ids: { tmdb: 13 } } },
+      ],
+    });
+
+    expect(result.data.ratings).toHaveLength(1);
+    expect(result.data.ratings[0].type).toBe("movie");
+    expect(result.diagnostics?.unsupported).toBe(2);
+    expect(result.warnings.some((w) => w.includes("2 Trakt season/episode ratings"))).toBe(true);
+  });
+
   test("maps show rating type to tv", () => {
     const result = parseTraktPayload({
       ratings: [

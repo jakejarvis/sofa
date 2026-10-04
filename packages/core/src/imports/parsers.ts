@@ -182,13 +182,13 @@ interface TraktHistoryEpisode {
 }
 
 interface TraktWatchlistItem {
-  type?: "movie" | "show";
+  type?: "movie" | "show" | "season" | "episode";
   movie?: { title?: string; year?: number; ids?: TraktIds };
   show?: { title?: string; year?: number; ids?: TraktIds };
 }
 
 interface TraktRatingItem {
-  type?: "movie" | "show";
+  type?: "movie" | "show" | "season" | "episode";
   rating?: number;
   rated_at?: string;
   movie?: { title?: string; year?: number; ids?: TraktIds };
@@ -237,7 +237,16 @@ export function parseTraktPayload(data: {
   }
 
   // Watchlist
+  // Sofa has no season/episode watchlist: those items mean "the user wants this show".
   for (const item of data.watchlist ?? []) {
+    if (
+      item.type !== "movie" &&
+      item.type !== "show" &&
+      item.type !== "season" &&
+      item.type !== "episode"
+    ) {
+      continue;
+    }
     const entry = item.type === "movie" ? item.movie : item.show;
     if (!entry?.title) continue;
     watchlist.push({
@@ -246,12 +255,18 @@ export function parseTraktPayload(data: {
       tvdbId: entry.ids?.tvdb,
       title: entry.title,
       year: entry.year,
-      type: item.type === "show" ? "tv" : "movie",
+      type: item.type === "movie" ? "movie" : "tv",
     });
   }
 
-  // Ratings
+  // Ratings (Sofa only rates movies and shows; season/episode ratings are unsupported)
+  let unsupported = 0;
   for (const item of data.ratings ?? []) {
+    if (item.type === "season" || item.type === "episode") {
+      unsupported++;
+      continue;
+    }
+    if (item.type !== "movie" && item.type !== "show") continue;
     const entry = item.type === "movie" ? item.movie : item.show;
     if (!entry?.title || item.rating == null) continue;
     const converted = convertRating10to5(item.rating);
@@ -271,6 +286,12 @@ export function parseTraktPayload(data: {
     });
   }
 
+  if (unsupported > 0) {
+    warnings.push(
+      `Skipped ${unsupported} Trakt season/episode ratings (Sofa only rates movies and shows)`,
+    );
+  }
+
   log.info(
     `Parsed Trakt data: ${movies.length} movies, ${episodes.length} episodes, ${watchlist.length} watchlist, ${ratings.length} ratings`,
   );
@@ -286,7 +307,7 @@ export function parseTraktPayload(data: {
   return {
     data: normalized,
     warnings,
-    diagnostics: { unresolved: countUnresolved(normalized), unsupported: 0 },
+    diagnostics: { unresolved: countUnresolved(normalized), unsupported },
   };
 }
 
