@@ -92,6 +92,14 @@ async function loadWidgetsModule() {
   return import("./widgets");
 }
 
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((r) => {
+    resolve = r;
+  });
+  return { promise, resolve };
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   vi.spyOn(console, "warn").mockImplementation(() => undefined);
@@ -192,8 +200,24 @@ describe("refreshWidgets", () => {
       ],
     });
 
+    upcoming.mockResolvedValue({
+      items: [
+        {
+          titleId: "show-1",
+          titleName: "A Show",
+          titleType: "tv",
+          date: "2026-03-30",
+          seasonNumber: 1,
+          episodeNumber: 2,
+          episodeCount: 1,
+          backdropPath: "/bad-backdrop.jpg",
+          posterPath: "/poster.jpg",
+        },
+      ],
+    });
+
     downloadWidgetImage.mockImplementation(async (url: string, key: string) => {
-      if (url.includes("/bad.jpg")) {
+      if (url.includes("/bad")) {
         throw new Error("download failed");
       }
       return `file:///group/${key}`;
@@ -202,11 +226,67 @@ describe("refreshWidgets", () => {
     const { refreshWidgets } = await loadWidgetsModule();
     await refreshWidgets();
 
+    // The first item's episode still fails, so it falls back to the show's backdrop.
     const entries = continueWatchingWidget.updateTimeline.mock.calls[0]?.[0];
     expect(continueWatchingWidget.updateTimeline).toHaveBeenCalledTimes(1);
     expect(entries).toHaveLength(25);
-    expect(entries[0]?.props?.imageFilePath).toBe("");
+    expect(entries[0]?.props?.imageFilePath).toMatch(CACHED_WIDGET_IMAGE_RE);
     expect(entries[1]?.props?.imageFilePath).toMatch(CACHED_WIDGET_IMAGE_RE);
+    expect(downloadWidgetImage).toHaveBeenCalledWith(
+      "https://sofa.test/bad.jpg",
+      expect.any(String),
+    );
+    expect(downloadWidgetImage).toHaveBeenCalledWith(
+      "https://sofa.test/fallback.jpg",
+      expect.any(String),
+    );
+
+    // Upcoming falls back from a failed backdrop to the poster.
+    const upcomingEntries = upcomingWidget.updateTimeline.mock.calls[0]?.[0];
+    expect(upcomingEntries[0]?.props?.imageFilePath).toMatch(/^file:\/\/\/group\/up_/);
+    expect(downloadWidgetImage).toHaveBeenCalledWith(
+      "https://sofa.test/poster.jpg",
+      expect.any(String),
+    );
+  });
+
+  test("leaves the image empty when every artwork candidate fails", async () => {
+    continueWatching.mockResolvedValue({
+      items: [
+        {
+          title: { id: "title-1", title: "The Pitt", backdropPath: "/backdrop.jpg" },
+          nextEpisode: { seasonNumber: 1, episodeNumber: 5, stillPath: "/still.jpg" },
+          watchedEpisodes: 4,
+          totalEpisodes: 12,
+        },
+      ],
+    });
+    upcoming.mockResolvedValue({
+      items: [
+        {
+          titleId: "show-1",
+          titleName: "A Show",
+          titleType: "tv",
+          date: "2026-03-30",
+          seasonNumber: 1,
+          episodeNumber: 2,
+          episodeCount: 1,
+          backdropPath: "/up-backdrop.jpg",
+          posterPath: "/up-poster.jpg",
+        },
+      ],
+    });
+    downloadWidgetImage.mockRejectedValue(new Error("download failed"));
+
+    const { refreshWidgets } = await loadWidgetsModule();
+    await refreshWidgets();
+
+    const entries = continueWatchingWidget.updateTimeline.mock.calls[0]?.[0];
+    expect(entries[0]?.props).toMatchObject({ titleName: "The Pitt", imageFilePath: "" });
+    const upcomingEntries = upcomingWidget.updateTimeline.mock.calls[0]?.[0];
+    expect(upcomingEntries[0]?.props).toMatchObject({ titleName: "A Show", imageFilePath: "" });
+    // Every candidate was tried before giving up.
+    expect(downloadWidgetImage).toHaveBeenCalledTimes(4);
   });
 
   test("passes the copied icon path into empty widget states", async () => {
@@ -387,6 +467,76 @@ describe("resetWidgets", () => {
     expect(upcomingWidget.updateSnapshot).not.toHaveBeenCalled();
     expect(continueWatching).not.toHaveBeenCalled();
     expect(upcoming).not.toHaveBeenCalled();
+  });
+});
+
+describe("widget refresh ordering", () => {
+  const watchingItem = {
+    title: { id: "title-1", title: "Severance", backdropPath: "/backdrop-1.jpg" },
+    nextEpisode: { seasonNumber: 2, episodeNumber: 3, stillPath: "/still-1.jpg" },
+    watchedEpisodes: 2,
+    totalEpisodes: 10,
+  };
+
+  test("a reset waits for an in-flight refresh instead of being overwritten by it", async () => {
+    const pending = deferred<LibraryResult>();
+    continueWatching.mockReturnValueOnce(pending.promise);
+
+    const { refreshWidgets, resetWidgets } = await loadWidgetsModule();
+    const refresh = refreshWidgets();
+    const reset = resetWidgets();
+
+    pending.resolve({ items: [watchingItem] });
+    await Promise.all([refresh, reset]);
+
+    expect(continueWatchingWidget.updateTimeline).toHaveBeenCalledTimes(1);
+    expect(clearWidgetImages.mock.invocationCallOrder[0]).toBeGreaterThan(
+      continueWatchingWidget.updateTimeline.mock.invocationCallOrder[0]!,
+    );
+    expect(continueWatchingWidget.updateSnapshot).toHaveBeenLastCalledWith(
+      expect.objectContaining({ titleName: "" }),
+    );
+  });
+
+  test("refresh requests made while one is waiting share it", async () => {
+    const { refreshWidgets } = await loadWidgetsModule();
+
+    const first = refreshWidgets();
+    const second = refreshWidgets();
+    const third = refreshWidgets();
+
+    expect(second).toBe(first);
+    expect(third).toBe(first);
+    await first;
+    expect(continueWatching).toHaveBeenCalledTimes(1);
+  });
+
+  test("a request during a running refresh queues exactly one more", async () => {
+    const pending = deferred<LibraryResult>();
+    continueWatching.mockReturnValueOnce(pending.promise);
+
+    const { refreshWidgets } = await loadWidgetsModule();
+    const running = refreshWidgets();
+    await vi.waitFor(() => expect(continueWatching).toHaveBeenCalledTimes(1));
+
+    const queued = refreshWidgets();
+    const alsoQueued = refreshWidgets();
+    expect(queued).not.toBe(running);
+    expect(alsoQueued).toBe(queued);
+
+    pending.resolve({ items: [] });
+    await Promise.all([running, queued, alsoQueued]);
+
+    expect(continueWatching).toHaveBeenCalledTimes(2);
+  });
+
+  test("does not prune cached images after a widget fails to refresh", async () => {
+    upcoming.mockRejectedValue(new Error("offline"));
+
+    const { refreshWidgets } = await loadWidgetsModule();
+    await refreshWidgets();
+
+    expect(pruneWidgetImages).not.toHaveBeenCalled();
   });
 });
 

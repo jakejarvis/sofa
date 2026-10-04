@@ -46,6 +46,18 @@ async function downloadImage(path: string | null, key: string): Promise<string> 
   }
 }
 
+/** Downloads the first of `paths` that succeeds, or returns "" if none do. */
+async function downloadFirstImage(
+  paths: Array<string | null | undefined>,
+  key: string,
+): Promise<string> {
+  for (const path of new Set(paths.filter((p): p is string => !!p))) {
+    const file = await downloadImage(path, key);
+    if (file) return file;
+  }
+  return "";
+}
+
 const IMAGE_PRUNE_MAX_AGE_SECONDS = 6 * 60 * 60;
 const WIDGET_ICON_KEY = "sofa_icon.png";
 
@@ -209,10 +221,7 @@ function emptyUpcomingProps(iconFilePath: string): UpcomingProps {
   });
 }
 
-/** Replace widget content with empty states and delete cached artwork (sign-out / server change). */
-export async function resetWidgets(): Promise<void> {
-  if (Platform.OS !== "ios") return;
-
+async function runReset(): Promise<void> {
   const [{ default: ContinueWatchingWidget }, { default: UpcomingWidget }] = await Promise.all([
     import("@/widgets/continue-watching"),
     import("@/widgets/upcoming"),
@@ -230,9 +239,7 @@ export async function resetWidgets(): Promise<void> {
   UpcomingWidget.updateSnapshot(emptyUpcomingProps(iconFilePath));
 }
 
-export async function refreshWidgets(): Promise<void> {
-  if (Platform.OS !== "ios") return;
-
+async function runRefresh(): Promise<void> {
   // Lazy import to avoid loading widget modules on Android
   const [{ default: ContinueWatchingWidget }, { default: UpcomingWidget }] = await Promise.all([
     import("@/widgets/continue-watching"),
@@ -240,28 +247,59 @@ export async function refreshWidgets(): Promise<void> {
   ]);
 
   const iconFilePath = await ensureIcon();
-  await Promise.all([
+  const [continueWatchingOk, upcomingOk] = await Promise.all([
     refreshContinueWatching(ContinueWatchingWidget, iconFilePath),
     refreshUpcoming(UpcomingWidget, iconFilePath),
   ]);
 
-  try {
-    await pruneWidgetImages(IMAGE_PRUNE_MAX_AGE_SECONDS);
-  } catch (error) {
-    console.warn("[Widgets] Failed to prune cached images:", error);
+  // A failed refresh leaves that widget's previous timeline in place; keep its images.
+  if (continueWatchingOk && upcomingOk) {
+    try {
+      await pruneWidgetImages(IMAGE_PRUNE_MAX_AGE_SECONDS);
+    } catch (error) {
+      console.warn("[Widgets] Failed to prune cached images:", error);
+    }
   }
+}
+
+// Refreshes and resets run one at a time, in call order, so a slow refresh can't overwrite
+// a newer one or put the previous account's data back after sign-out.
+let widgetQueue: Promise<void> = Promise.resolve();
+let pendingRefresh: Promise<void> | null = null;
+
+function enqueue(task: () => Promise<void>): Promise<void> {
+  const run = widgetQueue.then(task);
+  widgetQueue = run.catch(() => undefined);
+  return run;
+}
+
+/** Replace widget content with empty states and delete cached artwork (sign-out / server change). */
+export function resetWidgets(): Promise<void> {
+  if (Platform.OS !== "ios") return Promise.resolve();
+  return enqueue(runReset);
+}
+
+export function refreshWidgets(): Promise<void> {
+  if (Platform.OS !== "ios") return Promise.resolve();
+  // Requests made while a refresh is still waiting its turn share it; one made while a
+  // refresh is running queues exactly one more.
+  pendingRefresh ??= enqueue(async () => {
+    pendingRefresh = null;
+    await runRefresh();
+  });
+  return pendingRefresh;
 }
 
 async function refreshContinueWatching(
   widget: Awaited<typeof import("@/widgets/continue-watching")>["default"],
   iconFilePath: string,
-): Promise<void> {
+): Promise<boolean> {
   try {
     const { items } = await client.library.continueWatching();
 
     if (items.length === 0) {
       widget.updateSnapshot(emptyContinueWatchingProps(iconFilePath));
-      return;
+      return true;
     }
 
     const top = items.slice(0, 5);
@@ -277,7 +315,10 @@ async function refreshContinueWatching(
           imagePath,
           index,
         ]);
-        const imageFilePath = await downloadImage(imagePath, imageKey);
+        const imageFilePath = await downloadFirstImage(
+          [item.nextEpisode?.stillPath, item.title.backdropPath],
+          imageKey,
+        );
 
         return sanitizeProps<ContinueWatchingProps>({
           titleId: item.title.id,
@@ -300,15 +341,17 @@ async function refreshContinueWatching(
         props: item,
       })),
     );
+    return true;
   } catch (error) {
     console.warn("[Widgets] Failed to refresh Continue Watching:", error);
+    return false;
   }
 }
 
 async function refreshUpcoming(
   widget: Awaited<typeof import("@/widgets/upcoming")>["default"],
   iconFilePath: string,
-): Promise<void> {
+): Promise<boolean> {
   try {
     const { items } = await client.library.upcoming({
       days: UPCOMING_DAYS,
@@ -318,7 +361,7 @@ async function refreshUpcoming(
     const timeline = buildUpcomingTimeline(items, new Date());
     if (!timeline.some((entry) => entry.item)) {
       widget.updateSnapshot(emptyUpcomingProps(iconFilePath));
-      return;
+      return true;
     }
 
     const refreshToken = nextRefreshToken("up");
@@ -337,7 +380,7 @@ async function refreshUpcoming(
           item.backdropPath,
           index,
         ]);
-        file = downloadImage(item.backdropPath, imageKey);
+        file = downloadFirstImage([item.backdropPath, item.posterPath], imageKey);
         imageFiles.set(item, file);
       }
       return file;
@@ -361,7 +404,9 @@ async function refreshUpcoming(
     );
 
     widget.updateTimeline(entries);
+    return true;
   } catch (error) {
     console.warn("[Widgets] Failed to refresh Upcoming:", error);
+    return false;
   }
 }
