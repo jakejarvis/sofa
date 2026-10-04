@@ -2,10 +2,13 @@ import { ORPCError } from "@orpc/server";
 
 import { type ImportJob, NormalizedImportSchema } from "@sofa/api/schemas";
 import {
+  backdateTitleStatusAddedAt,
   getImportJob,
   getImportJobStatus,
   hasEpisodeWatch,
+  hasEpisodeWatchBetween,
   hasMovieWatch,
+  hasMovieWatchBetween,
   hasRating,
   getTitleStatusValue,
   updateImportJobProgress,
@@ -19,6 +22,26 @@ import type { ImportEpisode, ImportMovie, ImportRating, ImportWatchlistItem } fr
 import { resolveMovieTmdbId, resolveShowTmdbId } from "./resolve";
 
 const log = createLogger("imports");
+
+/** Two plays of the same item this close together are treated as the same play
+ * (e.g. a Plex webhook watch and the same play scrobbled to Trakt). */
+const TIMESTAMP_DEDUPE_WINDOW_MS = 3 * 60 * 60 * 1000;
+/** Date-only entries (Letterboxd diary) match any watch within ±36h of UTC
+ * midnight on that date, which covers every timezone. */
+const DATE_ONLY_DEDUPE_WINDOW_MS = 36 * 60 * 60 * 1000;
+
+function importedWatchTime(item: {
+  watchedAt?: string;
+  watchedOn?: string;
+}): { at: Date; windowMs: number } | null {
+  const candidate = item.watchedAt
+    ? { at: new Date(item.watchedAt), windowMs: TIMESTAMP_DEDUPE_WINDOW_MS }
+    : item.watchedOn
+      ? { at: new Date(item.watchedOn), windowMs: DATE_ONLY_DEDUPE_WINDOW_MS }
+      : null;
+  if (!candidate || Number.isNaN(candidate.at.getTime())) return null;
+  return candidate;
+}
 
 function safeParseJsonArray(value: string | null): string[] {
   if (!value) return [];
@@ -79,17 +102,21 @@ async function processMovie(
     return;
   }
 
-  if (hasMovieWatch(userId, title.id)) {
+  const time = importedWatchTime(movie);
+  const isDuplicate = time
+    ? hasMovieWatchBetween(
+        userId,
+        title.id,
+        new Date(time.at.getTime() - time.windowMs),
+        new Date(time.at.getTime() + time.windowMs),
+      )
+    : hasMovieWatch(userId, title.id); // undated: any existing watch counts
+  if (isDuplicate) {
     result.skipped++;
     return;
   }
 
-  const watchedAt = movie.watchedAt
-    ? new Date(movie.watchedAt)
-    : movie.watchedOn
-      ? new Date(movie.watchedOn)
-      : undefined;
-  logMovieWatch(userId, title.id, "import", watchedAt);
+  logMovieWatch(userId, title.id, "import", time?.at);
   result.imported++;
 }
 
@@ -142,17 +169,21 @@ async function processEpisode(
     return;
   }
 
-  if (hasEpisodeWatch(userId, episode.id)) {
+  const time = importedWatchTime(ep);
+  const isDuplicate = time
+    ? hasEpisodeWatchBetween(
+        userId,
+        episode.id,
+        new Date(time.at.getTime() - time.windowMs),
+        new Date(time.at.getTime() + time.windowMs),
+      )
+    : hasEpisodeWatch(userId, episode.id); // undated: any existing watch counts
+  if (isDuplicate) {
     result.skipped++;
     return;
   }
 
-  const watchedAt = ep.watchedAt
-    ? new Date(ep.watchedAt)
-    : ep.watchedOn
-      ? new Date(ep.watchedOn)
-      : undefined;
-  logEpisodeWatch(userId, episode.id, "import", watchedAt);
+  logEpisodeWatch(userId, episode.id, "import", time?.at);
   result.imported++;
 }
 
@@ -200,14 +231,18 @@ async function processWatchlistItem(
         ? "watchlist"
         : requested;
   const currentStatus = getTitleStatusValue(userId, title.id);
+  const parsedAddedAt = item.addedAt ? new Date(item.addedAt) : undefined;
+  const addedAt =
+    parsedAddedAt && !Number.isNaN(parsedAddedAt.getTime()) ? parsedAddedAt : undefined;
 
   if (currentStatus && STATUS_RANK[currentStatus] >= STATUS_RANK[targetStatus]) {
+    if (addedAt) backdateTitleStatusAddedAt(userId, title.id, addedAt);
     result.skipped++;
     return;
   }
 
-  const addedAt = item.addedAt ? new Date(item.addedAt) : undefined;
   setTitleStatus(userId, title.id, targetStatus, "import", addedAt);
+  if (addedAt) backdateTitleStatusAddedAt(userId, title.id, addedAt);
   result.imported++;
 }
 
@@ -332,6 +367,20 @@ export async function processImportJob(jobId: string): Promise<void> {
     warnings: [],
   };
 
+  const finishCancelled = (processed: number) => {
+    updateImportJobProgress(jobId, {
+      finishedAt: new Date(),
+      processedItems: processed,
+      importedCount: result.imported,
+      skippedCount: result.skipped,
+      failedCount: result.failed,
+      errors: JSON.stringify(result.errors),
+      warnings: JSON.stringify(result.warnings),
+      currentMessage: "Import cancelled",
+    });
+    log.info(`Import job ${jobId} cancelled by user`);
+  };
+
   try {
     // Build item list based on options
     const items: { type: string; index: number }[] = [];
@@ -398,17 +447,7 @@ export async function processImportJob(jobId: string): Promise<void> {
       if (i % progressInterval === 0) {
         const currentStatus = getImportJobStatus(jobId);
         if (currentStatus?.status === "cancelled") {
-          updateImportJobProgress(jobId, {
-            finishedAt: new Date(),
-            processedItems: i,
-            importedCount: result.imported,
-            skippedCount: result.skipped,
-            failedCount: result.failed,
-            errors: JSON.stringify(result.errors),
-            warnings: JSON.stringify(result.warnings),
-            currentMessage: "Import cancelled",
-          });
-          log.info(`Import job ${jobId} cancelled by user`);
+          finishCancelled(i);
           return;
         }
       }
@@ -466,6 +505,13 @@ export async function processImportJob(jobId: string): Promise<void> {
       }
     }
 
+    // A cancel may have arrived after the last periodic check. This check and the
+    // success write below are synchronous (no await), so they cannot race.
+    if (getImportJobStatus(jobId)?.status === "cancelled") {
+      finishCancelled(total);
+      return;
+    }
+
     // Success
     updateImportJobProgress(jobId, {
       status: "success",
@@ -483,6 +529,12 @@ export async function processImportJob(jobId: string): Promise<void> {
       `Import job ${jobId} complete: ${result.imported} imported, ${result.skipped} skipped, ${result.failed} failed`,
     );
   } catch (err) {
+    // A cancelled job must not be rewritten to "error"
+    if (getImportJobStatus(jobId)?.status === "cancelled") {
+      finishCancelled(result.imported + result.skipped + result.failed);
+      return;
+    }
+
     // Fatal error
     result.errors.push(`Fatal: ${err instanceof Error ? err.message : String(err)}`);
     updateImportJobProgress(jobId, {

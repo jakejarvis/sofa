@@ -553,3 +553,183 @@ describe("processImportJob — failed resolution", () => {
     }
   });
 });
+
+// ── Rewatches, added dates, late cancellation ───────────────────────
+
+describe("processImportJob — rewatches and added dates", () => {
+  const movieWatches = (userId: string) =>
+    testDb.select().from(userMovieWatches).where(eq(userMovieWatches.userId, userId)).all();
+
+  const emptyPayload = (source: NormalizedImport["source"]): NormalizedImport => ({
+    source,
+    movies: [],
+    episodes: [],
+    watchlist: [],
+    ratings: [],
+  });
+
+  const twoPlays: NormalizedImport = {
+    ...emptyPayload("trakt"),
+    movies: [
+      { tmdbId: 550, title: "Fight Club", watchedAt: "2024-01-01T20:00:00Z" },
+      { tmdbId: 550, title: "Fight Club", watchedAt: "2024-06-01T20:00:00Z" },
+    ],
+  };
+
+  test("keeps rewatches with distinct timestamps", async () => {
+    const userId = insertUser();
+    insertMovieTitle("movie-1", 550, "Fight Club");
+
+    const jobId = createJob(userId, twoPlays);
+    await processImportJob(jobId);
+
+    const job = readImportJob(jobId);
+    expect(job.importedCount).toBe(2);
+    expect(movieWatches(userId)).toHaveLength(2);
+  });
+
+  test("skips a play already recorded at the same time", async () => {
+    const userId = insertUser();
+    insertMovieTitle("movie-1", 550, "Fight Club");
+    insertMovieWatch(userId, "movie-1", new Date("2024-01-01T20:30:00Z"));
+
+    const payload: NormalizedImport = {
+      ...emptyPayload("trakt"),
+      movies: [{ tmdbId: 550, title: "Fight Club", watchedAt: "2024-01-01T20:00:00Z" }],
+    };
+    const jobId = createJob(userId, payload);
+    await processImportJob(jobId);
+
+    const job = readImportJob(jobId);
+    expect(job.skippedCount).toBe(1);
+    expect(job.importedCount).toBe(0);
+    expect(movieWatches(userId)).toHaveLength(1);
+  });
+
+  test("re-running the same import is idempotent", async () => {
+    const userId = insertUser();
+    insertMovieTitle("movie-1", 550, "Fight Club");
+
+    const firstJobId = createJob(userId, twoPlays);
+    await processImportJob(firstJobId);
+    expect(readImportJob(firstJobId).importedCount).toBe(2);
+
+    const secondJobId = createJob(userId, twoPlays);
+    await processImportJob(secondJobId);
+
+    const second = readImportJob(secondJobId);
+    expect(second.skippedCount).toBe(2);
+    expect(second.importedCount).toBe(0);
+    expect(movieWatches(userId)).toHaveLength(2);
+  });
+
+  test("keeps episode rewatches", async () => {
+    const userId = insertUser();
+    insertTvShowWithFetchedAt("tv-1", 1396);
+
+    const payload: NormalizedImport = {
+      ...emptyPayload("trakt"),
+      episodes: [
+        {
+          showTmdbId: 1396,
+          showTitle: "Test Show",
+          seasonNumber: 1,
+          episodeNumber: 1,
+          watchedAt: "2024-01-01T20:00:00Z",
+        },
+        {
+          showTmdbId: 1396,
+          showTitle: "Test Show",
+          seasonNumber: 1,
+          episodeNumber: 1,
+          watchedAt: "2024-02-01T20:00:00Z",
+        },
+      ],
+    };
+    const jobId = createJob(userId, payload);
+    await processImportJob(jobId);
+
+    expect(readImportJob(jobId).importedCount).toBe(2);
+    const watches = testDb
+      .select()
+      .from(userEpisodeWatches)
+      .where(eq(userEpisodeWatches.userId, userId))
+      .all();
+    expect(watches).toHaveLength(2);
+  });
+
+  test("date-only diary entries on different dates are both kept", async () => {
+    const userId = insertUser();
+    insertMovieTitle("movie-1", 550, "Fight Club");
+
+    const payload: NormalizedImport = {
+      ...emptyPayload("letterboxd"),
+      movies: [
+        { tmdbId: 550, title: "Fight Club", watchedOn: "2024-01-01" },
+        { tmdbId: 550, title: "Fight Club", watchedOn: "2024-01-10" },
+      ],
+    };
+    const jobId = createJob(userId, payload);
+    await processImportJob(jobId);
+
+    expect(readImportJob(jobId).importedCount).toBe(2);
+    expect(movieWatches(userId)).toHaveLength(2);
+  });
+
+  test("library item backdates addedAt after a watch created the row", async () => {
+    const userId = insertUser();
+    insertMovieTitle("movie-1", 550, "Fight Club");
+
+    const payload: NormalizedImport = {
+      ...emptyPayload("trakt"),
+      movies: [{ tmdbId: 550, title: "Fight Club", watchedAt: "2024-06-01T20:00:00Z" }],
+      watchlist: [
+        {
+          tmdbId: 550,
+          title: "Fight Club",
+          type: "movie",
+          status: "completed",
+          addedAt: "2023-01-01T00:00:00Z",
+        },
+      ],
+    };
+    const jobId = createJob(userId, payload);
+    await processImportJob(jobId);
+
+    const row = testDb
+      .select()
+      .from(userTitleStatus)
+      .where(eq(userTitleStatus.userId, userId))
+      .get();
+    expect(row).toBeDefined();
+    expect(row?.addedAt).toEqual(new Date("2023-01-01T00:00:00Z"));
+  });
+
+  test("cancel during the last item is not overwritten by success", async () => {
+    const userId = insertUser();
+    insertMovieTitle("movie-1", 550, "Fight Club");
+
+    const payload: NormalizedImport = {
+      ...emptyPayload("letterboxd"),
+      movies: [{ imdbId: "tt0137523", title: "Fight Club" }],
+    };
+
+    let jobId = "";
+    const findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockImplementation(async () => {
+      testDb.update(importJobs).set({ status: "cancelled" }).where(eq(importJobs.id, jobId)).run();
+      return { movie_results: [{ id: 550 }] } as never;
+    });
+
+    try {
+      jobId = createJob(userId, payload);
+      await processImportJob(jobId);
+
+      expect(findSpy).toHaveBeenCalled();
+      const job = testDb.select().from(importJobs).where(eq(importJobs.id, jobId)).get();
+      expect(job?.status).toBe("cancelled");
+      expect(job?.finishedAt).not.toBeNull();
+    } finally {
+      findSpy.mockRestore();
+    }
+  });
+});

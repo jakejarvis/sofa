@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, gt, gte, inArray, lte } from "drizzle-orm";
 
 import { db } from "../client";
 import {
@@ -27,6 +27,62 @@ export function hasEpisodeWatch(userId: string, episodeId: string): boolean {
     .where(and(eq(userEpisodeWatches.userId, userId), eq(userEpisodeWatches.episodeId, episodeId)))
     .get();
   return !!existing;
+}
+
+export function hasMovieWatchBetween(
+  userId: string,
+  titleId: string,
+  from: Date,
+  to: Date,
+): boolean {
+  const existing = db
+    .select({ id: userMovieWatches.id })
+    .from(userMovieWatches)
+    .where(
+      and(
+        eq(userMovieWatches.userId, userId),
+        eq(userMovieWatches.titleId, titleId),
+        gte(userMovieWatches.watchedAt, from),
+        lte(userMovieWatches.watchedAt, to),
+      ),
+    )
+    .get();
+  return !!existing;
+}
+
+export function hasEpisodeWatchBetween(
+  userId: string,
+  episodeId: string,
+  from: Date,
+  to: Date,
+): boolean {
+  const existing = db
+    .select({ id: userEpisodeWatches.id })
+    .from(userEpisodeWatches)
+    .where(
+      and(
+        eq(userEpisodeWatches.userId, userId),
+        eq(userEpisodeWatches.episodeId, episodeId),
+        gte(userEpisodeWatches.watchedAt, from),
+        lte(userEpisodeWatches.watchedAt, to),
+      ),
+    )
+    .get();
+  return !!existing;
+}
+
+/** Move a library row's addedAt earlier (never later). Used by imports. */
+export function backdateTitleStatusAddedAt(userId: string, titleId: string, addedAt: Date): void {
+  db.update(userTitleStatus)
+    .set({ addedAt })
+    .where(
+      and(
+        eq(userTitleStatus.userId, userId),
+        eq(userTitleStatus.titleId, titleId),
+        gt(userTitleStatus.addedAt, addedAt),
+      ),
+    )
+    .run();
 }
 
 export function hasTitleStatus(userId: string, titleId: string): boolean {
