@@ -5,6 +5,7 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 
 import { orpc } from "@/lib/orpc/client";
+import { invalidateTrackingQueries } from "@/lib/orpc/invalidate";
 import type { Season } from "@sofa/api/schemas";
 
 import { useTitleContext } from "./title-context";
@@ -40,10 +41,19 @@ export function useTitleActions() {
     [queryClient, userInfoKey],
   );
 
-  const { mutateAsync: watch } = useMutation(orpc.tracking.watch.mutationOptions());
-  const { mutateAsync: unwatch } = useMutation(orpc.tracking.unwatch.mutationOptions());
-  const { mutateAsync: updateStatus } = useMutation(orpc.tracking.updateStatus.mutationOptions());
-  const { mutateAsync: updateRating } = useMutation(orpc.tracking.rate.mutationOptions());
+  const invalidateAfterMutation = { onSettled: () => void invalidateTrackingQueries(queryClient) };
+  const { mutateAsync: watch } = useMutation(
+    orpc.tracking.watch.mutationOptions(invalidateAfterMutation),
+  );
+  const { mutateAsync: unwatch } = useMutation(
+    orpc.tracking.unwatch.mutationOptions(invalidateAfterMutation),
+  );
+  const { mutateAsync: updateStatus } = useMutation(
+    orpc.tracking.updateStatus.mutationOptions(invalidateAfterMutation),
+  );
+  const { mutateAsync: updateRating } = useMutation(
+    orpc.tracking.rate.mutationOptions(invalidateAfterMutation),
+  );
 
   const catchUp = useCallback(
     async (episodeIds: string[]) => {

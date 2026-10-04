@@ -2,7 +2,7 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconCloudUpload, IconLink } from "@tabler/icons-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -23,6 +23,7 @@ import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { getErrorMessage } from "@/lib/error-messages";
 import { client, orpc } from "@/lib/orpc/client";
+import { invalidateTrackingQueries } from "@/lib/orpc/invalidate";
 import type { NormalizedImport } from "@sofa/api/schemas";
 import { formatList } from "@sofa/i18n/format";
 
@@ -192,6 +193,7 @@ export function ImportsSection() {
 
 function ImportSourceCard({ config }: { config: SourceConfig }) {
   const { i18n, t } = useLingui();
+  const queryClient = useQueryClient();
   const { data: systemStatus } = useQuery(orpc.system.status.queryOptions());
   const publicApiUrl = systemStatus?.publicApiUrl ?? "https://public-api.sofa.watch";
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -285,6 +287,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
             warnings: event.job.warnings,
           });
           setStep("done");
+          void invalidateTrackingQueries(queryClient);
           const importedCount = event.job.importedCount;
           const sourceLabel = config.label;
           if (importedCount > 0) {
@@ -320,6 +323,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
               warnings: finalJob.warnings,
             });
             setStep("done");
+            void invalidateTrackingQueries(queryClient);
           } else {
             toast.info(t`Import is still running in the background. Check back later.`);
             setStep("preview");

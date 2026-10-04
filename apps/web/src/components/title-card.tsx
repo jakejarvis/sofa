@@ -10,15 +10,17 @@ import {
   IconPlus,
   IconStarFilled,
 } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { type MotionStyle, type MotionValue, motion } from "motion/react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTiltEffect } from "@/hooks/use-tilt-effect";
 import { orpc } from "@/lib/orpc/client";
+import { invalidateTrackingQueries } from "@/lib/orpc/invalidate";
 import { thumbHashToUrl } from "@/lib/thumbhash";
 
 export function TitleCardSkeleton() {
@@ -86,11 +88,14 @@ function useStatusConfig() {
 function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStatus | null }) {
   const { t } = useLingui();
   const statusConfig = useStatusConfig();
+  const queryClient = useQueryClient();
   const [optimisticStatus, setOptimisticStatus] = useState<TitleStatus | null>(null);
 
   const addToWatchlistMutation = useMutation(
     orpc.tracking.updateStatus.mutationOptions({
       onSuccess: () => setOptimisticStatus("in_watchlist"),
+      onError: () => toast.error(t`Failed to update status`),
+      onSettled: () => void invalidateTrackingQueries(queryClient),
     }),
   );
 

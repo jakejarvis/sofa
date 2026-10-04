@@ -12,7 +12,7 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -44,6 +44,7 @@ import { authClient, signOut } from "@/lib/auth/client";
 import { getErrorMessage } from "@/lib/error-messages";
 import { useAppForm } from "@/lib/form";
 import { client, orpc } from "@/lib/orpc/client";
+import { invalidateTrackingQueries } from "@/lib/orpc/invalidate";
 import type { NormalizedImport } from "@sofa/api/schemas";
 import { formatDate } from "@sofa/i18n/format";
 
@@ -379,6 +380,7 @@ interface ImportResult {
 
 function SofaImportDialog() {
   const { t } = useLingui();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importAbortRef = useRef<AbortController | null>(null);
   const [open, setOpen] = useState(false);
@@ -448,6 +450,7 @@ function SofaImportDialog() {
             warnings: event.job.warnings,
           });
           setStep("done");
+          void invalidateTrackingQueries(queryClient);
           const importedCount = event.job.importedCount;
           if (importedCount > 0) {
             toast.success(t`Imported ${importedCount} items from Sofa export`);
@@ -481,6 +484,7 @@ function SofaImportDialog() {
               warnings: finalJob.warnings,
             });
             setStep("done");
+            void invalidateTrackingQueries(queryClient);
           } else {
             toast.info(t`Import is still running in the background. Check back later.`);
             handleClose();
