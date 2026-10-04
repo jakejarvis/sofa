@@ -1,3 +1,11 @@
+import type { z } from "zod";
+
+import {
+  ImportEpisodeSchema,
+  ImportMovieSchema,
+  ImportRatingSchema,
+  ImportWatchlistItemSchema,
+} from "@sofa/api/schemas";
 import { createLogger } from "@sofa/logger";
 
 const log = createLogger("imports");
@@ -87,6 +95,76 @@ export function countUnresolved(data: NormalizedImport): number {
     if (!r.tmdbId && !r.imdbId && !r.tvdbId) count++;
   }
   return count;
+}
+
+/** Mirrors the `.max()` on each list in NormalizedImportSchema. */
+const MAX_ITEMS_PER_LIST = 50_000;
+
+/** Turn `null` / `NaN` field values into `undefined` (the API schemas allow optional, not null). */
+function withoutNulls<T extends object>(item: T): T {
+  const clean: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(item)) {
+    if (value === null || (typeof value === "number" && Number.isNaN(value))) continue;
+    clean[key] = value;
+  }
+  return clean as T;
+}
+
+/**
+ * Make parser output conform to NormalizedImportSchema. Real exports contain
+ * nulls (Trakt sends `"imdb": null`, `"year": null`) and occasional invalid
+ * entries (e.g. episode number 0); one bad item must not fail the whole parse,
+ * so invalid items are dropped and summarized in a warning.
+ */
+export function finalizeParseResult(
+  data: NormalizedImport,
+  warnings: string[],
+  unsupported = 0,
+): ParseResult {
+  let dropped = 0;
+
+  function clean<T extends object>(list: string, items: T[], schema: z.ZodType<T>): T[] {
+    const kept: T[] = [];
+    const examples: string[] = [];
+    let invalid = 0;
+    for (const raw of items) {
+      const result = schema.safeParse(withoutNulls(raw));
+      if (result.success) {
+        kept.push(result.data);
+      } else {
+        invalid++;
+        if (examples.length < 3) {
+          const issue = result.error.issues[0];
+          examples.push(`${issue?.path.join(".") || "item"}: ${issue?.message ?? "invalid"}`);
+        }
+      }
+    }
+    if (invalid > 0) {
+      dropped += invalid;
+      warnings.push(`Skipped ${invalid} invalid ${list} (${examples.join("; ")})`);
+    }
+    if (kept.length > MAX_ITEMS_PER_LIST) {
+      warnings.push(
+        `Only the first ${MAX_ITEMS_PER_LIST.toLocaleString("en-US")} ${list} were included (${kept.length.toLocaleString("en-US")} found)`,
+      );
+      return kept.slice(0, MAX_ITEMS_PER_LIST);
+    }
+    return kept;
+  }
+
+  const normalized: NormalizedImport = {
+    source: data.source,
+    movies: clean("movies", data.movies, ImportMovieSchema),
+    episodes: clean("episodes", data.episodes, ImportEpisodeSchema),
+    watchlist: clean("watchlist items", data.watchlist, ImportWatchlistItemSchema),
+    ratings: clean("ratings", data.ratings, ImportRatingSchema),
+  };
+
+  return {
+    data: normalized,
+    warnings,
+    diagnostics: { unresolved: countUnresolved(normalized), unsupported: unsupported + dropped },
+  };
 }
 
 // ─── Rating Conversion ──────────────────────────────────────────────
@@ -304,11 +382,7 @@ export function parseTraktPayload(data: {
     ratings,
   };
 
-  return {
-    data: normalized,
-    warnings,
-    diagnostics: { unresolved: countUnresolved(normalized), unsupported },
-  };
+  return finalizeParseResult(normalized, warnings, unsupported);
 }
 
 // ─── Simkl Parser ───────────────────────────────────────────────────
@@ -500,11 +574,7 @@ export function parseSimklPayload(data: {
     ratings,
   };
 
-  return {
-    data: normalized,
-    warnings,
-    diagnostics: { unresolved: countUnresolved(normalized), unsupported: 0 },
-  };
+  return finalizeParseResult(normalized, warnings);
 }
 
 // ─── Letterboxd Parser ──────────────────────────────────────────────
@@ -668,12 +738,9 @@ export async function parseLetterboxdExport(zipFile: Blob): Promise<ParseResult>
     `Parsed Letterboxd export: ${movies.length} movies, ${watchlist.length} watchlist, ${ratings.length} ratings`,
   );
 
-  // Letterboxd has no IDs — all items need title-based resolution
-  const unresolved = movies.length + watchlist.length + ratings.length;
-
-  return {
-    data: { source: "letterboxd", movies, episodes: [], watchlist, ratings },
+  // Letterboxd has no IDs — all items need title-based resolution (counted by the finalizer)
+  return finalizeParseResult(
+    { source: "letterboxd", movies, episodes: [], watchlist, ratings },
     warnings,
-    diagnostics: { unresolved, unsupported: 0 },
-  };
+  );
 }

@@ -2,7 +2,7 @@ import { SofaExportSchema } from "@sofa/api/schemas";
 import { createLogger } from "@sofa/logger";
 
 import type { NormalizedImport, ParseResult } from "./parsers";
-import { countUnresolved } from "./parsers";
+import { finalizeParseResult } from "./parsers";
 
 const log = createLogger("imports");
 
@@ -59,9 +59,5 @@ export function parseSofaExport(data: unknown): ParseResult {
     `Parsed Sofa export: ${normalized.movies.length} movies, ${normalized.episodes.length} episodes, ${normalized.watchlist.length} library, ${normalized.ratings.length} ratings`,
   );
 
-  return {
-    data: normalized,
-    warnings,
-    diagnostics: { unresolved: countUnresolved(normalized), unsupported: 0 },
-  };
+  return finalizeParseResult(normalized, warnings);
 }

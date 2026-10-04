@@ -1,6 +1,8 @@
 import AdmZip from "adm-zip";
 import { describe, expect, test } from "vitest";
 
+import { NormalizedImportSchema } from "@sofa/api/schemas";
+
 import {
   type ParseResult,
   parseLetterboxdExport,
@@ -1070,5 +1072,104 @@ describe("parseLetterboxdExport", () => {
     for (const item of result.data.watchlist) {
       expect(item.type).toBe("movie");
     }
+  });
+});
+
+// ─── Output always matches the API schema ────────────────────────────
+
+describe("parser output always matches the API schema", () => {
+  test("Trakt nulls become undefined", () => {
+    const result = parseTraktPayload({
+      history: {
+        movies: [
+          {
+            watched_at: "2024-01-15T20:00:00.000Z",
+            movie: { title: "No IDs", year: null, ids: { trakt: 1, tmdb: null, imdb: null } },
+          },
+        ],
+        shows: [
+          {
+            watched_at: "2024-01-15T21:00:00.000Z",
+            show: { title: "Show", year: null, ids: { tmdb: 1396, imdb: null, tvdb: null } },
+            episode: { season: 1, number: 1 },
+          },
+        ],
+      },
+      watchlist: [
+        { type: "movie", movie: { title: "W", year: null, ids: { tmdb: 5, imdb: null } } },
+      ],
+      ratings: [
+        {
+          type: "movie",
+          rating: 8,
+          rated_at: null,
+          movie: { title: "R", year: 2000, ids: { tmdb: 6, imdb: null } },
+        },
+      ],
+    } as never);
+
+    expect(NormalizedImportSchema.safeParse(result.data).success).toBe(true);
+    expect(result.data.movies).toHaveLength(1);
+    expect(result.data.episodes).toHaveLength(1);
+    expect(result.data.watchlist).toHaveLength(1);
+    expect(result.data.ratings).toHaveLength(1);
+    expect(result.data.movies[0].imdbId).toBeUndefined();
+  });
+
+  test("invalid items are dropped with a warning, not fatal", () => {
+    const result = parseTraktPayload({
+      history: {
+        shows: [
+          {
+            watched_at: "2024-01-15T21:00:00.000Z",
+            show: { title: "Show", ids: { tmdb: 1396 } },
+            episode: { season: 0, number: 0 },
+          },
+          {
+            watched_at: "2024-01-15T21:00:00.000Z",
+            show: { title: "Show", ids: { tmdb: 1396 } },
+            episode: { season: 1, number: 2 },
+          },
+        ],
+      },
+    });
+
+    expect(result.data.episodes).toHaveLength(1);
+    expect(NormalizedImportSchema.safeParse(result.data).success).toBe(true);
+    expect(result.warnings.some((w) => w.includes("episodes"))).toBe(true);
+    expect(result.diagnostics?.unsupported).toBeGreaterThanOrEqual(1);
+  });
+
+  test("Simkl nulls become undefined", () => {
+    const result = parseSimklPayload({
+      movies: [
+        {
+          title: "M",
+          year: null,
+          status: "completed",
+          last_watched_at: null,
+          ids: { tmdb: 7, imdb: null },
+        },
+      ],
+    } as never);
+
+    expect(result.data.movies).toHaveLength(1);
+    expect(NormalizedImportSchema.safeParse(result.data).success).toBe(true);
+    expect(result.data.movies[0].watchedAt).toBeUndefined();
+  });
+
+  test("oversized lists are truncated with a warning", () => {
+    const result = parseTraktPayload({
+      history: {
+        movies: Array.from({ length: 50_001 }, (_, i) => ({
+          watched_at: "2024-01-15T20:00:00.000Z",
+          movie: { title: `M${i}`, ids: { tmdb: i + 1 } },
+        })),
+      },
+    });
+
+    expect(result.data.movies).toHaveLength(50_000);
+    expect(NormalizedImportSchema.safeParse(result.data).success).toBe(true);
+    expect(result.warnings.some((w) => w.includes("50,000"))).toBe(true);
   });
 });
