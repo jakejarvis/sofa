@@ -1,5 +1,5 @@
 {
-  "bunVersion": "1.x",
+  "bunVersion": "1.4.x",
   "rewrites": [
     {
       "source": "/ingest/static/:path(.*)",
