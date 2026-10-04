@@ -1,3 +1,4 @@
+import { msg, plural } from "@lingui/core/macro";
 import { Image, Platform } from "react-native";
 
 import { client } from "@/lib/orpc";
@@ -5,6 +6,10 @@ import { resolveUrl } from "@/lib/server";
 import { getWidgetIconAsset } from "@/lib/widget-assets";
 import type { ContinueWatchingProps } from "@/widgets/continue-watching";
 import type { UpcomingProps } from "@/widgets/upcoming";
+import type { UpcomingItem } from "@sofa/api/schemas";
+import { i18n } from "@sofa/i18n";
+import { formatLocalDate } from "@sofa/i18n/date-buckets";
+import { formatDate } from "@sofa/i18n/format";
 
 import {
   clearWidgetImages,
@@ -41,30 +46,95 @@ async function downloadImage(path: string | null, key: string): Promise<string> 
   }
 }
 
-const TIMELINE_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes (iOS minimum)
 const IMAGE_PRUNE_MAX_AGE_SECONDS = 6 * 60 * 60;
 const WIDGET_ICON_KEY = "sofa_icon.png";
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const ROTATION_INTERVAL_MS = 30 * 60 * 1000;
+const ROTATION_SPAN_MS = 12 * 60 * 60 * 1000;
+const UPCOMING_DAYS = 30;
 
-function formatShortDate(dateStr: string): string {
-  const parts = dateStr.split("-");
-  const monthIdx = parseInt(parts[1]!, 10) - 1;
-  const day = parseInt(parts[2]!, 10);
-  return `${MONTHS[monthIdx]} ${day}`;
+/**
+ * expo-widgets always asks WidgetKit to reload when a timeline ends, and the reload gets these
+ * same stored entries back, so the widget keeps showing the last entry until the app runs
+ * again. Rotate for a while, then come back to the first (most relevant) item.
+ */
+export function buildRotationTimeline<T>(items: T[], now: number): Array<{ date: Date; item: T }> {
+  if (items.length <= 1) return items.map((item) => ({ date: new Date(now), item }));
+
+  const entries: Array<{ date: Date; item: T }> = [];
+  for (let step = 0; step * ROTATION_INTERVAL_MS < ROTATION_SPAN_MS; step += 1) {
+    entries.push({
+      date: new Date(now + step * ROTATION_INTERVAL_MS),
+      item: items[step % items.length]!,
+    });
+  }
+  entries.push({ date: new Date(now + ROTATION_SPAN_MS), item: items[0]! });
+  return entries;
 }
 
-function formatEpisodeLabel(item: {
-  titleType: "movie" | "tv";
-  episodeCount: number;
-  seasonNumber?: number | null;
-  episodeNumber?: number | null;
-}): string {
-  if (item.titleType !== "tv") return "Movie";
-  if (item.episodeCount > 1 && item.seasonNumber != null)
-    return `S${item.seasonNumber} · ${item.episodeCount} eps`;
-  if (item.seasonNumber != null) return `S${item.seasonNumber} · E${item.episodeNumber}`;
-  return "TV";
+function localDay(date: Date, offsetDays = 0): string {
+  return formatLocalDate(
+    new Date(date.getFullYear(), date.getMonth(), date.getDate() + offsetDays),
+  );
+}
+
+function upcomingDayKind(itemDate: string, on: Date): "today" | "tomorrow" | "later" {
+  if (itemDate === localDay(on)) return "today";
+  if (itemDate === localDay(on, 1)) return "tomorrow";
+  return "later";
+}
+
+/**
+ * One entry per local midnight at which the shown item or its Today/Tomorrow label changes,
+ * starting now, ending with an empty entry once every item's date has passed.
+ * `items` must be sorted by `date` ascending (the API guarantees this).
+ */
+export function buildUpcomingTimeline<T extends { date: string }>(
+  items: T[],
+  now: Date,
+): Array<{ date: Date; item: T | null }> {
+  const entries: Array<{ date: Date; item: T | null }> = [];
+  let previousKey: string | null = null;
+
+  for (let offset = 0; offset <= UPCOMING_DAYS + 1; offset += 1) {
+    const date =
+      offset === 0 ? now : new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+    const today = localDay(date);
+    const item = items.find((candidate) => candidate.date >= today) ?? null;
+    const key = item ? `${items.indexOf(item)}:${upcomingDayKind(item.date, date)}` : "empty";
+    if (key !== previousKey) {
+      entries.push({ date, item });
+      previousKey = key;
+    }
+    if (!item) break;
+  }
+  return entries;
+}
+
+function episodeCode(seasonNum: number, epNum: number): string {
+  return i18n._(msg`S${seasonNum} E${epNum}`);
+}
+
+function upcomingEpisodeLabel(item: UpcomingItem): string {
+  if (item.titleType === "movie") return i18n._(msg`Movie`);
+  if (item.episodeCount > 1 && item.seasonNumber != null) {
+    const seasonNum = item.seasonNumber;
+    const epCount = item.episodeCount;
+    return i18n._(
+      msg`S${seasonNum} · ${plural(epCount, { one: "# episode", other: "# episodes" })}`,
+    );
+  }
+  if (item.seasonNumber != null && item.episodeNumber != null) {
+    return episodeCode(item.seasonNumber, item.episodeNumber);
+  }
+  return i18n._(msg`TV`);
+}
+
+function upcomingDateLabel(itemDate: string, on: Date): string {
+  const kind = upcomingDayKind(itemDate, on);
+  if (kind === "today") return i18n._(msg`Today`);
+  if (kind === "tomorrow") return i18n._(msg`Tomorrow`);
+  return formatDate(itemDate, { year: undefined, month: "short" });
 }
 
 let refreshSequence = 0;
@@ -120,9 +190,10 @@ function emptyContinueWatchingProps(iconFilePath: string): ContinueWatchingProps
     titleId: "",
     titleName: "",
     imageFilePath: "",
+    episodeLabel: "",
     watchedEpisodes: 0,
     totalEpisodes: 0,
-    isMovie: false,
+    emptyLabel: i18n._(msg`Nothing to watch`),
   });
 }
 
@@ -132,10 +203,9 @@ function emptyUpcomingProps(iconFilePath: string): UpcomingProps {
     titleId: "",
     titleName: "",
     imageFilePath: "",
-    titleType: "tv",
-    episodeCount: 0,
     dateLabel: "",
     episodeLabel: "",
+    emptyLabel: i18n._(msg`Nothing upcoming`),
   });
 }
 
@@ -194,11 +264,11 @@ async function refreshContinueWatching(
       return;
     }
 
-    const top5 = items.slice(0, 5);
+    const top = items.slice(0, 5);
     const refreshToken = nextRefreshToken("cw");
 
-    const entries = await Promise.all(
-      top5.map(async (item, index) => {
+    const propsPerItem = await Promise.all(
+      top.map(async (item, index) => {
         const imagePath = item.nextEpisode?.stillPath ?? item.title.backdropPath;
         const imageKey = buildImageKey("cw", refreshToken, [
           item.title.id,
@@ -209,24 +279,27 @@ async function refreshContinueWatching(
         ]);
         const imageFilePath = await downloadImage(imagePath, imageKey);
 
-        return {
-          date: new Date(Date.now() + index * TIMELINE_INTERVAL_MS),
-          props: sanitizeProps<ContinueWatchingProps>({
-            titleId: item.title.id,
-            titleName: item.title.title,
-            imageFilePath,
-            iconFilePath,
-            seasonNumber: item.nextEpisode?.seasonNumber,
-            episodeNumber: item.nextEpisode?.episodeNumber,
-            watchedEpisodes: item.watchedEpisodes,
-            totalEpisodes: item.totalEpisodes,
-            isMovie: !item.nextEpisode,
-          }),
-        };
+        return sanitizeProps<ContinueWatchingProps>({
+          titleId: item.title.id,
+          titleName: item.title.title,
+          imageFilePath,
+          iconFilePath,
+          episodeLabel: item.nextEpisode
+            ? episodeCode(item.nextEpisode.seasonNumber, item.nextEpisode.episodeNumber)
+            : "",
+          watchedEpisodes: item.watchedEpisodes,
+          totalEpisodes: item.totalEpisodes,
+          emptyLabel: "",
+        });
       }),
     );
 
-    widget.updateTimeline(entries);
+    widget.updateTimeline(
+      buildRotationTimeline(propsPerItem, Date.now()).map(({ date, item }) => ({
+        date,
+        props: item,
+      })),
+    );
   } catch (error) {
     console.warn("[Widgets] Failed to refresh Continue Watching:", error);
   }
@@ -238,20 +311,23 @@ async function refreshUpcoming(
 ): Promise<void> {
   try {
     const { items } = await client.library.upcoming({
-      days: 30,
+      days: UPCOMING_DAYS,
       limit: 5,
     });
 
-    if (items.length === 0) {
+    const timeline = buildUpcomingTimeline(items, new Date());
+    if (!timeline.some((entry) => entry.item)) {
       widget.updateSnapshot(emptyUpcomingProps(iconFilePath));
       return;
     }
 
-    const top5 = items.slice(0, 5);
     const refreshToken = nextRefreshToken("up");
 
-    const entries = await Promise.all(
-      top5.map(async (item, index) => {
+    // Download each item's art once, however many entries show it.
+    const imageFiles = new Map<UpcomingItem, Promise<string>>();
+    const imageFor = (item: UpcomingItem, index: number) => {
+      let file = imageFiles.get(item);
+      if (!file) {
         const imageKey = buildImageKey("up", refreshToken, [
           item.titleId,
           item.date,
@@ -261,24 +337,27 @@ async function refreshUpcoming(
           item.backdropPath,
           index,
         ]);
-        const imageFilePath = await downloadImage(item.backdropPath, imageKey);
+        file = downloadImage(item.backdropPath, imageKey);
+        imageFiles.set(item, file);
+      }
+      return file;
+    };
 
-        return {
-          date: new Date(Date.now() + index * TIMELINE_INTERVAL_MS),
-          props: sanitizeProps<UpcomingProps>({
-            titleId: item.titleId,
-            titleName: item.titleName,
-            imageFilePath,
-            iconFilePath,
-            titleType: item.titleType,
-            seasonNumber: item.seasonNumber,
-            episodeNumber: item.episodeNumber,
-            episodeCount: item.episodeCount,
-            dateLabel: formatShortDate(item.date),
-            episodeLabel: formatEpisodeLabel(item),
-          }),
-        };
-      }),
+    const entries = await Promise.all(
+      timeline.map(async ({ date, item }) => ({
+        date,
+        props: item
+          ? sanitizeProps<UpcomingProps>({
+              titleId: item.titleId,
+              titleName: item.titleName,
+              imageFilePath: await imageFor(item, items.indexOf(item)),
+              iconFilePath,
+              dateLabel: upcomingDateLabel(item.date, date),
+              episodeLabel: upcomingEpisodeLabel(item),
+              emptyLabel: "",
+            })
+          : emptyUpcomingProps(iconFilePath),
+      })),
     );
 
     widget.updateTimeline(entries);

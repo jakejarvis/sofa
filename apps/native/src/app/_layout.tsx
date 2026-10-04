@@ -96,7 +96,7 @@ function AppContent() {
   }, [isPending, hasServerUrl, isLocaleReady]);
 
   // Refresh iOS home screen widgets on foreground and when session becomes ready
-  useWidgetRefresh(!!session);
+  useWidgetRefresh(!!session && isLocaleReady);
 
   return (
     <ThemeProvider value={sofaTheme}>

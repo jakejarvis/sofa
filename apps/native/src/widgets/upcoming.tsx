@@ -20,12 +20,12 @@ export type UpcomingProps = {
   titleName: string;
   imageFilePath: string;
   iconFilePath: string;
-  titleType: "movie" | "tv";
-  seasonNumber?: number;
-  episodeNumber?: number;
-  episodeCount: number;
+  /** Localized "Today", "Tomorrow" or a short date. */
   dateLabel: string;
+  /** Localized "S2 E3", "S2 · 8 episodes", "Movie" or "TV". */
   episodeLabel: string;
+  /** Localized empty-state text, shown when `titleName` is empty. */
+  emptyLabel: string;
 };
 
 const UpcomingWidget = (props: UpcomingProps, _env: WidgetEnvironment) => {
@@ -52,7 +52,7 @@ const UpcomingWidget = (props: UpcomingProps, _env: WidgetEnvironment) => {
             foregroundStyle("rgba(255,255,255,0.7)"),
           ]}
         >
-          Nothing upcoming
+          {props.emptyLabel}
         </Text>
       </VStack>
     );

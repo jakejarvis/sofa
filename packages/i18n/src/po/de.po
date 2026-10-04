@@ -1922,6 +1922,7 @@ msgstr "Film"
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/native/src/components/search/search-result-row.tsx
+#: apps/native/src/lib/widgets.ts
 #: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/explore/hero-banner.tsx
 #: apps/web/src/components/library/library-filters.tsx
@@ -2104,6 +2105,14 @@ msgstr "Nicht konfiguriert"
 #: apps/native/src/app/+not-found.tsx
 msgid "Not Found"
 msgstr "Nicht gefunden"
+
+#: apps/native/src/lib/widgets.ts
+msgid "Nothing to watch"
+msgstr ""
+
+#: apps/native/src/lib/widgets.ts
+msgid "Nothing upcoming"
+msgstr ""
 
 #: apps/web/src/components/library/library-filters.tsx
 #~ msgid "Older"
@@ -2682,9 +2691,14 @@ msgstr "Jetzt ausführen"
 #~ msgstr "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/native/src/lib/widgets.ts
 #: apps/web/src/components/dashboard/upcoming-item.tsx
 msgid "S{seasonNum} · {epCount, plural, one {# episode} other {# episodes}}"
 msgstr "S{seasonNum} · {epCount, plural, one {# Episode} other {# Episoden}}"
+
+#: apps/native/src/lib/widgets.ts
+msgid "S{seasonNum} E{epNum}"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Saturday"
@@ -3217,6 +3231,7 @@ msgid "today"
 msgstr "heute"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
+#: apps/native/src/lib/widgets.ts
 #: apps/web/src/components/dashboard/stats-display.tsx
 #: packages/i18n/src/date-buckets.ts
 msgid "Today"
@@ -3242,6 +3257,7 @@ msgstr "Geplante Backups umschalten"
 msgid "Toggle Sidebar"
 msgstr "Seitenleiste umschalten"
 
+#: apps/native/src/lib/widgets.ts
 #: packages/i18n/src/date-buckets.ts
 msgid "Tomorrow"
 msgstr ""
@@ -3292,6 +3308,7 @@ msgstr "Serie"
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/native/src/components/search/search-result-row.tsx
+#: apps/native/src/lib/widgets.ts
 #: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/explore/hero-banner.tsx
 #: apps/web/src/components/library/library-filters.tsx

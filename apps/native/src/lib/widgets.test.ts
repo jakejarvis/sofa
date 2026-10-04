@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 const CACHED_WIDGET_IMAGE_RE = /^file:\/\/\/group\/cw_/;
 type LibraryResult = { items: Array<Record<string, unknown>> };
 type SnapshotProps = Record<string, unknown>;
-type TimelineEntry = { props?: Record<string, unknown> };
+type TimelineEntry = { date?: Date; props?: Record<string, unknown> };
 
 const platform = { OS: "ios" };
 const resolveAssetSource = vi.fn<() => { uri: string }>(() => ({
@@ -36,6 +36,23 @@ vi.mock("react-native", () => ({
     resolveAssetSource,
   },
   Platform: platform,
+}));
+
+vi.mock("@sofa/i18n", () => ({
+  i18n: {
+    locale: "en",
+    _: (descriptor: { id?: string; message?: string } | string) =>
+      typeof descriptor === "string" ? descriptor : (descriptor.message ?? descriptor.id ?? ""),
+  },
+}));
+
+vi.mock("@lingui/core/macro", () => ({
+  msg: (strings: TemplateStringsArray, ...values: unknown[]) => ({
+    id: String.raw(strings, ...values),
+    message: String.raw(strings, ...values),
+  }),
+  plural: (value: number, forms: { one: string; other: string }) =>
+    (value === 1 ? forms.one : forms.other).replace("#", String(value)),
 }));
 
 vi.mock("@/lib/widget-assets", () => ({
@@ -187,7 +204,7 @@ describe("refreshWidgets", () => {
 
     const entries = continueWatchingWidget.updateTimeline.mock.calls[0]?.[0];
     expect(continueWatchingWidget.updateTimeline).toHaveBeenCalledTimes(1);
-    expect(entries).toHaveLength(2);
+    expect(entries).toHaveLength(25);
     expect(entries[0]?.props?.imageFilePath).toBe("");
     expect(entries[1]?.props?.imageFilePath).toMatch(CACHED_WIDGET_IMAGE_RE);
   });
@@ -200,14 +217,126 @@ describe("refreshWidgets", () => {
       expect.objectContaining({
         iconFilePath: "file:///group/sofa_icon.png",
         titleName: "",
+        emptyLabel: "Nothing to watch",
       }),
     );
     expect(upcomingWidget.updateSnapshot).toHaveBeenCalledWith(
       expect.objectContaining({
         iconFilePath: "file:///group/sofa_icon.png",
         titleName: "",
+        emptyLabel: "Nothing upcoming",
       }),
     );
+  });
+
+  test("gives Continue Watching a localized episode code and no raw season/episode props", async () => {
+    continueWatching.mockResolvedValue({
+      items: [
+        {
+          title: { id: "title-1", title: "Severance", backdropPath: "/backdrop-1.jpg" },
+          nextEpisode: { seasonNumber: 2, episodeNumber: 3, stillPath: "/still-1.jpg" },
+          watchedEpisodes: 2,
+          totalEpisodes: 10,
+        },
+      ],
+    });
+
+    const { refreshWidgets } = await loadWidgetsModule();
+    await refreshWidgets();
+
+    const entries = continueWatchingWidget.updateTimeline.mock.calls[0]?.[0];
+    expect(entries).toHaveLength(1);
+    expect(entries[0]?.props).toMatchObject({
+      titleId: "title-1",
+      titleName: "Severance",
+      episodeLabel: "S2 E3",
+      watchedEpisodes: 2,
+      totalEpisodes: 10,
+      emptyLabel: "",
+    });
+    expect(entries[0]?.props).not.toHaveProperty("seasonNumber");
+    expect(entries[0]?.props).not.toHaveProperty("episodeNumber");
+    expect(entries[0]?.props).not.toHaveProperty("isMovie");
+  });
+
+  test("writes an Upcoming timeline that advances with the calendar and ends empty", async () => {
+    // Local time, so the Today/Tomorrow boundaries don't depend on the machine's timezone.
+    vi.setSystemTime(new Date(2026, 2, 24, 12));
+    upcoming.mockResolvedValue({
+      items: [
+        {
+          titleId: "movie-1",
+          titleName: "A Movie",
+          titleType: "movie",
+          date: "2026-03-24",
+          episodeCount: 1,
+          backdropPath: "/a.jpg",
+        },
+        {
+          titleId: "show-1",
+          titleName: "A Show",
+          titleType: "tv",
+          date: "2026-03-26",
+          seasonNumber: 2,
+          episodeNumber: 1,
+          episodeCount: 8,
+          backdropPath: "/b.jpg",
+        },
+        {
+          titleId: "show-2",
+          titleName: "Another Show",
+          titleType: "tv",
+          date: "2026-04-10",
+          seasonNumber: 1,
+          episodeNumber: 4,
+          episodeCount: 1,
+          backdropPath: "/c.jpg",
+        },
+      ],
+    });
+
+    const { refreshWidgets } = await loadWidgetsModule();
+    await refreshWidgets();
+
+    const entries = upcomingWidget.updateTimeline.mock.calls[0]?.[0];
+    expect(entries).toHaveLength(7);
+    expect(entries.map((entry) => entry.props?.dateLabel)).toEqual([
+      "Today",
+      "Tomorrow",
+      "Today",
+      "Apr 10",
+      "Tomorrow",
+      "Today",
+      "",
+    ]);
+    expect(entries.map((entry) => entry.props?.titleId)).toEqual([
+      "movie-1",
+      "show-1",
+      "show-1",
+      "show-2",
+      "show-2",
+      "show-2",
+      "",
+    ]);
+    expect(entries.map((entry) => entry.props?.episodeLabel)).toEqual([
+      "Movie",
+      "S2 · 8 episodes",
+      "S2 · 8 episodes",
+      "S1 E4",
+      "S1 E4",
+      "S1 E4",
+      "",
+    ]);
+
+    const last = entries[6]?.props;
+    expect(last?.titleName).toBe("");
+    expect(last?.emptyLabel).toBe("Nothing upcoming");
+    expect(entries[6]?.date).toEqual(new Date(2026, 3, 11));
+
+    // Each item's artwork is downloaded once, however many entries show it.
+    expect(downloadWidgetImage).toHaveBeenCalledTimes(3);
+    expect(entries[1]?.props?.imageFilePath).toBe(entries[2]?.props?.imageFilePath);
+    expect(upcomingWidget.updateSnapshot).not.toHaveBeenCalled();
   });
 
   test("is a no-op outside iOS", async () => {
@@ -258,5 +387,63 @@ describe("resetWidgets", () => {
     expect(upcomingWidget.updateSnapshot).not.toHaveBeenCalled();
     expect(continueWatching).not.toHaveBeenCalled();
     expect(upcoming).not.toHaveBeenCalled();
+  });
+});
+
+describe("buildRotationTimeline", () => {
+  const HALF_HOUR_MS = 30 * 60 * 1000;
+  const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
+
+  test("returns nothing for no items and a single entry for one item", async () => {
+    const { buildRotationTimeline } = await loadWidgetsModule();
+
+    expect(buildRotationTimeline([], 0)).toEqual([]);
+    expect(buildRotationTimeline(["a"], 0)).toEqual([{ date: new Date(0), item: "a" }]);
+  });
+
+  test("cycles through the items for 12 hours, then rests on the first", async () => {
+    const { buildRotationTimeline } = await loadWidgetsModule();
+    const entries = buildRotationTimeline(["a", "b", "c"], 0);
+
+    expect(entries).toHaveLength(25);
+    expect(entries.slice(0, 6).map((entry) => entry.item)).toEqual(["a", "b", "c", "a", "b", "c"]);
+    expect(entries[1]?.date.getTime()).toBe(HALF_HOUR_MS);
+    expect(entries.at(-1)?.item).toBe("a");
+    expect(entries.at(-1)?.date.getTime()).toBe(TWELVE_HOURS_MS);
+    for (let i = 1; i < entries.length; i += 1) {
+      expect(entries[i]!.date.getTime()).toBeGreaterThan(entries[i - 1]!.date.getTime());
+    }
+  });
+});
+
+describe("buildUpcomingTimeline", () => {
+  test("adds an entry at each local midnight where the item or its label changes", async () => {
+    const { buildUpcomingTimeline } = await loadWidgetsModule();
+    const now = new Date(2026, 2, 24, 12);
+    const [a, b, c] = [
+      { id: "a", date: "2026-03-24" },
+      { id: "b", date: "2026-03-26" },
+      { id: "c", date: "2026-04-10" },
+    ];
+
+    const entries = buildUpcomingTimeline([a, b, c], now);
+
+    expect(entries.map((entry) => entry.date)).toEqual([
+      now,
+      new Date(2026, 2, 25),
+      new Date(2026, 2, 26),
+      new Date(2026, 2, 27),
+      new Date(2026, 3, 9),
+      new Date(2026, 3, 10),
+      new Date(2026, 3, 11),
+    ]);
+    expect(entries.map((entry) => entry.item)).toEqual([a, b, b, c, c, c, null]);
+  });
+
+  test("is a single empty entry when there is nothing upcoming", async () => {
+    const { buildUpcomingTimeline } = await loadWidgetsModule();
+    const now = new Date(2026, 2, 24, 12);
+
+    expect(buildUpcomingTimeline([], now)).toEqual([{ date: now, item: null }]);
   });
 });

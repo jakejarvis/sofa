@@ -22,11 +22,12 @@ export type ContinueWatchingProps = {
   titleName: string;
   imageFilePath: string;
   iconFilePath: string;
-  seasonNumber?: number;
-  episodeNumber?: number;
+  /** Localized next-episode code, e.g. "S2 E3". */
+  episodeLabel: string;
   watchedEpisodes: number;
   totalEpisodes: number;
-  isMovie: boolean;
+  /** Localized empty-state text, shown when `titleName` is empty. */
+  emptyLabel: string;
 };
 
 const ContinueWatchingWidget = (props: ContinueWatchingProps, _env: WidgetEnvironment) => {
@@ -53,7 +54,7 @@ const ContinueWatchingWidget = (props: ContinueWatchingProps, _env: WidgetEnviro
             foregroundStyle("rgba(255,255,255,0.7)"),
           ]}
         >
-          Nothing to watch
+          {props.emptyLabel}
         </Text>
       </VStack>
     );
@@ -63,14 +64,9 @@ const ContinueWatchingWidget = (props: ContinueWatchingProps, _env: WidgetEnviro
     1,
     Math.max(0, props.totalEpisodes > 0 ? props.watchedEpisodes / props.totalEpisodes : 0),
   );
-  const episodeLabel =
-    !props.isMovie && props.seasonNumber != null
-      ? `S${props.seasonNumber} · E${props.episodeNumber}`
-      : null;
+  const episodeLabel = props.episodeLabel || null;
   const progressLabel =
-    !props.isMovie && props.totalEpisodes > 0
-      ? `${props.watchedEpisodes} of ${props.totalEpisodes}`
-      : null;
+    props.totalEpisodes > 0 ? `${props.watchedEpisodes}/${props.totalEpisodes}` : null;
 
   return (
     <ZStack
@@ -143,7 +139,7 @@ const ContinueWatchingWidget = (props: ContinueWatchingProps, _env: WidgetEnviro
           {props.titleName}
         </Text>
         {/* Progress bar for TV shows */}
-        {!props.isMovie && props.totalEpisodes > 0 && (
+        {props.totalEpisodes > 0 && (
           <ProgressView
             value={progress}
             modifiers={[progressViewStyle("linear"), tint("#3b82f6"), padding({ top: 4 })]}
