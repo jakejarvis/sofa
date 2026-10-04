@@ -27,6 +27,8 @@ export const admin = oo.spec(
   base.middleware(async ({ context, next }) => {
     const sessionData = await auth.api.getSession({
       headers: context.headers,
+      // Bypass the 5-minute cookie cache so role changes take effect immediately.
+      query: { disableCookieCache: true },
     });
     if (!sessionData?.session || !sessionData?.user) {
       throw new ORPCError("UNAUTHORIZED");

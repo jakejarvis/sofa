@@ -9,7 +9,11 @@ const app = new Hono();
 
 app.get("/:filename", async (c) => {
   // Auth + admin check
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  const session = await auth.api.getSession({
+    headers: c.req.raw.headers,
+    // Bypass the 5-minute cookie cache so role changes take effect immediately.
+    query: { disableCookieCache: true },
+  });
   if (!session) {
     return c.json({ error: "Unauthorized" }, 401);
   }

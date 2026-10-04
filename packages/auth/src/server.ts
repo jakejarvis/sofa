@@ -1,8 +1,9 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { expo } from "@better-auth/expo";
 import { APIError, createAuthMiddleware } from "better-auth/api";
+import { setCookieCache } from "better-auth/cookies";
 import { type BetterAuthOptions, betterAuth } from "better-auth/minimal";
-import { admin, genericOAuth } from "better-auth/plugins";
+import { admin, genericOAuth, type UserWithRole } from "better-auth/plugins";
 
 import { claimInitialAdmin, isRegistrationOpen } from "@sofa/core/settings";
 import { db } from "@sofa/db/client";
@@ -104,6 +105,26 @@ export const auth = betterAuth({
             message: "Registration is currently closed",
           });
         }
+      }
+    }),
+    after: createAuthMiddleware(async (ctx) => {
+      // The first user is promoted to admin by a create.after database hook, which
+      // Better Auth runs after the sign-up transaction commits — i.e. after the
+      // session cookie (including its cached user) was already written with
+      // role "user". Re-read the user and refresh the cache cookie if it changed.
+      const newSession = ctx.context.newSession;
+      if (!newSession) return;
+      try {
+        const fresh = (await ctx.context.internalAdapter.findUserById(
+          newSession.user.id,
+        )) as UserWithRole | null;
+        const cachedRole = (newSession.user as UserWithRole).role;
+        if (!fresh || fresh.role === cachedRole) return;
+        const user = { ...newSession.user, role: fresh.role };
+        await setCookieCache(ctx, { session: newSession.session, user }, false);
+      } catch (err) {
+        // Never turn a successful sign-in into an error over a cache refresh.
+        authLog.warn("Failed to refresh session cookie cache:", err);
       }
     }),
   },
