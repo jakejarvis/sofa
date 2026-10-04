@@ -2035,6 +2035,10 @@ msgstr "الحلقة التالية"
 msgid "Next run"
 msgstr "التشغيل التالي"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Next Week"
+msgstr ""
+
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 msgid "Next: S{seasonNum} E{epNum}"
 msgstr "التالي: م{seasonNum} ح{epNum}"
@@ -3104,6 +3108,7 @@ msgstr "هذا الأسبوع"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "This Week"
 msgstr "هذا الأسبوع"
 
@@ -3205,6 +3210,7 @@ msgstr "اليوم"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "Today"
 msgstr "اليوم"
 
@@ -3227,6 +3233,10 @@ msgstr "تبديل النسخ الاحتياطية المجدولة"
 #: apps/web/src/components/ui/sidebar.tsx
 msgid "Toggle Sidebar"
 msgstr "تبديل الشريط الجانبي"
+
+#: packages/i18n/src/date-buckets.ts
+msgid "Tomorrow"
+msgstr ""
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Track what you watch. Know what's next.<0/>Your library, your data, your rules."

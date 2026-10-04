@@ -2035,6 +2035,10 @@ msgstr "Volgende aflevering"
 msgid "Next run"
 msgstr "Volgende uitvoering"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Next Week"
+msgstr ""
+
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 msgid "Next: S{seasonNum} E{epNum}"
 msgstr "Volgende: S{seasonNum} E{epNum}"
@@ -3104,6 +3108,7 @@ msgstr "deze week"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "This Week"
 msgstr "Deze week"
 
@@ -3205,6 +3210,7 @@ msgstr "vandaag"
 
 #: apps/native/src/components/dashboard/stats-card.tsx
 #: apps/web/src/components/dashboard/stats-display.tsx
+#: packages/i18n/src/date-buckets.ts
 msgid "Today"
 msgstr "Vandaag"
 
@@ -3227,6 +3233,10 @@ msgstr "Geplande back-ups in-/uitschakelen"
 #: apps/web/src/components/ui/sidebar.tsx
 msgid "Toggle Sidebar"
 msgstr "Zijbalk in-/uitschakelen"
+
+#: packages/i18n/src/date-buckets.ts
+msgid "Tomorrow"
+msgstr ""
 
 #: apps/web/src/components/landing-page.tsx
 msgid "Track what you watch. Know what's next.<0/>Your library, your data, your rules."
