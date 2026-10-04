@@ -9,12 +9,12 @@
   },
   "dependencies": {
     "@sofa/db": "workspace:*",
-    "better-sqlite3": "12.11.1",
+    "better-sqlite3": "13.0.3",
     "drizzle-orm": "catalog:"
   },
   "devDependencies": {
     "@sofa/tsconfig": "workspace:*",
-    "@types/better-sqlite3": "7.6.13",
+    "@types/better-sqlite3": "9.6.0",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

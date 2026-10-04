@@ -81,8 +81,8 @@ export function AuthForm({
     setError("");
     setOidcLoading(true);
     try {
-      await authClient.signIn.oauth2({
-        providerId: "oidc",
+      await authClient.signIn.social({
+        provider: "oidc",
         callbackURL: "/dashboard",
       });
     } catch {

@@ -2,16 +2,16 @@ import type { OpenAPIPageProps_Preloaded } from "fumadocs-openapi/ui";
 
 import { openapi } from "@/lib/openapi";
 
-import { OpenAPIPage } from "./api-page.client";
+import { OpenAPIPage as ClientOpenAPIPage } from "./api-page.client";
 
-type APIPageProps = Omit<OpenAPIPageProps_Preloaded, "preloaded">;
+type OpenAPIPageProps = Omit<OpenAPIPageProps_Preloaded, "preloaded">;
 
-export async function APIPage(props: APIPageProps) {
+export async function OpenAPIPage(props: OpenAPIPageProps) {
   const { document, ...pageProps } = props;
   const { bundled } = await openapi.getSchema(document);
 
   return (
-    <OpenAPIPage
+    <ClientOpenAPIPage
       {...pageProps}
       payload={{
         bundled,

@@ -45,15 +45,14 @@
     "@sofa/db": "workspace:*",
     "@sofa/logger": "workspace:*",
     "@sofa/tmdb": "workspace:*",
-    "adm-zip": "0.5.18",
+    "adm-zip": "0.6.1",
     "node-vibrant": "4.0.4",
-    "sharp": "0.35.3",
+    "sharp": "0.35.5",
     "thumbhash": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@sofa/tsconfig": "workspace:*",
-    "@types/adm-zip": "0.5.8",
     "@types/bun": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

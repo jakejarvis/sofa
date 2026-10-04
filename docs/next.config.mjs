@@ -36,7 +36,7 @@ const config = {
         source: "/android",
         destination: "https://play.google.com/store/apps/details?id=com.jakejarvis.sofa",
         permanent: false,
-      }
+      },
     ];
   },
   async rewrites() {

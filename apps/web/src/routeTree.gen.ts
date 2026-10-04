@@ -9,67 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SetupRouteImport } from './routes/setup'
-import { Route as AuthRouteImport } from './routes/_auth'
-import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
-import { Route as AuthLoginRouteImport } from './routes/_auth/login'
-import { Route as AppUpcomingRouteImport } from './routes/_app/upcoming'
-import { Route as AppSettingsRouteImport } from './routes/_app/settings'
-import { Route as AppOnboardingRouteImport } from './routes/_app/onboarding'
-import { Route as AppLibraryRouteImport } from './routes/_app/library'
-import { Route as AppExploreRouteImport } from './routes/_app/explore'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as SetupRouteImport } from './routes/setup'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
-import { Route as AppTitlesIdRouteImport } from './routes/_app/titles.$id'
+import { Route as AppExploreRouteImport } from './routes/_app/explore'
+import { Route as AppLibraryRouteImport } from './routes/_app/library'
+import { Route as AppOnboardingRouteImport } from './routes/_app/onboarding'
+import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppUpcomingRouteImport } from './routes/_app/upcoming'
+import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AppPeopleIdRouteImport } from './routes/_app/people.$id'
+import { Route as AppTitlesIdRouteImport } from './routes/_app/titles.$id'
 
-const SetupRoute = SetupRouteImport.update({
-  id: '/setup',
-  path: '/setup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/_auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRegisterRoute = AuthRegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => AuthRoute,
+const SetupRoute = SetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AppUpcomingRoute = AppUpcomingRouteImport.update({
-  id: '/upcoming',
-  path: '/upcoming',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppSettingsRoute = AppSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppOnboardingRoute = AppOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppLibraryRoute = AppLibraryRouteImport.update({
-  id: '/library',
-  path: '/library',
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
 const AppExploreRoute = AppExploreRouteImport.update({
@@ -77,19 +52,44 @@ const AppExploreRoute = AppExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => AppRoute,
 } as any)
-const AppDashboardRoute = AppDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AppLibraryRoute = AppLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOnboardingRoute = AppOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUpcomingRoute = AppUpcomingRouteImport.update({
+  id: '/upcoming',
+  path: '/upcoming',
+  getParentRoute: () => AppRoute,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AppPeopleIdRoute = AppPeopleIdRouteImport.update({
+  id: '/people/$id',
+  path: '/people/$id',
   getParentRoute: () => AppRoute,
 } as any)
 const AppTitlesIdRoute = AppTitlesIdRouteImport.update({
   id: '/titles/$id',
   path: '/titles/$id',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPeopleIdRoute = AppPeopleIdRouteImport.update({
-  id: '/people/$id',
-  path: '/people/$id',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -194,18 +194,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/setup': {
-      id: '/setup'
-      path: '/setup'
-      fullPath: '/setup'
-      preLoaderRoute: typeof SetupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_auth': {
-      id: '/_auth'
-      path: ''
+    '/': {
+      id: '/'
+      path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AuthRouteImport
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -215,53 +208,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
+    '/_auth': {
+      id: '/_auth'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_auth/register': {
-      id: '/_auth/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof AuthRegisterRouteImport
-      parentRoute: typeof AuthRoute
+    '/setup': {
+      id: '/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof SetupRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_auth/login': {
-      id: '/_auth/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_app/upcoming': {
-      id: '/_app/upcoming'
-      path: '/upcoming'
-      fullPath: '/upcoming'
-      preLoaderRoute: typeof AppUpcomingRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/settings': {
-      id: '/_app/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/onboarding': {
-      id: '/_app/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof AppOnboardingRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/library': {
-      id: '/_app/library'
-      path: '/library'
-      fullPath: '/library'
-      preLoaderRoute: typeof AppLibraryRouteImport
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/explore': {
@@ -271,11 +236,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppExploreRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/dashboard': {
-      id: '/_app/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AppDashboardRouteImport
+    '/_app/library': {
+      id: '/_app/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof AppLibraryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/onboarding': {
+      id: '/_app/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AppOnboardingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/upcoming': {
+      id: '/_app/upcoming'
+      path: '/upcoming'
+      fullPath: '/upcoming'
+      preLoaderRoute: typeof AppUpcomingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/register': {
+      id: '/_auth/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_app/people/$id': {
+      id: '/_app/people/$id'
+      path: '/people/$id'
+      fullPath: '/people/$id'
+      preLoaderRoute: typeof AppPeopleIdRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/titles/$id': {
@@ -283,13 +290,6 @@ declare module '@tanstack/react-router' {
       path: '/titles/$id'
       fullPath: '/titles/$id'
       preLoaderRoute: typeof AppTitlesIdRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/people/$id': {
-      id: '/_app/people/$id'
-      path: '/people/$id'
-      fullPath: '/people/$id'
-      preLoaderRoute: typeof AppPeopleIdRouteImport
       parentRoute: typeof AppRoute
     }
   }

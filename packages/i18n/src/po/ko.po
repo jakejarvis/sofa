@@ -123,7 +123,6 @@ msgstr "{cachedImageCount, plural, other {# 캐시된 이미지}}"
 #~ msgstr "{cachedImageCount} cached images"
 
 #: apps/web/src/components/titles/use-title-actions.ts
-#: apps/web/src/components/titles/use-title-actions.ts
 msgid "{count, plural, one {# earlier episode} other {# earlier episodes}} unwatched"
 msgstr "{count, plural, other {이전 에피소드 #편}} 미시청"
 
@@ -131,7 +130,6 @@ msgstr "{count, plural, other {이전 에피소드 #편}} 미시청"
 msgid "{count, plural, one {# ep} other {# eps}}"
 msgstr "{count, plural, other {# 에피}}"
 
-#: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 #~ msgid "{count} earlier {count, plural, one {episode} other {episodes}} unwatched"
 #~ msgstr ""
@@ -217,7 +215,6 @@ msgstr "{watched}/{total, plural, other {# 에피소드}}"
 #~ msgid "{watchedCount}/{0} episodes"
 #~ msgstr "{watchedCount}/{0} episodes"
 
-#: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/components/titles/season-accordion.tsx
 msgid "{watchedCount}/{episodeCount, plural, one {# episode} other {# episodes}}"
 msgstr "{watchedCount}/{episodeCount, plural, other {# 에피소드}}"
@@ -347,23 +344,17 @@ msgid "Added \"{titleName}\" to watchlist"
 msgstr "\"{titleName}\"를 찜 목록에 추가했습니다"
 
 #: apps/native/src/hooks/use-title-actions.ts
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Added to watchlist"
 msgstr "찜 목록에 추가됨"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Admin"
 msgstr "관리자"
 
-#: apps/web/src/routes/_app/settings.tsx
-#: apps/web/src/routes/_app/settings.tsx
-#: apps/web/src/routes/_app/settings.tsx
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Admin only"
 msgstr "관리자 전용"
@@ -384,21 +375,15 @@ msgstr "나이 {age}"
 
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/components/explore/filterable-title-row.tsx
 #: apps/native/src/components/library/filter-sheet.tsx
-#: apps/native/src/components/library/filter-sheet.tsx
-#: apps/native/src/components/library/filter-sheet.tsx
-#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
-#: apps/web/src/routes/_app/upcoming.tsx
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "All"
 msgstr "전체"
 
 #: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/library/library-filters.tsx
@@ -430,7 +415,6 @@ msgstr "다음에서도 이용 가능"
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
 msgstr "페이지를 불러오는 중 예기치 못한 오류가 발생했습니다. 다시 시도하거나 대시보드로 돌아가세요."
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Anonymous usage reporting"
 msgstr "익명 사용 통계 보고"
@@ -504,8 +488,6 @@ msgid "Availability"
 msgstr "이용 가능 여부"
 
 #: apps/native/src/components/library/filter-sheet.tsx
-#: apps/native/src/components/library/filter-sheet.tsx
-#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/library/library-filters.tsx
 #~ msgid "Available to stream"
 #~ msgstr "Available to stream"
@@ -562,23 +544,15 @@ msgid "Can't reach server"
 msgstr "서버에 연결할 수 없습니다"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/components/header-avatar.tsx
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 #: apps/native/src/components/settings/integration-card.tsx
-#: apps/native/src/components/settings/integration-card.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
-#: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/backup-restore-section.tsx
 #: apps/web/src/components/settings/backup-section.tsx
 #: apps/web/src/components/settings/danger-section.tsx
-#: apps/web/src/components/settings/danger-section.tsx
-#: apps/web/src/components/settings/danger-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/titles/status-button.tsx
 #: apps/web/src/components/titles/title-seasons.tsx
@@ -594,7 +568,6 @@ msgstr "편집 취소"
 msgid "Cast"
 msgstr "출연진"
 
-#: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Catch up"
 msgstr "따라잡기"
@@ -620,7 +593,6 @@ msgstr "따라잡기 완료 — {count, plural, other {에피소드 #개}}를 �
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/account-section.tsx
 msgid "Change password"
 msgstr "비밀번호 변경"
 
@@ -640,7 +612,6 @@ msgstr "서버 변경"
 msgid "Check configuration"
 msgstr "설정 확인"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Check for updates"
 msgstr "업데이트 확인"
@@ -678,15 +649,8 @@ msgstr ""
 #~ msgstr "Choose your subscriptions"
 
 #: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
-#: apps/native/src/components/search/recently-viewed-list.ios.tsx
-#: apps/native/src/components/search/recently-viewed-list.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 #: apps/web/src/components/library/library-filters.tsx
 msgid "Clear"
@@ -710,7 +674,6 @@ msgid "Clear Recently Viewed?"
 msgstr "최근 본 항목을 지우시겠습니까?"
 
 #: apps/native/src/components/settings/integration-configs.ts
-#: apps/native/src/components/settings/integration-configs.ts
 msgid "Click \"+\" and select \"Custom Lists\""
 msgstr "\"+\"를 클릭하고 \"Custom Lists\"를 선택하세요"
 
@@ -718,7 +681,6 @@ msgstr "\"+\"를 클릭하고 \"Custom Lists\"를 선택하세요"
 msgid "Click \"Add Webhook\" and paste the URL above"
 msgstr "\"Add Webhook\"을 클릭하고 위의 URL을 붙여넣으세요"
 
-#: apps/web/src/components/settings/integration-configs.tsx
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Click <0>+</0> and select <1>Custom Lists</1>"
 msgstr "<0>+</0>를 클릭하고 <1>Custom Lists</1>를 선택하세요"
@@ -732,8 +694,6 @@ msgid "Click the button to verify your configuration"
 msgstr "버튼을 클릭하여 설정을 확인하세요"
 
 #: apps/native/src/components/navigation/modal-layout.tsx
-#: apps/native/src/components/navigation/modal-layout.tsx
-#: apps/web/src/components/ui/dialog.tsx
 #: apps/web/src/components/ui/dialog.tsx
 #: apps/web/src/components/ui/sheet.tsx
 msgid "Close"
@@ -755,7 +715,6 @@ msgstr "명령 팔레트"
 msgid "Completed"
 msgstr "완료됨"
 
-#: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Confirm new password"
@@ -823,7 +782,6 @@ msgstr "콘텐츠 등급"
 
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/components/library/filter-sheet.tsx
-#: apps/native/src/components/library/filter-sheet.tsx
 msgid "Content Rating"
 msgstr "콘텐츠 등급"
 
@@ -868,7 +826,6 @@ msgid "Could not load your library"
 msgstr "라이브러리를 불러올 수 없습니다"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Crash reporting"
 msgstr "충돌 보고"
 
@@ -877,12 +834,10 @@ msgid "Create a TMDB account"
 msgstr "TMDB 계정 만들기"
 
 #: apps/native/src/app/(auth)/register.tsx
-#: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Create account"
 msgstr "계정 만들기"
 
-#: apps/native/src/app/(auth)/register.tsx
 #: apps/native/src/app/(auth)/register.tsx
 #~ msgid "Create Account"
 #~ msgstr ""
@@ -899,7 +854,6 @@ msgstr "계정을 만드세요"
 msgid "Creating…"
 msgstr "생성 중…"
 
-#: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Current password"
@@ -929,7 +883,6 @@ msgstr "위험 구역"
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 #: apps/web/src/routes/_app/people.$id.tsx
-#: apps/web/src/routes/_app/titles.$id.tsx
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Dashboard"
 msgstr "대시보드"
@@ -966,7 +919,6 @@ msgstr "기본값"
 
 #: apps/native/src/components/ui/swipeable-row.tsx
 #: apps/web/src/components/settings/backup-section.tsx
-#: apps/web/src/components/settings/backup-section.tsx
 msgid "Delete"
 msgstr "삭제"
 
@@ -984,7 +936,6 @@ msgid "Deleted {0, plural, one {# file} other {# files}}, freed {freed}"
 msgstr "{0, plural, other {파일 #개}} 삭제됨, {freed} 공간 확보"
 
 #: apps/web/src/components/settings/imports-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
 msgid "Device code expired. Please try again."
 msgstr "기기 코드가 만료되었습니다. 다시 시도해주세요."
 
@@ -1000,11 +951,9 @@ msgid "Director"
 msgstr "감독"
 
 #: apps/web/src/components/settings/system-health-section.tsx
-#: apps/web/src/components/settings/system-health-section.tsx
 msgid "Disabled"
 msgstr "비활성화됨"
 
-#: apps/native/src/components/settings/integration-card.tsx
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Disconnect"
@@ -1056,7 +1005,6 @@ msgid "Double tap to rate {star, plural, one {# star} other {# stars}}"
 msgstr "두 번 탭하여 {star, plural, other {# 별}}점 평가"
 
 #: apps/web/src/components/settings/backup-section.tsx
-#: apps/web/src/components/settings/backup-section.tsx
 msgid "Download"
 msgstr "다운로드"
 
@@ -1079,8 +1027,6 @@ msgid "Editor"
 msgstr "편집자"
 
 #: apps/native/src/app/(auth)/login.tsx
-#: apps/native/src/app/(auth)/login.tsx
-#: apps/native/src/app/(auth)/register.tsx
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Email"
@@ -1137,7 +1083,6 @@ msgid "Environment"
 msgstr "환경"
 
 #: apps/native/src/components/titles/episode-row.tsx
-#: apps/native/src/components/titles/episode-row.tsx
 #~ msgid "Episode {0}"
 #~ msgstr ""
 
@@ -1145,7 +1090,6 @@ msgstr "환경"
 #~ msgid "Episode {0}, {episodeLabel}"
 #~ msgstr ""
 
-#: apps/native/src/components/titles/episode-row.tsx
 #: apps/native/src/components/titles/episode-row.tsx
 msgid "Episode {episodeNumber}"
 msgstr "에피소드 {episodeNumber}"
@@ -1197,7 +1141,6 @@ msgstr "향후 90일 이내 방영 예정인 에피소드와 영화입니다."
 #~ msgstr ""
 
 #: apps/native/src/app/change-password.tsx
-#: apps/native/src/app/change-password.tsx
 msgid "Error"
 msgstr "오류"
 
@@ -1218,7 +1161,6 @@ msgstr "매 {n}시간"
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
-#: apps/web/src/components/nav-bar.tsx
 msgid "Explore"
 msgstr "탐색"
 
@@ -1236,7 +1178,6 @@ msgstr "내보내기"
 msgid "Failed"
 msgstr "실패"
 
-#: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to add to watchlist"
 msgstr "찜 목록에 추가 실패"
@@ -1292,6 +1233,12 @@ msgstr "작품 정보를 불러오지 못했습니다"
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark all episodes as watched"
 msgstr "모든 에피소드 시청 처리 실패"
+
+#: apps/native/src/hooks/use-title-actions.ts
+#: apps/native/src/lib/title-actions.ts
+#: apps/web/src/components/titles/use-title-actions.ts
+msgid "Failed to mark as unwatched"
+msgstr ""
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -1386,7 +1333,6 @@ msgstr "이름 업데이트 실패"
 msgid "Failed to update rating"
 msgstr "평점 업데이트 실패"
 
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Failed to update registration setting"
 msgstr "회원가입 설정 업데이트 실패"
@@ -1464,14 +1410,8 @@ msgstr "금요일"
 #~ msgstr "From"
 
 #: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/library/library-filters.tsx
-#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/library/library-filters.tsx
 msgid "Genre"
 msgstr "장르"
@@ -1489,8 +1429,6 @@ msgid "Global"
 msgstr "전체"
 
 #: apps/native/src/app/person/[id].tsx
-#: apps/native/src/app/person/[id].tsx
-#: apps/native/src/app/title/[id].tsx
 #: apps/native/src/app/title/[id].tsx
 #: apps/web/src/components/command-palette.tsx
 msgid "Go back"
@@ -1567,12 +1505,10 @@ msgstr "힌디어"
 #: apps/native/src/app/(tabs)/(home)/_layout.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
-#: apps/web/src/components/nav-bar.tsx
 msgid "Home"
 msgstr "홈"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/web/src/components/settings/system-health-section.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Image cache"
 msgstr "이미지 캐시"
@@ -1618,8 +1554,6 @@ msgid "Import from {sourceLabel}"
 msgstr "{sourceLabel}에서 가져오기"
 
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Import is still running in the background. Check back later."
 msgstr "가져오기가 백그라운드에서 계속 실행 중입니다. 나중에 다시 확인하세요."
@@ -1719,7 +1653,6 @@ msgid "Keyboard shortcuts"
 msgstr "키보드 단축키"
 
 #: apps/web/src/components/command-palette.tsx
-#: apps/web/src/components/command-palette.tsx
 msgid "Keyboard Shortcuts"
 msgstr "키보드 단축키"
 
@@ -1728,9 +1661,6 @@ msgid "Korean"
 msgstr "한국어"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/settings/language-section.tsx
 msgid "Language"
@@ -1785,9 +1715,7 @@ msgid "Last run succeeded"
 msgstr "마지막 실행 성공"
 
 #: apps/native/src/app/(tabs)/(library)/_layout.tsx
-#: apps/native/src/app/(tabs)/(library)/_layout.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
-#: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/routes/_app/library.tsx
@@ -1835,7 +1763,6 @@ msgstr "모든 에피소드를 시청 완료로 표시하시겠습니까?"
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/components/ui/poster-card.tsx
 #: apps/web/src/components/titles/title-seasons.tsx
-#: apps/web/src/components/titles/title-seasons.tsx
 msgid "Mark All Watched"
 msgstr "모두 시청 완료로 표시"
 
@@ -1860,6 +1787,13 @@ msgstr "에피소드 {epNum} 시청함으로 표시"
 msgid "Mark Episode Watched"
 msgstr "에피소드 시청함으로 표시"
 
+#: apps/native/src/app/title/[id].tsx
+#: apps/native/src/components/dashboard/upcoming-row.tsx
+#: apps/native/src/components/ui/poster-card.tsx
+#: apps/web/src/components/titles/title-actions.tsx
+msgid "Mark Unwatched"
+msgstr ""
+
 #: apps/web/src/components/command-palette.tsx
 msgid "Mark watched"
 msgstr "시청함으로 표시"
@@ -1872,12 +1806,21 @@ msgid "Mark Watched"
 msgstr "시청 완료 표시"
 
 #: apps/native/src/app/title/[id].tsx
+msgid "Marked \"{name}\" as unwatched"
+msgstr ""
+
+#: apps/native/src/app/title/[id].tsx
 msgid "Marked \"{name}\" as watched"
 msgstr "\"{name}\"을(를) 시청함으로 표시했습니다"
 
 #: apps/native/src/lib/title-actions.ts
 #~ msgid "Marked \"{titleName}\" as completed"
 #~ msgstr ""
+
+#: apps/native/src/lib/title-actions.ts
+#: apps/web/src/components/titles/use-title-actions.ts
+msgid "Marked \"{titleName}\" as unwatched"
+msgstr ""
 
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
@@ -1897,6 +1840,12 @@ msgstr "\"{titleName}\"의 모든 에피소드를 시청 완료로 표시했습�
 #: apps/native/src/lib/title-actions.ts
 #~ msgid "Marked as completed"
 #~ msgstr ""
+
+#: apps/native/src/app/title/[id].tsx
+#: apps/native/src/hooks/use-title-actions.ts
+#: apps/native/src/lib/title-actions.ts
+msgid "Marked as unwatched"
+msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
 #: apps/native/src/hooks/use-title-actions.ts
@@ -1965,7 +1914,6 @@ msgstr "영화"
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
 #: apps/native/src/components/search/search-result-row.tsx
-#: apps/native/src/components/search/search-result-row.tsx
 #: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/explore/hero-banner.tsx
 #: apps/web/src/components/library/library-filters.tsx
@@ -2002,7 +1950,6 @@ msgstr "영화 {select}"
 #~ msgid "Movies this month"
 #~ msgstr ""
 
-#: apps/native/src/app/(auth)/register.tsx
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Name"
@@ -2054,7 +2001,6 @@ msgid "New backup"
 msgstr "새 백업"
 
 #: apps/native/src/app/change-password.tsx
-#: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "New password"
 msgstr "새 비밀번호"
@@ -2069,7 +2015,6 @@ msgid "New Season"
 msgstr "새 시즌"
 
 #: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 msgid "Newest"
 msgstr "최신순"
@@ -2099,7 +2044,6 @@ msgstr "다음: S{seasonNum} E{epNum}"
 msgid "No backups yet"
 msgstr "아직 백업 없음"
 
-#: apps/native/src/components/ui/offline-banner.ios.tsx
 #: apps/native/src/components/ui/offline-banner.ios.tsx
 #: apps/native/src/components/ui/offline-banner.tsx
 msgid "No internet connection"
@@ -2140,7 +2084,6 @@ msgid "No upcoming episodes or releases in the next 90 days."
 msgstr "향후 90일 이내 예정된 에피소드 또는 출시가 없습니다."
 
 #: apps/native/src/components/settings/integration-card.tsx
-#: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Not configured"
@@ -2159,8 +2102,6 @@ msgid "Oldest"
 msgstr "오래된 순"
 
 #: apps/native/src/components/library/filter-sheet.tsx
-#: apps/native/src/components/library/filter-sheet.tsx
-#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/library/library-filters.tsx
 msgid "On my services"
 msgstr "내 서비스에서"
@@ -2213,7 +2154,6 @@ msgid "Open Radarr, go to Settings > Import Lists"
 msgstr "Radarr를 열고, Settings > Import Lists로 이동하세요"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
 msgid "Open registration"
 msgstr "회원가입 허용"
@@ -2260,8 +2200,6 @@ msgid "Parsing..."
 msgstr "파싱 중..."
 
 #: apps/native/src/app/(auth)/login.tsx
-#: apps/native/src/app/(auth)/login.tsx
-#: apps/native/src/app/(auth)/register.tsx
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/web/src/components/auth-form.tsx
 msgid "Password"
@@ -2305,7 +2243,6 @@ msgid "person"
 msgstr "인물"
 
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
-#: apps/native/src/components/search/search-result-row.tsx
 #: apps/native/src/components/search/search-result-row.tsx
 msgid "Person"
 msgstr "인물"
@@ -2352,11 +2289,9 @@ msgid "Portuguese"
 msgstr "포르투갈어"
 
 #: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/explore/discover-section.tsx
 msgid "Pre-1970"
 msgstr "1970년 이전"
 
-#: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/web/src/components/library/library-filters.tsx
 msgid "Pre-1980"
@@ -2370,7 +2305,6 @@ msgstr "복원 전 백업"
 msgid "Previous"
 msgstr "이전"
 
-#: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 msgid "Primary"
 msgstr "기본"
@@ -2392,12 +2326,9 @@ msgid "Profile picture updated"
 msgstr "프로필 사진이 업데이트되었습니다"
 
 #: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/explore/discover-section.tsx
 msgid "Provider"
 msgstr "제공자"
 
-#: apps/web/src/components/settings/danger-section.tsx
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purge all"
 msgstr "모두 삭제"
@@ -2411,11 +2342,9 @@ msgid "Purge image cache?"
 msgstr "이미지 캐시를 삭제하시겠습니까?"
 
 #: apps/web/src/components/settings/danger-section.tsx
-#: apps/web/src/components/settings/danger-section.tsx
 msgid "Purge images"
 msgstr "이미지 삭제"
 
-#: apps/web/src/components/settings/danger-section.tsx
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purge metadata"
 msgstr "메타데이터 삭제"
@@ -2437,8 +2366,6 @@ msgstr "오래된 항목 {0, plural, other {#개}}과 고아 인물 {1, plural, 
 msgid "Purged {0, plural, one {# title} other {# titles}}, {1, plural, one {# person} other {# persons}}, {2, plural, one {# file} other {# files}} ({freed} freed)"
 msgstr "항목 {0, plural, other {#개}}, 인물 {1, plural, other {#명}}, 파일 {2, plural, other {#개}} 삭제됨 ({freed} 확보됨)"
 
-#: apps/web/src/components/settings/danger-section.tsx
-#: apps/web/src/components/settings/danger-section.tsx
 #: apps/web/src/components/settings/danger-section.tsx
 msgid "Purging..."
 msgstr "삭제 중..."
@@ -2497,13 +2424,9 @@ msgid "Rated {stars, plural, one {# star} other {# stars}}"
 msgstr "별 {stars, plural, other {#개}}로 평가됨"
 
 #: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/library/library-filters.tsx
-#: apps/web/src/components/library/library-filters.tsx
-#: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/titles/star-rating.tsx
 msgid "Rating"
@@ -2520,8 +2443,6 @@ msgid "Rating: {rating} out of 5 stars"
 msgstr "평점: 5점 만점에 {rating}점"
 
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Ratings"
 msgstr "평점"
@@ -2575,7 +2496,6 @@ msgid "Refresh system health"
 msgstr "시스템 상태 새로고침"
 
 #: apps/native/src/components/settings/integration-card.tsx
-#: apps/native/src/components/settings/integration-card.tsx
 msgid "Regenerate"
 msgstr "재생성"
 
@@ -2618,7 +2538,6 @@ msgid "Release Date"
 msgstr "출시일"
 
 #: apps/native/src/components/titles/status-action-button.tsx
-#: apps/web/src/components/titles/status-button.tsx
 #: apps/web/src/components/titles/status-button.tsx
 msgid "Remove"
 msgstr "제거"
@@ -2696,7 +2615,6 @@ msgstr "재시작"
 msgid "Restart Required"
 msgstr "재시작 필요"
 
-#: apps/web/src/components/settings/backup-restore-section.tsx
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Restore"
 msgstr "복원"
@@ -2840,20 +2758,15 @@ msgstr "영화, 프로그램, 인물 검색..."
 #~ msgstr "Search your library..."
 
 #: apps/web/src/components/nav-bar.tsx
-#: apps/web/src/components/nav-bar.tsx
 msgid "Search…"
 msgstr "검색…"
 
 #: apps/native/src/components/titles/season-accordion.tsx
-#: apps/native/src/components/titles/season-accordion.tsx
-#: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 #~ msgid "Season {0}"
 #~ msgstr ""
 
 #: apps/native/src/components/titles/season-accordion.tsx
-#: apps/native/src/components/titles/season-accordion.tsx
-#: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Season {seasonNumber}"
 msgstr "시즌 {seasonNumber}"
@@ -2915,8 +2828,6 @@ msgid "Set the TMDB_API_READ_ACCESS_TOKEN environment variable and restart Sofa.
 msgstr "TMDB_API_READ_ACCESS_TOKEN 환경 변수를 설정하고 Sofa를 다시 시작하세요."
 
 #: apps/native/src/components/settings/integration-configs.ts
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-configs.tsx
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Set your preferred quality profile and root folder"
 msgstr "선호하는 품질 프로필과 루트 폴더를 설정하세요"
@@ -2924,8 +2835,6 @@ msgstr "선호하는 품질 프로필과 루트 폴더를 설정하세요"
 #: apps/native/src/app/(tabs)/(settings)/_layout.tsx
 #: apps/native/src/components/header-avatar.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
-#: apps/web/src/components/nav-bar.tsx
-#: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/settings-shell.tsx
 msgid "Settings"
@@ -2941,12 +2850,10 @@ msgid "Setup required"
 msgstr "초기 설정 필요"
 
 #: apps/native/src/components/ui/expandable-text.tsx
-#: apps/native/src/components/ui/expandable-text.tsx
 #: apps/web/src/components/expandable-text.tsx
 msgid "Show less"
 msgstr "간략히 보기"
 
-#: apps/native/src/components/ui/expandable-text.tsx
 #: apps/native/src/components/ui/expandable-text.tsx
 msgid "Show more"
 msgstr "더 보기"
@@ -2956,7 +2863,6 @@ msgid "Sidebar"
 msgstr "사이드바"
 
 #: apps/native/src/app/(auth)/login.tsx
-#: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/landing-page.tsx
 msgid "Sign in"
@@ -2990,10 +2896,6 @@ msgid "Sign in with {providerName}"
 msgstr "{providerName}(으)로 로그인"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/components/header-avatar.tsx
-#: apps/native/src/components/header-avatar.tsx
 #: apps/native/src/components/header-avatar.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/account-section.tsx
@@ -3001,13 +2903,10 @@ msgid "Sign out"
 msgstr "로그아웃"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/app/(tabs)/(settings)/index.tsx
-#: apps/native/src/components/header-avatar.tsx
 #: apps/native/src/components/header-avatar.tsx
 #~ msgid "Sign Out"
 #~ msgstr ""
 
-#: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Sign out of other sessions"
@@ -3039,10 +2938,6 @@ msgid "Sofa v{latestVersion} is available"
 msgstr "Sofa v{latestVersion}을 사용할 수 있습니다"
 
 #: apps/native/src/components/settings/integration-configs.ts
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-configs.tsx
-#: apps/web/src/components/settings/integration-configs.tsx
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Sofa will automatically log movies and episodes when you finish watching them"
 msgstr "시청을 완료하면 Sofa가 자동으로 영화와 에피소드를 기록합니다"
@@ -3072,8 +2967,6 @@ msgid "Sonarr List URL"
 msgstr "Sonarr 목록 URL"
 
 #: apps/native/src/components/library/sort-menu.tsx
-#: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/explore/discover-section.tsx
 #: apps/web/src/components/library/library-toolbar.tsx
 msgid "Sort"
@@ -3110,10 +3003,7 @@ msgid "Starting import..."
 msgstr "가져오기 시작 중..."
 
 #: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/components/library/filter-sheet.tsx
-#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/library/library-filters.tsx
 msgid "Status"
 msgstr "상태"
@@ -3335,8 +3225,6 @@ msgid "Toggle scheduled backups"
 msgstr "예약 백업 토글"
 
 #: apps/web/src/components/ui/sidebar.tsx
-#: apps/web/src/components/ui/sidebar.tsx
-#: apps/web/src/components/ui/sidebar.tsx
 msgid "Toggle Sidebar"
 msgstr "사이드바 토글"
 
@@ -3344,7 +3232,6 @@ msgstr "사이드바 토글"
 msgid "Track what you watch. Know what's next.<0/>Your library, your data, your rules."
 msgstr "시청하는 것을 기록하세요. 다음이 무엇인지 알 수 있습니다.<0/>내 라이브러리, 내 데이터, 내 규칙."
 
-#: apps/web/src/components/titles/trailer-dialog.tsx
 #: apps/web/src/components/titles/trailer-dialog.tsx
 msgid "Trailer"
 msgstr "예고편"
@@ -3416,7 +3303,6 @@ msgid "unknown"
 msgstr "알 수 없음"
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
-#: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "unlimited"
 msgstr "무제한"
 
@@ -3460,7 +3346,6 @@ msgstr "다음 에피소드"
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
 #: apps/native/src/components/dashboard/upcoming-section.tsx
 #: apps/web/src/components/dashboard/upcoming-section.tsx
-#: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "Upcoming"
@@ -3587,13 +3472,11 @@ msgid "Watch history"
 msgstr "시청 기록"
 
 #: apps/web/src/components/titles/title-availability.tsx
-#: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Watch on {name}"
 #~ msgstr ""
 
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/lib/title-actions.ts
-#: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Watched all of {seasonLabel}"
 msgstr "{seasonLabel} 전체 시청 완료"
@@ -3602,7 +3485,6 @@ msgstr "{seasonLabel} 전체 시청 완료"
 #~ msgid "Watched all of {seasonName}"
 #~ msgstr ""
 
-#: apps/web/src/components/titles/use-title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Watched S{seasonNum} E{epNum}"
 msgstr "S{seasonNum} E{epNum} 시청 완료"
@@ -3629,7 +3511,6 @@ msgstr "시청 중"
 #: apps/native/src/components/titles/status-action-button.tsx
 #: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/settings/imports-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
 #: apps/web/src/components/titles/status-button.tsx
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "Watchlist"
@@ -3639,8 +3520,6 @@ msgstr "관심 목록"
 #~ msgid "Watchlisted"
 #~ msgstr ""
 
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/native/src/components/settings/integration-configs.ts
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Webhook URL"
 msgstr "웹훅 URL"
@@ -3682,13 +3561,8 @@ msgid "Writer"
 msgstr "작가"
 
 #: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
-#: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/explore/discover-section.tsx
-#: apps/web/src/components/library/library-filters.tsx
-#: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/library/library-filters.tsx
 msgid "Year"
 msgstr "연도"
@@ -3730,4 +3604,3 @@ msgstr "이름"
 #: apps/web/src/components/auth-form.tsx
 msgid "Your name…"
 msgstr "이름…"
-

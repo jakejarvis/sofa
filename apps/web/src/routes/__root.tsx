@@ -4,7 +4,12 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
-import { createRootRouteWithContext, HeadContent, Outlet } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  type ErrorComponentProps,
+  HeadContent,
+  Outlet,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Provider as StoreProvider } from "jotai";
 import { MotionConfig } from "motion/react";
@@ -143,7 +148,7 @@ function GlobalNotFound() {
   );
 }
 
-function GlobalError({ reset }: { error: Error; reset: () => void }) {
+function GlobalError({ reset }: ErrorComponentProps) {
   const { t } = useLingui();
 
   return (

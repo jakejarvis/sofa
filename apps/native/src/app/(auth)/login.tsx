@@ -99,8 +99,8 @@ export default function LoginScreen() {
             <Animated.View entering={FadeInDown.duration(300).delay(100)} className="mb-4">
               <Button
                 onPress={() => {
-                  authClient.signIn.oauth2({
-                    providerId: "oidc",
+                  authClient.signIn.social({
+                    provider: "oidc",
                     callbackURL: "/(tabs)/(home)",
                   });
                 }}
