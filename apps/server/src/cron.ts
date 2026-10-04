@@ -16,6 +16,7 @@ import {
   getTitleByIdForCron,
   getTitleIdsWithStaleSeasons,
   getTitlesWithFreshRecommendations,
+  runIsolated,
   startCronRun,
 } from "@sofa/core/cron";
 import {
@@ -107,20 +108,28 @@ async function nightlyRefreshLibrary() {
   // Library titles: 7 days
   const staleLibrary = getStaleLibraryTitles(libraryIds, libraryStale);
 
-  for (const { id } of staleLibrary) {
-    await refreshTitle(id);
-    await Bun.sleep(RATE_LIMIT_MS);
-  }
+  await runIsolated(
+    staleLibrary.map((t) => t.id),
+    async (id) => {
+      await refreshTitle(id);
+      await Bun.sleep(RATE_LIMIT_MS);
+    },
+    (id, err) => log.warn(`Failed to refresh title ${id}:`, err),
+  );
 
   // Non-library titles: 30 days
-  const nonLibrary = getStaleNonLibraryTitlesForRefresh(nonLibraryStale, 50);
+  const nonLibraryIds = getStaleNonLibraryTitlesForRefresh(nonLibraryStale, 50)
+    .map((t) => t.id)
+    .filter((id) => !libraryIds.includes(id));
 
-  for (const t of nonLibrary) {
-    if (!libraryIds.includes(t.id)) {
-      await refreshTitle(t.id);
+  await runIsolated(
+    nonLibraryIds,
+    async (id) => {
+      await refreshTitle(id);
       await Bun.sleep(RATE_LIMIT_MS);
-    }
-  }
+    },
+    (id, err) => log.warn(`Failed to refresh title ${id}:`, err),
+  );
 }
 
 // Refresh availability for library titles where stale
@@ -131,12 +140,14 @@ async function refreshAvailabilityJob() {
 
   const { withOffers, withStaleOffers } = getStaleAvailabilityTitles(libraryIds, stale);
 
-  for (const titleId of libraryIds) {
-    if (withStaleOffers.has(titleId) || !withOffers.has(titleId)) {
-      await refreshAvailability(titleId);
+  await runIsolated(
+    libraryIds.filter((id) => withStaleOffers.has(id) || !withOffers.has(id)),
+    async (id) => {
+      await refreshAvailability(id);
       await Bun.sleep(RATE_LIMIT_MS);
-    }
-  }
+    },
+    (id, err) => log.warn(`Failed to refresh availability for title ${id}:`, err),
+  );
 }
 
 async function refreshRecommendationsJob() {
@@ -148,10 +159,14 @@ async function refreshRecommendationsJob() {
     `Refreshing recommendations for ${staleIds.length} of ${libraryIds.length} library titles`,
   );
 
-  for (const titleId of staleIds) {
-    await refreshRecommendations(titleId);
-    await Bun.sleep(RATE_LIMIT_MS);
-  }
+  await runIsolated(
+    staleIds,
+    async (id) => {
+      await refreshRecommendations(id);
+      await Bun.sleep(RATE_LIMIT_MS);
+    },
+    (id, err) => log.warn(`Failed to refresh recommendations for title ${id}:`, err),
+  );
 }
 
 async function refreshTvChildrenJob() {
@@ -164,14 +179,16 @@ async function refreshTvChildrenJob() {
   const tvIds = tvShows.map((s) => s.id);
   const titlesWithStaleSeasons = getTitleIdsWithStaleSeasons(tvIds, stale);
 
-  for (const show of tvShows) {
-    if (titlesWithStaleSeasons.has(show.id)) {
+  await runIsolated(
+    tvShows.filter((s) => titlesWithStaleSeasons.has(s.id)),
+    async (show) => {
       const details = await getTvDetails(show.tmdbId);
       await refreshTvChildren(show.id, show.tmdbId, details.number_of_seasons);
       await syncTvChildArt(show.id, { warmCache: true });
       await Bun.sleep(RATE_LIMIT_MS);
-    }
-  }
+    },
+    (show, err) => log.warn(`Failed to refresh episodes for TV show ${show.id}:`, err),
+  );
 }
 
 async function cacheImagesJob() {
