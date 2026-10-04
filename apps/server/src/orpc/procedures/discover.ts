@@ -280,7 +280,13 @@ export const search = os.discover.search.use(authed).handler(async ({ input }) =
   const titleResults = mapped.filter(
     (r): r is typeof r & { type: "movie" | "tv" } => r.type !== "person",
   );
-  const titleMap = ensureBrowseTitlesExist(titleResults);
+  const titleMap = ensureBrowseTitlesExist(
+    titleResults.map((r) => ({
+      ...r,
+      releaseDate: r.type === "movie" ? r.releaseDate : null,
+      firstAirDate: r.type === "tv" ? r.releaseDate : null,
+    })),
+  );
 
   const personResults = mapped.filter((r) => r.type === "person");
   const personMap = ensureBrowsePersonsExist(

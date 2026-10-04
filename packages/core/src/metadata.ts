@@ -137,6 +137,26 @@ export function extractTvContentRating(show: TmdbTvDetails): string | null {
   return us?.rating || null;
 }
 
+/** Title columns derived from TMDB TV details (everything except lastFetchedAt). */
+function tvTitleFields(show: TmdbTvDetails) {
+  return {
+    title: show.name,
+    originalTitle: show.original_name,
+    overview: show.overview,
+    firstAirDate: show.first_air_date || null,
+    posterPath: show.poster_path,
+    backdropPath: show.backdrop_path,
+    popularity: show.popularity,
+    voteAverage: show.vote_average,
+    voteCount: show.vote_count,
+    status: show.status,
+    contentRating: extractTvContentRating(show),
+    tvdbId: show.external_ids?.tvdb_id ?? null,
+    imdbId: show.external_ids?.imdb_id ?? null,
+    originalLanguage: show.original_language ?? null,
+  };
+}
+
 /** Fire-and-forget enrichment tasks (availability, recommendations, art, credits, trailer) */
 function fireAndForgetEnrichment(
   titleId: string,
@@ -209,14 +229,7 @@ async function fetchTitleByTmdbId(tmdbId: number, type: "movie" | "tv") {
       // TV shell — fetch details + children
       const show = await getTvDetails(tmdbId);
       updateTitleWithArtInvalidation(existing, {
-        overview: show.overview,
-        posterPath: show.poster_path,
-        backdropPath: show.backdrop_path,
-        status: show.status,
-        contentRating: extractTvContentRating(show),
-        tvdbId: show.external_ids?.tvdb_id ?? null,
-        imdbId: show.external_ids?.imdb_id ?? null,
-        originalLanguage: show.original_language ?? null,
+        ...tvTitleFields(show),
         lastFetchedAt: new Date(),
       });
       upsertGenresTransaction(existing.id, show.genres ?? []);
@@ -327,20 +340,7 @@ export async function refreshTitle(titleId: string) {
   } else {
     const show = await getTvDetails(title.tmdbId);
     updateTitleWithArtInvalidation(title, {
-      title: show.name,
-      originalTitle: show.original_name,
-      overview: show.overview,
-      firstAirDate: show.first_air_date || null,
-      posterPath: show.poster_path,
-      backdropPath: show.backdrop_path,
-      popularity: show.popularity,
-      voteAverage: show.vote_average,
-      voteCount: show.vote_count,
-      status: show.status,
-      contentRating: extractTvContentRating(show),
-      tvdbId: show.external_ids?.tvdb_id ?? null,
-      imdbId: show.external_ids?.imdb_id ?? null,
-      originalLanguage: show.original_language ?? null,
+      ...tvTitleFields(show),
       lastFetchedAt: now,
     });
     upsertGenresTransaction(titleId, show.genres ?? []);
@@ -586,13 +586,7 @@ export async function ensureTvHydrated(titleId: string): Promise<Season[]> {
     try {
       const show = await getTvDetails(tmdbId);
       updateTitleWithArtInvalidation(title, {
-        overview: show.overview,
-        posterPath: show.poster_path,
-        backdropPath: show.backdrop_path,
-        status: show.status,
-        contentRating: extractTvContentRating(show),
-        imdbId: show.external_ids?.imdb_id ?? null,
-        originalLanguage: show.original_language ?? null,
+        ...tvTitleFields(show),
         lastFetchedAt: new Date(),
       });
       upsertGenresTransaction(titleId, show.genres ?? []);
@@ -792,6 +786,7 @@ export async function getOrFetchTitle(
     titleSeasons = title.lastFetchedAt ? fetchSeasonsFromDb(id) : [];
     if (titleSeasons.length === 0) {
       titleSeasons = await ensureTvHydrated(id);
+      title = getTitleById(id) ?? title;
     }
   }
 
