@@ -95,7 +95,23 @@ export function batchInsertEpisodeWatchesTransaction(
   db.transaction((tx) => {
     const now = watchedAt ?? new Date();
 
-    for (const episodeId of episodeIds) {
+    // Bulk marking records state, not rewatches (single-episode logEpisodeWatch is the rewatch path).
+    const alreadyWatched = new Set(
+      tx
+        .select({ episodeId: userEpisodeWatches.episodeId })
+        .from(userEpisodeWatches)
+        .where(
+          and(
+            eq(userEpisodeWatches.userId, userId),
+            inArray(userEpisodeWatches.episodeId, episodeIds),
+          ),
+        )
+        .all()
+        .map((w) => w.episodeId),
+    );
+
+    for (const episodeId of new Set(episodeIds)) {
+      if (alreadyWatched.has(episodeId)) continue;
       tx.insert(userEpisodeWatches).values({ userId, episodeId, watchedAt: now, source }).run();
     }
 
@@ -254,20 +270,17 @@ export function getEpisodeProgressByTitleIds(userId: string, titleIds: string[])
 }
 
 export function getUserTitleInfo(userId: string, titleId: string) {
-  const info = db
-    .select({
-      status: userTitleStatus.status,
-      ratingStars: userRatings.ratingStars,
-    })
+  const statusRow = db
+    .select({ status: userTitleStatus.status })
     .from(userTitleStatus)
-    .leftJoin(
-      userRatings,
-      and(
-        eq(userRatings.userId, userTitleStatus.userId),
-        eq(userRatings.titleId, userTitleStatus.titleId),
-      ),
-    )
     .where(and(eq(userTitleStatus.userId, userId), eq(userTitleStatus.titleId, titleId)))
+    .get();
+
+  // Ratings exist independently of library membership (rateTitleStars doesn't add a status row).
+  const ratingRow = db
+    .select({ ratingStars: userRatings.ratingStars })
+    .from(userRatings)
+    .where(and(eq(userRatings.userId, userId), eq(userRatings.titleId, titleId)))
     .get();
 
   const watchedEpisodeIds = db
@@ -280,8 +293,8 @@ export function getUserTitleInfo(userId: string, titleId: string) {
     .map((w) => w.episodeId);
 
   return {
-    status: info?.status ?? null,
-    rating: info?.ratingStars ?? null,
+    status: statusRow?.status ?? null,
+    rating: ratingRow?.ratingStars ?? null,
     episodeWatches: watchedEpisodeIds,
   };
 }

@@ -29,6 +29,7 @@ import {
   unwatchMovie,
   unwatchSeason,
   unwatchSeries,
+  watchSeason,
 } from "../src/tracking";
 
 beforeEach(() => {
@@ -297,6 +298,20 @@ describe("logEpisodeWatchBatch", () => {
     expect(row?.status).toBe("in_progress");
   });
 
+  test("skips episodes that are already watched", () => {
+    insertUser();
+    const { episodeIds } = insertTvShow("tv-1", 99999, 1, 3);
+    logEpisodeWatch("user-1", episodeIds[0]);
+    logEpisodeWatchBatch("user-1", episodeIds);
+
+    const watches = testDb
+      .select()
+      .from(userEpisodeWatches)
+      .where(eq(userEpisodeWatches.userId, "user-1"))
+      .all();
+    expect(watches).toHaveLength(3);
+  });
+
   test("no-op for empty array", () => {
     insertUser();
     logEpisodeWatchBatch("user-1", []);
@@ -307,6 +322,26 @@ describe("logEpisodeWatchBatch", () => {
       .where(eq(userEpisodeWatches.userId, "user-1"))
       .all();
     expect(watches).toHaveLength(0);
+  });
+});
+
+// ── watchSeason ─────────────────────────────────────────────────────
+
+describe("watchSeason", () => {
+  test("does not duplicate already-watched episodes", () => {
+    insertUser();
+    const { episodeIds } = insertTvShow("tv-1", 99999, 1, 3);
+    logEpisodeWatch("user-1", episodeIds[0]);
+    logEpisodeWatch("user-1", episodeIds[1]);
+    watchSeason("user-1", "tv-1-s1");
+
+    const watches = testDb
+      .select()
+      .from(userEpisodeWatches)
+      .where(eq(userEpisodeWatches.userId, "user-1"))
+      .all();
+    expect(watches).toHaveLength(3);
+    expect(new Set(watches.map((w) => w.episodeId)).size).toBe(3);
   });
 });
 
@@ -645,6 +680,16 @@ describe("getUserTitleInfo", () => {
     expect(info.episodeWatches).toHaveLength(2);
     expect(info.episodeWatches).toContain(episodeIds[0]);
     expect(info.episodeWatches).toContain(episodeIds[1]);
+  });
+
+  test("returns a rating for a title not in the library", () => {
+    insertUser();
+    insertTitle();
+    rateTitleStars("user-1", "title-1", 4);
+
+    const info = getUserTitleInfo("user-1", "title-1");
+    expect(info.rating).toBe(4);
+    expect(info.status).toBeNull();
   });
 
   test("returns nulls when no data exists", () => {
