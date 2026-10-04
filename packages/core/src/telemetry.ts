@@ -7,6 +7,9 @@ import { getInstanceId, getSetting, getUserCount, setSetting } from "./settings"
 const APP_VERSION = process.env.APP_VERSION || "0.0.0";
 const PUBLIC_API_URL = process.env.PUBLIC_API_URL || "https://public-api.sofa.watch";
 const REPORT_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+// Cron fires on exact boundaries but the timestamp is written after the network
+// call finishes, so allow some slack or every other scheduled run is skipped.
+const SCHEDULE_TOLERANCE_MS = 10 * 60 * 1000;
 
 const log = createLogger("telemetry");
 
@@ -40,7 +43,7 @@ export async function performTelemetryReport(): Promise<void> {
   const lastReported = getSetting("telemetryLastReportedAt");
   if (lastReported) {
     const elapsed = Date.now() - new Date(lastReported).getTime();
-    if (elapsed < REPORT_INTERVAL_MS) {
+    if (elapsed < REPORT_INTERVAL_MS - SCHEDULE_TOLERANCE_MS) {
       return;
     }
   }

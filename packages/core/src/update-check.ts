@@ -9,6 +9,9 @@ const log = createLogger("update-check");
 const VERSION_PREFIX_RE = /^v/;
 const PUBLIC_API_URL = process.env.PUBLIC_API_URL || "https://public-api.sofa.watch";
 const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
+// Cron fires on exact boundaries but the timestamp is written after the network
+// call finishes, so allow some slack or every other scheduled run is skipped.
+const SCHEDULE_TOLERANCE_MS = 10 * 60 * 1000;
 
 export interface UpdateCheckResult {
   updateAvailable: boolean;
@@ -63,7 +66,7 @@ export async function performUpdateCheck(): Promise<UpdateCheckResult> {
   const lastChecked = getSetting("updateCheckLastCheckedAt");
   if (lastChecked) {
     const elapsed = Date.now() - new Date(lastChecked).getTime();
-    if (elapsed < CHECK_INTERVAL_MS) {
+    if (elapsed < CHECK_INTERVAL_MS - SCHEDULE_TOLERANCE_MS) {
       return getCachedUpdateCheck();
     }
   }

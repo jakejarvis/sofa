@@ -91,6 +91,19 @@ describe("performTelemetryReport", () => {
     expect(globalThis.fetch).toHaveBeenCalledOnce();
   });
 
+  test("reports on the next daily run despite last run's latency", async () => {
+    setSetting("telemetryEnabled", "true");
+    const lastReported = new Date(TEST_NOW.getTime() - (24 * 60 * 60 * 1000 - 30_000));
+    setSetting("telemetryLastReportedAt", lastReported.toISOString());
+
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      (async () => new Response(null, { status: 200 })) as unknown as typeof fetch,
+    );
+
+    await performTelemetryReport();
+    expect(globalThis.fetch).toHaveBeenCalledOnce();
+  });
+
   test("does not throw on fetch failure", async () => {
     setSetting("telemetryEnabled", "true");
 
