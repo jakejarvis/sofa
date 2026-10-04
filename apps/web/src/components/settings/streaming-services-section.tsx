@@ -1,8 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconChevronDown, IconCircleCheck, IconDeviceTv } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { SVGProps, useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { PlatformGrid } from "@/components/platforms/platform-grid";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
@@ -18,42 +19,67 @@ export function StreamingServicesSection() {
   const savedTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const selectedIdsRef = useRef<Set<string>>(selectedIds);
   const saveCounterRef = useRef(0);
-  const initialized = useRef(false);
+  const mountedRef = useRef(true);
+  const dirtyRef = useRef(false);
 
+  const queryClient = useQueryClient();
   const platformsQuery = useQuery(orpc.discover.platforms.queryOptions());
   const userPlatformsQuery = useQuery(orpc.account.platforms.queryOptions());
 
-  // Initialize selected IDs from server data
+  const persist = useCallback(
+    async (ids: Set<string>, counter = saveCounterRef.current) => {
+      try {
+        const platformIds = [...ids];
+        await client.account.updatePlatforms({ platformIds });
+        queryClient.setQueryData(orpc.account.platforms.queryKey(), { platformIds });
+        void queryClient.invalidateQueries({ queryKey: orpc.library.key() });
+        void queryClient.invalidateQueries({ queryKey: orpc.discover.key() });
+        if (!mountedRef.current || saveCounterRef.current !== counter) return;
+        setSaved(true);
+        clearTimeout(savedTimerRef.current);
+        savedTimerRef.current = setTimeout(setSaved, 1500, false);
+      } catch {
+        toast.error(t`Failed to update setting`);
+      } finally {
+        if (saveCounterRef.current === counter) dirtyRef.current = false;
+      }
+    },
+    [queryClient, t],
+  );
+
+  // Mirror server data into local state unless the user has unsaved edits.
   useEffect(() => {
-    if (userPlatformsQuery.data && !initialized.current) {
+    if (userPlatformsQuery.data && !dirtyRef.current) {
       const ids = new Set(userPlatformsQuery.data.platformIds);
       setSelectedIds(ids);
       selectedIdsRef.current = ids;
-      initialized.current = true;
     }
   }, [userPlatformsQuery.data]);
 
-  // Cleanup timers on unmount
+  // Flush a pending save on unmount and clean up timers
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
-      clearTimeout(saveTimerRef.current);
+      mountedRef.current = false;
       clearTimeout(savedTimerRef.current);
+      if (saveTimerRef.current) {
+        // Leaving within the debounce window: save now instead of dropping the edit.
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = undefined;
+        void persist(selectedIdsRef.current);
+      }
     };
-  }, []);
+  }, [persist]);
 
   const save = useCallback(() => {
+    dirtyRef.current = true;
     clearTimeout(saveTimerRef.current);
     const counter = ++saveCounterRef.current;
-    saveTimerRef.current = setTimeout(async () => {
-      const ids = selectedIdsRef.current;
-      await client.account.updatePlatforms({ platformIds: [...ids] });
-      // Only show "Saved" if no newer save was triggered
-      if (saveCounterRef.current !== counter) return;
-      setSaved(true);
-      clearTimeout(savedTimerRef.current);
-      savedTimerRef.current = setTimeout(setSaved, 1500, false);
+    saveTimerRef.current = setTimeout(() => {
+      saveTimerRef.current = undefined;
+      void persist(selectedIdsRef.current, counter);
     }, 500);
-  }, []);
+  }, [persist]);
 
   const handleToggle = useCallback(
     (id: string) => {

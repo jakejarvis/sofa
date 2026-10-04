@@ -1,8 +1,9 @@
-import { Trans } from "@lingui/react/macro";
-import { useQuery } from "@tanstack/react-query";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useCallback, useState } from "react";
+import { toast } from "sonner";
 
 import { PlatformGrid } from "@/components/platforms/platform-grid";
 import { RouteError } from "@/components/route-error";
@@ -19,7 +20,9 @@ export const Route = createFileRoute("/_app/onboarding")({
 });
 
 function OnboardingPage() {
+  const { t } = useLingui();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
 
@@ -43,8 +46,13 @@ function OnboardingPage() {
     try {
       if (selectedIds.size > 0) {
         await client.account.updatePlatforms({ platformIds: [...selectedIds] });
+        queryClient.setQueryData(orpc.account.platforms.queryKey(), {
+          platformIds: [...selectedIds],
+        });
       }
       void navigate({ to: "/dashboard" });
+    } catch {
+      toast.error(t`Failed to update setting`);
     } finally {
       setSaving(false);
     }
