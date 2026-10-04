@@ -8,11 +8,13 @@ import { i18n } from "@sofa/i18n";
 
 let widgetRefreshTimer: ReturnType<typeof setTimeout> | null = null;
 
-/** Invalidate title + tracking + library queries. Used by most title mutations. */
+/** Invalidate every query that carries per-user tracking state. Used by most title mutations. */
 export function invalidateTitleQueries() {
   queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
   queryClient.invalidateQueries({ queryKey: orpc.tracking.key() });
   queryClient.invalidateQueries({ queryKey: orpc.library.key() });
+  queryClient.invalidateQueries({ queryKey: orpc.discover.key() });
+  queryClient.invalidateQueries({ queryKey: orpc.people.key() });
 
   // Debounce widget refresh to batch rapid mutations (e.g. watching multiple episodes)
   if (widgetRefreshTimer) clearTimeout(widgetRefreshTimer);
