@@ -39,6 +39,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useResetUserState } from "@/hooks/use-reset-user-state";
 import { authClient, signOut } from "@/lib/auth/client";
 import { getErrorMessage } from "@/lib/error-messages";
 import { useAppForm } from "@/lib/form";
@@ -59,6 +60,7 @@ export function AccountSection({
 }) {
   const { t } = useLingui();
   const navigate = useNavigate();
+  const resetUserState = useResetUserState();
   const router = useRouter();
   const [avatarUrl, setAvatarUrl] = useState(user.image);
   const [isHovered, setIsHovered] = useState(false);
@@ -318,7 +320,8 @@ export function AccountSection({
             variant="destructive"
             onClick={async () => {
               await signOut();
-              void navigate({ to: "/" });
+              await navigate({ to: "/" });
+              resetUserState();
             }}
           >
             <IconLogout aria-hidden={true} />
