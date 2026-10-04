@@ -25,11 +25,40 @@ export function formatDate(date: Date | string, options?: Intl.DateTimeFormatOpt
 }
 
 export function formatShortDate(date: Date | string): string {
+  // Date-only strings are parsed as UTC midnight; format in UTC to keep the calendar day.
+  const useUTC = typeof date === "string" && isDateOnly(date);
   return new Intl.DateTimeFormat(i18n.locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
+    ...(useUTC ? { timeZone: "UTC" } : {}),
   }).format(toDate(date));
+}
+
+function dateOnlyParts(value: string): { y: number; m: number; d: number } | null {
+  if (!isDateOnly(value)) return null;
+  const [y, m, d] = value.split("-").map(Number);
+  return { y: y!, m: m!, d: d! };
+}
+
+/**
+ * Age in whole years from TMDB date-only strings ("YYYY-MM-DD"). Compares
+ * calendar dates directly so the result doesn't depend on the viewer's timezone.
+ */
+export function calculateAge(
+  birthday: string,
+  deathday?: string | null,
+  now: Date = new Date(),
+): number | null {
+  const birth = dateOnlyParts(birthday);
+  if (!birth) return null;
+  const end = deathday
+    ? dateOnlyParts(deathday)
+    : { y: now.getFullYear(), m: now.getMonth() + 1, d: now.getDate() };
+  if (!end) return null;
+  let age = end.y - birth.y;
+  if (end.m < birth.m || (end.m === birth.m && end.d < birth.d)) age--;
+  return age;
 }
 
 export function formatRelativeTime(date: Date | string): string {

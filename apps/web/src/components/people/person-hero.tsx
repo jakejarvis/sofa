@@ -5,21 +5,10 @@ import { ExpandableText } from "@/components/expandable-text";
 import { Badge } from "@/components/ui/badge";
 import { thumbHashToUrl } from "@/lib/thumbhash";
 import type { ResolvedPerson } from "@sofa/api/schemas";
-import { formatDate } from "@sofa/i18n/format";
+import { calculateAge, formatDate } from "@sofa/i18n/format";
 
 interface PersonHeroProps {
   person: ResolvedPerson;
-}
-
-function calculateAge(birthday: string, deathday?: string | null): number {
-  const birth = new Date(birthday);
-  const end = deathday ? new Date(deathday) : new Date();
-  let age = end.getFullYear() - birth.getFullYear();
-  const m = end.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && end.getDate() < birth.getDate())) {
-    age--;
-  }
-  return age;
 }
 
 export function PersonHero({ person }: PersonHeroProps) {

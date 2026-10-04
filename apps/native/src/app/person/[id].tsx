@@ -28,22 +28,11 @@ import { Text } from "@/components/ui/text";
 import { useTitleActions } from "@/hooks/use-title-actions";
 import { orpc } from "@/lib/orpc";
 import { addRecentlyViewed } from "@/lib/recently-viewed";
-import { formatDate } from "@sofa/i18n/format";
+import { calculateAge, formatDate } from "@sofa/i18n/format";
 
 const FILMOGRAPHY_GAP = 12;
 const FILMOGRAPHY_PADDING = 16;
 const FILMOGRAPHY_GUTTER = FILMOGRAPHY_GAP / 2;
-
-function calculateAge(birthday: string, deathday?: string | null): number {
-  const birth = new Date(birthday);
-  const end = deathday ? new Date(deathday) : new Date();
-  let age = end.getFullYear() - birth.getFullYear();
-  const m = end.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && end.getDate() < birth.getDate())) {
-    age--;
-  }
-  return age;
-}
 
 export default function PersonDetailScreen() {
   const { t } = useLingui();
@@ -187,6 +176,7 @@ export default function PersonDetailScreen() {
                     <Text className="text-muted-foreground/60 text-sm">
                       {(() => {
                         const age = calculateAge(person.birthday, person.deathday);
+                        if (age === null) return null;
                         return person.deathday ? ` (${t`died at ${age}`})` : ` (${t`age ${age}`})`;
                       })()}
                     </Text>
