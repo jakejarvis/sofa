@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { episodes } from "@sofa/db/schema";
 import {
   clearAllTables,
   insertIntegration,
   insertMovieWatch,
   insertTvShow,
   insertUser,
+  testDb,
 } from "@sofa/test/db";
 
 import {
@@ -264,6 +266,22 @@ describe("parseJellyfinPayload", () => {
     });
   });
 
+  test("ignores the item TMDB id for episodes", () => {
+    const result = parseJellyfinPayload({
+      NotificationType: "PlaybackStop",
+      PlayedToCompletion: true,
+      ItemType: "Episode",
+      Name: "Ozymandias",
+      SeriesName: "Breaking Bad",
+      SeasonNumber: 5,
+      EpisodeNumber: 14,
+      Provider_tmdb: "62085",
+      Provider_tvdb: "4882562",
+    });
+    expect(result?.tmdbId).toBeUndefined();
+    expect(result?.tvdbId).toBe("4882562");
+  });
+
   test("returns null when not PlaybackStop", () => {
     expect(
       parseJellyfinPayload({
@@ -354,6 +372,61 @@ describe("parseEmbyPayload", () => {
       episodeNumber: 1,
       showTitle: "Lost",
     });
+  });
+
+  test("ignores the item TMDB id for episodes", () => {
+    const result = parseEmbyPayload({
+      Event: "playback.stop",
+      PlayedToCompletion: true,
+      Item: {
+        Type: "Episode",
+        Name: "Pilot",
+        SeriesName: "Lost",
+        ParentIndexNumber: 1,
+        IndexNumber: 1,
+        ProviderIds: { Tvdb: "127131", Tmdb: "62085" },
+      },
+    });
+    expect(result?.tmdbId).toBeUndefined();
+    expect(result?.tvdbId).toBe("127131");
+  });
+
+  test("parses a native Emby payload with PlaybackInfo.PlayedToCompletion", () => {
+    const result = parseEmbyPayload({
+      Event: "playback.stop",
+      User: { Name: "u", Id: "1" },
+      Item: {
+        Type: "Episode",
+        Name: "Pilot",
+        SeriesName: "Lost",
+        ParentIndexNumber: 1,
+        IndexNumber: 1,
+        ProviderIds: { Tvdb: "127131" },
+      },
+      PlaybackInfo: { PlayedToCompletion: true, PositionTicks: 1 },
+    });
+    expect(result).not.toBeNull();
+    expect(result?.mediaType).toBe("episode");
+    expect(result?.tvdbId).toBe("127131");
+    expect(result?.seasonNumber).toBe(1);
+  });
+
+  test("ignores a native Emby payload that was not played to completion", () => {
+    expect(
+      parseEmbyPayload({
+        Event: "playback.stop",
+        User: { Name: "u", Id: "1" },
+        Item: {
+          Type: "Episode",
+          Name: "Pilot",
+          SeriesName: "Lost",
+          ParentIndexNumber: 1,
+          IndexNumber: 1,
+          ProviderIds: { Tvdb: "127131" },
+        },
+        PlaybackInfo: { PlayedToCompletion: false },
+      }),
+    ).toBeNull();
   });
 
   test("returns null for non-stop events", () => {
@@ -567,6 +640,51 @@ describe("processWebhook", () => {
     const result = await processWebhook(connectionId, userId, "plex", event);
     expect(result.status).toBe("error");
     expect(result.message).toContain("S1E99 not found");
+  });
+
+  test("refreshes when the season exists but the episode is missing", async () => {
+    mockResolveShowTmdbId.mockResolvedValue(1396);
+    insertTvShow("tv-1", 1396, 1, 1, { title: "Breaking Bad" });
+    mockGetOrFetchTitleByTmdbId.mockResolvedValue({ id: "tv-1" });
+    mockRefreshTvChildren.mockImplementation(async () => {
+      testDb
+        .insert(episodes)
+        .values({ id: "tv-1-s1e2", seasonId: "tv-1-s1", episodeNumber: 2, name: "S1E2" })
+        .run();
+    });
+
+    const event: WebhookEvent = {
+      provider: "plex",
+      mediaType: "episode",
+      title: "E2",
+      showTitle: "Breaking Bad",
+      seasonNumber: 1,
+      episodeNumber: 2,
+    };
+
+    const result = await processWebhook(connectionId, userId, "plex", event);
+    expect(result.status).toBe("success");
+    expect(mockGetTvDetails).toHaveBeenCalledTimes(1);
+  });
+
+  test("ignores specials without refetching the show", async () => {
+    mockResolveShowTmdbId.mockResolvedValue(1396);
+    insertTvShow("tv-1", 1396, 1, 1, { title: "Breaking Bad" });
+    mockGetOrFetchTitleByTmdbId.mockResolvedValue({ id: "tv-1" });
+
+    const event: WebhookEvent = {
+      provider: "plex",
+      mediaType: "episode",
+      title: "Special",
+      showTitle: "Breaking Bad",
+      seasonNumber: 0,
+      episodeNumber: 1,
+    };
+
+    const result = await processWebhook(connectionId, userId, "plex", event);
+    expect(result.status).toBe("ignored");
+    expect(mockGetTvDetails).not.toHaveBeenCalled();
+    expect(mockRefreshTvChildren).not.toHaveBeenCalled();
   });
 
   test("returns error when episode is missing season/episode numbers", async () => {

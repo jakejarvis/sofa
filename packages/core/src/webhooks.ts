@@ -109,7 +109,9 @@ export function parseJellyfinPayload(body: Record<string, unknown>): WebhookEven
   const isEpisode = itemType === "Episode";
   if (!isMovie && !isEpisode) return null;
 
-  const tmdbId = toOptionalInt(body.Provider_tmdb);
+  // Item-level TMDB ids on episode events identify the episode, not the series
+  // (same as Plex, see #53) — rely on IMDb/TVDB/title to resolve the show.
+  const tmdbId = isMovie ? toOptionalInt(body.Provider_tmdb) : undefined;
 
   return {
     provider: "jellyfin",
@@ -128,7 +130,13 @@ export function parseEmbyPayload(body: Record<string, unknown>): WebhookEvent | 
   // Emby sends "playback.stop" or "PlaybackStop" depending on webhook plugin version
   const event = body.Event as string | undefined;
   if (event !== "playback.stop" && event !== "PlaybackStop") return null;
-  if (body.PlayedToCompletion !== true) return null;
+
+  // Native Emby webhooks (4.7.9+) nest the flag under PlaybackInfo; older plugin
+  // payloads put it at the top level. Accept either.
+  const playbackInfo = body.PlaybackInfo as Record<string, unknown> | undefined;
+  const playedToCompletion =
+    body.PlayedToCompletion === true || playbackInfo?.PlayedToCompletion === true;
+  if (!playedToCompletion) return null;
 
   const item = body.Item as Record<string, unknown> | undefined;
   if (!item) return null;
@@ -139,7 +147,9 @@ export function parseEmbyPayload(body: Record<string, unknown>): WebhookEvent | 
   if (!isMovie && !isEpisode) return null;
 
   const providerIds = (item.ProviderIds ?? {}) as Record<string, string>;
-  const tmdbId = toOptionalInt(providerIds.Tmdb);
+  // Item-level TMDB ids on episode events identify the episode, not the series
+  // (same as Plex, see #53) — rely on IMDb/TVDB/title to resolve the show.
+  const tmdbId = isMovie ? toOptionalInt(providerIds.Tmdb) : undefined;
 
   return {
     provider: "emby",
@@ -277,12 +287,25 @@ export async function processWebhook(
       // Find the episode in our DB
       let season = findSeasonByTitleAndNumber(title.id, resolved.seasonNumber);
 
-      if (!season) {
-        // Season might be newly released — try refreshing from TMDB
+      // Sofa doesn't store specials (season 0). Don't refetch the whole show for them.
+      if (!season && resolved.seasonNumber === 0) {
+        logEvent(connectionId, event, "ignored", "Specials (season 0) are not tracked");
+        return { status: "ignored", message: "Specials are not tracked" };
+      }
+
+      let episode = season
+        ? findEpisodeBySeasonAndNumber(season.id, resolved.episodeNumber)
+        : undefined;
+
+      if (!episode) {
+        // Season or episode may be newer than our last TMDB fetch — refresh once.
         try {
           const show = await getTvDetails(resolved.showTmdbId);
           await refreshTvChildren(title.id, resolved.showTmdbId, show.number_of_seasons);
           season = findSeasonByTitleAndNumber(title.id, resolved.seasonNumber);
+          episode = season
+            ? findEpisodeBySeasonAndNumber(season.id, resolved.episodeNumber)
+            : undefined;
         } catch (err) {
           log.warn(`Failed to refresh seasons for TMDB ${resolved.showTmdbId}:`, err);
         }
@@ -295,8 +318,6 @@ export async function processWebhook(
           message: `Season ${resolved.seasonNumber} not found`,
         };
       }
-
-      const episode = findEpisodeBySeasonAndNumber(season.id, resolved.episodeNumber);
 
       if (!episode) {
         logEvent(
