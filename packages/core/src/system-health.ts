@@ -1,8 +1,9 @@
 import { access, constants, readdir } from "node:fs/promises";
 import path from "node:path";
 
-import { CACHE_DIR, DATA_DIR, DATABASE_URL, TMDB_API_BASE_URL } from "@sofa/config";
+import { CACHE_DIR, DATA_DIR, DATABASE_URL } from "@sofa/config";
 import { getLatestCronRuns, getTableCounts } from "@sofa/db/queries/system-health";
+import { tmdbApiUrl } from "@sofa/tmdb/config";
 
 import { listBackups } from "./backup";
 import { imageCacheEnabled } from "./image-cache";
@@ -98,7 +99,7 @@ async function getTmdbHealth(): Promise<SystemHealthData["tmdb"]> {
 
   try {
     const start = performance.now();
-    const res = await fetch(`${TMDB_API_BASE_URL}/configuration`, {
+    const res = await fetch(tmdbApiUrl("/configuration"), {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",

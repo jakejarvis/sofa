@@ -2,6 +2,7 @@ import createClient, { type Middleware } from "openapi-fetch";
 
 import { createLogger } from "@sofa/logger";
 
+import { resolveTmdbBase } from "./config";
 import type { operations, paths } from "./schema";
 
 const log = createLogger("tmdb");
@@ -103,18 +104,13 @@ function getApiKey() {
   return key;
 }
 
-// The default TMDB base URL ends with /3, matching the schema's /3/… paths.
-// Custom proxy URLs (e.g. https://tmdb.internal) may omit /3 — those worked
-// before because the old client built paths like /search/multi against the
-// custom base. To preserve that, we always strip /3 from the configured URL
-// and use the schema paths as-is (they already include /3/).
-const DEFAULT_TMDB_BASE = "https://api.themoviedb.org/3";
-const configuredBase = process.env.TMDB_API_BASE_URL || DEFAULT_TMDB_BASE;
-const isCustomBase = configuredBase !== DEFAULT_TMDB_BASE;
+// Schema paths start with /3/…. resolveTmdbBase decides whether the configured
+// base already carries /3 (keep paths as-is) or is a proxy mounted at the API
+// root (strip /3 from each request path). See ./config.
 const TMDB_VERSION_PREFIX_RE = /^\/3\//;
-const baseUrl = configuredBase.replace(/\/3\/?$/, "");
+const { baseUrl, stripVersionPrefix } = resolveTmdbBase(process.env.TMDB_API_BASE_URL);
 
-const baseUrlRewriteMiddleware: Middleware | null = isCustomBase
+const baseUrlRewriteMiddleware: Middleware | null = stripVersionPrefix
   ? {
       async onRequest({ request }) {
         // Custom proxy: strip the /3 prefix from schema paths so requests
