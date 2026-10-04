@@ -1362,6 +1362,18 @@ describe("parseTraktExport", () => {
     );
   });
 
+  test("accepts a JSON file with a UTF-8 byte-order mark", async () => {
+    const bytes = new Uint8Array([
+      0xef,
+      0xbb,
+      0xbf,
+      ...new TextEncoder().encode(JSON.stringify(historyItems)),
+    ]);
+    const result = await parseTraktExport(new Blob([bytes], { type: "application/json" }));
+    expect(result.data.movies).toHaveLength(1);
+    expect(result.data.episodes).toHaveLength(1);
+  });
+
   test("skips an unparsable JSON entry inside the ZIP", async () => {
     const zip = createZip({
       "watched-history-1.json": JSON.stringify(historyItems),

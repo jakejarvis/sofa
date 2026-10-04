@@ -424,6 +424,11 @@ function addTraktDocument(agg: TraktAggregate, json: unknown): void {
   }
 }
 
+/** JSON.parse that tolerates a leading UTF-8 BOM (as Blob.json() does). */
+function parseJsonText(text: string): unknown {
+  return JSON.parse(text.charCodeAt(0) === 0xfeff ? text.slice(1) : text);
+}
+
 /**
  * Parse an uploaded Trakt export: Trakt's official ZIP (watched-history-*.json,
  * ratings-*.json, lists-watchlist.json, …), any single JSON file from it, or the
@@ -447,7 +452,7 @@ export async function parseTraktExport(file: Blob): Promise<ParseResult> {
       const name = entry.entryName.split("/").pop() ?? entry.entryName;
       if (!name.toLowerCase().endsWith(".json")) continue;
       try {
-        addTraktDocument(agg, JSON.parse(entry.getData().toString("utf-8")));
+        addTraktDocument(agg, parseJsonText(entry.getData().toString("utf-8")));
       } catch {
         log.debug(`Skipping unreadable Trakt export entry: ${entry.entryName}`);
       }
@@ -455,7 +460,7 @@ export async function parseTraktExport(file: Blob): Promise<ParseResult> {
   } else {
     let json: unknown;
     try {
-      json = JSON.parse(buf.toString("utf8"));
+      json = parseJsonText(buf.toString("utf8"));
     } catch {
       throw new Error("Invalid JSON file");
     }
