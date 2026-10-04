@@ -60,6 +60,13 @@ function flattenSimklItems(items: SimklApiItem[], mediaKey: "movie" | "show") {
   });
 }
 
+/** Simkl returns `{ movies: [...] }` / `{ shows: [...] }` / `{ anime: [...] }` (or `{}` when empty). */
+function unwrapAllItems(body: unknown, key: "movies" | "shows" | "anime"): SimklApiItem[] {
+  if (Array.isArray(body)) return body as SimklApiItem[];
+  const list = (body as Record<string, unknown> | null)?.[key];
+  return Array.isArray(list) ? (list as SimklApiItem[]) : [];
+}
+
 // ─── Provider ────────────────────────────────────────────────
 
 export const simkl: ImportProvider = {
@@ -86,23 +93,28 @@ export const simkl: ImportProvider = {
   },
 
   async pollForToken(clientId, _clientSecret, deviceCode): Promise<PollResult> {
-    const res = await fetch(`${API_BASE}/oauth/pin/${deviceCode}`, {
-      method: "GET",
-      headers: { "simkl-api-key": clientId },
-      signal: AbortSignal.timeout(10_000),
-    });
+    const res = await fetch(
+      `${API_BASE}/oauth/pin/${encodeURIComponent(deviceCode)}?client_id=${encodeURIComponent(clientId)}`,
+      {
+        method: "GET",
+        headers: { "simkl-api-key": clientId },
+        signal: AbortSignal.timeout(10_000),
+      },
+    );
 
     if (!res.ok) return { status: "pending" };
 
-    const data = (await res.json()) as {
-      result?: string;
-      access_token?: string;
-    };
+    let data: { result?: string; access_token?: string };
+    try {
+      data = (await res.json()) as { result?: string; access_token?: string };
+    } catch {
+      return { status: "pending" };
+    }
 
     if (data.result === "OK" && data.access_token) {
       return { status: "authorized", accessToken: data.access_token };
     }
-    if (data.result === "KO") return { status: "denied" };
+    // Simkl answers "KO" until the user enters the PIN; expiry is enforced by the client's expires_in deadline.
     return { status: "pending" };
   },
 
@@ -124,16 +136,16 @@ export const simkl: ImportProvider = {
     }
 
     const [moviesData, showsData, animeData] = await Promise.all([
-      moviesRes.ok ? (moviesRes.json() as Promise<SimklApiItem[]>) : ([] as SimklApiItem[]),
-      showsRes.ok ? (showsRes.json() as Promise<SimklApiItem[]>) : ([] as SimklApiItem[]),
-      animeRes.ok ? (animeRes.json() as Promise<SimklApiItem[]>) : ([] as SimklApiItem[]),
+      moviesRes.ok ? (moviesRes.json() as Promise<unknown>) : ([] as unknown),
+      showsRes.ok ? (showsRes.json() as Promise<unknown>) : ([] as unknown),
+      animeRes.ok ? (animeRes.json() as Promise<unknown>) : ([] as unknown),
     ]);
 
     // Return flattened API response — parsing happens on the self-hosted server
     return {
-      movies: flattenSimklItems(moviesData, "movie"),
-      shows: flattenSimklItems(showsData, "show"),
-      anime: flattenSimklItems(animeData, "show"),
+      movies: flattenSimklItems(unwrapAllItems(moviesData, "movies"), "movie"),
+      shows: flattenSimklItems(unwrapAllItems(showsData, "shows"), "show"),
+      anime: flattenSimklItems(unwrapAllItems(animeData, "anime"), "show"),
     };
   },
 };
