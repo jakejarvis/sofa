@@ -40,7 +40,6 @@ export const Route = createFileRoute("/_app/library")({
           initialPageParam: 1,
           getNextPageParam: (lastPage) =>
             lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-          maxPages: 10,
         }),
       ),
       context.queryClient.ensureQueryData(orpc.library.genres.queryOptions()),
@@ -154,7 +153,6 @@ function LibraryPage() {
       initialPageParam: 1,
       getNextPageParam: (lastPage) =>
         lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-      maxPages: 10,
     }),
   );
 

@@ -76,7 +76,6 @@ export default function PersonDetailScreen() {
         initialPageParam: 1,
         getNextPageParam: (lastPage) =>
           lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-        maxPages: 10,
       }),
     );
 

@@ -67,7 +67,6 @@ export default function UpcomingScreen() {
         }),
         initialPageParam: undefined as string | undefined,
         getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-        maxPages: 10,
       }),
     );
 

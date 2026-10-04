@@ -31,7 +31,6 @@ export const Route = createFileRoute("/_app/upcoming")({
         }),
         initialPageParam: undefined as string | undefined,
         getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-        maxPages: 10,
       }),
     );
   },
@@ -81,7 +80,6 @@ function UpcomingPage() {
       }),
       initialPageParam: undefined as string | undefined,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-      maxPages: 10,
     }),
   );
 
