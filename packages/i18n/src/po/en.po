@@ -750,6 +750,14 @@ msgstr ""
 msgid "Connect with {sourceLabel}"
 msgstr "Connect with {sourceLabel}"
 
+#: apps/web/src/components/settings/imports-section.tsx
+msgid "Connect your Simkl account or upload a JSON export"
+msgstr "Connect your Simkl account or upload a JSON export"
+
+#: apps/web/src/components/settings/imports-section.tsx
+msgid "Connect your Trakt account or upload your Trakt export (ZIP or JSON)"
+msgstr "Connect your Trakt account or upload your Trakt export (ZIP or JSON)"
+
 #: apps/native/src/app/(auth)/server-url.tsx
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/system-health-section.tsx
@@ -3428,6 +3436,10 @@ msgstr ""
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Upload profile picture"
 msgstr ""
+
+#: apps/web/src/components/settings/imports-section.tsx
+msgid "Upload the ZIP export from your Letterboxd account settings"
+msgstr "Upload the ZIP export from your Letterboxd account settings"
 
 #: apps/native/src/components/settings/integration-card.tsx
 msgid "URL copied to clipboard"

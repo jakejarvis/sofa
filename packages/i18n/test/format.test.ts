@@ -7,6 +7,7 @@ vi.mock("../src/index", () => ({
 import {
   formatBytes,
   formatDate,
+  formatList,
   formatNumber,
   formatRelativeTime,
   formatShortDate,
@@ -144,5 +145,19 @@ describe("formatBytes", () => {
 
   test("fractional megabytes", () => {
     expect(formatBytes(1536 * 1024)).toBe("1.5 MB");
+  });
+});
+
+describe("formatList", () => {
+  test("joins items as a conjunction by default", () => {
+    expect(formatList(["A", "B", "C"])).toBe("A, B, and C");
+  });
+
+  test("supports disjunctions", () => {
+    expect(formatList(["ZIP", "JSON"], { type: "disjunction" })).toBe("ZIP or JSON");
+  });
+
+  test("returns a single item unchanged", () => {
+    expect(formatList(["ZIP"], { type: "disjunction" })).toBe("ZIP");
   });
 });

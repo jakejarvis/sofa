@@ -63,3 +63,7 @@ export function formatBytes(bytes: number): string {
   const value = bytes / k ** i;
   return `${new Intl.NumberFormat(i18n.locale, { maximumFractionDigits: 1 }).format(value)} ${sizes[i]}`;
 }
+
+export function formatList(items: string[], options?: Intl.ListFormatOptions): string {
+  return new Intl.ListFormat(i18n.locale, options).format(items);
+}

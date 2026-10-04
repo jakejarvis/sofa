@@ -1,3 +1,5 @@
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconCloudUpload, IconLink } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -22,6 +24,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { getErrorMessage } from "@/lib/error-messages";
 import { client, orpc } from "@/lib/orpc/client";
 import type { NormalizedImport } from "@sofa/api/schemas";
+import { formatList } from "@sofa/i18n/format";
 
 // ─── Source Configs ──────────────────────────────────────────
 
@@ -30,10 +33,19 @@ type ImportSource = "trakt" | "simkl" | "letterboxd";
 interface SourceConfig {
   source: ImportSource;
   label: string;
-  description: string;
+  description: MessageDescriptor;
   accept: string;
   icon: React.ReactNode;
   supportsOAuth: boolean;
+}
+
+/** Turns an `accept` string like ".json,.zip" into a readable label like "JSON or ZIP". */
+function formatAcceptLabel(accept: string): string {
+  const formats = accept
+    .split(",")
+    .map((ext) => ext.trim().replace(/^\./, "").toUpperCase())
+    .filter(Boolean);
+  return formatList(formats, { type: "disjunction" });
 }
 
 // ─── Provider Logos ──────────────────────────────────────────
@@ -99,7 +111,7 @@ const SOURCES: SourceConfig[] = [
   {
     source: "trakt",
     label: "Trakt",
-    description: "Connect your Trakt account or upload your Trakt export (ZIP or JSON)",
+    description: msg`Connect your Trakt account or upload your Trakt export (ZIP or JSON)`,
     accept: ".json,.zip",
     icon: <TraktLogo className="text-primary size-4" />,
     supportsOAuth: true,
@@ -107,7 +119,7 @@ const SOURCES: SourceConfig[] = [
   {
     source: "simkl",
     label: "Simkl",
-    description: "Connect your Simkl account or upload a JSON export",
+    description: msg`Connect your Simkl account or upload a JSON export`,
     accept: ".json",
     icon: <SimklLogo className="text-primary size-4" />,
     supportsOAuth: true,
@@ -115,7 +127,7 @@ const SOURCES: SourceConfig[] = [
   {
     source: "letterboxd",
     label: "Letterboxd",
-    description: "Upload the ZIP export from your Letterboxd account settings",
+    description: msg`Upload the ZIP export from your Letterboxd account settings`,
     accept: ".zip",
     icon: <LetterboxdLogo className="text-primary size-4" />,
     supportsOAuth: false,
@@ -179,7 +191,7 @@ export function ImportsSection() {
 // ─── Source Card ─────────────────────────────────────────────
 
 function ImportSourceCard({ config }: { config: SourceConfig }) {
-  const { t } = useLingui();
+  const { i18n, t } = useLingui();
   const { data: systemStatus } = useQuery(orpc.system.status.queryOptions());
   const publicApiUrl = systemStatus?.publicApiUrl ?? "https://public-api.sofa.watch";
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -453,7 +465,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
             </div>
             <div>
               <CardTitle>{config.label}</CardTitle>
-              <CardDescription>{config.description}</CardDescription>
+              <CardDescription>{i18n._(config.description)}</CardDescription>
             </div>
           </div>
           <input
@@ -548,7 +560,7 @@ function ChooseStep({
 }) {
   const { t } = useLingui();
   const sourceLabel = config.label;
-  const acceptFormat = config.accept;
+  const acceptFormat = formatAcceptLabel(config.accept);
   return (
     <>
       <DialogHeader>
