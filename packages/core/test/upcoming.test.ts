@@ -220,6 +220,61 @@ describe("cursor pagination", () => {
   });
 });
 
+// ── Cursor pagination edge cases ────────────────────────────────────
+
+function collectAllTitles(limit: number) {
+  const names: string[] = [];
+  let cursor: string | undefined;
+  for (let guard = 0; guard < 50; guard++) {
+    const page = getUpcomingFeed("user-1", { days: 30, limit, cursor });
+    names.push(...page.items.map((i) => `${i.titleName}#${i.episodeNumber ?? "-"}`));
+    if (!page.nextCursor) break;
+    cursor = page.nextCursor;
+  }
+  return names;
+}
+
+describe("cursor pagination edge cases", () => {
+  test("handles non-Latin-1 title names at a page boundary", () => {
+    insertTvShow("tv-s", 201, 1, 1, { title: "Shōgun", airDates: [daysFromNow(1)] });
+    insertTvShow("tv-z", 202, 1, 1, { title: "Zzz Show", airDates: [daysFromNow(2)] });
+    insertStatus("user-1", "tv-s", "in_progress");
+    insertStatus("user-1", "tv-z", "in_progress");
+
+    const page1 = getUpcomingFeed("user-1", { days: 30, limit: 1 });
+    expect(page1.items.map((i) => i.titleName)).toEqual(["Shōgun"]);
+    expect(page1.nextCursor).not.toBeNull();
+
+    const page2 = getUpcomingFeed("user-1", { days: 30, limit: 1, cursor: page1.nextCursor! });
+    expect(page2.items.map((i) => i.titleName)).toEqual(["Zzz Show"]);
+  });
+
+  test("does not skip mixed-case names airing on the same date", () => {
+    const d = daysFromNow(1);
+    insertTvShow("tv-a", 211, 1, 1, { title: "apple show", airDates: [d] });
+    insertTvShow("tv-b", 212, 1, 1, { title: "Banana Show", airDates: [d] });
+    insertTvShow("tv-c", 213, 1, 1, { title: "cherry show", airDates: [d] });
+    insertStatus("user-1", "tv-a", "in_progress");
+    insertStatus("user-1", "tv-b", "in_progress");
+    insertStatus("user-1", "tv-c", "in_progress");
+
+    const all = getUpcomingFeed("user-1", { days: 30, limit: 50 }).items.map(
+      (i) => `${i.titleName}#${i.episodeNumber ?? "-"}`,
+    );
+    const paged = collectAllTitles(1);
+    expect(paged).toHaveLength(3);
+    expect(paged).toEqual(all);
+  });
+
+  test("does not skip a second same-day episode split across pages", () => {
+    const d = daysFromNow(1);
+    insertTvShow("tv-x", 300, 1, 2, { title: "Pair Show", airDates: [d, d] });
+    insertStatus("user-1", "tv-x", "in_progress");
+
+    expect(collectAllTitles(1)).toEqual(["Pair Show#1", "Pair Show#2"]);
+  });
+});
+
 // ── isNewSeason ─────────────────────────────────────────────────────
 
 describe("isNewSeason", () => {
