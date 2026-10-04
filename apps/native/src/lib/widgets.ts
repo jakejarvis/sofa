@@ -7,6 +7,7 @@ import type { ContinueWatchingProps } from "@/widgets/continue-watching";
 import type { UpcomingProps } from "@/widgets/upcoming";
 
 import {
+  clearWidgetImages,
   copyBundledAsset,
   downloadWidgetImage,
   pruneWidgetImages,
@@ -113,6 +114,52 @@ async function ensureIcon(): Promise<string> {
   }
 }
 
+function emptyContinueWatchingProps(iconFilePath: string): ContinueWatchingProps {
+  return sanitizeProps<ContinueWatchingProps>({
+    iconFilePath,
+    titleId: "",
+    titleName: "",
+    imageFilePath: "",
+    watchedEpisodes: 0,
+    totalEpisodes: 0,
+    isMovie: false,
+  });
+}
+
+function emptyUpcomingProps(iconFilePath: string): UpcomingProps {
+  return sanitizeProps<UpcomingProps>({
+    iconFilePath,
+    titleId: "",
+    titleName: "",
+    imageFilePath: "",
+    titleType: "tv",
+    episodeCount: 0,
+    dateLabel: "",
+    episodeLabel: "",
+  });
+}
+
+/** Replace widget content with empty states and delete cached artwork (sign-out / server change). */
+export async function resetWidgets(): Promise<void> {
+  if (Platform.OS !== "ios") return;
+
+  const [{ default: ContinueWatchingWidget }, { default: UpcomingWidget }] = await Promise.all([
+    import("@/widgets/continue-watching"),
+    import("@/widgets/upcoming"),
+  ]);
+
+  try {
+    await clearWidgetImages();
+  } catch (error) {
+    console.warn("[Widgets] Failed to clear cached images:", error);
+  }
+
+  // clearWidgetImages() also removes the cached icon, so copy it again.
+  const iconFilePath = await ensureIcon();
+  ContinueWatchingWidget.updateSnapshot(emptyContinueWatchingProps(iconFilePath));
+  UpcomingWidget.updateSnapshot(emptyUpcomingProps(iconFilePath));
+}
+
 export async function refreshWidgets(): Promise<void> {
   if (Platform.OS !== "ios") return;
 
@@ -143,17 +190,7 @@ async function refreshContinueWatching(
     const { items } = await client.library.continueWatching();
 
     if (items.length === 0) {
-      widget.updateSnapshot(
-        sanitizeProps<ContinueWatchingProps>({
-          iconFilePath,
-          titleId: "",
-          titleName: "",
-          imageFilePath: "",
-          watchedEpisodes: 0,
-          totalEpisodes: 0,
-          isMovie: false,
-        }),
-      );
+      widget.updateSnapshot(emptyContinueWatchingProps(iconFilePath));
       return;
     }
 
@@ -206,18 +243,7 @@ async function refreshUpcoming(
     });
 
     if (items.length === 0) {
-      widget.updateSnapshot(
-        sanitizeProps<UpcomingProps>({
-          iconFilePath,
-          titleId: "",
-          titleName: "",
-          imageFilePath: "",
-          titleType: "tv",
-          episodeCount: 0,
-          dateLabel: "",
-          episodeLabel: "",
-        }),
-      );
+      widget.updateSnapshot(emptyUpcomingProps(iconFilePath));
       return;
     }
 

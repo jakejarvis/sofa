@@ -18,6 +18,7 @@ const copyBundledAsset = vi.fn<(assetUri: string, key: string) => Promise<string
   async (_assetUri: string, key: string) => `file:///group/${key}`,
 );
 const pruneWidgetImages = vi.fn<() => Promise<void>>(async () => undefined);
+const clearWidgetImages = vi.fn<() => Promise<void>>(async () => undefined);
 const getWidgetIconAsset = vi.fn<() => string>(() => "widget-icon-asset");
 
 const continueWatchingWidget = {
@@ -55,6 +56,7 @@ vi.mock("@/lib/server", () => ({
 }));
 
 vi.mock("../../modules/sofa-widgets-support", () => ({
+  clearWidgetImages,
   copyBundledAsset,
   downloadWidgetImage,
   pruneWidgetImages,
@@ -88,6 +90,7 @@ beforeEach(() => {
     async (_assetUri: string, key: string) => `file:///group/${key}`,
   );
   pruneWidgetImages.mockResolvedValue(undefined);
+  clearWidgetImages.mockResolvedValue(undefined);
   resolveAssetSource.mockReturnValue({ uri: "file:///tmp/sofa-icon.png" });
   getWidgetIconAsset.mockReturnValue("widget-icon-asset");
 });
@@ -218,5 +221,42 @@ describe("refreshWidgets", () => {
     expect(downloadWidgetImage).not.toHaveBeenCalled();
     expect(copyBundledAsset).not.toHaveBeenCalled();
     expect(pruneWidgetImages).not.toHaveBeenCalled();
+  });
+});
+
+describe("resetWidgets", () => {
+  test("clears cached images and writes empty snapshots", async () => {
+    const { resetWidgets } = await loadWidgetsModule();
+    await resetWidgets();
+
+    expect(clearWidgetImages).toHaveBeenCalledTimes(1);
+    expect(continueWatchingWidget.updateSnapshot).toHaveBeenCalledTimes(1);
+    expect(upcomingWidget.updateSnapshot).toHaveBeenCalledTimes(1);
+    expect(continueWatchingWidget.updateSnapshot).toHaveBeenCalledWith(
+      expect.objectContaining({ titleId: "", iconFilePath: "file:///group/sofa_icon.png" }),
+    );
+    expect(upcomingWidget.updateSnapshot).toHaveBeenCalledWith(
+      expect.objectContaining({ titleId: "", iconFilePath: "file:///group/sofa_icon.png" }),
+    );
+    expect(continueWatching).not.toHaveBeenCalled();
+    expect(upcoming).not.toHaveBeenCalled();
+    // The icon lives in the cleared directory, so it must be copied again afterwards.
+    expect(clearWidgetImages.mock.invocationCallOrder[0]).toBeLessThan(
+      copyBundledAsset.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  test("is a no-op outside iOS", async () => {
+    platform.OS = "android";
+
+    const { resetWidgets } = await loadWidgetsModule();
+    await resetWidgets();
+
+    expect(clearWidgetImages).not.toHaveBeenCalled();
+    expect(copyBundledAsset).not.toHaveBeenCalled();
+    expect(continueWatchingWidget.updateSnapshot).not.toHaveBeenCalled();
+    expect(upcomingWidget.updateSnapshot).not.toHaveBeenCalled();
+    expect(continueWatching).not.toHaveBeenCalled();
+    expect(upcoming).not.toHaveBeenCalled();
   });
 });
