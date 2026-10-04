@@ -23,3 +23,14 @@ export const TMDB_IMAGE_BASE_URL = process.env.TMDB_IMAGE_BASE_URL || "https://i
 // ─── Watch providers ──────────────────────────────────────────
 
 export const WATCH_REGION = process.env.WATCH_REGION || "US";
+
+// ─── Dates ───────────────────────────────────────────────────
+
+/**
+ * Calendar date (YYYY-MM-DD) in the server's local timezone. TMDB air/release
+ * dates are date-only, so "has it aired?" must compare against one consistent
+ * notion of today — the server's (set via TZ).
+ */
+export function localDateString(d: Date = new Date()): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}

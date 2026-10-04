@@ -1,5 +1,7 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
 
+import { localDateString } from "@sofa/config";
+
 import { db } from "../client";
 import {
   episodes,
@@ -226,7 +228,7 @@ export function getUserStatusesByTitleIds(userId: string, titleIds: string[]) {
 
 export function getEpisodeProgressByTitleIds(userId: string, titleIds: string[]) {
   if (titleIds.length === 0) return [];
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateString();
   return db
     .select({
       titleId: titles.id,

@@ -1,5 +1,7 @@
 import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 
+import { localDateString } from "@sofa/config";
+
 import { db } from "../client";
 import {
   episodes,
@@ -82,7 +84,7 @@ export function getUserStatusCounts(userId: string) {
     .all();
 
   // Count TV shows where all aired episodes are watched (caught_up + completed display states)
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateString();
   const [tvRow] = db
     .select({ count: sql<number>`count(*)` })
     .from(userTitleStatus)

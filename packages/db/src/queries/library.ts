@@ -1,5 +1,7 @@
 import { and, asc, countDistinct, desc, eq, gte, isNotNull, lte, sql } from "drizzle-orm";
 
+import { localDateString } from "@sofa/config";
+
 import { db } from "../client";
 import {
   episodes,
@@ -51,7 +53,7 @@ function watchedEpisodeCount(
 }
 
 function displayStatusExpr() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateString();
   const aired = airedEpisodeCount(titles.id, today);
   const watched = watchedEpisodeCount(titles.id, userTitleStatus.userId, today);
 

@@ -1,3 +1,4 @@
+import { localDateString } from "@sofa/config";
 import {
   getAllTrackedTitleIds,
   getAvailabilityByTitleIds,
@@ -24,10 +25,6 @@ import { tmdbImageUrl } from "@sofa/tmdb/image";
 
 import type { DisplayStatus } from "./display-status";
 import { getDisplayStatusesByTitleIds } from "./tracking";
-
-function formatLocalDate(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
 
 export type TimePeriod = "today" | "this_week" | "this_month" | "this_year";
 
@@ -234,7 +231,8 @@ export function getContinueWatchingFeed(userId: string): ContinueWatchingItem[] 
   }
 
   const items: ContinueWatchingItem[] = [];
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateString();
+  const isAired = (airDate: string | null) => airDate != null && airDate <= today;
 
   for (const row of inProgress) {
     const title = titleMap.get(row.titleId);
@@ -248,27 +246,31 @@ export function getContinueWatchingFeed(userId: string): ContinueWatchingItem[] 
 
     for (const s of titleSeasonsArr) {
       const eps = episodesBySeason.get(s.id) ?? [];
-      totalEpisodes += eps.length;
 
       for (const ep of eps) {
+        const aired = isAired(ep.airDate);
         if (watchedEpisodeIds.has(ep.id)) {
-          watchedEpisodes++;
           const watchDate = watchDateMap.get(ep.id);
           if (watchDate && (!lastWatchedAt || watchDate > lastWatchedAt)) {
             lastWatchedAt = watchDate;
           }
-        } else if (!nextEpisode) {
-          // Skip episodes not yet aired
-          if (ep.airDate && ep.airDate > today) continue;
-          nextEpisode = {
-            id: ep.id,
-            seasonNumber: s.seasonNumber,
-            episodeNumber: ep.episodeNumber,
-            name: ep.name,
-            stillPath: ep.stillPath,
-            stillThumbHash: ep.stillThumbHash,
-            overview: ep.overview,
-          };
+          if (aired) {
+            totalEpisodes++;
+            watchedEpisodes++;
+          }
+        } else if (aired) {
+          totalEpisodes++;
+          if (!nextEpisode) {
+            nextEpisode = {
+              id: ep.id,
+              seasonNumber: s.seasonNumber,
+              episodeNumber: ep.episodeNumber,
+              name: ep.name,
+              stillPath: ep.stillPath,
+              stillThumbHash: ep.stillThumbHash,
+              overview: ep.overview,
+            };
+          }
         }
       }
     }
@@ -441,10 +443,10 @@ export function getUpcomingFeed(
   const storedStatuses = statusFilter?.map((s) => (s === "watching" ? "in_progress" : s));
 
   const now = new Date();
-  const today = formatLocalDate(now);
+  const today = localDateString(now);
   const horizon = new Date();
   horizon.setDate(horizon.getDate() + days);
-  const toDate = formatLocalDate(horizon);
+  const toDate = localDateString(horizon);
 
   // Use the cursor date as the lower bound so later pages skip already-seen dates,
   // but don't apply a DB-level LIMIT so same-day items aren't truncated.

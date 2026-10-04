@@ -23,27 +23,34 @@ export function getNextEpisode(
   seasons: Season[],
   watchedEpisodeIds: Set<string>,
 ): NextEpisodeResult {
-  const today = new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  // Device-local calendar date; TMDB air dates are date-only.
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   let nextEpisode: NextEpisodeInfo | null = null;
   let totalEpisodes = 0;
   let watchedEpisodes = 0;
 
   for (const season of seasons) {
     for (const ep of season.episodes) {
-      totalEpisodes++;
+      // Undated (TBA) episodes are treated as unaired.
+      const aired = ep.airDate != null && ep.airDate <= today;
       if (watchedEpisodeIds.has(ep.id)) {
-        watchedEpisodes++;
-      } else if (!nextEpisode) {
-        // Skip episodes not yet aired
-        if (ep.airDate && ep.airDate > today) continue;
-        nextEpisode = {
-          id: ep.id,
-          seasonNumber: season.seasonNumber,
-          episodeNumber: ep.episodeNumber,
-          name: ep.name,
-          stillPath: ep.stillPath,
-          stillThumbHash: ep.stillThumbHash,
-        };
+        if (aired) {
+          totalEpisodes++;
+          watchedEpisodes++;
+        }
+      } else if (aired) {
+        totalEpisodes++;
+        if (!nextEpisode) {
+          nextEpisode = {
+            id: ep.id,
+            seasonNumber: season.seasonNumber,
+            episodeNumber: ep.episodeNumber,
+            name: ep.name,
+            stillPath: ep.stillPath,
+            stillThumbHash: ep.stillThumbHash,
+          };
+        }
       }
     }
   }
