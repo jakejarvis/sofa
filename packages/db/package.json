@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./backup-tables": "./src/backup-tables.ts",
     "./client": "./src/client.ts",
     "./migrate": "./src/migrate.ts",
     "./schema": "./src/schema.ts",

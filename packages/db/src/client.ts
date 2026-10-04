@@ -3,14 +3,12 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { closeSync, openSync, readSync } from "node:fs";
 
 import type { Logger } from "drizzle-orm";
-import { getTableName } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
-import { SQLiteTable } from "drizzle-orm/sqlite-core";
 
 import { DATABASE_URL } from "@sofa/config";
 import { createLogger } from "@sofa/logger";
 
-import * as schema from "./schema";
+import { findMissingBackupTables } from "./backup-tables";
 
 const log = createLogger("drizzle");
 
@@ -119,10 +117,6 @@ export function closeDatabase() {
 
 const SQLITE_MAGIC = "SQLite format 3\0";
 
-const REQUIRED_TABLES = Object.values(schema)
-  .filter((v) => v instanceof SQLiteTable)
-  .map((t) => getTableName(t as SQLiteTable));
-
 export function validateBackupDatabase(filePath: string): void {
   // Check SQLite magic bytes before opening with Database() to avoid
   // passing arbitrary files to the SQLite parser.
@@ -154,8 +148,7 @@ export function validateBackupDatabase(filePath: string): void {
     const tableRows = validationDb
       .query("SELECT name FROM sqlite_master WHERE type='table'")
       .all() as { name: string }[];
-    const tableSet = new Set(tableRows.map((row) => row.name));
-    const missing = REQUIRED_TABLES.filter((table) => !tableSet.has(table));
+    const missing = findMissingBackupTables(tableRows.map((row) => row.name));
     if (missing.length > 0) {
       throw new Error(`Invalid backup: missing required tables (${missing.join(", ")})`);
     }
