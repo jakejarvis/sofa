@@ -22,7 +22,7 @@ export const queryClient = new QueryClient({
       toast.error(i18n._(msg`Something went wrong…`), {
         action: {
           label: i18n._(msg`Retry`),
-          onClick: () => query.invalidate(),
+          onClick: () => void queryClient.refetchQueries({ queryKey: query.queryKey, exact: true }),
         },
       });
     },

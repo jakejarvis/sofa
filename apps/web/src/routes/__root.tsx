@@ -4,12 +4,7 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
-import {
-  createRootRouteWithContext,
-  type ErrorComponentProps,
-  HeadContent,
-  Outlet,
-} from "@tanstack/react-router";
+import { createRootRouteWithContext, HeadContent, Outlet, useRouter } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Provider as StoreProvider } from "jotai";
 import { MotionConfig } from "motion/react";
@@ -148,8 +143,9 @@ function GlobalNotFound() {
   );
 }
 
-function GlobalError({ reset }: ErrorComponentProps) {
+function GlobalError() {
   const { t } = useLingui();
+  const router = useRouter();
 
   return (
     <div className="flex flex-col items-center gap-6 py-24 text-center">
@@ -171,7 +167,7 @@ function GlobalError({ reset }: ErrorComponentProps) {
         <button
           type="button"
           aria-label={t`Try again`}
-          onClick={reset}
+          onClick={() => void router.invalidate()}
           className="group bg-primary text-primary-foreground hover:shadow-primary/20 relative inline-flex h-10 items-center justify-center gap-2 overflow-hidden rounded-lg px-5 text-sm font-medium transition-shadow hover:shadow-lg"
         >
           <span className="relative z-10">
