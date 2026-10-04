@@ -6,6 +6,7 @@ import { logger } from "hono/logger";
 import { z } from "zod";
 
 import { getImporter, getImporterConfig, ProviderEnum } from "./importers";
+import { authorizedPollBody } from "./poll-response";
 
 const GITHUB_RELEASES_URL = "https://api.github.com/repos/jakejarvis/sofa/releases/latest";
 const VERSION_PREFIX_RE = /^v/;
@@ -192,7 +193,11 @@ app.post(
       // Fetch user data and return it inline
       try {
         const data = await importer.fetchUserData(result.accessToken, config.clientId);
-        return c.json({ status: "authorized", data });
+        const body = authorizedPollBody(data);
+        if (body.status === "fetch_error") {
+          console.warn(`Import payload for ${provider} exceeded the response size limit`);
+        }
+        return c.json(body);
       } catch (e) {
         // Auth succeeded but data fetch failed. Return a distinct status so
         // the client can show a meaningful error instead of polling forever.

@@ -24,6 +24,15 @@ function createLetterboxdZip(files: Record<string, string>): Blob {
 // ─── parseTraktPayload ───────────────────────────────────────────────
 
 describe("parseTraktPayload", () => {
+  test("passes through warnings from the OAuth proxy", () => {
+    const result = parseTraktPayload({
+      history: { movies: [] },
+      warnings: ["Only some history fit", 42],
+    } as never);
+    expect(result.warnings).toContain("Only some history fit");
+    expect(result.warnings.every((w) => typeof w === "string")).toBe(true);
+  });
+
   test("parses valid data with movies, episodes, watchlist, and ratings", () => {
     const result = parseTraktPayload({
       history: {

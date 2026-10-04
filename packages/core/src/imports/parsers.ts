@@ -277,8 +277,15 @@ export function parseTraktPayload(data: {
   history?: { movies?: TraktHistoryMovie[]; shows?: TraktHistoryEpisode[] };
   watchlist?: TraktWatchlistItem[];
   ratings?: TraktRatingItem[];
+  // Notes from the OAuth proxy (e.g. "history truncated"); ignored by older servers
+  warnings?: unknown;
 }): ParseResult {
   const warnings: string[] = [];
+  if (Array.isArray(data.warnings)) {
+    for (const warning of data.warnings) {
+      if (typeof warning === "string") warnings.push(warning);
+    }
+  }
   const movies: ImportMovie[] = [];
   const episodes: ImportEpisode[] = [];
   const watchlist: ImportWatchlistItem[] = [];
