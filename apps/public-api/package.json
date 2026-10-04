@@ -12,9 +12,9 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@hono/zod-validator": "0.7.6",
-    "@vercel/firewall": "1.1.2",
-    "hono": "4.12.9",
+    "@hono/zod-validator": "0.9.1",
+    "@vercel/firewall": "1.2.5",
+    "hono": "4.13.13",
     "zod": "catalog:"
   },
   "devDependencies": {

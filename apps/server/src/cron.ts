@@ -46,13 +46,13 @@ const DAY = 24 * 60 * 60 * 1000;
 const RATE_LIMIT_MS = 300;
 
 const globalForJobs = globalThis as unknown as {
-  _jobs: Map<string, Cron> | undefined;
+  cronJobs: Map<string, Cron> | undefined;
 };
 
-if (!globalForJobs._jobs) {
-  globalForJobs._jobs = new Map<string, Cron>();
+if (!globalForJobs.cronJobs) {
+  globalForJobs.cronJobs = new Map<string, Cron>();
 }
-const jobs = globalForJobs._jobs;
+const jobs = globalForJobs.cronJobs;
 
 function schedule(name: string, cron: string, handler: () => Promise<void>) {
   jobs.set(

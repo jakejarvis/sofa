@@ -4,7 +4,12 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
-import { createRootRouteWithContext, HeadContent, Outlet } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  type ErrorComponentProps,
+  HeadContent,
+  Outlet,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Provider as StoreProvider } from "jotai";
 import { MotionConfig } from "motion/react";
@@ -91,6 +96,8 @@ function AppShell() {
 }
 
 function GlobalNotFound() {
+  const { t } = useLingui();
+
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6">
       <div className="bg-primary/4 pointer-events-none absolute top-[40%] left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[160px]" />
@@ -121,6 +128,7 @@ function GlobalNotFound() {
         >
           <a
             href="/"
+            aria-label={t`Return home`}
             className="group bg-primary text-primary-foreground hover:shadow-primary/20 relative inline-flex h-10 items-center justify-center overflow-hidden rounded-lg px-6 text-sm font-medium transition-shadow hover:shadow-lg"
           >
             <span className="relative z-10">
@@ -140,7 +148,9 @@ function GlobalNotFound() {
   );
 }
 
-function GlobalError({ reset }: { error: Error; reset: () => void }) {
+function GlobalError({ reset }: ErrorComponentProps) {
+  const { t } = useLingui();
+
   return (
     <div className="flex flex-col items-center gap-6 py-24 text-center">
       <div className="border-destructive/20 bg-destructive/5 text-destructive flex size-14 items-center justify-center rounded-full border">
@@ -160,6 +170,7 @@ function GlobalError({ reset }: { error: Error; reset: () => void }) {
       <div className="flex items-center gap-3">
         <button
           type="button"
+          aria-label={t`Try again`}
           onClick={reset}
           className="group bg-primary text-primary-foreground hover:shadow-primary/20 relative inline-flex h-10 items-center justify-center gap-2 overflow-hidden rounded-lg px-5 text-sm font-medium transition-shadow hover:shadow-lg"
         >

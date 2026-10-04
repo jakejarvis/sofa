@@ -1982,6 +1982,77 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": true
+                        },
+                        "code": {
+                          "const": "NOT_FOUND"
+                        },
+                        "status": {
+                          "const": 404
+                        },
+                        "message": {
+                          "type": "string",
+                          "default": "Title not found"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "const": "TITLE_NOT_FOUND"
+                            }
+                          },
+                          "required": [
+                            "code"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message",
+                        "data"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "defined": {
+                          "const": false
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "number"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {}
+                      },
+                      "required": [
+                        "defined",
+                        "code",
+                        "status",
+                        "message"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4461,7 +4532,6 @@
           {
             "name": "page",
             "in": "query",
-            "required": false,
             "schema": {
               "type": "integer",
               "minimum": 1,
@@ -4475,7 +4545,6 @@
           {
             "name": "limit",
             "in": "query",
-            "required": false,
             "schema": {
               "type": "integer",
               "minimum": 1,
@@ -4997,16 +5066,6 @@
             }
           }
         ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK"
@@ -5045,16 +5104,6 @@
             }
           }
         ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Integration with new token",
@@ -5553,16 +5602,6 @@
             }
           }
         ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK"
@@ -7592,16 +7631,6 @@
             }
           }
         ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Updated job state",

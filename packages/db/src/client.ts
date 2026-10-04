@@ -39,44 +39,43 @@ export class DatabaseRestoreInProgressError extends Error {
 // Use `closeDatabase()` for graceful shutdown instead.
 
 const globalForDb = globalThis as unknown as {
-  _db: ReturnType<typeof drizzle> | undefined;
-  _client: Database | undefined;
-  _accessBlocked: boolean | undefined;
+  db: ReturnType<typeof drizzle> | undefined;
+  client: Database | undefined;
+  accessBlocked: boolean | undefined;
 };
 
 const dbAccessBypass = new AsyncLocalStorage<boolean>();
 
 function assertDatabaseAccessible() {
-  if (globalForDb._accessBlocked && !dbAccessBypass.getStore()) {
+  if (globalForDb.accessBlocked && !dbAccessBypass.getStore()) {
     throw new DatabaseRestoreInProgressError();
   }
 }
 
 function getClient() {
   assertDatabaseAccessible();
-  if (!globalForDb._client) {
-    globalForDb._client = new Database(DATABASE_URL);
-    globalForDb._client.run("PRAGMA journal_mode = WAL");
-    globalForDb._client.run("PRAGMA foreign_keys = ON");
-    globalForDb._client.run("PRAGMA busy_timeout = 5000");
-    globalForDb._client.run("PRAGMA synchronous = NORMAL");
-    globalForDb._client.run("PRAGMA cache_size = -64000");
-    globalForDb._client.run("PRAGMA temp_store = MEMORY");
-    globalForDb._client.run("PRAGMA mmap_size = 268435456");
+  if (!globalForDb.client) {
+    globalForDb.client = new Database(DATABASE_URL);
+    globalForDb.client.run("PRAGMA journal_mode = WAL");
+    globalForDb.client.run("PRAGMA foreign_keys = ON");
+    globalForDb.client.run("PRAGMA busy_timeout = 5000");
+    globalForDb.client.run("PRAGMA synchronous = NORMAL");
+    globalForDb.client.run("PRAGMA cache_size = -64000");
+    globalForDb.client.run("PRAGMA temp_store = MEMORY");
+    globalForDb.client.run("PRAGMA mmap_size = 268435456");
   }
-  return globalForDb._client;
+  return globalForDb.client;
 }
 
 function getDb() {
   assertDatabaseAccessible();
-  if (!globalForDb._db) {
-    globalForDb._db = drizzle({
+  if (!globalForDb.db) {
+    globalForDb.db = drizzle({
       client: getClient(),
-      schema,
       logger: drizzleLogger,
     });
   }
-  return globalForDb._db;
+  return globalForDb.db;
 }
 
 export const db = new Proxy({} as ReturnType<typeof drizzle>, {
@@ -97,23 +96,23 @@ export function vacuumDatabase(into: string): void {
 }
 
 export function isDatabaseAccessBlocked(): boolean {
-  return globalForDb._accessBlocked === true;
+  return globalForDb.accessBlocked === true;
 }
 
 export async function withDatabaseAccessBlocked<T>(fn: () => Promise<T> | T): Promise<T> {
-  globalForDb._accessBlocked = true;
+  globalForDb.accessBlocked = true;
   try {
     return await dbAccessBypass.run(true, fn);
   } finally {
-    globalForDb._accessBlocked = false;
+    globalForDb.accessBlocked = false;
   }
 }
 
 /** Close the current connection, and clear singletons so the Proxy re-initializes on next access. */
 export function closeDatabase() {
-  globalForDb._client?.close();
-  globalForDb._client = undefined;
-  globalForDb._db = undefined;
+  globalForDb.client?.close();
+  globalForDb.client = undefined;
+  globalForDb.db = undefined;
 }
 
 // ─── Backup validation ──────────────────────────────────────────────

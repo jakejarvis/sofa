@@ -4,7 +4,6 @@ export function SofaLogo({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       className={className ?? "size-6"}
-      role="img"
       aria-label="Sofa"
     >
       <path

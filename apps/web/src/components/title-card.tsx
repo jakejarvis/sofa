@@ -125,7 +125,7 @@ function QuickAddButton({ id, userStatus }: { id: string; userStatus?: TitleStat
       <TooltipTrigger
         onClick={handleClick}
         className="absolute end-2 top-2 z-10 flex size-8 items-center justify-center rounded-full bg-black/50 text-white opacity-60 backdrop-blur-sm transition-opacity hover:bg-black/70 focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-        render={<button type="button" />}
+        render={<button type="button" aria-label={t`Add to Watchlist`} />}
       >
         {!addToWatchlistMutation.isPending && <IconPlus className="size-4" />}
         {addToWatchlistMutation.isPending && <IconLoader className="size-4 animate-spin" />}

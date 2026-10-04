@@ -22,7 +22,6 @@ export function StarRating({ value, onChange }: StarRatingProps) {
   return (
     <div
       className="flex items-center gap-0.5"
-      role="radiogroup"
       aria-label={t`Rating`}
       onMouseLeave={() => setHover(0)}
     >
@@ -32,8 +31,7 @@ export function StarRating({ value, onChange }: StarRatingProps) {
           <motion.button
             key={star}
             type="button"
-            role="radio"
-            aria-checked={star === value}
+            aria-pressed={star === value}
             aria-label={t`Rate ${plural(star, { one: "# star", other: "# stars" })}`}
             onClick={() => onChange(star === value ? 0 : star)}
             onMouseEnter={() => setHover(star)}

@@ -1,9 +1,11 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import type { ErrorComponentProps } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 
 export function RouteError({ reset }: ErrorComponentProps) {
+  const { t } = useLingui();
+
   return (
     <div className="flex flex-col items-center gap-6 py-24 text-center">
       <div className="border-destructive/20 bg-destructive/5 text-destructive flex size-14 items-center justify-center rounded-full border">
@@ -23,6 +25,7 @@ export function RouteError({ reset }: ErrorComponentProps) {
       <div className="flex items-center gap-3">
         <button
           type="button"
+          aria-label={t`Try again`}
           onClick={reset}
           className="group bg-primary text-primary-foreground hover:shadow-primary/20 relative inline-flex h-10 items-center justify-center gap-2 overflow-hidden rounded-lg px-5 text-sm font-medium transition-shadow hover:shadow-lg"
         >

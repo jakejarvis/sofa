@@ -13,12 +13,12 @@ export const link = new RPCLink({
       ...options,
       credentials: process.env.EXPO_OS === "web" ? "include" : "omit",
     }),
-  headers() {
+  async headers() {
     if (process.env.EXPO_OS === "web") {
       return {};
     }
     const headers = new Map<string, string>();
-    const cookies = authClient.getCookie();
+    const cookies = await authClient.getCookie();
     if (cookies) {
       headers.set("Cookie", cookies);
     }

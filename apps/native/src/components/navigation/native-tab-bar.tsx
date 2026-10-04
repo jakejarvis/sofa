@@ -40,7 +40,7 @@ export function NativeTabBar() {
         <NativeTabs.Trigger.Label>{t`Settings`}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="gear" md="settings" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(search)" role="search" disableTransparentOnScrollEdge>
+      <NativeTabs.Trigger name="(search)" disableTransparentOnScrollEdge>
         <NativeTabs.Trigger.Label>{t`Search`}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="magnifyingglass" md="search" />
       </NativeTabs.Trigger>

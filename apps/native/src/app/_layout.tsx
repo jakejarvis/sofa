@@ -1,13 +1,13 @@
 import "@/lib/intl-polyfills";
 import "@/global.css";
 import { I18nProvider } from "@lingui/react";
-import { ThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
   persistQueryClientRestore,
   persistQueryClientSubscribe,
 } from "@tanstack/react-query-persist-client";
 import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
+import { ThemeProvider } from "expo-router/react-navigation";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";

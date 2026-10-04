@@ -1,4 +1,4 @@
-import { DarkTheme } from "@react-navigation/native";
+import { DarkTheme } from "expo-router/react-navigation";
 
 export const sofaTheme = {
   ...DarkTheme,

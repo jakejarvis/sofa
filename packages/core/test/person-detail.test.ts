@@ -4,7 +4,7 @@ import { personFilmography, persons } from "@sofa/db/schema";
 import { clearAllTables, eq, testDb } from "@sofa/test/db";
 
 const TINY_PNG = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4//8/AwAI/AL+X2NDNwAAAABJRU5ErkJggg==",
+  "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAEUlEQVQImWP4z8DwH4QZYAwAR8oH+Xm0fdIAAAAASUVORK5CYII=",
   "base64",
 );
 
@@ -43,8 +43,8 @@ const defaultCombinedCredits = {
 };
 
 const { mockGetPersonDetails, mockGetPersonCombinedCredits } = vi.hoisted(() => ({
-  mockGetPersonDetails: vi.fn(),
-  mockGetPersonCombinedCredits: vi.fn(),
+  mockGetPersonDetails: vi.fn<() => Promise<typeof defaultPersonDetails>>(),
+  mockGetPersonCombinedCredits: vi.fn<() => Promise<typeof defaultCombinedCredits>>(),
 }));
 
 vi.mock("@sofa/tmdb/client", () => ({

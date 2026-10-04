@@ -1,6 +1,6 @@
 import { expoClient } from "@better-auth/expo/client";
 import { focusManager, onlineManager } from "@tanstack/react-query";
-import { adminClient, genericOAuthClient } from "better-auth/client/plugins";
+import { adminClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import * as Network from "expo-network";
 import * as SecureStore from "expo-secure-store";
@@ -336,7 +336,6 @@ function buildAuthClient() {
     },
     plugins: [
       adminClient(),
-      genericOAuthClient(),
       expoClient({
         scheme: "sofa",
         storagePrefix: getStoragePrefix(),
@@ -380,7 +379,7 @@ function getCachedSession(): CachedSessionData | null {
   }
 }
 
-let _cachedSessionSeeded = false;
+let cachedSessionSeeded = false;
 
 /**
  * Seed the Better Auth session atom from SecureStore before React renders.
@@ -389,7 +388,7 @@ let _cachedSessionSeeded = false;
 export function initSession(): void {
   const cached = getCachedSession();
   if (cached) {
-    _cachedSessionSeeded = true;
+    cachedSessionSeeded = true;
     const sessionAtom = authClient.$store.atoms.session;
     sessionAtom.set({
       data: cached,
@@ -402,11 +401,11 @@ export function initSession(): void {
 }
 
 export function wasCachedSessionSeeded(): boolean {
-  return _cachedSessionSeeded;
+  return cachedSessionSeeded;
 }
 
 export function clearCachedSessionSeeded(): void {
-  _cachedSessionSeeded = false;
+  cachedSessionSeeded = false;
 }
 
 // ---------------------------------------------------------------------------
@@ -419,15 +418,15 @@ export function clearCachedSessionSeeded(): void {
 
 // Signals that the next session-loss redirect should go to the server-url
 // screen instead of login (set by the "Change Server" flow in settings).
-let _serverChangeRequested = false;
+let serverChangeRequested = false;
 
 export function requestServerChange(): void {
-  _serverChangeRequested = true;
+  serverChangeRequested = true;
 }
 
 export function consumeServerChangeRequest(): boolean {
-  const was = _serverChangeRequested;
-  _serverChangeRequested = false;
+  const was = serverChangeRequested;
+  serverChangeRequested = false;
   return was;
 }
 

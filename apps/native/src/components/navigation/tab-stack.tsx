@@ -4,6 +4,20 @@ import { useCSSVariable, useResolveClassNames } from "uniwind";
 
 import { HeaderAvatar } from "@/components/header-avatar";
 
+function renderHeaderAvatar() {
+  return <HeaderAvatar />;
+}
+
+function getHeaderRightItems() {
+  return [
+    {
+      type: "custom" as const,
+      element: <HeaderAvatar />,
+      hidesSharedBackground: true,
+    },
+  ];
+}
+
 export function TabStack({ title, children }: { title?: string; children?: ReactNode }) {
   const contentStyle = useResolveClassNames("bg-background");
   const tintColor = useCSSVariable("--color-primary") as string;
@@ -16,13 +30,7 @@ export function TabStack({ title, children }: { title?: string; children?: React
       <Stack
         screenOptions={{
           contentStyle,
-          unstable_headerRightItems: () => [
-            {
-              type: "custom" as const,
-              element: <HeaderAvatar />,
-              hidesSharedBackground: true,
-            },
-          ],
+          unstable_headerRightItems: getHeaderRightItems,
         }}
       >
         {title ? (
@@ -55,7 +63,7 @@ export function TabStack({ title, children }: { title?: string; children?: React
       screenOptions={{
         contentStyle,
         headerTitleAlign: "left",
-        headerRight: () => <HeaderAvatar />,
+        headerRight: renderHeaderAvatar,
       }}
     >
       {title ? (

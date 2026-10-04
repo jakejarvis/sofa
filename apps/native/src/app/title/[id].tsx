@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
 import {
   IconAlertTriangle,
@@ -18,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
+import { useHeaderHeight } from "expo-router/react-navigation";
 import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
@@ -57,10 +57,10 @@ const titleGenresContentStyle = { paddingHorizontal: 16 };
 const titleAvailabilityContentStyle = { gap: 8, paddingHorizontal: 16 };
 const titleDetailStyles = StyleSheet.create({
   heroFill: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   heroBaseOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "rgba(0,0,0,0.1)",
   },
   heroGradient: {

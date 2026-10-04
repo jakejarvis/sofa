@@ -1,3 +1,5 @@
+import { Icon } from "@expo/ui";
+import { MenuView } from "@expo/ui/community/menu";
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -38,7 +40,6 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useCSSVariable } from "uniwind";
-import * as DropdownMenu from "zeego/dropdown-menu";
 
 import { IntegrationsSection } from "@/components/settings/integrations-section";
 import { SettingsRow } from "@/components/settings/settings-row";
@@ -65,6 +66,15 @@ const settingsContentContainerStyle = {
   paddingBottom: 24,
   paddingHorizontal: 16,
 };
+
+const changePhotoIcon = Icon.select({
+  ios: "photo.on.rectangle.angled",
+  android: import("@expo/material-symbols/photo_library.xml"),
+});
+const removePhotoIcon = Icon.select({
+  ios: "trash",
+  android: import("@expo/material-symbols/delete.xml"),
+});
 
 export default function SettingsScreen() {
   const { t, i18n } = useLingui();
@@ -241,52 +251,49 @@ export default function SettingsScreen() {
         <SettingsSection title={t`Account`} icon={IconUser}>
           <View className="flex-row items-center py-3.5">
             {hasAvatarImage ? (
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild>
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={t`Edit profile photo`}
-                    accessibilityHint={t`Opens options to change or remove your photo`}
-                    className="mr-3"
-                    hitSlop={8}
-                  >
-                    <View className="bg-secondary size-11 overflow-hidden rounded-full">
-                      {isUploadingAvatar ? (
-                        <View className="flex-1 items-center justify-center">
-                          <Spinner size="sm" colorClassName="accent-primary" />
-                        </View>
-                      ) : (
-                        <Image
-                          source={{ uri: session.user.image ?? undefined }}
-                          style={{ width: "100%", height: "100%" }}
-                          contentFit="cover"
-                        />
-                      )}
-                    </View>
-                    <View className="bg-primary absolute right-0 bottom-0 size-[18px] items-center justify-center rounded-full">
-                      <IconCamera size={10} color={primaryFgColor} />
-                    </View>
-                  </Pressable>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content>
-                  <DropdownMenu.Item key="change" onSelect={() => pickAvatar()}>
-                    <DropdownMenu.ItemIcon ios={{ name: "photo.on.rectangle.angled" }} />
-                    <DropdownMenu.ItemTitle>
-                      <Trans>Change Photo</Trans>
-                    </DropdownMenu.ItemTitle>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item
-                    key="remove"
-                    destructive
-                    onSelect={() => removeAvatar.mutate()}
-                  >
-                    <DropdownMenu.ItemIcon ios={{ name: "trash" }} />
-                    <DropdownMenu.ItemTitle>
-                      <Trans>Remove Photo</Trans>
-                    </DropdownMenu.ItemTitle>
-                  </DropdownMenu.Item>
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
+              <MenuView
+                actions={[
+                  { id: "change", title: t`Change Photo`, image: changePhotoIcon },
+                  {
+                    id: "remove",
+                    title: t`Remove Photo`,
+                    image: removePhotoIcon,
+                    attributes: { destructive: true },
+                  },
+                ]}
+                onPressAction={({ nativeEvent }) => {
+                  if (nativeEvent.event === "change") {
+                    pickAvatar();
+                  } else if (nativeEvent.event === "remove") {
+                    removeAvatar.mutate();
+                  }
+                }}
+              >
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t`Edit profile photo`}
+                  accessibilityHint={t`Opens options to change or remove your photo`}
+                  className="mr-3"
+                  hitSlop={8}
+                >
+                  <View className="bg-secondary size-11 overflow-hidden rounded-full">
+                    {isUploadingAvatar ? (
+                      <View className="flex-1 items-center justify-center">
+                        <Spinner size="sm" colorClassName="accent-primary" />
+                      </View>
+                    ) : (
+                      <Image
+                        source={{ uri: session.user.image ?? undefined }}
+                        style={{ width: "100%", height: "100%" }}
+                        contentFit="cover"
+                      />
+                    )}
+                  </View>
+                  <View className="bg-primary absolute right-0 bottom-0 size-[18px] items-center justify-center rounded-full">
+                    <IconCamera size={10} color={primaryFgColor} />
+                  </View>
+                </Pressable>
+              </MenuView>
             ) : (
               <Pressable
                 onPress={pickAvatar}

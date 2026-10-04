@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
 import {
   IconAlertTriangle,
@@ -10,6 +9,7 @@ import {
 } from "@tabler/icons-react-native";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useHeaderHeight } from "expo-router/react-navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { Pressable, useWindowDimensions, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";

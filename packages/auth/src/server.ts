@@ -6,9 +6,15 @@ import { admin, genericOAuth } from "better-auth/plugins";
 
 import { claimInitialAdmin, isRegistrationOpen } from "@sofa/core/settings";
 import { db } from "@sofa/db/client";
+import * as schema from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 
-import { isOidcAutoRegisterEnabled, isOidcConfigured, isPasswordLoginDisabled } from "./config";
+import {
+  getOidcRedirectURI,
+  isOidcAutoRegisterEnabled,
+  isOidcConfigured,
+  isPasswordLoginDisabled,
+} from "./config";
 
 const authLog = createLogger("auth");
 
@@ -25,6 +31,14 @@ export const auth = betterAuth({
   },
   database: drizzleAdapter(db, {
     provider: "sqlite",
+    // `db` is created without a schema, so the adapter can't discover tables
+    // via `db._.fullSchema` and must be given them explicitly.
+    schema: {
+      user: schema.user,
+      session: schema.session,
+      account: schema.account,
+      verification: schema.verification,
+    },
   }),
   emailAndPassword: {
     enabled: !isPasswordLoginDisabled(),
@@ -53,11 +67,18 @@ export const auth = betterAuth({
                 clientId: process.env.OIDC_CLIENT_ID ?? "",
                 clientSecret: process.env.OIDC_CLIENT_SECRET ?? "",
                 discoveryUrl: `${process.env.OIDC_ISSUER_URL}/.well-known/openid-configuration`,
+                redirectURI: getOidcRedirectURI(),
                 scopes: ["openid", "email", "profile"],
                 pkce: true,
                 disableImplicitSignUp: !isOidcAutoRegisterEnabled(),
                 mapProfileToUser: (profile) => ({
-                  name: profile.name || profile.preferred_username || profile.email,
+                  name:
+                    profile.name ||
+                    (typeof profile.preferred_username === "string"
+                      ? profile.preferred_username
+                      : undefined) ||
+                    profile.email ||
+                    undefined,
                 }),
               },
             ],
