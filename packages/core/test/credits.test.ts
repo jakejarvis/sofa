@@ -1,7 +1,11 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { persons, titleCast } from "@sofa/db/schema";
-import { clearAllTables, eq, insertTitle, testDb } from "@sofa/test/db";
+import { clearAllTables, eq, insertTitle, testClient, testDb } from "@sofa/test/db";
 
 const { mockGetMovieCredits, mockGetTvAggregateCredits } = vi.hoisted(() => ({
   mockGetMovieCredits: vi.fn<
@@ -191,6 +195,77 @@ describe("refreshCredits", () => {
     expect(creator).toBeDefined();
   });
 
+  test("does not duplicate crew rows when refreshed twice", async () => {
+    insertTitle({ id: "m1", tmdbId: 100, type: "movie" });
+
+    mockGetMovieCredits.mockResolvedValue({
+      cast: [{ id: 1, name: "Actor A", profile_path: "/a.jpg", character: "Hero", popularity: 10 }],
+      crew: [
+        {
+          id: 3,
+          name: "Dir Person",
+          profile_path: "/d.jpg",
+          job: "Director",
+          department: "Directing",
+          popularity: 8,
+        },
+      ],
+    });
+
+    await refreshCredits("m1");
+    await refreshCredits("m1");
+
+    const castRows = testDb.select().from(titleCast).where(eq(titleCast.titleId, "m1")).all();
+    expect(castRows).toHaveLength(2);
+  });
+
+  test("removes cast members no longer returned by TMDB", async () => {
+    insertTitle({ id: "m1", tmdbId: 100, type: "movie" });
+    const actorA = {
+      id: 1,
+      name: "Actor A",
+      profile_path: null,
+      character: "Hero",
+      popularity: 10,
+    };
+    const actorB = {
+      id: 2,
+      name: "Actor B",
+      profile_path: null,
+      character: "Villain",
+      popularity: 5,
+    };
+
+    mockGetMovieCredits.mockResolvedValue({ cast: [actorA, actorB], crew: [] });
+    await refreshCredits("m1");
+    expect(testDb.select().from(titleCast).where(eq(titleCast.titleId, "m1")).all()).toHaveLength(
+      2,
+    );
+
+    mockGetMovieCredits.mockResolvedValue({ cast: [actorA], crew: [] });
+    await refreshCredits("m1");
+    expect(testDb.select().from(titleCast).where(eq(titleCast.titleId, "m1")).all()).toHaveLength(
+      1,
+    );
+  });
+
+  test("keeps existing credits when TMDB returns an empty payload", async () => {
+    insertTitle({ id: "m1", tmdbId: 100, type: "movie" });
+
+    mockGetMovieCredits.mockResolvedValue({
+      cast: [{ id: 1, name: "Actor A", profile_path: null, character: "Hero", popularity: 10 }],
+      crew: [],
+    });
+    await refreshCredits("m1");
+
+    mockGetMovieCredits.mockResolvedValue({ cast: [], crew: [] });
+    await refreshCredits("m1");
+
+    expect(testDb.select().from(titleCast).where(eq(titleCast.titleId, "m1")).all()).toHaveLength(
+      1,
+    );
+  });
+
   test("does nothing for nonexistent title", async () => {
     await refreshCredits("nonexistent");
     expect(mockGetMovieCredits).not.toHaveBeenCalled();
@@ -282,5 +357,40 @@ describe("refreshCredits", () => {
     expect(castRows).toHaveLength(2);
     const jobs = castRows.map((r) => r.job).sort();
     expect(jobs).toEqual(["Director", "Writer"]);
+  });
+});
+
+// ─── dedupe migration ───────────────────────────────────────────────
+
+describe("dedupe_title_cast migration", () => {
+  test("keeps one row per credit", () => {
+    insertTitle({ id: "m1", tmdbId: 1 });
+    insertPerson("p1", 100, "Director Person");
+
+    for (let i = 0; i < 3; i++) {
+      testDb
+        .insert(titleCast)
+        .values({
+          titleId: "m1",
+          personId: "p1",
+          character: null,
+          department: "Directing",
+          job: "Director",
+          displayOrder: 100,
+          lastFetchedAt: new Date(),
+        })
+        .run();
+    }
+    insertCastEntry("m1", "p1", { character: "Hero" });
+
+    const dir = fileURLToPath(new URL("../../db/drizzle", import.meta.url));
+    const folder = readdirSync(dir).find((d) => d.endsWith("_dedupe_title_cast"));
+    expect(folder).toBeDefined();
+    testClient.exec(readFileSync(join(dir, folder!, "migration.sql"), "utf8"));
+
+    const rows = testDb.select().from(titleCast).where(eq(titleCast.titleId, "m1")).all();
+    expect(rows).toHaveLength(2);
+    expect(rows.filter((r) => r.department === "Directing")).toHaveLength(1);
+    expect(rows.filter((r) => r.department === "Acting")).toHaveLength(1);
   });
 });

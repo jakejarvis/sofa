@@ -1,11 +1,11 @@
 import type { CastMember } from "@sofa/api/schemas";
 import {
   batchUpsertPersonsTransaction,
-  batchUpsertTitleCast,
   getCastForTitleJoined,
   getExistingPersonsByTmdbIds,
   getFallbackPersonsByTmdbIds,
   getPersonsForTitleCast,
+  replaceTitleCastTransaction,
 } from "@sofa/db/queries/credits";
 import { getTitleById } from "@sofa/db/queries/title";
 import type { titleCast } from "@sofa/db/schema";
@@ -164,7 +164,8 @@ export async function refreshCredits(titleId: string) {
         });
         crewOrder++;
       }
-      batchUpsertTitleCast(allCastRows);
+      // Skip empty payloads so a blank TMDB response doesn't wipe existing credits
+      if (allCastRows.length > 0) replaceTitleCastTransaction(titleId, allCastRows);
     } else {
       const credits = await getTvAggregateCredits(title.tmdbId);
       const tvCast = credits.cast ?? [];
@@ -244,7 +245,8 @@ export async function refreshCredits(titleId: string) {
         });
         crewOrder++;
       }
-      batchUpsertTitleCast(allCastRows);
+      // Skip empty payloads so a blank TMDB response doesn't wipe existing credits
+      if (allCastRows.length > 0) replaceTitleCastTransaction(titleId, allCastRows);
     }
 
     log.debug(`Credits refreshed for "${title.title}"`);

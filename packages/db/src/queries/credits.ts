@@ -99,20 +99,31 @@ export function getPersonsForTitleCast(titleId: string) {
     .all();
 }
 
-export function batchUpsertTitleCast(rows: (typeof titleCast.$inferInsert)[]): void {
-  if (rows.length === 0) return;
-  db.insert(titleCast)
-    .values(rows)
-    .onConflictDoUpdate({
-      target: [titleCast.titleId, titleCast.personId, titleCast.department, titleCast.character],
-      set: {
-        job: sql`excluded.job`,
-        displayOrder: sql`excluded.displayOrder`,
-        episodeCount: sql`excluded.episodeCount`,
-        lastFetchedAt: sql`excluded.lastFetchedAt`,
-      },
-    })
-    .run();
+/**
+ * Atomically replace all cast/crew rows for a title. Upserting is not enough:
+ * crew rows have character = NULL, and SQLite treats NULLs as distinct in the
+ * unique index, so upserts kept inserting duplicates.
+ */
+export function replaceTitleCastTransaction(
+  titleId: string,
+  rows: (typeof titleCast.$inferInsert)[],
+): void {
+  db.transaction((tx) => {
+    tx.delete(titleCast).where(eq(titleCast.titleId, titleId)).run();
+    if (rows.length === 0) return;
+    tx.insert(titleCast)
+      .values(rows)
+      .onConflictDoUpdate({
+        target: [titleCast.titleId, titleCast.personId, titleCast.department, titleCast.character],
+        set: {
+          job: sql`excluded.job`,
+          displayOrder: sql`excluded.displayOrder`,
+          episodeCount: sql`excluded.episodeCount`,
+          lastFetchedAt: sql`excluded.lastFetchedAt`,
+        },
+      })
+      .run();
+  });
 }
 
 export function getCastForTitleJoined(titleId: string) {
