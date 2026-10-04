@@ -1,12 +1,16 @@
-import { HStack, Image, Spacer, Text, VStack, ZStack } from "@expo/ui/swift-ui";
+import { HStack, Image, Rectangle, Text, VStack, ZStack } from "@expo/ui/swift-ui";
 import {
-  background,
+  aspectRatio,
+  clipped,
+  containerBackground,
   cornerRadius,
   font,
   foregroundStyle,
   frame,
   lineLimit,
   padding,
+  resizable,
+  widgetAccentedRenderingMode,
   widgetURL,
 } from "@expo/ui/swift-ui/modifiers";
 import { createWidget, type WidgetEnvironment } from "expo-widgets";
@@ -27,19 +31,17 @@ export type UpcomingProps = {
 const UpcomingWidget = (props: UpcomingProps, _env: WidgetEnvironment) => {
   "widget";
 
+  // This function is serialized and run inside the widget extension's own JS runtime, so
+  // everything it uses must be defined in here.
+  const fill = { minWidth: 0, maxWidth: Infinity, minHeight: 0, maxHeight: Infinity };
+
   if (!props.titleName) {
     return (
-      <VStack
-        modifiers={[
-          frame({ width: 155, height: 155 }),
-          background("#101010"),
-          padding({ all: 16 }),
-        ]}
-      >
+      <VStack spacing={8} modifiers={[frame(fill), containerBackground("#101010", "widget")]}>
         {props.iconFilePath ? (
           <Image
             uiImage={props.iconFilePath}
-            modifiers={[frame({ width: 40, height: 40 }), cornerRadius(8)]}
+            modifiers={[resizable(), frame({ width: 40, height: 40 }), cornerRadius(8)]}
           />
         ) : (
           <Image systemName="play.tv" color="#FFFFFF" size={40} />
@@ -59,29 +61,57 @@ const UpcomingWidget = (props: UpcomingProps, _env: WidgetEnvironment) => {
   return (
     <ZStack
       alignment="bottomLeading"
-      modifiers={[frame({ width: 155, height: 155 }), widgetURL(`sofa://title/${props.titleId}`)]}
+      modifiers={[
+        frame(fill),
+        containerBackground("#101010", "widget"),
+        widgetURL(`sofa://title/${props.titleId}`),
+      ]}
     >
-      {/* Background image or dark fallback */}
+      {/* Full-bleed artwork; the container background shows through when there is none */}
       {props.imageFilePath ? (
-        <Image uiImage={props.imageFilePath} modifiers={[frame({ width: 155, height: 155 })]} />
-      ) : (
-        <Spacer modifiers={[frame({ width: 155, height: 155 }), background("#1a1a1a")]} />
-      )}
+        <Image
+          uiImage={props.imageFilePath}
+          modifiers={[
+            resizable(),
+            widgetAccentedRenderingMode("desaturated"),
+            aspectRatio({ contentMode: "fill" }),
+            frame(fill),
+            clipped(),
+          ]}
+        />
+      ) : null}
 
-      {/* Dark overlay for text readability */}
-      <Spacer modifiers={[frame({ width: 155, height: 155 }), background("rgba(0,0,0,0.45)")]} />
+      {/* Gradient scrim for text readability */}
+      <Rectangle
+        modifiers={[
+          foregroundStyle({
+            type: "linearGradient",
+            colors: ["rgba(0,0,0,0)", "rgba(0,0,0,0.85)"],
+            startPoint: { x: 0.5, y: 0.2 },
+            endPoint: { x: 0.5, y: 1 },
+          }),
+        ]}
+      />
 
       {/* Text overlay at bottom */}
       <VStack
         alignment="leading"
         spacing={2}
-        modifiers={[padding({ all: 12 }), frame({ width: 155 })]}
+        modifiers={[frame({ maxWidth: Infinity, alignment: "leading" }), padding({ all: 14 })]}
       >
         <HStack spacing={4}>
-          <Text modifiers={[font({ weight: "medium", size: 11 }), foregroundStyle("#e4a532")]}>
+          <Text
+            modifiers={[
+              font({ weight: "medium", size: 11 }),
+              foregroundStyle("#e4a532"),
+              lineLimit(1),
+            ]}
+          >
             {props.dateLabel}
           </Text>
-          <Text modifiers={[font({ size: 11 }), foregroundStyle("rgba(255,255,255,0.5)")]}>
+          <Text
+            modifiers={[font({ size: 11 }), foregroundStyle("rgba(255,255,255,0.5)"), lineLimit(1)]}
+          >
             · {props.episodeLabel}
           </Text>
         </HStack>

@@ -152,14 +152,20 @@
             {
               "name": "ContinueWatching",
               "displayName": "Continue Watching",
-              "description": "Your in-progress TV shows and movies",
-              "supportedFamilies": ["systemSmall"]
+              "description": "The next episode of the shows you're watching",
+              "ios": {
+                "supportedFamilies": ["systemSmall"],
+                "contentMarginsDisabled": true
+              }
             },
             {
               "name": "Upcoming",
               "displayName": "Upcoming",
               "description": "Upcoming episodes and movie releases",
-              "supportedFamilies": ["systemSmall"]
+              "ios": {
+                "supportedFamilies": ["systemSmall"],
+                "contentMarginsDisabled": true
+              }
             }
           ]
         }

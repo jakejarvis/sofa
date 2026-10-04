@@ -1,12 +1,18 @@
-import { HStack, Image, Spacer, Text, VStack, ZStack } from "@expo/ui/swift-ui";
+import { HStack, Image, ProgressView, Rectangle, Text, VStack, ZStack } from "@expo/ui/swift-ui";
 import {
-  background,
+  aspectRatio,
+  clipped,
+  containerBackground,
   cornerRadius,
   font,
   foregroundStyle,
   frame,
   lineLimit,
   padding,
+  progressViewStyle,
+  resizable,
+  tint,
+  widgetAccentedRenderingMode,
   widgetURL,
 } from "@expo/ui/swift-ui/modifiers";
 import { createWidget, type WidgetEnvironment } from "expo-widgets";
@@ -26,19 +32,17 @@ export type ContinueWatchingProps = {
 const ContinueWatchingWidget = (props: ContinueWatchingProps, _env: WidgetEnvironment) => {
   "widget";
 
+  // This function is serialized and run inside the widget extension's own JS runtime, so
+  // everything it uses must be defined in here.
+  const fill = { minWidth: 0, maxWidth: Infinity, minHeight: 0, maxHeight: Infinity };
+
   if (!props.titleName) {
     return (
-      <VStack
-        modifiers={[
-          frame({ width: 155, height: 155 }),
-          background("#101010"),
-          padding({ all: 16 }),
-        ]}
-      >
+      <VStack spacing={8} modifiers={[frame(fill), containerBackground("#101010", "widget")]}>
         {props.iconFilePath ? (
           <Image
             uiImage={props.iconFilePath}
-            modifiers={[frame({ width: 40, height: 40 }), cornerRadius(8)]}
+            modifiers={[resizable(), frame({ width: 40, height: 40 }), cornerRadius(8)]}
           />
         ) : (
           <Image systemName="play.tv" color="#FFFFFF" size={40} />
@@ -55,7 +59,10 @@ const ContinueWatchingWidget = (props: ContinueWatchingProps, _env: WidgetEnviro
     );
   }
 
-  const progress = props.totalEpisodes > 0 ? props.watchedEpisodes / props.totalEpisodes : 0;
+  const progress = Math.min(
+    1,
+    Math.max(0, props.totalEpisodes > 0 ? props.watchedEpisodes / props.totalEpisodes : 0),
+  );
   const episodeLabel =
     !props.isMovie && props.seasonNumber != null
       ? `S${props.seasonNumber} · E${props.episodeNumber}`
@@ -68,23 +75,43 @@ const ContinueWatchingWidget = (props: ContinueWatchingProps, _env: WidgetEnviro
   return (
     <ZStack
       alignment="bottomLeading"
-      modifiers={[frame({ width: 155, height: 155 }), widgetURL(`sofa://title/${props.titleId}`)]}
+      modifiers={[
+        frame(fill),
+        containerBackground("#101010", "widget"),
+        widgetURL(`sofa://title/${props.titleId}`),
+      ]}
     >
-      {/* Background image or dark fallback */}
+      {/* Full-bleed artwork; the container background shows through when there is none */}
       {props.imageFilePath ? (
-        <Image uiImage={props.imageFilePath} modifiers={[frame({ width: 155, height: 155 })]} />
-      ) : (
-        <Spacer modifiers={[frame({ width: 155, height: 155 }), background("#1a1a1a")]} />
-      )}
+        <Image
+          uiImage={props.imageFilePath}
+          modifiers={[
+            resizable(),
+            widgetAccentedRenderingMode("desaturated"),
+            aspectRatio({ contentMode: "fill" }),
+            frame(fill),
+            clipped(),
+          ]}
+        />
+      ) : null}
 
-      {/* Dark overlay for text readability */}
-      <Spacer modifiers={[frame({ width: 155, height: 155 }), background("rgba(0,0,0,0.45)")]} />
+      {/* Gradient scrim for text readability */}
+      <Rectangle
+        modifiers={[
+          foregroundStyle({
+            type: "linearGradient",
+            colors: ["rgba(0,0,0,0)", "rgba(0,0,0,0.85)"],
+            startPoint: { x: 0.5, y: 0.2 },
+            endPoint: { x: 0.5, y: 1 },
+          }),
+        ]}
+      />
 
       {/* Text overlay at bottom */}
       <VStack
         alignment="leading"
         spacing={2}
-        modifiers={[padding({ all: 12 }), frame({ width: 155 })]}
+        modifiers={[frame({ maxWidth: Infinity, alignment: "leading" }), padding({ all: 14 })]}
       >
         {episodeLabel && (
           <HStack spacing={4}>
@@ -92,12 +119,19 @@ const ContinueWatchingWidget = (props: ContinueWatchingProps, _env: WidgetEnviro
               modifiers={[
                 font({ weight: "medium", size: 11 }),
                 foregroundStyle("rgba(255,255,255,0.7)"),
+                lineLimit(1),
               ]}
             >
               {episodeLabel}
             </Text>
             {progressLabel && (
-              <Text modifiers={[font({ size: 11 }), foregroundStyle("rgba(255,255,255,0.5)")]}>
+              <Text
+                modifiers={[
+                  font({ size: 11 }),
+                  foregroundStyle("rgba(255,255,255,0.5)"),
+                  lineLimit(1),
+                ]}
+              >
                 {progressLabel}
               </Text>
             )}
@@ -110,22 +144,10 @@ const ContinueWatchingWidget = (props: ContinueWatchingProps, _env: WidgetEnviro
         </Text>
         {/* Progress bar for TV shows */}
         {!props.isMovie && props.totalEpisodes > 0 && (
-          <ZStack modifiers={[frame({ width: 131, height: 3 }), padding({ top: 2 })]}>
-            <Spacer
-              modifiers={[
-                frame({ width: 131, height: 3 }),
-                cornerRadius(1.5),
-                background("rgba(255,255,255,0.15)"),
-              ]}
-            />
-            <Spacer
-              modifiers={[
-                frame({ width: Math.max(3, Math.round(131 * progress)), height: 3 }),
-                cornerRadius(1.5),
-                background("#3b82f6"),
-              ]}
-            />
-          </ZStack>
+          <ProgressView
+            value={progress}
+            modifiers={[progressViewStyle("linear"), tint("#3b82f6"), padding({ top: 4 })]}
+          />
         )}
       </VStack>
     </ZStack>
