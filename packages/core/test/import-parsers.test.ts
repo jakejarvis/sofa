@@ -7,6 +7,7 @@ import {
   type ParseResult,
   parseLetterboxdExport,
   parseSimklPayload,
+  parseTraktExport,
   parseTraktPayload,
 } from "../src/imports/parsers";
 
@@ -1253,5 +1254,121 @@ describe("parser output always matches the API schema", () => {
     expect(result.data.movies).toHaveLength(50_000);
     expect(NormalizedImportSchema.safeParse(result.data).success).toBe(true);
     expect(result.warnings.some((w) => w.includes("50,000"))).toBe(true);
+  });
+});
+
+// ─── parseTraktExport ────────────────────────────────────────────────
+
+function createZip(files: Record<string, string>): Blob {
+  const zip = new AdmZip();
+  for (const [name, content] of Object.entries(files)) {
+    zip.addFile(name, Buffer.from(content, "utf-8"));
+  }
+  return new Blob([zip.toBuffer()], { type: "application/zip" });
+}
+
+function jsonBlob(value: unknown): Blob {
+  return new Blob([JSON.stringify(value)], { type: "application/json" });
+}
+
+describe("parseTraktExport", () => {
+  const historyItems = [
+    {
+      watched_at: "2024-01-15T20:00:00.000Z",
+      type: "movie",
+      movie: { title: "Inception", year: 2010, ids: { tmdb: 27205 } },
+    },
+    {
+      watched_at: "2024-01-16T20:00:00.000Z",
+      type: "episode",
+      show: { title: "Lost", year: 2004, ids: { tmdb: 4607 } },
+      episode: { season: 1, number: 2 },
+    },
+  ];
+  const ratingItems = [
+    {
+      rated_at: "2024-01-01T00:00:00.000Z",
+      rating: 8,
+      type: "movie",
+      movie: { title: "M", ids: { tmdb: 1 } },
+    },
+  ];
+  const watchlistItems = [
+    {
+      listed_at: "2024-01-01T00:00:00.000Z",
+      type: "show",
+      show: { title: "S", ids: { tmdb: 2 } },
+    },
+  ];
+
+  test("parses a watched-history file (array of mixed movie/episode plays)", async () => {
+    const result = await parseTraktExport(jsonBlob(historyItems));
+    expect(result.data.source).toBe("trakt");
+    expect(result.data.movies).toHaveLength(1);
+    expect(result.data.episodes).toHaveLength(1);
+  });
+
+  test("parses a ratings file", async () => {
+    const result = await parseTraktExport(jsonBlob(ratingItems));
+    expect(result.data.ratings).toHaveLength(1);
+  });
+
+  test("parses a watchlist file", async () => {
+    const result = await parseTraktExport(jsonBlob(watchlistItems));
+    expect(result.data.watchlist).toHaveLength(1);
+    expect(result.data.watchlist[0]?.type).toBe("tv");
+  });
+
+  test("parses the official ZIP", async () => {
+    const zip = createZip({
+      "trakt-export/watched-history-1.json": JSON.stringify(historyItems),
+      "trakt-export/watched-history-2.json": JSON.stringify([
+        {
+          watched_at: "2024-03-01T20:00:00.000Z",
+          type: "movie",
+          movie: { title: "Heat", year: 1995, ids: { tmdb: 949 } },
+        },
+      ]),
+      "trakt-export/ratings-movies.json": JSON.stringify(ratingItems),
+      "trakt-export/lists-watchlist.json": JSON.stringify(watchlistItems),
+      "trakt-export/user-profile.json": "{}",
+    });
+    const result = await parseTraktExport(zip);
+    expect(result.data.movies).toHaveLength(2);
+    expect(result.data.episodes).toHaveLength(1);
+    expect(result.data.ratings).toHaveLength(1);
+    expect(result.data.watchlist).toHaveLength(1);
+  });
+
+  test("still accepts the aggregated format", async () => {
+    const result = await parseTraktExport(
+      jsonBlob({
+        history: { movies: [historyItems[0]], shows: [] },
+        watchlist: [],
+        ratings: [],
+      }),
+    );
+    expect(result.data.movies).toHaveLength(1);
+  });
+
+  test("reports unrecognized files instead of silently returning nothing", async () => {
+    const result = await parseTraktExport(jsonBlob({ foo: 1 }));
+    expect(result.data.movies).toHaveLength(0);
+    expect(result.data.episodes).toHaveLength(0);
+    expect(result.data.watchlist).toHaveLength(0);
+    expect(result.data.ratings).toHaveLength(0);
+    expect(result.warnings.some((w) => w.includes("No Trakt history, ratings or watchlist"))).toBe(
+      true,
+    );
+  });
+
+  test("skips an unparsable JSON entry inside the ZIP", async () => {
+    const zip = createZip({
+      "watched-history-1.json": JSON.stringify(historyItems),
+      "broken.json": "{not json",
+    });
+    const result = await parseTraktExport(zip);
+    expect(result.data.movies).toHaveLength(1);
+    expect(result.data.episodes).toHaveLength(1);
   });
 });

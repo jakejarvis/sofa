@@ -99,8 +99,8 @@ const SOURCES: SourceConfig[] = [
   {
     source: "trakt",
     label: "Trakt",
-    description: "Connect your Trakt account or upload a JSON export",
-    accept: ".json",
+    description: "Connect your Trakt account or upload your Trakt export (ZIP or JSON)",
+    accept: ".json,.zip",
     icon: <TraktLogo className="text-primary size-4" />,
     supportsOAuth: true,
   },

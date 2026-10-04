@@ -8,6 +8,7 @@ import {
   parseLetterboxdExport,
   parseSimklPayload,
   parseSofaExport,
+  parseTraktExport,
   parseTraktPayload,
   processImportJob,
   readImportJob,
@@ -32,16 +33,14 @@ export const parseFile = os.imports.parseFile.use(authed).handler(async ({ input
       result = await parseLetterboxdExport(file);
       break;
     case "trakt": {
-      let json: unknown;
       try {
-        json = await file.json();
+        result = await parseTraktExport(file);
       } catch {
         throw new ORPCError("BAD_REQUEST", {
           message: "Invalid JSON file",
           data: { code: AppErrorCode.IMPORT_INVALID_FILE },
         });
       }
-      result = parseTraktPayload(json as Parameters<typeof parseTraktPayload>[0]);
       break;
     }
     case "simkl": {

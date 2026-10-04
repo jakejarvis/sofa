@@ -10,6 +10,7 @@ export {
   type ParseResult,
   parseLetterboxdExport,
   parseSimklPayload,
+  parseTraktExport,
   parseTraktPayload,
 } from "./parsers";
 export { parseSofaExport } from "./sofa-parser";

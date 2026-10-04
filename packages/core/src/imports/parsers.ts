@@ -385,6 +385,96 @@ export function parseTraktPayload(data: {
   return finalizeParseResult(normalized, warnings, unsupported);
 }
 
+interface TraktAggregate {
+  history: { movies: TraktHistoryMovie[]; shows: TraktHistoryEpisode[] };
+  watchlist: TraktWatchlistItem[];
+  ratings: TraktRatingItem[];
+}
+
+function pushArray<T>(target: T[], value: unknown): void {
+  if (Array.isArray(value)) target.push(...(value as T[]));
+}
+
+/** Sort one JSON document's Trakt items into the aggregate parseTraktPayload expects. */
+function addTraktDocument(agg: TraktAggregate, json: unknown): void {
+  if (json && typeof json === "object" && !Array.isArray(json)) {
+    // Already-aggregated format: { history: { movies, shows }, watchlist, ratings }
+    const obj = json as Record<string, unknown>;
+    const history = obj.history;
+    if (history && typeof history === "object" && !Array.isArray(history)) {
+      const h = history as Record<string, unknown>;
+      pushArray(agg.history.movies, h.movies);
+      pushArray(agg.history.shows, h.shows);
+    }
+    pushArray(agg.watchlist, obj.watchlist);
+    pushArray(agg.ratings, obj.ratings);
+    return;
+  }
+  if (!Array.isArray(json)) return;
+  for (const item of json as Record<string, unknown>[]) {
+    if (!item || typeof item !== "object") continue;
+    if ("watched_at" in item) {
+      if (item.episode && item.show) agg.history.shows.push(item as TraktHistoryEpisode);
+      else if (item.movie) agg.history.movies.push(item as TraktHistoryMovie);
+    } else if ("rating" in item) {
+      agg.ratings.push(item as TraktRatingItem);
+    } else if ("listed_at" in item) {
+      agg.watchlist.push(item as TraktWatchlistItem);
+    }
+  }
+}
+
+/**
+ * Parse an uploaded Trakt export: Trakt's official ZIP (watched-history-*.json,
+ * ratings-*.json, lists-watchlist.json, …), any single JSON file from it, or the
+ * aggregated { history, watchlist, ratings } JSON. Items are classified by their
+ * fields rather than file names.
+ */
+export async function parseTraktExport(file: Blob): Promise<ParseResult> {
+  const agg: TraktAggregate = { history: { movies: [], shows: [] }, watchlist: [], ratings: [] };
+  const buf = Buffer.from(await file.arrayBuffer());
+
+  if (buf.length >= 4 && buf[0] === 0x50 && buf[1] === 0x4b && buf[2] === 0x03 && buf[3] === 0x04) {
+    const AdmZip = (await import("adm-zip")).default;
+    let entries: ReturnType<InstanceType<typeof AdmZip>["getEntries"]>;
+    try {
+      entries = new AdmZip(buf).getEntries();
+    } catch {
+      throw new Error("Invalid export file");
+    }
+    for (const entry of entries) {
+      if (entry.isDirectory) continue;
+      const name = entry.entryName.split("/").pop() ?? entry.entryName;
+      if (!name.toLowerCase().endsWith(".json")) continue;
+      try {
+        addTraktDocument(agg, JSON.parse(entry.getData().toString("utf-8")));
+      } catch {
+        log.debug(`Skipping unreadable Trakt export entry: ${entry.entryName}`);
+      }
+    }
+  } else {
+    let json: unknown;
+    try {
+      json = JSON.parse(buf.toString("utf8"));
+    } catch {
+      throw new Error("Invalid JSON file");
+    }
+    addTraktDocument(agg, json);
+  }
+
+  const empty =
+    agg.history.movies.length === 0 &&
+    agg.history.shows.length === 0 &&
+    agg.watchlist.length === 0 &&
+    agg.ratings.length === 0;
+
+  const result = parseTraktPayload(agg);
+  if (empty) {
+    result.warnings.push("No Trakt history, ratings or watchlist items were found in this file.");
+  }
+  return result;
+}
+
 // ─── Simkl Parser ───────────────────────────────────────────────────
 
 interface SimklIds {
