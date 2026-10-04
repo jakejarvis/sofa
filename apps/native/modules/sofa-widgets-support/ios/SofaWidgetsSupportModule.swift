@@ -6,6 +6,10 @@ private let imageDirectory = "widget_images"
 private let widgetIconKey = "sofa_icon.png"
 private let infoPlistAppGroupKey = "ExpoWidgetsAppGroupIdentifier"
 private let logPrefix = "[SofaWidgetsSupport]"
+// systemSmall widgets are at most 170pt square (510px at 3x). WidgetKit refuses to
+// render images whose pixel area is far beyond the widget's, so artwork is cropped
+// to that square.
+private let widgetImagePixelSize: CGFloat = 510
 
 public class SofaWidgetsSupportModule: Module {
   public func definition() -> ModuleDefinition {
@@ -34,11 +38,9 @@ public class SofaWidgetsSupportModule: Module {
         return nil
       }
 
-      // Resize to fit widget dimensions (systemSmall ~155pt = ~465px at 3x)
-      let maxDimension: CGFloat = 465
-      let resized = resizeImage(image, maxDimension: maxDimension)
+      let resized = squareThumbnail(image, side: widgetImagePixelSize)
 
-      guard let jpegData = resized.jpegData(compressionQuality: 0.7) else {
+      guard let jpegData = resized.jpegData(compressionQuality: 0.8) else {
         return nil
       }
 
@@ -182,20 +184,23 @@ public class SofaWidgetsSupportModule: Module {
     print("\(logPrefix) \(message)")
   }
 
-  private func resizeImage(_ image: UIImage, maxDimension: CGFloat) -> UIImage {
+  /// Scales `image` to cover a `side`×`side` square (never upscaling) and center-crops it.
+  /// Renders at scale 1 so the output's pixel size equals its point size; the default
+  /// renderer format uses the screen scale and would triple the pixel dimensions.
+  private func squareThumbnail(_ image: UIImage, side maxSide: CGFloat) -> UIImage {
     let size = image.size
-    let scale = min(maxDimension / size.width, maxDimension / size.height, 1.0)
+    guard size.width > 0, size.height > 0 else { return image }
+    let side = min(maxSide, size.width, size.height).rounded(.down)
+    let scale = side / min(size.width, size.height)
+    let drawSize = CGSize(width: size.width * scale, height: size.height * scale)
+    let origin = CGPoint(x: (side - drawSize.width) / 2, y: (side - drawSize.height) / 2)
 
-    if scale >= 1.0 { return image }
-
-    let newSize = CGSize(
-      width: round(size.width * scale),
-      height: round(size.height * scale)
-    )
-
-    let renderer = UIGraphicsImageRenderer(size: newSize)
+    let format = UIGraphicsImageRendererFormat()
+    format.scale = 1
+    format.opaque = true
+    let renderer = UIGraphicsImageRenderer(size: CGSize(width: side, height: side), format: format)
     return renderer.image { _ in
-      image.draw(in: CGRect(origin: .zero, size: newSize))
+      image.draw(in: CGRect(origin: origin, size: drawSize))
     }
   }
 }
