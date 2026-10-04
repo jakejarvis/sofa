@@ -403,6 +403,9 @@ interface SimklItem {
   status?: string; // "completed", "watching", "plantowatch", "dropped", "hold"
   user_rating?: number;
   last_watched_at?: string;
+  added_to_watchlist_at?: string;
+  movie?: { title?: string; year?: number; ids?: SimklIds };
+  show?: { title?: string; year?: number; ids?: SimklIds };
   watched_episodes_count?: number;
   total_episodes_count?: number;
   seasons?: {
@@ -426,6 +429,36 @@ function mapSimklStatus(status?: string): "watchlist" | "in_progress" | "complet
   }
 }
 
+/**
+ * Simkl's API and its SimklBackup.json nest title metadata under `movie`/`show`;
+ * Sofa's public-api flattens it first. Accept both shapes. When episodes carry
+ * `watched_at`, only those are watched (the API lists unwatched ones too);
+ * when none do, every listed episode counts as watched.
+ */
+function normalizeSimklItem(item: SimklItem): SimklItem {
+  const media = item.movie ?? item.show;
+  const anyTimestamp = item.seasons?.some((s) => s.episodes?.some((ep) => ep.watched_at));
+  const seasons = anyTimestamp
+    ? item.seasons
+        ?.map((s) => ({ ...s, episodes: s.episodes?.filter((ep) => ep.watched_at) }))
+        .filter((s) => (s.episodes?.length ?? 0) > 0)
+    : item.seasons;
+  return {
+    ...item,
+    title: item.title ?? media?.title,
+    year: item.year ?? media?.year,
+    ids: item.ids ?? media?.ids,
+    seasons,
+  };
+}
+
+/** ISO timestamp for the schema's `.datetime()`, or undefined if unparseable. */
+function simklAddedAt(value?: string): string | undefined {
+  if (!value) return undefined;
+  const ms = Date.parse(value);
+  return Number.isNaN(ms) ? undefined : new Date(ms).toISOString();
+}
+
 export function parseSimklPayload(data: {
   movies?: SimklItem[];
   shows?: SimklItem[];
@@ -438,7 +471,8 @@ export function parseSimklPayload(data: {
   const ratings: ImportRating[] = [];
 
   // Movies
-  for (const item of data.movies ?? []) {
+  for (const raw of data.movies ?? []) {
+    const item = normalizeSimklItem(raw);
     if (!item.title) continue;
     const tmdbId =
       typeof item.ids?.tmdb === "number"
@@ -456,6 +490,7 @@ export function parseSimklPayload(data: {
         year: item.year,
         type: "movie",
         status: sofaStatus,
+        addedAt: simklAddedAt(item.added_to_watchlist_at),
       });
     }
 
@@ -491,7 +526,7 @@ export function parseSimklPayload(data: {
   }
 
   // Shows + Anime (both map to TV type)
-  const allShows = [...(data.shows ?? []), ...(data.anime ?? [])];
+  const allShows = [...(data.shows ?? []), ...(data.anime ?? [])].map(normalizeSimklItem);
   for (const item of allShows) {
     if (!item.title) continue;
     const tmdbId =
@@ -517,6 +552,7 @@ export function parseSimklPayload(data: {
         year: item.year,
         type: "tv",
         status: sofaStatus,
+        addedAt: simklAddedAt(item.added_to_watchlist_at),
       });
     }
 

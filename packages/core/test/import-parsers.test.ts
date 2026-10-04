@@ -729,6 +729,88 @@ describe("parseSimklPayload", () => {
     // movie watch + library item, both without IDs
     expect(result.diagnostics?.unresolved).toBe(2);
   });
+
+  test("parses nested backup items", () => {
+    const result = parseSimklPayload({
+      movies: [
+        {
+          status: "completed",
+          last_watched_at: "2024-01-15T20:00:00Z",
+          user_rating: 8,
+          movie: { title: "Inception", year: 2010, ids: { tmdb: 27205, imdb: "tt1375666" } },
+        },
+      ],
+      shows: [
+        {
+          status: "watching",
+          show: { title: "Lost", year: 2004, ids: { tvdb: 73739 } },
+          seasons: [
+            {
+              number: 1,
+              episodes: [{ number: 1, watched_at: "2024-01-16T20:00:00Z" }, { number: 2 }],
+            },
+          ],
+        },
+      ],
+      anime: [{ status: "plantowatch", show: { title: "Frieren", ids: { tmdb: 209867 } } }],
+    } as never);
+
+    expect(result.data.movies).toHaveLength(1);
+    expect(result.data.movies[0].title).toBe("Inception");
+    expect(result.data.movies[0].tmdbId).toBe(27205);
+    expect(result.data.ratings.filter((r) => r.type === "movie")).toHaveLength(1);
+    expect(result.data.episodes).toHaveLength(1);
+    expect(result.data.episodes[0].seasonNumber).toBe(1);
+    expect(result.data.episodes[0].episodeNumber).toBe(1);
+    expect(result.data.watchlist.some((w) => w.type === "tv" && w.title === "Frieren")).toBe(true);
+  });
+
+  test("treats all listed episodes as watched when none carry watched_at", () => {
+    const result = parseSimklPayload({
+      shows: [
+        {
+          status: "watching",
+          show: { title: "Severance", ids: { tmdb: 95396 } },
+          seasons: [{ number: 1, episodes: [{ number: 1 }, { number: 2 }] }],
+        },
+      ],
+    } as never);
+
+    expect(result.data.episodes).toHaveLength(2);
+  });
+
+  test("maps added_to_watchlist_at to addedAt", () => {
+    const result = parseSimklPayload({
+      movies: [
+        {
+          status: "plantowatch",
+          added_to_watchlist_at: "2023-05-01T10:00:00Z",
+          movie: { title: "Dune", year: 2021, ids: { tmdb: 438631 } },
+        },
+      ],
+    } as never);
+
+    expect(result.data.watchlist).toHaveLength(1);
+    expect(new Date(result.data.watchlist[0].addedAt as string).toISOString()).toBe(
+      "2023-05-01T10:00:00.000Z",
+    );
+  });
+
+  test("keeps a watchlist item whose added_to_watchlist_at is unparseable", () => {
+    const result = parseSimklPayload({
+      movies: [
+        {
+          status: "plantowatch",
+          added_to_watchlist_at: "not a date",
+          movie: { title: "Odd Date", ids: { tmdb: 99 } },
+        },
+      ],
+    } as never);
+
+    expect(result.data.watchlist).toHaveLength(1);
+    expect(result.data.watchlist[0].title).toBe("Odd Date");
+    expect(result.data.watchlist[0].addedAt).toBeUndefined();
+  });
 });
 
 // ─── parseLetterboxdExport ───────────────────────────────────────────
