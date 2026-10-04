@@ -282,7 +282,13 @@ export const search = os.discover.search.use(authed).handler(async ({ input }) =
   );
   const titleMap = ensureBrowseTitlesExist(
     titleResults.map((r) => ({
-      ...r,
+      tmdbId: r.tmdbId,
+      type: r.type,
+      title: r.title,
+      overview: r.overview,
+      posterPath: r.posterPath,
+      popularity: r.popularity,
+      voteAverage: r.voteAverage,
       releaseDate: r.type === "movie" ? r.releaseDate : null,
       firstAirDate: r.type === "tv" ? r.releaseDate : null,
     })),
