@@ -167,9 +167,9 @@ export async function loadImageBuffer(
   return remote?.buffer ?? null;
 }
 
-export async function cacheImagesForTitle(titleId: string) {
+export async function cacheImagesForTitle(titleId: string): Promise<number> {
   const title = getTitleWithPaths(titleId);
-  if (!title) return;
+  if (!title) return 0;
 
   // Collect all candidate images, then check cache in parallel
   const candidates: { imgPath: string; category: ImageCategory }[] = [];
@@ -200,9 +200,10 @@ export async function cacheImagesForTitle(titleId: string) {
   }
 
   await Promise.allSettled(tasks);
+  return tasks.length;
 }
 
-export async function cacheEpisodeStills(titleId: string) {
+export async function cacheEpisodeStills(titleId: string): Promise<number> {
   const allEps = getEpisodeStillsForTitle(titleId);
 
   const epsWithStills = allEps.filter(
@@ -221,9 +222,10 @@ export async function cacheEpisodeStills(titleId: string) {
     (c) => downloadAndCacheImage(c.stillPath, "stills"),
     STILL_DOWNLOAD_CONCURRENCY,
   );
+  return uncached.length;
 }
 
-export async function cacheProviderLogos(titleId: string) {
+export async function cacheProviderLogos(titleId: string): Promise<number> {
   const offers = getAvailabilityLogosForTitle(titleId);
 
   // Deduplicate and parallel cache checks
@@ -245,9 +247,10 @@ export async function cacheProviderLogos(titleId: string) {
     .map((c) => downloadAndCacheImage(c.logoPath, "logos"));
 
   await Promise.allSettled(tasks);
+  return tasks.length;
 }
 
-export async function cacheProfilePhotos(titleId: string) {
+export async function cacheProfilePhotos(titleId: string): Promise<number> {
   const castRows = getCastProfilePathsForTitle(titleId);
 
   // Deduplicate and parallel cache checks
@@ -272,4 +275,5 @@ export async function cacheProfilePhotos(titleId: string) {
     log.debug(`Caching ${tasks.length} profile photos for title ${titleId}`);
   }
   await Promise.allSettled(tasks);
+  return tasks.length;
 }

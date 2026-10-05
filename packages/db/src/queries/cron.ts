@@ -180,3 +180,18 @@ export function getTitleIdsCheckedBefore(
     .all()
     .map((r) => r.id);
 }
+
+export function getRefreshCandidates(titleIds: string[]) {
+  if (titleIds.length === 0) return [];
+  return db
+    .select({
+      id: titles.id,
+      type: titles.type,
+      status: titles.status,
+      releaseDate: titles.releaseDate,
+      lastFetchedAt: titles.lastFetchedAt,
+    })
+    .from(titles)
+    .where(inArray(titles.id, titleIds))
+    .all();
+}

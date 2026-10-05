@@ -1,6 +1,7 @@
 import {
   getCastEntryForTitle,
   getLibraryTitleIds as queryGetLibraryTitleIds,
+  getRefreshCandidates,
   getReturningTvShows,
   getStaleTitles,
   getStaleNonLibraryTitles,
@@ -14,6 +15,7 @@ import {
   updateCronRunError,
   updateCronRunSuccess,
 } from "@sofa/db/queries/cron";
+import { getSeasonsForTitle } from "@sofa/db/queries/metadata";
 
 /**
  * Run `fn` for each item in order, isolating failures so one bad item (e.g. a
@@ -67,6 +69,40 @@ export function getThumbhashBackfillTitleIds(): string[] {
 
 export function getStaleLibraryTitles(libraryIds: string[], staleDate: Date) {
   return getStaleTitles(libraryIds, staleDate);
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const SETTLED_TV_STATUSES = new Set(["Ended", "Canceled"]);
+
+/** How long a library title's metadata stays fresh. Settled titles rarely change on TMDB. */
+export function libraryRefreshIntervalMs(
+  title: { type: string; status: string | null; releaseDate: string | null },
+  now = new Date(),
+): number {
+  if (title.type === "tv" && title.status && SETTLED_TV_STATUSES.has(title.status)) {
+    return 60 * DAY_MS;
+  }
+  if (title.type === "movie" && title.releaseDate) {
+    const released = Date.parse(`${title.releaseDate}T00:00:00Z`);
+    if (Number.isFinite(released) && now.getTime() - released > 365 * DAY_MS) return 60 * DAY_MS;
+  }
+  return 7 * DAY_MS;
+}
+
+/** Library title ids whose metadata is due for a refresh. */
+export function getLibraryTitlesDueForRefresh(libraryIds: string[], now = new Date()): string[] {
+  return getRefreshCandidates(libraryIds)
+    .filter(
+      (t) =>
+        !t.lastFetchedAt ||
+        now.getTime() - t.lastFetchedAt.getTime() >= libraryRefreshIntervalMs(t, now),
+    )
+    .map((t) => t.id);
+}
+
+/** Season numbers Sofa has stored for a title. */
+export function getStoredSeasonNumbers(titleId: string): number[] {
+  return getSeasonsForTitle(titleId).map((s) => s.seasonNumber);
 }
 
 export function getStaleNonLibraryTitlesForRefresh(staleDate: Date, limit: number) {

@@ -6,7 +6,9 @@ import { clearAllTables, eq, insertTitle, testDb } from "@sofa/test/db";
 import {
   completeCronRun,
   failCronRun,
+  getLibraryTitlesDueForRefresh,
   getStaleLibraryTitles,
+  libraryRefreshIntervalMs,
   runIsolated,
   startCronRun,
 } from "../src/cron";
@@ -123,5 +125,76 @@ describe("getStaleLibraryTitles", () => {
     insertTitle({ id: "t-shell", tmdbId: 1 });
     insertTitle({ id: "t-other", tmdbId: 4 });
     expect(getStaleLibraryTitles(["t-shell"], staleDate)).toEqual([{ id: "t-shell" }]);
+  });
+});
+
+describe("libraryRefreshIntervalMs", () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const now = new Date("2026-06-01T00:00:00Z");
+
+  test("ended TV shows refresh every 60 days", () => {
+    expect(libraryRefreshIntervalMs({ type: "tv", status: "Ended", releaseDate: null }, now)).toBe(
+      60 * DAY,
+    );
+  });
+
+  test("returning TV shows refresh every 7 days", () => {
+    expect(
+      libraryRefreshIntervalMs({ type: "tv", status: "Returning Series", releaseDate: null }, now),
+    ).toBe(7 * DAY);
+  });
+
+  test("movies released over a year ago refresh every 60 days", () => {
+    expect(
+      libraryRefreshIntervalMs(
+        { type: "movie", status: "Released", releaseDate: "2001-01-01" },
+        now,
+      ),
+    ).toBe(60 * DAY);
+  });
+
+  test("recent movies refresh every 7 days", () => {
+    expect(
+      libraryRefreshIntervalMs(
+        { type: "movie", status: "Released", releaseDate: "2026-05-02" },
+        now,
+      ),
+    ).toBe(7 * DAY);
+  });
+
+  test("movies without a release date refresh every 7 days", () => {
+    expect(
+      libraryRefreshIntervalMs({ type: "movie", status: "Released", releaseDate: null }, now),
+    ).toBe(7 * DAY);
+  });
+});
+
+describe("getLibraryTitlesDueForRefresh", () => {
+  const now = new Date("2026-06-01T00:00:00Z");
+  const tenDaysAgo = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000);
+
+  test("skips an ended show fetched 10 days ago", () => {
+    insertTitle({ id: "t-ended", tmdbId: 1, type: "tv" });
+    testDb
+      .update(titles)
+      .set({ status: "Ended", lastFetchedAt: tenDaysAgo })
+      .where(eq(titles.id, "t-ended"))
+      .run();
+    expect(getLibraryTitlesDueForRefresh(["t-ended"], now)).toEqual([]);
+  });
+
+  test("includes a returning show fetched 10 days ago", () => {
+    insertTitle({ id: "t-returning", tmdbId: 2, type: "tv" });
+    testDb
+      .update(titles)
+      .set({ status: "Returning Series", lastFetchedAt: tenDaysAgo })
+      .where(eq(titles.id, "t-returning"))
+      .run();
+    expect(getLibraryTitlesDueForRefresh(["t-returning"], now)).toEqual(["t-returning"]);
+  });
+
+  test("includes a never-fetched shell title", () => {
+    insertTitle({ id: "t-shell", tmdbId: 3 });
+    expect(getLibraryTitlesDueForRefresh(["t-shell"], now)).toEqual(["t-shell"]);
   });
 });

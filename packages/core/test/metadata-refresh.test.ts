@@ -56,7 +56,11 @@ vi.mock("@sofa/tmdb/client", () => ({
   getVideos: async () => ({ results: [] }),
 }));
 
-import { refreshTvChildren, updateTitleWithArtInvalidation } from "../src/metadata";
+import {
+  refreshTvChildren,
+  seasonsToRefresh,
+  updateTitleWithArtInvalidation,
+} from "../src/metadata";
 
 beforeEach(() => {
   clearAllTables();
@@ -66,7 +70,38 @@ beforeEach(() => {
   }));
 });
 
+describe("seasonsToRefresh", () => {
+  test("returning shows refresh only the two latest seasons", () => {
+    expect(seasonsToRefresh("Returning Series", 6, [1, 2, 3, 4, 5, 6])).toEqual([5, 6]);
+  });
+
+  test("returning shows also refresh seasons never stored", () => {
+    expect(seasonsToRefresh("Returning Series", 6, [1, 2, 3])).toEqual([4, 5, 6]);
+  });
+
+  test("ended shows refresh every season", () => {
+    expect(seasonsToRefresh("Ended", 6, [1, 2, 3, 4, 5, 6])).toBeUndefined();
+  });
+
+  test("shows with no stored seasons refresh every season", () => {
+    expect(seasonsToRefresh("Returning Series", 6, [])).toBeUndefined();
+  });
+
+  test("single-season returning show refreshes that season", () => {
+    expect(seasonsToRefresh("Returning Series", 1, [1])).toEqual([1]);
+  });
+});
+
 describe("refreshTvChildren", () => {
+  test("onlySeasons limits which seasons are fetched", async () => {
+    insertTitle({ id: "tv-1", tmdbId: 10, type: "tv", title: "Show" });
+
+    await refreshTvChildren("tv-1", 10, 3, { onlySeasons: [3] });
+
+    expect(mockGetTvSeasonDetails).toHaveBeenCalledTimes(1);
+    expect(mockGetTvSeasonDetails.mock.calls[0] as unknown[]).toEqual([10, 3]);
+  });
+
   test("clears stale season and episode thumbhashes when artwork paths change", async () => {
     insertTitle({ id: "tv-1", tmdbId: 10, type: "tv", title: "Show" });
     testDb

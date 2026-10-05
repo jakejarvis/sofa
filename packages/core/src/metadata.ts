@@ -334,7 +334,12 @@ export async function refreshTitle(titleId: string) {
       lastFetchedAt: now,
     });
     upsertGenresTransaction(titleId, show.genres ?? []);
-    await refreshTvChildren(titleId, title.tmdbId, show.number_of_seasons);
+    const onlySeasons = seasonsToRefresh(
+      show.status ?? null,
+      show.number_of_seasons,
+      getSeasonsForTitle(titleId).map((s) => s.seasonNumber),
+    );
+    await refreshTvChildren(titleId, title.tmdbId, show.number_of_seasons, { onlySeasons });
   }
 
   const updated = getTitleById(titleId);
@@ -351,9 +356,38 @@ export async function refreshTitle(titleId: string) {
   return updated;
 }
 
-export async function refreshTvChildren(titleId: string, tmdbId: number, numberOfSeasons: number) {
+const RETURNING_TV_STATUSES = new Set(["Returning Series", "In Production"]);
+
+/**
+ * Seasons worth re-fetching for a show we already have: for returning shows, the two latest
+ * plus any season never stored; otherwise every season.
+ */
+export function seasonsToRefresh(
+  status: string | null,
+  numberOfSeasons: number,
+  storedSeasonNumbers: number[],
+): number[] | undefined {
+  if (!status || !RETURNING_TV_STATUSES.has(status) || storedSeasonNumbers.length === 0) {
+    return undefined; // all seasons
+  }
+  const stored = new Set(storedSeasonNumbers);
+  const result: number[] = [];
+  for (let sn = 1; sn <= numberOfSeasons; sn++) {
+    if (sn >= numberOfSeasons - 1 || !stored.has(sn)) result.push(sn);
+  }
+  return result;
+}
+
+export async function refreshTvChildren(
+  titleId: string,
+  tmdbId: number,
+  numberOfSeasons: number,
+  options?: { onlySeasons?: number[] },
+) {
   // Fetch seasons with limited concurrency to stay within TMDB's 40 req/s limit
-  const seasonNumbers = Array.from({ length: numberOfSeasons }, (_, i) => i + 1);
+  const allSeasons = Array.from({ length: numberOfSeasons }, (_, i) => i + 1);
+  const only = options?.onlySeasons;
+  const seasonNumbers = only ? allSeasons.filter((sn) => only.includes(sn)) : allSeasons;
   const fetched = await mapWithConcurrency(
     seasonNumbers,
     (sn) => getTvSeasonDetails(tmdbId, sn),
