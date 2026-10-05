@@ -4,7 +4,7 @@ import { adminClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import * as Network from "expo-network";
 import * as SecureStore from "expo-secure-store";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { AppState, type AppStateStatus } from "react-native";
 
 import { globalStorage } from "@/lib/mmkv";
@@ -100,6 +100,15 @@ export function onServerUrlChange(callback: () => void): () => void {
 
 export function hasStoredServerUrl(): boolean {
   return globalStorage.contains(SERVER_URL_KEY);
+}
+
+function hasServerUrlSnapshot(): boolean {
+  return !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
+}
+
+/** Whether a server is configured; re-renders when the server URL changes (React-Compiler safe). */
+export function useHasServerUrl(): boolean {
+  return useSyncExternalStore(onServerUrlChange, hasServerUrlSnapshot);
 }
 
 // ---------------------------------------------------------------------------

@@ -11,11 +11,11 @@ import {
   consumeSessionRejected,
   ensureInstanceId,
   getCurrentInstanceId,
-  hasStoredServerUrl,
   onServerReachabilityChange,
   onServerUrlChange,
   rebuildAuthClient,
   startReachabilityMonitor,
+  useHasServerUrl,
   wasCachedSessionSeeded,
 } from "@/lib/server";
 import { toast } from "@/lib/toast";
@@ -44,7 +44,7 @@ export function useServerConnection() {
   );
 
   const { data: session, isPending, isRefetching } = authClient.useSession();
-  const hasServerUrl = !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
+  const hasServerUrl = useHasServerUrl();
 
   // --- Instance ID resolution ---
   const [instanceId, setInstanceId] = useState(getCurrentInstanceId);

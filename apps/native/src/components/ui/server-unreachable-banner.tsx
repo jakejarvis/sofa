@@ -9,11 +9,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { queryClient } from "@/lib/query-client";
-import { authClient, hasStoredServerUrl, useServerReachability } from "@/lib/server";
+import { authClient, useHasServerUrl, useServerReachability } from "@/lib/server";
 import * as Haptics from "@/utils/haptics";
 
 export function ServerUnreachableBanner() {
-  const hasServerUrl = !!process.env.EXPO_PUBLIC_SERVER_URL || hasStoredServerUrl();
+  const hasServerUrl = useHasServerUrl();
   const { isReachable } = useServerReachability();
   const insets = useSafeAreaInsets();
   const wasReachable = useRef(true);
