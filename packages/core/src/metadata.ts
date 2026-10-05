@@ -46,6 +46,7 @@ import { tmdbImageUrl } from "@sofa/tmdb/image";
 
 import { refreshAvailability } from "./availability";
 import { extractAndStoreColors, parseColorPalette } from "./colors";
+import { mapWithConcurrency } from "./concurrency";
 import { getCastForTitle, refreshCredits } from "./credits";
 import {
   cacheEpisodeStills,
@@ -64,26 +65,7 @@ import {
 
 const log = createLogger("metadata");
 
-async function mapWithConcurrency<T, R>(
-  items: T[],
-  fn: (item: T) => Promise<R>,
-  concurrency: number,
-): Promise<PromiseSettledResult<R>[]> {
-  const results: PromiseSettledResult<R>[] = Array.from({ length: items.length });
-  let i = 0;
-  async function worker() {
-    while (i < items.length) {
-      const idx = i++;
-      try {
-        results[idx] = { status: "fulfilled", value: await fn(items[idx]) };
-      } catch (reason) {
-        results[idx] = { status: "rejected", reason };
-      }
-    }
-  }
-  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
-  return results;
-}
+const THUMBHASH_CONCURRENCY = 4;
 
 export function updateTitleWithArtInvalidation(
   title: Pick<
@@ -893,11 +875,12 @@ export async function refreshTrailer(titleId: string) {
 async function generateMissingTvChildThumbHashes(titleId: string) {
   const titleSeasons = getSeasonsForTitle(titleId);
 
-  const hashTasks: Promise<unknown>[] = [];
+  const work: (() => Promise<unknown>)[] = [];
 
   for (const s of titleSeasons) {
     if (s.posterPath && !s.posterThumbHash) {
-      hashTasks.push(generateSeasonThumbHash(s.id, s.posterPath));
+      const posterPath = s.posterPath;
+      work.push(() => generateSeasonThumbHash(s.id, posterPath));
     }
   }
 
@@ -905,11 +888,11 @@ async function generateMissingTvChildThumbHashes(titleId: string) {
   if (seasonIds.length > 0) {
     const epsNeedingHash = getEpisodesNeedingStillHash(seasonIds);
     for (const ep of epsNeedingHash) {
-      hashTasks.push(generateEpisodeThumbHash(ep.id, ep.stillPath));
+      work.push(() => generateEpisodeThumbHash(ep.id, ep.stillPath));
     }
   }
 
-  await Promise.all(hashTasks);
+  await mapWithConcurrency(work, (run) => run(), THUMBHASH_CONCURRENCY);
 }
 
 export async function syncTvChildArt(titleId: string, options?: { warmCache?: boolean }) {
@@ -922,7 +905,8 @@ export async function syncTvChildArt(titleId: string, options?: { warmCache?: bo
 
 /**
  * Warm the image cache for a title, then derive poster colors and thumbhashes.
- * Sequencing avoids duplicate TMDB downloads on cold caches.
+ * Sequencing avoids duplicate TMDB downloads on cold caches. For TV, episode stills
+ * and season/episode thumbhashes continue in the background after this resolves.
  */
 async function syncTitleArt(
   titleId: string,
@@ -932,9 +916,6 @@ async function syncTitleArt(
 ) {
   if (imageCacheEnabled()) {
     await cacheImagesForTitle(titleId);
-    if (type === "tv") {
-      await cacheEpisodeStills(titleId);
-    }
   }
 
   const posterBuffer = posterPath ? await loadImageBuffer(posterPath, "posters") : undefined;
@@ -947,7 +928,9 @@ async function syncTitleArt(
   ]);
 
   if (type === "tv") {
-    await syncTvChildArt(titleId, { warmCache: false });
+    // Episode stills and season/episode thumbhashes can number in the hundreds; callers
+    // (often a title-page request) shouldn't wait for them.
+    syncTvChildArt(titleId).catch((err) => log.debug("TV child art sync failed:", err));
   }
 }
 

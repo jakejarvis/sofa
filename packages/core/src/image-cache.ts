@@ -12,7 +12,11 @@ import {
 import { createLogger } from "@sofa/logger";
 import { IMAGE_CATEGORY_SIZES, type ImageCategory, tmdbCdnImageUrl } from "@sofa/tmdb/image";
 
+import { mapWithConcurrency } from "./concurrency";
+
 const log = createLogger("image-cache");
+
+const STILL_DOWNLOAD_CONCURRENCY = 6;
 
 export type { ImageCategory };
 
@@ -211,11 +215,12 @@ export async function cacheEpisodeStills(titleId: string) {
       cached: await isImageCached("stills", path.basename(ep.stillPath)),
     })),
   );
-  const tasks = checks
-    .filter((c) => !c.cached)
-    .map((c) => downloadAndCacheImage(c.stillPath, "stills"));
-
-  await Promise.allSettled(tasks);
+  const uncached = checks.filter((c) => !c.cached);
+  await mapWithConcurrency(
+    uncached,
+    (c) => downloadAndCacheImage(c.stillPath, "stills"),
+    STILL_DOWNLOAD_CONCURRENCY,
+  );
 }
 
 export async function cacheProviderLogos(titleId: string) {
