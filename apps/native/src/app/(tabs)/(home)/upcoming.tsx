@@ -130,15 +130,17 @@ export default function UpcomingScreen() {
     </ScrollView>
   );
 
+  const isIOS = process.env.EXPO_OS === "ios";
+
   return (
     <>
       <Stack.Header
-        transparent
-        blurEffect="systemChromeMaterialDark"
+        transparent={isIOS}
+        blurEffect={isIOS ? "systemChromeMaterialDark" : undefined}
         style={{
           color: tintColor,
           shadowColor: "transparent",
-          backgroundColor: process.env.EXPO_OS === "ios" ? undefined : backgroundColor,
+          backgroundColor: isIOS ? undefined : backgroundColor,
         }}
       />
       <Stack.Screen.Title style={headerTitleStyle as Record<string, unknown>}>

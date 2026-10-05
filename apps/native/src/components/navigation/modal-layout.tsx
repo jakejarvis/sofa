@@ -18,7 +18,7 @@ export function ModalLayout({ children }: { children: ReactNode }) {
 
   return (
     <View className="bg-background flex-1">
-      <Stack.Header transparent blurEffect="none" />
+      <Stack.Header hidden={process.env.EXPO_OS !== "ios"} transparent blurEffect="none" />
       {process.env.EXPO_OS === "ios" && (
         <Stack.Toolbar placement="right">
           <Stack.Toolbar.Button onPress={() => dismissAll()}>
