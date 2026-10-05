@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { titleAvailability } from "@sofa/db/schema";
+import { titleAvailability, titles } from "@sofa/db/schema";
 import {
   clearAllTables,
   eq,
@@ -42,5 +42,14 @@ describe("refreshAvailability", () => {
       .all();
 
     expect(offers).toHaveLength(0);
+  });
+
+  test("records availabilityCheckedAt even when TMDB has no providers", async () => {
+    insertTitle({ id: "movie-2", tmdbId: 102, type: "movie", title: "Movie 2" });
+
+    await refreshAvailability("movie-2");
+
+    const row = testDb.select().from(titles).where(eq(titles.id, "movie-2")).get();
+    expect(row?.availabilityCheckedAt).toBeInstanceOf(Date);
   });
 });

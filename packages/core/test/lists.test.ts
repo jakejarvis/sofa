@@ -177,6 +177,18 @@ describe("getSonarrList", () => {
     expect(list).toEqual([]);
   });
 
+  test("remembers a null TVDB ID instead of looking it up again", async () => {
+    insertUser("user-1");
+    insertTitle({ id: "tv1", tmdbId: 300, type: "tv", title: "Show C" });
+    insertStatus("user-1", "tv1", "watchlist");
+
+    mockGetTvExternalIds.mockResolvedValueOnce({ tvdb_id: null, imdb_id: null });
+
+    expect(await getSonarrList("user-1")).toEqual([]);
+    expect(await getSonarrList("user-1")).toEqual([]);
+    expect(mockGetTvExternalIds).toHaveBeenCalledTimes(1);
+  });
+
   test("filters by status", async () => {
     insertUser("user-1");
     insertTitle({

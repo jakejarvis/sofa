@@ -47,6 +47,7 @@ export function getSonarrShows(
       id: titles.id,
       tmdbId: titles.tmdbId,
       tvdbId: titles.tvdbId,
+      tvdbCheckedAt: titles.tvdbCheckedAt,
       title: titles.title,
     })
     .from(userTitleStatus)

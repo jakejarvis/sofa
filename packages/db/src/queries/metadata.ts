@@ -53,6 +53,23 @@ export function updateTrailerKey(titleId: string, key: string | null) {
   db.update(titles).set({ trailerVideoKey: key }).where(eq(titles.id, titleId)).run();
 }
 
+export type EnrichmentKind = "credits" | "availability" | "recommendations" | "trailer" | "tvdb";
+
+/** Record that an enrichment lookup ran (even if TMDB returned nothing). */
+export function markEnrichmentChecked(titleId: string, kind: EnrichmentKind, at = new Date()) {
+  const values: Partial<typeof titles.$inferInsert> =
+    kind === "credits"
+      ? { creditsCheckedAt: at }
+      : kind === "availability"
+        ? { availabilityCheckedAt: at }
+        : kind === "recommendations"
+          ? { recommendationsCheckedAt: at }
+          : kind === "trailer"
+            ? { trailerCheckedAt: at }
+            : { tvdbCheckedAt: at };
+  db.update(titles).set(values).where(eq(titles.id, titleId)).run();
+}
+
 // ─── Genres ──────────────────────────────────────────────────────────
 
 interface TmdbGenreInput {

@@ -3,6 +3,7 @@ import {
   getAvailabilityForTitle,
   replaceAvailabilityTransaction,
 } from "@sofa/db/queries/availability";
+import { markEnrichmentChecked } from "@sofa/db/queries/metadata";
 import { getTitleById } from "@sofa/db/queries/title";
 import type { titleAvailability } from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
@@ -42,6 +43,7 @@ export async function refreshAvailability(titleId: string) {
   }
 
   replaceAvailabilityTransaction(titleId, "US", allOfferRows);
+  markEnrichmentChecked(titleId, "availability", now);
 
   if (!us) {
     log.debug(`No US providers for title ${titleId}; cleared cached offers`);
