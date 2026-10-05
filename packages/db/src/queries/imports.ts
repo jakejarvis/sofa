@@ -1,4 +1,4 @@
-import { and, eq, gt, gte, inArray, lte } from "drizzle-orm";
+import { and, eq, gt, gte, inArray, lte, ne } from "drizzle-orm";
 
 import { db } from "../client";
 import {
@@ -114,6 +114,44 @@ export function hasRating(userId: string, titleId: string): boolean {
 
 export function getImportJob(jobId: string) {
   return db.select().from(importJobs).where(eq(importJobs.id, jobId)).get();
+}
+
+/** A job without its payload (which can be several MB) — for progress polling. */
+export function getImportJobSummary(jobId: string) {
+  return db
+    .select({
+      id: importJobs.id,
+      userId: importJobs.userId,
+      source: importJobs.source,
+      status: importJobs.status,
+      totalItems: importJobs.totalItems,
+      processedItems: importJobs.processedItems,
+      importedCount: importJobs.importedCount,
+      skippedCount: importJobs.skippedCount,
+      failedCount: importJobs.failedCount,
+      currentMessage: importJobs.currentMessage,
+      errors: importJobs.errors,
+      warnings: importJobs.warnings,
+      createdAt: importJobs.createdAt,
+      startedAt: importJobs.startedAt,
+      finishedAt: importJobs.finishedAt,
+    })
+    .from(importJobs)
+    .where(eq(importJobs.id, jobId))
+    .get();
+}
+
+const FINISHED_STATUSES = ["success", "error", "cancelled"] as const;
+
+/** Empty the payload of finished jobs; only the processor reads it. Returns rows changed. */
+export function clearFinishedImportPayloads(jobId?: string): number {
+  const finished = inArray(importJobs.status, [...FINISHED_STATUSES]);
+  return db
+    .update(importJobs)
+    .set({ payload: "" })
+    .where(and(finished, ne(importJobs.payload, ""), jobId ? eq(importJobs.id, jobId) : undefined))
+    .returning({ id: importJobs.id })
+    .all().length;
 }
 
 export function updateImportJobProgress(

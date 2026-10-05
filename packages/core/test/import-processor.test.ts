@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { clearFinishedImportPayloads } from "@sofa/db/queries/imports";
 import * as maintenance from "@sofa/db/queries/maintenance";
 import {
   importJobs,
@@ -770,5 +771,111 @@ describe("processImportJob — rewatches and added dates", () => {
     } finally {
       findSpy.mockRestore();
     }
+  });
+});
+
+// ── Payload retention ───────────────────────────────────────────────
+
+const blankPayload = (source: NormalizedImport["source"]): NormalizedImport => ({
+  source,
+  movies: [],
+  episodes: [],
+  watchlist: [],
+  ratings: [],
+});
+
+function readPayload(jobId: string) {
+  return testDb
+    .select({ payload: importJobs.payload })
+    .from(importJobs)
+    .where(eq(importJobs.id, jobId))
+    .get()?.payload;
+}
+
+describe("processImportJob — payload retention", () => {
+  test("empties the payload after a successful import", async () => {
+    const userId = insertUser();
+    insertMovieTitle("movie-1", 550, "Fight Club");
+
+    const payload: NormalizedImport = {
+      ...blankPayload("trakt"),
+      movies: [{ tmdbId: 550, title: "Fight Club", year: 1999, watchedAt: "2024-06-15T20:00:00Z" }],
+    };
+
+    const jobId = createJob(userId, payload);
+    expect(readPayload(jobId)).not.toBe("");
+
+    await processImportJob(jobId);
+
+    expect(readImportJob(jobId).status).toBe("success");
+    expect(readPayload(jobId)).toBe("");
+  });
+
+  test("empties the payload of a job that fails on invalid JSON", async () => {
+    const userId = insertUser();
+    const jobId = "job-invalid-json";
+    testDb
+      .insert(importJobs)
+      .values({
+        id: jobId,
+        userId,
+        source: "trakt",
+        status: "pending",
+        payload: "{not json",
+        importWatches: true,
+        importWatchlist: true,
+        importRatings: true,
+        createdAt: new Date(),
+      })
+      .run();
+
+    await processImportJob(jobId);
+
+    const job = testDb.select().from(importJobs).where(eq(importJobs.id, jobId)).get();
+    expect(job?.status).toBe("error");
+    expect(job?.payload).toBe("");
+  });
+
+  test("clearFinishedImportPayloads only empties finished jobs", () => {
+    // Only one active (pending/running) job is allowed per user
+    const pendingId = createJob(insertUser("user-pending"), blankPayload("trakt"));
+    const successId = createJob(insertUser("user-success"), blankPayload("trakt"));
+    testDb.update(importJobs).set({ status: "success" }).where(eq(importJobs.id, successId)).run();
+
+    expect(clearFinishedImportPayloads()).toBe(1);
+
+    expect(readPayload(pendingId)).not.toBe("");
+    expect(readPayload(successId)).toBe("");
+    expect(clearFinishedImportPayloads()).toBe(0);
+  });
+
+  test("readImportJob still returns progress fields after the payload is cleared", () => {
+    const userId = insertUser();
+    const jobId = createJob(userId, blankPayload("trakt"));
+    testDb
+      .update(importJobs)
+      .set({
+        status: "error",
+        totalItems: 5,
+        processedItems: 3,
+        importedCount: 2,
+        skippedCount: 1,
+        failedCount: 0,
+        errors: JSON.stringify(["boom"]),
+        finishedAt: new Date(),
+      })
+      .where(eq(importJobs.id, jobId))
+      .run();
+    clearFinishedImportPayloads(jobId);
+    expect(readPayload(jobId)).toBe("");
+
+    const job = readImportJob(jobId, userId);
+    expect(job.status).toBe("error");
+    expect(job.totalItems).toBe(5);
+    expect(job.processedItems).toBe(3);
+    expect(job.importedCount).toBe(2);
+    expect(job.skippedCount).toBe(1);
+    expect(job.errors).toEqual(["boom"]);
+    expect(job.finishedAt).not.toBeNull();
   });
 });

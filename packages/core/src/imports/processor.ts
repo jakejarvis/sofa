@@ -3,8 +3,10 @@ import { ORPCError } from "@orpc/server";
 import { type ImportJob, NormalizedImportSchema } from "@sofa/api/schemas";
 import {
   backdateTitleStatusAddedAt,
+  clearFinishedImportPayloads,
   getImportJob,
   getImportJobStatus,
+  getImportJobSummary,
   hasEpisodeWatch,
   hasEpisodeWatchBetween,
   hasMovieWatch,
@@ -297,7 +299,7 @@ async function processRating(
 // ─── Read Job Helper ─────────────────────────────────────────────────
 
 export function readImportJob(jobId: string, userId?: string): ImportJob {
-  const row = getImportJob(jobId);
+  const row = getImportJobSummary(jobId);
 
   if (!row) {
     throw new ORPCError("NOT_FOUND", { message: `Import job ${jobId} not found` });
@@ -328,6 +330,18 @@ export function readImportJob(jobId: string, userId?: string): ImportJob {
 // ─── Job Processor ───────────────────────────────────────────────────
 
 export async function processImportJob(jobId: string): Promise<void> {
+  try {
+    await runImportJob(jobId);
+  } finally {
+    try {
+      clearFinishedImportPayloads(jobId);
+    } catch (err) {
+      log.warn(`Failed to clear payload for import job ${jobId}:`, err);
+    }
+  }
+}
+
+async function runImportJob(jobId: string): Promise<void> {
   const row = getImportJob(jobId);
 
   if (!row) {

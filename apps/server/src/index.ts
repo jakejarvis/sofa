@@ -8,7 +8,7 @@ import { ensureImageDirs, imageCacheEnabled } from "@sofa/core/image-cache";
 import { registerJobScheduleProvider } from "@sofa/core/system-health";
 import { closeDatabase, isDatabaseAccessBlocked } from "@sofa/db/client";
 import { runMigrations } from "@sofa/db/migrate";
-import { recoverStaleImportJobs } from "@sofa/db/queries/imports";
+import { clearFinishedImportPayloads, recoverStaleImportJobs } from "@sofa/db/queries/imports";
 import { seedPlatforms } from "@sofa/db/seed-platforms";
 import { createLogger } from "@sofa/logger";
 
@@ -44,6 +44,12 @@ seedPlatforms();
 const recoveredJobs = recoverStaleImportJobs();
 if (recoveredJobs > 0) {
   log.warn(`Recovered ${recoveredJobs} stale import job(s) from previous shutdown`);
+}
+
+// Payloads of finished imports are never read again; reclaim the space (and keep backups small).
+const clearedPayloads = clearFinishedImportPayloads();
+if (clearedPayloads > 0) {
+  log.info(`Cleared stored payloads of ${clearedPayloads} finished import job(s)`);
 }
 
 // Wire up job schedule provider for system health
