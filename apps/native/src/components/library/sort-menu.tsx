@@ -1,9 +1,9 @@
 import { MenuView } from "@expo/ui/community/menu";
 import { useLingui } from "@lingui/react/macro";
 import { IconArrowsSort } from "@tabler/icons-react-native";
-import { Pressable } from "react-native";
 import { useCSSVariable } from "uniwind";
 
+import { MenuTrigger } from "@/components/ui/menu-trigger";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import * as Haptics from "@/utils/haptics";
 
@@ -49,15 +49,15 @@ export function SortMenu({ sortBy, sortDirection, onSortChange }: SortMenuProps)
         );
         if (option) onSortChange(option.sortBy, option.sortDirection);
       }}
+      onOpenMenu={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
     >
-      <Pressable
+      <MenuTrigger
         onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
-        accessibilityRole="button"
         accessibilityLabel={t`Sort`}
         hitSlop={8}
       >
         <ScaledIcon icon={IconArrowsSort} size={22} color={foregroundColor} />
-      </Pressable>
+      </MenuTrigger>
     </MenuView>
   );
 }

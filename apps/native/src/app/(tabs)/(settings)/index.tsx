@@ -46,6 +46,7 @@ import { SettingsRow } from "@/components/settings/settings-row";
 import { SettingsSection } from "@/components/settings/settings-section";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { Image } from "@/components/ui/image";
+import { MenuTrigger } from "@/components/ui/menu-trigger";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
@@ -285,8 +286,7 @@ export default function SettingsScreen() {
                   }
                 }}
               >
-                <Pressable
-                  accessibilityRole="button"
+                <MenuTrigger
                   accessibilityLabel={t`Edit profile photo`}
                   accessibilityHint={t`Opens options to change or remove your photo`}
                   className="mr-3"
@@ -308,7 +308,7 @@ export default function SettingsScreen() {
                   <View className="bg-primary absolute right-0 bottom-0 size-[18px] items-center justify-center rounded-full">
                     <IconCamera size={10} color={primaryFgColor} />
                   </View>
-                </Pressable>
+                </MenuTrigger>
               </MenuView>
             ) : (
               <Pressable

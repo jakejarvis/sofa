@@ -1,8 +1,9 @@
 import { MenuView } from "@expo/ui/community/menu";
 import { useLingui } from "@lingui/react/macro";
 import type { Icon } from "@tabler/icons-react-native";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 
+import { MenuTrigger } from "@/components/ui/menu-trigger";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Sparkline } from "@/components/ui/sparkline";
 import { Text } from "@/components/ui/text";
@@ -96,13 +97,11 @@ export function StatsCard(props: StatsCardProps) {
           const nextPeriod = periods.find((value) => value === nativeEvent.event);
           if (nextPeriod) onPeriodChange(nextPeriod);
         }}
+        onOpenMenu={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
       >
-        <Pressable
-          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
-          accessibilityRole="button"
-        >
+        <MenuTrigger onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
           <CardInner {...props} />
-        </Pressable>
+        </MenuTrigger>
       </MenuView>
     </View>
   );

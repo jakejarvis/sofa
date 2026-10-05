@@ -2,9 +2,10 @@ import { Icon } from "@expo/ui";
 import { MenuView } from "@expo/ui/community/menu";
 import { useLingui } from "@lingui/react/macro";
 import { useRouter } from "expo-router";
-import { Alert, Pressable, View } from "react-native";
+import { Alert, View } from "react-native";
 
 import { Image } from "@/components/ui/image";
+import { MenuTrigger } from "@/components/ui/menu-trigger";
 import { Text } from "@/components/ui/text";
 import { queryClient } from "@/lib/query-client";
 import { authClient } from "@/lib/server";
@@ -58,10 +59,10 @@ export function HeaderAvatar() {
           ]);
         }
       }}
+      onOpenMenu={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
     >
-      <Pressable
+      <MenuTrigger
         onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
-        accessibilityRole="button"
         accessibilityLabel={t`User menu`}
         hitSlop={8}
       >
@@ -84,7 +85,7 @@ export function HeaderAvatar() {
             </View>
           )}
         </View>
-      </Pressable>
+      </MenuTrigger>
     </MenuView>
   );
 }
