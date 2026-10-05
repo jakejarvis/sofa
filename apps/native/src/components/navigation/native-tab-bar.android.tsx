@@ -1,10 +1,12 @@
+import { useLingui } from "@lingui/react/macro";
 import { NativeTabs, type NativeTabsProps } from "expo-router/unstable-native-tabs";
 import { useMemo } from "react";
 import { useCSSVariable, useResolveClassNames } from "uniwind";
 
 import * as Haptics from "@/utils/haptics";
 
-export function NativeTabBar({ showSettingsBadge }: { showSettingsBadge: boolean }) {
+export function NativeTabBar() {
+  const { t } = useLingui();
   const primaryColor = useCSSVariable("--color-primary") as string;
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
   const surfaceColor = useCSSVariable("--color-card") as string;
@@ -38,21 +40,24 @@ export function NativeTabBar({ showSettingsBadge }: { showSettingsBadge: boolean
       screenListeners={screenListeners}
     >
       <NativeTabs.Trigger name="(home)" disableTransparentOnScrollEdge>
-        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t`Home`}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon md="home" />
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="(library)" disableTransparentOnScrollEdge>
+        <NativeTabs.Trigger.Label>{t`Library`}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon md="local_library" />
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="(explore)" disableTransparentOnScrollEdge>
-        <NativeTabs.Trigger.Label>Explore</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t`Explore`}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon md="explore" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(search)" disableTransparentOnScrollEdge>
-        <NativeTabs.Trigger.Label>Search</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon md="search" />
-      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="(settings)" disableTransparentOnScrollEdge>
-        <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t`Settings`}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon md="settings" />
-        {showSettingsBadge ? <NativeTabs.Trigger.Badge>!</NativeTabs.Trigger.Badge> : null}
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="(search)" disableTransparentOnScrollEdge>
+        <NativeTabs.Trigger.Label>{t`Search`}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon md="search" />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

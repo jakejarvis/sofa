@@ -1221,6 +1221,7 @@ msgstr "كل {n} ساعة"
 
 #: apps/native/src/app/(tabs)/(explore)/_layout.tsx
 #: apps/native/src/app/(tabs)/(home)/index.tsx
+#: apps/native/src/components/navigation/native-tab-bar.android.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 msgid "Explore"
@@ -1575,6 +1576,7 @@ msgid "Hindi"
 msgstr "الهندية"
 
 #: apps/native/src/app/(tabs)/(home)/_layout.tsx
+#: apps/native/src/components/navigation/native-tab-bar.android.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 msgid "Home"
@@ -1812,6 +1814,7 @@ msgid "Last run succeeded"
 msgstr "نجح آخر تشغيل"
 
 #: apps/native/src/app/(tabs)/(library)/_layout.tsx
+#: apps/native/src/components/navigation/native-tab-bar.android.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/account-section.tsx
@@ -2856,6 +2859,7 @@ msgid "Scheduled backups enabled"
 msgstr "تم تفعيل النسخ الاحتياطية المجدولة"
 
 #: apps/native/src/app/(tabs)/(search)/_layout.tsx
+#: apps/native/src/components/navigation/native-tab-bar.android.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
 #: apps/web/src/components/command-palette.tsx
 msgid "Search"
@@ -2975,6 +2979,7 @@ msgstr "حدد ملف تعريف الجودة المفضل والمجلد الج
 
 #: apps/native/src/app/(tabs)/(settings)/_layout.tsx
 #: apps/native/src/components/header-avatar.tsx
+#: apps/native/src/components/navigation/native-tab-bar.android.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/components/settings/settings-shell.tsx
