@@ -43,16 +43,17 @@ export function onStorageScopeChange(callback: () => void): () => void {
   };
 }
 
-// Query persister — reads/writes through scopedStore via closure
-const scopedMmkvStorage = {
-  getItem: (key: string) => scopedStore?.getString(key) ?? null,
-  setItem: (key: string, value: string) => scopedStore?.set(key, value),
-  removeItem: (key: string) => void scopedStore?.remove(key),
-};
-
 export const QUERY_CACHE_KEY = "REACT_QUERY_OFFLINE_CACHE";
 
-export const queryPersister = createAsyncStoragePersister({
-  storage: scopedMmkvStorage,
-  key: QUERY_CACHE_KEY,
-});
+/** A query persister bound to one scope's store, so delayed (throttled) writes can't land in
+ * another server/user's partition after a switch. */
+export function createScopedQueryPersister(store: ReturnType<typeof createMMKV>) {
+  return createAsyncStoragePersister({
+    storage: {
+      getItem: (key) => store.getString(key) ?? null,
+      setItem: (key, value) => store.set(key, value),
+      removeItem: (key) => void store.remove(key),
+    },
+    key: QUERY_CACHE_KEY,
+  });
+}

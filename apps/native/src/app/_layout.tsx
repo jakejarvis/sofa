@@ -6,12 +6,14 @@ import {
   persistQueryClientRestore,
   persistQueryClientSubscribe,
 } from "@tanstack/react-query-persist-client";
+import * as Application from "expo-application";
 import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import { ThemeProvider } from "expo-router/react-navigation";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import * as Updates from "expo-updates";
 import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -23,11 +25,12 @@ import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-bann
 import { useServerConnection } from "@/hooks/use-server-connection";
 import { useWidgetRefresh } from "@/hooks/use-widget-refresh";
 import { initLocale } from "@/lib/i18n";
+import { createScopedQueryPersister, hasScopedStorage, scopedStorage } from "@/lib/mmkv";
 import { initAnalytics, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
 import { QUERY_PERSIST_MAX_AGE } from "@/lib/query-config";
 import { initSentry, Sentry } from "@/lib/sentry";
-import { getScopeKey, initSession, onStorageScopeChange, queryPersister } from "@/lib/server";
+import { getScopeKey, initSession, onStorageScopeChange } from "@/lib/server";
 import { sofaTheme } from "@/lib/theme";
 import { i18n } from "@sofa/i18n";
 
@@ -137,6 +140,13 @@ function AppContent() {
   );
 }
 
+/** Persisted caches from another app build or OTA update are discarded, never restored. */
+const QUERY_PERSIST_BUSTER = [
+  Application.nativeApplicationVersion ?? "dev",
+  Application.nativeBuildVersion ?? "0",
+  Updates.updateId ?? "embedded",
+].join(":");
+
 /**
  * Always renders a single QueryClientProvider so the React tree is never torn
  * down. Cache persistence is managed imperatively: when scoped storage becomes
@@ -145,13 +155,7 @@ function AppContent() {
  * partition, and re-subscribe.
  */
 function QueryProvider({ children }: { children: React.ReactNode }) {
-  const [, setScopeVersion] = useState(0);
-
-  useEffect(() => {
-    return onStorageScopeChange(() => setScopeVersion((n) => n + 1));
-  }, []);
-
-  const scopeKey = getScopeKey();
+  const scopeKey = useSyncExternalStore(onStorageScopeChange, getScopeKey);
 
   const prevScopeKeyRef = useRef<string | null>(null);
 
@@ -169,17 +173,26 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
       queryClient.clear();
     }
 
-    if (!scopeKey) return;
+    if (!scopeKey || !hasScopedStorage()) return;
 
-    const options = { queryClient, persister: queryPersister, maxAge: QUERY_PERSIST_MAX_AGE };
+    const persister = createScopedQueryPersister(scopedStorage());
+    const options = {
+      queryClient,
+      persister,
+      maxAge: QUERY_PERSIST_MAX_AGE,
+      buster: QUERY_PERSIST_BUSTER,
+      dehydrateOptions: { shouldDehydrateMutation: () => false },
+    };
 
     let unsubscribe: (() => void) | undefined;
     let aborted = false;
 
-    persistQueryClientRestore(options).then(() => {
-      if (aborted) return;
-      unsubscribe = persistQueryClientSubscribe(options);
-    });
+    persistQueryClientRestore(options)
+      .catch((error) => console.warn("[QueryCache] Failed to restore persisted cache:", error))
+      .then(() => {
+        if (aborted) return;
+        unsubscribe = persistQueryClientSubscribe(options);
+      });
 
     return () => {
       aborted = true;

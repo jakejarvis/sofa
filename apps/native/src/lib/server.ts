@@ -15,7 +15,6 @@ export {
   getScopeKey,
   hasScopedStorage,
   onStorageScopeChange,
-  queryPersister,
   setStorageScope,
 } from "@/lib/mmkv";
 
