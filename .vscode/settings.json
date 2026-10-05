@@ -1,5 +1,6 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "js/ts.experimental.useTsgo": true,
+  "js/ts.tsdk.path": "node_modules/typescript",
   "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
@@ -18,7 +19,6 @@
     "**/routeTree.gen.ts": true,
     "packages/i18n/src/po/*": true
   },
-  "emmet.showExpandedAbbreviation": "never",
   "[javascript]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
