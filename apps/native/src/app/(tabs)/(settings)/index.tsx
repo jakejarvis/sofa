@@ -56,7 +56,8 @@ import { orpc } from "@/lib/orpc";
 import { isAnalyticsEnabled, setAnalyticsEnabled } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
 import { isCrashReportingEnabled, setCrashReportingEnabled } from "@/lib/sentry";
-import { authClient, getServerUrl, requestServerChange } from "@/lib/server";
+import { authClient, getServerUrl } from "@/lib/server";
+import { markSessionEnding } from "@/lib/session-end";
 import { toast } from "@/lib/toast";
 import { activateLocale, isLocaleRTL, type SupportedLocale } from "@sofa/i18n";
 import { LOCALE_INFO } from "@sofa/i18n/locales";
@@ -231,6 +232,7 @@ export default function SettingsScreen() {
         text: t`Sign out`,
         style: "destructive",
         onPress: () => {
+          markSessionEnding("sign-out");
           authClient.signOut();
           queryClient.clear();
         },
@@ -394,7 +396,7 @@ export default function SettingsScreen() {
                   text: t`Continue`,
                   style: "destructive",
                   onPress: async () => {
-                    requestServerChange();
+                    markSessionEnding("server-change");
                     await authClient.signOut();
                     queryClient.clear();
                   },

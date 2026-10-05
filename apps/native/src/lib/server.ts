@@ -411,8 +411,6 @@ function getCachedSession(): CachedSessionData | null {
   }
 }
 
-let cachedSessionSeeded = false;
-
 /**
  * Seed the Better Auth session atom from SecureStore before React renders.
  * Call at module scope in the root layout. Idempotent.
@@ -420,7 +418,6 @@ let cachedSessionSeeded = false;
 export function initSession(): void {
   const cached = getCachedSession();
   if (cached) {
-    cachedSessionSeeded = true;
     const sessionAtom = authClient.$store.atoms.session;
     sessionAtom.set({
       data: cached,
@@ -430,50 +427,6 @@ export function initSession(): void {
       refetch: sessionAtom.get().refetch,
     });
   }
-}
-
-export function wasCachedSessionSeeded(): boolean {
-  return cachedSessionSeeded;
-}
-
-export function clearCachedSessionSeeded(): void {
-  cachedSessionSeeded = false;
-}
-
-// ---------------------------------------------------------------------------
-// serverManager — compound operations for server-url screen
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Server-change flag
-// ---------------------------------------------------------------------------
-
-// Signals that the next session-loss redirect should go to the server-url
-// screen instead of login (set by the "Change Server" flow in settings).
-let serverChangeRequested = false;
-
-export function requestServerChange(): void {
-  serverChangeRequested = true;
-}
-
-export function consumeServerChangeRequest(): boolean {
-  const was = serverChangeRequested;
-  serverChangeRequested = false;
-  return was;
-}
-
-// Signals that the server rejected the current session (an API call returned 401), so the
-// session-loss redirect should explain why.
-let sessionRejected = false;
-
-export function markSessionRejected(): void {
-  sessionRejected = true;
-}
-
-export function consumeSessionRejected(): boolean {
-  const was = sessionRejected;
-  sessionRejected = false;
-  return was;
 }
 
 // ---------------------------------------------------------------------------

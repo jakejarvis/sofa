@@ -6,9 +6,6 @@ import { clearStorageScope, hasScopedStorage, setStorageScope } from "@/lib/mmkv
 import { queryClient } from "@/lib/query-client";
 import {
   authClient,
-  clearCachedSessionSeeded,
-  consumeServerChangeRequest,
-  consumeSessionRejected,
   ensureInstanceId,
   getCurrentInstanceId,
   onServerReachabilityChange,
@@ -16,8 +13,8 @@ import {
   rebuildAuthClient,
   startReachabilityMonitor,
   useHasServerUrl,
-  wasCachedSessionSeeded,
 } from "@/lib/server";
+import { consumeSessionEndReason } from "@/lib/session-end";
 import { toast } from "@/lib/toast";
 import { i18n } from "@sofa/i18n";
 
@@ -43,7 +40,7 @@ export function useServerConnection() {
     [],
   );
 
-  const { data: session, isPending, isRefetching } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
   const hasServerUrl = useHasServerUrl();
 
   // --- Instance ID resolution ---
@@ -96,15 +93,6 @@ export function useServerConnection() {
     [],
   );
 
-  // Track whether the session was seeded from cache and hasn't yet been
-  // confirmed by the server. Once confirmed, flip to false so explicit
-  // sign-outs don't show a misleading "session expired" toast.
-  const [hadOptimisticSession, setHadOptimisticSession] = useState(wasCachedSessionSeeded);
-
-  if (hadOptimisticSession && session && !isRefetching) {
-    setHadOptimisticSession(false);
-  }
-
   const { replace } = useRouter();
   const prevSessionRef = useRef(session);
 
@@ -116,23 +104,18 @@ export function useServerConnection() {
   useEffect(() => {
     const hadSession = prevSessionRef.current != null;
     prevSessionRef.current = session;
-    if (session) {
-      // A confirmed session clears a stale "rejected" flag (e.g. a 401 raced a sign-in).
-      consumeSessionRejected();
-      return;
-    }
+    if (session) return;
     if (!hadSession) return;
 
-    const changingServer = consumeServerChangeRequest();
-    replace(changingServer ? "/(auth)/server-url" : "/(auth)/login");
+    const reason = consumeSessionEndReason();
+    replace(reason === "server-change" ? "/(auth)/server-url" : "/(auth)/login");
 
-    if (hadOptimisticSession || consumeSessionRejected()) {
+    if (reason === null) {
       toast.info(i18n._(msg`Session expired`), {
         description: i18n._(msg`Please sign in again.`),
       });
-      clearCachedSessionSeeded();
     }
-  }, [session, replace, hadOptimisticSession]);
+  }, [session, replace]);
 
   return { session, isPending, hasServerUrl, instanceId };
 }

@@ -5,7 +5,7 @@ import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { isClientError, isUnauthorizedError } from "@/lib/error-messages";
 import { posthog } from "@/lib/posthog";
 import { QUERY_GC_TIME } from "@/lib/query-config";
-import { authClient, getIsReachable, isNetworkError, markSessionRejected } from "@/lib/server";
+import { authClient, getIsReachable, isNetworkError } from "@/lib/server";
 import { toast } from "@/lib/toast";
 import { i18n } from "@sofa/i18n";
 
@@ -16,7 +16,6 @@ function handleUnauthorized() {
   const now = Date.now();
   if (now - lastSessionCheck < 5_000) return;
   lastSessionCheck = now;
-  markSessionRejected();
   authClient.$store.atoms.session.get().refetch?.();
 }
 

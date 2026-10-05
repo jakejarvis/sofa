@@ -8,6 +8,7 @@ import { Image } from "@/components/ui/image";
 import { Text } from "@/components/ui/text";
 import { queryClient } from "@/lib/query-client";
 import { authClient } from "@/lib/server";
+import { markSessionEnding } from "@/lib/session-end";
 import * as Haptics from "@/utils/haptics";
 
 const settingsIcon = Icon.select({
@@ -49,6 +50,7 @@ export function HeaderAvatar() {
               text: t`Sign out`,
               style: "destructive",
               onPress: () => {
+                markSessionEnding("sign-out");
                 authClient.signOut();
                 queryClient.clear();
               },
