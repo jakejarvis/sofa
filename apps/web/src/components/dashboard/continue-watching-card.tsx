@@ -116,7 +116,7 @@ export function ContinueWatchingCard({ item }: { item: ContinueWatchingItemProps
                 size="icon"
                 aria-label={quickWatchLabel}
                 disabled={pendingId === nextEpisode.id}
-                className="absolute top-2 right-2 rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70"
+                className="absolute end-2 top-2 rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70"
                 onClick={() =>
                   watchEpisode(
                     nextEpisode.id,
