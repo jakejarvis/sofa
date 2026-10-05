@@ -66,7 +66,7 @@ export default function UpcomingScreen() {
           days: 90,
           limit: 20,
           cursor: pageParam,
-          direction: view,
+          direction: isRecent ? "recent" : undefined,
           mediaType: !isRecent && mediaType !== "all" ? mediaType : undefined,
           statusFilter: !isRecent && statusFilter !== "all" ? [statusFilter] : undefined,
         }),

@@ -78,7 +78,7 @@ function UpcomingPage() {
           days: 90,
           limit: 20,
           cursor: pageParam,
-          direction: view,
+          direction: isRecent ? "recent" : undefined,
           mediaType: !isRecent && typeFilter !== "all" ? (typeFilter as "movie" | "tv") : undefined,
           statusFilter:
             !isRecent && statusFilter !== "all"
