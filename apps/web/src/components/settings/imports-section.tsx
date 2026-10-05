@@ -21,6 +21,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { startDevicePoll } from "@/lib/device-code-poll";
 import { getErrorMessage } from "@/lib/error-messages";
 import { client, orpc } from "@/lib/orpc/client";
 import { invalidateTrackingQueries } from "@/lib/orpc/invalidate";
@@ -210,7 +211,8 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
   // OAuth state
   const [deviceCode, setDeviceCode] = useState<DeviceCodeInfo | null>(null);
   const [oauthError, setOauthError] = useState<string | null>(null);
-  const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollRef = useRef<{ stop: () => void } | null>(null);
+  const flowIdRef = useRef(0);
   const importAbortRef = useRef<AbortController | null>(null);
 
   const parseMutation = useMutation(
@@ -344,14 +346,13 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
 
   // Clean up poll timer on unmount or dialog close
   const stopPolling = useCallback(() => {
-    if (pollTimerRef.current) {
-      clearInterval(pollTimerRef.current);
-      pollTimerRef.current = null;
-    }
+    pollRef.current?.stop();
+    pollRef.current = null;
   }, []);
 
   function handleClose() {
     stopPolling();
+    flowIdRef.current += 1;
     importAbortRef.current?.abort();
     importAbortRef.current = null;
     setDialogOpen(false);
@@ -370,6 +371,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
   // ─── OAuth: Start device code flow ────────────────────────
 
   async function startDeviceCodeFlow() {
+    const flowId = ++flowIdRef.current;
     setOauthError(null);
     setStep("device-code");
     const sourceLabel = config.label;
@@ -382,12 +384,14 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         throw new Error("device-code request failed");
       }
       const data = (await res.json()) as DeviceCodeInfo;
+      if (flowIdRef.current !== flowId) return;
       setDeviceCode(data);
       setDialogOpen(true);
 
       // Start polling
       startPolling(data);
     } catch {
+      if (flowIdRef.current !== flowId) return;
       setOauthError(t`Failed to start ${sourceLabel} connection`);
       setStep("choose");
       setDialogOpen(true);
@@ -396,58 +400,61 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
 
   function startPolling(code: DeviceCodeInfo) {
     stopPolling();
-    const interval = (code.interval || 5) * 1000;
-    const expiresAt = Date.now() + code.expires_in * 1000;
 
-    pollTimerRef.current = setInterval(async () => {
-      if (Date.now() > expiresAt) {
-        stopPolling();
-        setOauthError(t`Device code expired. Please try again.`);
-        setStep("choose");
-        return;
-      }
-
-      try {
+    pollRef.current = startDevicePoll({
+      intervalMs: (code.interval || 5) * 1000,
+      expiresAt: Date.now() + code.expires_in * 1000,
+      poll: async (signal) => {
         const res = await fetch(`${publicApiUrl}/v1/import/${config.source}/poll`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ device_code: code.device_code }),
+          signal,
         });
-        if (!res.ok) return;
+        if (!res.ok) return null;
 
-        const data = (await res.json()) as {
+        return (await res.json()) as {
           status: string;
           data?: Record<string, unknown>;
           error?: string;
         };
+      },
+      onResponse: (data) => {
+        if (!data) return false;
 
         if (data.status === "authorized" && data.data) {
-          stopPolling();
           setStep("fetching");
           parsePayloadMutation.mutate({
             source: config.source as "trakt" | "simkl",
             rawPayload: data.data,
           });
-        } else if (data.status === "denied") {
-          stopPolling();
+          return true;
+        }
+        if (data.status === "denied") {
           setOauthError(t`Authorization was denied. Please try again.`);
           setStep("choose");
-        } else if (data.status === "expired") {
-          stopPolling();
+          return true;
+        }
+        if (data.status === "expired") {
           setOauthError(t`Device code expired. Please try again.`);
           setStep("choose");
-        } else if (data.status === "fetch_error") {
-          stopPolling();
+          return true;
+        }
+        if (data.status === "fetch_error") {
           setOauthError(
             t`Authorization succeeded but failed to fetch your library. Please try again.`,
           );
           setStep("choose");
+          return true;
         }
         // "pending" → keep polling
-      } catch {
-        // Network error, keep polling
-      }
-    }, interval);
+        return false;
+      },
+      onExpired: () => {
+        setOauthError(t`Device code expired. Please try again.`);
+        setStep("choose");
+      },
+    });
   }
 
   // Clean up on unmount

@@ -214,3 +214,15 @@ describe("fitToBudget", () => {
     expect(result.warnings).toEqual([]);
   });
 });
+
+describe("trakt.pollForToken", () => {
+  test("treats 409 (code already redeemed) as pending", async () => {
+    stubTrakt((path) => (path === "/oauth/device/token" ? { status: 409 } : undefined));
+    expect(await trakt.pollForToken("id", "secret", "code")).toEqual({ status: "pending" });
+  });
+
+  test("treats 410 as expired", async () => {
+    stubTrakt((path) => (path === "/oauth/device/token" ? { status: 410 } : undefined));
+    expect(await trakt.pollForToken("id", "secret", "code")).toEqual({ status: "expired" });
+  });
+});
