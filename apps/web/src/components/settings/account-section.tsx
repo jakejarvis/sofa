@@ -12,13 +12,20 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import {
+  DoneStep,
+  ImportingStep,
+  OptionCheckbox,
+  StatBadge,
+} from "@/components/settings/import-dialog-parts";
+import { useImportJob } from "@/components/settings/use-import-job";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -36,15 +43,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useResetUserState } from "@/hooks/use-reset-user-state";
 import { authClient, signOut } from "@/lib/auth/client";
 import { getErrorMessage } from "@/lib/error-messages";
 import { useAppForm } from "@/lib/form";
-import { client, orpc } from "@/lib/orpc/client";
-import { invalidateTrackingQueries } from "@/lib/orpc/invalidate";
+import { orpc } from "@/lib/orpc/client";
 import type { NormalizedImport } from "@sofa/api/schemas";
 import { formatDate } from "@sofa/i18n/format";
 
@@ -370,28 +375,12 @@ interface ImportPreview {
   stats: { movies: number; episodes: number; watchlist: number; ratings: number };
 }
 
-interface ImportResult {
-  imported: number;
-  skipped: number;
-  failed: number;
-  errors: string[];
-  warnings: string[];
-}
-
 function SofaImportDialog() {
   const { t } = useLingui();
-  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const importAbortRef = useRef<AbortController | null>(null);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"preview" | "importing" | "done">("preview");
   const [preview, setPreview] = useState<ImportPreview | null>(null);
-  const [result, setResult] = useState<ImportResult | null>(null);
-  const [progress, setProgress] = useState<{
-    current: number;
-    total: number;
-    message: string;
-  } | null>(null);
   const [options, setOptions] = useState({
     importWatches: true,
     importWatchlist: true,
@@ -408,109 +397,41 @@ function SofaImportDialog() {
       onError: (err) => {
         toast.error(getErrorMessage(err, t`Failed to parse file`));
       },
-      onSettled: () => {
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      },
     }),
   );
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    parseMutation.mutate({ source: "sofa", file });
+    parseMutation.mutate(
+      { source: "sofa", file },
+      {
+        onSettled: () => {
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        },
+      },
+    );
   }
+
+  const job = useImportJob({
+    successMessage: (importedCount) => t`Imported ${importedCount} items from Sofa export`,
+    onDetached: handleClose,
+  });
 
   async function handleImport() {
     if (!preview) return;
     setStep("importing");
-    setProgress(null);
-
-    const abort = new AbortController();
-    importAbortRef.current = abort;
-
-    try {
-      const job = await client.imports.createJob({
-        data: preview.data,
-        options,
-      });
-
-      const eventSource = await client.imports.jobEvents({ id: job.id }, { signal: abort.signal });
-
-      let receivedComplete = false;
-
-      for await (const event of eventSource) {
-        if (abort.signal.aborted) break;
-        if (event.type === "complete") {
-          receivedComplete = true;
-          setResult({
-            imported: event.job.importedCount,
-            skipped: event.job.skippedCount,
-            failed: event.job.failedCount,
-            errors: event.job.errors,
-            warnings: event.job.warnings,
-          });
-          setStep("done");
-          void invalidateTrackingQueries(queryClient);
-          const importedCount = event.job.importedCount;
-          if (importedCount > 0) {
-            toast.success(t`Imported ${importedCount} items from Sofa export`);
-          }
-        } else if (event.type === "timeout") {
-          receivedComplete = true;
-          toast.info(t`Import is still running in the background. Check back later.`);
-          handleClose();
-        } else {
-          setProgress({
-            current: event.job.processedItems,
-            total: event.job.totalItems,
-            message: event.job.currentMessage ?? "",
-          });
-        }
-      }
-
-      if (!receivedComplete && !abort.signal.aborted) {
-        try {
-          const finalJob = await client.imports.getJob({ id: job.id });
-          const isTerminal =
-            finalJob.status === "success" ||
-            finalJob.status === "error" ||
-            finalJob.status === "cancelled";
-          if (isTerminal) {
-            setResult({
-              imported: finalJob.importedCount,
-              skipped: finalJob.skippedCount,
-              failed: finalJob.failedCount,
-              errors: finalJob.errors,
-              warnings: finalJob.warnings,
-            });
-            setStep("done");
-            void invalidateTrackingQueries(queryClient);
-          } else {
-            toast.info(t`Import is still running in the background. Check back later.`);
-            handleClose();
-          }
-        } catch {
-          toast.error(t`Lost connection to import. Check status in settings.`);
-          handleClose();
-        }
-      }
-    } catch (err) {
-      if (abort.signal.aborted) return;
-      toast.error(getErrorMessage(err, t`Import failed`));
-      setStep("preview");
-    } finally {
-      importAbortRef.current = null;
-    }
+    const outcome = await job.start({ data: preview.data, options });
+    if (outcome === "done") setStep("done");
+    else if (outcome === "failed") setStep("preview");
   }
 
   function handleClose() {
-    importAbortRef.current?.abort();
-    importAbortRef.current = null;
+    job.abort();
     setOpen(false);
     setStep("preview");
     setPreview(null);
-    setResult(null);
-    setProgress(null);
+    job.reset();
     setOptions({ importWatches: true, importWatchlist: true, importRatings: true });
   }
 
@@ -521,9 +442,6 @@ function SofaImportDialog() {
       (options.importWatchlist ? preview.stats.watchlist : 0) +
       (options.importRatings ? preview.stats.ratings : 0)
     : 0;
-
-  const pct =
-    progress && progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : null;
 
   return (
     <>
@@ -583,29 +501,32 @@ function SofaImportDialog() {
 
                   <div className="space-y-4 py-2">
                     <div className="grid grid-cols-2 gap-3">
-                      <ImportStatBadge label={t`Movies`} count={movieCount} />
-                      <ImportStatBadge label={t`Episodes`} count={episodeCount} />
-                      <ImportStatBadge label={t`Library`} count={watchlistCount} />
-                      <ImportStatBadge label={t`Ratings`} count={ratingCount} />
+                      <StatBadge label={t`Movies`} count={movieCount} />
+                      <StatBadge label={t`Episodes`} count={episodeCount} />
+                      <StatBadge label={t`Library`} count={watchlistCount} />
+                      <StatBadge label={t`Ratings`} count={ratingCount} />
                     </div>
 
                     <div className="space-y-2">
                       <p className="text-sm font-medium">
                         <Trans>Import options</Trans>
                       </p>
-                      <ImportOptionCheckbox
+                      <OptionCheckbox
+                        idPrefix="sofa-import"
                         label={t`Watch history`}
                         description={t`${movieCount} movies, ${episodeCount} episodes`}
                         checked={options.importWatches}
                         onChange={(v) => setOptions({ ...options, importWatches: v })}
                       />
-                      <ImportOptionCheckbox
+                      <OptionCheckbox
+                        idPrefix="sofa-import"
                         label={t`Library statuses`}
                         description={t`${watchlistCount} items`}
                         checked={options.importWatchlist}
                         onChange={(v) => setOptions({ ...options, importWatchlist: v })}
                       />
-                      <ImportOptionCheckbox
+                      <OptionCheckbox
+                        idPrefix="sofa-import"
                         label={t`Ratings`}
                         description={t`${ratingCount} ratings`}
                         checked={options.importRatings}
@@ -639,144 +560,14 @@ function SofaImportDialog() {
               );
             })()}
 
-          {step === "importing" && (
-            <>
-              <DialogHeader>
-                <DialogTitle>
-                  <Trans>Importing data</Trans>
-                </DialogTitle>
-                <DialogDescription>
-                  <Trans>
-                    This may take a few minutes for large libraries. Please don't close this tab.
-                  </Trans>
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col items-center gap-4 py-8">
-                <Progress value={pct} className="w-full" />
-                <div className="flex flex-col items-center gap-1 text-center">
-                  {progress ? (
-                    <>
-                      <p className="text-sm font-medium">
-                        {progress.current} / {progress.total}
-                      </p>
-                      <p className="text-muted-foreground max-w-[300px] truncate text-xs">
-                        {progress.message}
-                      </p>
-                    </>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Spinner className="size-3" />
-                      <p className="text-muted-foreground text-sm">
-                        <Trans>Starting import...</Trans>
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </>
+          {step === "importing" && <ImportingStep source="Sofa" progress={job.progress} />}
+
+          {step === "done" && job.result && (
+            <DoneStep source="Sofa" result={job.result} onClose={handleClose} />
           )}
-
-          {step === "done" &&
-            result &&
-            (() => {
-              const errorCount = result.errors.length;
-              const warningCount = result.warnings.length;
-              const remainingErrors = errorCount - 50;
-              return (
-                <>
-                  <DialogHeader>
-                    <DialogTitle>
-                      <Trans>Import complete</Trans>
-                    </DialogTitle>
-                    <DialogDescription>
-                      <Trans>Finished importing your Sofa export.</Trans>
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <div className="space-y-4 py-2">
-                    <div className="grid grid-cols-3 gap-3">
-                      <ImportStatBadge label={t`Imported`} count={result.imported} />
-                      <ImportStatBadge label={t`Skipped`} count={result.skipped} />
-                      <ImportStatBadge label={t`Failed`} count={result.failed} />
-                    </div>
-
-                    {errorCount > 0 && (
-                      <div className="bg-destructive/10 max-h-40 overflow-y-auto rounded-lg p-3">
-                        <p className="text-destructive mb-1 text-xs font-medium">
-                          <Trans>Errors ({errorCount})</Trans>
-                        </p>
-                        <ul className="text-destructive/80 space-y-0.5 text-xs">
-                          {result.errors.slice(0, 50).map((e, i) => (
-                            <li key={i}>{e}</li>
-                          ))}
-                          {errorCount > 50 && (
-                            <li>
-                              <Trans>...and {remainingErrors} more</Trans>
-                            </li>
-                          )}
-                        </ul>
-                      </div>
-                    )}
-
-                    {warningCount > 0 && (
-                      <div className="max-h-32 overflow-y-auto rounded-lg bg-yellow-500/10 p-3">
-                        <p className="mb-1 text-xs font-medium text-yellow-600">
-                          <Trans>Warnings ({warningCount})</Trans>
-                        </p>
-                        <ul className="space-y-0.5 text-xs text-yellow-600/80">
-                          {result.warnings.slice(0, 20).map((w, i) => (
-                            <li key={i}>{w}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  <DialogFooter>
-                    <Button onClick={handleClose}>
-                      <Trans>Done</Trans>
-                    </Button>
-                  </DialogFooter>
-                </>
-              );
-            })()}
         </DialogContent>
       </Dialog>
     </>
-  );
-}
-
-function ImportStatBadge({ label, count }: { label: string; count: number }) {
-  return (
-    <div className="bg-muted/50 rounded-lg p-2.5 text-center">
-      <p className="text-lg leading-none font-semibold">{count}</p>
-      <p className="text-muted-foreground mt-1 text-xs">{label}</p>
-    </div>
-  );
-}
-
-function ImportOptionCheckbox({
-  label,
-  description,
-  checked,
-  onChange,
-}: {
-  label: string;
-  description: string;
-  checked: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  const id = `sofa-import-${label}`;
-  return (
-    <div className="flex items-center gap-3">
-      <Checkbox id={id} checked={checked} onCheckedChange={onChange} />
-      <div>
-        <Label htmlFor={id} className="text-sm">
-          {label}
-        </Label>
-        <p className="text-muted-foreground text-xs">{description}</p>
-      </div>
-    </div>
   );
 }
 

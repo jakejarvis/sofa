@@ -22,8 +22,7 @@ msgstr ""
 #~ msgid "...and {0} more"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "...and {remainingErrors} more"
 msgstr "...그 외 {remainingErrors}개 더"
 
@@ -1043,8 +1042,7 @@ msgstr "서버가 없으신가요?"
 msgid "Don't have an account?"
 msgstr "계정이 없으신가요?"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Done"
 msgstr "완료"
 
@@ -1210,8 +1208,7 @@ msgstr "오류"
 #~ msgid "Errors ({0})"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Errors ({errorCount})"
 msgstr "오류 ({errorCount})"
 
@@ -1236,8 +1233,7 @@ msgstr "작품 탐색"
 msgid "Export"
 msgstr "내보내기"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Failed"
 msgstr "실패"
 
@@ -1450,13 +1446,13 @@ msgstr "필모그래피"
 msgid "Filters"
 msgstr "필터"
 
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Finished importing from {source}."
 msgstr "{source}에서 가져오기가 완료되었습니다."
 
 #: apps/web/src/components/settings/account-section.tsx
-msgid "Finished importing your Sofa export."
-msgstr "Sofa 내보내기 가져오기가 완료되었습니다."
+#~ msgid "Finished importing your Sofa export."
+#~ msgstr "Sofa 내보내기 가져오기가 완료되었습니다."
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Free"
@@ -1605,13 +1601,11 @@ msgstr "가져오기"
 msgid "Import {totalItems} items"
 msgstr "항목 {totalItems}개 가져오기"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Import complete"
 msgstr "가져오기 완료"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Import failed"
 msgstr "가져오기 실패"
 
@@ -1627,8 +1621,7 @@ msgstr "{source}에서 가져오기"
 msgid "Import from {sourceLabel}"
 msgstr "{sourceLabel}에서 가져오기"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Import is still running in the background. Check back later."
 msgstr "가져오기가 백그라운드에서 계속 실행 중입니다. 나중에 다시 확인하세요."
 
@@ -1646,8 +1639,7 @@ msgstr ""
 msgid "Import Sofa data"
 msgstr "Sofa 데이터 가져오기"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Imported"
 msgstr "가져옴"
 
@@ -1664,10 +1656,10 @@ msgid "Imported {importedCount} items from Sofa export"
 msgstr "Sofa 내보내기에서 {importedCount}개의 항목을 가져왔습니다"
 
 #: apps/web/src/components/settings/account-section.tsx
-msgid "Importing data"
-msgstr "데이터 가져오는 중"
+#~ msgid "Importing data"
+#~ msgstr "데이터 가져오는 중"
 
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Importing from {source}"
 msgstr "{source}에서 가져오는 중"
 
@@ -1843,8 +1835,7 @@ msgstr "로딩 중…"
 msgid "Login failed"
 msgstr "로그인 실패"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Lost connection to import. Check status in settings."
 msgstr "가져오기 연결이 끊어졌습니다. 설정에서 상태를 확인하세요."
 
@@ -3062,8 +3053,7 @@ msgstr "다른 세션에서 로그아웃"
 msgid "Skip for now"
 msgstr "지금은 건너뛰기"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Skipped"
 msgstr "건너뜀"
 
@@ -3148,8 +3138,7 @@ msgstr "시청 추적을 시작하세요"
 msgid "Starting at"
 msgstr "시작 시간"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Starting import..."
 msgstr "가져오기 시작 중..."
 
@@ -3233,8 +3222,7 @@ msgstr ""
 msgid "This import cannot be cancelled"
 msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "This may take a few minutes for large libraries. Please don't close this tab."
 msgstr "라이브러리가 크면 몇 분 정도 걸릴 수 있습니다. 이 탭을 닫지 마세요."
 
@@ -3646,8 +3634,7 @@ msgstr "경고"
 #~ msgid "Warnings ({0})"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Warnings ({warningCount})"
 msgstr "경고 ({warningCount})"
 

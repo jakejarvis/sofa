@@ -22,8 +22,7 @@ msgstr ""
 #~ msgid "...and {0} more"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "...and {remainingErrors} more"
 msgstr "...及另外 {remainingErrors} 个"
 
@@ -1043,8 +1042,7 @@ msgstr "没有服务器？"
 msgid "Don't have an account?"
 msgstr "没有账户？"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Done"
 msgstr "完成"
 
@@ -1210,8 +1208,7 @@ msgstr "错误"
 #~ msgid "Errors ({0})"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Errors ({errorCount})"
 msgstr "错误 ({errorCount})"
 
@@ -1236,8 +1233,7 @@ msgstr "浏览影视"
 msgid "Export"
 msgstr "导出"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Failed"
 msgstr "失败"
 
@@ -1450,13 +1446,13 @@ msgstr "作品列表"
 msgid "Filters"
 msgstr "筛选"
 
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Finished importing from {source}."
 msgstr "已完成从 {source} 导入。"
 
 #: apps/web/src/components/settings/account-section.tsx
-msgid "Finished importing your Sofa export."
-msgstr "已完成导入您的 Sofa 导出文件。"
+#~ msgid "Finished importing your Sofa export."
+#~ msgstr "已完成导入您的 Sofa 导出文件。"
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Free"
@@ -1605,13 +1601,11 @@ msgstr "导入"
 msgid "Import {totalItems} items"
 msgstr "导入 {totalItems} 个项目"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Import complete"
 msgstr "导入完成"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Import failed"
 msgstr "导入失败"
 
@@ -1627,8 +1621,7 @@ msgstr "从 {source} 导入"
 msgid "Import from {sourceLabel}"
 msgstr "从 {sourceLabel} 导入"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Import is still running in the background. Check back later."
 msgstr "导入仍在后台运行，请稍后再来查看。"
 
@@ -1646,8 +1639,7 @@ msgstr ""
 msgid "Import Sofa data"
 msgstr "导入 Sofa 数据"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Imported"
 msgstr "已导入"
 
@@ -1664,10 +1656,10 @@ msgid "Imported {importedCount} items from Sofa export"
 msgstr "已从 Sofa 导出文件导入 {importedCount} 个条目"
 
 #: apps/web/src/components/settings/account-section.tsx
-msgid "Importing data"
-msgstr "正在导入数据"
+#~ msgid "Importing data"
+#~ msgstr "正在导入数据"
 
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Importing from {source}"
 msgstr "正在从 {source} 导入"
 
@@ -1843,8 +1835,7 @@ msgstr "加载中…"
 msgid "Login failed"
 msgstr "登录失败"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Lost connection to import. Check status in settings."
 msgstr "导入连接已断开，请在设置中查看状态。"
 
@@ -3062,8 +3053,7 @@ msgstr "退出其他会话"
 msgid "Skip for now"
 msgstr "暂时跳过"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Skipped"
 msgstr "已跳过"
 
@@ -3148,8 +3138,7 @@ msgstr "开始记录您的观看历史"
 msgid "Starting at"
 msgstr "开始时间"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Starting import..."
 msgstr "正在开始导入..."
 
@@ -3233,8 +3222,7 @@ msgstr ""
 msgid "This import cannot be cancelled"
 msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "This may take a few minutes for large libraries. Please don't close this tab."
 msgstr "大型媒体库可能需要几分钟。请勿关闭此标签页。"
 
@@ -3646,8 +3634,7 @@ msgstr "警告"
 #~ msgid "Warnings ({0})"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Warnings ({warningCount})"
 msgstr "警告（{warningCount}）"
 

@@ -22,8 +22,7 @@ msgstr ""
 #~ msgid "...and {0} more"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "...and {remainingErrors} more"
 msgstr "...他{remainingErrors}件"
 
@@ -1043,8 +1042,7 @@ msgstr "サーバーをお持ちでないですか？"
 msgid "Don't have an account?"
 msgstr "アカウントをお持ちでないですか？"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Done"
 msgstr "完了"
 
@@ -1210,8 +1208,7 @@ msgstr "エラー"
 #~ msgid "Errors ({0})"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Errors ({errorCount})"
 msgstr "エラー ({errorCount})"
 
@@ -1236,8 +1233,7 @@ msgstr "作品を探索"
 msgid "Export"
 msgstr "エクスポート"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Failed"
 msgstr "失敗"
 
@@ -1450,13 +1446,13 @@ msgstr "フィルモグラフィ"
 msgid "Filters"
 msgstr "フィルター"
 
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Finished importing from {source}."
 msgstr "{source}からのインポートが完了しました。"
 
 #: apps/web/src/components/settings/account-section.tsx
-msgid "Finished importing your Sofa export."
-msgstr "Sofaのエクスポートのインポートが完了しました。"
+#~ msgid "Finished importing your Sofa export."
+#~ msgstr "Sofaのエクスポートのインポートが完了しました。"
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Free"
@@ -1605,13 +1601,11 @@ msgstr "インポート"
 msgid "Import {totalItems} items"
 msgstr "{totalItems}件をインポート"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Import complete"
 msgstr "インポート完了"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Import failed"
 msgstr "インポート失敗"
 
@@ -1627,8 +1621,7 @@ msgstr "{source}からインポート"
 msgid "Import from {sourceLabel}"
 msgstr "{sourceLabel}からインポート"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Import is still running in the background. Check back later."
 msgstr "インポートはバックグラウンドで実行中です。後で確認してください。"
 
@@ -1646,8 +1639,7 @@ msgstr ""
 msgid "Import Sofa data"
 msgstr "Sofaデータをインポート"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Imported"
 msgstr "インポート済み"
 
@@ -1664,10 +1656,10 @@ msgid "Imported {importedCount} items from Sofa export"
 msgstr "Sofaエクスポートから{importedCount}件をインポートしました"
 
 #: apps/web/src/components/settings/account-section.tsx
-msgid "Importing data"
-msgstr "データをインポート中"
+#~ msgid "Importing data"
+#~ msgstr "データをインポート中"
 
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Importing from {source}"
 msgstr "{source}からインポート中"
 
@@ -1843,8 +1835,7 @@ msgstr "読み込み中…"
 msgid "Login failed"
 msgstr "ログインに失敗しました"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Lost connection to import. Check status in settings."
 msgstr "インポートへの接続が切断されました。設定でステータスを確認してください。"
 
@@ -3062,8 +3053,7 @@ msgstr "他のセッションからサインアウト"
 msgid "Skip for now"
 msgstr "今はスキップ"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Skipped"
 msgstr "スキップ済み"
 
@@ -3148,8 +3138,7 @@ msgstr "視聴のトラッキングを開始する"
 msgid "Starting at"
 msgstr "開始時刻"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Starting import..."
 msgstr "インポートを開始中..."
 
@@ -3233,8 +3222,7 @@ msgstr ""
 msgid "This import cannot be cancelled"
 msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "This may take a few minutes for large libraries. Please don't close this tab."
 msgstr "大規模なライブラリでは数分かかる場合があります。このタブを閉じないでください。"
 
@@ -3646,8 +3634,7 @@ msgstr "警告"
 #~ msgid "Warnings ({0})"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Warnings ({warningCount})"
 msgstr "警告（{warningCount}）"
 

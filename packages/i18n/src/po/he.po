@@ -22,8 +22,7 @@ msgstr ""
 #~ msgid "...and {0} more"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "...and {remainingErrors} more"
 msgstr "...ועוד {remainingErrors}"
 
@@ -1043,8 +1042,7 @@ msgstr "אין לך שרת?"
 msgid "Don't have an account?"
 msgstr "אין לך חשבון?"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Done"
 msgstr "סיום"
 
@@ -1210,8 +1208,7 @@ msgstr "שגיאה"
 #~ msgid "Errors ({0})"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Errors ({errorCount})"
 msgstr "שגיאות ({errorCount})"
 
@@ -1236,8 +1233,7 @@ msgstr "גלה כותרות"
 msgid "Export"
 msgstr "ייצוא"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Failed"
 msgstr "נכשל"
 
@@ -1450,13 +1446,13 @@ msgstr "פילמוגרפיה"
 msgid "Filters"
 msgstr "מסננים"
 
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Finished importing from {source}."
 msgstr "הייבוא מ-{source} הסתיים."
 
 #: apps/web/src/components/settings/account-section.tsx
-msgid "Finished importing your Sofa export."
-msgstr "ייבוא הנתונים מ-Sofa שלך הושלם."
+#~ msgid "Finished importing your Sofa export."
+#~ msgstr "ייבוא הנתונים מ-Sofa שלך הושלם."
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Free"
@@ -1605,13 +1601,11 @@ msgstr "ייבוא"
 msgid "Import {totalItems} items"
 msgstr "ייבא {totalItems} פריטים"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Import complete"
 msgstr "הייבוא הושלם"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Import failed"
 msgstr "הייבוא נכשל"
 
@@ -1627,8 +1621,7 @@ msgstr "ייבא מ-{source}"
 msgid "Import from {sourceLabel}"
 msgstr "ייבא מ-{sourceLabel}"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Import is still running in the background. Check back later."
 msgstr "הייבוא עדיין רץ ברקע. בדוק שוב מאוחר יותר."
 
@@ -1646,8 +1639,7 @@ msgstr ""
 msgid "Import Sofa data"
 msgstr "ייבא נתוני Sofa"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Imported"
 msgstr "יובא"
 
@@ -1664,10 +1656,10 @@ msgid "Imported {importedCount} items from Sofa export"
 msgstr "יובאו {importedCount} פריטים מייצוא Sofa"
 
 #: apps/web/src/components/settings/account-section.tsx
-msgid "Importing data"
-msgstr "מייבא נתונים"
+#~ msgid "Importing data"
+#~ msgstr "מייבא נתונים"
 
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Importing from {source}"
 msgstr "מייבא מ-{source}"
 
@@ -1843,8 +1835,7 @@ msgstr "טוען…"
 msgid "Login failed"
 msgstr "הכניסה נכשלה"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Lost connection to import. Check status in settings."
 msgstr "אבד החיבור לייבוא. בדוק את הסטטוס בהגדרות."
 
@@ -3062,8 +3053,7 @@ msgstr "התנתק משאר ההפעלות"
 msgid "Skip for now"
 msgstr "דלג לעת עתה"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Skipped"
 msgstr "דולג"
 
@@ -3148,8 +3138,7 @@ msgstr "התחל לעקוב אחרי הצפיות שלך"
 msgid "Starting at"
 msgstr "מתחיל ב-"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Starting import..."
 msgstr "מתחיל ייבוא..."
 
@@ -3233,8 +3222,7 @@ msgstr ""
 msgid "This import cannot be cancelled"
 msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "This may take a few minutes for large libraries. Please don't close this tab."
 msgstr "פעולה זו עשויה לקחת מספר דקות עבור ספריות גדולות. אנא אל תסגור לשונית זו."
 
@@ -3646,8 +3634,7 @@ msgstr "אזהרות"
 #~ msgid "Warnings ({0})"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Warnings ({warningCount})"
 msgstr "אזהרות ({warningCount})"
 

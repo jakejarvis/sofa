@@ -2,13 +2,19 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconCloudUpload, IconLink } from "@tabler/icons-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import {
+  ImportingStep,
+  DoneStep,
+  OptionCheckbox,
+  StatBadge,
+} from "@/components/settings/import-dialog-parts";
+import { useImportJob } from "@/components/settings/use-import-job";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -18,13 +24,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import { startDevicePoll } from "@/lib/device-code-poll";
 import { getErrorMessage } from "@/lib/error-messages";
-import { client, orpc } from "@/lib/orpc/client";
-import { invalidateTrackingQueries } from "@/lib/orpc/invalidate";
+import { orpc } from "@/lib/orpc/client";
 import type { NormalizedImport } from "@sofa/api/schemas";
 import { formatList } from "@sofa/i18n/format";
 
@@ -154,14 +157,6 @@ interface ImportPreview {
   };
 }
 
-interface ImportResult {
-  imported: number;
-  skipped: number;
-  failed: number;
-  errors: string[];
-  warnings: string[];
-}
-
 interface DeviceCodeInfo {
   device_code: string;
   user_code: string;
@@ -194,14 +189,12 @@ export function ImportsSection() {
 
 function ImportSourceCard({ config }: { config: SourceConfig }) {
   const { i18n, t } = useLingui();
-  const queryClient = useQueryClient();
   const { data: systemStatus } = useQuery(orpc.system.status.queryOptions());
   const publicApiUrl = systemStatus?.publicApiUrl ?? "https://public-api.sofa.watch";
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [step, setStep] = useState<DialogStep>(config.supportsOAuth ? "choose" : "preview");
   const [preview, setPreview] = useState<ImportPreview | null>(null);
-  const [result, setResult] = useState<ImportResult | null>(null);
   const [options, setOptions] = useState({
     importWatches: true,
     importWatchlist: true,
@@ -213,7 +206,6 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
   const [oauthError, setOauthError] = useState<string | null>(null);
   const pollRef = useRef<{ stop: () => void } | null>(null);
   const flowIdRef = useRef(0);
-  const importAbortRef = useRef<AbortController | null>(null);
 
   const parseMutation = useMutation(
     orpc.imports.parseFile.mutationOptions({
@@ -241,13 +233,6 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
     }),
   );
 
-  // Progress state
-  const [progress, setProgress] = useState<{
-    current: number;
-    total: number;
-    message: string;
-  } | null>(null);
-
   function handleFileSelect(file: File) {
     parseMutation.mutate(
       { source: config.source, file },
@@ -259,89 +244,20 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
     );
   }
 
+  const job = useImportJob({
+    successMessage: (importedCount) => {
+      const sourceLabel = config.label;
+      return t`Imported ${importedCount} items from ${sourceLabel}`;
+    },
+    onDetached: handleClose,
+  });
+
   async function handleImport() {
     if (!preview) return;
     setStep("importing");
-    setProgress(null);
-
-    const abort = new AbortController();
-    importAbortRef.current = abort;
-
-    try {
-      const job = await client.imports.createJob({
-        data: preview.data,
-        options,
-      });
-
-      const eventSource = await client.imports.jobEvents({ id: job.id }, { signal: abort.signal });
-
-      let receivedComplete = false;
-
-      for await (const event of eventSource) {
-        if (abort.signal.aborted) break;
-        if (event.type === "complete") {
-          receivedComplete = true;
-          setResult({
-            imported: event.job.importedCount,
-            skipped: event.job.skippedCount,
-            failed: event.job.failedCount,
-            errors: event.job.errors,
-            warnings: event.job.warnings,
-          });
-          setStep("done");
-          void invalidateTrackingQueries(queryClient);
-          const importedCount = event.job.importedCount;
-          const sourceLabel = config.label;
-          if (importedCount > 0) {
-            toast.success(t`Imported ${importedCount} items from ${sourceLabel}`);
-          }
-        } else if (event.type === "timeout") {
-          receivedComplete = true;
-          toast.info(t`Import is still running in the background. Check back later.`);
-          setStep("preview");
-        } else {
-          setProgress({
-            current: event.job.processedItems,
-            total: event.job.totalItems,
-            message: event.job.currentMessage ?? "",
-          });
-        }
-      }
-
-      // Stream ended without a complete/timeout event (e.g. connection dropped)
-      if (!receivedComplete && !abort.signal.aborted) {
-        try {
-          const finalJob = await client.imports.getJob({ id: job.id });
-          const isTerminal =
-            finalJob.status === "success" ||
-            finalJob.status === "error" ||
-            finalJob.status === "cancelled";
-          if (isTerminal) {
-            setResult({
-              imported: finalJob.importedCount,
-              skipped: finalJob.skippedCount,
-              failed: finalJob.failedCount,
-              errors: finalJob.errors,
-              warnings: finalJob.warnings,
-            });
-            setStep("done");
-            void invalidateTrackingQueries(queryClient);
-          } else {
-            toast.info(t`Import is still running in the background. Check back later.`);
-            setStep("preview");
-          }
-        } catch {
-          toast.error(t`Lost connection to import. Check status in settings.`);
-          setStep("preview");
-        }
-      }
-    } catch (err) {
-      if (abort.signal.aborted) return;
-      toast.error(getErrorMessage(err, t`Import failed`));
-      setStep("preview");
-    } finally {
-      importAbortRef.current = null;
-    }
+    const outcome = await job.start({ data: preview.data, options });
+    if (outcome === "done") setStep("done");
+    else if (outcome === "failed") setStep("preview");
   }
 
   // Clean up poll timer on unmount or dialog close
@@ -353,12 +269,11 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
   function handleClose() {
     stopPolling();
     flowIdRef.current += 1;
-    importAbortRef.current?.abort();
-    importAbortRef.current = null;
+    job.abort();
     setDialogOpen(false);
     setStep(config.supportsOAuth ? "choose" : "preview");
     setPreview(null);
-    setResult(null);
+    job.reset();
     setDeviceCode(null);
     setOauthError(null);
     setOptions({
@@ -538,9 +453,9 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
               onCancel={handleClose}
             />
           )}
-          {step === "importing" && <ImportingStep source={config.label} progress={progress} />}
-          {step === "done" && result && (
-            <DoneStep source={config.label} result={result} onClose={handleClose} />
+          {step === "importing" && <ImportingStep source={config.label} progress={job.progress} />}
+          {step === "done" && job.result && (
+            <DoneStep source={config.label} result={job.result} onClose={handleClose} />
           )}
         </DialogContent>
       </Dialog>
@@ -788,18 +703,21 @@ function PreviewStep({
             <Trans>Import options</Trans>
           </p>
           <OptionCheckbox
+            idPrefix="import-opt"
             label={t`Watch history`}
             description={t`${movieCount} movies, ${episodeCount} episodes`}
             checked={options.importWatches}
             onChange={(v) => setOptions({ ...options, importWatches: v })}
           />
           <OptionCheckbox
+            idPrefix="import-opt"
             label={t`Watchlist`}
             description={t`${watchlistCount} items`}
             checked={options.importWatchlist}
             onChange={(v) => setOptions({ ...options, importWatchlist: v })}
           />
           <OptionCheckbox
+            idPrefix="import-opt"
             label={t`Ratings`}
             description={t`${ratingCount} ratings`}
             checked={options.importRatings}
@@ -830,161 +748,5 @@ function PreviewStep({
         </Button>
       </DialogFooter>
     </>
-  );
-}
-
-function ImportingStep({
-  source,
-  progress,
-}: {
-  source: string;
-  progress: { current: number; total: number; message: string } | null;
-}) {
-  const pct =
-    progress && progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : null;
-
-  return (
-    <>
-      <DialogHeader>
-        <DialogTitle>
-          <Trans>Importing from {source}</Trans>
-        </DialogTitle>
-        <DialogDescription>
-          <Trans>
-            This may take a few minutes for large libraries. Please don't close this tab.
-          </Trans>
-        </DialogDescription>
-      </DialogHeader>
-      <div className="flex flex-col items-center gap-4 py-8">
-        <Progress value={pct} className="w-full" />
-        <div className="flex flex-col items-center gap-1 text-center">
-          {progress ? (
-            <>
-              <p className="text-sm font-medium">
-                {progress.current} / {progress.total}
-              </p>
-              <p className="text-muted-foreground max-w-[300px] truncate text-xs">
-                {progress.message}
-              </p>
-            </>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Spinner className="size-3" />
-              <p className="text-muted-foreground text-sm">
-                <Trans>Starting import...</Trans>
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-    </>
-  );
-}
-
-function DoneStep({
-  source,
-  result,
-  onClose,
-}: {
-  source: string;
-  result: ImportResult;
-  onClose: () => void;
-}) {
-  const { t } = useLingui();
-  const errorCount = result.errors.length;
-  const warningCount = result.warnings.length;
-  const remainingErrors = errorCount - 50;
-  return (
-    <>
-      <DialogHeader>
-        <DialogTitle>
-          <Trans>Import complete</Trans>
-        </DialogTitle>
-        <DialogDescription>
-          <Trans>Finished importing from {source}.</Trans>
-        </DialogDescription>
-      </DialogHeader>
-
-      <div className="space-y-4 py-2">
-        <div className="grid grid-cols-3 gap-3">
-          <StatBadge label={t`Imported`} count={result.imported} />
-          <StatBadge label={t`Skipped`} count={result.skipped} />
-          <StatBadge label={t`Failed`} count={result.failed} />
-        </div>
-
-        {errorCount > 0 && (
-          <div className="bg-destructive/10 max-h-40 overflow-y-auto rounded-lg p-3">
-            <p className="text-destructive mb-1 text-xs font-medium">
-              <Trans>Errors ({errorCount})</Trans>
-            </p>
-            <ul className="text-destructive/80 space-y-0.5 text-xs">
-              {result.errors.slice(0, 50).map((e, i) => (
-                <li key={i}>{e}</li>
-              ))}
-              {errorCount > 50 && (
-                <li>
-                  <Trans>...and {remainingErrors} more</Trans>
-                </li>
-              )}
-            </ul>
-          </div>
-        )}
-
-        {warningCount > 0 && (
-          <div className="max-h-32 overflow-y-auto rounded-lg bg-yellow-500/10 p-3">
-            <p className="mb-1 text-xs font-medium text-yellow-600">
-              <Trans>Warnings ({warningCount})</Trans>
-            </p>
-            <ul className="space-y-0.5 text-xs text-yellow-600/80">
-              {result.warnings.slice(0, 20).map((w, i) => (
-                <li key={i}>{w}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-
-      <DialogFooter>
-        <Button onClick={onClose}>
-          <Trans>Done</Trans>
-        </Button>
-      </DialogFooter>
-    </>
-  );
-}
-
-// ─── Helpers ────────────────────────────────────────────────
-
-function StatBadge({ label, count }: { label: string; count: number }) {
-  return (
-    <div className="bg-muted/50 rounded-lg p-2.5 text-center">
-      <p className="text-lg leading-none font-semibold">{count}</p>
-      <p className="text-muted-foreground mt-1 text-xs">{label}</p>
-    </div>
-  );
-}
-
-function OptionCheckbox({
-  label,
-  description,
-  checked,
-  onChange,
-}: {
-  label: string;
-  description: string;
-  checked: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  const id = `import-opt-${label}`;
-  return (
-    <div className="flex items-center gap-3">
-      <Checkbox id={id} checked={checked} onCheckedChange={onChange} />
-      <div>
-        <Label htmlFor={id} className="text-sm">
-          {label}
-        </Label>
-        <p className="text-muted-foreground text-xs">{description}</p>
-      </div>
-    </div>
   );
 }

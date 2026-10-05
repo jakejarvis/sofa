@@ -22,8 +22,7 @@ msgstr ""
 #~ msgid "...and {0} more"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "...and {remainingErrors} more"
 msgstr "...en {remainingErrors} meer"
 
@@ -1043,8 +1042,7 @@ msgstr "Geen server?"
 msgid "Don't have an account?"
 msgstr "Nog geen account?"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Done"
 msgstr "Klaar"
 
@@ -1210,8 +1208,7 @@ msgstr "Fout"
 #~ msgid "Errors ({0})"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Errors ({errorCount})"
 msgstr "Fouten ({errorCount})"
 
@@ -1236,8 +1233,7 @@ msgstr "Titels verkennen"
 msgid "Export"
 msgstr "Exporteren"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Failed"
 msgstr "Mislukt"
 
@@ -1450,13 +1446,13 @@ msgstr "Filmografie"
 msgid "Filters"
 msgstr ""
 
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Finished importing from {source}."
 msgstr "Importeren vanuit {source} voltooid."
 
 #: apps/web/src/components/settings/account-section.tsx
-msgid "Finished importing your Sofa export."
-msgstr "Importeren van je Sofa-export voltooid."
+#~ msgid "Finished importing your Sofa export."
+#~ msgstr "Importeren van je Sofa-export voltooid."
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Free"
@@ -1605,13 +1601,11 @@ msgstr "Importeren"
 msgid "Import {totalItems} items"
 msgstr "{totalItems} items importeren"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Import complete"
 msgstr "Importeren voltooid"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Import failed"
 msgstr "Importeren mislukt"
 
@@ -1627,8 +1621,7 @@ msgstr "Importeren vanuit {source}"
 msgid "Import from {sourceLabel}"
 msgstr "Importeren vanuit {sourceLabel}"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Import is still running in the background. Check back later."
 msgstr "Importeren loopt nog op de achtergrond. Controleer het later."
 
@@ -1646,8 +1639,7 @@ msgstr ""
 msgid "Import Sofa data"
 msgstr "Sofa-gegevens importeren"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Imported"
 msgstr "Geïmporteerd"
 
@@ -1664,10 +1656,10 @@ msgid "Imported {importedCount} items from Sofa export"
 msgstr "{importedCount} items geïmporteerd vanuit Sofa-export"
 
 #: apps/web/src/components/settings/account-section.tsx
-msgid "Importing data"
-msgstr "Gegevens importeren"
+#~ msgid "Importing data"
+#~ msgstr "Gegevens importeren"
 
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Importing from {source}"
 msgstr "Importeren vanuit {source}"
 
@@ -1843,8 +1835,7 @@ msgstr "Laden…"
 msgid "Login failed"
 msgstr "Aanmelden mislukt"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/use-import-job.ts
 msgid "Lost connection to import. Check status in settings."
 msgstr "Verbinding met de import verbroken. Controleer de status in de instellingen."
 
@@ -3062,8 +3053,7 @@ msgstr "Andere sessies afmelden"
 msgid "Skip for now"
 msgstr "Nu overslaan"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Skipped"
 msgstr "Overgeslagen"
 
@@ -3148,8 +3138,7 @@ msgstr "Begin met het bijhouden van je kijkgeschiedenis"
 msgid "Starting at"
 msgstr "Starten om"
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Starting import..."
 msgstr "Import starten..."
 
@@ -3233,8 +3222,7 @@ msgstr ""
 msgid "This import cannot be cancelled"
 msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "This may take a few minutes for large libraries. Please don't close this tab."
 msgstr "Dit kan een paar minuten duren voor grote bibliotheken. Sluit dit tabblad niet."
 
@@ -3646,8 +3634,7 @@ msgstr "Waarschuwingen"
 #~ msgid "Warnings ({0})"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Warnings ({warningCount})"
 msgstr "Waarschuwingen ({warningCount})"
 
