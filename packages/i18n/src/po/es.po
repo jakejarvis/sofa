@@ -2753,6 +2753,8 @@ msgstr "Obteniendo tu historial de visionado, lista y valoraciones..."
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 #: apps/native/src/components/explore/filterable-title-row.tsx
 #: apps/native/src/components/settings/integrations-section.tsx
+#: apps/native/src/components/ui/offline-banner.ios.tsx
+#: apps/native/src/components/ui/offline-banner.tsx
 #: apps/native/src/components/ui/server-unreachable-banner.ios.tsx
 #: apps/native/src/components/ui/server-unreachable-banner.tsx
 #: apps/web/src/lib/orpc/client.ts

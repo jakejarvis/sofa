@@ -2,30 +2,28 @@ import { Trans } from "@lingui/react/macro";
 import { IconWifiOff } from "@tabler/icons-react-native";
 import * as Network from "expo-network";
 import { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import Animated, { SlideInUp, SlideOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
+import { probeServer, useHasServerUrl, useServerReachability } from "@/lib/server";
 import * as Haptics from "@/utils/haptics";
 
 export function OfflineBanner() {
-  const [isOffline, setIsOffline] = useState(false);
+  const [isDeviceOffline, setIsDeviceOffline] = useState(false);
+  const hasServerUrl = useHasServerUrl();
+  const { isReachable } = useServerReachability();
   const insets = useSafeAreaInsets();
-  const wasOnline = useRef(true);
+  const wasVisible = useRef(false);
 
   useEffect(() => {
     let mounted = true;
 
     const handleState = (state: Network.NetworkState) => {
       if (!mounted) return;
-      const offline = !state.isConnected || state.isInternetReachable === false;
-      setIsOffline(offline);
-      if (offline && wasOnline.current) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-      }
-      wasOnline.current = !offline;
+      setIsDeviceOffline(!state.isConnected || state.isInternetReachable === false);
     };
 
     // Check initial state
@@ -40,7 +38,19 @@ export function OfflineBanner() {
     };
   }, []);
 
-  if (!isOffline) return null;
+  // The OS can report "no internet" while the Sofa server still answers (e.g. a LAN server on
+  // Android Wi-Fi without validated internet), so only claim offline when the server is
+  // unreachable too. Before a server is configured there is no reachability signal.
+  const visible = isDeviceOffline && (!hasServerUrl || !isReachable);
+
+  useEffect(() => {
+    if (visible && !wasVisible.current) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+    wasVisible.current = visible;
+  }, [visible]);
+
+  if (!visible) return null;
 
   return (
     <Animated.View
@@ -59,6 +69,14 @@ export function OfflineBanner() {
         <Text className="font-sans text-sm font-medium text-white">
           <Trans>No internet connection</Trans>
         </Text>
+        <Pressable
+          onPress={() => void probeServer()}
+          className="ml-1 rounded-md bg-white/20 px-2 py-0.5"
+        >
+          <Text className="font-sans text-xs font-medium text-white">
+            <Trans>Retry</Trans>
+          </Text>
+        </Pressable>
       </View>
     </Animated.View>
   );

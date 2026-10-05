@@ -241,13 +241,16 @@ function syncOnlineState(state: Network.NetworkState | null = lastNetworkState) 
 }
 
 // While the server is unreachable, queries are paused and never hit serverFetch, so probe the
-// health endpoint directly; a success flips reachability (and the online flag) back.
-function probeServerIfUnreachable() {
-  if (isReachable) return;
+// health endpoint directly; a response flips reachability (and the online flag) back. `force`
+// probes even while reachable — used when the OS reports the device offline, because reachability
+// only changes on a request and an idle app would otherwise never notice.
+export function probeServer({ force = false }: { force?: boolean } = {}): Promise<boolean> {
+  if (isReachable && !force) return Promise.resolve(true);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 5000);
-  serverFetch(`${getServerUrl()}/api/health`, { method: "GET", signal: controller.signal })
-    .catch(() => {})
+  return serverFetch(`${getServerUrl()}/api/health`, { method: "GET", signal: controller.signal })
+    .then(() => true)
+    .catch(() => false)
     .finally(() => clearTimeout(timer));
 }
 
@@ -298,20 +301,24 @@ export function onServerReachabilityChange(callback: (reachable: boolean) => voi
 
 export function startReachabilityMonitor(): () => void {
   syncAppFocus(AppState.currentState);
-  void Network.getNetworkStateAsync().then(syncOnlineState);
-
-  const networkSubscription = Network.addNetworkStateListener((state) => {
+  const syncNetworkState = (state: Network.NetworkState) => {
     syncOnlineState(state);
-    probeServerIfUnreachable();
-  });
+    void probeServer({ force: !isDeviceOnline(state) });
+  };
+  void Network.getNetworkStateAsync().then(syncNetworkState);
+
+  const networkSubscription = Network.addNetworkStateListener(syncNetworkState);
 
   const appStateSubscription = AppState.addEventListener("change", (nextState) => {
     syncAppFocus(nextState);
     if (nextState === "active") {
-      void Network.getNetworkStateAsync().then(syncOnlineState);
-      probeServerIfUnreachable();
+      void Network.getNetworkStateAsync().then(syncNetworkState);
     }
   });
+
+  const probeTimer = setInterval(() => {
+    if (AppState.currentState === "active") void probeServer();
+  }, 30_000);
 
   const removeServerUrlListener = onServerUrlChange(() => {
     setReachable(true);
@@ -322,6 +329,7 @@ export function startReachabilityMonitor(): () => void {
     networkSubscription.remove();
     appStateSubscription.remove();
     removeServerUrlListener();
+    clearInterval(probeTimer);
     focusManager.setFocused(undefined);
     onlineManager.setOnline(true);
   };
@@ -484,11 +492,12 @@ export const serverManager = {
   connectToServer(url: string, instanceId: string): void {
     registerServer(url, instanceId);
     setServerUrlInternal(url);
-    // Validation just succeeded, so mark the server as reachable before
-    // rebuilding. This prevents a banner flash between the monitor starting
-    // (once hasServerUrl becomes true) and the first successful fetch.
-    setReachable(true);
     authClient = buildAuthClient();
+    // Validation just succeeded, so mark the server as reachable. Do it after the auth client is
+    // rebuilt: the reachability listeners refetch the session, which must hit the new server, not
+    // the old one. This also prevents a banner flash between the monitor starting (once
+    // hasServerUrl becomes true) and the first successful fetch.
+    setReachable(true);
     for (const listener of serverUrlListeners) listener();
   },
 };

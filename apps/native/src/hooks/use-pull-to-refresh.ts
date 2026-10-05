@@ -1,6 +1,8 @@
 import { onlineManager } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 
+import { probeServer } from "@/lib/server";
+
 /** Longest the pull-to-refresh spinner stays up; refetches keep running after it hides. */
 const MAX_SPINNER_MS = 15_000;
 
@@ -14,7 +16,7 @@ export function usePullToRefresh(refresh: () => Promise<unknown>) {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(async () => {
     if (!onlineManager.isOnline()) {
-      void refresh();
+      void probeServer().then(() => refresh());
       return;
     }
     setRefreshing(true);
