@@ -147,19 +147,21 @@ function LibraryPage() {
     return input;
   }, [search]);
 
-  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
-    orpc.library.list.infiniteOptions({
-      input: (pageParam: number) => ({ ...queryInput, page: pageParam }),
-      initialPageParam: 1,
-      getNextPageParam: (lastPage) =>
-        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-    }),
-  );
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } =
+    useInfiniteQuery(
+      orpc.library.list.infiniteOptions({
+        input: (pageParam: number) => ({ ...queryInput, page: pageParam }),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) =>
+          lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+      }),
+    );
 
   const sentinelRef = useInfiniteScroll({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isFetchNextPageError,
   });
 
   const items = data?.pages.flatMap((p) => p.items) ?? [];

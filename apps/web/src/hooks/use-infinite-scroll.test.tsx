@@ -10,11 +10,13 @@ function HorizontalRow({
   fetchNextPage,
   hasNextPage = true,
   isFetchingNextPage = false,
+  isFetchNextPageError = false,
   rootMargin = "0px",
 }: {
   fetchNextPage: () => void;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  isFetchNextPageError?: boolean;
   rootMargin?: string;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -22,6 +24,7 @@ function HorizontalRow({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isFetchNextPageError,
     rootRef: scrollRef,
     rootMargin,
   });
@@ -122,5 +125,35 @@ describe("useInfiniteScroll with rootRef", () => {
     await nextFrames();
 
     expect(fetchNextPage).not.toHaveBeenCalled();
+  });
+
+  test("does not refetch after a failed page until the sentinel leaves and re-enters view", async () => {
+    const fetchNextPage = vi.fn<() => void>();
+    const host = mount(<HorizontalRow fetchNextPage={fetchNextPage} />);
+    const scroller = host.querySelector<HTMLElement>("[data-testid=scroller]");
+    expect(scroller).not.toBeNull();
+
+    await nextFrames();
+    scroller!.scrollLeft = scroller!.scrollWidth;
+    await vi.waitFor(() => expect(fetchNextPage).toHaveBeenCalledTimes(1));
+
+    // The fetch starts, then fails; the sentinel is still on screen.
+    act(() => {
+      root?.render(<HorizontalRow fetchNextPage={fetchNextPage} isFetchingNextPage />);
+    });
+    await nextFrames();
+    act(() => {
+      root?.render(<HorizontalRow fetchNextPage={fetchNextPage} isFetchNextPageError />);
+    });
+    await nextFrames(5);
+    expect(fetchNextPage).toHaveBeenCalledTimes(1);
+
+    // Scroll away, then back to the end: now it may fetch again.
+    scroller!.scrollLeft = 0;
+    await nextFrames(5);
+    expect(fetchNextPage).toHaveBeenCalledTimes(1);
+
+    scroller!.scrollLeft = scroller!.scrollWidth;
+    await vi.waitFor(() => expect(fetchNextPage).toHaveBeenCalledTimes(2));
   });
 });

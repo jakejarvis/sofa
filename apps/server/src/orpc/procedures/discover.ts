@@ -22,6 +22,7 @@ import { tmdbImageUrl } from "@sofa/tmdb/image";
 
 import { os } from "../context";
 import { authed } from "../middleware";
+import { clampTotalPages, tmdbSortBy } from "./discover-utils";
 
 function requireTmdb() {
   if (!isTmdbConfigured()) {
@@ -115,7 +116,7 @@ export const trending = os.discover.trending.use(authed).handler(async ({ input,
     userStatuses,
     episodeProgress,
     page: (data as { page?: number }).page ?? input.page,
-    totalPages: (data as { total_pages?: number }).total_pages ?? 1,
+    totalPages: clampTotalPages((data as { total_pages?: number }).total_pages),
     totalResults: (data as { total_results?: number }).total_results ?? 0,
   };
 });
@@ -162,7 +163,7 @@ export const popular = os.discover.popular.use(authed).handler(async ({ input, c
     userStatuses,
     episodeProgress,
     page: data.page ?? input.page,
-    totalPages: data.total_pages ?? 1,
+    totalPages: clampTotalPages(data.total_pages),
     totalResults: data.total_results ?? 0,
   };
 });
@@ -214,7 +215,7 @@ export const search = os.discover.search.use(authed).handler(async ({ input }) =
         }),
       ),
       page: personResults.page ?? input.page,
-      totalPages: personResults.total_pages ?? 1,
+      totalPages: clampTotalPages(personResults.total_pages),
       totalResults: personResults.total_results ?? 0,
     };
   }
@@ -319,7 +320,7 @@ export const search = os.discover.search.use(authed).handler(async ({ input }) =
   return {
     results,
     page: raw.page ?? input.page,
-    totalPages: raw.total_pages ?? 1,
+    totalPages: clampTotalPages(raw.total_pages),
     totalResults: raw.total_results ?? 0,
   };
 });
@@ -330,7 +331,7 @@ export const browse = os.discover.browse.use(authed).handler(async ({ input, con
   requireTmdb();
 
   const params: Record<string, string> = {
-    sort_by: input.sortBy ?? "popularity.desc",
+    sort_by: tmdbSortBy(input.type, input.sortBy),
     "vote_count.gte": "50",
   };
   if (input.genreId) params.with_genres = String(input.genreId);
@@ -397,7 +398,7 @@ export const browse = os.discover.browse.use(authed).handler(async ({ input, con
     userStatuses,
     episodeProgress,
     page: results.page ?? input.page,
-    totalPages: results.total_pages ?? 1,
+    totalPages: clampTotalPages(results.total_pages),
     totalResults: results.total_results ?? 0,
   };
 });

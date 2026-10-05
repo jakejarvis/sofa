@@ -68,25 +68,27 @@ function UpcomingPage() {
   const typeFilter = search.type ?? "all";
   const statusFilter = search.status ?? "all";
 
-  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
-    orpc.library.upcoming.infiniteOptions({
-      input: (pageParam: string | undefined) => ({
-        days: 90,
-        limit: 20,
-        cursor: pageParam,
-        mediaType: typeFilter !== "all" ? (typeFilter as "movie" | "tv") : undefined,
-        statusFilter:
-          statusFilter !== "all" ? [statusFilter as "watching" | "watchlist"] : undefined,
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } =
+    useInfiniteQuery(
+      orpc.library.upcoming.infiniteOptions({
+        input: (pageParam: string | undefined) => ({
+          days: 90,
+          limit: 20,
+          cursor: pageParam,
+          mediaType: typeFilter !== "all" ? (typeFilter as "movie" | "tv") : undefined,
+          statusFilter:
+            statusFilter !== "all" ? [statusFilter as "watching" | "watchlist"] : undefined,
+        }),
+        initialPageParam: undefined as string | undefined,
+        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
       }),
-      initialPageParam: undefined as string | undefined,
-      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-    }),
-  );
+    );
 
   const sentinelRef = useInfiniteScroll({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isFetchNextPageError,
   });
 
   function setTypeFilter(value: string) {

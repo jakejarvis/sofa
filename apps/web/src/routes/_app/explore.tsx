@@ -79,6 +79,7 @@ function ExplorePage() {
     fetchNextPage: fetchNextTrending,
     hasNextPage: hasNextTrending,
     isFetchingNextPage: isFetchingNextTrending,
+    isFetchNextPageError: isTrendingNextPageError,
   } = useInfiniteQuery(
     orpc.discover.trending.infiniteOptions({
       input: (pageParam: number) => ({ type: "all" as const, page: pageParam }),
@@ -147,6 +148,7 @@ function ExplorePage() {
           onEndReached={fetchNextTrending}
           hasNextPage={hasNextTrending}
           isFetchingNextPage={isFetchingNextTrending}
+          isFetchNextPageError={isTrendingNextPageError}
         />
       </div>
 

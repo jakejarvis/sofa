@@ -26,6 +26,7 @@ interface TitleRowProps {
   onEndReached?: () => void;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  isFetchNextPageError?: boolean;
 }
 
 export function TitleRow({
@@ -37,12 +38,14 @@ export function TitleRow({
   onEndReached,
   hasNextPage = false,
   isFetchingNextPage = false,
+  isFetchNextPageError = false,
 }: TitleRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useInfiniteScroll({
     fetchNextPage: onEndReached ?? noop,
     hasNextPage: !!onEndReached && hasNextPage,
     isFetchingNextPage,
+    isFetchNextPageError,
     rootRef: scrollRef,
     rootMargin: "0px 400px 0px 0px",
   });

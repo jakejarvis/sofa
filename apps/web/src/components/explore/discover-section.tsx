@@ -72,29 +72,31 @@ export function DiscoverSection() {
   const { data: genreData } = useQuery(orpc.discover.genres.queryOptions({ input: { type } }));
   const { data: providerData } = useQuery(orpc.discover.platforms.queryOptions());
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteQuery(
-    orpc.discover.browse.infiniteOptions({
-      input: (pageParam: number) => ({
-        type,
-        genreId,
-        yearMin,
-        yearMax,
-        ratingMin,
-        sortBy,
-        language,
-        platformId,
-        page: pageParam,
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError, isPending } =
+    useInfiniteQuery(
+      orpc.discover.browse.infiniteOptions({
+        input: (pageParam: number) => ({
+          type,
+          genreId,
+          yearMin,
+          yearMax,
+          ratingMin,
+          sortBy,
+          language,
+          platformId,
+          page: pageParam,
+        }),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) =>
+          lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
       }),
-      initialPageParam: 1,
-      getNextPageParam: (lastPage) =>
-        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-    }),
-  );
+    );
 
   const sentinelRef = useInfiniteScroll({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isFetchNextPageError,
   });
 
   const items = useMemo(() => {

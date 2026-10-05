@@ -32,19 +32,21 @@ export function PersonDetailSkeleton() {
 }
 
 export function PersonDetailClient({ id }: { id: string }) {
-  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
-    orpc.people.get.infiniteOptions({
-      input: (pageParam: number) => ({ id, page: pageParam, limit: 20 }),
-      initialPageParam: 1,
-      getNextPageParam: (lastPage) =>
-        lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-    }),
-  );
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } =
+    useInfiniteQuery(
+      orpc.people.get.infiniteOptions({
+        input: (pageParam: number) => ({ id, page: pageParam, limit: 20 }),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) =>
+          lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+      }),
+    );
 
   const sentinelRef = useInfiniteScroll({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isFetchNextPageError,
   });
 
   const person = data?.pages[0]?.person;
