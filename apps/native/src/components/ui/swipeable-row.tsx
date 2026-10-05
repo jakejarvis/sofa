@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { IconTrash } from "@tabler/icons-react-native";
 import type { PropsWithChildren } from "react";
 import { View } from "react-native";
@@ -34,16 +33,8 @@ interface SwipeableRowProps extends PropsWithChildren {
 }
 
 export function SwipeableRow({ onDelete, children }: SwipeableRowProps) {
-  const { t } = useLingui();
   return (
-    <View
-      accessibilityActions={[{ name: "delete", label: t`Delete` }]}
-      onAccessibilityAction={(event) => {
-        if (event.nativeEvent.actionName === "delete") {
-          onDelete();
-        }
-      }}
-    >
+    <View>
       <ReanimatedSwipeable
         friction={2}
         rightThreshold={40}

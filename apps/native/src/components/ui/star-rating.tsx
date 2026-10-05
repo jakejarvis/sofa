@@ -30,16 +30,13 @@ export function StarRating({
   const primary = accentColor ?? defaultPrimary;
 
   return (
-    <View
-      className="flex-row items-center gap-1"
-      accessibilityLabel={t`Rating: ${rating} out of 5 stars`}
-      accessibilityRole="adjustable"
-    >
+    <View className="flex-row items-center gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
         <Pressable
           key={star}
           disabled={!interactive}
           accessibilityRole="button"
+          accessibilityState={{ selected: star <= rating, disabled: !interactive }}
           accessibilityLabel={plural(star, { one: "# star", other: "# stars" })}
           accessibilityHint={
             interactive

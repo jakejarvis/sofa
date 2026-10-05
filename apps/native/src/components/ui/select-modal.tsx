@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { type Icon, IconCheck } from "@tabler/icons-react-native";
 import { Modal, Pressable, ScrollView, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -47,6 +48,7 @@ export function SelectModal({
   clearLabel,
   onClear,
 }: SelectModalProps) {
+  const { t } = useLingui();
   const mutedFgColor = useCSSVariable("--color-muted-foreground") as string;
   const primaryColor = useCSSVariable("--color-primary") as string;
   const { top: safeTop, bottom: safeBottom } = useSafeAreaInsets();
@@ -64,18 +66,26 @@ export function SelectModal({
       onRequestClose={() => onOpenChange(false)}
     >
       <Pressable
+        accessible={false}
         className="flex-1 items-center justify-center bg-black/60"
         style={{ paddingTop: safeTop + 16, paddingBottom: safeBottom + 16 }}
         onPress={() => onOpenChange(false)}
       >
         <Pressable
+          accessible={false}
+          onAccessibilityEscape={() => onOpenChange(false)}
           className="bg-card mx-8 w-full max-w-sm overflow-hidden rounded-2xl"
           style={{ maxHeight: maxCardHeight }}
           onPress={(e) => e.stopPropagation()}
         >
           <View className="border-border/50 flex-row items-center border-b p-4">
             {Icon && <ScaledIcon icon={Icon} size={20} color={mutedFgColor} />}
-            <Text className="text-foreground ml-1.5 flex-1 text-base font-medium">{label}</Text>
+            <Text
+              accessibilityRole="header"
+              className="text-foreground ml-1.5 flex-1 text-base font-medium"
+            >
+              {label}
+            </Text>
             {clearLabel && onClear && (
               <Pressable
                 onPress={() => {
@@ -87,6 +97,15 @@ export function SelectModal({
                 <Text className="text-muted-foreground text-sm">{clearLabel}</Text>
               </Pressable>
             )}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t`Close`}
+              onPress={() => onOpenChange(false)}
+              hitSlop={8}
+              className="ml-4"
+            >
+              <Text className="text-muted-foreground text-sm">{t`Close`}</Text>
+            </Pressable>
           </View>
           <ScrollView bounces={false}>
             {options.map((option) => {
@@ -94,6 +113,9 @@ export function SelectModal({
               return (
                 <Pressable
                   key={option.value}
+                  accessibilityRole={multiSelect ? "checkbox" : "radio"}
+                  accessibilityState={multiSelect ? { checked: selected } : { selected }}
+                  accessibilityLabel={option.label}
                   className="active:bg-primary/5 flex-row items-center px-5 py-3.5"
                   onPress={() => {
                     onSelect(option.value);

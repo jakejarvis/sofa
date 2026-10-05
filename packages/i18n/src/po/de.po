@@ -713,6 +713,7 @@ msgid "Click the button to verify your configuration"
 msgstr "Klicke auf die Schaltfläche, um deine Konfiguration zu überprüfen"
 
 #: apps/native/src/components/navigation/modal-layout.tsx
+#: apps/native/src/components/ui/select-modal.tsx
 #: apps/web/src/components/ui/dialog.tsx
 #: apps/web/src/components/ui/sheet.tsx
 msgid "Close"
@@ -972,7 +973,7 @@ msgstr "Jahrzehnt"
 msgid "Default"
 msgstr "Standard"
 
-#: apps/native/src/components/ui/swipeable-row.tsx
+#: apps/native/src/components/search/recently-viewed-row.tsx
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Delete"
 msgstr "Löschen"
@@ -2258,6 +2259,10 @@ msgstr "Öffne Sonarr, gehe zu <0>Settings > Import Lists</0>"
 msgid "Open Sonarr, go to Settings > Import Lists"
 msgstr "Öffne Sonarr, gehe zu Settings > Import Lists"
 
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+msgid "Opens options"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Opens options to change or remove your photo"
 msgstr "Öffnet Optionen zum Ändern oder Entfernen deines Fotos"
@@ -2540,8 +2545,8 @@ msgid "Rating removed"
 msgstr "Bewertung entfernt"
 
 #: apps/native/src/components/ui/star-rating.tsx
-msgid "Rating: {rating} out of 5 stars"
-msgstr "Bewertung: {rating} von 5 Sternen"
+#~ msgid "Rating: {rating} out of 5 stars"
+#~ msgstr "Bewertung: {rating} von 5 Sternen"
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx

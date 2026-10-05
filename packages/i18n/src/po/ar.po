@@ -713,6 +713,7 @@ msgid "Click the button to verify your configuration"
 msgstr "انقر على الزر للتحقق من إعداداتك"
 
 #: apps/native/src/components/navigation/modal-layout.tsx
+#: apps/native/src/components/ui/select-modal.tsx
 #: apps/web/src/components/ui/dialog.tsx
 #: apps/web/src/components/ui/sheet.tsx
 msgid "Close"
@@ -972,7 +973,7 @@ msgstr "العقد"
 msgid "Default"
 msgstr "افتراضي"
 
-#: apps/native/src/components/ui/swipeable-row.tsx
+#: apps/native/src/components/search/recently-viewed-row.tsx
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Delete"
 msgstr "حذف"
@@ -2258,6 +2259,10 @@ msgstr "افتح Sonarr، وانتقل إلى <0>الإعدادات > Import Lis
 msgid "Open Sonarr, go to Settings > Import Lists"
 msgstr "افتح Sonarr، وانتقل إلى الإعدادات > Import Lists"
 
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+msgid "Opens options"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Opens options to change or remove your photo"
 msgstr "يفتح خيارات لتغيير صورتك أو إزالتها"
@@ -2540,8 +2545,8 @@ msgid "Rating removed"
 msgstr "تم حذف التقييم"
 
 #: apps/native/src/components/ui/star-rating.tsx
-msgid "Rating: {rating} out of 5 stars"
-msgstr "التقييم: {rating} من أصل 5 نجوم"
+#~ msgid "Rating: {rating} out of 5 stars"
+#~ msgstr "التقييم: {rating} من أصل 5 نجوم"
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx

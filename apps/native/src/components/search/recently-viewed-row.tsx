@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Link } from "expo-router";
 import { memo, useMemo } from "react";
 import { Pressable } from "react-native";
@@ -13,6 +14,7 @@ export const RecentlyViewedRow = memo(function RecentlyViewedRow({
   item: RecentlyViewedItem;
   onDelete: (id: string) => void;
 }) {
+  const { t } = useLingui();
   const accessibilityLabel = [
     item.title,
     item.type === "tv" ? "TV" : item.type === "movie" ? "Movie" : "Person",
@@ -35,6 +37,10 @@ export const RecentlyViewedRow = memo(function RecentlyViewedRow({
         <Pressable
           accessibilityRole="link"
           accessibilityLabel={accessibilityLabel}
+          accessibilityActions={[{ name: "delete", label: t`Delete` }]}
+          onAccessibilityAction={(e) => {
+            if (e.nativeEvent.actionName === "delete") onDelete(item.id);
+          }}
           className="bg-background px-4 py-3"
           style={({ pressed }) => ({
             borderBottomWidth: 0.5,

@@ -713,6 +713,7 @@ msgid "Click the button to verify your configuration"
 msgstr "버튼을 클릭하여 설정을 확인하세요"
 
 #: apps/native/src/components/navigation/modal-layout.tsx
+#: apps/native/src/components/ui/select-modal.tsx
 #: apps/web/src/components/ui/dialog.tsx
 #: apps/web/src/components/ui/sheet.tsx
 msgid "Close"
@@ -972,7 +973,7 @@ msgstr "연대"
 msgid "Default"
 msgstr "기본값"
 
-#: apps/native/src/components/ui/swipeable-row.tsx
+#: apps/native/src/components/search/recently-viewed-row.tsx
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Delete"
 msgstr "삭제"
@@ -2258,6 +2259,10 @@ msgstr "Sonarr를 열고, <0>Settings > Import Lists</0>로 이동하세요"
 msgid "Open Sonarr, go to Settings > Import Lists"
 msgstr "Sonarr를 열고, Settings > Import Lists로 이동하세요"
 
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+msgid "Opens options"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Opens options to change or remove your photo"
 msgstr "사진을 변경하거나 제거하는 옵션을 엽니다"
@@ -2540,8 +2545,8 @@ msgid "Rating removed"
 msgstr "평점이 삭제되었습니다"
 
 #: apps/native/src/components/ui/star-rating.tsx
-msgid "Rating: {rating} out of 5 stars"
-msgstr "평점: 5점 만점에 {rating}점"
+#~ msgid "Rating: {rating} out of 5 stars"
+#~ msgstr "평점: 5점 만점에 {rating}점"
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx

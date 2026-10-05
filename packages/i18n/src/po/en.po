@@ -713,6 +713,7 @@ msgid "Click the button to verify your configuration"
 msgstr "Click the button to verify your configuration"
 
 #: apps/native/src/components/navigation/modal-layout.tsx
+#: apps/native/src/components/ui/select-modal.tsx
 #: apps/web/src/components/ui/dialog.tsx
 #: apps/web/src/components/ui/sheet.tsx
 msgid "Close"
@@ -972,7 +973,7 @@ msgstr "Decade"
 msgid "Default"
 msgstr "Default"
 
-#: apps/native/src/components/ui/swipeable-row.tsx
+#: apps/native/src/components/search/recently-viewed-row.tsx
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Delete"
 msgstr ""
@@ -2258,6 +2259,10 @@ msgstr ""
 msgid "Open Sonarr, go to Settings > Import Lists"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+msgid "Opens options"
+msgstr "Opens options"
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Opens options to change or remove your photo"
 msgstr "Opens options to change or remove your photo"
@@ -2540,8 +2545,8 @@ msgid "Rating removed"
 msgstr ""
 
 #: apps/native/src/components/ui/star-rating.tsx
-msgid "Rating: {rating} out of 5 stars"
-msgstr "Rating: {rating} out of 5 stars"
+#~ msgid "Rating: {rating} out of 5 stars"
+#~ msgstr "Rating: {rating} out of 5 stars"
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx

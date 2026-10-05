@@ -713,6 +713,7 @@ msgid "Click the button to verify your configuration"
 msgstr "点击按钮验证您的配置"
 
 #: apps/native/src/components/navigation/modal-layout.tsx
+#: apps/native/src/components/ui/select-modal.tsx
 #: apps/web/src/components/ui/dialog.tsx
 #: apps/web/src/components/ui/sheet.tsx
 msgid "Close"
@@ -972,7 +973,7 @@ msgstr "年代"
 msgid "Default"
 msgstr "默认"
 
-#: apps/native/src/components/ui/swipeable-row.tsx
+#: apps/native/src/components/search/recently-viewed-row.tsx
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Delete"
 msgstr "删除"
@@ -2258,6 +2259,10 @@ msgstr "打开 Sonarr，前往 <0>Settings > Import Lists</0>"
 msgid "Open Sonarr, go to Settings > Import Lists"
 msgstr "打开 Sonarr，前往 Settings > Import Lists"
 
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+msgid "Opens options"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Opens options to change or remove your photo"
 msgstr "打开更改或删除头像的选项"
@@ -2540,8 +2545,8 @@ msgid "Rating removed"
 msgstr "评分已删除"
 
 #: apps/native/src/components/ui/star-rating.tsx
-msgid "Rating: {rating} out of 5 stars"
-msgstr "评分：{rating} / 5 星"
+#~ msgid "Rating: {rating} out of 5 stars"
+#~ msgstr "评分：{rating} / 5 星"
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx

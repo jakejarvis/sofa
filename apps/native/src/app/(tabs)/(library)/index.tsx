@@ -77,6 +77,7 @@ function DropdownChip({
   isActive: boolean;
   onPress: () => void;
 }) {
+  const { t } = useLingui();
   return (
     <Pressable
       onPress={() => {
@@ -84,6 +85,9 @@ function DropdownChip({
         onPress();
       }}
       accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: isActive }}
+      accessibilityHint={t`Opens options`}
       className={`flex-row items-center gap-1 rounded-full px-3 py-1.5 ${isActive ? "bg-primary/15 border-primary/40 border" : "bg-secondary"}`}
     >
       <Text
@@ -91,7 +95,11 @@ function DropdownChip({
       >
         {label}
       </Text>
-      <Text className={`text-[10px] ${isActive ? "text-primary" : "text-muted-foreground"}`}>
+      <Text
+        accessible={false}
+        importantForAccessibility="no"
+        className={`text-[10px] ${isActive ? "text-primary" : "text-muted-foreground"}`}
+      >
         {"\u25BE"}
       </Text>
     </Pressable>
