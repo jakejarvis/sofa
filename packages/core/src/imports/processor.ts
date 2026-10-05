@@ -29,21 +29,53 @@ const log = createLogger("imports");
 /** Two plays of the same item this close together are treated as the same play
  * (e.g. a Plex webhook watch and the same play scrobbled to Trakt). */
 const TIMESTAMP_DEDUPE_WINDOW_MS = 3 * 60 * 60 * 1000;
-/** Date-only entries (Letterboxd diary) match any watch within ±36h of UTC
- * midnight on that date, which covers every timezone. */
-const DATE_ONLY_DEDUPE_WINDOW_MS = 36 * 60 * 60 * 1000;
+
+/** Date-only values are stored at server-local noon so stats (which bucket in server-local
+ * time) put them on their calendar day. */
+function dateOnlyToLocalNoon(day: string): Date {
+  return new Date(`${day}T12:00:00`);
+}
+
+interface ImportedWatchTime {
+  at: Date;
+  /** Inclusive [from, to] ranges; an existing watch in any of them is the same play. */
+  ranges: Array<[Date, Date]>;
+}
 
 function importedWatchTime(item: {
   watchedAt?: string;
   watchedOn?: string;
-}): { at: Date; windowMs: number } | null {
-  const candidate = item.watchedAt
-    ? { at: new Date(item.watchedAt), windowMs: TIMESTAMP_DEDUPE_WINDOW_MS }
-    : item.watchedOn
-      ? { at: new Date(item.watchedOn), windowMs: DATE_ONLY_DEDUPE_WINDOW_MS }
-      : null;
-  if (!candidate || Number.isNaN(candidate.at.getTime())) return null;
-  return candidate;
+}): ImportedWatchTime | null {
+  if (item.watchedAt) {
+    const at = new Date(item.watchedAt);
+    if (Number.isNaN(at.getTime())) return null;
+    return {
+      at,
+      ranges: [
+        [
+          new Date(at.getTime() - TIMESTAMP_DEDUPE_WINDOW_MS),
+          new Date(at.getTime() + TIMESTAMP_DEDUPE_WINDOW_MS),
+        ],
+      ],
+    };
+  }
+  if (item.watchedOn) {
+    const start = new Date(`${item.watchedOn}T00:00:00`); // server-local midnight
+    if (Number.isNaN(start.getTime())) return null;
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+    end.setMilliseconds(end.getMilliseconds() - 1);
+    // Imports before this fix stored date-only watches at UTC midnight; match those exactly.
+    const legacy = new Date(`${item.watchedOn}T00:00:00Z`);
+    return {
+      at: dateOnlyToLocalNoon(item.watchedOn),
+      ranges: [
+        [start, end],
+        [legacy, legacy],
+      ],
+    };
+  }
+  return null;
 }
 
 function safeParseJsonArray(value: string | null): string[] {
@@ -107,12 +139,7 @@ async function processMovie(
 
   const time = importedWatchTime(movie);
   const isDuplicate = time
-    ? hasMovieWatchBetween(
-        userId,
-        title.id,
-        new Date(time.at.getTime() - time.windowMs),
-        new Date(time.at.getTime() + time.windowMs),
-      )
+    ? time.ranges.some(([from, to]) => hasMovieWatchBetween(userId, title.id, from, to))
     : hasMovieWatch(userId, title.id); // undated: any existing watch counts
   if (isDuplicate) {
     result.skipped++;
@@ -174,12 +201,7 @@ async function processEpisode(
 
   const time = importedWatchTime(ep);
   const isDuplicate = time
-    ? hasEpisodeWatchBetween(
-        userId,
-        episode.id,
-        new Date(time.at.getTime() - time.windowMs),
-        new Date(time.at.getTime() + time.windowMs),
-      )
+    ? time.ranges.some(([from, to]) => hasEpisodeWatchBetween(userId, episode.id, from, to))
     : hasEpisodeWatch(userId, episode.id); // undated: any existing watch counts
   if (isDuplicate) {
     result.skipped++;
@@ -290,7 +312,7 @@ async function processRating(
   const ratedAt = item.ratedAt
     ? new Date(item.ratedAt)
     : item.ratedOn
-      ? new Date(item.ratedOn)
+      ? dateOnlyToLocalNoon(item.ratedOn)
       : undefined;
   rateTitleStars(userId, title.id, item.rating, ratedAt);
   result.imported++;

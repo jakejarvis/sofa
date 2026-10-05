@@ -716,6 +716,84 @@ describe("processImportJob — rewatches and added dates", () => {
     expect(movieWatches(userId)).toHaveLength(2);
   });
 
+  describe("date-only watches in a west-of-UTC server time zone", () => {
+    async function withLosAngeles(fn: () => Promise<void>) {
+      const tz = process.env.TZ;
+      process.env.TZ = "America/Los_Angeles";
+      try {
+        await fn();
+      } finally {
+        if (tz === undefined) delete process.env.TZ;
+        else process.env.TZ = tz;
+      }
+    }
+
+    const diary = (...days: string[]): NormalizedImport => ({
+      ...emptyPayload("letterboxd"),
+      movies: days.map((watchedOn) => ({ tmdbId: 550, title: "Fight Club", watchedOn })),
+    });
+
+    test("consecutive-day diary entries are both kept", () =>
+      withLosAngeles(async () => {
+        const userId = insertUser();
+        insertMovieTitle("movie-1", 550, "Fight Club");
+        const jobId = createJob(userId, diary("2024-01-15", "2024-01-16"));
+        await processImportJob(jobId);
+
+        expect(readImportJob(jobId).importedCount).toBe(2);
+        expect(movieWatches(userId)).toHaveLength(2);
+      }));
+
+    test("stores the watch on its calendar day", () =>
+      withLosAngeles(async () => {
+        const userId = insertUser();
+        insertMovieTitle("movie-1", 550, "Fight Club");
+        await processImportJob(createJob(userId, diary("2024-01-15")));
+
+        const [watch] = movieWatches(userId);
+        const at = watch?.watchedAt as Date;
+        expect(at.getFullYear()).toBe(2024);
+        expect(at.getMonth()).toBe(0);
+        expect(at.getDate()).toBe(15);
+      }));
+
+    test("re-importing the same diary is idempotent", () =>
+      withLosAngeles(async () => {
+        const userId = insertUser();
+        insertMovieTitle("movie-1", 550, "Fight Club");
+        await processImportJob(createJob(userId, diary("2024-01-15")));
+        const secondId = createJob(userId, diary("2024-01-15"));
+        await processImportJob(secondId);
+
+        expect(movieWatches(userId)).toHaveLength(1);
+        expect(readImportJob(secondId).skippedCount).toBe(1);
+      }));
+
+    test("legacy UTC-midnight rows still dedupe", () =>
+      withLosAngeles(async () => {
+        const userId = insertUser();
+        insertMovieTitle("movie-1", 550, "Fight Club");
+        insertMovieWatch(userId, "movie-1", new Date("2024-01-15T00:00:00Z"));
+        const jobId = createJob(userId, diary("2024-01-15"));
+        await processImportJob(jobId);
+
+        expect(readImportJob(jobId).skippedCount).toBe(1);
+        expect(movieWatches(userId)).toHaveLength(1);
+      }));
+
+    test("a same-day evening play dedupes the diary entry", () =>
+      withLosAngeles(async () => {
+        const userId = insertUser();
+        insertMovieTitle("movie-1", 550, "Fight Club");
+        insertMovieWatch(userId, "movie-1", new Date("2024-01-15T21:30:00"));
+        const jobId = createJob(userId, diary("2024-01-15"));
+        await processImportJob(jobId);
+
+        expect(readImportJob(jobId).skippedCount).toBe(1);
+        expect(movieWatches(userId)).toHaveLength(1);
+      }));
+  });
+
   test("library item backdates addedAt after a watch created the row", async () => {
     const userId = insertUser();
     insertMovieTitle("movie-1", 550, "Fight Club");

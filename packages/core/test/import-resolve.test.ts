@@ -106,6 +106,22 @@ describe("resolveMovieTmdbId", () => {
     expect(result).toBe(200);
   });
 
+  test("matches a Jan 1 release year west of UTC", async () => {
+    const tz = process.env.TZ;
+    process.env.TZ = "America/Los_Angeles";
+    try {
+      searchMoviesSpy = vi.spyOn(tmdbClient, "searchMovies").mockResolvedValue({
+        results: [{ id: 42, release_date: "2010-01-01" }],
+      } as never);
+
+      const result = await resolveMovieTmdbId({ title: "X", year: 2010 });
+      expect(result).toBe(42);
+    } finally {
+      if (tz === undefined) delete process.env.TZ;
+      else process.env.TZ = tz;
+    }
+  });
+
   test("title search without year match returns null", async () => {
     searchMoviesSpy = vi.spyOn(tmdbClient, "searchMovies").mockResolvedValue({
       results: [
@@ -252,6 +268,22 @@ describe("resolveShowTmdbId", () => {
 
     const result = await resolveShowTmdbId({ tvdbId: 54321 });
     expect(result).toBe(850);
+  });
+
+  test("matches a Jan 1 first-air year west of UTC", async () => {
+    const tz = process.env.TZ;
+    process.env.TZ = "America/Los_Angeles";
+    try {
+      searchTvSpy = vi.spyOn(tmdbClient, "searchTv").mockResolvedValue({
+        results: [{ id: 42, first_air_date: "2010-01-01" }],
+      } as never);
+
+      const result = await resolveShowTmdbId({ title: "X", year: 2010 });
+      expect(result).toBe(42);
+    } finally {
+      if (tz === undefined) delete process.env.TZ;
+      else process.env.TZ = tz;
+    }
   });
 
   test("falls back to title search", async () => {

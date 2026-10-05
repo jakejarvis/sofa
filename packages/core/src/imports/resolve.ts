@@ -91,7 +91,7 @@ export async function resolveMovieTmdbId(
     const results = searchResult.results ?? [];
     if (ids.year) {
       const match = results.find((r) => {
-        const releaseYear = r.release_date ? new Date(r.release_date).getFullYear() : null;
+        const releaseYear = r.release_date ? Number.parseInt(r.release_date.slice(0, 4), 10) : null;
         return releaseYear === ids.year;
       });
       if (match) {
@@ -162,7 +162,7 @@ export async function resolveShowTmdbId(
     const results = searchResult.results ?? [];
     if (ids.year) {
       const match = results.find((r) => {
-        const airYear = r.first_air_date ? new Date(r.first_air_date).getFullYear() : null;
+        const airYear = r.first_air_date ? Number.parseInt(r.first_air_date.slice(0, 4), 10) : null;
         return airYear === ids.year;
       });
       if (match) {
