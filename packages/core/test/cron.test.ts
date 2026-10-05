@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { cronRuns, titles } from "@sofa/db/schema";
+import { cronRuns, seasons, titles } from "@sofa/db/schema";
 import { clearAllTables, eq, insertTitle, testDb } from "@sofa/test/db";
 
 import {
@@ -8,6 +8,7 @@ import {
   failCronRun,
   getLibraryTitlesDueForRefresh,
   getStaleLibraryTitles,
+  getTitleIdsWithStaleSeasons,
   libraryRefreshIntervalMs,
   runIsolated,
   startCronRun,
@@ -196,5 +197,32 @@ describe("getLibraryTitlesDueForRefresh", () => {
   test("includes a never-fetched shell title", () => {
     insertTitle({ id: "t-shell", tmdbId: 3 });
     expect(getLibraryTitlesDueForRefresh(["t-shell"], now)).toEqual(["t-shell"]);
+  });
+});
+
+describe("getTitleIdsWithStaleSeasons", () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const cutoff = new Date(now - 7 * DAY);
+
+  function addSeason(id: string, titleId: string, seasonNumber: number, daysAgo: number) {
+    testDb
+      .insert(seasons)
+      .values({ id, titleId, seasonNumber, lastFetchedAt: new Date(now - daysAgo * DAY) })
+      .run();
+  }
+
+  test("is not stale when the most recent season fetch is fresh", () => {
+    insertTitle({ id: "tv-partial", tmdbId: 1, type: "tv" });
+    addSeason("s-1", "tv-partial", 1, 30);
+    addSeason("s-2", "tv-partial", 2, 1);
+    expect(getTitleIdsWithStaleSeasons(["tv-partial"], cutoff).has("tv-partial")).toBe(false);
+  });
+
+  test("is stale when every season was fetched long ago", () => {
+    insertTitle({ id: "tv-old", tmdbId: 2, type: "tv" });
+    addSeason("s-3", "tv-old", 1, 30);
+    addSeason("s-4", "tv-old", 2, 30);
+    expect(getTitleIdsWithStaleSeasons(["tv-old"], cutoff).has("tv-old")).toBe(true);
   });
 });

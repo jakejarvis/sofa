@@ -1,4 +1,4 @@
-import { and, eq, gte, inArray, isNotNull, isNull, lt, or } from "drizzle-orm";
+import { and, eq, gte, inArray, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
 
 import { db } from "../client";
 import {
@@ -111,14 +111,19 @@ export function getReturningTvShows() {
     .all();
 }
 
+/**
+ * Titles whose most recent season fetch is older than `staleDate`. Uses the latest
+ * season fetch (not any season) because partial refreshes only touch the newest seasons.
+ */
 export function getTitleIdsWithStaleSeasons(titleIds: string[], staleDate: Date) {
   if (titleIds.length === 0) return new Set<string>();
   return new Set(
     db
       .select({ titleId: seasons.titleId })
       .from(seasons)
-      .where(and(inArray(seasons.titleId, titleIds), lt(seasons.lastFetchedAt, staleDate)))
+      .where(inArray(seasons.titleId, titleIds))
       .groupBy(seasons.titleId)
+      .having(sql`max(${seasons.lastFetchedAt}) < ${sql.param(staleDate, seasons.lastFetchedAt)}`)
       .all()
       .map((r) => r.titleId),
   );
