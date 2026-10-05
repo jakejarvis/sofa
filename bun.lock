@@ -26,7 +26,7 @@
     },
     "apps/native": {
       "name": "@sofa/native",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "dependencies": {
         "@better-auth/expo": "catalog:",
         "@expo/material-symbols": "0.1.1",
