@@ -409,13 +409,11 @@ msgstr "כבר יש לך חשבון? התחבר"
 msgid "Also available on"
 msgstr "זמין גם ב"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "An account with this email already exists"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "An import is already in progress"
 msgstr ""
 
@@ -521,13 +519,11 @@ msgstr "גיבוי נוצר"
 msgid "Backup deleted"
 msgstr "גיבוי נמחק"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Backup not found"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Backup restoration failed"
 msgstr ""
 
@@ -1117,8 +1113,7 @@ msgstr "אנגלית"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Enter a valid email address"
 msgstr "הזן כתובת דוא\"ל תקינה"
 
@@ -1267,9 +1262,8 @@ msgstr "יצירת החשבון נכשלה"
 msgid "Failed to create backup"
 msgstr "יצירת הגיבוי נכשלה"
 
-#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/settings/backup-section.tsx
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Failed to delete backup"
 msgstr "מחיקת הגיבוי נכשלה"
 
@@ -1278,8 +1272,7 @@ msgstr "מחיקת הגיבוי נכשלה"
 msgid "Failed to disconnect {label}"
 msgstr "ניתוק {label} נכשל"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Failed to export data"
 msgstr ""
 
@@ -1630,8 +1623,7 @@ msgstr "הייבוא עדיין רץ ברקע. בדוק שוב מאוחר יות
 msgid "Import options"
 msgstr "אפשרויות ייבוא"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Import payload is too large"
 msgstr ""
 
@@ -1690,8 +1682,7 @@ msgstr "התקן את <0>תוסף ה-Webhook<1/></0> מקטלוג התוספים
 msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "התקן את תוסף ה-Webhook מקטלוג התוספים של Jellyfin"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Integration not found"
 msgstr ""
 
@@ -1700,13 +1691,11 @@ msgstr ""
 msgid "Integrations"
 msgstr "אינטגרציות"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Invalid email or password"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Invalid import file"
 msgstr ""
 
@@ -1726,8 +1715,7 @@ msgstr "יפנית"
 msgid "Job"
 msgstr "משימה"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Job not found"
 msgstr ""
 
@@ -1773,25 +1761,25 @@ msgstr "אחרון <0/>"
 #~ msgid "Last event {0}"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Last event {relativeTime}"
 msgstr "אירוע אחרון {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
-msgid "Last event {timeAgo}"
-msgstr "אירוע אחרון {timeAgo}"
+#~ msgid "Last event {timeAgo}"
+#~ msgstr "אירוע אחרון {timeAgo}"
 
 #: apps/web/src/components/settings/integration-card.tsx
 #~ msgid "Last polled {0}"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Last polled {relativeTime}"
 msgstr "בדיקה אחרונה {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
-msgid "Last polled {timeAgo}"
-msgstr "בדיקה אחרונה {timeAgo}"
+#~ msgid "Last polled {timeAgo}"
+#~ msgstr "בדיקה אחרונה {timeAgo}"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Last run"
@@ -2314,13 +2302,11 @@ msgstr "סיסמה"
 msgid "Password is required"
 msgstr "סיסמה נדרשת"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Password is too long"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Password is too short"
 msgstr ""
 
@@ -2362,9 +2348,8 @@ msgid "Person"
 msgstr "אדם"
 
 #: apps/native/src/app/person/[id].tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/people.$id.tsx
+#: packages/i18n/src/errors.ts
 msgid "Person not found"
 msgstr "האדם לא נמצא"
 
@@ -2567,13 +2552,11 @@ msgstr "דירוגים"
 msgid "Read more"
 msgstr "קרא עוד"
 
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Ready — not polled yet"
 msgstr "מוכן — טרם נסרק"
 
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Ready — nothing received yet"
 msgstr "מוכן — טרם התקבל דבר"
 
@@ -2643,8 +2626,7 @@ msgstr "ההרשמה סגורה"
 msgid "Registration failed"
 msgstr "ההרשמה נכשלה"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Registration is currently closed"
 msgstr ""
 
@@ -3085,12 +3067,11 @@ msgstr "Sofa יתעד אוטומטית סרטים ופרקים כשתסיים ל
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
-#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/__root.tsx
+#: packages/i18n/src/errors.ts
 msgid "Something went wrong"
 msgstr "משהו השתבש"
 
@@ -3217,8 +3198,7 @@ msgstr "ואז"
 msgid "This doesn't appear to be a Sofa server. Double-check the URL."
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "This import cannot be cancelled"
 msgstr ""
 
@@ -3324,9 +3304,8 @@ msgid "Title A-Z"
 msgstr "כותרת א-ת"
 
 #: apps/native/src/app/title/[id].tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/titles.$id.tsx
+#: packages/i18n/src/errors.ts
 msgid "Title not found"
 msgstr "כותר לא נמצא"
 
@@ -3345,8 +3324,7 @@ msgstr "כותרים ברשימת הצפייה שלך ב-Sofa יתווספו א�
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
 msgstr "כותרים ברשימת הצפייה שלך ב-Sofa יתווספו אוטומטית להורדה כאשר Sonarr סוקר רשימה זו (כל 6 שעות כברירת מחדל)"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "TMDB API key is not configured"
 msgstr ""
 
@@ -3395,8 +3373,7 @@ msgstr "החלף סרגל צד"
 msgid "Tomorrow"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Too many attempts. Wait a moment and try again."
 msgstr ""
 

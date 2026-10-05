@@ -409,13 +409,11 @@ msgstr "すでにアカウントをお持ちの方はサインイン"
 msgid "Also available on"
 msgstr "他でも視聴可能"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "An account with this email already exists"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "An import is already in progress"
 msgstr ""
 
@@ -521,13 +519,11 @@ msgstr "バックアップを作成しました"
 msgid "Backup deleted"
 msgstr "バックアップを削除しました"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Backup not found"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Backup restoration failed"
 msgstr ""
 
@@ -1117,8 +1113,7 @@ msgstr "英語"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Enter a valid email address"
 msgstr "有効なメールアドレスを入力してください"
 
@@ -1267,9 +1262,8 @@ msgstr "アカウントの作成に失敗しました"
 msgid "Failed to create backup"
 msgstr "バックアップの作成に失敗しました"
 
-#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/settings/backup-section.tsx
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Failed to delete backup"
 msgstr "バックアップの削除に失敗しました"
 
@@ -1278,8 +1272,7 @@ msgstr "バックアップの削除に失敗しました"
 msgid "Failed to disconnect {label}"
 msgstr "{label}の切断に失敗しました"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Failed to export data"
 msgstr ""
 
@@ -1630,8 +1623,7 @@ msgstr "インポートはバックグラウンドで実行中です。後で確
 msgid "Import options"
 msgstr "インポートオプション"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Import payload is too large"
 msgstr ""
 
@@ -1690,8 +1682,7 @@ msgstr "Jellyfinのプラグインカタログから<0>Webhookプラグイン<1/
 msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "JellyfinのプラグインカタログからWebhookプラグインをインストールする"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Integration not found"
 msgstr ""
 
@@ -1700,13 +1691,11 @@ msgstr ""
 msgid "Integrations"
 msgstr "連携"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Invalid email or password"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Invalid import file"
 msgstr ""
 
@@ -1726,8 +1715,7 @@ msgstr "日本語"
 msgid "Job"
 msgstr "ジョブ"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Job not found"
 msgstr ""
 
@@ -1773,25 +1761,25 @@ msgstr "最後の<0/>"
 #~ msgid "Last event {0}"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Last event {relativeTime}"
 msgstr "最後のイベント {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
-msgid "Last event {timeAgo}"
-msgstr "最後のイベント {timeAgo}"
+#~ msgid "Last event {timeAgo}"
+#~ msgstr "最後のイベント {timeAgo}"
 
 #: apps/web/src/components/settings/integration-card.tsx
 #~ msgid "Last polled {0}"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Last polled {relativeTime}"
 msgstr "最後のポーリング {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
-msgid "Last polled {timeAgo}"
-msgstr "最後のポーリング {timeAgo}"
+#~ msgid "Last polled {timeAgo}"
+#~ msgstr "最後のポーリング {timeAgo}"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Last run"
@@ -2314,13 +2302,11 @@ msgstr "パスワード"
 msgid "Password is required"
 msgstr "パスワードは必須です"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Password is too long"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Password is too short"
 msgstr ""
 
@@ -2362,9 +2348,8 @@ msgid "Person"
 msgstr "人物"
 
 #: apps/native/src/app/person/[id].tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/people.$id.tsx
+#: packages/i18n/src/errors.ts
 msgid "Person not found"
 msgstr "人物が見つかりません"
 
@@ -2567,13 +2552,11 @@ msgstr "評価"
 msgid "Read more"
 msgstr "続きを読む"
 
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Ready — not polled yet"
 msgstr "準備完了 — まだポーリングされていません"
 
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Ready — nothing received yet"
 msgstr "準備完了 — まだ受信していません"
 
@@ -2643,8 +2626,7 @@ msgstr "登録が締め切られています"
 msgid "Registration failed"
 msgstr "登録に失敗しました"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Registration is currently closed"
 msgstr ""
 
@@ -3085,12 +3067,11 @@ msgstr "視聴完了後、Sofaが自動的に映画やエピソードを記録�
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
-#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/__root.tsx
+#: packages/i18n/src/errors.ts
 msgid "Something went wrong"
 msgstr "エラーが発生しました"
 
@@ -3217,8 +3198,7 @@ msgstr "次に"
 msgid "This doesn't appear to be a Sofa server. Double-check the URL."
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "This import cannot be cancelled"
 msgstr ""
 
@@ -3324,9 +3304,8 @@ msgid "Title A-Z"
 msgstr "タイトル A-Z"
 
 #: apps/native/src/app/title/[id].tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/titles.$id.tsx
+#: packages/i18n/src/errors.ts
 msgid "Title not found"
 msgstr "タイトルが見つかりません"
 
@@ -3345,8 +3324,7 @@ msgstr "SofaのウォッチリストにあるタイトルはRadarrがこのリ�
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
 msgstr "SofaのウォッチリストにあるタイトルはSonarrがこのリストをポーリングする際（デフォルトでは6時間ごと）に自動的にダウンロード対象として追加されます"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "TMDB API key is not configured"
 msgstr ""
 
@@ -3395,8 +3373,7 @@ msgstr "サイドバーを切り替え"
 msgid "Tomorrow"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Too many attempts. Wait a moment and try again."
 msgstr ""
 

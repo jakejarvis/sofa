@@ -409,13 +409,11 @@ msgstr "이미 계정이 있으신가요? 로그인"
 msgid "Also available on"
 msgstr "다음에서도 이용 가능"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "An account with this email already exists"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "An import is already in progress"
 msgstr ""
 
@@ -521,13 +519,11 @@ msgstr "백업 생성됨"
 msgid "Backup deleted"
 msgstr "백업 삭제됨"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Backup not found"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Backup restoration failed"
 msgstr ""
 
@@ -1117,8 +1113,7 @@ msgstr "영어"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Enter a valid email address"
 msgstr "유효한 이메일 주소를 입력하세요"
 
@@ -1267,9 +1262,8 @@ msgstr "계정 생성 실패"
 msgid "Failed to create backup"
 msgstr "백업 생성 실패"
 
-#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/settings/backup-section.tsx
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Failed to delete backup"
 msgstr "백업 삭제 실패"
 
@@ -1278,8 +1272,7 @@ msgstr "백업 삭제 실패"
 msgid "Failed to disconnect {label}"
 msgstr "{label} 연결 해제 실패"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Failed to export data"
 msgstr ""
 
@@ -1630,8 +1623,7 @@ msgstr "가져오기가 백그라운드에서 계속 실행 중입니다. 나중
 msgid "Import options"
 msgstr "가져오기 옵션"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Import payload is too large"
 msgstr ""
 
@@ -1690,8 +1682,7 @@ msgstr "Jellyfin 플러그인 카탈로그에서 <0>Webhook 플러그인<1/></0>
 msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "Jellyfin 플러그인 카탈로그에서 Webhook 플러그인을 설치하세요"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Integration not found"
 msgstr ""
 
@@ -1700,13 +1691,11 @@ msgstr ""
 msgid "Integrations"
 msgstr "통합"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Invalid email or password"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Invalid import file"
 msgstr ""
 
@@ -1726,8 +1715,7 @@ msgstr "일본어"
 msgid "Job"
 msgstr "작업"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Job not found"
 msgstr ""
 
@@ -1773,25 +1761,25 @@ msgstr "마지막 <0/>"
 #~ msgid "Last event {0}"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Last event {relativeTime}"
 msgstr "마지막 이벤트 {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
-msgid "Last event {timeAgo}"
-msgstr "마지막 이벤트 {timeAgo}"
+#~ msgid "Last event {timeAgo}"
+#~ msgstr "마지막 이벤트 {timeAgo}"
 
 #: apps/web/src/components/settings/integration-card.tsx
 #~ msgid "Last polled {0}"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Last polled {relativeTime}"
 msgstr "마지막 폴링 {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
-msgid "Last polled {timeAgo}"
-msgstr "마지막 폴링 {timeAgo}"
+#~ msgid "Last polled {timeAgo}"
+#~ msgstr "마지막 폴링 {timeAgo}"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Last run"
@@ -2314,13 +2302,11 @@ msgstr "비밀번호"
 msgid "Password is required"
 msgstr "비밀번호를 입력해주세요"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Password is too long"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Password is too short"
 msgstr ""
 
@@ -2362,9 +2348,8 @@ msgid "Person"
 msgstr "인물"
 
 #: apps/native/src/app/person/[id].tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/people.$id.tsx
+#: packages/i18n/src/errors.ts
 msgid "Person not found"
 msgstr "인물을 찾을 수 없습니다"
 
@@ -2567,13 +2552,11 @@ msgstr "평점"
 msgid "Read more"
 msgstr "더 보기"
 
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Ready — not polled yet"
 msgstr "준비됨 — 아직 폴링하지 않음"
 
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Ready — nothing received yet"
 msgstr "준비됨 — 아직 수신된 이벤트 없음"
 
@@ -2643,8 +2626,7 @@ msgstr "회원가입 비활성화됨"
 msgid "Registration failed"
 msgstr "회원가입 실패"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Registration is currently closed"
 msgstr ""
 
@@ -3085,12 +3067,11 @@ msgstr "시청을 완료하면 Sofa가 자동으로 영화와 에피소드를 �
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
-#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/__root.tsx
+#: packages/i18n/src/errors.ts
 msgid "Something went wrong"
 msgstr "오류가 발생했습니다"
 
@@ -3217,8 +3198,7 @@ msgstr "그 다음"
 msgid "This doesn't appear to be a Sofa server. Double-check the URL."
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "This import cannot be cancelled"
 msgstr ""
 
@@ -3324,9 +3304,8 @@ msgid "Title A-Z"
 msgstr "제목 A-Z"
 
 #: apps/native/src/app/title/[id].tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/titles.$id.tsx
+#: packages/i18n/src/errors.ts
 msgid "Title not found"
 msgstr "타이틀을 찾을 수 없습니다"
 
@@ -3345,8 +3324,7 @@ msgstr "Sofa 관심 목록의 타이틀은 Radarr가 이 목록을 폴링할 때
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
 msgstr "Sofa 관심 목록의 타이틀은 Sonarr가 이 목록을 폴링할 때(기본값: 6시간마다) 자동으로 다운로드에 추가됩니다"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "TMDB API key is not configured"
 msgstr ""
 
@@ -3395,8 +3373,7 @@ msgstr "사이드바 토글"
 msgid "Tomorrow"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Too many attempts. Wait a moment and try again."
 msgstr ""
 

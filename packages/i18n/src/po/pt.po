@@ -409,13 +409,11 @@ msgstr "Já tem uma conta? Entrar"
 msgid "Also available on"
 msgstr "Também disponível em"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "An account with this email already exists"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "An import is already in progress"
 msgstr ""
 
@@ -521,13 +519,11 @@ msgstr "Backup criado"
 msgid "Backup deleted"
 msgstr "Backup excluído"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Backup not found"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Backup restoration failed"
 msgstr ""
 
@@ -1117,8 +1113,7 @@ msgstr "Inglês"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Enter a valid email address"
 msgstr "Introduza um endereço de email válido"
 
@@ -1267,9 +1262,8 @@ msgstr "Falha ao criar conta"
 msgid "Failed to create backup"
 msgstr "Falha ao criar backup"
 
-#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/settings/backup-section.tsx
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Failed to delete backup"
 msgstr "Falha ao excluir backup"
 
@@ -1278,8 +1272,7 @@ msgstr "Falha ao excluir backup"
 msgid "Failed to disconnect {label}"
 msgstr "Falha ao desconectar {label}"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Failed to export data"
 msgstr ""
 
@@ -1630,8 +1623,7 @@ msgstr "A importação ainda está em andamento em segundo plano. Verifique mais
 msgid "Import options"
 msgstr "Opções de importação"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Import payload is too large"
 msgstr ""
 
@@ -1690,8 +1682,7 @@ msgstr "Instale o <0>plugin Webhook<1/></0> do catálogo de plugins do Jellyfin"
 msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "Instale o plugin Webhook do catálogo de plugins do Jellyfin"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Integration not found"
 msgstr ""
 
@@ -1700,13 +1691,11 @@ msgstr ""
 msgid "Integrations"
 msgstr "Integrações"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Invalid email or password"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Invalid import file"
 msgstr ""
 
@@ -1726,8 +1715,7 @@ msgstr "Japonês"
 msgid "Job"
 msgstr "Tarefa"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Job not found"
 msgstr ""
 
@@ -1773,25 +1761,25 @@ msgstr "último <0/>"
 #~ msgid "Last event {0}"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Last event {relativeTime}"
 msgstr "Último evento {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
-msgid "Last event {timeAgo}"
-msgstr "Último evento {timeAgo}"
+#~ msgid "Last event {timeAgo}"
+#~ msgstr "Último evento {timeAgo}"
 
 #: apps/web/src/components/settings/integration-card.tsx
 #~ msgid "Last polled {0}"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Last polled {relativeTime}"
 msgstr "Última verificação {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
-msgid "Last polled {timeAgo}"
-msgstr "Última verificação {timeAgo}"
+#~ msgid "Last polled {timeAgo}"
+#~ msgstr "Última verificação {timeAgo}"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Last run"
@@ -2314,13 +2302,11 @@ msgstr "Senha"
 msgid "Password is required"
 msgstr "A palavra-passe é obrigatória"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Password is too long"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Password is too short"
 msgstr ""
 
@@ -2362,9 +2348,8 @@ msgid "Person"
 msgstr "Pessoa"
 
 #: apps/native/src/app/person/[id].tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/people.$id.tsx
+#: packages/i18n/src/errors.ts
 msgid "Person not found"
 msgstr "Pessoa não encontrada"
 
@@ -2567,13 +2552,11 @@ msgstr "Avaliações"
 msgid "Read more"
 msgstr "Ler mais"
 
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Ready — not polled yet"
 msgstr "Pronto — ainda não verificado"
 
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Ready — nothing received yet"
 msgstr "Pronto — nada recebido ainda"
 
@@ -2643,8 +2626,7 @@ msgstr "Registro Fechado"
 msgid "Registration failed"
 msgstr "Falha no registo"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Registration is currently closed"
 msgstr ""
 
@@ -3085,12 +3067,11 @@ msgstr "O Sofa registrará automaticamente filmes e episódios quando você term
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
-#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/__root.tsx
+#: packages/i18n/src/errors.ts
 msgid "Something went wrong"
 msgstr "Algo deu errado"
 
@@ -3217,8 +3198,7 @@ msgstr "depois"
 msgid "This doesn't appear to be a Sofa server. Double-check the URL."
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "This import cannot be cancelled"
 msgstr ""
 
@@ -3324,9 +3304,8 @@ msgid "Title A-Z"
 msgstr "Título A-Z"
 
 #: apps/native/src/app/title/[id].tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/titles.$id.tsx
+#: packages/i18n/src/errors.ts
 msgid "Title not found"
 msgstr "Título não encontrado"
 
@@ -3345,8 +3324,7 @@ msgstr "Os títulos na sua lista de desejos do Sofa serão automaticamente adici
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
 msgstr "Os títulos na sua lista de desejos do Sofa serão automaticamente adicionados para download quando o Sonarr verificar esta lista (a cada 6 horas por padrão)"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "TMDB API key is not configured"
 msgstr ""
 
@@ -3395,8 +3373,7 @@ msgstr "Alternar barra lateral"
 msgid "Tomorrow"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Too many attempts. Wait a moment and try again."
 msgstr ""
 

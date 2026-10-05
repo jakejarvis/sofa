@@ -409,13 +409,11 @@ msgstr "已有账户？立即登录"
 msgid "Also available on"
 msgstr "同样在以下平台可用"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "An account with this email already exists"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "An import is already in progress"
 msgstr ""
 
@@ -521,13 +519,11 @@ msgstr "备份已创建"
 msgid "Backup deleted"
 msgstr "备份已删除"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Backup not found"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Backup restoration failed"
 msgstr ""
 
@@ -1117,8 +1113,7 @@ msgstr "英文"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Enter a valid email address"
 msgstr "请输入有效的电子邮件地址"
 
@@ -1267,9 +1262,8 @@ msgstr "创建账户失败"
 msgid "Failed to create backup"
 msgstr "创建备份失败"
 
-#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/settings/backup-section.tsx
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Failed to delete backup"
 msgstr "删除备份失败"
 
@@ -1278,8 +1272,7 @@ msgstr "删除备份失败"
 msgid "Failed to disconnect {label}"
 msgstr "断开 {label} 连接失败"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Failed to export data"
 msgstr ""
 
@@ -1630,8 +1623,7 @@ msgstr "导入仍在后台运行，请稍后再来查看。"
 msgid "Import options"
 msgstr "导入选项"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Import payload is too large"
 msgstr ""
 
@@ -1690,8 +1682,7 @@ msgstr "从 Jellyfin 的插件目录安装 <0>Webhook 插件<1/></0>"
 msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "从 Jellyfin 的插件目录安装 Webhook 插件"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Integration not found"
 msgstr ""
 
@@ -1700,13 +1691,11 @@ msgstr ""
 msgid "Integrations"
 msgstr "集成"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Invalid email or password"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Invalid import file"
 msgstr ""
 
@@ -1726,8 +1715,7 @@ msgstr "日语"
 msgid "Job"
 msgstr "任务"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Job not found"
 msgstr ""
 
@@ -1773,25 +1761,25 @@ msgstr "上次 <0/>"
 #~ msgid "Last event {0}"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Last event {relativeTime}"
 msgstr "最近事件 {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
-msgid "Last event {timeAgo}"
-msgstr "最近事件 {timeAgo}"
+#~ msgid "Last event {timeAgo}"
+#~ msgstr "最近事件 {timeAgo}"
 
 #: apps/web/src/components/settings/integration-card.tsx
 #~ msgid "Last polled {0}"
 #~ msgstr ""
 
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Last polled {relativeTime}"
 msgstr "最近轮询 {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
-msgid "Last polled {timeAgo}"
-msgstr "最近轮询 {timeAgo}"
+#~ msgid "Last polled {timeAgo}"
+#~ msgstr "最近轮询 {timeAgo}"
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Last run"
@@ -2314,13 +2302,11 @@ msgstr "密码"
 msgid "Password is required"
 msgstr "密码不能为空"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Password is too long"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Password is too short"
 msgstr ""
 
@@ -2362,9 +2348,8 @@ msgid "Person"
 msgstr "人物"
 
 #: apps/native/src/app/person/[id].tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/people.$id.tsx
+#: packages/i18n/src/errors.ts
 msgid "Person not found"
 msgstr "未找到该人物"
 
@@ -2567,13 +2552,11 @@ msgstr "评分"
 msgid "Read more"
 msgstr "阅读更多"
 
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Ready — not polled yet"
 msgstr "就绪 — 尚未轮询"
 
-#: apps/native/src/components/settings/integration-configs.ts
-#: apps/web/src/components/settings/integration-card.tsx
+#: packages/i18n/src/integration-status.ts
 msgid "Ready — nothing received yet"
 msgstr "就绪 — 尚未收到任何事件"
 
@@ -2643,8 +2626,7 @@ msgstr "注册已关闭"
 msgid "Registration failed"
 msgstr "注册失败"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Registration is currently closed"
 msgstr ""
 
@@ -3085,12 +3067,11 @@ msgstr "当您看完电影或剧集时，Sofa 将自动记录"
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
-#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/__root.tsx
+#: packages/i18n/src/errors.ts
 msgid "Something went wrong"
 msgstr "出现错误"
 
@@ -3217,8 +3198,7 @@ msgstr "然后"
 msgid "This doesn't appear to be a Sofa server. Double-check the URL."
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "This import cannot be cancelled"
 msgstr ""
 
@@ -3324,9 +3304,8 @@ msgid "Title A-Z"
 msgstr "标题 A-Z"
 
 #: apps/native/src/app/title/[id].tsx
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/titles.$id.tsx
+#: packages/i18n/src/errors.ts
 msgid "Title not found"
 msgstr "未找到内容"
 
@@ -3345,8 +3324,7 @@ msgstr "您 Sofa 待看列表中的内容将在 Radarr 轮询此列表时自动�
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
 msgstr "您 Sofa 待看列表中的内容将在 Sonarr 轮询此列表时自动添加到下载队列（默认每 6 小时一次）"
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "TMDB API key is not configured"
 msgstr ""
 
@@ -3395,8 +3373,7 @@ msgstr "切换侧边栏"
 msgid "Tomorrow"
 msgstr ""
 
-#: apps/native/src/lib/error-messages.ts
-#: apps/web/src/lib/error-messages.ts
+#: packages/i18n/src/errors.ts
 msgid "Too many attempts. Wait a moment and try again."
 msgstr ""
 
