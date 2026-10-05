@@ -2,10 +2,10 @@ import { Trans } from "@lingui/react/macro";
 import { IconExternalLink, IconInfoCircle } from "@tabler/icons-react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { listStatus, webhookStatus } from "@sofa/i18n/integration-status";
 
 import { EmbyIcon, JellyfinIcon, PlexIcon, RadarrIcon, SonarrIcon } from "./icons";
 import type { IntegrationConfig } from "./integration-card";
-import { listStatus, webhookStatus } from "./integration-card";
 
 function origin() {
   return typeof window !== "undefined" ? window.location.origin : "";

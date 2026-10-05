@@ -10,7 +10,7 @@ import {
   SonarrIcon,
 } from "@/components/settings/icons";
 import { getServerUrl } from "@/lib/server";
-import { formatRelativeTime } from "@sofa/i18n/format";
+import { listStatus, webhookStatus } from "@sofa/i18n/integration-status";
 
 export interface IntegrationConfig {
   provider: "plex" | "jellyfin" | "emby" | "sonarr" | "radarr";
@@ -24,22 +24,6 @@ export interface IntegrationConfig {
   setupSteps: string[];
 }
 
-function webhookStatus(i18n: I18n, lastEventAt: string | null): string {
-  if (lastEventAt) {
-    const timeAgo = formatRelativeTime(new Date(lastEventAt));
-    return i18n._(msg`Last event ${timeAgo}`);
-  }
-  return i18n._(msg`Ready — nothing received yet`);
-}
-
-function listStatus(i18n: I18n, lastEventAt: string | null): string {
-  if (lastEventAt) {
-    const timeAgo = formatRelativeTime(new Date(lastEventAt));
-    return i18n._(msg`Last polled ${timeAgo}`);
-  }
-  return i18n._(msg`Ready — not polled yet`);
-}
-
 export function getIntegrationConfigs(i18n: I18n): IntegrationConfig[] {
   return [
     {
@@ -49,7 +33,7 @@ export function getIntegrationConfigs(i18n: I18n): IntegrationConfig[] {
       type: "webhook",
       buildUrl: (token) => `${getServerUrl()}/api/webhooks/${token}`,
       urlLabel: i18n._(msg`Webhook URL`),
-      connectedStatus: (lastEventAt) => webhookStatus(i18n, lastEventAt),
+      connectedStatus: (lastEventAt) => webhookStatus(lastEventAt, i18n),
       requirementNote: i18n._(msg`Requires an active Plex Pass subscription.`),
       setupSteps: [
         i18n._(msg`Open Plex, go to Settings > Webhooks`),
@@ -64,7 +48,7 @@ export function getIntegrationConfigs(i18n: I18n): IntegrationConfig[] {
       type: "webhook",
       buildUrl: (token) => `${getServerUrl()}/api/webhooks/${token}`,
       urlLabel: i18n._(msg`Webhook URL`),
-      connectedStatus: (lastEventAt) => webhookStatus(i18n, lastEventAt),
+      connectedStatus: (lastEventAt) => webhookStatus(lastEventAt, i18n),
       setupSteps: [
         i18n._(msg`Install the Webhook plugin from Jellyfin's plugin catalog`),
         i18n._(msg`Go to Dashboard > Plugins > Webhook`),
@@ -80,7 +64,7 @@ export function getIntegrationConfigs(i18n: I18n): IntegrationConfig[] {
       type: "webhook",
       buildUrl: (token) => `${getServerUrl()}/api/webhooks/${token}`,
       urlLabel: i18n._(msg`Webhook URL`),
-      connectedStatus: (lastEventAt) => webhookStatus(i18n, lastEventAt),
+      connectedStatus: (lastEventAt) => webhookStatus(lastEventAt, i18n),
       requirementNote: i18n._(
         msg`Requires Emby Server 4.7.9+ and an active Emby Premiere license.`,
       ),
@@ -98,7 +82,7 @@ export function getIntegrationConfigs(i18n: I18n): IntegrationConfig[] {
       type: "list",
       buildUrl: (token) => `${getServerUrl()}/api/lists/${token}`,
       urlLabel: i18n._(msg`Sonarr List URL`),
-      connectedStatus: (lastEventAt) => listStatus(i18n, lastEventAt),
+      connectedStatus: (lastEventAt) => listStatus(lastEventAt, i18n),
       setupSteps: [
         i18n._(msg`Open Sonarr, go to Settings > Import Lists`),
         i18n._(msg`Click "+" and select "Custom Lists"`),
@@ -116,7 +100,7 @@ export function getIntegrationConfigs(i18n: I18n): IntegrationConfig[] {
       type: "list",
       buildUrl: (token) => `${getServerUrl()}/api/lists/${token}`,
       urlLabel: i18n._(msg`Radarr List URL`),
-      connectedStatus: (lastEventAt) => listStatus(i18n, lastEventAt),
+      connectedStatus: (lastEventAt) => listStatus(lastEventAt, i18n),
       setupSteps: [
         i18n._(msg`Open Radarr, go to Settings > Import Lists`),
         i18n._(msg`Click "+" and select "Custom Lists"`),

@@ -1,4 +1,3 @@
-import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   IconBook2,
@@ -27,8 +26,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { orpc } from "@/lib/orpc/client";
-import { i18n } from "@sofa/i18n";
-import { formatRelativeTime } from "@sofa/i18n/format";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -279,24 +276,4 @@ export function IntegrationCard({
       </Collapsible>
     </Card>
   );
-}
-
-// ─── Helpers for config authoring ───────────────────────────────────
-
-/** Status line for webhook integrations (shows last event time). */
-export function webhookStatus(lastEventAt: string | null): string {
-  if (lastEventAt) {
-    const relativeTime = formatRelativeTime(lastEventAt);
-    return i18n._(msg`Last event ${relativeTime}`);
-  }
-  return i18n._(msg`Ready — nothing received yet`);
-}
-
-/** Status line for list integrations (shows last event time). */
-export function listStatus(lastEventAt: string | null): string {
-  if (lastEventAt) {
-    const relativeTime = formatRelativeTime(lastEventAt);
-    return i18n._(msg`Last polled ${relativeTime}`);
-  }
-  return i18n._(msg`Ready — not polled yet`);
 }
