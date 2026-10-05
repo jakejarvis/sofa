@@ -18,8 +18,9 @@ import {
 import { refreshPlannerStats } from "@sofa/db/queries/maintenance";
 import { findEpisodeBySeasonAndNumber, findSeasonByTitleAndNumber } from "@sofa/db/queries/title";
 import { createLogger } from "@sofa/logger";
+import { getTvDetails } from "@sofa/tmdb/client";
 
-import { getOrFetchTitleByTmdbId } from "../metadata";
+import { getOrFetchTitleByTmdbId, refreshTvChildren } from "../metadata";
 import { logEpisodeWatch, logMovieWatch, rateTitleStars, setTitleStatus } from "../tracking";
 import type { ImportEpisode, ImportMovie, ImportRating, ImportWatchlistItem } from "./parsers";
 import { resolveMovieTmdbId, resolveShowTmdbId } from "./resolve";
@@ -96,6 +97,13 @@ export interface ImportOptions {
   importRatings: boolean;
 }
 
+/** Per-job state for episode processing. */
+interface EpisodeImportContext {
+  /** Shows already refreshed from TMDB during this job (refresh at most once per show). */
+  refreshedShows: Set<number>;
+  specialsSkipped: number;
+}
+
 export interface ImportResult {
   imported: number;
   skipped: number;
@@ -154,7 +162,8 @@ async function processEpisode(
   userId: string,
   ep: ImportEpisode,
   result: ImportResult,
-  cache?: Map<string, number | null>,
+  cache: Map<string, number | null> | undefined,
+  ctx: EpisodeImportContext,
 ): Promise<void> {
   const showTmdbId = await resolveShowTmdbId(
     {
@@ -182,8 +191,29 @@ async function processEpisode(
     return;
   }
 
-  // Find the specific episode in our DB
-  const season = findSeasonByTitleAndNumber(title.id, ep.seasonNumber);
+  let season = findSeasonByTitleAndNumber(title.id, ep.seasonNumber);
+
+  // Sofa doesn't store specials (season 0) — skip them without an error line.
+  if (!season && ep.seasonNumber === 0) {
+    result.skipped++;
+    ctx.specialsSkipped++;
+    return;
+  }
+
+  let episode = season ? findEpisodeBySeasonAndNumber(season.id, ep.episodeNumber) : undefined;
+
+  // The season/episode may have aired after our last TMDB fetch — refresh the show once per job.
+  if (!episode && !ctx.refreshedShows.has(showTmdbId)) {
+    ctx.refreshedShows.add(showTmdbId);
+    try {
+      const show = await getTvDetails(showTmdbId);
+      await refreshTvChildren(title.id, showTmdbId, show.number_of_seasons);
+      season = findSeasonByTitleAndNumber(title.id, ep.seasonNumber);
+      episode = season ? findEpisodeBySeasonAndNumber(season.id, ep.episodeNumber) : undefined;
+    } catch (err) {
+      log.warn(`Failed to refresh seasons for TMDB ${showTmdbId}:`, err);
+    }
+  }
 
   if (!season) {
     result.failed++;
@@ -191,24 +221,23 @@ async function processEpisode(
     return;
   }
 
-  const episode = findEpisodeBySeasonAndNumber(season.id, ep.episodeNumber);
-
   if (!episode) {
     result.failed++;
     result.errors.push(`S${ep.seasonNumber}E${ep.episodeNumber} not found for "${title.title}"`);
     return;
   }
 
+  const found = episode;
   const time = importedWatchTime(ep);
   const isDuplicate = time
-    ? time.ranges.some(([from, to]) => hasEpisodeWatchBetween(userId, episode.id, from, to))
-    : hasEpisodeWatch(userId, episode.id); // undated: any existing watch counts
+    ? time.ranges.some(([from, to]) => hasEpisodeWatchBetween(userId, found.id, from, to))
+    : hasEpisodeWatch(userId, found.id); // undated: any existing watch counts
   if (isDuplicate) {
     result.skipped++;
     return;
   }
 
-  logEpisodeWatch(userId, episode.id, "import", time?.at);
+  logEpisodeWatch(userId, found.id, "import", time?.at);
   result.imported++;
 }
 
@@ -477,6 +506,7 @@ async function runImportJob(jobId: string): Promise<void> {
 
     // Shared resolution cache for the entire import job
     const resolveCache = new Map<string, number | null>();
+    const episodeCtx: EpisodeImportContext = { refreshedShows: new Set(), specialsSkipped: 0 };
 
     const progressInterval = 4;
     for (let i = 0; i < items.length; i++) {
@@ -496,7 +526,13 @@ async function runImportJob(jobId: string): Promise<void> {
             await processMovie(row.userId, data.movies[item.index], result, resolveCache);
             break;
           case "episode":
-            await processEpisode(row.userId, data.episodes[item.index], result, resolveCache);
+            await processEpisode(
+              row.userId,
+              data.episodes[item.index],
+              result,
+              resolveCache,
+              episodeCtx,
+            );
             break;
           case "watchlist":
             await processWatchlistItem(
@@ -540,6 +576,12 @@ async function runImportJob(jobId: string): Promise<void> {
           currentMessage: label,
         });
       }
+    }
+
+    if (episodeCtx.specialsSkipped > 0) {
+      result.warnings.push(
+        `Skipped ${episodeCtx.specialsSkipped} special episode(s) (season 0) — Sofa doesn't track specials`,
+      );
     }
 
     // A cancel may have arrived after the last periodic check. This check and the

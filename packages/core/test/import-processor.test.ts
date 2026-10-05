@@ -247,6 +247,120 @@ describe("processImportJob — episodes", () => {
       .all();
     expect(watches).toHaveLength(2);
   });
+
+  function episodePayload(...eps: Array<[number, number]>): NormalizedImport {
+    return {
+      source: "trakt",
+      movies: [],
+      episodes: eps.map(([seasonNumber, episodeNumber]) => ({
+        showTmdbId: 1399,
+        showTitle: "Test Show",
+        seasonNumber,
+        episodeNumber,
+        watchedAt: "2024-01-10T20:00:00Z",
+      })),
+      watchlist: [],
+      ratings: [],
+    };
+  }
+
+  function seasonDetails(seasonNumber: number, episodeCount: number) {
+    return {
+      season_number: seasonNumber,
+      name: `Season ${seasonNumber}`,
+      overview: "",
+      poster_path: null,
+      air_date: null,
+      episodes: Array.from({ length: episodeCount }, (_, i) => ({
+        episode_number: i + 1,
+        name: `S${seasonNumber}E${i + 1}`,
+        overview: "",
+        still_path: null,
+        air_date: null,
+        runtime: 30,
+      })),
+    };
+  }
+
+  test("skips specials without an error and without refreshing the show", async () => {
+    const userId = insertUser();
+    insertTvShowWithFetchedAt("tv-1", 1399, 1, 3);
+    const detailsSpy = vi.spyOn(tmdbClient, "getTvDetails");
+
+    try {
+      const jobId = createJob(userId, episodePayload([0, 1]));
+      await processImportJob(jobId);
+
+      const job = readImportJob(jobId);
+      expect(job.status).toBe("success");
+      expect(job.importedCount).toBe(0);
+      expect(job.skippedCount).toBe(1);
+      expect(job.failedCount).toBe(0);
+      expect(job.errors).toHaveLength(0);
+      expect(job.warnings).toHaveLength(1);
+      expect(job.warnings[0]).toContain("season 0");
+      expect(detailsSpy).not.toHaveBeenCalled();
+    } finally {
+      detailsSpy.mockRestore();
+    }
+  });
+
+  test("refreshes a show once when episodes are newer than the last fetch", async () => {
+    const userId = insertUser();
+    insertTvShowWithFetchedAt("tv-1", 1399, 1, 3);
+    const detailsSpy = vi
+      .spyOn(tmdbClient, "getTvDetails")
+      .mockResolvedValue({ number_of_seasons: 2 } as Awaited<
+        ReturnType<typeof tmdbClient.getTvDetails>
+      >);
+    const seasonSpy = vi
+      .spyOn(tmdbClient, "getTvSeasonDetails")
+      .mockImplementation(
+        async (_tmdbId, seasonNumber) =>
+          seasonDetails(seasonNumber, seasonNumber === 1 ? 3 : 2) as never,
+      );
+
+    try {
+      const jobId = createJob(userId, episodePayload([2, 1], [2, 2]));
+      await processImportJob(jobId);
+
+      const job = readImportJob(jobId);
+      expect(job.status).toBe("success");
+      expect(job.importedCount).toBe(2);
+      expect(job.failedCount).toBe(0);
+      expect(detailsSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      detailsSpy.mockRestore();
+      seasonSpy.mockRestore();
+    }
+  });
+
+  test("still fails when the season is missing after the refresh", async () => {
+    const userId = insertUser();
+    insertTvShowWithFetchedAt("tv-1", 1399, 1, 3);
+    const detailsSpy = vi
+      .spyOn(tmdbClient, "getTvDetails")
+      .mockResolvedValue({ number_of_seasons: 2 } as Awaited<
+        ReturnType<typeof tmdbClient.getTvDetails>
+      >);
+    const seasonSpy = vi
+      .spyOn(tmdbClient, "getTvSeasonDetails")
+      .mockImplementation(async (_tmdbId, seasonNumber) => seasonDetails(seasonNumber, 3) as never);
+
+    try {
+      const jobId = createJob(userId, episodePayload([5, 1]));
+      await processImportJob(jobId);
+
+      const job = readImportJob(jobId);
+      expect(job.importedCount).toBe(0);
+      expect(job.failedCount).toBe(1);
+      expect(job.errors[0]).toContain("Season 5 not found");
+      expect(detailsSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      detailsSpy.mockRestore();
+      seasonSpy.mockRestore();
+    }
+  });
 });
 
 // ── Watchlist Import ────────────────────────────────────────────────
