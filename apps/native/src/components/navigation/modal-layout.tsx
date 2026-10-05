@@ -12,7 +12,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
  * - Android: floating close button with safe-area offset
  */
 export function ModalLayout({ children }: { children: ReactNode }) {
-  const { dismissAll } = useRouter();
+  const router = useRouter();
+  const close = () => {
+    if (router.canDismiss()) {
+      router.dismissAll();
+    } else {
+      router.replace("/");
+    }
+  };
   const { t } = useLingui();
   const insets = useSafeAreaInsets();
 
@@ -21,7 +28,7 @@ export function ModalLayout({ children }: { children: ReactNode }) {
       <Stack.Header hidden={process.env.EXPO_OS !== "ios"} transparent blurEffect="none" />
       {process.env.EXPO_OS === "ios" && (
         <Stack.Toolbar placement="right">
-          <Stack.Toolbar.Button onPress={() => dismissAll()}>
+          <Stack.Toolbar.Button onPress={close}>
             <Stack.Toolbar.Icon sf="xmark" />
             <Stack.Toolbar.Label>{t`Close`}</Stack.Toolbar.Label>
           </Stack.Toolbar.Button>
@@ -33,7 +40,7 @@ export function ModalLayout({ children }: { children: ReactNode }) {
 
       {process.env.EXPO_OS !== "ios" && (
         <Pressable
-          onPress={() => dismissAll()}
+          onPress={close}
           accessibilityRole="button"
           accessibilityLabel={t`Close`}
           hitSlop={8}

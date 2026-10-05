@@ -2714,6 +2714,10 @@ msgstr "Requer Emby Server 4.7.9+ e uma licença ativa do Emby Premiere."
 #~ msgid "Restart"
 #~ msgstr "Reiniciar"
 
+#: apps/native/src/components/root-error-fallback.tsx
+msgid "Restart app"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Restart Required"
 #~ msgstr "Reinício Necessário"
@@ -3041,6 +3045,10 @@ msgstr "Ignorar por agora"
 msgid "Skipped"
 msgstr "Ignorado"
 
+#: apps/native/src/components/root-error-fallback.tsx
+msgid "Sofa hit an unexpected error."
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Sofa needs to restart to apply the new layout direction."
 #~ msgstr "O Sofa precisa de reiniciar para aplicar a nova direção do layout."
@@ -3069,6 +3077,7 @@ msgstr "O Sofa registrará automaticamente filmes e episódios quando você term
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/components/root-error-fallback.tsx
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
@@ -3406,6 +3415,7 @@ msgid "Try adjusting your filters"
 msgstr "Tente ajustar os seus filtros"
 
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/components/root-error-fallback.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "Try again"

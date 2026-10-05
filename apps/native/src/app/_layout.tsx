@@ -12,7 +12,7 @@ import { ThemeProvider } from "expo-router/react-navigation";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
-import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";
+import { PostHogProvider } from "posthog-react-native";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -20,6 +20,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableFreeze } from "react-native-screens";
 import { Uniwind, useResolveClassNames } from "uniwind";
 
+import { RootErrorFallback } from "@/components/root-error-fallback";
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-banner";
 import { useFollowDeviceLocale } from "@/hooks/use-follow-device-locale";
@@ -221,11 +222,22 @@ function RootLayout() {
     </I18nProvider>
   );
 
-  if (!posthog) return inner;
+  const guarded = (
+    <Sentry.ErrorBoundary
+      fallback={({ resetError }) => <RootErrorFallback resetError={resetError} />}
+      onError={(error) => {
+        posthog?.captureException(error, { source: "error-boundary" });
+      }}
+    >
+      {inner}
+    </Sentry.ErrorBoundary>
+  );
+
+  if (!posthog) return guarded;
 
   return (
     <PostHogProvider client={posthog} autocapture={{ captureScreens: false }}>
-      <PostHogErrorBoundary>{inner}</PostHogErrorBoundary>
+      {guarded}
     </PostHogProvider>
   );
 }
