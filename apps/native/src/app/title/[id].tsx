@@ -252,7 +252,7 @@ export default function TitleDetailScreen() {
     );
   }
 
-  if (detail.isError || !title) {
+  if (!title) {
     return (
       <ModalLayout>
         <View className="flex-1 items-center justify-center px-6">

@@ -97,7 +97,28 @@ export default function RegisterScreen() {
     }
   };
 
-  if (!registrationOpen && !publicInfo.isPending) {
+  if (publicInfo.isError && !publicInfo.data) {
+    return (
+      <AuthScreen title={t`Can't reach the server`}>
+        <Animated.View entering={FadeInDown.duration(300).delay(200)}>
+          <Button className="bg-primary mt-6" onPress={() => publicInfo.refetch()}>
+            <ButtonLabel className="text-primary-foreground">
+              <Trans>Retry</Trans>
+            </ButtonLabel>
+          </Button>
+          <Link href="/(auth)/login" asChild>
+            <Button variant="secondary" className="mt-3">
+              <ButtonLabel>
+                <Trans>Back to Login</Trans>
+              </ButtonLabel>
+            </Button>
+          </Link>
+        </Animated.View>
+      </AuthScreen>
+    );
+  }
+
+  if (publicInfo.data && !registrationOpen) {
     return (
       <AuthScreen
         title={t`Registration Closed`}

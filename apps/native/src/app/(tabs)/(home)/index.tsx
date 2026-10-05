@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { FlashList } from "@shopify/flash-list";
 import {
+  IconAlertTriangle,
   IconBooks,
   IconCheck,
   IconDeviceTvOld,
@@ -199,6 +200,14 @@ export default function DashboardScreen() {
             <HorizontalPosterRow items={[]} isLoading />
           ) : hasLibrary ? (
             <HorizontalPosterRow items={library.data?.items ?? []} />
+          ) : library.isError && !library.data ? (
+            <EmptyState
+              icon={IconAlertTriangle}
+              title={t`Something went wrong`}
+              description={t`Couldn't load your library`}
+              actionLabel={t`Retry`}
+              onAction={() => library.refetch()}
+            />
           ) : (
             <EmptyState
               title={t`Your library is empty`}

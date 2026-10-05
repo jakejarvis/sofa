@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { FlashList } from "@shopify/flash-list";
+import { IconAlertTriangle } from "@tabler/icons-react-native";
 import { skipToken, useInfiniteQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -8,6 +9,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 
 import { RecentlyViewedList } from "@/components/search/recently-viewed-list";
 import { type SearchResultItem, SearchResultRow } from "@/components/search/search-result-row";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -89,6 +91,14 @@ export default function SearchScreen() {
         <View className="flex-1 items-center justify-center">
           <Spinner colorClassName="accent-primary" />
         </View>
+      ) : searchResults.isError && allResults.length === 0 ? (
+        <EmptyState
+          icon={IconAlertTriangle}
+          title={t`Something went wrong`}
+          description={t`Couldn't search right now`}
+          actionLabel={t`Retry`}
+          onAction={() => searchResults.refetch()}
+        />
       ) : allResults.length === 0 ? (
         <Animated.View
           entering={FadeIn.duration(300)}

@@ -563,6 +563,10 @@ msgstr "Gerenciamento de cache"
 msgid "Can't reach server"
 msgstr "Não foi possível alcançar o servidor"
 
+#: apps/native/src/app/(auth)/register.tsx
+msgid "Can't reach the server"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/native/src/components/header-avatar.tsx
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
@@ -859,6 +863,26 @@ msgstr "Não foi possível carregar a sua biblioteca"
 
 #: apps/native/src/app/(auth)/server-url.tsx
 msgid "Could not reach the server. Check your connection and the URL."
+msgstr ""
+
+#: apps/native/src/app/(tabs)/(library)/index.tsx
+msgid "Couldn't load more"
+msgstr ""
+
+#: apps/native/src/components/explore/filterable-title-row.tsx
+msgid "Couldn't load titles"
+msgstr ""
+
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+msgid "Couldn't load upcoming releases"
+msgstr ""
+
+#: apps/native/src/app/(tabs)/(home)/index.tsx
+msgid "Couldn't load your library"
+msgstr ""
+
+#: apps/native/src/app/(tabs)/(search)/index.tsx
+msgid "Couldn't search right now"
 msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
@@ -2746,7 +2770,12 @@ msgstr "Resultados"
 msgid "Retrieving your watch history, watchlist, and ratings..."
 msgstr "Buscando seu histórico de exibição, lista de desejos e avaliações..."
 
+#: apps/native/src/app/(auth)/register.tsx
+#: apps/native/src/app/(tabs)/(home)/index.tsx
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
+#: apps/native/src/app/(tabs)/(search)/index.tsx
+#: apps/native/src/components/explore/filterable-title-row.tsx
 #: apps/native/src/components/settings/integrations-section.tsx
 #: apps/native/src/components/ui/server-unreachable-banner.ios.tsx
 #: apps/native/src/components/ui/server-unreachable-banner.tsx
@@ -3054,7 +3083,10 @@ msgstr "Sofa v{latestVersion} disponível"
 msgid "Sofa will automatically log movies and episodes when you finish watching them"
 msgstr "O Sofa registrará automaticamente filmes e episódios quando você terminar de assisti-los"
 
+#: apps/native/src/app/(tabs)/(home)/index.tsx
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
+#: apps/native/src/app/(tabs)/(search)/index.tsx
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx

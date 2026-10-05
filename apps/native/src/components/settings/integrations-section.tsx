@@ -24,7 +24,7 @@ export function IntegrationsSection() {
         <View className="items-center py-4">
           <Spinner colorClassName="accent-primary" />
         </View>
-      ) : integrations.isError ? (
+      ) : integrations.isError && !integrations.data ? (
         <View className="items-center gap-2 py-4">
           <Text className="text-muted-foreground text-sm">
             <Trans>Could not load integrations</Trans>

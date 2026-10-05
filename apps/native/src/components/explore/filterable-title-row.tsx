@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import type { Icon } from "@tabler/icons-react-native";
 import { skipToken, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 import {
   HorizontalPosterRow,
@@ -129,7 +129,14 @@ export function FilterableTitleRow({
         </ScrollView>
       )}
 
-      {!showLoading && items.length === 0 && selectedGenre !== null ? (
+      {!showLoading && items.length === 0 && selectedGenre !== null && discover.isError ? (
+        <View className="items-center gap-2 py-6">
+          <Text className="text-muted-foreground text-sm">{t`Couldn't load titles`}</Text>
+          <Pressable onPress={() => discover.refetch()}>
+            <Text className="text-primary font-sans text-sm font-medium">{t`Retry`}</Text>
+          </Pressable>
+        </View>
+      ) : !showLoading && items.length === 0 && selectedGenre !== null ? (
         <View className="items-center py-6">
           <Text className="text-muted-foreground text-sm">
             <Trans>No titles found for this genre.</Trans>

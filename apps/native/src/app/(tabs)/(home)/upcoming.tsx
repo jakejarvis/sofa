@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { IconCalendarEvent } from "@tabler/icons-react-native";
+import { IconAlertTriangle, IconCalendarEvent } from "@tabler/icons-react-native";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -8,6 +8,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { useCSSVariable, useResolveClassNames } from "uniwind";
 
 import { UpcomingRow } from "@/components/dashboard/upcoming-row";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { orpc } from "@/lib/orpc";
@@ -55,20 +56,28 @@ export default function UpcomingScreen() {
   const [mediaType, setMediaType] = useState<"all" | "movie" | "tv">("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "watching" | "watchlist">("all");
 
-  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage, isRefetching } =
-    useInfiniteQuery(
-      orpc.library.upcoming.infiniteOptions({
-        input: (pageParam: string | undefined) => ({
-          days: 90,
-          limit: 20,
-          cursor: pageParam,
-          mediaType: mediaType !== "all" ? mediaType : undefined,
-          statusFilter: statusFilter !== "all" ? [statusFilter] : undefined,
-        }),
-        initialPageParam: undefined as string | undefined,
-        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isRefetching,
+  } = useInfiniteQuery(
+    orpc.library.upcoming.infiniteOptions({
+      input: (pageParam: string | undefined) => ({
+        days: 90,
+        limit: 20,
+        cursor: pageParam,
+        mediaType: mediaType !== "all" ? mediaType : undefined,
+        statusFilter: statusFilter !== "all" ? [statusFilter] : undefined,
       }),
-    );
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    }),
+  );
 
   const allItems = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
   const sections = useMemo(
@@ -141,44 +150,50 @@ export default function UpcomingScreen() {
         {t`Upcoming`}
       </Stack.Screen.Title>
       <Stack.Screen.BackButton displayMode="minimal" />
-      {!isPending && allItems.length === 0 ? (
-        <Animated.View
-          entering={FadeInDown.duration(300)}
-          className="flex-1 items-center justify-center px-4"
-        >
-          {filterChips}
-          <View className="flex-1 items-center justify-center">
-            <ScaledIcon icon={IconCalendarEvent} size={48} color={`${mutedColor}66`} />
-            <Text className="text-muted-foreground mt-4 text-center text-sm">
-              <Trans>No upcoming episodes or releases in the next 90 days.</Trans>
+      <SectionList
+        sections={sections}
+        keyExtractor={(item, i) => `${item.titleId}-${item.date}-${i}`}
+        ListHeaderComponent={filterChips}
+        renderItem={({ item }) => (
+          <View className="px-4 py-1">
+            <UpcomingRow item={item} />
+          </View>
+        )}
+        renderSectionHeader={({ section: { title } }) => (
+          <View className="bg-background px-4 pt-3 pb-1">
+            <Text className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+              {title}
             </Text>
           </View>
-        </Animated.View>
-      ) : (
-        <SectionList
-          sections={sections}
-          keyExtractor={(item, i) => `${item.titleId}-${item.date}-${i}`}
-          ListHeaderComponent={filterChips}
-          renderItem={({ item }) => (
-            <View className="px-4 py-1">
-              <UpcomingRow item={item} />
-            </View>
-          )}
-          renderSectionHeader={({ section: { title } }) => (
-            <View className="bg-background px-4 pt-3 pb-1">
-              <Text className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                {title}
+        )}
+        stickySectionHeadersEnabled
+        contentContainerStyle={contentContainerStyle}
+        contentInsetAdjustmentBehavior="automatic"
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.5}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />}
+        ListEmptyComponent={
+          isPending ? null : isError && allItems.length === 0 ? (
+            <EmptyState
+              icon={IconAlertTriangle}
+              title={t`Something went wrong`}
+              description={t`Couldn't load upcoming releases`}
+              actionLabel={t`Retry`}
+              onAction={() => refetch()}
+            />
+          ) : (
+            <Animated.View
+              entering={FadeInDown.duration(300)}
+              className="items-center justify-center px-4 py-16"
+            >
+              <ScaledIcon icon={IconCalendarEvent} size={48} color={`${mutedColor}66`} />
+              <Text className="text-muted-foreground mt-4 text-center text-sm">
+                <Trans>No upcoming episodes or releases in the next 90 days.</Trans>
               </Text>
-            </View>
-          )}
-          stickySectionHeadersEnabled
-          contentContainerStyle={contentContainerStyle}
-          contentInsetAdjustmentBehavior="automatic"
-          onEndReached={onEndReached}
-          onEndReachedThreshold={0.5}
-          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />}
-        />
-      )}
+            </Animated.View>
+          )
+        }
+      />
     </>
   );
 }

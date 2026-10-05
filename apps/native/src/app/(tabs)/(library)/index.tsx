@@ -377,7 +377,7 @@ export default function LibraryScreen() {
         <View className="flex-1 items-center justify-center">
           <Spinner colorClassName="accent-primary" />
         </View>
-      ) : libraryQuery.isError ? (
+      ) : libraryQuery.isError && allItems.length === 0 ? (
         <EmptyState
           icon={IconAlertTriangle}
           title={t`Something went wrong`}
@@ -418,7 +418,11 @@ export default function LibraryScreen() {
           }}
           refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
           onEndReached={() => {
-            if (libraryQuery.hasNextPage && !libraryQuery.isFetchingNextPage) {
+            if (
+              libraryQuery.hasNextPage &&
+              !libraryQuery.isFetchingNextPage &&
+              !libraryQuery.isFetchNextPageError
+            ) {
               libraryQuery.fetchNextPage();
             }
           }}
@@ -427,6 +431,13 @@ export default function LibraryScreen() {
             libraryQuery.isFetchingNextPage ? (
               <View className="items-center py-4">
                 <Spinner />
+              </View>
+            ) : libraryQuery.isFetchNextPageError ? (
+              <View className="flex-row items-center justify-center gap-3 py-4">
+                <Text className="text-muted-foreground text-sm">{t`Couldn't load more`}</Text>
+                <Pressable onPress={() => libraryQuery.fetchNextPage()}>
+                  <Text className="text-primary font-sans text-sm font-medium">{t`Retry`}</Text>
+                </Pressable>
               </View>
             ) : null
           }
