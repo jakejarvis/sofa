@@ -1,1 +1,1 @@
-export * from "@sofa/i18n/errors";
+export { getAppErrorCode, getAuthErrorMessage, getErrorMessage } from "@sofa/i18n/errors";
