@@ -70,6 +70,7 @@ If you're running Sofa behind a reverse proxy (Caddy, nginx, Traefik, etc.), mak
 1. Set `BETTER_AUTH_URL` to your public URL (e.g. `https://sofa.example.com`)
 2. Set `CORS_ORIGIN` to the same URL if your proxy uses a different origin
 3. Forward the `Host` header and WebSocket connections
+4. If your proxy doesn't run on the same host, Docker network, or private LAN as Sofa (for example a VPS reaching it over the internet or Tailscale), set `TRUSTED_PROXIES` to the proxy's address so sign-in rate limits apply per user (see [Configuration](/docs/configuration#network)).
 
 Example with Caddy:
 

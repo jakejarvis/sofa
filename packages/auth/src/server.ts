@@ -11,6 +11,8 @@ import * as schema from "@sofa/db/schema";
 import { createLogger } from "@sofa/logger";
 
 import {
+  CLIENT_IP_HEADER,
+  getOidcDiscoveryURL,
   getOidcRedirectURI,
   isOidcAutoRegisterEnabled,
   isOidcConfigured,
@@ -67,7 +69,7 @@ export const auth = betterAuth({
                 providerId: "oidc",
                 clientId: process.env.OIDC_CLIENT_ID ?? "",
                 clientSecret: process.env.OIDC_CLIENT_SECRET ?? "",
-                discoveryUrl: `${process.env.OIDC_ISSUER_URL}/.well-known/openid-configuration`,
+                discoveryUrl: getOidcDiscoveryURL() ?? "",
                 redirectURI: getOidcRedirectURI(),
                 scopes: ["openid", "email", "profile"],
                 pkce: true,
@@ -91,6 +93,12 @@ export const auth = betterAuth({
   advanced: {
     database: {
       generateId: () => Bun.randomUUIDv7(),
+    },
+    // apps/server resolves the client IP (TCP peer + TRUSTED_PROXIES hops) and passes it in this
+    // header; see apps/server/src/client-ip.ts. Don't set `trustedProxies` here: Better Auth would
+    // then discard resolved LAN addresses, because they fall inside the trusted ranges.
+    ipAddress: {
+      ipAddressHeaders: [CLIENT_IP_HEADER],
     },
   },
   hooks: {

@@ -40,3 +40,16 @@ export function getOidcRedirectURI(): string | undefined {
   const authBaseURL = new URL(trimmed).pathname === "/" ? `${trimmed}/api/auth` : trimmed;
   return `${authBaseURL}/oauth2/callback/oidc`;
 }
+
+/**
+ * Internal request header carrying the client IP that apps/server resolved from the TCP peer
+ * address and trusted proxy hops (see apps/server/src/client-ip.ts). Better Auth reads only this
+ * header for rate limiting; apps/server overwrites or removes any client-sent value.
+ */
+export const CLIENT_IP_HEADER = "x-sofa-client-ip";
+
+/** The OIDC discovery document URL, or `undefined` when `OIDC_ISSUER_URL` isn't set. */
+export function getOidcDiscoveryURL(): string | undefined {
+  const issuer = process.env.OIDC_ISSUER_URL;
+  return issuer ? `${issuer}/.well-known/openid-configuration` : undefined;
+}

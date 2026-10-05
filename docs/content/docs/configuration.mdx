@@ -137,12 +137,15 @@ These are only needed if you're proxying TMDB requests or using an alternative e
 
 ## Network
 
-| Variable      | Default                 | Description           |
-| ------------- | ----------------------- | --------------------- |
-| `CORS_ORIGIN` | `http://localhost:3000` | Allowed CORS origin   |
-| `PORT`        | `3000`                  | Server listening port |
+| Variable | Default | Description |
+| --- | --- | --- |
+| `CORS_ORIGIN` | `http://localhost:3000` | Allowed CORS origin |
+| `PORT` | `3000` | Server listening port |
+| `TRUSTED_PROXIES` | loopback + private ranges | Comma-separated IPs/CIDRs of reverse proxies whose `X-Forwarded-For` hops are trusted for sign-in rate limiting; `none` to trust none |
 
 Set `CORS_ORIGIN` to your public URL when using a reverse proxy.
+
+Sofa rate-limits sign-in attempts per client IP. The default works when Sofa is reached directly, or through a reverse proxy or Cloudflare Tunnel (`cloudflared`) running on the same host or Docker network. If your proxy runs elsewhere (for example on a VPS that reaches Sofa over the internet or Tailscale, or Cloudflare proxying straight to Sofa's port), add its addresses to `TRUSTED_PROXIES` (Cloudflare publishes its ranges at https://www.cloudflare.com/ips/). Otherwise every user shares the proxy's rate limit, and Sofa logs `Ignored X-Forwarded-For from …` once. Set `none` if untrusted devices on your LAN can reach Sofa directly and you don't use a proxy.
 
 ## Update Checks
 
