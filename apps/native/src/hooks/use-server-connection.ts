@@ -87,6 +87,10 @@ export function useServerConnection() {
       onServerReachabilityChange((reachable) => {
         if (reachable) {
           authClient.$store.atoms.session.get().refetch?.();
+          void queryClient.refetchQueries({
+            type: "active",
+            predicate: (q) => q.state.status === "error",
+          });
         }
       }),
     [],

@@ -206,6 +206,7 @@ export async function validateServerUrl(url: string): Promise<ValidationResult> 
 // ---------------------------------------------------------------------------
 
 let isReachable = true;
+let lastNetworkState: Network.NetworkState | null = null;
 const reachabilityListeners: Array<(reachable: boolean) => void> = [];
 
 function notifyReachability() {
@@ -218,14 +219,28 @@ function setReachable(nextReachable: boolean) {
   if (isReachable === nextReachable) return;
   isReachable = nextReachable;
   notifyReachability();
+  syncOnlineState();
 }
 
 function isDeviceOnline(state: Network.NetworkState): boolean {
   return !!state.isConnected && state.isInternetReachable !== false;
 }
 
-function syncOnlineState(state: Network.NetworkState) {
-  onlineManager.setOnline(isDeviceOnline(state) || isReachable);
+function syncOnlineState(state: Network.NetworkState | null = lastNetworkState) {
+  if (state) lastNetworkState = state;
+  const deviceOnline = lastNetworkState ? isDeviceOnline(lastNetworkState) : true;
+  onlineManager.setOnline(deviceOnline || isReachable);
+}
+
+// While the server is unreachable, queries are paused and never hit serverFetch, so probe the
+// health endpoint directly; a success flips reachability (and the online flag) back.
+function probeServerIfUnreachable() {
+  if (isReachable) return;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
+  serverFetch(`${getServerUrl()}/api/health`, { method: "GET", signal: controller.signal })
+    .catch(() => {})
+    .finally(() => clearTimeout(timer));
 }
 
 function syncAppFocus(state: AppStateStatus) {
@@ -252,9 +267,6 @@ export async function serverFetch(input: RequestInfo | URL, init?: RequestInit):
   try {
     const response = await fetch(input, init);
     setReachable(true);
-    if (!onlineManager.isOnline()) {
-      onlineManager.setOnline(true);
-    }
     return response;
   } catch (error) {
     if (isNetworkError(error)) {
@@ -280,12 +292,16 @@ export function startReachabilityMonitor(): () => void {
   syncAppFocus(AppState.currentState);
   void Network.getNetworkStateAsync().then(syncOnlineState);
 
-  const networkSubscription = Network.addNetworkStateListener(syncOnlineState);
+  const networkSubscription = Network.addNetworkStateListener((state) => {
+    syncOnlineState(state);
+    probeServerIfUnreachable();
+  });
 
   const appStateSubscription = AppState.addEventListener("change", (nextState) => {
     syncAppFocus(nextState);
     if (nextState === "active") {
       void Network.getNetworkStateAsync().then(syncOnlineState);
+      probeServerIfUnreachable();
     }
   });
 

@@ -4,6 +4,7 @@ import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 
 import { isClientError, isUnauthorizedError } from "@/lib/error-messages";
 import { posthog } from "@/lib/posthog";
+import { QUERY_GC_TIME } from "@/lib/query-config";
 import { authClient, getIsReachable, isNetworkError, markSessionRejected } from "@/lib/server";
 import { toast } from "@/lib/toast";
 import { i18n } from "@sofa/i18n";
@@ -23,7 +24,7 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60_000,
-      gcTime: 300_000,
+      gcTime: QUERY_GC_TIME,
       networkMode: "online",
       retry: (failureCount, error) => {
         // 4xx errors can't succeed on retry.

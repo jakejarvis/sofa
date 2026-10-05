@@ -25,6 +25,7 @@ import { useWidgetRefresh } from "@/hooks/use-widget-refresh";
 import { initLocale } from "@/lib/i18n";
 import { initAnalytics, posthog } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
+import { QUERY_PERSIST_MAX_AGE } from "@/lib/query-config";
 import { initSentry, Sentry } from "@/lib/sentry";
 import { getScopeKey, initSession, onStorageScopeChange, queryPersister } from "@/lib/server";
 import { sofaTheme } from "@/lib/theme";
@@ -170,7 +171,7 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
 
     if (!scopeKey) return;
 
-    const options = { queryClient, persister: queryPersister };
+    const options = { queryClient, persister: queryPersister, maxAge: QUERY_PERSIST_MAX_AGE };
 
     let unsubscribe: (() => void) | undefined;
     let aborted = false;
