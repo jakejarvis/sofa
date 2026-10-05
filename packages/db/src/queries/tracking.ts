@@ -1,4 +1,4 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, lt, or, sql } from "drizzle-orm";
 
 import { localDateString } from "@sofa/config";
 
@@ -348,4 +348,93 @@ export function deleteAllEpisodeWatchesForTitle(userId: string, titleId: string)
 
   if (titleEpisodeIds.length === 0) return;
   deleteEpisodeWatches(userId, titleEpisodeIds);
+}
+
+// ─── Watch history ──────────────────────────────────────────────────
+
+type WatchSource = "manual" | "import" | "plex" | "jellyfin" | "emby";
+
+export interface WatchHistoryCursor {
+  /** watchedAt in epoch ms */
+  t: number;
+  /** watch row id */
+  i: string;
+}
+
+export interface WatchHistoryQueryOptions {
+  limit: number;
+  source?: WatchSource;
+  before?: { watchedAt: Date; id: string };
+}
+
+export function getMovieWatchHistory(userId: string, opts: WatchHistoryQueryOptions) {
+  const conditions = [eq(userMovieWatches.userId, userId)];
+  if (opts.source) conditions.push(eq(userMovieWatches.source, opts.source));
+  if (opts.before) {
+    conditions.push(
+      or(
+        lt(userMovieWatches.watchedAt, opts.before.watchedAt),
+        and(
+          eq(userMovieWatches.watchedAt, opts.before.watchedAt),
+          lt(userMovieWatches.id, opts.before.id),
+        ),
+      )!,
+    );
+  }
+  return db
+    .select({
+      watchId: userMovieWatches.id,
+      watchedAt: userMovieWatches.watchedAt,
+      source: userMovieWatches.source,
+      titleId: titles.id,
+      title: titles.title,
+      type: titles.type,
+      posterPath: titles.posterPath,
+      posterThumbHash: titles.posterThumbHash,
+    })
+    .from(userMovieWatches)
+    .innerJoin(titles, eq(userMovieWatches.titleId, titles.id))
+    .where(and(...conditions))
+    .orderBy(desc(userMovieWatches.watchedAt), desc(userMovieWatches.id))
+    .limit(opts.limit)
+    .all();
+}
+
+export function getEpisodeWatchHistory(userId: string, opts: WatchHistoryQueryOptions) {
+  const conditions = [eq(userEpisodeWatches.userId, userId)];
+  if (opts.source) conditions.push(eq(userEpisodeWatches.source, opts.source));
+  if (opts.before) {
+    conditions.push(
+      or(
+        lt(userEpisodeWatches.watchedAt, opts.before.watchedAt),
+        and(
+          eq(userEpisodeWatches.watchedAt, opts.before.watchedAt),
+          lt(userEpisodeWatches.id, opts.before.id),
+        ),
+      )!,
+    );
+  }
+  return db
+    .select({
+      watchId: userEpisodeWatches.id,
+      watchedAt: userEpisodeWatches.watchedAt,
+      source: userEpisodeWatches.source,
+      titleId: titles.id,
+      title: titles.title,
+      type: titles.type,
+      posterPath: titles.posterPath,
+      posterThumbHash: titles.posterThumbHash,
+      episodeId: episodes.id,
+      seasonNumber: seasons.seasonNumber,
+      episodeNumber: episodes.episodeNumber,
+      episodeName: episodes.name,
+    })
+    .from(userEpisodeWatches)
+    .innerJoin(episodes, eq(userEpisodeWatches.episodeId, episodes.id))
+    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
+    .innerJoin(titles, eq(seasons.titleId, titles.id))
+    .where(and(...conditions))
+    .orderBy(desc(userEpisodeWatches.watchedAt), desc(userEpisodeWatches.id))
+    .limit(opts.limit)
+    .all();
 }

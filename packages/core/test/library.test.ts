@@ -1,6 +1,14 @@
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 
-import { clearAllTables, insertStatus, insertTitle, insertUser } from "@sofa/test/db";
+import {
+  clearAllTables,
+  insertEpisodeWatch,
+  insertMovieWatch,
+  insertStatus,
+  insertTitle,
+  insertTvShow,
+  insertUser,
+} from "@sofa/test/db";
 
 import { getFilteredLibraryFeed, getLibraryGenresList } from "../src/library";
 
@@ -135,6 +143,38 @@ describe("getFilteredLibraryFeed", () => {
 });
 
 // ── getLibraryGenresList ──────────────────────────────────────────────
+
+describe("getFilteredLibraryFeed last_watched sort", () => {
+  test("orders by most recent watch (movies and shows) with unwatched last", () => {
+    insertUser();
+    insertTitle({ id: "old-movie", tmdbId: 1 });
+    insertTitle({ id: "never", tmdbId: 2 });
+    insertTitle({ id: "recent-movie", tmdbId: 3 });
+    const { episodeIds } = insertTvShow("show", 4, 1, 2);
+    for (const id of ["old-movie", "never", "recent-movie", "show"]) {
+      insertStatus("user-1", id, "watchlist");
+    }
+    insertMovieWatch("user-1", "old-movie", new Date("2024-01-01T00:00:00Z"));
+    insertMovieWatch("user-1", "recent-movie", new Date("2024-03-01T00:00:00Z"));
+    insertEpisodeWatch("user-1", episodeIds[0], new Date("2024-02-01T00:00:00Z"));
+    insertEpisodeWatch("user-1", episodeIds[1], new Date("2024-02-10T00:00:00Z"));
+
+    const desc = getFilteredLibraryFeed("user-1", { ...defaultFilters, sortBy: "last_watched" });
+    expect(desc.items.map((i) => i.titleId)).toEqual([
+      "recent-movie",
+      "show",
+      "old-movie",
+      "never",
+    ]);
+
+    const asc = getFilteredLibraryFeed("user-1", {
+      ...defaultFilters,
+      sortBy: "last_watched",
+      sortDirection: "asc",
+    });
+    expect(asc.items.map((i) => i.titleId)).toEqual(["old-movie", "show", "recent-movie", "never"]);
+  });
+});
 
 describe("getLibraryGenresList", () => {
   test("returns empty array when user has no titles", () => {

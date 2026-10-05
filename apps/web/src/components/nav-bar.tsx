@@ -3,6 +3,7 @@ import {
   IconBooks,
   IconCalendarEvent,
   IconCompass,
+  IconHistory,
   IconHome,
   IconLogout,
   IconSearch,
@@ -125,6 +126,7 @@ export function NavBar({
     { href: "/library", label: t`Library` },
     { href: "/explore", label: t`Explore` },
     { href: "/upcoming", label: t`Upcoming` },
+    { href: "/history", label: t`History` },
   ] as const;
 
   const initial = userName?.charAt(0).toUpperCase() ?? "?";
@@ -289,6 +291,7 @@ export function MobileTabBar() {
     { href: "/library", label: t`Library`, icon: IconBooks },
     { href: "/explore", label: t`Explore`, icon: IconCompass },
     { href: "/upcoming", label: t`Upcoming`, icon: IconCalendarEvent },
+    { href: "/history", label: t`History`, icon: IconHistory },
     { href: "/settings", label: t`Settings`, icon: IconSettings },
   ] as const;
 

@@ -2294,6 +2294,245 @@
         ]
       }
     },
+    "/tracking/history": {
+      "get": {
+        "operationId": "tracking.history",
+        "summary": "List watch history",
+        "description": "List the user's watches (movies and episodes), newest first, with cursor pagination.",
+        "tags": [
+          "Tracking"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 30,
+              "description": "Maximum items to return"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "description": "Opaque cursor from a previous response's nextCursor"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "movie",
+                "tv"
+              ],
+              "type": "string",
+              "description": "Only movies or only TV episodes"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "manual",
+                "import",
+                "plex",
+                "jellyfin",
+                "emby"
+              ],
+              "type": "string",
+              "description": "Only watches logged by this source"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of watch history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "watchId": {
+                            "type": "string",
+                            "description": "Watch record ID"
+                          },
+                          "kind": {
+                            "enum": [
+                              "movie",
+                              "episode"
+                            ],
+                            "type": "string",
+                            "description": "Whether this watch is a movie or an episode"
+                          },
+                          "watchedAt": {
+                            "type": "string",
+                            "description": "ISO 8601 timestamp of the watch"
+                          },
+                          "source": {
+                            "enum": [
+                              "manual",
+                              "import",
+                              "plex",
+                              "jellyfin",
+                              "emby"
+                            ],
+                            "type": "string",
+                            "description": "How the watch was logged"
+                          },
+                          "title": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "Title ID"
+                              },
+                              "title": {
+                                "type": "string",
+                                "description": "Display title"
+                              },
+                              "type": {
+                                "enum": [
+                                  "movie",
+                                  "tv"
+                                ],
+                                "type": "string",
+                                "description": "Title type"
+                              },
+                              "posterPath": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ],
+                                "description": "Poster image URL"
+                              },
+                              "posterThumbHash": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ],
+                                "description": "Poster ThumbHash placeholder"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "title",
+                              "type",
+                              "posterPath",
+                              "posterThumbHash"
+                            ],
+                            "description": "The movie or show"
+                          },
+                          "episode": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "description": "Episode ID"
+                                  },
+                                  "seasonNumber": {
+                                    "type": "number",
+                                    "description": "Season number"
+                                  },
+                                  "episodeNumber": {
+                                    "type": "number",
+                                    "description": "Episode number"
+                                  },
+                                  "name": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ],
+                                    "description": "Episode name"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "seasonNumber",
+                                  "episodeNumber",
+                                  "name"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ],
+                            "description": "Episode details (null for movies)"
+                          }
+                        },
+                        "required": [
+                          "watchId",
+                          "kind",
+                          "watchedAt",
+                          "source",
+                          "title",
+                          "episode"
+                        ],
+                        "description": "A single watch event"
+                      },
+                      "description": "Watches, newest first"
+                    },
+                    "nextCursor": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Cursor for the next page, or null at the end"
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "nextCursor"
+                  ],
+                  "description": "A page of watch history"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/library": {
       "get": {
         "operationId": "library.list",
@@ -2439,7 +2678,8 @@
                 "release_date",
                 "popularity",
                 "user_rating",
-                "vote_average"
+                "vote_average",
+                "last_watched"
               ],
               "type": "string",
               "default": "added_at",

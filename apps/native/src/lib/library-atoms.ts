@@ -6,7 +6,8 @@ export type SortBy =
   | "release_date"
   | "user_rating"
   | "vote_average"
-  | "popularity";
+  | "popularity"
+  | "last_watched";
 
 export const libraryActiveFilterCountAtom = atom(0);
 export const librarySortByAtom = atom<SortBy>("added_at");

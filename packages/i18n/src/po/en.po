@@ -378,6 +378,7 @@ msgstr ""
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
+#: apps/web/src/routes/_app/history.tsx
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "All"
 msgstr ""
@@ -1096,6 +1097,11 @@ msgstr ""
 msgid "Email is required"
 msgstr "Email is required"
 
+#: apps/web/src/components/history/history-row.tsx
+#: apps/web/src/routes/_app/history.tsx
+msgid "Emby"
+msgstr "Emby"
+
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Enable the \"Playback Stop\" notification type"
 msgstr ""
@@ -1215,6 +1221,10 @@ msgstr "Errors ({errorCount})"
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Every {n}h"
 msgstr "Every {n}h"
+
+#: apps/web/src/routes/_app/history.tsx
+msgid "Everything you've watched, newest first."
+msgstr "Everything you've watched, newest first."
 
 #: apps/native/src/app/(tabs)/(explore)/_layout.tsx
 #: apps/native/src/app/(tabs)/(home)/index.tsx
@@ -1570,6 +1580,11 @@ msgstr "Highest rated"
 msgid "Hindi"
 msgstr "Hindi"
 
+#: apps/web/src/components/nav-bar.tsx
+#: apps/web/src/routes/_app/history.tsx
+msgid "History"
+msgstr "History"
+
 #: apps/native/src/app/(tabs)/(home)/_layout.tsx
 #: apps/native/src/components/navigation/native-tab-bar.android.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
@@ -1590,7 +1605,9 @@ msgstr ""
 msgid "Image cache and backup disk usage"
 msgstr ""
 
+#: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/routes/_app/history.tsx
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Import"
 msgstr ""
@@ -1717,6 +1734,11 @@ msgstr "Italian"
 msgid "Japanese"
 msgstr "Japanese"
 
+#: apps/web/src/components/history/history-row.tsx
+#: apps/web/src/routes/_app/history.tsx
+msgid "Jellyfin"
+msgstr "Jellyfin"
+
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Job"
 msgstr ""
@@ -1799,6 +1821,11 @@ msgstr ""
 msgid "Last run succeeded"
 msgstr ""
 
+#: apps/native/src/components/library/sort-menu.tsx
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "Last watched"
+msgstr "Last watched"
+
 #: apps/native/src/app/(tabs)/(library)/_layout.tsx
 #: apps/native/src/components/navigation/native-tab-bar.android.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
@@ -1836,6 +1863,11 @@ msgstr ""
 #: apps/web/src/components/settings/settings-shell.tsx
 msgid "Manage your account and preferences"
 msgstr ""
+
+#: apps/web/src/components/history/history-row.tsx
+#: apps/web/src/routes/_app/history.tsx
+msgid "Manual"
+msgstr "Manual"
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Manual backup"
@@ -2031,6 +2063,7 @@ msgstr ""
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/routes/_app/history.tsx
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "Movies"
 msgstr ""
@@ -2209,6 +2242,10 @@ msgstr "Nothing to watch"
 #: apps/native/src/lib/widgets.ts
 msgid "Nothing upcoming"
 msgstr "Nothing upcoming"
+
+#: apps/web/src/routes/_app/history.tsx
+msgid "Nothing watched yet."
+msgstr "Nothing watched yet."
 
 #: apps/web/src/components/library/library-filters.tsx
 #~ msgid "Older"
@@ -2398,6 +2435,11 @@ msgstr "Please confirm your password"
 #: apps/native/src/hooks/use-server-connection.ts
 msgid "Please sign in again."
 msgstr "Please sign in again."
+
+#: apps/web/src/components/history/history-row.tsx
+#: apps/web/src/routes/_app/history.tsx
+msgid "Plex"
+msgstr "Plex"
 
 #: apps/native/src/app/(tabs)/(explore)/index.tsx
 #: apps/web/src/routes/_app/explore.tsx
@@ -2816,6 +2858,14 @@ msgstr ""
 #: apps/web/src/components/dashboard/upcoming-item.tsx
 #~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 #~ msgstr "S{0} · {1} {2, plural, one {episode} other {episodes}}"
+
+#: apps/web/src/components/history/history-row.tsx
+msgid "S{season} E{episode}"
+msgstr "S{season} E{episode}"
+
+#: apps/web/src/components/history/history-row.tsx
+msgid "S{season} E{episode} · {name}"
+msgstr "S{season} E{episode} · {name}"
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/lib/widgets.ts
@@ -3486,6 +3536,7 @@ msgstr ""
 msgid "TV show"
 msgstr ""
 
+#: apps/web/src/routes/_app/history.tsx
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "TV Shows"
 msgstr "TV Shows"

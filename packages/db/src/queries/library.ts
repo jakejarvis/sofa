@@ -11,6 +11,7 @@ import {
   titleGenres,
   titles,
   userEpisodeWatches,
+  userMovieWatches,
   userPlatforms,
   userRatings,
   userTitleStatus,
@@ -220,6 +221,24 @@ export function getFilteredLibrary(userId: string, filters: LibraryFilters) {
     case "vote_average":
       sortExpressions.push(dirFn(titles.voteAverage));
       break;
+    case "last_watched": {
+      // Latest watch per title (movie watch, or any episode watch for a show);
+      // never-watched titles sort last regardless of direction.
+      const lastWatched = sql<number | null>`(
+        SELECT MAX(w.watchedAt) FROM (
+          SELECT ${userMovieWatches.watchedAt} AS watchedAt FROM ${userMovieWatches}
+          WHERE ${userMovieWatches.titleId} = ${titles.id} AND ${userMovieWatches.userId} = ${userId}
+          UNION ALL
+          SELECT uew.watchedAt AS watchedAt FROM ${userEpisodeWatches} uew
+          JOIN ${episodes} e ON e.id = uew.episodeId
+          JOIN ${seasons} s ON s.id = e.seasonId
+          WHERE s.titleId = ${titles.id} AND uew.userId = ${userId}
+        ) w
+      )`;
+      sortExpressions.push(asc(sql`CASE WHEN ${lastWatched} IS NULL THEN 1 ELSE 0 END`));
+      sortExpressions.push(dirFn(lastWatched));
+      break;
+    }
     default:
       sortExpressions.push(desc(userTitleStatus.addedAt));
   }

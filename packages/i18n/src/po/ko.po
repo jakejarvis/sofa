@@ -378,6 +378,7 @@ msgstr "나이 {age}"
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/web/src/components/library/library-filters.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
+#: apps/web/src/routes/_app/history.tsx
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "All"
 msgstr "전체"
@@ -1096,6 +1097,11 @@ msgstr "이메일"
 msgid "Email is required"
 msgstr "이메일을 입력해주세요"
 
+#: apps/web/src/components/history/history-row.tsx
+#: apps/web/src/routes/_app/history.tsx
+msgid "Emby"
+msgstr ""
+
 #: apps/native/src/components/settings/integration-configs.ts
 msgid "Enable the \"Playback Stop\" notification type"
 msgstr "\"Playback Stop\" 알림 유형 활성화"
@@ -1215,6 +1221,10 @@ msgstr "오류 ({errorCount})"
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Every {n}h"
 msgstr "매 {n}시간"
+
+#: apps/web/src/routes/_app/history.tsx
+msgid "Everything you've watched, newest first."
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(explore)/_layout.tsx
 #: apps/native/src/app/(tabs)/(home)/index.tsx
@@ -1570,6 +1580,11 @@ msgstr "평점 높은 순"
 msgid "Hindi"
 msgstr "힌디어"
 
+#: apps/web/src/components/nav-bar.tsx
+#: apps/web/src/routes/_app/history.tsx
+msgid "History"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(home)/_layout.tsx
 #: apps/native/src/components/navigation/native-tab-bar.android.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
@@ -1590,7 +1605,9 @@ msgstr "이미지 캐시"
 msgid "Image cache and backup disk usage"
 msgstr "이미지 캐시 및 백업 디스크 사용량"
 
+#: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/routes/_app/history.tsx
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Import"
 msgstr "가져오기"
@@ -1717,6 +1734,11 @@ msgstr "이탈리아어"
 msgid "Japanese"
 msgstr "일본어"
 
+#: apps/web/src/components/history/history-row.tsx
+#: apps/web/src/routes/_app/history.tsx
+msgid "Jellyfin"
+msgstr ""
+
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Job"
 msgstr "작업"
@@ -1799,6 +1821,11 @@ msgstr "마지막 실행 실패"
 msgid "Last run succeeded"
 msgstr "마지막 실행 성공"
 
+#: apps/native/src/components/library/sort-menu.tsx
+#: apps/web/src/components/library/library-toolbar.tsx
+msgid "Last watched"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(library)/_layout.tsx
 #: apps/native/src/components/navigation/native-tab-bar.android.tsx
 #: apps/native/src/components/navigation/native-tab-bar.tsx
@@ -1836,6 +1863,11 @@ msgstr "가져오기 연결이 끊어졌습니다. 설정에서 상태를 확인
 #: apps/web/src/components/settings/settings-shell.tsx
 msgid "Manage your account and preferences"
 msgstr "계정 및 환경설정을 관리하세요"
+
+#: apps/web/src/components/history/history-row.tsx
+#: apps/web/src/routes/_app/history.tsx
+msgid "Manual"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Manual backup"
@@ -2031,6 +2063,7 @@ msgstr "영화"
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
+#: apps/web/src/routes/_app/history.tsx
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "Movies"
 msgstr "영화"
@@ -2208,6 +2241,10 @@ msgstr ""
 
 #: apps/native/src/lib/widgets.ts
 msgid "Nothing upcoming"
+msgstr ""
+
+#: apps/web/src/routes/_app/history.tsx
+msgid "Nothing watched yet."
 msgstr ""
 
 #: apps/web/src/components/library/library-filters.tsx
@@ -2398,6 +2435,11 @@ msgstr "비밀번호를 확인해주세요"
 #: apps/native/src/hooks/use-server-connection.ts
 msgid "Please sign in again."
 msgstr "다시 로그인해주세요."
+
+#: apps/web/src/components/history/history-row.tsx
+#: apps/web/src/routes/_app/history.tsx
+msgid "Plex"
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(explore)/index.tsx
 #: apps/web/src/routes/_app/explore.tsx
@@ -2816,6 +2858,14 @@ msgstr "지금 실행"
 #: apps/web/src/components/dashboard/upcoming-item.tsx
 #~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 #~ msgstr "S{0} · {1} {2, plural, one {episode} other {episodes}}"
+
+#: apps/web/src/components/history/history-row.tsx
+msgid "S{season} E{episode}"
+msgstr ""
+
+#: apps/web/src/components/history/history-row.tsx
+msgid "S{season} E{episode} · {name}"
+msgstr ""
 
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/lib/widgets.ts
@@ -3486,6 +3536,7 @@ msgstr "TV 에피소드"
 msgid "TV show"
 msgstr "TV 프로그램"
 
+#: apps/web/src/routes/_app/history.tsx
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "TV Shows"
 msgstr "TV 프로그램"

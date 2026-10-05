@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppExploreRouteImport } from './routes/_app/explore'
+import { Route as AppHistoryRouteImport } from './routes/_app/history'
 import { Route as AppLibraryRouteImport } from './routes/_app/library'
 import { Route as AppOnboardingRouteImport } from './routes/_app/onboarding'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
@@ -50,6 +51,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
 const AppExploreRoute = AppExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHistoryRoute = AppHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLibraryRoute = AppLibraryRouteImport.update({
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/setup': typeof SetupRoute
   '/dashboard': typeof AppDashboardRoute
   '/explore': typeof AppExploreRoute
+  '/history': typeof AppHistoryRoute
   '/library': typeof AppLibraryRoute
   '/onboarding': typeof AppOnboardingRoute
   '/settings': typeof AppSettingsRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/setup': typeof SetupRoute
   '/dashboard': typeof AppDashboardRoute
   '/explore': typeof AppExploreRoute
+  '/history': typeof AppHistoryRoute
   '/library': typeof AppLibraryRoute
   '/onboarding': typeof AppOnboardingRoute
   '/settings': typeof AppSettingsRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/setup': typeof SetupRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/explore': typeof AppExploreRoute
+  '/_app/history': typeof AppHistoryRoute
   '/_app/library': typeof AppLibraryRoute
   '/_app/onboarding': typeof AppOnboardingRoute
   '/_app/settings': typeof AppSettingsRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/dashboard'
     | '/explore'
+    | '/history'
     | '/library'
     | '/onboarding'
     | '/settings'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/dashboard'
     | '/explore'
+    | '/history'
     | '/library'
     | '/onboarding'
     | '/settings'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/_app/dashboard'
     | '/_app/explore'
+    | '/_app/history'
     | '/_app/library'
     | '/_app/onboarding'
     | '/_app/settings'
@@ -234,6 +246,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof AppExploreRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/history': {
+      id: '/_app/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AppHistoryRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/library': {
@@ -298,6 +317,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppExploreRoute: typeof AppExploreRoute
+  AppHistoryRoute: typeof AppHistoryRoute
   AppLibraryRoute: typeof AppLibraryRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -309,6 +329,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppExploreRoute: AppExploreRoute,
+  AppHistoryRoute: AppHistoryRoute,
   AppLibraryRoute: AppLibraryRoute,
   AppOnboardingRoute: AppOnboardingRoute,
   AppSettingsRoute: AppSettingsRoute,

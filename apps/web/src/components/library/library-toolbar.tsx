@@ -51,6 +51,7 @@ export function LibraryToolbar({
       { label: t`Release Date`, sortBy: "release_date", direction: "desc" },
       { label: t`User Rating`, sortBy: "user_rating", direction: "desc" },
       { label: t`TMDB Rating`, sortBy: "vote_average", direction: "desc" },
+      { label: t`Last watched`, sortBy: "last_watched", direction: "desc" },
       { label: t`Popularity`, sortBy: "popularity", direction: "desc" },
     ],
     [t],

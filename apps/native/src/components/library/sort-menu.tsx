@@ -7,7 +7,14 @@ import { MenuTrigger } from "@/components/ui/menu-trigger";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import * as Haptics from "@/utils/haptics";
 
-type SortBy = "added_at" | "title" | "release_date" | "user_rating" | "vote_average" | "popularity";
+type SortBy =
+  | "added_at"
+  | "title"
+  | "release_date"
+  | "user_rating"
+  | "vote_average"
+  | "popularity"
+  | "last_watched";
 type SortDirection = "asc" | "desc";
 
 interface SortOption {
@@ -33,6 +40,7 @@ export function SortMenu({ sortBy, sortDirection, onSortChange }: SortMenuProps)
     { sortBy: "release_date", sortDirection: "desc", label: t`Release Date` },
     { sortBy: "user_rating", sortDirection: "desc", label: t`User Rating` },
     { sortBy: "vote_average", sortDirection: "desc", label: t`TMDB Rating` },
+    { sortBy: "last_watched", sortDirection: "desc", label: t`Last watched` },
     { sortBy: "popularity", sortDirection: "desc", label: t`Popularity` },
   ];
 

@@ -62,6 +62,8 @@ import {
   UserInfoOutput,
   UserPlatformsOutput,
   WatchHistoryInput,
+  WatchHistoryListInput,
+  WatchHistoryListOutput,
   WatchHistoryOutput,
   WatchInput,
 } from "./schemas";
@@ -183,6 +185,18 @@ export const contract = {
       })
       .input(WatchHistoryInput)
       .output(WatchHistoryOutput),
+    history: oc
+      .route({
+        method: "GET",
+        path: "/tracking/history",
+        tags: ["Tracking"],
+        summary: "List watch history",
+        description:
+          "List the user's watches (movies and episodes), newest first, with cursor pagination.",
+        successDescription: "A page of watch history",
+      })
+      .input(WatchHistoryListInput)
+      .output(WatchHistoryListOutput),
   },
 
   // ─── Library ────────────────────────────────────────────────

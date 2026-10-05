@@ -7,6 +7,7 @@ import { getOrFetchTitleByTmdbId } from "@sofa/core/metadata";
 import {
   getDisplayStatusesByTitleIds,
   getUserTitleInfo,
+  listWatchHistory,
   logEpisodeWatch,
   logEpisodeWatchBatch,
   logMovieWatch,
@@ -21,6 +22,7 @@ import {
   watchSeason,
 } from "@sofa/core/tracking";
 import { createLogger } from "@sofa/logger";
+import { tmdbImageUrl } from "@sofa/tmdb/image";
 
 import { os } from "../context";
 import { authed } from "../middleware";
@@ -121,4 +123,22 @@ export const stats = os.tracking.stats.use(authed).handler(({ input, context }) 
   const count = getWatchCount(context.user.id, coreType, input.period);
   const history = getWatchHistory(context.user.id, coreType, input.period);
   return { count, history };
+});
+
+export const history = os.tracking.history.use(authed).handler(({ input, context }) => {
+  const result = listWatchHistory(context.user.id, input);
+  return {
+    items: result.items.map((item) => ({
+      watchId: item.watchId,
+      kind: item.kind,
+      watchedAt: item.watchedAt.toISOString(),
+      source: item.source,
+      title: {
+        ...item.title,
+        posterPath: tmdbImageUrl(item.title.posterPath, "posters"),
+      },
+      episode: item.episode,
+    })),
+    nextCursor: result.nextCursor,
+  };
 });

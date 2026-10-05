@@ -21,6 +21,7 @@ export const implementedRouter = {
     rate: tracking.rate,
     userInfo: tracking.userInfo,
     stats: tracking.stats,
+    history: tracking.history,
   },
   library: {
     list: library.list,
