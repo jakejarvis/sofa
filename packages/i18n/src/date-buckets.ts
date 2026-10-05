@@ -27,8 +27,10 @@ function getEndOfWeek(today: string): string {
 }
 
 function getMonthLabel(dateStr: string): string {
-  const d = new Date(`${dateStr}T00:00:00`);
-  return new Intl.DateTimeFormat(i18n.locale, { month: "long" }).format(d);
+  // Format a UTC instant in UTC: correct regardless of the formatter's default time zone
+  // (the native Intl polyfill defaults to UTC; browsers use the device zone).
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  return new Intl.DateTimeFormat(i18n.locale, { month: "long", timeZone: "UTC" }).format(d);
 }
 
 type BucketKey = "today" | "tomorrow" | "this_week" | "next_week" | string;

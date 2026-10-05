@@ -4,8 +4,11 @@
  * Load order matters — each polyfill depends on the ones before it.
  * See: https://formatjs.github.io/docs/guides/react-native-hermes
  *
- * We use `polyfill` (not `polyfill-force`) so Hermes's native Intl
- * implementations are preserved when available, and only gaps are filled.
+ * We use `polyfill` (not `polyfill-force`). Note: Hermes has no
+ * Intl.DateTimeFormat#formatRange, so the DateTimeFormat polyfill always
+ * installs on device. No time-zone data is loaded, so its default time zone
+ * is UTC — always pass `timeZone` explicitly when formatting dates (format
+ * date-only values as UTC instants with timeZone: "UTC").
  */
 
 // 1. getCanonicalLocales (no dependencies)

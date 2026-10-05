@@ -75,6 +75,31 @@ describe("groupByDateBucket", () => {
     expect(result[0].key).toBe("next_week");
   });
 
+  test("month bucket label names the bucket's month", () => {
+    expect(groupByDateBucket([{ date: "2024-08-15" }])[0].label).toBe("August");
+    expect(groupByDateBucket([{ date: "2024-12-03" }])[0].label).toBe("December");
+  });
+
+  test("month label doesn't depend on the process time zone", () => {
+    const originalTz = process.env.TZ;
+    try {
+      const labels: Record<string, string> = {};
+      for (const zone of ["Europe/Berlin", "Pacific/Kiritimati", "America/Los_Angeles", "UTC"]) {
+        process.env.TZ = zone;
+        labels[zone] = groupByDateBucket([{ date: "2024-12-03" }])[0].label;
+      }
+      expect(labels).toEqual({
+        "Europe/Berlin": "December",
+        "Pacific/Kiritimati": "December",
+        "America/Los_Angeles": "December",
+        UTC: "December",
+      });
+    } finally {
+      if (originalTz === undefined) delete process.env.TZ;
+      else process.env.TZ = originalTz;
+    }
+  });
+
   test("item 30+ days out goes to month bucket", () => {
     const result = groupByDateBucket([{ date: "2024-08-15" }]);
     expect(result).toHaveLength(1);
