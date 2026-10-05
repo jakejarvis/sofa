@@ -35,6 +35,16 @@ const APP_ERROR_MESSAGES: Record<AppErrorCode, MessageDescriptor> = {
   EXPORT_FAILED: msg`Failed to export data`,
 };
 
+/** True when an oRPC call failed because the server no longer accepts the session. */
+export function isUnauthorizedError(error: unknown): boolean {
+  return error instanceof ORPCError && (error.code === "UNAUTHORIZED" || error.status === 401);
+}
+
+/** True for 4xx oRPC errors — retrying them can't succeed. */
+export function isClientError(error: unknown): boolean {
+  return error instanceof ORPCError && error.status >= 400 && error.status < 500;
+}
+
 /** Localized message for an oRPC error carrying an app error code, else `fallback`. */
 export function getErrorMessage(error: unknown, fallback?: string): string {
   const code = getAppErrorCode(error);

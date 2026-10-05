@@ -430,6 +430,20 @@ export function consumeServerChangeRequest(): boolean {
   return was;
 }
 
+// Signals that the server rejected the current session (an API call returned 401), so the
+// session-loss redirect should explain why.
+let sessionRejected = false;
+
+export function markSessionRejected(): void {
+  sessionRejected = true;
+}
+
+export function consumeSessionRejected(): boolean {
+  const was = sessionRejected;
+  sessionRejected = false;
+  return was;
+}
+
 // ---------------------------------------------------------------------------
 // serverManager — compound operations for server-url screen
 // ---------------------------------------------------------------------------

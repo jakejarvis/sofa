@@ -1,6 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { clearStorageScope, hasScopedStorage, setStorageScope } from "@/lib/mmkv";
 import { queryClient } from "@/lib/query-client";
@@ -8,6 +8,7 @@ import {
   authClient,
   clearCachedSessionSeeded,
   consumeServerChangeRequest,
+  consumeSessionRejected,
   ensureInstanceId,
   getCurrentInstanceId,
   hasStoredServerUrl,
@@ -95,40 +96,39 @@ export function useServerConnection() {
   // confirmed by the server. Once confirmed, flip to false so explicit
   // sign-outs don't show a misleading "session expired" toast.
   const [hadOptimisticSession, setHadOptimisticSession] = useState(wasCachedSessionSeeded);
-  const [prevSession, setPrevSession] = useState(session);
 
   if (hadOptimisticSession && session && !isRefetching) {
     setHadOptimisticSession(false);
   }
 
-  // Detect session loss during render so the effect doesn't need to call
-  // setPrevSession (which triggers the set-state-in-effect lint rule).
-  let sessionLost = false;
-  if (prevSession !== session) {
-    if (prevSession && !session) {
-      sessionLost = true;
-    }
-    setPrevSession(session);
-  }
-
   const { replace } = useRouter();
+  const prevSessionRef = useRef(session);
 
   // Navigate to auth when session is lost. Stack.Protected handles screen
   // availability, but enableFreeze can prevent the navigator from
-  // transitioning on its own.
+  // transitioning on its own. The previous-session comparison lives in the
+  // effect (via a ref) because a render-phase setState discards that render's
+  // locals, so a render-local "sessionLost" flag would never be committed.
   useEffect(() => {
-    if (sessionLost) {
-      const changingServer = consumeServerChangeRequest();
-      replace(changingServer ? "/(auth)/server-url" : "/(auth)/login");
-
-      if (hadOptimisticSession) {
-        toast.info(i18n._(msg`Session expired`), {
-          description: i18n._(msg`Please sign in again.`),
-        });
-        clearCachedSessionSeeded();
-      }
+    const hadSession = prevSessionRef.current != null;
+    prevSessionRef.current = session;
+    if (session) {
+      // A confirmed session clears a stale "rejected" flag (e.g. a 401 raced a sign-in).
+      consumeSessionRejected();
+      return;
     }
-  }, [sessionLost, replace, hadOptimisticSession]);
+    if (!hadSession) return;
+
+    const changingServer = consumeServerChangeRequest();
+    replace(changingServer ? "/(auth)/server-url" : "/(auth)/login");
+
+    if (hadOptimisticSession || consumeSessionRejected()) {
+      toast.info(i18n._(msg`Session expired`), {
+        description: i18n._(msg`Please sign in again.`),
+      });
+      clearCachedSessionSeeded();
+    }
+  }, [session, replace, hadOptimisticSession]);
 
   return { session, isPending, hasServerUrl, instanceId };
 }

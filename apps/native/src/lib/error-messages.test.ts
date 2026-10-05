@@ -16,7 +16,22 @@ vi.mock("@lingui/core/macro", () => ({
   }),
 }));
 
-const { getAuthErrorMessage, getErrorMessage } = await import("./error-messages");
+const { getAuthErrorMessage, getErrorMessage, isClientError, isUnauthorizedError } =
+  await import("./error-messages");
+
+describe("error classification", () => {
+  test("isUnauthorizedError matches only UNAUTHORIZED oRPC errors", () => {
+    expect(isUnauthorizedError(new ORPCError("UNAUTHORIZED"))).toBe(true);
+    expect(isUnauthorizedError(new ORPCError("FORBIDDEN"))).toBe(false);
+    expect(isUnauthorizedError(new Error("boom"))).toBe(false);
+  });
+
+  test("isClientError matches 4xx oRPC errors only", () => {
+    expect(isClientError(new ORPCError("BAD_REQUEST"))).toBe(true);
+    expect(isClientError(new ORPCError("INTERNAL_SERVER_ERROR"))).toBe(false);
+    expect(isClientError(new Error("Network request failed"))).toBe(false);
+  });
+});
 
 describe("getErrorMessage", () => {
   test("returns the English message for a mapped app error code", () => {

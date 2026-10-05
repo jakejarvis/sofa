@@ -210,26 +210,26 @@ export default function LoginScreen() {
               </Link>
             </Animated.View>
           )}
-
-          <Animated.View entering={FadeIn.duration(300).delay(500)} className="mt-8 items-center">
-            <Link href="/(auth)/server-url" replace asChild>
-              <Pressable
-                disabled={busy}
-                accessibilityRole="button"
-                accessibilityState={{ disabled: busy }}
-                className="flex-row items-center gap-1.5"
-              >
-                <ScaledIcon icon={IconServer2} size={14} color={statusCompletedColor} />
-                <Text className="text-muted-foreground font-sans text-xs">
-                  <Trans>
-                    Connected to <Text className="font-medium">{serverHost}</Text>. Tap to change.
-                  </Trans>
-                </Text>
-              </Pressable>
-            </Link>
-          </Animated.View>
         </View>
       )}
+
+      <Animated.View entering={FadeIn.duration(300).delay(500)} className="mt-8 items-center">
+        <Link href="/(auth)/server-url" replace asChild>
+          <Pressable
+            disabled={busy}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: busy }}
+            className="flex-row items-center gap-1.5"
+          >
+            <ScaledIcon icon={IconServer2} size={14} color={statusCompletedColor} />
+            <Text className="text-muted-foreground font-sans text-xs">
+              <Trans>
+                Connected to <Text className="font-medium">{serverHost}</Text>. Tap to change.
+              </Trans>
+            </Text>
+          </Pressable>
+        </Link>
+      </Animated.View>
     </AuthScreen>
   );
 }
