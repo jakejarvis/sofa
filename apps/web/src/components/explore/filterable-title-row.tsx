@@ -5,7 +5,7 @@ import { useMemo, useRef, useState } from "react";
 import { TitleCard, TitleCardSkeleton } from "@/components/title-card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { hasReachedHorizontalEnd } from "@/hooks/use-infinite-scroll";
+import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { orpc } from "@/lib/orpc/client";
 
 interface Genre {
@@ -92,6 +92,14 @@ export function FilterableTitleRow({
     [discoverData?.pages],
   );
 
+  const sentinelRef = useInfiniteScroll({
+    fetchNextPage,
+    hasNextPage: selectedGenre !== null && hasNextPage,
+    isFetchingNextPage,
+    rootRef: scrollRef,
+    rootMargin: "0px 400px 0px 0px",
+  });
+
   const isLoading = selectedGenre !== null && isPending;
   const items = selectedGenre === null ? defaultItems : discoverItems;
   const userStatuses = selectedGenre === null ? initialStatuses : discoverStatuses;
@@ -155,21 +163,6 @@ export function FilterableTitleRow({
           hideScrollbar
           className="-mx-6 sm:-mx-2"
           scrollRef={scrollRef}
-          onScrollEnd={() => {
-            const viewport = scrollRef.current;
-
-            if (
-              selectedGenre === null ||
-              !viewport ||
-              !hasNextPage ||
-              isFetchingNextPage ||
-              !hasReachedHorizontalEnd(viewport)
-            ) {
-              return;
-            }
-
-            fetchNextPage();
-          }}
         >
           <div className="flex gap-4 px-6 py-2 sm:px-2">
             {items.map((item: TitleRowItem, i: number) => (
@@ -197,6 +190,7 @@ export function FilterableTitleRow({
                 <div className="border-primary size-5 animate-spin rounded-full border-2 border-t-transparent" />
               </div>
             )}
+            <div ref={sentinelRef} className="w-px shrink-0" aria-hidden />
           </div>
         </ScrollArea>
       )}

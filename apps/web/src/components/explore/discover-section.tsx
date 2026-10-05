@@ -97,7 +97,25 @@ export function DiscoverSection() {
     isFetchingNextPage,
   });
 
-  const items = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data?.pages]);
+  const items = useMemo(() => {
+    const pages = data?.pages ?? [];
+    const statuses = Object.assign({}, ...pages.map((p) => p.userStatuses)) as Record<
+      string,
+      "in_watchlist" | "watching" | "caught_up" | "completed"
+    >;
+    const progress = Object.assign({}, ...pages.map((p) => p.episodeProgress)) as Record<
+      string,
+      { watched: number; total: number }
+    >;
+    return pages
+      .flatMap((p) => p.items)
+      .map((item) =>
+        Object.assign({}, item, {
+          userStatus: statuses[item.id] ?? null,
+          episodeProgress: progress[item.id] ?? null,
+        }),
+      );
+  }, [data?.pages]);
 
   const genres = genreData?.genres ?? [];
   const providers = providerData?.platforms ?? [];

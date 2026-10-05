@@ -1,21 +1,18 @@
 import { useEffect, useRef } from "react";
 
-export function hasReachedHorizontalEnd(element: HTMLElement, threshold = 24) {
-  if (element.scrollWidth <= element.clientWidth) {
-    return false;
-  }
-
-  return element.scrollLeft + element.clientWidth >= element.scrollWidth - threshold;
-}
-
 export function useInfiniteScroll({
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  rootRef,
+  rootMargin = "200px",
 }: {
   fetchNextPage: () => void;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
+  /** Scroll container to observe within. Defaults to the document viewport. */
+  rootRef?: React.RefObject<HTMLElement | null>;
+  rootMargin?: string;
 }) {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -29,12 +26,12 @@ export function useInfiniteScroll({
           fetchNextPage();
         }
       },
-      { rootMargin: "200px" },
+      { root: rootRef?.current ?? null, rootMargin },
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, rootRef, rootMargin]);
 
   return sentinelRef;
 }
