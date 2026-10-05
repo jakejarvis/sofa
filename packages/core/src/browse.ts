@@ -6,6 +6,7 @@ import type { DiscoverInput } from "@sofa/api/schemas";
 import { WATCH_REGION } from "@sofa/config";
 import {
   discover,
+  findByExternalId,
   getGenres,
   getPopular,
   getTrending,
@@ -281,6 +282,27 @@ async function searchPeople(query: string, requestedPage: number) {
   };
 }
 
+// IMDb IDs (e.g. tt0133093) are resolved via TMDB's find endpoint instead of text search.
+const IMDB_ID_PATTERN = /^tt\d{7,10}$/i;
+
+async function findByImdbId(imdbId: string, type: "movie" | "tv" | null): Promise<TmdbPage> {
+  const found = await findByExternalId(imdbId.toLowerCase(), "imdb_id");
+  const results = [
+    ...(type === "tv"
+      ? []
+      : (found.movie_results ?? []).map((r) => Object.assign({}, r, { media_type: "movie" }))),
+    ...(type === "movie"
+      ? []
+      : (found.tv_results ?? []).map((r) => Object.assign({}, r, { media_type: "tv" }))),
+  ];
+  return {
+    page: 1,
+    total_pages: results.length > 0 ? 1 : 0,
+    total_results: results.length,
+    results,
+  };
+}
+
 export async function searchCatalog(input: {
   query: string;
   type?: SearchType | null;
@@ -296,8 +318,9 @@ export async function searchCatalog(input: {
     return searchPeople(query, input.page);
   }
 
-  const raw: TmdbPage =
-    type === "movie"
+  const raw: TmdbPage = IMDB_ID_PATTERN.test(query)
+    ? await findByImdbId(query, type)
+    : type === "movie"
       ? await searchMovies(query, input.page)
       : type === "tv"
         ? await searchTv(query, input.page)

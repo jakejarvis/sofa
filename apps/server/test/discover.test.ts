@@ -332,3 +332,94 @@ describe("discover.browse", () => {
     );
   });
 });
+
+describe("search by IMDb ID", () => {
+  const found = { movie_results: [movie], tv_results: [show] };
+
+  test("resolves an IMDb ID through the find endpoint instead of text search", async () => {
+    tmdb.findByExternalId.mockResolvedValue(found);
+
+    const result = await call(
+      implementedRouter.discover.search,
+      { query: "tt0133093", page: 1 },
+      ctx,
+    );
+
+    expect(tmdb.findByExternalId).toHaveBeenCalledWith("tt0133093", "imdb_id");
+    expect(tmdb.searchMulti).not.toHaveBeenCalled();
+    expect(result.results).toHaveLength(2);
+    expect(result.results[0]).toMatchObject({ tmdbId: 603, type: "movie", title: "The Matrix" });
+    expect(result.results[0]?.id).toBeTruthy();
+    expect(result.results[1]).toMatchObject({
+      tmdbId: 1399,
+      type: "tv",
+      title: "Game of Thrones",
+    });
+    expect(result.results[1]?.id).toBeTruthy();
+    expect(result.page).toBe(1);
+    expect(result.totalPages).toBe(1);
+    expect(result.totalResults).toBe(2);
+  });
+
+  test("lowercases the IMDb ID", async () => {
+    tmdb.findByExternalId.mockResolvedValue(found);
+
+    await call(implementedRouter.discover.search, { query: "TT0133093", page: 1 }, ctx);
+
+    expect(tmdb.findByExternalId).toHaveBeenCalledWith("tt0133093", "imdb_id");
+  });
+
+  test("respects the type filter", async () => {
+    tmdb.findByExternalId.mockResolvedValue(found);
+
+    const result = await call(
+      implementedRouter.discover.search,
+      { query: "tt0133093", type: "movie", page: 1 },
+      ctx,
+    );
+
+    expect(result.results).toHaveLength(1);
+    expect(result.results[0]).toMatchObject({ tmdbId: 603, type: "movie" });
+  });
+
+  test("returns no pages when the ID matches nothing", async () => {
+    tmdb.findByExternalId.mockResolvedValue({ movie_results: [], tv_results: [] });
+
+    const result = await call(
+      implementedRouter.discover.search,
+      { query: "tt0133093", page: 1 },
+      ctx,
+    );
+
+    expect(result.results).toEqual([]);
+    expect(result.totalPages).toBe(0);
+    expect(result.totalResults).toBe(0);
+  });
+
+  test("treats a too-short ID as a regular text query", async () => {
+    tmdb.searchMulti.mockResolvedValue({ page: 1, total_pages: 1, total_results: 0, results: [] });
+
+    await call(implementedRouter.discover.search, { query: "tt123", page: 1 }, ctx);
+
+    expect(tmdb.searchMulti).toHaveBeenCalledWith("tt123", 1);
+    expect(tmdb.findByExternalId).not.toHaveBeenCalled();
+  });
+
+  test("person searches never use the find endpoint", async () => {
+    tmdb.searchPerson.mockResolvedValue({
+      page: 1,
+      total_pages: 1,
+      total_results: 0,
+      results: [],
+    });
+
+    await call(
+      implementedRouter.discover.search,
+      { query: "tt0133093", type: "person", page: 1 },
+      ctx,
+    );
+
+    expect(tmdb.searchPerson).toHaveBeenCalledWith("tt0133093", 1);
+    expect(tmdb.findByExternalId).not.toHaveBeenCalled();
+  });
+});
