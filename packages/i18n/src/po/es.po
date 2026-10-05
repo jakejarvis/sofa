@@ -2711,12 +2711,12 @@ msgid "Requires Emby Server 4.7.9+ and an active Emby Premiere license."
 msgstr "Requiere Emby Server 4.7.9+ y una licencia activa de Emby Premiere."
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-msgid "Restart"
-msgstr "Reiniciar"
+#~ msgid "Restart"
+#~ msgstr "Reiniciar"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-msgid "Restart Required"
-msgstr "Reinicio requerido"
+#~ msgid "Restart Required"
+#~ msgstr "Reinicio requerido"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Restore"
@@ -3042,8 +3042,8 @@ msgid "Skipped"
 msgstr "Omitido"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
-msgid "Sofa needs to restart to apply the new layout direction."
-msgstr "Sofa necesita reiniciarse para aplicar la nueva dirección del diseño."
+#~ msgid "Sofa needs to restart to apply the new layout direction."
+#~ msgstr "Sofa necesita reiniciarse para aplicar la nueva dirección del diseño."
 
 #: apps/web/src/routes/setup.tsx
 msgid "Sofa uses <0>The Movie Database{linkIcon}</0> for movie & TV metadata, posters, and streaming availability. You'll need a free API key to get started."

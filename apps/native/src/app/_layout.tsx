@@ -22,6 +22,7 @@ import { Uniwind, useResolveClassNames } from "uniwind";
 
 import { OfflineBanner } from "@/components/ui/offline-banner";
 import { ServerUnreachableBanner } from "@/components/ui/server-unreachable-banner";
+import { useFollowDeviceLocale } from "@/hooks/use-follow-device-locale";
 import { useServerConnection } from "@/hooks/use-server-connection";
 import { useWidgetRefresh } from "@/hooks/use-widget-refresh";
 import { initLocale } from "@/lib/i18n";
@@ -67,6 +68,8 @@ function AppContent() {
   useEffect(() => {
     localeReady.then(() => setLocaleReady(true)).catch(() => setLocaleReady(true));
   }, []);
+
+  useFollowDeviceLocale();
 
   // --- Analytics init (sync PostHog opt-in/out from stored preference) ---
   useEffect(() => {

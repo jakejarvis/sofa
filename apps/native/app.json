@@ -145,7 +145,25 @@
           "microphonePermission": false
         }
       ],
-      "expo-localization",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": [
+            "en",
+            "fr",
+            "de",
+            "es",
+            "it",
+            "pt",
+            "nl",
+            "ar",
+            "he",
+            "zh",
+            "ja",
+            "ko"
+          ]
+        }
+      ],
       [
         "expo-widgets",
         {

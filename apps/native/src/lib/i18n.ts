@@ -2,46 +2,39 @@ import { reloadAppAsync } from "expo";
 import * as Localization from "expo-localization";
 import { I18nManager } from "react-native";
 
-import { activateLocale, isLocaleRTL, SUPPORTED_LOCALES, type SupportedLocale } from "@sofa/i18n";
+import { activateLocale, isLocaleRTL, type SupportedLocale } from "@sofa/i18n";
 
 import { globalStorage } from "./mmkv";
+import { resolveLocale } from "./resolve-locale";
 
-const LOCALE_STORAGE_KEY = "sofa:locale";
+// Written by app versions that had an in-app language picker. The OS language setting is now the
+// only source of truth; the key is deleted on launch.
+const LEGACY_LOCALE_STORAGE_KEY = "sofa:locale";
 
-export function getPersistedLocale(): SupportedLocale {
-  const stored = globalStorage.getString(LOCALE_STORAGE_KEY);
-  if (stored && SUPPORTED_LOCALES.includes(stored as SupportedLocale)) {
-    return stored as SupportedLocale;
-  }
-  const deviceLocales = Localization.getLocales();
-  for (const loc of deviceLocales) {
-    const lang = loc.languageCode;
-    if (lang && SUPPORTED_LOCALES.includes(lang as SupportedLocale)) {
-      return lang as SupportedLocale;
-    }
-  }
-  return "en";
+let appliedLocale: SupportedLocale | null = null;
+
+export function getDeviceLocale(): SupportedLocale {
+  return resolveLocale(Localization.getLocales().map((l) => l.languageTag));
 }
 
-export function setPersistedLocale(locale: SupportedLocale): void {
-  globalStorage.set(LOCALE_STORAGE_KEY, locale);
+/**
+ * Activate `locale`'s catalog. When its layout direction differs from the running one, store the
+ * new direction and reload: React Native only reads it at start-up. The flag is persisted
+ * natively, so this also clears a direction forced by the old in-app picker.
+ */
+export function applyLocale(locale: SupportedLocale): Promise<void> {
+  if (locale === appliedLocale) return Promise.resolve();
+  appliedLocale = locale;
   const rtl = isLocaleRTL(locale);
   I18nManager.allowRTL(rtl);
   I18nManager.forceRTL(rtl);
-}
-
-export function initLocale(): Promise<void> {
-  const locale = getPersistedLocale();
-  const rtl = isLocaleRTL(locale);
-  I18nManager.allowRTL(rtl);
-  I18nManager.forceRTL(rtl);
-  // forceRTL only takes effect on the next launch — if the current layout
-  // doesn't match (e.g. fresh install on an RTL device), reload immediately.
   if (I18nManager.isRTL !== rtl) {
     reloadAppAsync();
   }
-  if (locale !== "en") {
-    return activateLocale(locale);
-  }
-  return Promise.resolve();
+  return activateLocale(locale);
+}
+
+export function initLocale(): Promise<void> {
+  globalStorage.remove(LEGACY_LOCALE_STORAGE_KEY);
+  return applyLocale(getDeviceLocale());
 }

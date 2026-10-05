@@ -19,7 +19,7 @@ Sofa supports multiple languages for the web and mobile apps. The current suppor
 - Portuguese
 - Spanish
 
-You can switch languages in **Settings > Language** on web or the mobile app. Sofa detects your browser or device language on first launch and defaults to it if supported. This setting is **not** saved to the server — it is only persisted to the current browser or device.
+On the web, switch languages in **Settings > Language**. Sofa detects your browser language on first visit, and the choice is saved in that browser only. The mobile app follows your device's language. To use a different language for Sofa only, change it in your phone's settings (iOS: **Settings > Apps > Sofa > Language**; Android 13+: **App info > Language**). Language preferences are never saved to the server.
 
 ## How translations work
 
@@ -70,6 +70,7 @@ The script only translates strings with empty `msgstr` — existing translations
 2. Run `bun run i18n:extract` — this creates a new `.po` file for the locale
 3. Translate the strings (via Crowdin, manually, or with `bun packages/i18n/scripts/claude.ts <locale>`)
 4. Add the locale to the `LOCALE_INFO` array in [`packages/i18n/src/locales.ts`](https://github.com/jakejarvis/sofa/blob/main/packages/i18n/src/locales.ts) with its native name
+5. Add the locale to `supportedLocales` in the `expo-localization` plugin in [`apps/native/app.json`](https://github.com/jakejarvis/sofa/blob/main/apps/native/app.json) so iOS and Android offer it (a native test fails until you do)
 
 ## Translation guidelines
 

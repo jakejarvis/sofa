@@ -24,7 +24,6 @@ import {
   IconWorld,
 } from "@tabler/icons-react-native";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { reloadAppAsync } from "expo";
 import * as Application from "expo-application";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -32,6 +31,7 @@ import { useCallback, useState } from "react";
 import {
   Alert,
   Linking,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -47,11 +47,9 @@ import { SettingsSection } from "@/components/settings/settings-section";
 import { TmdbLogo } from "@/components/tmdb-logo";
 import { Image } from "@/components/ui/image";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
-import { SelectModal } from "@/components/ui/select-modal";
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
-import { setPersistedLocale } from "@/lib/i18n";
 import { orpc } from "@/lib/orpc";
 import { isAnalyticsEnabled, setAnalyticsEnabled } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
@@ -59,7 +57,6 @@ import { isCrashReportingEnabled, setCrashReportingEnabled } from "@/lib/sentry"
 import { authClient, getServerUrl } from "@/lib/server";
 import { markSessionEnding } from "@/lib/session-end";
 import { toast } from "@/lib/toast";
-import { activateLocale, isLocaleRTL, type SupportedLocale } from "@sofa/i18n";
 import { LOCALE_INFO } from "@sofa/i18n/locales";
 
 const settingsContentContainerStyle = {
@@ -77,6 +74,14 @@ const removePhotoIcon = Icon.select({
   android: import("@expo/material-symbols/delete.xml"),
 });
 
+// Per-app language is in system settings: iOS 13+ (Settings → Sofa → Language) and Android 13+
+// (App info → Language). Older Android only has the device language.
+const canOpenLanguageSettings =
+  process.env.EXPO_OS === "ios" ||
+  (process.env.EXPO_OS === "android" &&
+    typeof Platform.Version === "number" &&
+    Platform.Version >= 33);
+
 export default function SettingsScreen() {
   const { t, i18n } = useLingui();
   const { push } = useRouter();
@@ -93,7 +98,6 @@ export default function SettingsScreen() {
     }
   }
 
-  const [languageModalOpen, setLanguageModalOpen] = useState(false);
   const languageLabel = LOCALE_INFO.find((o) => o.code === i18n.locale)?.nativeName ?? i18n.locale;
   const [analyticsEnabled, setAnalyticsToggle] = useState(isAnalyticsEnabled);
   const [crashReportingEnabled, setCrashReportingToggle] = useState(isCrashReportingEnabled);
@@ -428,7 +432,7 @@ export default function SettingsScreen() {
             label={t`Language`}
             value={languageLabel}
             icon={IconLanguage}
-            onPress={() => setLanguageModalOpen(true)}
+            onPress={canOpenLanguageSettings ? () => void Linking.openSettings() : undefined}
           />
           <SettingsRow
             label={t`Anonymous usage reporting`}
@@ -567,36 +571,6 @@ export default function SettingsScreen() {
           </Pressable>
         </SettingsSection>
       </Animated.View>
-
-      {/* Language Modal */}
-      <SelectModal
-        open={languageModalOpen}
-        onOpenChange={setLanguageModalOpen}
-        label={t`Language`}
-        icon={IconLanguage}
-        selection={i18n.locale}
-        options={LOCALE_INFO.map((info) => ({
-          value: info.code,
-          label: info.nativeName,
-        }))}
-        onSelect={(locale) => {
-          setLanguageModalOpen(false);
-          const previousLocale = i18n.locale;
-          activateLocale(locale as SupportedLocale).then(
-            () => {
-              setPersistedLocale(locale as SupportedLocale);
-              if (isLocaleRTL(locale) !== isLocaleRTL(previousLocale)) {
-                Alert.alert(
-                  t`Restart Required`,
-                  t`Sofa needs to restart to apply the new layout direction.`,
-                  [{ text: t`Restart`, onPress: () => reloadAppAsync() }],
-                );
-              }
-            },
-            () => {},
-          );
-        }}
-      />
 
       {/* Version */}
       <Animated.View entering={FadeInDown.duration(300).delay(400)} className="mt-6 items-center">
