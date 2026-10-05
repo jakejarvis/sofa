@@ -124,7 +124,8 @@ export default function SettingsScreen() {
         toast.success(t`Name updated`);
         setIsEditingName(false);
         queryClient.invalidateQueries({ queryKey: orpc.account.key() });
-        refetchSession();
+        // Bypass the 5-minute session cookie cache, which would return the pre-edit user.
+        void refetchSession({ query: { disableCookieCache: true } });
       },
       onError: () => toast.error(t`Failed to update name`),
     }),
@@ -135,7 +136,8 @@ export default function SettingsScreen() {
       onSuccess: () => {
         toast.success(t`Profile picture updated`);
         queryClient.invalidateQueries({ queryKey: orpc.account.key() });
-        refetchSession();
+        // Bypass the 5-minute session cookie cache, which would return the pre-edit user.
+        void refetchSession({ query: { disableCookieCache: true } });
       },
       onError: () => toast.error(t`Failed to upload avatar`),
     }),
@@ -146,7 +148,8 @@ export default function SettingsScreen() {
       onSuccess: () => {
         toast.success(t`Profile picture removed`);
         queryClient.invalidateQueries({ queryKey: orpc.account.key() });
-        refetchSession();
+        // Bypass the 5-minute session cookie cache, which would return the pre-edit user.
+        void refetchSession({ query: { disableCookieCache: true } });
       },
       onError: () => toast.error(t`Failed to remove profile picture`),
     }),
@@ -240,11 +243,18 @@ export default function SettingsScreen() {
     ]);
   };
 
+  const saveName = () => {
+    const name = nameInput.trim();
+    if (!name || updateName.isPending) return;
+    updateName.mutate({ name });
+  };
+
   return (
     <ScrollView
       className="bg-background"
       contentContainerStyle={settingsContentContainerStyle}
       contentInsetAdjustmentBehavior="automatic"
+      keyboardShouldPersistTaps="handled"
       scrollToOverflowEnabled
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
@@ -329,14 +339,24 @@ export default function SettingsScreen() {
                     value={nameInput}
                     accessibilityLabel={t`Display name`}
                     onChangeText={setNameInput}
+                    // oxlint-disable-next-line jsx-a11y/no-autofocus -- user just tapped the name to edit it
+                    autoFocus
+                    returnKeyType="done"
+                    onSubmitEditing={saveName}
+                    maxLength={100}
                     className="border-primary text-foreground min-h-10 flex-1 border-b py-2 font-sans text-base"
                   />
-                  <Pressable onPress={() => updateName.mutate({ name: nameInput })}>
+                  <Pressable
+                    onPress={saveName}
+                    disabled={updateName.isPending}
+                    accessibilityRole="button"
+                  >
                     <Text className="text-primary text-sm">
                       <Trans>Save</Trans>
                     </Text>
                   </Pressable>
                   <Pressable
+                    accessibilityRole="button"
                     onPress={() => {
                       setNameInput(session?.user?.name ?? "");
                       setIsEditingName(false);
