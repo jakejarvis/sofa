@@ -207,6 +207,10 @@ function QueryProvider({ children }: { children: React.ReactNode }) {
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
 
+const renderRootErrorFallback = ({ resetError }: { resetError: () => void }) => (
+  <RootErrorFallback resetError={resetError} />
+);
+
 function RootLayout() {
   const inner = (
     <I18nProvider i18n={i18n}>
@@ -224,7 +228,7 @@ function RootLayout() {
 
   const guarded = (
     <Sentry.ErrorBoundary
-      fallback={({ resetError }) => <RootErrorFallback resetError={resetError} />}
+      fallback={renderRootErrorFallback}
       onError={(error) => {
         posthog?.captureException(error, { source: "error-boundary" });
       }}
