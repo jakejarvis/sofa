@@ -560,6 +560,7 @@ export const ContinueWatchingOutput = z
           }),
           nextEpisode: z
             .object({
+              id: z.string().describe("Episode ID"),
               seasonNumber: z.number().describe("Season number"),
               episodeNumber: z.number().describe("Episode number"),
               name: z.string().nullable().describe("Episode title"),

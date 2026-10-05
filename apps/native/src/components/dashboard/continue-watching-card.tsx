@@ -21,6 +21,7 @@ export interface ContinueWatchingItem {
   watchedEpisodes: number;
   totalEpisodes: number;
   nextEpisode?: {
+    id: string;
     seasonNumber: number;
     episodeNumber: number;
     name: string | null;
@@ -43,6 +44,7 @@ export const ContinueWatchingCard = memo(function ContinueWatchingCard({
   const seasonNum = item.nextEpisode?.seasonNumber;
   const epNum = item.nextEpisode?.episodeNumber;
   const nextEpLabel = item.nextEpisode ? t`Next: S${seasonNum} E${epNum}` : undefined;
+  const nextEpisodeId = item.nextEpisode?.id;
   const cardLabel = [item.title.title, progressLabel, nextEpLabel].filter(Boolean).join(", ");
 
   return (
@@ -107,6 +109,13 @@ export const ContinueWatchingCard = memo(function ContinueWatchingCard({
           </Link.Trigger>
           <Link.Preview />
           <Link.Menu>
+            {nextEpisodeId && (
+              <Link.MenuAction
+                title={t`Mark S${seasonNum} E${epNum} Watched`}
+                icon="checkmark.circle"
+                onPress={() => titleActions.watchEpisode(nextEpisodeId)}
+              />
+            )}
             <Link.MenuAction
               title={t`Remove from library`}
               icon="trash"

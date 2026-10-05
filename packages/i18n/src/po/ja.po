@@ -1308,6 +1308,7 @@ msgstr "視聴済みにするのに失敗しました"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
+#: apps/web/src/components/dashboard/use-quick-watch.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark episode"
 msgstr "エピソードのマークに失敗しました"
@@ -1867,6 +1868,21 @@ msgstr "エピソード{epNum}を視聴済みにする"
 msgid "Mark Episode Watched"
 msgstr "エピソードを視聴済みにする"
 
+#. placeholder {0}: nextEpisode.seasonNumber
+#. placeholder {1}: nextEpisode.episodeNumber
+#: apps/web/src/components/dashboard/continue-watching-card.tsx
+#~ msgid "Mark S{0} E{1} watched"
+#~ msgstr ""
+
+#: apps/web/src/components/dashboard/continue-watching-card.tsx
+#: apps/web/src/components/dashboard/upcoming-item.tsx
+msgid "Mark S{quickWatchSeason} E{quickWatchEpisode} watched"
+msgstr ""
+
+#: apps/native/src/components/dashboard/continue-watching-card.tsx
+msgid "Mark S{seasonNum} E{epNum} Watched"
+msgstr ""
+
 #: apps/native/src/app/title/[id].tsx
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/ui/poster-card.tsx
@@ -1906,6 +1922,10 @@ msgstr ""
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Marked \"{titleName}\" as watched"
 msgstr "「{titleName}」を視聴済みにしました"
+
+#: apps/web/src/components/dashboard/use-quick-watch.ts
+msgid "Marked {label} as watched"
+msgstr ""
 
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts

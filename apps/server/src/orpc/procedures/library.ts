@@ -63,6 +63,7 @@ export const continueWatching = os.library.continueWatching.use(authed).handler(
     },
     nextEpisode: item.nextEpisode
       ? {
+          id: item.nextEpisode.id,
           seasonNumber: item.nextEpisode.seasonNumber,
           episodeNumber: item.nextEpisode.episodeNumber,
           name: item.nextEpisode.name,

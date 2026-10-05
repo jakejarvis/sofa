@@ -2816,6 +2816,10 @@
                               {
                                 "type": "object",
                                 "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "description": "Episode ID"
+                                  },
                                   "seasonNumber": {
                                     "type": "number",
                                     "description": "Season number"
@@ -2859,6 +2863,7 @@
                                   }
                                 },
                                 "required": [
+                                  "id",
                                   "seasonNumber",
                                   "episodeNumber",
                                   "name",

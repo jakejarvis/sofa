@@ -10,6 +10,7 @@ import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { titleActions } from "@/lib/title-actions";
 import type { UpcomingItem } from "@sofa/api/schemas";
+import { formatLocalDate } from "@sofa/i18n/date-buckets";
 
 const statusColors = {
   in_watchlist: "--color-status-watchlist",
@@ -25,6 +26,10 @@ function formatShortDate(dateStr: string): string {
     day: "numeric",
     timeZone: "UTC",
   }).format(d);
+}
+
+function hasAired(date: string): boolean {
+  return date <= formatLocalDate(new Date());
 }
 
 export function UpcomingRow({ item }: { item: UpcomingItem }) {
@@ -140,7 +145,7 @@ export function UpcomingRow({ item }: { item: UpcomingItem }) {
             onPress={() => titleActions.markMovieWatched(item.titleId, item.titleName)}
           />
         )}
-        {item.titleType === "tv" && item.episodeId && (
+        {item.titleType === "tv" && item.episodeId && hasAired(item.date) && (
           <Link.MenuAction
             title={t`Mark Episode Watched`}
             icon="checkmark.circle"
