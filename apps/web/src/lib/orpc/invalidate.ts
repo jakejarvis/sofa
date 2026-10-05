@@ -1,5 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 
+import { trackingDerivedQueryKeys, trackingStateQueryKeys } from "@sofa/api/query-keys";
+
 import { orpc } from "./client";
 
 /**
@@ -9,11 +11,9 @@ import { orpc } from "./client";
  * (`titles.get`) are deliberately excluded — they don't depend on tracking.
  */
 export function invalidateTrackingQueries(queryClient: QueryClient): Promise<unknown> {
-  return Promise.all([
-    queryClient.invalidateQueries({ queryKey: orpc.tracking.key() }),
-    queryClient.invalidateQueries({ queryKey: orpc.library.key() }),
-    queryClient.invalidateQueries({ queryKey: orpc.discover.key() }),
-    queryClient.invalidateQueries({ queryKey: orpc.people.key() }),
-    queryClient.invalidateQueries({ queryKey: orpc.titles.similar.key() }),
-  ]);
+  return Promise.all(
+    [...trackingStateQueryKeys(orpc), ...trackingDerivedQueryKeys(orpc)].map((queryKey) =>
+      queryClient.invalidateQueries({ queryKey }),
+    ),
+  );
 }
