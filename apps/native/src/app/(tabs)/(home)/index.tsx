@@ -27,6 +27,7 @@ import {
   horizontalListStyle,
 } from "@/components/ui/horizontal-list-spacing";
 import { SectionHeader } from "@/components/ui/section-header";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { authClient } from "@/lib/server";
@@ -67,17 +68,16 @@ export default function DashboardScreen() {
   const library = useQuery(orpc.library.list.queryOptions({ input: { page: 1, limit: 10 } }));
   const recommendations = useQuery(orpc.discover.recommendations.queryOptions());
 
-  const isRefreshing =
-    libraryStats.isRefetching ||
-    continueWatching.isRefetching ||
-    library.isRefetching ||
-    movieHistory.isRefetching ||
-    episodeHistory.isRefetching;
-
-  const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: orpc.tracking.key() });
-    queryClient.invalidateQueries({ queryKey: orpc.library.key() });
-  }, []);
+  const refreshDashboard = useCallback(
+    () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: orpc.tracking.key() }),
+        queryClient.invalidateQueries({ queryKey: orpc.library.key() }),
+        queryClient.invalidateQueries({ queryKey: orpc.discover.recommendations.key() }),
+      ]),
+    [],
+  );
+  const { refreshing, onRefresh } = usePullToRefresh(refreshDashboard);
 
   const hasLibrary = (library.data?.items?.length ?? 0) > 0;
   const hasContinueWatching = (continueWatching.data?.items?.length ?? 0) > 0;
@@ -106,7 +106,7 @@ export default function DashboardScreen() {
       contentContainerStyle={dashboardContentContainerStyle}
       contentInsetAdjustmentBehavior="automatic"
       scrollToOverflowEnabled
-      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View className="gap-6">
         {/* Stats Grid */}

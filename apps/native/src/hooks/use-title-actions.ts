@@ -52,7 +52,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
           ? (statusMessages[input.status] ?? t`Status updated`)
           : t`Removed from library`;
         toast.success(resolveToast(toastOverrides?.updateStatus, defaultMsg, input));
-        invalidateTitleQueries();
+        return invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to update status`),
     }),
@@ -62,7 +62,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
     orpc.tracking.watch.mutationOptions({
       onSuccess: (_data, input) => {
         toast.success(resolveToast(toastOverrides?.watchMovie, t`Marked as watched`, input));
-        invalidateTitleQueries();
+        return invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to mark as watched`),
     }),
@@ -72,7 +72,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
     orpc.tracking.unwatch.mutationOptions({
       onSuccess: (_data, input) => {
         toast.success(resolveToast(toastOverrides?.unwatchMovie, t`Marked as unwatched`, input));
-        invalidateTitleQueries();
+        return invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to mark as unwatched`),
     }),
@@ -87,7 +87,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
             ? t`Rated ${plural(stars, { one: "# star", other: "# stars" })}`
             : t`Rating removed`;
         toast.success(resolveToast(toastOverrides?.updateRating, defaultMsg, input));
-        invalidateTitleQueries();
+        return invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to update rating`),
     }),
@@ -97,7 +97,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
     orpc.tracking.watch.mutationOptions({
       onSuccess: (_data, input) => {
         toast.success(resolveToast(toastOverrides?.watchEpisode, t`Episode watched`, input));
-        invalidateTitleQueries();
+        return invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to mark episode`),
     }),
@@ -107,7 +107,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
     orpc.tracking.unwatch.mutationOptions({
       onSuccess: (_data, input) => {
         toast.success(resolveToast(toastOverrides?.unwatchEpisode, t`Episode unwatched`, input));
-        invalidateTitleQueries();
+        return invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to unmark episode`),
     }),
@@ -117,7 +117,7 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
     orpc.tracking.watch.mutationOptions({
       onSuccess: (_data, input) => {
         toast.success(resolveToast(toastOverrides?.watchSeason, t`Season watched`, input));
-        invalidateTitleQueries();
+        return invalidateTitleQueries();
       },
       onError: () => toast.error(t`Failed to mark some episodes`),
     }),

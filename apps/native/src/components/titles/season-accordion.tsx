@@ -98,15 +98,26 @@ export function SeasonAccordion({
     },
   });
 
+  const [pendingEpisodeIds, setPendingEpisodeIds] = useState<ReadonlySet<string>>(() => new Set());
+
   const handleEpisodeToggle = useCallback(
     (episodeId: string) => {
+      if (pendingEpisodeIds.has(episodeId)) return;
+      setPendingEpisodeIds((prev) => new Set(prev).add(episodeId));
+      const done = () =>
+        setPendingEpisodeIds((prev) => {
+          const next = new Set(prev);
+          next.delete(episodeId);
+          return next;
+        });
+      const input = { scope: "episode" as const, ids: [episodeId] };
       if (watchedEpisodeIds.has(episodeId)) {
-        unwatchEpisode.mutate({ scope: "episode", ids: [episodeId] });
+        unwatchEpisode.mutate(input, { onSettled: done });
       } else {
-        watchEpisode.mutate({ scope: "episode", ids: [episodeId] });
+        watchEpisode.mutate(input, { onSettled: done });
       }
     },
-    [watchedEpisodeIds, unwatchEpisode, watchEpisode],
+    [pendingEpisodeIds, watchedEpisodeIds, unwatchEpisode, watchEpisode],
   );
 
   const seasonNumber = season.seasonNumber;
@@ -159,6 +170,8 @@ export function SeasonAccordion({
           {watchedCount < episodes.length && (
             <Pressable
               onPress={() => watchSeason.mutate({ scope: "season", ids: [season.id] })}
+              disabled={watchSeason.isPending}
+              accessibilityState={{ disabled: watchSeason.isPending }}
               className="bg-secondary mx-4 mb-2 flex-row items-center justify-center rounded-lg py-2"
             >
               <Text className="text-title-accent font-sans text-xs font-medium">
@@ -175,6 +188,7 @@ export function SeasonAccordion({
               name={episode.name}
               airDate={episode.airDate}
               isWatched={watchedEpisodeIds.has(episode.id)}
+              isPending={pendingEpisodeIds.has(episode.id)}
               onToggle={handleEpisodeToggle}
               accentColor={titleAccentColor}
               mutedColor={mutedFgColor}

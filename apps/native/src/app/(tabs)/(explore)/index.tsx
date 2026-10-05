@@ -7,6 +7,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 import { FilterableTitleRow } from "@/components/explore/filterable-title-row";
 import { HeroBanner } from "@/components/explore/hero-banner";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 
@@ -30,12 +31,11 @@ export default function ExploreScreen() {
   const movieGenres = useQuery(orpc.discover.genres.queryOptions({ input: { type: "movie" } }));
   const tvGenres = useQuery(orpc.discover.genres.queryOptions({ input: { type: "tv" } }));
 
-  const isRefreshing =
-    trending.isRefetching || popularMovies.isRefetching || popularTv.isRefetching;
-
-  const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: orpc.discover.key() });
-  }, []);
+  const refreshDiscover = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: orpc.discover.key() }),
+    [],
+  );
+  const { refreshing, onRefresh } = usePullToRefresh(refreshDiscover);
 
   const heroItem = trending.data?.pages[0]?.hero ?? null;
 
@@ -66,7 +66,7 @@ export default function ExploreScreen() {
       contentContainerStyle={exploreContentContainerStyle}
       contentInsetAdjustmentBehavior="automatic"
       scrollToOverflowEnabled
-      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View className="gap-8">
         {heroItem && <HeroBanner item={heroItem} />}

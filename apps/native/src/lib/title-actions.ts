@@ -8,13 +8,16 @@ import { i18n } from "@sofa/i18n";
 
 let widgetRefreshTimer: ReturnType<typeof setTimeout> | null = null;
 
-/** Invalidate every query that carries per-user tracking state. Used by most title mutations. */
-export function invalidateTitleQueries() {
-  queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
-  queryClient.invalidateQueries({ queryKey: orpc.tracking.key() });
-  queryClient.invalidateQueries({ queryKey: orpc.library.key() });
-  queryClient.invalidateQueries({ queryKey: orpc.discover.key() });
-  queryClient.invalidateQueries({ queryKey: orpc.people.key() });
+/**
+ * Mark every query that depends on the user's tracking state as stale. Title details
+ * (`titles.get`) are excluded — they don't depend on tracking (same rule as the web's
+ * invalidateTrackingQueries). Resolves once tracking and library queries have refetched,
+ * so mutations can stay pending until the UI reflects the change.
+ */
+export function invalidateTitleQueries(): Promise<unknown> {
+  void queryClient.invalidateQueries({ queryKey: orpc.discover.key() });
+  void queryClient.invalidateQueries({ queryKey: orpc.people.key() });
+  void queryClient.invalidateQueries({ queryKey: orpc.titles.similar.key() });
 
   // Debounce widget refresh to batch rapid mutations (e.g. watching multiple episodes)
   if (widgetRefreshTimer) clearTimeout(widgetRefreshTimer);
@@ -22,6 +25,11 @@ export function invalidateTitleQueries() {
     void refreshWidgets();
     widgetRefreshTimer = null;
   }, 2000);
+
+  return Promise.all([
+    queryClient.invalidateQueries({ queryKey: orpc.tracking.key() }),
+    queryClient.invalidateQueries({ queryKey: orpc.library.key() }),
+  ]);
 }
 
 /**
@@ -41,7 +49,7 @@ export const titleActions = {
     } catch {
       toast.error(i18n._(msg`Failed to add to watchlist`));
       // Refetch so any optimistic local status reverts on failure
-      queryClient.invalidateQueries({ queryKey: orpc.titles.key() });
+      queryClient.invalidateQueries({ queryKey: orpc.tracking.key() });
     }
   },
 

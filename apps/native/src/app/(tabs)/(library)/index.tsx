@@ -21,6 +21,7 @@ import { PosterCard } from "@/components/ui/poster-card";
 import { SelectModal } from "@/components/ui/select-modal";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useTitleActions } from "@/hooks/use-title-actions";
 import {
   libraryActiveFilterCountAtom,
@@ -257,10 +258,11 @@ export default function LibraryScreen() {
     [libraryQuery.data?.pages],
   );
 
-  const isRefreshing = libraryQuery.isRefetching && !libraryQuery.isFetchingNextPage;
-  const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: orpc.library.key() });
-  }, []);
+  const refreshLibrary = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: orpc.library.key() }),
+    [],
+  );
+  const { refreshing, onRefresh } = usePullToRefresh(refreshLibrary);
 
   type LibraryItem = (typeof allItems)[number];
 
@@ -416,7 +418,7 @@ export default function LibraryScreen() {
             paddingHorizontal: EDGE_PADDING - GAP / 2,
             paddingBottom: 16,
           }}
-          refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           onEndReached={() => {
             if (
               libraryQuery.hasNextPage &&

@@ -11,6 +11,7 @@ import { UpcomingRow } from "@/components/dashboard/upcoming-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import * as Haptics from "@/utils/haptics";
@@ -56,28 +57,20 @@ export default function UpcomingScreen() {
   const [mediaType, setMediaType] = useState<"all" | "movie" | "tv">("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "watching" | "watchlist">("all");
 
-  const {
-    data,
-    isPending,
-    isError,
-    refetch,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isRefetching,
-  } = useInfiniteQuery(
-    orpc.library.upcoming.infiniteOptions({
-      input: (pageParam: string | undefined) => ({
-        days: 90,
-        limit: 20,
-        cursor: pageParam,
-        mediaType: mediaType !== "all" ? mediaType : undefined,
-        statusFilter: statusFilter !== "all" ? [statusFilter] : undefined,
+  const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery(
+      orpc.library.upcoming.infiniteOptions({
+        input: (pageParam: string | undefined) => ({
+          days: 90,
+          limit: 20,
+          cursor: pageParam,
+          mediaType: mediaType !== "all" ? mediaType : undefined,
+          statusFilter: statusFilter !== "all" ? [statusFilter] : undefined,
+        }),
+        initialPageParam: undefined as string | undefined,
+        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
       }),
-      initialPageParam: undefined as string | undefined,
-      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-    }),
-  );
+    );
 
   const allItems = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
   const sections = useMemo(
@@ -90,9 +83,11 @@ export default function UpcomingScreen() {
     [allItems],
   );
 
-  const onRefresh = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: orpc.library.upcoming.key() });
-  }, []);
+  const refreshUpcoming = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: orpc.library.upcoming.key() }),
+    [],
+  );
+  const { refreshing, onRefresh } = usePullToRefresh(refreshUpcoming);
 
   const onEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -171,7 +166,7 @@ export default function UpcomingScreen() {
         contentInsetAdjustmentBehavior="automatic"
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
-        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListEmptyComponent={
           isPending ? null : isError && allItems.length === 0 ? (
             <EmptyState
