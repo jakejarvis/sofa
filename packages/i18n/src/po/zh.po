@@ -410,6 +410,16 @@ msgstr "已有账户？立即登录"
 msgid "Also available on"
 msgstr "同样在以下平台可用"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "An account with this email already exists"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "An import is already in progress"
+msgstr ""
+
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
@@ -511,6 +521,16 @@ msgstr "备份已创建"
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Backup deleted"
 msgstr "备份已删除"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Backup not found"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Backup restoration failed"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Backup schedule"
@@ -784,6 +804,10 @@ msgstr "连接中..."
 msgid "Connecting…"
 msgstr "连接中…"
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Connection timed out. The server might be down or unreachable."
+msgstr ""
+
 #: apps/web/src/components/library/library-filters.tsx
 msgid "Content rating"
 msgstr "内容分级"
@@ -832,6 +856,10 @@ msgstr "无法加载标题详情"
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 msgid "Could not load your library"
 msgstr "无法加载您的媒体库"
+
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Could not reach the server. Check your connection and the URL."
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Crash reporting"
@@ -1067,6 +1095,8 @@ msgstr "英文"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 msgid "Enter a valid email address"
 msgstr "请输入有效的电子邮件地址"
 
@@ -1200,8 +1230,8 @@ msgid "Failed to change password"
 msgstr "修改密码失败"
 
 #: apps/web/src/components/settings/imports-section.tsx
-msgid "Failed to connect"
-msgstr "连接失败"
+#~ msgid "Failed to connect"
+#~ msgstr "连接失败"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -1216,7 +1246,9 @@ msgstr "创建账户失败"
 msgid "Failed to create backup"
 msgstr "创建备份失败"
 
+#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/settings/backup-section.tsx
+#: apps/web/src/lib/error-messages.ts
 msgid "Failed to delete backup"
 msgstr "删除备份失败"
 
@@ -1224,6 +1256,11 @@ msgstr "删除备份失败"
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Failed to disconnect {label}"
 msgstr "断开 {label} 连接失败"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Failed to export data"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Failed to load backup schedule settings"
@@ -1358,11 +1395,14 @@ msgid "Failed to update scheduled backup setting"
 msgstr "更新定时备份设置失败"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
+#: apps/web/src/components/settings/streaming-services-section.tsx
 #: apps/web/src/components/settings/update-check-section.tsx
+#: apps/web/src/routes/_app/onboarding.tsx
 msgid "Failed to update setting"
 msgstr "更新设置失败"
 
 #: apps/native/src/hooks/use-title-actions.ts
+#: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to update status"
 msgstr "更新状态失败"
@@ -1571,6 +1611,11 @@ msgstr "导入仍在后台运行，请稍后再来查看。"
 msgid "Import options"
 msgstr "导入选项"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Import payload is too large"
+msgstr ""
+
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Import Sofa data"
 msgstr "导入 Sofa 数据"
@@ -1627,10 +1672,25 @@ msgstr "从 Jellyfin 的插件目录安装 <0>Webhook 插件<1/></0>"
 msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "从 Jellyfin 的插件目录安装 Webhook 插件"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Integration not found"
+msgstr ""
+
 #: apps/native/src/components/settings/integrations-section.tsx
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Integrations"
 msgstr "集成"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Invalid email or password"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Invalid import file"
+msgstr ""
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Invalid token"
@@ -1647,6 +1707,11 @@ msgstr "日语"
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Job"
 msgstr "任务"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Job not found"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Keeping"
@@ -2231,6 +2296,16 @@ msgstr "密码"
 msgid "Password is required"
 msgstr "密码不能为空"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Password is too long"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Password is too short"
+msgstr ""
+
 #: apps/native/src/app/change-password.tsx
 msgid "Password must be at least 8 characters"
 msgstr "密码至少需要 8 个字符"
@@ -2269,6 +2344,8 @@ msgid "Person"
 msgstr "人物"
 
 #: apps/native/src/app/person/[id].tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/people.$id.tsx
 msgid "Person not found"
 msgstr "未找到该人物"
@@ -2547,6 +2624,11 @@ msgstr "注册已关闭"
 #: apps/web/src/components/auth-form.tsx
 msgid "Registration failed"
 msgstr "注册失败"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Registration is currently closed"
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
@@ -2832,6 +2914,10 @@ msgstr "自托管电影和电视剧追踪器"
 msgid "Server"
 msgstr "服务器"
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Server found but reporting an issue. Try again in a moment."
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Server Health"
 msgstr "服务器健康状态"
@@ -2972,9 +3058,11 @@ msgstr "当您看完电影或剧集时，Sofa 将自动记录"
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/__root.tsx
 msgid "Something went wrong"
 msgstr "出现错误"
@@ -3079,6 +3167,10 @@ msgstr "切换到 {name}"
 msgid "Takes effect after restarting the app"
 msgstr "重启应用后生效"
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "That URL doesn't look right. Include the full server address."
+msgstr ""
+
 #: apps/native/src/app/+not-found.tsx
 msgid "The page you're looking for doesn't exist."
 msgstr "您访问的页面不存在。"
@@ -3094,6 +3186,15 @@ msgstr "您查找的内容不存在，或已从数据库中删除。"
 #: apps/web/src/components/command-palette.tsx
 msgid "then"
 msgstr "然后"
+
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "This doesn't appear to be a Sofa server. Double-check the URL."
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "This import cannot be cancelled"
+msgstr ""
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
@@ -3198,6 +3299,8 @@ msgid "Title A-Z"
 msgstr "标题 A-Z"
 
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Title not found"
 msgstr "未找到内容"
@@ -3216,6 +3319,11 @@ msgstr "您 Sofa 待看列表中的内容将在 Radarr 轮询此列表时自动�
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
 msgstr "您 Sofa 待看列表中的内容将在 Sonarr 轮询此列表时自动添加到下载队列（默认每 6 小时一次）"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "TMDB API key is not configured"
+msgstr ""
 
 #: apps/native/src/components/library/sort-menu.tsx
 #: apps/web/src/components/library/library-toolbar.tsx
@@ -3260,6 +3368,11 @@ msgstr "切换侧边栏"
 #: apps/native/src/lib/widgets.ts
 #: packages/i18n/src/date-buckets.ts
 msgid "Tomorrow"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Too many attempts. Wait a moment and try again."
 msgstr ""
 
 #: apps/web/src/components/landing-page.tsx

@@ -103,6 +103,7 @@ export const auth = betterAuth({
         if (!open) {
           throw new APIError("FORBIDDEN", {
             message: "Registration is currently closed",
+            code: "REGISTRATION_CLOSED",
           });
         }
       }

@@ -15,6 +15,7 @@ import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { Input, Label, TextField } from "@/components/ui/text-field";
+import { getAuthErrorMessage } from "@/lib/error-messages";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { authClient, getServerUrl, splitUrl } from "@/lib/server";
@@ -58,7 +59,7 @@ export default function LoginScreen() {
         { email: result.data.email, password: result.data.password },
         {
           onError(error) {
-            toast.error(error.error?.message || t`Failed to sign in`);
+            toast.error(getAuthErrorMessage(error.error, t`Failed to sign in`));
           },
           onSuccess() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

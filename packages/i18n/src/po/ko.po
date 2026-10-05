@@ -410,6 +410,16 @@ msgstr "이미 계정이 있으신가요? 로그인"
 msgid "Also available on"
 msgstr "다음에서도 이용 가능"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "An account with this email already exists"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "An import is already in progress"
+msgstr ""
+
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
@@ -511,6 +521,16 @@ msgstr "백업 생성됨"
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Backup deleted"
 msgstr "백업 삭제됨"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Backup not found"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Backup restoration failed"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Backup schedule"
@@ -784,6 +804,10 @@ msgstr "연결 중..."
 msgid "Connecting…"
 msgstr "연결 중…"
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Connection timed out. The server might be down or unreachable."
+msgstr ""
+
 #: apps/web/src/components/library/library-filters.tsx
 msgid "Content rating"
 msgstr "콘텐츠 등급"
@@ -832,6 +856,10 @@ msgstr "제목 정보를 불러올 수 없습니다"
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 msgid "Could not load your library"
 msgstr "라이브러리를 불러올 수 없습니다"
+
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Could not reach the server. Check your connection and the URL."
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Crash reporting"
@@ -1067,6 +1095,8 @@ msgstr "영어"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 msgid "Enter a valid email address"
 msgstr "유효한 이메일 주소를 입력하세요"
 
@@ -1200,8 +1230,8 @@ msgid "Failed to change password"
 msgstr "비밀번호 변경 실패"
 
 #: apps/web/src/components/settings/imports-section.tsx
-msgid "Failed to connect"
-msgstr "연결 실패"
+#~ msgid "Failed to connect"
+#~ msgstr "연결 실패"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -1216,7 +1246,9 @@ msgstr "계정 생성 실패"
 msgid "Failed to create backup"
 msgstr "백업 생성 실패"
 
+#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/settings/backup-section.tsx
+#: apps/web/src/lib/error-messages.ts
 msgid "Failed to delete backup"
 msgstr "백업 삭제 실패"
 
@@ -1224,6 +1256,11 @@ msgstr "백업 삭제 실패"
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Failed to disconnect {label}"
 msgstr "{label} 연결 해제 실패"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Failed to export data"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Failed to load backup schedule settings"
@@ -1358,11 +1395,14 @@ msgid "Failed to update scheduled backup setting"
 msgstr "예약 백업 설정 업데이트 실패"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
+#: apps/web/src/components/settings/streaming-services-section.tsx
 #: apps/web/src/components/settings/update-check-section.tsx
+#: apps/web/src/routes/_app/onboarding.tsx
 msgid "Failed to update setting"
 msgstr "설정 업데이트 실패"
 
 #: apps/native/src/hooks/use-title-actions.ts
+#: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to update status"
 msgstr "상태 업데이트 실패"
@@ -1571,6 +1611,11 @@ msgstr "가져오기가 백그라운드에서 계속 실행 중입니다. 나중
 msgid "Import options"
 msgstr "가져오기 옵션"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Import payload is too large"
+msgstr ""
+
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Import Sofa data"
 msgstr "Sofa 데이터 가져오기"
@@ -1627,10 +1672,25 @@ msgstr "Jellyfin 플러그인 카탈로그에서 <0>Webhook 플러그인<1/></0>
 msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "Jellyfin 플러그인 카탈로그에서 Webhook 플러그인을 설치하세요"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Integration not found"
+msgstr ""
+
 #: apps/native/src/components/settings/integrations-section.tsx
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Integrations"
 msgstr "통합"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Invalid email or password"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Invalid import file"
+msgstr ""
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Invalid token"
@@ -1647,6 +1707,11 @@ msgstr "일본어"
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Job"
 msgstr "작업"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Job not found"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Keeping"
@@ -2231,6 +2296,16 @@ msgstr "비밀번호"
 msgid "Password is required"
 msgstr "비밀번호를 입력해주세요"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Password is too long"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Password is too short"
+msgstr ""
+
 #: apps/native/src/app/change-password.tsx
 msgid "Password must be at least 8 characters"
 msgstr "비밀번호는 최소 8자 이상이어야 합니다"
@@ -2269,6 +2344,8 @@ msgid "Person"
 msgstr "인물"
 
 #: apps/native/src/app/person/[id].tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/people.$id.tsx
 msgid "Person not found"
 msgstr "인물을 찾을 수 없습니다"
@@ -2547,6 +2624,11 @@ msgstr "회원가입 비활성화됨"
 #: apps/web/src/components/auth-form.tsx
 msgid "Registration failed"
 msgstr "회원가입 실패"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Registration is currently closed"
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
@@ -2832,6 +2914,10 @@ msgstr "자체 호스팅 영화 & TV 트래커"
 msgid "Server"
 msgstr "서버"
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Server found but reporting an issue. Try again in a moment."
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Server Health"
 msgstr "서버 상태"
@@ -2972,9 +3058,11 @@ msgstr "시청을 완료하면 Sofa가 자동으로 영화와 에피소드를 �
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/__root.tsx
 msgid "Something went wrong"
 msgstr "오류가 발생했습니다"
@@ -3079,6 +3167,10 @@ msgstr "{name}(으)로 전환"
 msgid "Takes effect after restarting the app"
 msgstr "앱을 다시 시작하면 적용됩니다"
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "That URL doesn't look right. Include the full server address."
+msgstr ""
+
 #: apps/native/src/app/+not-found.tsx
 msgid "The page you're looking for doesn't exist."
 msgstr "찾으시는 페이지가 존재하지 않습니다."
@@ -3094,6 +3186,15 @@ msgstr "찾으시는 타이틀이 존재하지 않거나 데이터베이스에�
 #: apps/web/src/components/command-palette.tsx
 msgid "then"
 msgstr "그 다음"
+
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "This doesn't appear to be a Sofa server. Double-check the URL."
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "This import cannot be cancelled"
+msgstr ""
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
@@ -3198,6 +3299,8 @@ msgid "Title A-Z"
 msgstr "제목 A-Z"
 
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Title not found"
 msgstr "타이틀을 찾을 수 없습니다"
@@ -3216,6 +3319,11 @@ msgstr "Sofa 관심 목록의 타이틀은 Radarr가 이 목록을 폴링할 때
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
 msgstr "Sofa 관심 목록의 타이틀은 Sonarr가 이 목록을 폴링할 때(기본값: 6시간마다) 자동으로 다운로드에 추가됩니다"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "TMDB API key is not configured"
+msgstr ""
 
 #: apps/native/src/components/library/sort-menu.tsx
 #: apps/web/src/components/library/library-toolbar.tsx
@@ -3260,6 +3368,11 @@ msgstr "사이드바 토글"
 #: apps/native/src/lib/widgets.ts
 #: packages/i18n/src/date-buckets.ts
 msgid "Tomorrow"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Too many attempts. Wait a moment and try again."
 msgstr ""
 
 #: apps/web/src/components/landing-page.tsx

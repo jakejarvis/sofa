@@ -410,6 +410,16 @@ msgstr "Hai già un account? Accedi"
 msgid "Also available on"
 msgstr "Disponibile anche su"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "An account with this email already exists"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "An import is already in progress"
+msgstr ""
+
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
@@ -511,6 +521,16 @@ msgstr "Backup creato"
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Backup deleted"
 msgstr "Backup eliminato"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Backup not found"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Backup restoration failed"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Backup schedule"
@@ -784,6 +804,10 @@ msgstr "Connessione in corso..."
 msgid "Connecting…"
 msgstr "Connessione in corso…"
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Connection timed out. The server might be down or unreachable."
+msgstr ""
+
 #: apps/web/src/components/library/library-filters.tsx
 msgid "Content rating"
 msgstr "Classificazione contenuti"
@@ -832,6 +856,10 @@ msgstr "Impossibile caricare i dettagli del titolo"
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 msgid "Could not load your library"
 msgstr "Impossibile caricare la tua libreria"
+
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Could not reach the server. Check your connection and the URL."
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Crash reporting"
@@ -1067,6 +1095,8 @@ msgstr "Inglese"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 msgid "Enter a valid email address"
 msgstr "Inserisci un indirizzo email valido"
 
@@ -1200,8 +1230,8 @@ msgid "Failed to change password"
 msgstr "Impossibile cambiare la password"
 
 #: apps/web/src/components/settings/imports-section.tsx
-msgid "Failed to connect"
-msgstr "Impossibile connettersi"
+#~ msgid "Failed to connect"
+#~ msgstr "Impossibile connettersi"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -1216,7 +1246,9 @@ msgstr "Impossibile creare l'account"
 msgid "Failed to create backup"
 msgstr "Impossibile creare il backup"
 
+#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/settings/backup-section.tsx
+#: apps/web/src/lib/error-messages.ts
 msgid "Failed to delete backup"
 msgstr "Impossibile eliminare il backup"
 
@@ -1224,6 +1256,11 @@ msgstr "Impossibile eliminare il backup"
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Failed to disconnect {label}"
 msgstr "Impossibile disconnettere {label}"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Failed to export data"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Failed to load backup schedule settings"
@@ -1358,11 +1395,14 @@ msgid "Failed to update scheduled backup setting"
 msgstr "Impossibile aggiornare l'impostazione di backup pianificato"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
+#: apps/web/src/components/settings/streaming-services-section.tsx
 #: apps/web/src/components/settings/update-check-section.tsx
+#: apps/web/src/routes/_app/onboarding.tsx
 msgid "Failed to update setting"
 msgstr "Impossibile aggiornare l'impostazione"
 
 #: apps/native/src/hooks/use-title-actions.ts
+#: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to update status"
 msgstr "Impossibile aggiornare lo stato"
@@ -1571,6 +1611,11 @@ msgstr "L'importazione è ancora in corso in background. Ricontrolla più tardi.
 msgid "Import options"
 msgstr "Opzioni di importazione"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Import payload is too large"
+msgstr ""
+
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Import Sofa data"
 msgstr "Importa dati Sofa"
@@ -1627,10 +1672,25 @@ msgstr "Installa il <0>plugin Webhook<1/></0> dal catalogo plugin di Jellyfin"
 msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "Installa il plugin Webhook dal catalogo plugin di Jellyfin"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Integration not found"
+msgstr ""
+
 #: apps/native/src/components/settings/integrations-section.tsx
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Integrations"
 msgstr "Integrazioni"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Invalid email or password"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Invalid import file"
+msgstr ""
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Invalid token"
@@ -1647,6 +1707,11 @@ msgstr "Giapponese"
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Job"
 msgstr "Attività"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Job not found"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Keeping"
@@ -2231,6 +2296,16 @@ msgstr ""
 msgid "Password is required"
 msgstr "La password è obbligatoria"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Password is too long"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Password is too short"
+msgstr ""
+
 #: apps/native/src/app/change-password.tsx
 msgid "Password must be at least 8 characters"
 msgstr "La password deve contenere almeno 8 caratteri"
@@ -2269,6 +2344,8 @@ msgid "Person"
 msgstr "Persona"
 
 #: apps/native/src/app/person/[id].tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/people.$id.tsx
 msgid "Person not found"
 msgstr "Persona non trovata"
@@ -2547,6 +2624,11 @@ msgstr "Registrazione chiusa"
 #: apps/web/src/components/auth-form.tsx
 msgid "Registration failed"
 msgstr "Registrazione non riuscita"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Registration is currently closed"
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
@@ -2832,6 +2914,10 @@ msgstr "Tracker film & TV self-hosted"
 msgid "Server"
 msgstr ""
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Server found but reporting an issue. Try again in a moment."
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Server Health"
 msgstr "Salute del server"
@@ -2972,9 +3058,11 @@ msgstr "Sofa registrerà automaticamente film ed episodi quando finisci di guard
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/__root.tsx
 msgid "Something went wrong"
 msgstr "Qualcosa è andato storto"
@@ -3079,6 +3167,10 @@ msgstr "Passa a {name}"
 msgid "Takes effect after restarting the app"
 msgstr "Avrà effetto dopo il riavvio dell'app"
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "That URL doesn't look right. Include the full server address."
+msgstr ""
+
 #: apps/native/src/app/+not-found.tsx
 msgid "The page you're looking for doesn't exist."
 msgstr "La pagina che stai cercando non esiste."
@@ -3094,6 +3186,15 @@ msgstr "Il titolo che stai cercando non esiste o potrebbe essere stato rimosso d
 #: apps/web/src/components/command-palette.tsx
 msgid "then"
 msgstr "poi"
+
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "This doesn't appear to be a Sofa server. Double-check the URL."
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "This import cannot be cancelled"
+msgstr ""
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
@@ -3198,6 +3299,8 @@ msgid "Title A-Z"
 msgstr "Titolo A-Z"
 
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Title not found"
 msgstr "Titolo non trovato"
@@ -3216,6 +3319,11 @@ msgstr "I titoli nella tua watchlist di Sofa verranno aggiunti automaticamente p
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
 msgstr "I titoli nella tua watchlist di Sofa verranno aggiunti automaticamente per il download quando Sonarr interroga questa lista (ogni 6 ore per impostazione predefinita)"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "TMDB API key is not configured"
+msgstr ""
 
 #: apps/native/src/components/library/sort-menu.tsx
 #: apps/web/src/components/library/library-toolbar.tsx
@@ -3260,6 +3368,11 @@ msgstr "Attiva/disattiva barra laterale"
 #: apps/native/src/lib/widgets.ts
 #: packages/i18n/src/date-buckets.ts
 msgid "Tomorrow"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Too many attempts. Wait a moment and try again."
 msgstr ""
 
 #: apps/web/src/components/landing-page.tsx

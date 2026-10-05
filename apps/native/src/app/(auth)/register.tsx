@@ -12,6 +12,7 @@ import { Button, ButtonLabel } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { Input, Label, TextField } from "@/components/ui/text-field";
+import { getAuthErrorMessage } from "@/lib/error-messages";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { authClient, getServerUrl, splitUrl } from "@/lib/server";
@@ -69,7 +70,7 @@ export default function RegisterScreen() {
         },
         {
           onError(error) {
-            toast.error(error.error?.message || t`Failed to create account`);
+            toast.error(getAuthErrorMessage(error.error, t`Failed to create account`));
           },
           onSuccess() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

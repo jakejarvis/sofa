@@ -1,3 +1,5 @@
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconAlertCircle, IconCircleCheck, IconInfoCircle } from "@tabler/icons-react-native";
 import { useRouter } from "expo-router";
@@ -20,6 +22,7 @@ import { Text } from "@/components/ui/text";
 import { Input } from "@/components/ui/text-field";
 import { getServerUrl, serverManager, type ValidationError } from "@/lib/server";
 import * as Haptics from "@/utils/haptics";
+import { i18n } from "@sofa/i18n";
 
 const TRAILING_SLASHES_RE = /\/+$/;
 
@@ -29,17 +32,13 @@ type ConnectionState =
   | { phase: "success" }
   | { phase: "error"; error: ValidationError };
 
-function getErrorMessages(
-  t: (strings: TemplateStringsArray, ...values: unknown[]) => string,
-): Record<ValidationError, string> {
-  return {
-    network_unreachable: t`Could not reach the server. Check your connection and the URL.`,
-    timeout: t`Connection timed out. The server might be down or unreachable.`,
-    not_sofa_server: t`This doesn't appear to be a Sofa server. Double-check the URL.`,
-    server_unhealthy: t`Server found but reporting an issue. Try again in a moment.`,
-    invalid_url: t`That URL doesn't look right. Include the full server address.`,
-  };
-}
+const SERVER_URL_ERRORS: Record<ValidationError, MessageDescriptor> = {
+  network_unreachable: msg`Could not reach the server. Check your connection and the URL.`,
+  timeout: msg`Connection timed out. The server might be down or unreachable.`,
+  not_sofa_server: msg`This doesn't appear to be a Sofa server. Double-check the URL.`,
+  server_unhealthy: msg`Server found but reporting an issue. Try again in a moment.`,
+  invalid_url: msg`That URL doesn't look right. Include the full server address.`,
+};
 
 export default function ServerUrlScreen() {
   const { t } = useLingui();
@@ -190,7 +189,7 @@ export default function ServerUrlScreen() {
               style={{ marginTop: 1 }}
             />
             <Text selectable className="text-destructive flex-1 text-sm">
-              {getErrorMessages(t)[connection.error]}
+              {i18n._(SERVER_URL_ERRORS[connection.error])}
             </Text>
           </Animated.View>
         )}

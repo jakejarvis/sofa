@@ -410,6 +410,16 @@ msgstr "すでにアカウントをお持ちの方はサインイン"
 msgid "Also available on"
 msgstr "他でも視聴可能"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "An account with this email already exists"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "An import is already in progress"
+msgstr ""
+
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/routes/__root.tsx
 msgid "An unexpected error occurred while loading this page. You can try again or head back to the dashboard."
@@ -511,6 +521,16 @@ msgstr "バックアップを作成しました"
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Backup deleted"
 msgstr "バックアップを削除しました"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Backup not found"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Backup restoration failed"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Backup schedule"
@@ -784,6 +804,10 @@ msgstr "接続中..."
 msgid "Connecting…"
 msgstr "接続中…"
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Connection timed out. The server might be down or unreachable."
+msgstr ""
+
 #: apps/web/src/components/library/library-filters.tsx
 msgid "Content rating"
 msgstr "コンテンツレーティング"
@@ -832,6 +856,10 @@ msgstr "タイトルの詳細を読み込めませんでした"
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 msgid "Could not load your library"
 msgstr "ライブラリを読み込めませんでした"
+
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Could not reach the server. Check your connection and the URL."
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Crash reporting"
@@ -1067,6 +1095,8 @@ msgstr "英語"
 
 #: apps/native/src/app/(auth)/login.tsx
 #: apps/native/src/app/(auth)/register.tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 msgid "Enter a valid email address"
 msgstr "有効なメールアドレスを入力してください"
 
@@ -1200,8 +1230,8 @@ msgid "Failed to change password"
 msgstr "パスワードの変更に失敗しました"
 
 #: apps/web/src/components/settings/imports-section.tsx
-msgid "Failed to connect"
-msgstr "接続に失敗しました"
+#~ msgid "Failed to connect"
+#~ msgstr "接続に失敗しました"
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -1216,7 +1246,9 @@ msgstr "アカウントの作成に失敗しました"
 msgid "Failed to create backup"
 msgstr "バックアップの作成に失敗しました"
 
+#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/settings/backup-section.tsx
+#: apps/web/src/lib/error-messages.ts
 msgid "Failed to delete backup"
 msgstr "バックアップの削除に失敗しました"
 
@@ -1224,6 +1256,11 @@ msgstr "バックアップの削除に失敗しました"
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Failed to disconnect {label}"
 msgstr "{label}の切断に失敗しました"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Failed to export data"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Failed to load backup schedule settings"
@@ -1358,11 +1395,14 @@ msgid "Failed to update scheduled backup setting"
 msgstr "スケジュールバックアップ設定の更新に失敗しました"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
+#: apps/web/src/components/settings/streaming-services-section.tsx
 #: apps/web/src/components/settings/update-check-section.tsx
+#: apps/web/src/routes/_app/onboarding.tsx
 msgid "Failed to update setting"
 msgstr "設定の更新に失敗しました"
 
 #: apps/native/src/hooks/use-title-actions.ts
+#: apps/web/src/components/title-card.tsx
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to update status"
 msgstr "ステータスの更新に失敗しました"
@@ -1571,6 +1611,11 @@ msgstr "インポートはバックグラウンドで実行中です。後で確
 msgid "Import options"
 msgstr "インポートオプション"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Import payload is too large"
+msgstr ""
+
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Import Sofa data"
 msgstr "Sofaデータをインポート"
@@ -1627,10 +1672,25 @@ msgstr "Jellyfinのプラグインカタログから<0>Webhookプラグイン<1/
 msgid "Install the Webhook plugin from Jellyfin's plugin catalog"
 msgstr "JellyfinのプラグインカタログからWebhookプラグインをインストールする"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Integration not found"
+msgstr ""
+
 #: apps/native/src/components/settings/integrations-section.tsx
 #: apps/web/src/routes/_app/settings.tsx
 msgid "Integrations"
 msgstr "連携"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Invalid email or password"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Invalid import file"
+msgstr ""
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Invalid token"
@@ -1647,6 +1707,11 @@ msgstr "日本語"
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Job"
 msgstr "ジョブ"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Job not found"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Keeping"
@@ -2231,6 +2296,16 @@ msgstr "パスワード"
 msgid "Password is required"
 msgstr "パスワードは必須です"
 
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Password is too long"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Password is too short"
+msgstr ""
+
 #: apps/native/src/app/change-password.tsx
 msgid "Password must be at least 8 characters"
 msgstr "パスワードは8文字以上必要です"
@@ -2269,6 +2344,8 @@ msgid "Person"
 msgstr "人物"
 
 #: apps/native/src/app/person/[id].tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/people.$id.tsx
 msgid "Person not found"
 msgstr "人物が見つかりません"
@@ -2547,6 +2624,11 @@ msgstr "登録が締め切られています"
 #: apps/web/src/components/auth-form.tsx
 msgid "Registration failed"
 msgstr "登録に失敗しました"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Registration is currently closed"
+msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #: apps/web/src/components/settings/registration-section.tsx
@@ -2832,6 +2914,10 @@ msgstr "セルフホスト型映画・TVトラッカー"
 msgid "Server"
 msgstr "サーバー"
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "Server found but reporting an issue. Try again in a moment."
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Server Health"
 msgstr "サーバーヘルス"
@@ -2972,9 +3058,11 @@ msgstr "視聴完了後、Sofaが自動的に映画やエピソードを記録�
 #: apps/native/src/app/change-password.tsx
 #: apps/native/src/app/person/[id].tsx
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/lib/error-messages.ts
 #: apps/web/src/components/auth-form.tsx
 #: apps/web/src/components/route-error.tsx
 #: apps/web/src/components/settings/account-section.tsx
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/__root.tsx
 msgid "Something went wrong"
 msgstr "エラーが発生しました"
@@ -3079,6 +3167,10 @@ msgstr "{name}に切り替え"
 msgid "Takes effect after restarting the app"
 msgstr "アプリを再起動後に反映されます"
 
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "That URL doesn't look right. Include the full server address."
+msgstr ""
+
 #: apps/native/src/app/+not-found.tsx
 msgid "The page you're looking for doesn't exist."
 msgstr "お探しのページは存在しません。"
@@ -3094,6 +3186,15 @@ msgstr "お探しのタイトルは存在しないか、データベースから
 #: apps/web/src/components/command-palette.tsx
 msgid "then"
 msgstr "次に"
+
+#: apps/native/src/app/(auth)/server-url.tsx
+msgid "This doesn't appear to be a Sofa server. Double-check the URL."
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "This import cannot be cancelled"
+msgstr ""
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
@@ -3198,6 +3299,8 @@ msgid "Title A-Z"
 msgstr "タイトル A-Z"
 
 #: apps/native/src/app/title/[id].tsx
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
 #: apps/web/src/routes/_app/titles.$id.tsx
 msgid "Title not found"
 msgstr "タイトルが見つかりません"
@@ -3216,6 +3319,11 @@ msgstr "SofaのウォッチリストにあるタイトルはRadarrがこのリ�
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Titles on your Sofa watchlist will be automatically added for download when Sonarr polls this list (every 6 hours by default)"
 msgstr "SofaのウォッチリストにあるタイトルはSonarrがこのリストをポーリングする際（デフォルトでは6時間ごと）に自動的にダウンロード対象として追加されます"
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "TMDB API key is not configured"
+msgstr ""
 
 #: apps/native/src/components/library/sort-menu.tsx
 #: apps/web/src/components/library/library-toolbar.tsx
@@ -3260,6 +3368,11 @@ msgstr "サイドバーを切り替え"
 #: apps/native/src/lib/widgets.ts
 #: packages/i18n/src/date-buckets.ts
 msgid "Tomorrow"
+msgstr ""
+
+#: apps/native/src/lib/error-messages.ts
+#: apps/web/src/lib/error-messages.ts
+msgid "Too many attempts. Wait a moment and try again."
 msgstr ""
 
 #: apps/web/src/components/landing-page.tsx

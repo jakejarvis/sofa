@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useResetUserState } from "@/hooks/use-reset-user-state";
 import { authClient, signIn, signUp } from "@/lib/auth/client";
+import { getAuthErrorMessage } from "@/lib/error-messages";
 import { useAppForm } from "@/lib/form";
 
 export interface AuthConfig {
@@ -62,13 +63,13 @@ export function AuthForm({
             password: value.password,
           });
           if (result.error) {
-            setError(result.error.message ?? t`Registration failed`);
+            setError(getAuthErrorMessage(result.error, t`Registration failed`));
             return;
           }
         } else {
           const result = await signIn.email({ email: value.email, password: value.password });
           if (result.error) {
-            setError(result.error.message ?? t`Login failed`);
+            setError(getAuthErrorMessage(result.error, t`Login failed`));
             return;
           }
         }

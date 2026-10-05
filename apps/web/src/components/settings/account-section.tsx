@@ -82,7 +82,7 @@ export function AccountSection({
         router.invalidate();
       },
       onError: (err) => {
-        toast.error(getErrorMessage(err, t, t`Update failed`));
+        toast.error(getErrorMessage(err, t`Update failed`));
       },
     }),
   );
@@ -114,7 +114,7 @@ export function AccountSection({
         router.invalidate();
       },
       onError: (err) => {
-        toast.error(getErrorMessage(err, t, t`Upload failed`));
+        toast.error(getErrorMessage(err, t`Upload failed`));
       },
       onSettled: () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
@@ -406,7 +406,7 @@ function SofaImportDialog() {
         setOpen(true);
       },
       onError: (err) => {
-        toast.error(getErrorMessage(err, t, t`Failed to parse file`));
+        toast.error(getErrorMessage(err, t`Failed to parse file`));
       },
       onSettled: () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
@@ -496,7 +496,7 @@ function SofaImportDialog() {
       }
     } catch (err) {
       if (abort.signal.aborted) return;
-      toast.error(getErrorMessage(err, t, t`Import failed`));
+      toast.error(getErrorMessage(err, t`Import failed`));
       setStep("preview");
     } finally {
       importAbortRef.current = null;

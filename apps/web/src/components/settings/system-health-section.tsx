@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTimeAgo } from "@/hooks/use-time-ago";
+import { getErrorMessage } from "@/lib/error-messages";
 import { orpc } from "@/lib/orpc/client";
 import type { CronJobName, SystemHealthData } from "@sofa/api/schemas";
 import { i18n } from "@sofa/i18n";
@@ -325,7 +326,7 @@ function BackgroundJobsCard({
         setTimeout(onRefresh, 1500);
       },
       onError: (err) => {
-        toast.error(err instanceof Error ? err.message : t`Failed to trigger job`);
+        toast.error(getErrorMessage(err, t`Failed to trigger job`));
       },
     }),
   );

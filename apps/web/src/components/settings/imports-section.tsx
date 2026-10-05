@@ -221,7 +221,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         setDialogOpen(true);
       },
       onError: (err) => {
-        toast.error(getErrorMessage(err, t, t`Failed to parse file`));
+        toast.error(getErrorMessage(err, t`Failed to parse file`));
       },
     }),
   );
@@ -233,7 +233,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         setStep("preview");
       },
       onError: (err) => {
-        toast.error(getErrorMessage(err, t, t`Failed to parse import data`));
+        toast.error(getErrorMessage(err, t`Failed to parse import data`));
         setStep("choose");
       },
     }),
@@ -335,7 +335,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
       }
     } catch (err) {
       if (abort.signal.aborted) return;
-      toast.error(getErrorMessage(err, t, t`Import failed`));
+      toast.error(getErrorMessage(err, t`Import failed`));
       setStep("preview");
     } finally {
       importAbortRef.current = null;
@@ -372,17 +372,14 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
   async function startDeviceCodeFlow() {
     setOauthError(null);
     setStep("device-code");
+    const sourceLabel = config.label;
 
     try {
       const res = await fetch(`${publicApiUrl}/v1/import/${config.source}/device-code`, {
         method: "POST",
       });
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        const sourceLabel = config.label;
-        throw new Error(
-          (err as { error?: string }).error ?? t`Failed to start ${sourceLabel} connection`,
-        );
+        throw new Error("device-code request failed");
       }
       const data = (await res.json()) as DeviceCodeInfo;
       setDeviceCode(data);
@@ -390,8 +387,8 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
 
       // Start polling
       startPolling(data);
-    } catch (e) {
-      setOauthError(e instanceof Error ? e.message : t`Failed to connect`);
+    } catch {
+      setOauthError(t`Failed to start ${sourceLabel} connection`);
       setStep("choose");
       setDialogOpen(true);
     }
@@ -442,8 +439,7 @@ function ImportSourceCard({ config }: { config: SourceConfig }) {
         } else if (data.status === "fetch_error") {
           stopPolling();
           setOauthError(
-            data.error ||
-              t`Authorization succeeded but failed to fetch your library. Please try again.`,
+            t`Authorization succeeded but failed to fetch your library. Please try again.`,
           );
           setStep("choose");
         }

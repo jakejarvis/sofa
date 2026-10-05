@@ -35,7 +35,7 @@ export function BackupRestoreSection() {
         setTimeout(() => window.location.reload(), 1500);
       },
       onError: (err) => {
-        toast.error(getErrorMessage(err, t, t`Restore failed`));
+        toast.error(getErrorMessage(err, t`Restore failed`));
       },
       onSettled: () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
