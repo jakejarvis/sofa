@@ -10,7 +10,7 @@
       "config": {
         "usesNonExemptEncryption": false
       },
-      "deploymentTarget": "16.4",
+      "deploymentTarget": "17.0",
       "icon": "./assets/images/sofa.icon",
       "bundleIdentifier": "com.jakejarvis.sofa",
       "appleTeamId": "B5ZWKBCUTU",
