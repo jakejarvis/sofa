@@ -288,6 +288,7 @@
       "dependencies": {
         "@lingui/core": "catalog:",
         "@lingui/react": "catalog:",
+        "@sofa/api": "workspace:*",
       },
       "devDependencies": {
         "@lingui/cli": "catalog:",

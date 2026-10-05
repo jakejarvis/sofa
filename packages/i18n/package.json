@@ -8,6 +8,8 @@
     "./locales": "./src/locales.ts",
     "./format": "./src/format.ts",
     "./date-buckets": "./src/date-buckets.ts",
+    "./errors": "./src/errors.ts",
+    "./integration-status": "./src/integration-status.ts",
     "./test-utils": "./src/test-utils.tsx"
   },
   "scripts": {
@@ -19,7 +21,8 @@
   },
   "dependencies": {
     "@lingui/core": "catalog:",
-    "@lingui/react": "catalog:"
+    "@lingui/react": "catalog:",
+    "@sofa/api": "workspace:*"
   },
   "devDependencies": {
     "@lingui/cli": "catalog:",
