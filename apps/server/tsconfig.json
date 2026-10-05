@@ -1,4 +1,4 @@
 {
   "extends": "@sofa/tsconfig/base.json",
-  "include": ["src"]
+  "include": ["src", "test"]
 }
