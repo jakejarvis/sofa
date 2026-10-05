@@ -1,4 +1,5 @@
 import { type Context, Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
 import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 
@@ -12,6 +13,7 @@ import { clearFinishedImportPayloads, recoverStaleImportJobs } from "@sofa/db/qu
 import { seedPlatforms } from "@sofa/db/seed-platforms";
 import { createLogger } from "@sofa/logger";
 
+import { apiBodyLimit, UPLOAD_BODY_LIMIT } from "./body-limits";
 import { getJobSchedules, startJobs, stopJobs } from "./cron";
 import { handler as rpcHandler } from "./orpc/handler";
 import { openApiHandler } from "./orpc/openapi-handler";
@@ -78,6 +80,12 @@ app.use("*", async (c, next) => {
   }
   await next();
 });
+
+// Request body limits (see body-limits.ts); Better Auth and webhook bodies are small.
+app.use("/rpc/*", apiBodyLimit);
+app.use("/api/v1/*", apiBodyLimit);
+app.use("/api/auth/*", bodyLimit({ maxSize: 1024 * 1024 }));
+app.use("/api/webhooks/*", bodyLimit({ maxSize: 10 * 1024 * 1024 }));
 
 // Non-RPC routes
 app.route("/api/health", healthRoutes);
@@ -166,6 +174,7 @@ const port = Number(process.env.PORT || process.env.API_PORT || 3001);
 const server = Bun.serve({
   port,
   fetch: app.fetch,
+  maxRequestBodySize: UPLOAD_BODY_LIMIT,
 });
 
 log.info(

@@ -1845,6 +1845,7 @@
                   "ids": {
                     "type": "array",
                     "minItems": 1,
+                    "maxItems": 20000,
                     "items": {
                       "type": "string",
                       "minLength": 1
@@ -1901,6 +1902,7 @@
                   "ids": {
                     "type": "array",
                     "minItems": 1,
+                    "maxItems": 20000,
                     "items": {
                       "type": "string",
                       "minLength": 1
@@ -4862,6 +4864,7 @@
                 "properties": {
                   "platformIds": {
                     "type": "array",
+                    "maxItems": 500,
                     "items": {
                       "type": "string"
                     },

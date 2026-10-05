@@ -72,14 +72,14 @@ export const WatchScope = z
 export const WatchInput = z
   .object({
     scope: WatchScope,
-    ids: z.array(z.string().min(1)).min(1).describe("IDs to mark as watched"),
+    ids: z.array(z.string().min(1)).min(1).max(20000).describe("IDs to mark as watched"),
   })
   .meta({ description: "Mark one or more items as watched" });
 
 export const UnwatchInput = z
   .object({
     scope: WatchScope,
-    ids: z.array(z.string().min(1)).min(1).describe("IDs to unwatch"),
+    ids: z.array(z.string().min(1)).min(1).max(20000).describe("IDs to unwatch"),
   })
   .meta({ description: "Remove watch records for one or more items" });
 
@@ -342,7 +342,7 @@ export const UserPlatformsOutput = z.object({
 });
 
 export const UpdateUserPlatformsInput = z.object({
-  platformIds: z.array(z.string()).describe("List of platform IDs the user subscribes to"),
+  platformIds: z.array(z.string()).max(500).describe("List of platform IDs the user subscribes to"),
 });
 
 export const CastMemberSchema = z
