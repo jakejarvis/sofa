@@ -4,11 +4,14 @@ import { describe, expect, test } from "vitest";
 import { NormalizedImportSchema } from "@sofa/api/schemas";
 
 import {
+  assertZipWithinLimits,
   type ParseResult,
   parseLetterboxdExport,
   parseSimklPayload,
   parseTraktExport,
   parseTraktPayload,
+  ZIP_LIMITS,
+  ZipTooLargeError,
 } from "../src/imports/parsers";
 
 // ─── Helpers ─────────────────────────────────────────────────────────
@@ -1391,5 +1394,55 @@ describe("parseTraktExport", () => {
     const result = await parseTraktExport(zip);
     expect(result.data.movies).toHaveLength(1);
     expect(result.data.episodes).toHaveLength(1);
+  });
+});
+
+describe("ZIP limits", () => {
+  const limits = { maxEntries: 10, maxEntryBytes: 10, maxTotalBytes: 100 };
+  const entry = (entryName: string, size: number) => ({
+    entryName,
+    isDirectory: false,
+    header: { size },
+  });
+  const isJson = (e: { entryName: string }) => e.entryName.endsWith(".json");
+
+  function createOversizedZip(): Blob {
+    const zip = new AdmZip();
+    for (let i = 0; i < ZIP_LIMITS.maxEntries + 1; i++) {
+      zip.addFile(`f${i}.txt`, Buffer.from("x"));
+    }
+    return new Blob([zip.toBuffer()], { type: "application/zip" });
+  }
+
+  test("rejects a selected entry that declares more than maxEntryBytes", () => {
+    expect(() => assertZipWithinLimits([entry("a.json", 11)], isJson, limits)).toThrow(
+      ZipTooLargeError,
+    );
+  });
+
+  test("rejects when the selected entries' total exceeds maxTotalBytes", () => {
+    const entries = [entry("a.json", 40), entry("b.json", 40), entry("c.json", 40)];
+    expect(() => assertZipWithinLimits(entries, isJson, { ...limits, maxEntryBytes: 50 })).toThrow(
+      ZipTooLargeError,
+    );
+  });
+
+  test("ignores oversized entries the predicate does not select", () => {
+    expect(() => assertZipWithinLimits([entry("reviews.csv", 1000)], isJson, limits)).not.toThrow();
+  });
+
+  test("rejects archives with more than maxEntries entries", () => {
+    const entries = Array.from({ length: 11 }, (_, i) => entry(`f${i}.json`, 1));
+    expect(() => assertZipWithinLimits(entries, isJson, limits)).toThrow(ZipTooLargeError);
+  });
+
+  test("parseTraktExport rejects an archive with too many entries", async () => {
+    await expect(parseTraktExport(createOversizedZip())).rejects.toBeInstanceOf(ZipTooLargeError);
+  });
+
+  test("parseLetterboxdExport returns a warning for an archive with too many entries", async () => {
+    const result = await parseLetterboxdExport(createOversizedZip());
+    expect(result.data.movies).toHaveLength(0);
+    expect(result.warnings.some((w) => w.includes("too large"))).toBe(true);
   });
 });

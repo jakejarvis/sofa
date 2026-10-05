@@ -10,6 +10,49 @@ import { createLogger } from "@sofa/logger";
 
 const log = createLogger("imports");
 
+// Real exports are a few MB; these bound memory if an archive is a decompression bomb.
+// adm-zip caps each entry's inflate output at its declared size, so checking declared
+// sizes before getData() is sufficient.
+export const ZIP_LIMITS = {
+  maxEntries: 2_000,
+  maxEntryBytes: 128 * 1024 * 1024,
+  maxTotalBytes: 256 * 1024 * 1024,
+};
+
+export class ZipTooLargeError extends Error {}
+
+interface ZipEntryLike {
+  entryName: string;
+  isDirectory: boolean;
+  header: { size: number };
+}
+
+/**
+ * Throws ZipTooLargeError if the archive has too many entries, or if the entries
+ * that `willRead` selects declare more uncompressed bytes than allowed.
+ */
+export function assertZipWithinLimits(
+  entries: readonly ZipEntryLike[],
+  willRead: (entry: ZipEntryLike) => boolean,
+  limits: typeof ZIP_LIMITS = ZIP_LIMITS,
+): void {
+  if (entries.length > limits.maxEntries) {
+    throw new ZipTooLargeError(`ZIP has ${entries.length} entries (max ${limits.maxEntries})`);
+  }
+  let total = 0;
+  for (const entry of entries) {
+    if (entry.isDirectory || !willRead(entry)) continue;
+    const size = entry.header.size;
+    if (size > limits.maxEntryBytes) {
+      throw new ZipTooLargeError(`ZIP entry ${entry.entryName} is too large`);
+    }
+    total += size;
+    if (total > limits.maxTotalBytes) {
+      throw new ZipTooLargeError("ZIP contents are too large");
+    }
+  }
+}
+
 // ─── Types ──────────────────────────────────────────────────────────
 
 export interface ImportMovie {
@@ -454,10 +497,11 @@ export async function parseTraktExport(file: Blob): Promise<ParseResult> {
     } catch {
       throw new Error("Invalid export file");
     }
+    const isTraktJson = (entry: { entryName: string }) =>
+      (entry.entryName.split("/").pop() ?? entry.entryName).toLowerCase().endsWith(".json");
+    assertZipWithinLimits(entries, isTraktJson);
     for (const entry of entries) {
-      if (entry.isDirectory) continue;
-      const name = entry.entryName.split("/").pop() ?? entry.entryName;
-      if (!name.toLowerCase().endsWith(".json")) continue;
+      if (entry.isDirectory || !isTraktJson(entry)) continue;
       try {
         addTraktDocument(agg, parseJsonText(entry.getData().toString("utf-8")));
       } catch {
@@ -752,6 +796,21 @@ export async function parseLetterboxdExport(zipFile: Blob): Promise<ParseResult>
   }
 
   const entries = zip.getEntries();
+  const isExpectedLetterboxdCsv = (entry: { entryName: string }) =>
+    LETTERBOXD_EXPECTED_FILES.includes(
+      (entry.entryName.split("/").pop() ??
+        entry.entryName) as (typeof LETTERBOXD_EXPECTED_FILES)[number],
+    );
+  try {
+    assertZipWithinLimits(entries, isExpectedLetterboxdCsv);
+  } catch (err) {
+    if (!(err instanceof ZipTooLargeError)) throw err;
+    warnings.push("ZIP file is too large to import. Ensure it is an unmodified Letterboxd export.");
+    return {
+      data: { source: "letterboxd", movies, episodes: [], watchlist, ratings },
+      warnings,
+    };
+  }
   const entryMap = new Map<string, string>();
   const allFilenames: string[] = [];
 
@@ -760,7 +819,7 @@ export async function parseLetterboxdExport(zipFile: Blob): Promise<ParseResult>
     // Letterboxd exports may nest files in a subdirectory — use the basename
     const name = entry.entryName.split("/").pop() ?? entry.entryName;
     allFilenames.push(name);
-    if (LETTERBOXD_EXPECTED_FILES.includes(name as (typeof LETTERBOXD_EXPECTED_FILES)[number])) {
+    if (isExpectedLetterboxdCsv(entry)) {
       entryMap.set(name, entry.getData().toString("utf-8"));
     }
   }
