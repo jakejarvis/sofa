@@ -2916,7 +2916,7 @@
       "get": {
         "operationId": "library.upcoming",
         "summary": "Get upcoming episodes and movies",
-        "description": "Fetch upcoming episodes and movie releases for titles in the user's library, sorted by date. Supports cursor-based pagination.",
+        "description": "Fetch upcoming episodes and movie releases for titles in the user's library, sorted by date. Supports cursor-based pagination. Pass direction: \"recent\" for unwatched episodes that aired in the past days, newest first.",
         "tags": [
           "Library"
         ],
@@ -2929,7 +2929,22 @@
               "minimum": 1,
               "maximum": 90,
               "default": 90,
-              "description": "How many days into the future to look"
+              "description": "How many days ahead (upcoming) or back (recent) to look"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "upcoming",
+                "recent"
+              ],
+              "type": "string",
+              "default": "upcoming",
+              "description": "\"upcoming\": the next `days` days. \"recent\": unwatched TV episodes that aired in the past `days` days (excluding today), newest first"
             },
             "allowEmptyValue": true,
             "allowReserved": true

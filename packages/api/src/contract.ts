@@ -238,7 +238,7 @@ export const contract = {
         tags: ["Library"],
         summary: "Get upcoming episodes and movies",
         description:
-          "Fetch upcoming episodes and movie releases for titles in the user's library, sorted by date. Supports cursor-based pagination.",
+          'Fetch upcoming episodes and movie releases for titles in the user\'s library, sorted by date. Supports cursor-based pagination. Pass direction: "recent" for unwatched episodes that aired in the past days, newest first.',
         successDescription: "Upcoming items sorted by date with streaming info",
       })
       .input(UpcomingInput)

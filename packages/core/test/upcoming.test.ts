@@ -388,3 +388,114 @@ describe("streaming provider", () => {
     expect(result.items[0].streamingProvider).toBeNull();
   });
 });
+
+// ── Recent direction ────────────────────────────────────────────────
+
+describe("recent direction", () => {
+  test("returns recently aired episodes newest first", () => {
+    insertTvShow("tv-1", 100, 1, 3, {
+      title: "Show",
+      airDates: [daysFromNow(-3), daysFromNow(-1), daysFromNow(-2)],
+    });
+    insertStatus("user-1", "tv-1", "in_progress");
+
+    const result = getUpcomingFeed("user-1", { direction: "recent" });
+    expect(result.items.map((i) => i.date)).toEqual([
+      daysFromNow(-1),
+      daysFromNow(-2),
+      daysFromNow(-3),
+    ]);
+    expect(result.items.map((i) => i.episodeNumber)).toEqual([2, 3, 1]);
+  });
+
+  test("excludes watched episodes", () => {
+    const { episodeIds } = insertTvShow("tv-1", 100, 1, 2, {
+      airDates: [daysFromNow(-1), daysFromNow(-2)],
+    });
+    insertStatus("user-1", "tv-1", "in_progress");
+    insertEpisodeWatch("user-1", episodeIds[0]!);
+
+    const result = getUpcomingFeed("user-1", { direction: "recent" });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0]!.episodeNumber).toBe(2);
+  });
+
+  test("excludes today's and future episodes", () => {
+    insertTvShow("tv-1", 100, 1, 3, {
+      airDates: [daysFromNow(0), daysFromNow(1), daysFromNow(-1)],
+    });
+    insertStatus("user-1", "tv-1", "in_progress");
+
+    const result = getUpcomingFeed("user-1", { direction: "recent" });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0]!.date).toBe(daysFromNow(-1));
+  });
+
+  test("excludes watchlist titles and includes completed titles", () => {
+    insertTvShow("tv-w", 101, 1, 1, { title: "Watchlisted", airDates: [daysFromNow(-1)] });
+    insertTvShow("tv-c", 102, 1, 1, { title: "Completed", airDates: [daysFromNow(-1)] });
+    insertStatus("user-1", "tv-w", "watchlist");
+    insertStatus("user-1", "tv-c", "completed");
+
+    const result = getUpcomingFeed("user-1", { direction: "recent" });
+    expect(result.items.map((i) => i.titleName)).toEqual(["Completed"]);
+  });
+
+  test("mediaType movie returns nothing and movies never appear", () => {
+    insertTitle({ id: "m-1", tmdbId: 500, type: "movie", releaseDate: daysFromNow(-1) });
+    insertStatus("user-1", "m-1", "completed");
+    insertTvShow("tv-1", 100, 1, 1, { airDates: [daysFromNow(-1)] });
+    insertStatus("user-1", "tv-1", "in_progress");
+
+    expect(getUpcomingFeed("user-1", { direction: "recent", mediaType: "movie" }).items).toEqual(
+      [],
+    );
+    const all = getUpcomingFeed("user-1", { direction: "recent" });
+    expect(all.items.every((i) => i.titleType === "tv")).toBe(true);
+    expect(all.items).toHaveLength(1);
+  });
+
+  test("respects days", () => {
+    insertTvShow("tv-1", 100, 1, 2, { airDates: [daysFromNow(-7), daysFromNow(-8)] });
+    insertStatus("user-1", "tv-1", "in_progress");
+
+    const result = getUpcomingFeed("user-1", { direction: "recent", days: 7 });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0]!.date).toBe(daysFromNow(-7));
+  });
+
+  test("paginates with a cursor in descending date order", () => {
+    for (let n = 1; n <= 5; n++) {
+      insertTvShow(`tv-${n}`, 100 + n, 1, 1, { title: `Show ${n}`, airDates: [daysFromNow(-n)] });
+      insertStatus("user-1", `tv-${n}`, "in_progress");
+    }
+
+    const page1 = getUpcomingFeed("user-1", { direction: "recent", limit: 2 });
+    expect(page1.items.map((i) => i.titleName)).toEqual(["Show 1", "Show 2"]);
+    expect(page1.nextCursor).not.toBeNull();
+    const page2 = getUpcomingFeed("user-1", {
+      direction: "recent",
+      limit: 2,
+      cursor: page1.nextCursor!,
+    });
+    expect(page2.items.map((i) => i.titleName)).toEqual(["Show 3", "Show 4"]);
+    expect(page2.nextCursor).not.toBeNull();
+    const page3 = getUpcomingFeed("user-1", {
+      direction: "recent",
+      limit: 2,
+      cursor: page2.nextCursor!,
+    });
+    expect(page3.items.map((i) => i.titleName)).toEqual(["Show 5"]);
+    expect(page3.nextCursor).toBeNull();
+  });
+
+  test("default call still returns only today-and-later items", () => {
+    insertTvShow("tv-1", 100, 1, 3, {
+      airDates: [daysFromNow(-1), daysFromNow(0), daysFromNow(1)],
+    });
+    insertStatus("user-1", "tv-1", "in_progress");
+
+    const result = getUpcomingFeed("user-1", { days: 7 });
+    expect(result.items.map((i) => i.date)).toEqual([daysFromNow(0), daysFromNow(1)]);
+  });
+});

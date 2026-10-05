@@ -1071,6 +1071,10 @@ msgstr "백업 다운로드"
 msgid "Download your library, watch history, and ratings as JSON"
 msgstr "라이브러리, 시청 기록, 평점을 JSON으로 다운로드"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Earlier this week"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Edit profile photo"
 msgstr "프로필 사진 편집"
@@ -2589,6 +2593,11 @@ msgstr "준비됨 — 아직 수신된 이벤트 없음"
 msgid "Recent Searches"
 msgstr "최근 검색"
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Recently aired"
+msgstr ""
+
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 msgid "Recently Viewed"
@@ -3517,6 +3526,10 @@ msgstr "모두 시청 취소"
 msgid "Unwatched all of {seasonLabel}"
 msgstr "{seasonLabel} 전체 시청 취소"
 
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Unwatched episodes from the last 90 days."
+msgstr ""
+
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Unwatched S{seasonNum} E{epNum}"
 msgstr "S{seasonNum} E{epNum} 시청 취소됨"
@@ -3765,9 +3778,18 @@ msgstr "연도"
 #~ msgid "Year to"
 #~ msgstr "Year to"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Yesterday"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "You'll be signed out to change the server URL."
 msgstr "서버 URL을 변경하려면 로그아웃됩니다."
+
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "You're all caught up on the last 90 days."
+msgstr ""
 
 #: apps/web/src/components/update-toast.tsx
 #~ msgid "You're running v{0}."

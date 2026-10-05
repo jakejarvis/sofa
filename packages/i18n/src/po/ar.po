@@ -1071,6 +1071,10 @@ msgstr "تنزيل النسخة الاحتياطية"
 msgid "Download your library, watch history, and ratings as JSON"
 msgstr "تنزيل مكتبتك وسجل المشاهدة والتقييمات بتنسيق JSON"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Earlier this week"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Edit profile photo"
 msgstr "تعديل صورة الملف الشخصي"
@@ -2589,6 +2593,11 @@ msgstr "جاهز — لم يتم استلام أي شيء بعد"
 msgid "Recent Searches"
 msgstr "عمليات البحث الأخيرة"
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Recently aired"
+msgstr ""
+
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 msgid "Recently Viewed"
@@ -3517,6 +3526,10 @@ msgstr "إلغاء مشاهدة الكل"
 msgid "Unwatched all of {seasonLabel}"
 msgstr "تم إلغاء مشاهدة كل {seasonLabel}"
 
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Unwatched episodes from the last 90 days."
+msgstr ""
+
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Unwatched S{seasonNum} E{epNum}"
 msgstr "تم إلغاء مشاهدة م{seasonNum} ح{epNum}"
@@ -3765,9 +3778,18 @@ msgstr "السنة"
 #~ msgid "Year to"
 #~ msgstr "Year to"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Yesterday"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "You'll be signed out to change the server URL."
 msgstr "سيتم تسجيل خروجك لتغيير رابط الخادم."
+
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "You're all caught up on the last 90 days."
+msgstr ""
 
 #: apps/web/src/components/update-toast.tsx
 #~ msgid "You're running v{0}."

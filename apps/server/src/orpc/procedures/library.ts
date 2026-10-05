@@ -84,6 +84,7 @@ export const upcoming = os.library.upcoming.use(authed).handler(({ input, contex
     cursor: input.cursor,
     mediaType: input.mediaType,
     statusFilter: input.statusFilter,
+    direction: input.direction,
   });
   return {
     items: result.items.map((item) => ({

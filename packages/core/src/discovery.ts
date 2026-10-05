@@ -17,6 +17,7 @@ import {
   getTitleByIdOrNull,
   getTitlesByIds,
   getTvTitlesByIds,
+  getRecentUnwatchedEpisodes,
   getUpcomingEpisodes,
   getUpcomingMovies,
   getUserStatusCounts,
@@ -401,6 +402,17 @@ function compareUpcomingKeys(a: UpcomingCursorKey, b: UpcomingCursorKey): number
   );
 }
 
+/** Same as compareUpcomingKeys, but dates descend (newest first). */
+function compareRecentKeys(a: UpcomingCursorKey, b: UpcomingCursorKey): number {
+  return (
+    b.d.localeCompare(a.d) ||
+    a.n.localeCompare(b.n) ||
+    a.i.localeCompare(b.i) ||
+    a.s - b.s ||
+    a.e - b.e
+  );
+}
+
 function encodeUpcomingCursor(key: UpcomingCursorKey): string {
   return Buffer.from(JSON.stringify(key), "utf8").toString("base64url");
 }
@@ -435,27 +447,52 @@ export function getUpcomingFeed(
     cursor?: string;
     mediaType?: "movie" | "tv";
     statusFilter?: ("watching" | "watchlist")[];
+    direction?: "upcoming" | "recent";
   } = {},
 ): UpcomingFeedResult {
-  const { days = 90, limit = 20, cursor, mediaType, statusFilter } = options;
+  const {
+    days = 90,
+    limit = 20,
+    cursor,
+    mediaType,
+    statusFilter,
+    direction = "upcoming",
+  } = options;
+  const isRecent = direction === "recent";
+  const compareKeys = isRecent ? compareRecentKeys : compareUpcomingKeys;
 
   // Map display status filter to stored statuses for DB query
   const storedStatuses = statusFilter?.map((s) => (s === "watching" ? "in_progress" : s));
 
   const now = new Date();
   const today = localDateString(now);
-  const horizon = new Date();
-  horizon.setDate(horizon.getDate() + days);
-  const toDate = localDateString(horizon);
-
-  // Use the cursor date as the lower bound so later pages skip already-seen dates,
-  // but don't apply a DB-level LIMIT so same-day items aren't truncated.
   const cursorKey = cursor ? decodeUpcomingCursor(cursor) : null;
-  const fromDate = cursorKey?.d ?? today;
-  const episodeRows =
-    mediaType === "movie" ? [] : getUpcomingEpisodes(userId, fromDate, toDate, storedStatuses);
-  const movieRows =
-    mediaType === "tv" ? [] : getUpcomingMovies(userId, fromDate, toDate, storedStatuses);
+
+  let episodeRows: ReturnType<typeof getUpcomingEpisodes>;
+  let movieRows: ReturnType<typeof getUpcomingMovies>;
+  if (isRecent) {
+    // Dates go down: the cursor date is the upper bound, `days` ago the lower bound.
+    const yesterdayDate = new Date(now);
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const earliest = new Date(now);
+    earliest.setDate(earliest.getDate() - days);
+    const toDate = cursorKey?.d ?? localDateString(yesterdayDate);
+    const fromDate = localDateString(earliest);
+    episodeRows = mediaType === "movie" ? [] : getRecentUnwatchedEpisodes(userId, fromDate, toDate);
+    movieRows = [];
+  } else {
+    const horizon = new Date();
+    horizon.setDate(horizon.getDate() + days);
+    const toDate = localDateString(horizon);
+
+    // Use the cursor date as the lower bound so later pages skip already-seen dates,
+    // but don't apply a DB-level LIMIT so same-day items aren't truncated.
+    const fromDate = cursorKey?.d ?? today;
+    episodeRows =
+      mediaType === "movie" ? [] : getUpcomingEpisodes(userId, fromDate, toDate, storedStatuses);
+    movieRows =
+      mediaType === "tv" ? [] : getUpcomingMovies(userId, fromDate, toDate, storedStatuses);
+  }
 
   // Merge into unified items
   type RawItem = {
@@ -494,7 +531,7 @@ export function getUpcomingFeed(
   ];
 
   // Sort by (date, title, titleId, season, episode) ASC — the same key the cursor uses
-  merged.sort((a, b) => compareUpcomingKeys(a.key, b.key));
+  merged.sort((a, b) => compareKeys(a.key, b.key));
 
   // Collapse batch drops: group 3+ episodes from the same title on the same date into one item
   const collapsed: (RawItem & { episodeCount: number })[] = [];
@@ -534,7 +571,7 @@ export function getUpcomingFeed(
   // Cursor is base64url-encoded UTF-8 JSON {d, n, i, s, e} matching the sort key.
   let startIdx = 0;
   if (cursorKey) {
-    startIdx = collapsed.findIndex((item) => compareUpcomingKeys(item.key, cursorKey) > 0);
+    startIdx = collapsed.findIndex((item) => compareKeys(item.key, cursorKey) > 0);
     if (startIdx === -1) startIdx = collapsed.length;
   }
 

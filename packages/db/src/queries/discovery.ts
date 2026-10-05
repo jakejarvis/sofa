@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, lte, notExists, sql } from "drizzle-orm";
 
 import { localDateString } from "@sofa/config";
 
@@ -307,6 +307,52 @@ export function getUpcomingEpisodes(
     )
     .where(and(...conditions))
     .orderBy(asc(episodes.airDate), asc(titles.title))
+    .all();
+}
+
+/** Aired, unwatched episodes for in-progress/completed titles, newest first. */
+export function getRecentUnwatchedEpisodes(userId: string, fromDate: string, toDate: string) {
+  return db
+    .select({
+      episodeId: episodes.id,
+      titleId: titles.id,
+      titleName: titles.title,
+      posterPath: titles.posterPath,
+      posterThumbHash: titles.posterThumbHash,
+      backdropPath: titles.backdropPath,
+      backdropThumbHash: titles.backdropThumbHash,
+      seasonNumber: seasons.seasonNumber,
+      episodeNumber: episodes.episodeNumber,
+      episodeName: episodes.name,
+      airDate: episodes.airDate,
+      userStatus: userTitleStatus.status,
+    })
+    .from(episodes)
+    .innerJoin(seasons, eq(episodes.seasonId, seasons.id))
+    .innerJoin(titles, and(eq(seasons.titleId, titles.id), eq(titles.type, "tv")))
+    .innerJoin(
+      userTitleStatus,
+      and(eq(userTitleStatus.titleId, titles.id), eq(userTitleStatus.userId, userId)),
+    )
+    .where(
+      and(
+        gte(episodes.airDate, fromDate),
+        lte(episodes.airDate, toDate),
+        inArray(userTitleStatus.status, ["in_progress", "completed"]),
+        notExists(
+          db
+            .select({ x: sql`1` })
+            .from(userEpisodeWatches)
+            .where(
+              and(
+                eq(userEpisodeWatches.episodeId, episodes.id),
+                eq(userEpisodeWatches.userId, userId),
+              ),
+            ),
+        ),
+      ),
+    )
+    .orderBy(desc(episodes.airDate), asc(titles.title))
     .all();
 }
 

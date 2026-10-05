@@ -46,9 +46,18 @@ function getBucketKey(dateStr: string, today: string): BucketKey {
   return `month_${dateStr.slice(0, 7)}`;
 }
 
+function getPastBucketKey(dateStr: string, today: string): BucketKey {
+  if (dateStr === today) return "today";
+  if (dateStr === addDays(today, -1)) return "yesterday";
+  if (dateStr >= addDays(today, -6)) return "earlier_this_week";
+  return `month_${dateStr.slice(0, 7)}`;
+}
+
 function getBucketLabel(key: BucketKey): string {
   if (key === "today") return i18n._(msg`Today`);
   if (key === "tomorrow") return i18n._(msg`Tomorrow`);
+  if (key === "yesterday") return i18n._(msg`Yesterday`);
+  if (key === "earlier_this_week") return i18n._(msg`Earlier this week`);
   if (key === "this_week") return i18n._(msg`This Week`);
   if (key === "next_week") return i18n._(msg`Next Week`);
   if (key.startsWith("month_")) {
@@ -57,13 +66,17 @@ function getBucketLabel(key: BucketKey): string {
   return key;
 }
 
-export function groupByDateBucket<T extends { date: string }>(items: T[]): DateBucket<T>[] {
+export function groupByDateBucket<T extends { date: string }>(
+  items: T[],
+  options?: { past?: boolean },
+): DateBucket<T>[] {
+  const bucketKeyFor = options?.past ? getPastBucketKey : getBucketKey;
   const today = getToday();
   const bucketMap = new Map<string, { label: string; items: T[] }>();
   const bucketOrder: string[] = [];
 
   for (const item of items) {
-    const key = getBucketKey(item.date, today);
+    const key = bucketKeyFor(item.date, today);
     let bucket = bucketMap.get(key);
     if (!bucket) {
       bucket = { label: getBucketLabel(key), items: [] };

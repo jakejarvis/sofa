@@ -154,3 +154,37 @@ describe("groupByDateBucket", () => {
     expect(result[1].label).toBeTruthy();
   });
 });
+
+describe("groupByDateBucket past option", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2024-06-12T10:00:00"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test("yesterday goes to the 'yesterday' bucket", () => {
+    const result = groupByDateBucket([{ date: "2024-06-11" }], { past: true });
+    expect(result[0].key).toBe("yesterday");
+    expect(result[0].label).toBe("Yesterday");
+  });
+
+  test("3 days ago goes to 'earlier_this_week'", () => {
+    const result = groupByDateBucket([{ date: "2024-06-09" }], { past: true });
+    expect(result[0].key).toBe("earlier_this_week");
+    expect(result[0].label).toBe("Earlier this week");
+  });
+
+  test("20 days ago goes to a month bucket", () => {
+    const result = groupByDateBucket([{ date: "2024-05-23" }], { past: true });
+    expect(result[0].key).toBe("month_2024-05");
+    expect(result[0].label).toBe("May");
+  });
+
+  test("default grouping is unchanged for a future date", () => {
+    const result = groupByDateBucket([{ date: "2024-06-13" }]);
+    expect(result[0].key).toBe("tomorrow");
+  });
+});

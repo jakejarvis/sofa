@@ -1071,6 +1071,10 @@ msgstr ""
 msgid "Download your library, watch history, and ratings as JSON"
 msgstr "Download your library, watch history, and ratings as JSON"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Earlier this week"
+msgstr "Earlier this week"
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Edit profile photo"
 msgstr "Edit profile photo"
@@ -2589,6 +2593,11 @@ msgstr ""
 msgid "Recent Searches"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Recently aired"
+msgstr "Recently aired"
+
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 msgid "Recently Viewed"
@@ -3517,6 +3526,10 @@ msgstr ""
 msgid "Unwatched all of {seasonLabel}"
 msgstr "Unwatched all of {seasonLabel}"
 
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Unwatched episodes from the last 90 days."
+msgstr "Unwatched episodes from the last 90 days."
+
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Unwatched S{seasonNum} E{epNum}"
 msgstr ""
@@ -3765,9 +3778,18 @@ msgstr "Year"
 #~ msgid "Year to"
 #~ msgstr "Year to"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Yesterday"
+msgstr "Yesterday"
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "You'll be signed out to change the server URL."
 msgstr ""
+
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "You're all caught up on the last 90 days."
+msgstr "You're all caught up on the last 90 days."
 
 #: apps/web/src/components/update-toast.tsx
 #~ msgid "You're running v{0}."

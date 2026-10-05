@@ -1071,6 +1071,10 @@ msgstr "Back-up downloaden"
 msgid "Download your library, watch history, and ratings as JSON"
 msgstr "Download je bibliotheek, kijkgeschiedenis en beoordelingen als JSON"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Earlier this week"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Edit profile photo"
 msgstr "Profielfoto bewerken"
@@ -2589,6 +2593,11 @@ msgstr "Gereed — nog niets ontvangen"
 msgid "Recent Searches"
 msgstr "Recente zoekopdrachten"
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Recently aired"
+msgstr ""
+
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 msgid "Recently Viewed"
@@ -3517,6 +3526,10 @@ msgstr "Alles als onbekeken markeren"
 msgid "Unwatched all of {seasonLabel}"
 msgstr "Alles van {seasonLabel} als niet bekeken gemarkeerd"
 
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Unwatched episodes from the last 90 days."
+msgstr ""
+
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Unwatched S{seasonNum} E{epNum}"
 msgstr "Niet bekeken S{seasonNum} E{epNum}"
@@ -3765,9 +3778,18 @@ msgstr "Jaar"
 #~ msgid "Year to"
 #~ msgstr "Year to"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Yesterday"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "You'll be signed out to change the server URL."
 msgstr "Je wordt afgemeld om de server-URL te wijzigen."
+
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "You're all caught up on the last 90 days."
+msgstr ""
 
 #: apps/web/src/components/update-toast.tsx
 #~ msgid "You're running v{0}."

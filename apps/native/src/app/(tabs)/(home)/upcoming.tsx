@@ -54,6 +54,8 @@ export default function UpcomingScreen() {
   const backgroundColor = useCSSVariable("--color-background") as string;
   const mutedColor = useCSSVariable("--color-muted-foreground") as string;
 
+  const [view, setView] = useState<"upcoming" | "recent">("upcoming");
+  const isRecent = view === "recent";
   const [mediaType, setMediaType] = useState<"all" | "movie" | "tv">("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "watching" | "watchlist">("all");
 
@@ -64,8 +66,9 @@ export default function UpcomingScreen() {
           days: 90,
           limit: 20,
           cursor: pageParam,
-          mediaType: mediaType !== "all" ? mediaType : undefined,
-          statusFilter: statusFilter !== "all" ? [statusFilter] : undefined,
+          direction: view,
+          mediaType: !isRecent && mediaType !== "all" ? mediaType : undefined,
+          statusFilter: !isRecent && statusFilter !== "all" ? [statusFilter] : undefined,
         }),
         initialPageParam: undefined as string | undefined,
         getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
@@ -75,12 +78,12 @@ export default function UpcomingScreen() {
   const allItems = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
   const sections = useMemo(
     () =>
-      groupByDateBucket(allItems).map((b) => ({
+      groupByDateBucket(allItems, { past: view === "recent" }).map((b) => ({
         key: b.key,
         title: b.label,
         data: b.items,
       })),
-    [allItems],
+    [allItems, view],
   );
 
   const refreshUpcoming = useCallback(
@@ -102,31 +105,46 @@ export default function UpcomingScreen() {
       contentContainerStyle={{ paddingHorizontal: 16, gap: 6, paddingTop: 10, paddingBottom: 6 }}
     >
       <FilterChip
-        label={t`All`}
-        isSelected={mediaType === "all"}
-        onPress={() => setMediaType("all")}
+        label={t`Upcoming`}
+        isSelected={view === "upcoming"}
+        onPress={() => setView("upcoming")}
       />
       <FilterChip
-        label={t`Movies`}
-        isSelected={mediaType === "movie"}
-        onPress={() => setMediaType("movie")}
-      />
-      <FilterChip
-        label={t`TV`}
-        isSelected={mediaType === "tv"}
-        onPress={() => setMediaType("tv")}
+        label={t`Recently aired`}
+        isSelected={view === "recent"}
+        onPress={() => setView("recent")}
       />
       <View className="bg-border/30 mx-1 w-px self-stretch" />
-      <FilterChip
-        label={t`Watching`}
-        isSelected={statusFilter === "watching"}
-        onPress={() => setStatusFilter(statusFilter === "watching" ? "all" : "watching")}
-      />
-      <FilterChip
-        label={t`Watchlist`}
-        isSelected={statusFilter === "watchlist"}
-        onPress={() => setStatusFilter(statusFilter === "watchlist" ? "all" : "watchlist")}
-      />
+      {!isRecent && (
+        <>
+          <FilterChip
+            label={t`All`}
+            isSelected={mediaType === "all"}
+            onPress={() => setMediaType("all")}
+          />
+          <FilterChip
+            label={t`Movies`}
+            isSelected={mediaType === "movie"}
+            onPress={() => setMediaType("movie")}
+          />
+          <FilterChip
+            label={t`TV`}
+            isSelected={mediaType === "tv"}
+            onPress={() => setMediaType("tv")}
+          />
+          <View className="bg-border/30 mx-1 w-px self-stretch" />
+          <FilterChip
+            label={t`Watching`}
+            isSelected={statusFilter === "watching"}
+            onPress={() => setStatusFilter(statusFilter === "watching" ? "all" : "watching")}
+          />
+          <FilterChip
+            label={t`Watchlist`}
+            isSelected={statusFilter === "watchlist"}
+            onPress={() => setStatusFilter(statusFilter === "watchlist" ? "all" : "watchlist")}
+          />
+        </>
+      )}
     </ScrollView>
   );
 
@@ -185,7 +203,11 @@ export default function UpcomingScreen() {
             >
               <ScaledIcon icon={IconCalendarEvent} size={48} color={`${mutedColor}66`} />
               <Text className="text-muted-foreground mt-4 text-center text-sm">
-                <Trans>No upcoming episodes or releases in the next 90 days.</Trans>
+                {isRecent ? (
+                  <Trans>You're all caught up on the last 90 days.</Trans>
+                ) : (
+                  <Trans>No upcoming episodes or releases in the next 90 days.</Trans>
+                )}
               </Text>
             </Animated.View>
           )

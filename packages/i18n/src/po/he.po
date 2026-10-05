@@ -1071,6 +1071,10 @@ msgstr "הורד גיבוי"
 msgid "Download your library, watch history, and ratings as JSON"
 msgstr "הורד את הספרייה, היסטוריית הצפייה והדירוגים שלך כ-JSON"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Earlier this week"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Edit profile photo"
 msgstr "ערוך תמונת פרופיל"
@@ -2589,6 +2593,11 @@ msgstr "מוכן — טרם התקבל דבר"
 msgid "Recent Searches"
 msgstr "חיפושים אחרונים"
 
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Recently aired"
+msgstr ""
+
 #: apps/native/src/components/search/recently-viewed-list.ios.tsx
 #: apps/native/src/components/search/recently-viewed-list.tsx
 msgid "Recently Viewed"
@@ -3517,6 +3526,10 @@ msgstr "הסר צפייה מהכל"
 msgid "Unwatched all of {seasonLabel}"
 msgstr "בוטלה צפייה בכל {seasonLabel}"
 
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "Unwatched episodes from the last 90 days."
+msgstr ""
+
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Unwatched S{seasonNum} E{epNum}"
 msgstr "בוטלה צפייה ב-S{seasonNum} E{epNum}"
@@ -3765,9 +3778,18 @@ msgstr "שנה"
 #~ msgid "Year to"
 #~ msgstr "Year to"
 
+#: packages/i18n/src/date-buckets.ts
+msgid "Yesterday"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "You'll be signed out to change the server URL."
 msgstr "תתנתק כדי לשנות את כתובת ה-URL של השרת."
+
+#: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/web/src/routes/_app/upcoming.tsx
+msgid "You're all caught up on the last 90 days."
+msgstr ""
 
 #: apps/web/src/components/update-toast.tsx
 #~ msgid "You're running v{0}."

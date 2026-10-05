@@ -663,7 +663,13 @@ export const UpcomingInput = z
       .min(1)
       .max(90)
       .default(90)
-      .describe("How many days into the future to look"),
+      .describe("How many days ahead (upcoming) or back (recent) to look"),
+    direction: z
+      .enum(["upcoming", "recent"])
+      .default("upcoming")
+      .describe(
+        '"upcoming": the next `days` days. "recent": unwatched TV episodes that aired in the past `days` days (excluding today), newest first',
+      ),
     limit: z.number().int().min(1).max(50).default(20).describe("Maximum items per page"),
     cursor: z.string().optional().describe("Pagination cursor"),
     mediaType: z
