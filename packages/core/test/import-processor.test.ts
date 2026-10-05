@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as maintenance from "@sofa/db/queries/maintenance";
 import {
   importJobs,
   titles,
@@ -159,6 +160,44 @@ describe("processImportJob — movies", () => {
       .where(eq(userMovieWatches.userId, userId))
       .all();
     expect(watches).toHaveLength(1);
+  });
+});
+
+// ── Planner Statistics ──────────────────────────────────────────────
+
+describe("processImportJob — planner statistics", () => {
+  function createMovieJob() {
+    const userId = insertUser();
+    insertMovieTitle("movie-1", 550, "Fight Club");
+    const payload: NormalizedImport = {
+      source: "trakt",
+      movies: [{ tmdbId: 550, title: "Fight Club", watchedAt: "2024-06-15T20:00:00Z" }],
+      episodes: [],
+      watchlist: [],
+      ratings: [],
+    };
+    return createJob(userId, payload);
+  }
+
+  test("refreshes planner statistics once after a successful import", async () => {
+    const spy = vi.spyOn(maintenance, "refreshPlannerStats");
+    const jobId = createMovieJob();
+
+    await processImportJob(jobId);
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(readImportJob(jobId).status).toBe("success");
+  });
+
+  test("a failing statistics refresh does not fail the import", async () => {
+    vi.spyOn(maintenance, "refreshPlannerStats").mockImplementation(() => {
+      throw new Error("boom");
+    });
+    const jobId = createMovieJob();
+
+    await processImportJob(jobId);
+
+    expect(readImportJob(jobId).status).toBe("success");
   });
 });
 

@@ -13,6 +13,7 @@ import {
   getTitleStatusValue,
   updateImportJobProgress,
 } from "@sofa/db/queries/imports";
+import { refreshPlannerStats } from "@sofa/db/queries/maintenance";
 import { findEpisodeBySeasonAndNumber, findSeasonByTitleAndNumber } from "@sofa/db/queries/title";
 import { createLogger } from "@sofa/logger";
 
@@ -524,6 +525,12 @@ export async function processImportJob(jobId: string): Promise<void> {
       warnings: JSON.stringify(result.warnings),
       currentMessage: "Import complete",
     });
+
+    try {
+      refreshPlannerStats();
+    } catch (err) {
+      log.warn("Failed to refresh planner statistics after import:", err);
+    }
 
     log.info(
       `Import job ${jobId} complete: ${result.imported} imported, ${result.skipped} skipped, ${result.failed} failed`,
