@@ -100,6 +100,26 @@ describe("groupByDateBucket", () => {
     }
   });
 
+  test("month label is right when Intl defaults to UTC (native polyfill)", () => {
+    const RealDTF = Intl.DateTimeFormat;
+    const originalTz = process.env.TZ;
+    try {
+      process.env.TZ = "Pacific/Kiritimati"; // UTC+14
+      // Emulate the polyfill's UTC default while still honouring an explicit timeZone.
+      vi.spyOn(Intl, "DateTimeFormat").mockImplementation(function (
+        locales?: Intl.LocalesArgument,
+        options?: Intl.DateTimeFormatOptions,
+      ) {
+        return new RealDTF(locales, { timeZone: "UTC", ...options });
+      } as unknown as typeof Intl.DateTimeFormat);
+      expect(groupByDateBucket([{ date: "2024-12-03" }])[0].label).toBe("December");
+    } finally {
+      vi.restoreAllMocks();
+      if (originalTz === undefined) delete process.env.TZ;
+      else process.env.TZ = originalTz;
+    }
+  });
+
   test("item 30+ days out goes to month bucket", () => {
     const result = groupByDateBucket([{ date: "2024-08-15" }]);
     expect(result).toHaveLength(1);
