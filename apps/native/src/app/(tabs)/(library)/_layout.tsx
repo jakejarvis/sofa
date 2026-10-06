@@ -1,19 +1,36 @@
 import { useLingui } from "@lingui/react/macro";
-import { Stack } from "expo-router";
+import { IconHistory } from "@tabler/icons-react-native";
+import { Stack, useRouter } from "expo-router";
 import { useAtom } from "jotai";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useCSSVariable, useResolveClassNames } from "uniwind";
 
 import { HeaderAvatar } from "@/components/header-avatar";
 import { SortMenu } from "@/components/library/sort-menu";
+import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { type SortBy, librarySortByAtom, librarySortDirectionAtom } from "@/lib/library-atoms";
+import * as Haptics from "@/utils/haptics";
 
 function LibraryHeaderRight() {
+  const { t } = useLingui();
+  const router = useRouter();
+  const foregroundColor = useCSSVariable("--color-foreground") as string;
   const [sortBy, setSortBy] = useAtom(librarySortByAtom);
   const [sortDirection, setSortDirection] = useAtom(librarySortDirectionAtom);
 
   return (
     <View className="flex-row items-center gap-4">
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t`History`}
+        hitSlop={8}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          router.push("/(tabs)/(library)/history");
+        }}
+      >
+        <ScaledIcon icon={IconHistory} size={22} color={foregroundColor} />
+      </Pressable>
       <SortMenu
         sortBy={sortBy}
         sortDirection={sortDirection}
@@ -51,13 +68,11 @@ export default function LibraryLayout() {
 
   if (process.env.EXPO_OS === "ios") {
     return (
-      <Stack
-        screenOptions={{
-          contentStyle,
-          unstable_headerRightItems: getLibraryHeaderRightItems,
-        }}
-      >
-        <Stack.Screen name="index">
+      <Stack screenOptions={{ contentStyle }}>
+        <Stack.Screen
+          name="index"
+          options={{ unstable_headerRightItems: getLibraryHeaderRightItems }}
+        >
           <Stack.Header
             transparent
             blurEffect="systemChromeMaterialDark"
@@ -84,10 +99,9 @@ export default function LibraryLayout() {
       screenOptions={{
         contentStyle,
         headerTitleAlign: "left",
-        headerRight: renderLibraryHeaderRight,
       }}
     >
-      <Stack.Screen name="index">
+      <Stack.Screen name="index" options={{ headerRight: renderLibraryHeaderRight }}>
         <Stack.Header
           transparent={false}
           style={{

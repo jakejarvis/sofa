@@ -373,6 +373,7 @@ msgid "age {age}"
 msgstr "גיל {age}"
 
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/components/explore/filterable-title-row.tsx
 #: apps/native/src/components/library/filter-sheet.tsx
@@ -878,6 +879,10 @@ msgstr ""
 msgid "Couldn't load your library"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(library)/history.tsx
+msgid "Couldn't load your watch history"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 msgid "Couldn't search right now"
 msgstr ""
@@ -1097,6 +1102,7 @@ msgstr "דוא\"ל"
 msgid "Email is required"
 msgstr "כתובת דוא\"ל נדרשת"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Emby"
@@ -1580,8 +1586,11 @@ msgstr "בדירוג הגבוה ביותר"
 msgid "Hindi"
 msgstr "הינדי"
 
+#: apps/native/src/app/(tabs)/(library)/_layout.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/routes/_app/history.tsx
+#: apps/web/src/routes/_app/library.tsx
 msgid "History"
 msgstr ""
 
@@ -1605,6 +1614,7 @@ msgstr "מטמון תמונות"
 msgid "Image cache and backup disk usage"
 msgstr "שימוש בדיסק של מטמון תמונות וגיבויים"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/routes/_app/history.tsx
@@ -1734,6 +1744,7 @@ msgstr "איטלקית"
 msgid "Japanese"
 msgstr "יפנית"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Jellyfin"
@@ -1864,6 +1875,7 @@ msgstr "אבד החיבור לייבוא. בדוק את הסטטוס בהגדר�
 msgid "Manage your account and preferences"
 msgstr "נהל את החשבון וההעדפות שלך"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Manual"
@@ -2059,6 +2071,7 @@ msgid "Movie"
 msgstr "סרט"
 
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/settings/account-section.tsx
@@ -2224,6 +2237,10 @@ msgstr "אין כותרות התואמות למסננים"
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "No upcoming episodes or releases in the next 90 days."
 msgstr "אין פרקים או יציאות קרובות ב-90 הימים הקרובים."
+
+#: apps/native/src/app/(tabs)/(library)/history.tsx
+msgid "No watches yet."
+msgstr ""
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -2436,6 +2453,7 @@ msgstr "אנא אשר את הסיסמה שלך"
 msgid "Please sign in again."
 msgstr "אנא התחבר שוב."
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Plex"
@@ -2829,6 +2847,7 @@ msgstr "מאחזר את היסטוריית הצפייה, רשימת הצפייה
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 #: apps/native/src/components/explore/filterable-title-row.tsx
@@ -2859,10 +2878,12 @@ msgstr "הפעל עכשיו"
 #~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 #~ msgstr "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 msgid "S{season} E{episode}"
 msgstr ""
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 msgid "S{season} E{episode} · {name}"
 msgstr ""
@@ -3156,6 +3177,7 @@ msgstr "Sofa יתעד אוטומטית סרטים ופרקים כשתסיים ל
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 #: apps/native/src/app/change-password.tsx
@@ -3514,6 +3536,7 @@ msgid "tv"
 msgstr "טלוויזיה"
 
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/title/[id].tsx
 #: apps/native/src/components/library/filter-sheet.tsx

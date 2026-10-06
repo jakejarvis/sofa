@@ -373,6 +373,7 @@ msgid "age {age}"
 msgstr "edad {age}"
 
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/components/explore/filterable-title-row.tsx
 #: apps/native/src/components/library/filter-sheet.tsx
@@ -878,6 +879,10 @@ msgstr ""
 msgid "Couldn't load your library"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(library)/history.tsx
+msgid "Couldn't load your watch history"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 msgid "Couldn't search right now"
 msgstr ""
@@ -1097,6 +1102,7 @@ msgstr "Correo electrónico"
 msgid "Email is required"
 msgstr "El correo electrónico es obligatorio"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Emby"
@@ -1580,8 +1586,11 @@ msgstr "Mejor valorados"
 msgid "Hindi"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(library)/_layout.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/routes/_app/history.tsx
+#: apps/web/src/routes/_app/library.tsx
 msgid "History"
 msgstr ""
 
@@ -1605,6 +1614,7 @@ msgstr "Caché de imágenes"
 msgid "Image cache and backup disk usage"
 msgstr "Uso del disco de caché de imágenes y copias de seguridad"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/routes/_app/history.tsx
@@ -1734,6 +1744,7 @@ msgstr "Italiano"
 msgid "Japanese"
 msgstr "Japonés"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Jellyfin"
@@ -1864,6 +1875,7 @@ msgstr "Se perdió la conexión con la importación. Comprueba el estado en ajus
 msgid "Manage your account and preferences"
 msgstr "Gestiona tu cuenta y preferencias"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Manual"
@@ -2059,6 +2071,7 @@ msgid "Movie"
 msgstr "Película"
 
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/settings/account-section.tsx
@@ -2224,6 +2237,10 @@ msgstr "Ningún título coincide con tus filtros"
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "No upcoming episodes or releases in the next 90 days."
 msgstr "No hay episodios ni estrenos en los próximos 90 días."
+
+#: apps/native/src/app/(tabs)/(library)/history.tsx
+msgid "No watches yet."
+msgstr ""
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -2436,6 +2453,7 @@ msgstr "Por favor, confirma tu contraseña"
 msgid "Please sign in again."
 msgstr "Por favor, inicia sesión de nuevo."
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Plex"
@@ -2829,6 +2847,7 @@ msgstr "Obteniendo tu historial de visionado, lista y valoraciones..."
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 #: apps/native/src/components/explore/filterable-title-row.tsx
@@ -2859,10 +2878,12 @@ msgstr "Ejecutar ahora"
 #~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 #~ msgstr "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 msgid "S{season} E{episode}"
 msgstr ""
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 msgid "S{season} E{episode} · {name}"
 msgstr ""
@@ -3156,6 +3177,7 @@ msgstr "Sofa registrará automáticamente películas y episodios cuando termines
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 #: apps/native/src/app/change-password.tsx
@@ -3514,6 +3536,7 @@ msgid "tv"
 msgstr "serie"
 
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/title/[id].tsx
 #: apps/native/src/components/library/filter-sheet.tsx

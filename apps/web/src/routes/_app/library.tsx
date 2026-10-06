@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
-import { IconBooks, IconFilterOff } from "@tabler/icons-react";
+import { IconBooks, IconFilterOff, IconHistory } from "@tabler/icons-react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
@@ -9,6 +9,7 @@ import { z } from "zod";
 import { TitleGrid, TitleGridSectionSkeleton } from "@/components/dashboard/title-grid";
 import { LibraryToolbar } from "@/components/library/library-toolbar";
 import { RouteError } from "@/components/route-error";
+import { buttonVariants } from "@/components/ui/button";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { orpc } from "@/lib/orpc/client";
 
@@ -180,9 +181,15 @@ function LibraryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <IconBooks aria-hidden={true} className="text-primary size-5" />
-        <h1 className="font-display text-xl tracking-tight">{t`Library`}</h1>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <IconBooks aria-hidden={true} className="text-primary size-5" />
+          <h1 className="font-display text-xl tracking-tight">{t`Library`}</h1>
+        </div>
+        <Link to="/history" className={buttonVariants({ variant: "outline", size: "sm" })}>
+          <IconHistory aria-hidden={true} />
+          {t`History`}
+        </Link>
       </div>
 
       <LibraryToolbar

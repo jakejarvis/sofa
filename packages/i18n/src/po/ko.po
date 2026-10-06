@@ -373,6 +373,7 @@ msgid "age {age}"
 msgstr "나이 {age}"
 
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/components/explore/filterable-title-row.tsx
 #: apps/native/src/components/library/filter-sheet.tsx
@@ -878,6 +879,10 @@ msgstr ""
 msgid "Couldn't load your library"
 msgstr ""
 
+#: apps/native/src/app/(tabs)/(library)/history.tsx
+msgid "Couldn't load your watch history"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 msgid "Couldn't search right now"
 msgstr ""
@@ -1097,6 +1102,7 @@ msgstr "이메일"
 msgid "Email is required"
 msgstr "이메일을 입력해주세요"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Emby"
@@ -1580,8 +1586,11 @@ msgstr "평점 높은 순"
 msgid "Hindi"
 msgstr "힌디어"
 
+#: apps/native/src/app/(tabs)/(library)/_layout.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/web/src/components/nav-bar.tsx
 #: apps/web/src/routes/_app/history.tsx
+#: apps/web/src/routes/_app/library.tsx
 msgid "History"
 msgstr ""
 
@@ -1605,6 +1614,7 @@ msgstr "이미지 캐시"
 msgid "Image cache and backup disk usage"
 msgstr "이미지 캐시 및 백업 디스크 사용량"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/routes/_app/history.tsx
@@ -1734,6 +1744,7 @@ msgstr "이탈리아어"
 msgid "Japanese"
 msgstr "일본어"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Jellyfin"
@@ -1864,6 +1875,7 @@ msgstr "가져오기 연결이 끊어졌습니다. 설정에서 상태를 확인
 msgid "Manage your account and preferences"
 msgstr "계정 및 환경설정을 관리하세요"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Manual"
@@ -2059,6 +2071,7 @@ msgid "Movie"
 msgstr "영화"
 
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/web/src/components/people/filmography-grid.tsx
 #: apps/web/src/components/settings/account-section.tsx
@@ -2224,6 +2237,10 @@ msgstr "필터에 맞는 제목이 없습니다"
 #: apps/web/src/routes/_app/upcoming.tsx
 msgid "No upcoming episodes or releases in the next 90 days."
 msgstr "향후 90일 이내 예정된 에피소드 또는 출시가 없습니다."
+
+#: apps/native/src/app/(tabs)/(library)/history.tsx
+msgid "No watches yet."
+msgstr ""
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -2436,6 +2453,7 @@ msgstr "비밀번호를 확인해주세요"
 msgid "Please sign in again."
 msgstr "다시 로그인해주세요."
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 #: apps/web/src/routes/_app/history.tsx
 msgid "Plex"
@@ -2829,6 +2847,7 @@ msgstr "시청 기록, 시청 목록, 평점을 가져오는 중..."
 #: apps/native/src/app/(auth)/register.tsx
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 #: apps/native/src/components/explore/filterable-title-row.tsx
@@ -2859,10 +2878,12 @@ msgstr "지금 실행"
 #~ msgid "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 #~ msgstr "S{0} · {1} {2, plural, one {episode} other {episodes}}"
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 msgid "S{season} E{episode}"
 msgstr ""
 
+#: apps/native/src/components/history/history-row.tsx
 #: apps/web/src/components/history/history-row.tsx
 msgid "S{season} E{episode} · {name}"
 msgstr ""
@@ -3156,6 +3177,7 @@ msgstr "시청을 완료하면 Sofa가 자동으로 영화와 에피소드를 �
 
 #: apps/native/src/app/(tabs)/(home)/index.tsx
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 #: apps/native/src/app/change-password.tsx
@@ -3514,6 +3536,7 @@ msgid "tv"
 msgstr ""
 
 #: apps/native/src/app/(tabs)/(home)/upcoming.tsx
+#: apps/native/src/app/(tabs)/(library)/history.tsx
 #: apps/native/src/app/(tabs)/(library)/index.tsx
 #: apps/native/src/app/title/[id].tsx
 #: apps/native/src/components/library/filter-sheet.tsx

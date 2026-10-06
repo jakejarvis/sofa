@@ -3,7 +3,6 @@ import {
   IconBooks,
   IconCalendarEvent,
   IconCompass,
-  IconHistory,
   IconHome,
   IconLogout,
   IconSearch,
@@ -291,7 +290,6 @@ export function MobileTabBar() {
     { href: "/library", label: t`Library`, icon: IconBooks },
     { href: "/explore", label: t`Explore`, icon: IconCompass },
     { href: "/upcoming", label: t`Upcoming`, icon: IconCalendarEvent },
-    { href: "/history", label: t`History`, icon: IconHistory },
     { href: "/settings", label: t`Settings`, icon: IconSettings },
   ] as const;
 
