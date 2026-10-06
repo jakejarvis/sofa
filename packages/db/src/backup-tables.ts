@@ -40,3 +40,18 @@ export function findMissingBackupTables(tableNames: Iterable<string>): string[] 
   const present = new Set(tableNames);
   return REQUIRED_BACKUP_TABLES.filter((table) => !present.has(table));
 }
+
+/**
+ * True when the backup has applied a migration newer than any this build ships —
+ * i.e. it was taken on a newer Sofa version and would run under code that doesn't know its schema.
+ */
+export function isFromNewerVersion(
+  appliedCreatedAt: Iterable<number | string>,
+  localFolderMillis: Iterable<number>,
+): boolean {
+  const newestLocal = Math.max(0, ...localFolderMillis);
+  for (const createdAt of appliedCreatedAt) {
+    if (Number(createdAt) > newestLocal) return true;
+  }
+  return false;
+}

@@ -1,14 +1,16 @@
 import { Database } from "bun:sqlite";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { closeSync, openSync, readSync } from "node:fs";
+import path from "node:path";
 
 import type { Logger } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sqlite";
+import { readMigrationFiles } from "drizzle-orm/migrator";
 
 import { DATABASE_URL } from "@sofa/config";
 import { createLogger } from "@sofa/logger";
 
-import { findMissingBackupTables } from "./backup-tables";
+import { findMissingBackupTables, isFromNewerVersion } from "./backup-tables";
 
 const log = createLogger("drizzle");
 
@@ -154,6 +156,19 @@ export function validateBackupDatabase(filePath: string): void {
     const missing = findMissingBackupTables(tableRows.map((row) => row.name));
     if (missing.length > 0) {
       throw new Error(`Invalid backup: missing required tables (${missing.join(", ")})`);
+    }
+
+    const applied = (
+      validationDb.query("SELECT created_at FROM __drizzle_migrations").all() as {
+        created_at: number | string;
+      }[]
+    ).map((row) => Number(row.created_at));
+    // Same folder as getMigrationsFolder() in migrate.ts (not importable here: circular).
+    const local = readMigrationFiles({
+      migrationsFolder: path.join(import.meta.dir, "../drizzle"),
+    }).map((m) => m.folderMillis);
+    if (isFromNewerVersion(applied, local)) {
+      throw new Error("Backup is from a newer version of Sofa");
     }
   } finally {
     validationDb.close();

@@ -1,4 +1,4 @@
-import { renameSync, unlinkSync } from "node:fs";
+import { copyFileSync, renameSync, unlinkSync } from "node:fs";
 import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 
@@ -12,7 +12,7 @@ import {
   validateBackupDatabase,
   withDatabaseAccessBlocked,
 } from "@sofa/db/client";
-import { runMigrations } from "@sofa/db/migrate";
+import { migrateDatabaseFile, runMigrations } from "@sofa/db/migrate";
 import { createLogger } from "@sofa/logger";
 
 function formatTimestamp(date: Date): string {
@@ -169,6 +169,16 @@ export async function readBackupFile(filename: string): Promise<Buffer | null> {
   return Buffer.from(await Bun.file(filePath).arrayBuffer());
 }
 
+function moveFileSync(from: string, to: string) {
+  try {
+    renameSync(from, to);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== "EXDEV") throw err;
+    copyFileSync(from, to);
+    unlinkSync(from);
+  }
+}
+
 export async function restoreFromBackup(source: Buffer | string): Promise<void> {
   await withBackupLock(async () => {
     await ensureBackupDir();
@@ -181,11 +191,14 @@ export async function restoreFromBackup(source: Buffer | string): Promise<void> 
 
     try {
       if (typeof source === "string") {
-        renameSync(source, tempPath);
+        moveFileSync(source, tempPath);
       } else {
         await Bun.write(tempPath, source);
       }
       validateBackupDatabase(tempPath);
+
+      log.info("Migrating backup before restore...");
+      await migrateDatabaseFile(tempPath);
 
       log.info("Creating pre-restore safety backup...");
       await createBackupInternal("pre-restore");
@@ -198,7 +211,7 @@ export async function restoreFromBackup(source: Buffer | string): Promise<void> 
         unlinkIfExistsSync(`${DATABASE_URL}-wal`);
         unlinkIfExistsSync(`${DATABASE_URL}-shm`);
 
-        // Ensure restored backups from older app versions are brought up-to-date.
+        // Safety net: the file was already migrated before the swap, so this is normally a no-op.
         runMigrations();
       });
       log.info("Database restored successfully");
