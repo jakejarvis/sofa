@@ -7,7 +7,7 @@ import {
   persistQueryClientSubscribe,
 } from "@tanstack/react-query-persist-client";
 import * as Application from "expo-application";
-import { Stack, useGlobalSearchParams, usePathname } from "expo-router";
+import { Stack, useSegments } from "expo-router";
 import { ThemeProvider } from "expo-router/react-navigation";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -28,7 +28,7 @@ import { useServerConnection } from "@/hooks/use-server-connection";
 import { useWidgetRefresh } from "@/hooks/use-widget-refresh";
 import { initLocale } from "@/lib/i18n";
 import { createScopedQueryPersister, hasScopedStorage, scopedStorage } from "@/lib/mmkv";
-import { initAnalytics, posthog } from "@/lib/posthog";
+import { initAnalytics, posthog, screenNameFromSegments } from "@/lib/posthog";
 import { queryClient } from "@/lib/query-client";
 import { QUERY_PERSIST_MAX_AGE } from "@/lib/query-config";
 import { initSentry, Sentry } from "@/lib/sentry";
@@ -78,14 +78,14 @@ function AppContent() {
   }, []);
 
   // --- PostHog screen tracking ---
-  const pathname = usePathname();
-  const params = useGlobalSearchParams();
+  const segments = useSegments();
+  const screenName = screenNameFromSegments(segments);
 
   useEffect(() => {
-    if (posthog && pathname) {
-      posthog.screen(pathname, params);
+    if (posthog) {
+      posthog.screen(screenName);
     }
-  }, [pathname, params]);
+  }, [screenName]);
 
   useEffect(() => {
     Uniwind.setTheme("dark");

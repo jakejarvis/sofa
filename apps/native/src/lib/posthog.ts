@@ -32,14 +32,24 @@ export const posthog: PostHog | null = posthogApiKey
     })
   : null;
 
-/** Whether the user has explicitly set a preference via the settings toggle. */
-export function hasExplicitPreference(): boolean {
-  return globalStorage.getBoolean(ANALYTICS_EXPLICIT_KEY) === true;
+/** Current analytics enabled state: explicit preference, else off — see docs/content/docs/telemetry.mdx. */
+export function isAnalyticsEnabled(): boolean {
+  return globalStorage.getBoolean(ANALYTICS_ENABLED_KEY) ?? false;
 }
 
-/** Current analytics enabled state (explicit preference or default). */
-export function isAnalyticsEnabled(): boolean {
-  return globalStorage.getBoolean(ANALYTICS_ENABLED_KEY) ?? true;
+/** Route groups that only wrap layouts; the tab groups inside `(tabs)` do name the screen. */
+const LAYOUT_GROUPS = new Set(["(tabs)", "(auth)"]);
+
+/**
+ * PostHog screen name from Expo Router segments, without dynamic values:
+ * ["(tabs)", "(search)", "index"] → "search", ["(tabs)", "(library)", "history"] →
+ * "library/history", ["title", "[id]"] → "title/[id]".
+ */
+export function screenNameFromSegments(segments: readonly string[]): string {
+  const parts = segments
+    .filter((s) => !LAYOUT_GROUPS.has(s) && s !== "index")
+    .map((s) => (s.startsWith("(") && s.endsWith(")") ? s.slice(1, -1) : s));
+  return parts.length > 0 ? parts.join("/") : "home";
 }
 
 /** Called by the settings toggle — marks the preference as explicit. */
