@@ -17,6 +17,7 @@ import { createLogger } from "@sofa/logger";
 
 import { apiBodyLimit, UPLOAD_BODY_LIMIT } from "./body-limits";
 import { getJobSchedules, startJobs, stopJobs } from "./cron";
+import { imageSecurityHeaders } from "./image-headers";
 import { handler as rpcHandler } from "./orpc/handler";
 import { openApiHandler } from "./orpc/openapi-handler";
 import { rejectCrossSiteRequests, SECURITY_HEADERS_OPTIONS } from "./request-guards";
@@ -83,6 +84,9 @@ app.use(
   }),
 );
 
+// Image responses get a sandboxing CSP; registered first so secureHeaders' CSP doesn't replace it.
+app.use("/images/*", imageSecurityHeaders);
+app.use("/api/avatars/*", imageSecurityHeaders);
 app.use("*", secureHeaders(SECURITY_HEADERS_OPTIONS));
 
 app.use("*", async (c, next) => {

@@ -75,6 +75,12 @@ async function fetchRemoteImage(
     return null;
   }
 
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.startsWith("image/")) {
+    log.warn(`Not an image: ${url} -> ${contentType || "no content-type"}`);
+    return null;
+  }
+
   const contentLength = Number(res.headers.get("content-length") || "0");
   if (contentLength > MAX_IMAGE_BYTES) {
     log.warn(`Image too large: ${url} -> ${contentLength} bytes`);
@@ -87,10 +93,7 @@ async function fetchRemoteImage(
     return null;
   }
 
-  return {
-    buffer,
-    contentType: res.headers.get("content-type") || "image/jpeg",
-  };
+  return { buffer, contentType };
 }
 
 export async function downloadAndCacheImage(
@@ -117,6 +120,9 @@ export async function downloadAndCacheImage(
   return buffer;
 }
 
+/** Concurrent misses for the same image share one TMDB fetch and one disk write. */
+const inflightFetches = new Map<string, Promise<{ buffer: Buffer; contentType: string } | null>>();
+
 export async function fetchAndMaybeCache(
   tmdbPath: string,
   category: ImageCategory,
@@ -132,23 +138,32 @@ export async function fetchAndMaybeCache(
     return { buffer: cached, contentType };
   }
 
-  // Fetch from TMDB
-  const remote = await fetchRemoteImage(tmdbPath, category);
-  if (!remote) return null;
+  const key = `${category}/${filename}`;
+  const inflight = inflightFetches.get(key);
+  if (inflight) return inflight;
 
-  const { buffer, contentType } = remote;
+  const fetchPromise = (async () => {
+    // Fetch from TMDB
+    const remote = await fetchRemoteImage(tmdbPath, category);
+    if (!remote) return null;
 
-  // Fire-and-forget save to disk
-  const finalPath = getLocalImagePath(category, filename);
-  const tmpPath = `${finalPath}.tmp.${Date.now()}`;
-  Bun.write(tmpPath, buffer)
-    .then(() => rename(tmpPath, finalPath))
-    .catch((err) => {
-      log.warn(`Failed to cache ${category}/${filename}:`, err);
-      unlink(tmpPath).catch(() => {});
-    });
+    const { buffer, contentType } = remote;
 
-  return { buffer, contentType };
+    // Fire-and-forget save to disk
+    const finalPath = getLocalImagePath(category, filename);
+    const tmpPath = `${finalPath}.tmp.${Date.now()}`;
+    Bun.write(tmpPath, buffer)
+      .then(() => rename(tmpPath, finalPath))
+      .catch((err) => {
+        log.warn(`Failed to cache ${category}/${filename}:`, err);
+        unlink(tmpPath).catch(() => {});
+      });
+
+    return { buffer, contentType };
+  })().finally(() => inflightFetches.delete(key));
+
+  inflightFetches.set(key, fetchPromise);
+  return fetchPromise;
 }
 
 export async function loadImageBuffer(

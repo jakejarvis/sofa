@@ -1,9 +1,19 @@
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { Hono } from "hono";
 
 import { auth } from "@sofa/auth/server";
 import { AVATAR_DIR } from "@sofa/config";
+
+const AVATAR_USER_ID = /^[A-Za-z0-9_-]{1,128}$/;
+// Keep in sync with MIME_TO_EXT in orpc/procedures/account.ts (the extensions uploads are saved with).
+const AVATAR_TYPES: Record<string, string> = {
+  jpg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  gif: "image/gif",
+};
 
 const app = new Hono();
 
@@ -15,31 +25,23 @@ app.get("/:userId", async (c) => {
   }
 
   const userId = c.req.param("userId");
-
-  // Sanitize userId to prevent path traversal
-  const safeUserId = path.basename(userId);
-  if (!safeUserId || safeUserId !== userId || safeUserId.includes("..")) {
+  if (!AVATAR_USER_ID.test(userId)) {
     return c.json({ error: "Invalid user ID" }, 400);
   }
 
-  // Find the avatar file (could be .jpg, .png, .webp, .gif)
-  const glob = new Bun.Glob(`${safeUserId}.*`);
-  const matches = await Array.fromAsync(glob.scan(AVATAR_DIR));
-  if (matches.length === 0) {
-    return c.json({ error: "Not found" }, 404);
+  for (const [ext, contentType] of Object.entries(AVATAR_TYPES)) {
+    let data: Buffer;
+    try {
+      data = await readFile(path.join(AVATAR_DIR, `${userId}.${ext}`));
+    } catch {
+      continue;
+    }
+    return new Response(new Uint8Array(data), {
+      status: 200,
+      headers: { "Content-Type": contentType, "Cache-Control": "private, no-cache" },
+    });
   }
-
-  const file = Bun.file(path.join(AVATAR_DIR, matches[0]));
-  if (!(await file.exists())) {
-    return c.json({ error: "Not found" }, 404);
-  }
-
-  return new Response(await file.arrayBuffer(), {
-    status: 200,
-    headers: {
-      "Content-Type": file.type,
-    },
-  });
+  return c.json({ error: "Not found" }, 404);
 });
 
 export default app;

@@ -96,6 +96,18 @@ describe("loadImageBuffer", () => {
     expect(result).toHaveLength(4);
   });
 
+  test("returns null when the response is not an image", async () => {
+    mockFetch(async () => {
+      return new Response("<html></html>", {
+        status: 200,
+        headers: { "content-type": "text/html" },
+      });
+    });
+
+    const result = await loadImageBuffer("/x.jpg", "posters");
+    expect(result).toBeNull();
+  });
+
   test("rejects images exceeding size limit via content-length", async () => {
     mockFetch(async () => {
       return new Response(new Uint8Array([1]), {
