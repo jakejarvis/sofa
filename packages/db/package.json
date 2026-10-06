@@ -16,6 +16,7 @@
     "format": "oxfmt --config ../../.oxfmtrc.json",
     "format:check": "oxfmt --check --config ../../.oxfmtrc.json",
     "check-types": "tsc --noEmit",
+    "test": "vitest run",
     "db:generate": "bun --bun drizzle-kit generate",
     "db:migrate": "bun --bun drizzle-kit migrate",
     "db:push": "bun --bun drizzle-kit push",
