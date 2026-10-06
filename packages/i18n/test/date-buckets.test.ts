@@ -187,4 +187,18 @@ describe("groupByDateBucket past option", () => {
     const result = groupByDateBucket([{ date: "2024-06-13" }]);
     expect(result[0].key).toBe("tomorrow");
   });
+
+  test("an explicit today overrides the real date", () => {
+    const result = groupByDateBucket([{ date: "2026-01-06" }], { today: "2026-01-05" });
+    expect(result[0].key).toBe("tomorrow");
+  });
+
+  test("an explicit locale drives month labels", () => {
+    const result = groupByDateBucket([{ date: "2026-02-20" }], {
+      today: "2026-01-05",
+      locale: "de",
+    });
+    expect(result[0].key).toBe("month_2026-02");
+    expect(result[0].label).toBe("Februar");
+  });
 });

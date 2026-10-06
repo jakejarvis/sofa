@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { LoadMoreFooter } from "@/components/ui/load-more-footer";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
+import { useLocalDay } from "@/hooks/use-local-day";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
@@ -49,7 +50,8 @@ function FilterChip({
 }
 
 export default function UpcomingScreen() {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
+  const day = useLocalDay();
   const headerTitleStyle = useResolveClassNames("font-display text-foreground text-xl");
   const tintColor = useCSSVariable("--color-primary") as string;
   const backgroundColor = useCSSVariable("--color-background") as string;
@@ -87,12 +89,14 @@ export default function UpcomingScreen() {
   const allItems = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
   const sections = useMemo(
     () =>
-      groupByDateBucket(allItems, { past: view === "recent" }).map((b) => ({
-        key: b.key,
-        title: b.label,
-        data: b.items,
-      })),
-    [allItems, view],
+      groupByDateBucket(allItems, { past: view === "recent", today: day, locale: i18n.locale }).map(
+        (b) => ({
+          key: b.key,
+          title: b.label,
+          data: b.items,
+        }),
+      ),
+    [allItems, view, day, i18n.locale],
   );
 
   const refreshUpcoming = useCallback(

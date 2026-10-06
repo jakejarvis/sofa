@@ -26,11 +26,11 @@ function getEndOfWeek(today: string): string {
   return addDays(today, 6);
 }
 
-function getMonthLabel(dateStr: string): string {
+function getMonthLabel(dateStr: string, locale: string): string {
   // Format a UTC instant in UTC: correct regardless of the formatter's default time zone
   // (the native Intl polyfill defaults to UTC; browsers use the device zone).
   const d = new Date(`${dateStr}T00:00:00Z`);
-  return new Intl.DateTimeFormat(i18n.locale, { month: "long", timeZone: "UTC" }).format(d);
+  return new Intl.DateTimeFormat(locale, { month: "long", timeZone: "UTC" }).format(d);
 }
 
 type BucketKey = "today" | "tomorrow" | "this_week" | "next_week" | string;
@@ -53,7 +53,7 @@ function getPastBucketKey(dateStr: string, today: string): BucketKey {
   return `month_${dateStr.slice(0, 7)}`;
 }
 
-function getBucketLabel(key: BucketKey): string {
+function getBucketLabel(key: BucketKey, locale: string): string {
   if (key === "today") return i18n._(msg`Today`);
   if (key === "tomorrow") return i18n._(msg`Tomorrow`);
   if (key === "yesterday") return i18n._(msg`Yesterday`);
@@ -61,17 +61,18 @@ function getBucketLabel(key: BucketKey): string {
   if (key === "this_week") return i18n._(msg`This Week`);
   if (key === "next_week") return i18n._(msg`Next Week`);
   if (key.startsWith("month_")) {
-    return getMonthLabel(`${key.slice(6)}-01`);
+    return getMonthLabel(`${key.slice(6)}-01`, locale);
   }
   return key;
 }
 
 export function groupByDateBucket<T extends { date: string }>(
   items: T[],
-  options?: { past?: boolean },
+  options?: { past?: boolean; today?: string; locale?: string },
 ): DateBucket<T>[] {
   const bucketKeyFor = options?.past ? getPastBucketKey : getBucketKey;
-  const today = getToday();
+  const today = options?.today ?? getToday();
+  const locale = options?.locale ?? i18n.locale;
   const bucketMap = new Map<string, { label: string; items: T[] }>();
   const bucketOrder: string[] = [];
 
@@ -79,7 +80,7 @@ export function groupByDateBucket<T extends { date: string }>(
     const key = bucketKeyFor(item.date, today);
     let bucket = bucketMap.get(key);
     if (!bucket) {
-      bucket = { label: getBucketLabel(key), items: [] };
+      bucket = { label: getBucketLabel(key, locale), items: [] };
       bucketMap.set(key, bucket);
       bucketOrder.push(key);
     }
