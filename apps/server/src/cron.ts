@@ -89,13 +89,14 @@ export function getJobSchedules(): {
   }));
 }
 
-/** Manually trigger a job by name. Returns false if job not found or already running. */
-export async function triggerJob(name: string): Promise<boolean> {
+/** Start a job by name without waiting for it to finish. */
+export function triggerJob(name: string): "started" | "not_found" | "busy" {
   const job = jobs.get(name);
-  if (!job) return false;
-  if (job.isBusy()) return false;
-  await job.trigger();
-  return true;
+  if (!job) return "not_found";
+  if (job.isBusy()) return "busy";
+  // The scheduled wrapper records the run and catches its errors; don't hold the request open.
+  void job.trigger();
+  return "started";
 }
 
 // Refresh titles where lastFetchedAt is stale

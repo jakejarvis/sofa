@@ -589,6 +589,10 @@ msgstr "ביטול עריכה"
 msgid "Cast"
 msgstr "שחקנים"
 
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Cast & crew"
+msgstr ""
+
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Catch up"
 msgstr "השלם צפייה"
@@ -965,6 +969,10 @@ msgstr "מסד נתונים"
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Database backups"
 msgstr "גיבויי מסד נתונים"
+
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Database maintenance"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Database restored. Reloading..."
@@ -3353,6 +3361,10 @@ msgstr "עבור ל-{name}"
 msgid "Takes effect after restarting the app"
 msgstr "ייכנס לתוקף לאחר הפעלה מחדש של האפליקציה"
 
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Telemetry"
+msgstr ""
+
 #: apps/web/src/components/titles/log-watch-dialog.tsx
 msgid "That time is in the future"
 msgstr ""
@@ -3383,6 +3395,10 @@ msgstr ""
 
 #: packages/i18n/src/errors.ts
 msgid "This import cannot be cancelled"
+msgstr ""
+
+#: packages/i18n/src/errors.ts
+msgid "This job is already running"
 msgstr ""
 
 #: apps/web/src/components/settings/import-dialog-parts.tsx

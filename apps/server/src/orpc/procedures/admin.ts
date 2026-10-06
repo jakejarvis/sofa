@@ -126,12 +126,18 @@ export const backupsUpdateSchedule = os.admin.backups.updateSchedule
 
 // ─── Jobs ─────────────────────────────────────────────────────
 
-export const triggerJob = os.admin.triggerJob.use(admin).handler(async ({ input }) => {
-  const triggered = await triggerCronJob(input.name);
-  if (!triggered) {
+export const triggerJob = os.admin.triggerJob.use(admin).handler(({ input }) => {
+  const outcome = triggerCronJob(input.name);
+  if (outcome === "not_found") {
     throw new ORPCError("NOT_FOUND", {
       message: "Job not found",
       data: { code: AppErrorCode.JOB_NOT_FOUND },
+    });
+  }
+  if (outcome === "busy") {
+    throw new ORPCError("CONFLICT", {
+      message: "Job is already running",
+      data: { code: AppErrorCode.JOB_ALREADY_RUNNING },
     });
   }
   return { ok: true as const };

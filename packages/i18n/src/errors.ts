@@ -22,6 +22,7 @@ const APP_ERROR_MESSAGES: Record<AppErrorCode, MessageDescriptor> = {
   BACKUP_DELETE_FAILED: msg`Failed to delete backup`,
   BACKUP_RESTORE_FAILED: msg`Backup restoration failed`,
   JOB_NOT_FOUND: msg`Job not found`,
+  JOB_ALREADY_RUNNING: msg`This job is already running`,
   TMDB_NOT_CONFIGURED: msg`TMDB API key is not configured`,
   IMPORT_INVALID_FILE: msg`Invalid import file`,
   IMPORT_PAYLOAD_TOO_LARGE: msg`Import payload is too large`,

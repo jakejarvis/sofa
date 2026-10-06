@@ -34,6 +34,9 @@ import { i18n } from "@sofa/i18n";
 
 const DIGITS_ONLY_RE = /^\d+$/;
 
+/** Scheduled jobs the API does not allow triggering manually. */
+const NOT_TRIGGERABLE = new Set(["optimizeDb"]);
+
 /** Convert a cron pattern to a short human-readable string */
 function cronToHuman(pattern: string): string {
   const parts = pattern.split(" ");
@@ -316,6 +319,9 @@ function BackgroundJobsCard({
     cacheImages: t`Image cache`,
     scheduledBackup: t`Backup`,
     updateCheck: t`Update check`,
+    refreshCredits: t`Cast & crew`,
+    telemetryReport: t`Telemetry`,
+    optimizeDb: t`Database maintenance`,
   };
 
   const triggerJobMutation = useMutation(
@@ -483,36 +489,38 @@ function BackgroundJobsCard({
 
                   {/* Trigger button */}
                   <TableCell className="pe-5 text-end">
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t`Trigger job`}
-                            className="size-6"
-                            disabled={isRunning || job.disabled}
-                            onClick={() =>
-                              triggerJobMutation.mutate({
-                                name: job.jobName as CronJobName,
-                              })
-                            }
-                          />
-                        }
-                      >
-                        {isRunning ? (
-                          <Spinner className="size-3" />
-                        ) : (
-                          <IconPlayerPlay
-                            aria-hidden={true}
-                            className="text-muted-foreground/70 size-3"
-                          />
-                        )}
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <Trans>Run now</Trans>
-                      </TooltipContent>
-                    </Tooltip>
+                    {!NOT_TRIGGERABLE.has(job.jobName) && (
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={t`Trigger job`}
+                              className="size-6"
+                              disabled={isRunning || job.disabled}
+                              onClick={() =>
+                                triggerJobMutation.mutate({
+                                  name: job.jobName as CronJobName,
+                                })
+                              }
+                            />
+                          }
+                        >
+                          {isRunning ? (
+                            <Spinner className="size-3" />
+                          ) : (
+                            <IconPlayerPlay
+                              aria-hidden={true}
+                              className="text-muted-foreground/70 size-3"
+                            />
+                          )}
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <Trans>Run now</Trans>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
                   </TableCell>
                 </TableRow>
               );

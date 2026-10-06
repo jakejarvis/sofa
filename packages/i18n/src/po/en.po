@@ -589,6 +589,10 @@ msgstr ""
 msgid "Cast"
 msgstr ""
 
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Cast & crew"
+msgstr "Cast & crew"
+
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Catch up"
 msgstr ""
@@ -965,6 +969,10 @@ msgstr ""
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Database backups"
 msgstr ""
+
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Database maintenance"
+msgstr "Database maintenance"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Database restored. Reloading..."
@@ -3353,6 +3361,10 @@ msgstr "Switch to {name}"
 msgid "Takes effect after restarting the app"
 msgstr "Takes effect after restarting the app"
 
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Telemetry"
+msgstr "Telemetry"
+
 #: apps/web/src/components/titles/log-watch-dialog.tsx
 msgid "That time is in the future"
 msgstr "That time is in the future"
@@ -3384,6 +3396,10 @@ msgstr "This doesn't appear to be a Sofa server. Double-check the URL."
 #: packages/i18n/src/errors.ts
 msgid "This import cannot be cancelled"
 msgstr "This import cannot be cancelled"
+
+#: packages/i18n/src/errors.ts
+msgid "This job is already running"
+msgstr "This job is already running"
 
 #: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "This may take a few minutes for large libraries. Please don't close this tab."

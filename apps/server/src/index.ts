@@ -5,6 +5,7 @@ import { cors } from "hono/cors";
 
 import { CACHE_DIR } from "@sofa/config";
 import { ensureBackupDir } from "@sofa/core/backup";
+import { recoverInterruptedCronRuns } from "@sofa/core/cron";
 import { ensureImageDirs, imageCacheEnabled } from "@sofa/core/image-cache";
 import { registerJobScheduleProvider } from "@sofa/core/system-health";
 import { closeDatabase, isDatabaseAccessBlocked } from "@sofa/db/client";
@@ -46,6 +47,12 @@ seedPlatforms();
 const recoveredJobs = recoverStaleImportJobs();
 if (recoveredJobs > 0) {
   log.warn(`Recovered ${recoveredJobs} stale import job(s) from previous shutdown`);
+}
+
+// Background job runs left "running" by a previous crash would otherwise look active forever
+const interruptedRuns = recoverInterruptedCronRuns();
+if (interruptedRuns > 0) {
+  log.warn(`Marked ${interruptedRuns} interrupted background job run(s) as failed`);
 }
 
 // Payloads of finished imports are never read again; reclaim the space (and keep backups small).

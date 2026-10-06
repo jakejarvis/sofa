@@ -8,6 +8,7 @@ import {
   getTitleIdsCheckedBefore,
   getTitleIdsWithStaleSeasons,
   insertCronRunReturning,
+  markInterruptedCronRuns,
   updateCronRunError,
   updateCronRunSuccess,
 } from "@sofa/db/queries/cron";
@@ -53,6 +54,11 @@ export function completeCronRun(runId: string, durationMs: number): void {
 export function failCronRun(runId: string, durationMs: number, error: unknown): void {
   const errorMessage = error instanceof Error ? error.message : String(error);
   updateCronRunError(runId, durationMs, errorMessage);
+}
+
+/** Mark runs left "running" by a previous process as failed. Returns how many were recovered. */
+export function recoverInterruptedCronRuns(): number {
+  return markInterruptedCronRuns();
 }
 
 export function getLibraryTitleIds(): string[] {

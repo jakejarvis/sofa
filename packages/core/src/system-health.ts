@@ -8,6 +8,7 @@ import { tmdbApiUrl } from "@sofa/tmdb/config";
 import { listBackups } from "./backup";
 import { imageCacheEnabled } from "./image-cache";
 import { getSetting } from "./settings";
+import { isTelemetryEnabled } from "./telemetry";
 import { isUpdateCheckEnabled } from "./update-check";
 
 export interface SystemHealthData {
@@ -64,6 +65,9 @@ const JOB_NAMES = [
   "cacheImages",
   "scheduledBackup",
   "updateCheck",
+  "refreshCredits",
+  "telemetryReport",
+  "optimizeDb",
 ];
 
 function getDatabaseHealth(): SystemHealthData["database"] {
@@ -168,7 +172,8 @@ function getJobsHealth(): SystemHealthData["jobs"] {
 
     const disabled =
       (jobName === "scheduledBackup" && getSetting("scheduledBackups") !== "true") ||
-      (jobName === "updateCheck" && !isUpdateCheckEnabled());
+      (jobName === "updateCheck" && !isUpdateCheckEnabled()) ||
+      (jobName === "telemetryReport" && !isTelemetryEnabled());
 
     return {
       jobName,

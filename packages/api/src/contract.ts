@@ -669,6 +669,10 @@ export const contract = {
           message: "Job not found",
           data: appErrorData(AppErrorCode.JOB_NOT_FOUND),
         },
+        CONFLICT: {
+          message: "Job is already running",
+          data: appErrorData(AppErrorCode.JOB_ALREADY_RUNNING),
+        },
       }),
     purgeMetadataCache: oc
       .route({

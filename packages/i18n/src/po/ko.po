@@ -589,6 +589,10 @@ msgstr "편집 취소"
 msgid "Cast"
 msgstr "출연진"
 
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Cast & crew"
+msgstr ""
+
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Catch up"
 msgstr "따라잡기"
@@ -965,6 +969,10 @@ msgstr "데이터베이스"
 #: apps/web/src/components/settings/backup-section.tsx
 msgid "Database backups"
 msgstr "데이터베이스 백업"
+
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Database maintenance"
+msgstr ""
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Database restored. Reloading..."
@@ -3353,6 +3361,10 @@ msgstr "{name}(으)로 전환"
 msgid "Takes effect after restarting the app"
 msgstr "앱을 다시 시작하면 적용됩니다"
 
+#: apps/web/src/components/settings/system-health-section.tsx
+msgid "Telemetry"
+msgstr ""
+
 #: apps/web/src/components/titles/log-watch-dialog.tsx
 msgid "That time is in the future"
 msgstr ""
@@ -3383,6 +3395,10 @@ msgstr ""
 
 #: packages/i18n/src/errors.ts
 msgid "This import cannot be cancelled"
+msgstr ""
+
+#: packages/i18n/src/errors.ts
+msgid "This job is already running"
 msgstr ""
 
 #: apps/web/src/components/settings/import-dialog-parts.tsx

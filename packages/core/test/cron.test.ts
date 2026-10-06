@@ -10,6 +10,7 @@ import {
   getStaleLibraryTitles,
   getTitleIdsWithStaleSeasons,
   libraryRefreshIntervalMs,
+  recoverInterruptedCronRuns,
   runIsolated,
   startCronRun,
 } from "../src/cron";
@@ -58,6 +59,26 @@ describe("failCronRun", () => {
 
     const row = testDb.select().from(cronRuns).where(eq(cronRuns.id, run.id)).get();
     expect(row?.errorMessage).toBe("string error");
+  });
+});
+
+describe("recoverInterruptedCronRuns", () => {
+  test("marks only still-running runs as interrupted errors", () => {
+    const open = startCronRun("job-a");
+    const done = startCronRun("job-b");
+    completeCronRun(done.id, 100);
+
+    expect(recoverInterruptedCronRuns()).toBe(1);
+
+    const openRow = testDb.select().from(cronRuns).where(eq(cronRuns.id, open.id)).get();
+    expect(openRow?.status).toBe("error");
+    expect(openRow?.errorMessage).toBe("Interrupted by server restart");
+    expect(openRow?.finishedAt).toBeInstanceOf(Date);
+
+    const doneRow = testDb.select().from(cronRuns).where(eq(cronRuns.id, done.id)).get();
+    expect(doneRow?.status).toBe("success");
+    expect(doneRow?.durationMs).toBe(100);
+    expect(doneRow?.errorMessage).toBeNull();
   });
 });
 

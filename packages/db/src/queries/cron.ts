@@ -25,6 +25,16 @@ export function updateCronRunError(id: string, durationMs: number, errorMessage:
     .run();
 }
 
+/** Mark runs left "running" by a previous process as errors (called once at startup). */
+export function markInterruptedCronRuns(): number {
+  return db
+    .update(cronRuns)
+    .set({ status: "error", finishedAt: new Date(), errorMessage: "Interrupted by server restart" })
+    .where(eq(cronRuns.status, "running"))
+    .returning({ id: cronRuns.id })
+    .all().length;
+}
+
 export function getLibraryTitleIds(): string[] {
   return db
     .select({ titleId: userTitleStatus.titleId })
