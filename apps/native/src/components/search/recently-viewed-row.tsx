@@ -17,7 +17,7 @@ export const RecentlyViewedRow = memo(function RecentlyViewedRow({
   const { t } = useLingui();
   const accessibilityLabel = [
     item.title,
-    item.type === "tv" ? "TV" : item.type === "movie" ? "Movie" : "Person",
+    item.type === "tv" ? t`TV` : item.type === "movie" ? t`Movie` : t`Person`,
     item.subtitle,
   ]
     .filter(Boolean)

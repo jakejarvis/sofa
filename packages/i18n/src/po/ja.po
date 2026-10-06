@@ -2094,6 +2094,7 @@ msgstr "映画"
 #: apps/native/src/app/title/[id].tsx
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
+#: apps/native/src/components/search/recently-viewed-row.tsx
 #: apps/native/src/components/search/search-result-row.tsx
 #: apps/native/src/lib/widgets.ts
 #: apps/web/src/components/explore/discover-section.tsx
@@ -2459,6 +2460,7 @@ msgid "person"
 msgstr "人物"
 
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
+#: apps/native/src/components/search/recently-viewed-row.tsx
 #: apps/native/src/components/search/search-result-row.tsx
 msgid "Person"
 msgstr "人物"
@@ -3596,6 +3598,7 @@ msgstr ""
 #: apps/native/src/app/title/[id].tsx
 #: apps/native/src/components/library/filter-sheet.tsx
 #: apps/native/src/components/search/recently-viewed-row-content.tsx
+#: apps/native/src/components/search/recently-viewed-row.tsx
 #: apps/native/src/components/search/search-result-row.tsx
 #: apps/native/src/lib/widgets.ts
 #: apps/web/src/components/explore/discover-section.tsx
