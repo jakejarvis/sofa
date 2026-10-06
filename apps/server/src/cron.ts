@@ -15,6 +15,7 @@ import {
   getTitleByIdForCron,
   getTitleIdsCheckedBefore,
   getTitleIdsWithStaleSeasons,
+  markTitleRefreshAttempted,
   runIsolated,
   startCronRun,
 } from "@sofa/core/cron";
@@ -118,9 +119,7 @@ async function nightlyRefreshLibrary() {
   );
 
   // Non-library titles: 30 days
-  const nonLibraryIds = getStaleNonLibraryTitlesForRefresh(nonLibraryStale, 50)
-    .map((t) => t.id)
-    .filter((id) => !libraryIds.includes(id));
+  const nonLibraryIds = getStaleNonLibraryTitlesForRefresh(nonLibraryStale, 50).map((t) => t.id);
 
   await runIsolated(
     nonLibraryIds,
@@ -128,7 +127,10 @@ async function nightlyRefreshLibrary() {
       await refreshTitle(id);
       await Bun.sleep(RATE_LIMIT_MS);
     },
-    (id, err) => log.warn(`Failed to refresh title ${id}:`, err),
+    (id, err) => {
+      log.warn(`Failed to refresh title ${id}:`, err);
+      markTitleRefreshAttempted(id);
+    },
   );
 }
 

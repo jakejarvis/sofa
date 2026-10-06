@@ -1,15 +1,17 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { cronRuns, seasons, titles } from "@sofa/db/schema";
-import { clearAllTables, eq, insertTitle, testDb } from "@sofa/test/db";
+import { clearAllTables, eq, insertStatus, insertTitle, insertUser, testDb } from "@sofa/test/db";
 
 import {
   completeCronRun,
   failCronRun,
   getLibraryTitlesDueForRefresh,
   getStaleLibraryTitles,
+  getStaleNonLibraryTitlesForRefresh,
   getTitleIdsWithStaleSeasons,
   libraryRefreshIntervalMs,
+  markTitleRefreshAttempted,
   recoverInterruptedCronRuns,
   runIsolated,
   startCronRun,
@@ -245,5 +247,55 @@ describe("getTitleIdsWithStaleSeasons", () => {
     addSeason("s-3", "tv-old", 1, 30);
     addSeason("s-4", "tv-old", 2, 30);
     expect(getTitleIdsWithStaleSeasons(["tv-old"], cutoff).has("tv-old")).toBe(true);
+  });
+});
+
+describe("getStaleNonLibraryTitlesForRefresh", () => {
+  const staleDate = new Date("2026-01-08T00:00:00Z");
+
+  function setFetched(id: string, date: Date) {
+    testDb.update(titles).set({ lastFetchedAt: date }).where(eq(titles.id, id)).run();
+  }
+
+  test("excludes titles in a user's library", () => {
+    insertUser();
+    insertTitle({ id: "t-lib", tmdbId: 1 });
+    insertTitle({ id: "t-free", tmdbId: 2 });
+    setFetched("t-lib", new Date("2025-12-01T00:00:00Z"));
+    setFetched("t-free", new Date("2025-12-02T00:00:00Z"));
+    insertStatus("user-1", "t-lib", "watchlist");
+
+    expect(getStaleNonLibraryTitlesForRefresh(staleDate, 10).map((t) => t.id)).toEqual(["t-free"]);
+  });
+
+  test("returns the oldest titles first within the limit", () => {
+    insertTitle({ id: "t-a", tmdbId: 1 });
+    insertTitle({ id: "t-b", tmdbId: 2 });
+    insertTitle({ id: "t-c", tmdbId: 3 });
+    setFetched("t-a", new Date("2025-12-03T00:00:00Z"));
+    setFetched("t-b", new Date("2025-12-01T00:00:00Z"));
+    setFetched("t-c", new Date("2025-12-02T00:00:00Z"));
+
+    expect(getStaleNonLibraryTitlesForRefresh(staleDate, 2).map((t) => t.id)).toEqual([
+      "t-b",
+      "t-c",
+    ]);
+  });
+
+  test("does not return shell titles with NULL lastFetchedAt", () => {
+    insertTitle({ id: "t-shell", tmdbId: 1 });
+
+    expect(getStaleNonLibraryTitlesForRefresh(staleDate, 10)).toEqual([]);
+  });
+
+  test("markTitleRefreshAttempted moves a title out of the stale window", () => {
+    insertTitle({ id: "t-old", tmdbId: 1 });
+    insertTitle({ id: "t-other", tmdbId: 2 });
+    setFetched("t-old", new Date("2025-12-01T00:00:00Z"));
+    setFetched("t-other", new Date("2025-12-02T00:00:00Z"));
+
+    markTitleRefreshAttempted("t-old");
+
+    expect(getStaleNonLibraryTitlesForRefresh(staleDate, 10).map((t) => t.id)).toEqual(["t-other"]);
   });
 });

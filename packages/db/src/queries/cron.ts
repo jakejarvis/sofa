@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, isNull, lt, notExists, or, sql } from "drizzle-orm";
 
 import { db } from "../client";
 import { cronRuns, seasons, titles, userTitleStatus } from "../schema";
@@ -62,9 +62,26 @@ export function getStaleNonLibraryTitles(staleDate: Date, limit: number) {
   return db
     .select({ id: titles.id })
     .from(titles)
-    .where(and(isNotNull(titles.lastFetchedAt), lt(titles.lastFetchedAt, staleDate)))
+    .where(
+      and(
+        isNotNull(titles.lastFetchedAt),
+        lt(titles.lastFetchedAt, staleDate),
+        notExists(
+          db
+            .select({ one: sql`1` })
+            .from(userTitleStatus)
+            .where(eq(userTitleStatus.titleId, titles.id)),
+        ),
+      ),
+    )
+    .orderBy(asc(titles.lastFetchedAt))
     .limit(limit)
     .all();
+}
+
+/** Record a refresh attempt so a title that keeps failing doesn't stay at the front of the queue. */
+export function markTitleRefreshAttempted(titleId: string, at: Date = new Date()): void {
+  db.update(titles).set({ lastFetchedAt: at }).where(eq(titles.id, titleId)).run();
 }
 
 export function getReturningTvShows() {

@@ -9,6 +9,7 @@ import {
   getTitleIdsWithStaleSeasons,
   insertCronRunReturning,
   markInterruptedCronRuns,
+  markTitleRefreshAttempted as queryMarkTitleRefreshAttempted,
   updateCronRunError,
   updateCronRunSuccess,
 } from "@sofa/db/queries/cron";
@@ -109,6 +110,10 @@ export function getStoredSeasonNumbers(titleId: string): number[] {
 
 export function getStaleNonLibraryTitlesForRefresh(staleDate: Date, limit: number) {
   return getStaleNonLibraryTitles(staleDate, limit);
+}
+
+export function markTitleRefreshAttempted(titleId: string, at: Date = new Date()): void {
+  queryMarkTitleRefreshAttempted(titleId, at);
 }
 
 export {
