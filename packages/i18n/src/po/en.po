@@ -2379,6 +2379,10 @@ msgstr ""
 msgid "Open registration"
 msgstr ""
 
+#: apps/native/src/lib/widgets.ts
+msgid "Open Sofa to see what's next"
+msgstr "Open Sofa to see what's next"
+
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Open Sonarr, go to <0>Settings > Import Lists</0>"
 msgstr ""

@@ -2379,6 +2379,10 @@ msgstr "打开 Radarr，前往 Settings > Import Lists"
 msgid "Open registration"
 msgstr "开放注册"
 
+#: apps/native/src/lib/widgets.ts
+msgid "Open Sofa to see what's next"
+msgstr ""
+
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Open Sonarr, go to <0>Settings > Import Lists</0>"
 msgstr "打开 Sonarr，前往 <0>Settings > Import Lists</0>"

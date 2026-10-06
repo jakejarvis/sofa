@@ -2379,6 +2379,10 @@ msgstr "Radarrを開き、設定 > インポートリストに移動する"
 msgid "Open registration"
 msgstr "公開登録"
 
+#: apps/native/src/lib/widgets.ts
+msgid "Open Sofa to see what's next"
+msgstr ""
+
 #: apps/web/src/components/settings/integration-configs.tsx
 msgid "Open Sonarr, go to <0>Settings > Import Lists</0>"
 msgstr "Sonarrを開き、<0>設定 > インポートリスト</0>に移動する"

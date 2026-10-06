@@ -209,7 +209,10 @@ function emptyContinueWatchingProps(iconFilePath: string): ContinueWatchingProps
   });
 }
 
-function emptyUpcomingProps(iconFilePath: string): UpcomingProps {
+function emptyUpcomingProps(
+  iconFilePath: string,
+  emptyLabel = i18n._(msg`Nothing upcoming`),
+): UpcomingProps {
   return sanitizeProps<UpcomingProps>({
     iconFilePath,
     titleId: "",
@@ -217,7 +220,7 @@ function emptyUpcomingProps(iconFilePath: string): UpcomingProps {
     imageFilePath: "",
     dateLabel: "",
     episodeLabel: "",
-    emptyLabel: i18n._(msg`Nothing upcoming`),
+    emptyLabel,
   });
 }
 
@@ -276,7 +279,10 @@ function enqueue(task: () => Promise<void>): Promise<void> {
 /** Replace widget content with empty states and delete cached artwork (sign-out / server change). */
 export function resetWidgets(): Promise<void> {
   if (Platform.OS !== "ios") return Promise.resolve();
-  return enqueue(runReset);
+  const run = enqueue(runReset);
+  // A refresh requested after this reset must run after it, not merge into one queued before it.
+  pendingRefresh = null;
+  return run;
 }
 
 export function refreshWidgets(): Promise<void> {
@@ -353,7 +359,7 @@ async function refreshUpcoming(
   iconFilePath: string,
 ): Promise<boolean> {
   try {
-    const { items } = await client.library.upcoming({
+    const { items, nextCursor } = await client.library.upcoming({
       days: UPCOMING_DAYS,
       limit: 5,
     });
@@ -363,6 +369,9 @@ async function refreshUpcoming(
       widget.updateSnapshot(emptyUpcomingProps(iconFilePath));
       return true;
     }
+
+    // The list is capped, so running out of fetched items doesn't mean nothing is upcoming.
+    const terminalLabel = nextCursor ? i18n._(msg`Open Sofa to see what's next`) : undefined;
 
     const refreshToken = nextRefreshToken("up");
 
@@ -399,7 +408,7 @@ async function refreshUpcoming(
               episodeLabel: upcomingEpisodeLabel(item),
               emptyLabel: "",
             })
-          : emptyUpcomingProps(iconFilePath),
+          : emptyUpcomingProps(iconFilePath, terminalLabel),
       })),
     );
 

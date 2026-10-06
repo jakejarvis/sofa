@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 const CACHED_WIDGET_IMAGE_RE = /^file:\/\/\/group\/cw_/;
-type LibraryResult = { items: Array<Record<string, unknown>> };
+type LibraryResult = { items: Array<Record<string, unknown>>; nextCursor?: string | null };
 type SnapshotProps = Record<string, unknown>;
 type TimelineEntry = { date?: Date; props?: Record<string, unknown> };
 
@@ -373,6 +373,7 @@ describe("refreshWidgets", () => {
           backdropPath: "/c.jpg",
         },
       ],
+      nextCursor: null,
     });
 
     const { refreshWidgets } = await loadWidgetsModule();
@@ -411,6 +412,87 @@ describe("refreshWidgets", () => {
     const last = entries[6]?.props;
     expect(last?.titleName).toBe("");
     expect(last?.emptyLabel).toBe("Nothing upcoming");
+    expect(entries[6]?.date).toEqual(new Date(2026, 3, 11));
+
+    // Each item's artwork is downloaded once, however many entries show it.
+    expect(downloadWidgetImage).toHaveBeenCalledTimes(3);
+    expect(entries[1]?.props?.imageFilePath).toBe(entries[2]?.props?.imageFilePath);
+    expect(upcomingWidget.updateSnapshot).not.toHaveBeenCalled();
+  });
+
+  test("writes an Upcoming timeline that ends with an open-the-app prompt when the list was truncated", async () => {
+    // Local time, so the Today/Tomorrow boundaries don't depend on the machine's timezone.
+    vi.setSystemTime(new Date(2026, 2, 24, 12));
+    upcoming.mockResolvedValue({
+      items: [
+        {
+          titleId: "movie-1",
+          titleName: "A Movie",
+          titleType: "movie",
+          date: "2026-03-24",
+          episodeCount: 1,
+          backdropPath: "/a.jpg",
+        },
+        {
+          titleId: "show-1",
+          titleName: "A Show",
+          titleType: "tv",
+          date: "2026-03-26",
+          seasonNumber: 2,
+          episodeNumber: 1,
+          episodeCount: 8,
+          backdropPath: "/b.jpg",
+        },
+        {
+          titleId: "show-2",
+          titleName: "Another Show",
+          titleType: "tv",
+          date: "2026-04-10",
+          seasonNumber: 1,
+          episodeNumber: 4,
+          episodeCount: 1,
+          backdropPath: "/c.jpg",
+        },
+      ],
+      nextCursor: "more",
+    });
+
+    const { refreshWidgets } = await loadWidgetsModule();
+    await refreshWidgets();
+
+    const entries = upcomingWidget.updateTimeline.mock.calls[0]?.[0];
+    expect(entries).toHaveLength(7);
+    expect(entries.map((entry) => entry.props?.dateLabel)).toEqual([
+      "Today",
+      "Tomorrow",
+      "Today",
+      "Apr 10",
+      "Tomorrow",
+      "Today",
+      "",
+    ]);
+    expect(entries.map((entry) => entry.props?.titleId)).toEqual([
+      "movie-1",
+      "show-1",
+      "show-1",
+      "show-2",
+      "show-2",
+      "show-2",
+      "",
+    ]);
+    expect(entries.map((entry) => entry.props?.episodeLabel)).toEqual([
+      "Movie",
+      "S2 · 8 episodes",
+      "S2 · 8 episodes",
+      "S1 E4",
+      "S1 E4",
+      "S1 E4",
+      "",
+    ]);
+
+    const last = entries[6]?.props;
+    expect(last?.titleName).toBe("");
+    expect(last?.emptyLabel).toBe("Open Sofa to see what's next");
     expect(entries[6]?.date).toEqual(new Date(2026, 3, 11));
 
     // Each item's artwork is downloaded once, however many entries show it.
@@ -496,6 +578,27 @@ describe("widget refresh ordering", () => {
     expect(continueWatchingWidget.updateSnapshot).toHaveBeenLastCalledWith(
       expect.objectContaining({ titleName: "" }),
     );
+  });
+
+  test("a refresh requested after a reset runs after it, not merged into one queued before it", async () => {
+    const pending = deferred<LibraryResult>();
+    continueWatching.mockReturnValueOnce(pending.promise);
+    continueWatching.mockResolvedValue({ items: [watchingItem] });
+
+    const { refreshWidgets, resetWidgets } = await loadWidgetsModule();
+    const a = refreshWidgets();
+    await vi.waitFor(() => expect(continueWatching).toHaveBeenCalledTimes(1));
+    const b = refreshWidgets();
+    const reset = resetWidgets();
+    const c = refreshWidgets();
+    expect(c).not.toBe(b);
+
+    pending.resolve({ items: [watchingItem] });
+    await Promise.all([a, b, reset, c]);
+
+    expect(continueWatching).toHaveBeenCalledTimes(3);
+    const lastTimeline = continueWatchingWidget.updateTimeline.mock.invocationCallOrder.at(-1)!;
+    expect(lastTimeline).toBeGreaterThan(clearWidgetImages.mock.invocationCallOrder[0]!);
   });
 
   test("refresh requests made while one is waiting share it", async () => {
