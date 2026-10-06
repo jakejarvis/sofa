@@ -41,12 +41,20 @@ export function invalidateTitleQueries(): Promise<unknown> {
 export const titleActions = {
   async addToWatchlist(id: string, titleName?: string) {
     try {
-      await client.tracking.updateStatus({ id, status: "watchlist" });
-      toast.success(
-        titleName
-          ? i18n._(msg`Added "${titleName}" to watchlist`)
-          : i18n._(msg`Added to watchlist`),
-      );
+      const result = await client.tracking.updateStatus({ id, status: "watchlist" });
+      if (result.alreadyAdded) {
+        toast.info(
+          titleName
+            ? i18n._(msg`"${titleName}" is already in your library`)
+            : i18n._(msg`Already in your library`),
+        );
+      } else {
+        toast.success(
+          titleName
+            ? i18n._(msg`Added "${titleName}" to watchlist`)
+            : i18n._(msg`Added to watchlist`),
+        );
+      }
       invalidateTitleQueries();
     } catch {
       toast.error(i18n._(msg`Failed to add to watchlist`));

@@ -70,7 +70,9 @@ export default function ExploreScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View className="gap-8">
-        {heroItem && <HeroBanner item={heroItem} />}
+        {heroItem && (
+          <HeroBanner item={{ ...heroItem, userStatus: trendingStatuses[heroItem.id] ?? null }} />
+        )}
 
         <Animated.View entering={FadeInDown.duration(300).delay(100)}>
           <FilterableTitleRow

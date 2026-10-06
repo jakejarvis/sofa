@@ -26,6 +26,10 @@ msgstr ""
 msgid "...and {remainingErrors} more"
 msgstr "...e altri {remainingErrors}"
 
+#: apps/native/src/lib/title-actions.ts
+msgid "\"{titleName}\" is already in your library"
+msgstr ""
+
 #. placeholder {0}: systemHealth.data.imageCache.imageCount
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "{0, plural, one {# image} other {# images}}"
@@ -406,6 +410,11 @@ msgstr "Hai già un account?"
 #: apps/native/src/app/(auth)/register.tsx
 msgid "Already have an account? Sign in"
 msgstr "Hai già un account? Accedi"
+
+#: apps/native/src/hooks/use-title-actions.ts
+#: apps/native/src/lib/title-actions.ts
+msgid "Already in your library"
+msgstr ""
 
 #: apps/web/src/components/titles/title-availability.tsx
 msgid "Also available on"

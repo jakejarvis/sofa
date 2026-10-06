@@ -44,7 +44,11 @@ export function useTitleActions(options?: UseTitleActionsOptions) {
 
   const updateStatus = useMutation(
     orpc.tracking.updateStatus.mutationOptions({
-      onSuccess: (_data, input) => {
+      onSuccess: (data, input) => {
+        if (input.status === "watchlist" && data?.alreadyAdded) {
+          toast.info(t`Already in your library`);
+          return invalidateTitleQueries();
+        }
         const statusMessages: Record<string, string> = {
           watchlist: t`Added to watchlist`,
         };

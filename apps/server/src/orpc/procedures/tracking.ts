@@ -90,7 +90,7 @@ export const updateStatus = os.tracking.updateStatus
   .handler(async ({ input, context }) => {
     if (input.status === null) {
       removeTitleStatus(context.user.id, input.id);
-      return;
+      return { alreadyAdded: false };
     }
 
     // Auto-import from TMDB if the title is a shell (absorbs quickAdd logic)
@@ -106,6 +106,8 @@ export const updateStatus = os.tracking.updateStatus
         log.warn(`Failed to import ${result.type} TMDB ${result.tmdbId}:`, err);
       });
     }
+
+    return { alreadyAdded: result.alreadyAdded };
   });
 
 export const rate = os.tracking.rate.use(authed).handler(({ input, context }) => {

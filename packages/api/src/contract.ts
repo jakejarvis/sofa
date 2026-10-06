@@ -146,7 +146,13 @@ export const contract = {
           "Set the user's tracking status for a title. Use null to remove the title from the library entirely.",
       })
       .input(UpdateStatusInput)
-      .output(z.void())
+      .output(
+        z.object({
+          alreadyAdded: z
+            .boolean()
+            .describe("True when the title was already in the library, so nothing changed"),
+        }),
+      )
       .errors({
         NOT_FOUND: {
           message: "Title not found",

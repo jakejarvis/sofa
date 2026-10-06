@@ -21,6 +21,7 @@ export interface HeroBannerItem {
   overview?: string | null;
   voteAverage?: number | null;
   releaseDate?: string | null;
+  userStatus?: string | null;
 }
 
 export function HeroBanner({ item }: { item: HeroBannerItem }) {
@@ -127,13 +128,15 @@ export function HeroBanner({ item }: { item: HeroBannerItem }) {
             </Pressable>
           </Link.Trigger>
           <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction
-              title={t`Add to Watchlist`}
-              icon="bookmark"
-              onPress={() => titleActions.addToWatchlist(item.id, item.title)}
-            />
-          </Link.Menu>
+          {!item.userStatus && (
+            <Link.Menu>
+              <Link.MenuAction
+                title={t`Add to Watchlist`}
+                icon="bookmark"
+                onPress={() => titleActions.addToWatchlist(item.id, item.title)}
+              />
+            </Link.Menu>
+          )}
         </Link>
       </Animated.View>
     </GestureDetector>

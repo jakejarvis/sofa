@@ -1983,7 +1983,23 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "alreadyAdded": {
+                      "type": "boolean",
+                      "description": "True when the title was already in the library, so nothing changed"
+                    }
+                  },
+                  "required": [
+                    "alreadyAdded"
+                  ]
+                }
+              }
+            }
           },
           "404": {
             "description": "404",
