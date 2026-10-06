@@ -15,6 +15,13 @@ function normalizeErrors(errors: unknown[]): Array<{ message?: string }> {
   return errors.map((e) => (typeof e === "string" ? { message: e } : (e as { message?: string })));
 }
 
+export function formatFieldErrors(errors: unknown[]): string {
+  return normalizeErrors(errors)
+    .map((e) => e.message ?? "")
+    .filter(Boolean)
+    .join(", ");
+}
+
 function TextField({
   label,
   description,

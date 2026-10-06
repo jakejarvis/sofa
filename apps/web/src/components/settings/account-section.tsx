@@ -47,8 +47,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useResetUserState } from "@/hooks/use-reset-user-state";
 import { authClient, signOut } from "@/lib/auth/client";
-import { getErrorMessage } from "@/lib/error-messages";
+import { getAuthErrorMessage, getErrorMessage } from "@/lib/error-messages";
 import { useAppForm } from "@/lib/form";
+import { formatFieldErrors } from "@/lib/form/fields";
 import { orpc } from "@/lib/orpc/client";
 import type { NormalizedImport } from "@sofa/api/schemas";
 import { formatDate } from "@sofa/i18n/format";
@@ -611,7 +612,7 @@ function ChangePasswordDialog() {
           revokeOtherSessions: value.revokeOtherSessions,
         });
         if (result.error) {
-          setError(t`Failed to change password`);
+          setError(getAuthErrorMessage(result.error, t`Failed to change password`));
           return;
         }
         toast.success(t`Password updated`);
@@ -677,9 +678,7 @@ function ChangePasswordDialog() {
                 />
                 {field.state.meta.errors.length > 0 && (
                   <p className="text-destructive text-xs">
-                    {field.state.meta.errors
-                      .map((e) => (typeof e === "string" ? e : ""))
-                      .join(", ")}
+                    {formatFieldErrors(field.state.meta.errors)}
                   </p>
                 )}
               </div>
@@ -703,9 +702,7 @@ function ChangePasswordDialog() {
                 />
                 {field.state.meta.errors.length > 0 && (
                   <p className="text-destructive text-xs">
-                    {field.state.meta.errors
-                      .map((e) => (typeof e === "string" ? e : ""))
-                      .join(", ")}
+                    {formatFieldErrors(field.state.meta.errors)}
                   </p>
                 )}
               </div>
@@ -729,9 +726,7 @@ function ChangePasswordDialog() {
                 />
                 {field.state.meta.errors.length > 0 && (
                   <p className="text-destructive text-xs">
-                    {field.state.meta.errors
-                      .map((e) => (typeof e === "string" ? e : ""))
-                      .join(", ")}
+                    {formatFieldErrors(field.state.meta.errors)}
                   </p>
                 )}
               </div>

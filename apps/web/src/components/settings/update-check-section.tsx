@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconWorldUpload } from "@tabler/icons-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useOptimistic, useState, useTransition } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
@@ -12,9 +12,9 @@ import { orpc } from "@/lib/orpc/client";
 export function UpdateCheckSection() {
   const { t } = useLingui();
   const { data, isPending: isLoading } = useQuery(orpc.admin.settings.get.queryOptions());
-  const [localEnabled, setLocalEnabled] = useState<boolean | null>(null);
-  const currentEnabled = localEnabled ?? data?.updateCheck.enabled ?? true;
+  const currentEnabled = data?.updateCheck.enabled ?? true;
   const [optimisticEnabled, setOptimisticEnabled] = useOptimistic(currentEnabled);
+  const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
   const toggleMutation = useMutation(orpc.admin.settings.update.mutationOptions());
 
@@ -31,7 +31,7 @@ export function UpdateCheckSection() {
       setOptimisticEnabled(checked);
       try {
         await toggleMutation.mutateAsync({ updateCheck: { enabled: checked } });
-        setLocalEnabled(checked);
+        await queryClient.invalidateQueries({ queryKey: orpc.admin.settings.get.key() });
         toast.success(checked ? t`Update checks enabled` : t`Update checks disabled`);
       } catch {
         toast.error(t`Failed to update setting`);

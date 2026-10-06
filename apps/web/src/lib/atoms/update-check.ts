@@ -4,4 +4,5 @@ export const updateToastDismissedVersionAtom = atomWithStorage<string | null>(
   "sofa:update-toast-dismissed-version",
   null,
   createJSONStorage(() => sessionStorage),
+  { getOnInit: true },
 );

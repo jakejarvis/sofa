@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconDoorEnter } from "@tabler/icons-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useOptimistic, useState, useTransition } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
@@ -12,9 +12,9 @@ import { orpc } from "@/lib/orpc/client";
 export function RegistrationSection() {
   const { t } = useLingui();
   const { data, isPending: isLoading } = useQuery(orpc.admin.settings.get.queryOptions());
-  const [registrationOpen, setRegistrationOpen] = useState<boolean | null>(null);
-  const currentOpen = registrationOpen ?? data?.registration.open ?? false;
+  const currentOpen = data?.registration.open ?? false;
   const [optimisticOpen, setOptimisticOpen] = useOptimistic(currentOpen);
+  const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
   const toggleMutation = useMutation(orpc.admin.settings.update.mutationOptions());
 
@@ -31,7 +31,7 @@ export function RegistrationSection() {
       setOptimisticOpen(checked);
       try {
         await toggleMutation.mutateAsync({ registration: { open: checked } });
-        setRegistrationOpen(checked);
+        await queryClient.invalidateQueries({ queryKey: orpc.admin.settings.get.key() });
         toast.success(checked ? t`Registration opened` : t`Registration closed`);
       } catch {
         toast.error(t`Failed to update registration setting`);
