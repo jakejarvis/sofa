@@ -1,5 +1,6 @@
 import { FlashList } from "@shopify/flash-list";
 import { useCallback } from "react";
+import { View } from "react-native";
 
 import {
   HorizontalListSeparator,
@@ -7,6 +8,7 @@ import {
   horizontalListStyle,
 } from "@/components/ui/horizontal-list-spacing";
 import { PosterCard, PosterCardSkeleton } from "@/components/ui/poster-card";
+import { Spinner } from "@/components/ui/spinner";
 import { useTitleActions } from "@/hooks/use-title-actions";
 
 export interface PosterRowItem {
@@ -25,9 +27,14 @@ export interface PosterRowItem {
 export function HorizontalPosterRow({
   items,
   isLoading,
+  onEndReached,
+  isFetchingNextPage,
 }: {
   items: PosterRowItem[];
   isLoading?: boolean;
+  /** Called when the user scrolls near the end of the row (load more). */
+  onEndReached?: () => void;
+  isFetchingNextPage?: boolean;
 }) {
   const { updateStatus } = useTitleActions();
   const handleQuickAdd = useCallback(
@@ -55,6 +62,16 @@ export function HorizontalPosterRow({
     [addingKey, handleQuickAdd],
   );
 
+  const footer = useCallback(
+    () =>
+      isFetchingNextPage ? (
+        <View className="h-full items-center justify-center px-4">
+          <Spinner size="sm" />
+        </View>
+      ) : null,
+    [isFetchingNextPage],
+  );
+
   if (isLoading) {
     return (
       <FlashList
@@ -77,6 +94,9 @@ export function HorizontalPosterRow({
       data={items}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
+      onEndReached={onEndReached}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={footer}
       ItemSeparatorComponent={HorizontalListSeparator}
       contentContainerStyle={horizontalListContentStyle}
       style={horizontalListStyle}

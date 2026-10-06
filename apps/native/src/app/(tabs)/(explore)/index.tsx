@@ -8,6 +8,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { FilterableTitleRow } from "@/components/explore/filterable-title-row";
 import { HeroBanner } from "@/components/explore/hero-banner";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import { dedupeById } from "@/lib/dedupe-by-id";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 
@@ -40,7 +41,7 @@ export default function ExploreScreen() {
   const heroItem = trending.data?.pages[0]?.hero ?? null;
 
   const trendingItems = useMemo(
-    () => trending.data?.pages.flatMap((p) => p.items) ?? [],
+    () => dedupeById(trending.data?.pages.flatMap((p) => p.items) ?? []),
     [trending.data?.pages],
   );
   const trendingStatuses = useMemo(
@@ -82,6 +83,16 @@ export default function ExploreScreen() {
             isLoading={trending.isPending}
             isError={trending.isError}
             onRetry={() => void trending.refetch()}
+            onEndReachedDefault={() => {
+              if (
+                trending.hasNextPage &&
+                !trending.isFetchingNextPage &&
+                !trending.isFetchNextPageError
+              ) {
+                void trending.fetchNextPage();
+              }
+            }}
+            isFetchingNextPageDefault={trending.isFetchingNextPage}
           />
         </Animated.View>
 

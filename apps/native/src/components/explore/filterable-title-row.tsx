@@ -11,6 +11,7 @@ import {
 import { GenreChip } from "@/components/explore/genre-chip";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Text } from "@/components/ui/text";
+import { dedupeById } from "@/lib/dedupe-by-id";
 import { orpc } from "@/lib/orpc";
 
 type TitleStatus = "in_watchlist" | "watching" | "caught_up" | "completed";
@@ -39,6 +40,8 @@ export function FilterableTitleRow({
   isLoading,
   isError,
   onRetry,
+  onEndReachedDefault,
+  isFetchingNextPageDefault,
 }: {
   title: string;
   icon: Icon;
@@ -61,6 +64,9 @@ export function FilterableTitleRow({
   isError?: boolean;
   /** Retries the default (no genre) list. */
   onRetry?: () => void;
+  /** Loads the next page of the default (no genre) list. */
+  onEndReachedDefault?: () => void;
+  isFetchingNextPageDefault?: boolean;
 }) {
   const { t } = useLingui();
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
@@ -82,7 +88,7 @@ export function FilterableTitleRow({
   });
 
   const discoverItems = useMemo(
-    () => discover.data?.pages.flatMap((p) => p.items) ?? [],
+    () => dedupeById(discover.data?.pages.flatMap((p) => p.items) ?? []),
     [discover.data?.pages],
   );
   const discoverStatuses = useMemo(
@@ -158,7 +164,26 @@ export function FilterableTitleRow({
           </Text>
         </View>
       ) : (
-        <HorizontalPosterRow items={items} isLoading={showLoading} />
+        <HorizontalPosterRow
+          items={items}
+          isLoading={showLoading}
+          onEndReached={
+            selectedGenre === null
+              ? onEndReachedDefault
+              : () => {
+                  if (
+                    discover.hasNextPage &&
+                    !discover.isFetchingNextPage &&
+                    !discover.isFetchNextPageError
+                  ) {
+                    void discover.fetchNextPage();
+                  }
+                }
+          }
+          isFetchingNextPage={
+            selectedGenre === null ? isFetchingNextPageDefault : discover.isFetchingNextPage
+          }
+        />
       )}
     </View>
   );
