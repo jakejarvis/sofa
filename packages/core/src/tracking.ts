@@ -4,9 +4,12 @@ import {
   batchInsertEpisodeWatchesTransaction,
   batchInsertMissingEpisodeWatches,
   countDistinctEpisodeWatches,
+  countMovieWatches,
   deleteAllEpisodeWatchesForTitle,
   deleteEpisodeWatch,
+  deleteEpisodeWatchById,
   deleteEpisodeWatches,
+  deleteMovieWatchById,
   deleteMovieWatches,
   deleteRating,
   deleteTitleStatus,
@@ -124,12 +127,8 @@ export function markAllEpisodesWatched(
   setTitleStatus(userId, titleId, "in_progress", source);
 }
 
-export function unwatchEpisode(userId: string, episodeId: string) {
-  deleteEpisodeWatch(userId, episodeId);
-
-  const titleId = getEpisodeTitleId(episodeId);
-  if (!titleId) return;
-
+/** After removing episode watches: an in-progress show with none left goes back to watchlist. */
+function downgradeShowIfNoEpisodeWatches(userId: string, titleId: string) {
   const existing = getTitleStatus(userId, titleId);
   if (!existing || existing.status !== "in_progress") return;
 
@@ -141,6 +140,23 @@ export function unwatchEpisode(userId: string, episodeId: string) {
   }
 }
 
+/** After removing all movie watches: a tracked movie falls back to watchlist. */
+function resetMovieToWatchlist(userId: string, titleId: string) {
+  const existing = getTitleStatus(userId, titleId);
+  if (existing && existing.status !== "watchlist") {
+    setTitleStatus(userId, titleId, "watchlist");
+  }
+}
+
+export function unwatchEpisode(userId: string, episodeId: string) {
+  deleteEpisodeWatch(userId, episodeId);
+
+  const titleId = getEpisodeTitleId(episodeId);
+  if (!titleId) return;
+
+  downgradeShowIfNoEpisodeWatches(userId, titleId);
+}
+
 export function unwatchSeason(userId: string, seasonId: string) {
   const epIds = getSeasonEpisodeIds(seasonId);
   if (epIds.length > 0) {
@@ -150,24 +166,49 @@ export function unwatchSeason(userId: string, seasonId: string) {
   const season = getSeasonById(seasonId);
   if (!season) return;
 
-  const existing = getTitleStatus(userId, season.titleId);
-  if (!existing || existing.status !== "in_progress") return;
-
-  // If no episodes remain watched, downgrade to watchlist
-  const allEpIds = getAllEpisodeIdsForTitle(season.titleId);
-  const watchCount = countDistinctEpisodeWatches(userId, allEpIds);
-  if (watchCount === 0) {
-    setTitleStatus(userId, season.titleId, "watchlist");
-  }
+  downgradeShowIfNoEpisodeWatches(userId, season.titleId);
 }
 
 export function unwatchMovie(userId: string, titleId: string) {
   deleteMovieWatches(userId, titleId);
+  resetMovieToWatchlist(userId, titleId);
+}
 
-  const existing = getTitleStatus(userId, titleId);
-  if (existing && existing.status !== "watchlist") {
-    setTitleStatus(userId, titleId, "watchlist");
+/** Remove a single watch owned by the user. Returns false if it doesn't exist or isn't theirs. */
+export function deleteWatch(userId: string, kind: "movie" | "episode", watchId: string): boolean {
+  if (kind === "movie") {
+    const deleted = deleteMovieWatchById(userId, watchId);
+    if (!deleted) return false;
+    if (countMovieWatches(userId, deleted.titleId) === 0) {
+      resetMovieToWatchlist(userId, deleted.titleId);
+    }
+    return true;
   }
+
+  const deleted = deleteEpisodeWatchById(userId, watchId);
+  if (!deleted) return false;
+  const titleId = getEpisodeTitleId(deleted.episodeId);
+  if (titleId) downgradeShowIfNoEpisodeWatches(userId, titleId);
+  return true;
+}
+
+/** Log a manual watch at a given time. `id` is a movie title id or an episode id. */
+export function logWatchAt(
+  userId: string,
+  kind: "movie" | "episode",
+  id: string,
+  watchedAt: Date,
+): "ok" | "not_found" {
+  if (kind === "movie") {
+    const title = getTitleById(id);
+    if (!title || title.type !== "movie") return "not_found";
+    logMovieWatch(userId, id, "manual", watchedAt);
+    return "ok";
+  }
+
+  if (!getEpisodeTitleId(id)) return "not_found";
+  logEpisodeWatch(userId, id, "manual", watchedAt);
+  return "ok";
 }
 
 export function unwatchSeries(userId: string, titleId: string) {

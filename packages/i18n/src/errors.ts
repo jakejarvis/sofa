@@ -14,6 +14,8 @@ export function getAppErrorCode(error: unknown): AppErrorCode | null {
 
 const APP_ERROR_MESSAGES: Record<AppErrorCode, MessageDescriptor> = {
   TITLE_NOT_FOUND: msg`Title not found`,
+  EPISODE_NOT_FOUND: msg`Episode not found`,
+  WATCH_NOT_FOUND: msg`Watch not found`,
   PERSON_NOT_FOUND: msg`Person not found`,
   INTEGRATION_NOT_FOUND: msg`Integration not found`,
   BACKUP_NOT_FOUND: msg`Backup not found`,

@@ -6,11 +6,13 @@ import { getWatchCount, getWatchHistory } from "@sofa/core/discovery";
 import { getOrFetchTitleByTmdbId } from "@sofa/core/metadata";
 import {
   getDisplayStatusesByTitleIds,
+  deleteWatch as deleteWatchRecord,
   getUserTitleInfo,
   listWatchHistory,
   logEpisodeWatch,
   logEpisodeWatchBatch,
   logMovieWatch,
+  logWatchAt,
   markAllEpisodesWatched,
   quickAddTitle,
   rateTitleStars,
@@ -141,4 +143,25 @@ export const history = os.tracking.history.use(authed).handler(({ input, context
     })),
     nextCursor: result.nextCursor,
   };
+});
+
+export const deleteWatch = os.tracking.deleteWatch.use(authed).handler(({ input, context }) => {
+  if (!deleteWatchRecord(context.user.id, input.kind, input.watchId)) {
+    throw new ORPCError("NOT_FOUND", {
+      message: "Watch not found",
+      data: { code: AppErrorCode.WATCH_NOT_FOUND },
+    });
+  }
+});
+
+export const logWatch = os.tracking.logWatch.use(authed).handler(({ input, context }) => {
+  const result = logWatchAt(context.user.id, input.kind, input.id, new Date(input.watchedAt));
+  if (result === "not_found") {
+    const code =
+      input.kind === "movie" ? AppErrorCode.TITLE_NOT_FOUND : AppErrorCode.EPISODE_NOT_FOUND;
+    throw new ORPCError("NOT_FOUND", {
+      message: code === AppErrorCode.TITLE_NOT_FOUND ? "Title not found" : "Episode not found",
+      data: { code },
+    });
+  }
 });

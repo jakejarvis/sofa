@@ -962,6 +962,10 @@ msgstr "데이터베이스 백업"
 msgid "Database restored. Reloading..."
 msgstr "데이터베이스가 복원되었습니다. 다시 로드 중..."
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Date"
+msgstr ""
+
 #: apps/native/src/components/library/sort-menu.tsx
 #: apps/web/src/components/library/library-toolbar.tsx
 msgid "Date Added"
@@ -1170,6 +1174,10 @@ msgstr "에피소드 {episodeNumber}"
 msgid "Episode {episodeNumber}, {episodeLabel}"
 msgstr "에피소드 {episodeNumber}, {episodeLabel}"
 
+#: packages/i18n/src/errors.ts
+msgid "Episode not found"
+msgstr ""
+
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -1309,6 +1317,10 @@ msgstr "백업 일정 설정을 불러오지 못했습니다"
 msgid "Failed to load title"
 msgstr "작품 정보를 불러오지 못했습니다"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Failed to log watch"
+msgstr ""
+
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark all episodes as watched"
@@ -1364,6 +1376,11 @@ msgstr "메타데이터 캐시 삭제 실패"
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Failed to regenerate {label} URL"
 msgstr "{label} URL 재생성 실패"
+
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/use-delete-watch.ts
+msgid "Failed to remove from history"
+msgstr ""
 
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to remove from library"
@@ -1863,6 +1880,18 @@ msgstr "로딩 중"
 msgid "Loading…"
 msgstr "로딩 중…"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch"
+msgstr ""
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch…"
+msgstr ""
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log watch"
+msgstr ""
+
 #: apps/web/src/components/auth-form.tsx
 msgid "Login failed"
 msgstr "로그인 실패"
@@ -2037,6 +2066,10 @@ msgstr "월요일"
 #: apps/web/src/components/ui/breadcrumb.tsx
 msgid "More"
 msgstr "더 보기"
+
+#: apps/web/src/components/history/history-row.tsx
+msgid "More actions"
+msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
 msgid "More Like This"
@@ -2676,6 +2709,10 @@ msgstr "추천 작품"
 msgid "Recommended for You"
 msgstr "맞춤 추천"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Record when you watched this."
+msgstr ""
+
 #: apps/web/src/components/auth-form.tsx
 msgid "Redirecting…"
 msgstr "리디렉션 중…"
@@ -2739,6 +2776,11 @@ msgstr "출시일"
 msgid "Remove"
 msgstr "제거"
 
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/history-row.tsx
+msgid "Remove from history"
+msgstr ""
+
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
@@ -2773,6 +2815,11 @@ msgstr "사진 제거"
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Remove profile picture"
 msgstr "프로필 사진 제거"
+
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/use-delete-watch.ts
+msgid "Removed from history"
+msgstr ""
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -3407,6 +3454,10 @@ msgstr "올해"
 msgid "Thursday"
 msgstr "목요일"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Time (optional)"
+msgstr ""
+
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Time:"
 msgstr "시간:"
@@ -3747,6 +3798,14 @@ msgstr "모두 시청 완료"
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Watch history"
 msgstr "시청 기록"
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Watch logged"
+msgstr ""
+
+#: packages/i18n/src/errors.ts
+msgid "Watch not found"
+msgstr ""
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Watch on {name}"

@@ -337,6 +337,36 @@ export function deleteMovieWatches(userId: string, titleId: string): void {
     .run();
 }
 
+export function deleteMovieWatchById(userId: string, watchId: string): { titleId: string } | null {
+  const row = db
+    .delete(userMovieWatches)
+    .where(and(eq(userMovieWatches.id, watchId), eq(userMovieWatches.userId, userId)))
+    .returning({ titleId: userMovieWatches.titleId })
+    .get();
+  return row ?? null;
+}
+
+export function deleteEpisodeWatchById(
+  userId: string,
+  watchId: string,
+): { episodeId: string } | null {
+  const row = db
+    .delete(userEpisodeWatches)
+    .where(and(eq(userEpisodeWatches.id, watchId), eq(userEpisodeWatches.userId, userId)))
+    .returning({ episodeId: userEpisodeWatches.episodeId })
+    .get();
+  return row ?? null;
+}
+
+export function countMovieWatches(userId: string, titleId: string): number {
+  const row = db
+    .select({ count: sql<number>`count(*)` })
+    .from(userMovieWatches)
+    .where(and(eq(userMovieWatches.userId, userId), eq(userMovieWatches.titleId, titleId)))
+    .get();
+  return row?.count ?? 0;
+}
+
 export function deleteAllEpisodeWatchesForTitle(userId: string, titleId: string): void {
   const titleEpisodeIds = db
     .select({ id: episodes.id })

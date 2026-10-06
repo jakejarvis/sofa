@@ -4,13 +4,14 @@ import { IconCheck, IconX } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
+import { LogWatchDialog } from "./log-watch-dialog";
 import { StarRating } from "./star-rating";
 import { StatusButton } from "./status-button";
 import { useTitleContext, useTitleUserInfo } from "./title-context";
 import { useTitleActions } from "./use-title-actions";
 
 export function TitleActions() {
-  const { titleType } = useTitleContext();
+  const { titleType, titleId } = useTitleContext();
   const { userStatus, userRating } = useTitleUserInfo();
   const { handleStatusChange, handleRating, handleWatchMovie, handleUnwatchMovie } =
     useTitleActions();
@@ -39,6 +40,7 @@ export function TitleActions() {
           )}
         </Button>
       )}
+      {titleType === "movie" && <LogWatchDialog titleId={titleId} />}
       <Separator orientation="vertical" className="bg-border/50 mx-0.5 my-auto h-6" />
       <StarRating value={userRating ?? 0} onChange={handleRating} />
     </div>

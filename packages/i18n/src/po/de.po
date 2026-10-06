@@ -962,6 +962,10 @@ msgstr "Datenbank-Backups"
 msgid "Database restored. Reloading..."
 msgstr "Datenbank wiederhergestellt. Lade neu..."
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Date"
+msgstr ""
+
 #: apps/native/src/components/library/sort-menu.tsx
 #: apps/web/src/components/library/library-toolbar.tsx
 msgid "Date Added"
@@ -1170,6 +1174,10 @@ msgstr "Folge {episodeNumber}"
 msgid "Episode {episodeNumber}, {episodeLabel}"
 msgstr "Folge {episodeNumber}, {episodeLabel}"
 
+#: packages/i18n/src/errors.ts
+msgid "Episode not found"
+msgstr ""
+
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -1309,6 +1317,10 @@ msgstr "Backup-Zeitplaneinstellungen konnten nicht geladen werden"
 msgid "Failed to load title"
 msgstr "Titel konnte nicht geladen werden"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Failed to log watch"
+msgstr ""
+
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark all episodes as watched"
@@ -1364,6 +1376,11 @@ msgstr "Metadaten-Cache konnte nicht geleert werden"
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Failed to regenerate {label} URL"
 msgstr "{label}-URL konnte nicht neu generiert werden"
+
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/use-delete-watch.ts
+msgid "Failed to remove from history"
+msgstr ""
 
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to remove from library"
@@ -1863,6 +1880,18 @@ msgstr "Wird geladen"
 msgid "Loading…"
 msgstr "Lade..."
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch"
+msgstr ""
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch…"
+msgstr ""
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log watch"
+msgstr ""
+
 #: apps/web/src/components/auth-form.tsx
 msgid "Login failed"
 msgstr "Anmeldung fehlgeschlagen"
@@ -2037,6 +2066,10 @@ msgstr "Montag"
 #: apps/web/src/components/ui/breadcrumb.tsx
 msgid "More"
 msgstr "Mehr"
+
+#: apps/web/src/components/history/history-row.tsx
+msgid "More actions"
+msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
 msgid "More Like This"
@@ -2676,6 +2709,10 @@ msgstr "Empfohlen"
 msgid "Recommended for You"
 msgstr "Für dich empfohlen"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Record when you watched this."
+msgstr ""
+
 #: apps/web/src/components/auth-form.tsx
 msgid "Redirecting…"
 msgstr "Weiterleiten..."
@@ -2739,6 +2776,11 @@ msgstr "Erscheinungsdatum"
 msgid "Remove"
 msgstr "Entfernen"
 
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/history-row.tsx
+msgid "Remove from history"
+msgstr ""
+
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
@@ -2773,6 +2815,11 @@ msgstr "Bild entfernen"
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Remove profile picture"
 msgstr "Profilbild entfernen"
+
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/use-delete-watch.ts
+msgid "Removed from history"
+msgstr ""
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -3407,6 +3454,10 @@ msgstr "Dieses Jahr"
 msgid "Thursday"
 msgstr "Donnerstag"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Time (optional)"
+msgstr ""
+
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Time:"
 msgstr "Uhrzeit:"
@@ -3747,6 +3798,14 @@ msgstr "Alle als gesehen markieren"
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Watch history"
 msgstr "Verlauf"
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Watch logged"
+msgstr ""
+
+#: packages/i18n/src/errors.ts
+msgid "Watch not found"
+msgstr ""
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Watch on {name}"

@@ -962,6 +962,10 @@ msgstr "数据库备份"
 msgid "Database restored. Reloading..."
 msgstr "数据库已还原。正在重新加载..."
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Date"
+msgstr ""
+
 #: apps/native/src/components/library/sort-menu.tsx
 #: apps/web/src/components/library/library-toolbar.tsx
 msgid "Date Added"
@@ -1170,6 +1174,10 @@ msgstr "第 {episodeNumber} 集"
 msgid "Episode {episodeNumber}, {episodeLabel}"
 msgstr "第 {episodeNumber} 集，{episodeLabel}"
 
+#: packages/i18n/src/errors.ts
+msgid "Episode not found"
+msgstr ""
+
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -1309,6 +1317,10 @@ msgstr "加载备份计划设置失败"
 msgid "Failed to load title"
 msgstr "加载影视内容失败"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Failed to log watch"
+msgstr ""
+
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark all episodes as watched"
@@ -1364,6 +1376,11 @@ msgstr "清除元数据缓存失败"
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Failed to regenerate {label} URL"
 msgstr "重新生成 {label} URL 失败"
+
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/use-delete-watch.ts
+msgid "Failed to remove from history"
+msgstr ""
 
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to remove from library"
@@ -1863,6 +1880,18 @@ msgstr "加载中"
 msgid "Loading…"
 msgstr "加载中…"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch"
+msgstr ""
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch…"
+msgstr ""
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log watch"
+msgstr ""
+
 #: apps/web/src/components/auth-form.tsx
 msgid "Login failed"
 msgstr "登录失败"
@@ -2037,6 +2066,10 @@ msgstr "星期一"
 #: apps/web/src/components/ui/breadcrumb.tsx
 msgid "More"
 msgstr "更多"
+
+#: apps/web/src/components/history/history-row.tsx
+msgid "More actions"
+msgstr ""
 
 #: apps/native/src/app/title/[id].tsx
 msgid "More Like This"
@@ -2676,6 +2709,10 @@ msgstr "推荐内容"
 msgid "Recommended for You"
 msgstr "为您推荐"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Record when you watched this."
+msgstr ""
+
 #: apps/web/src/components/auth-form.tsx
 msgid "Redirecting…"
 msgstr "正在跳转…"
@@ -2739,6 +2776,11 @@ msgstr "发行日期"
 msgid "Remove"
 msgstr "移除"
 
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/history-row.tsx
+msgid "Remove from history"
+msgstr ""
+
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
@@ -2773,6 +2815,11 @@ msgstr "删除图片"
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Remove profile picture"
 msgstr "删除头像"
+
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/use-delete-watch.ts
+msgid "Removed from history"
+msgstr ""
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -3407,6 +3454,10 @@ msgstr "今年"
 msgid "Thursday"
 msgstr "星期四"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Time (optional)"
+msgstr ""
+
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Time:"
 msgstr "时间："
@@ -3747,6 +3798,14 @@ msgstr "标记全部为已看"
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Watch history"
 msgstr "观看历史"
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Watch logged"
+msgstr ""
+
+#: packages/i18n/src/errors.ts
+msgid "Watch not found"
+msgstr ""
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Watch on {name}"

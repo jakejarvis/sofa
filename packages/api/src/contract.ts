@@ -11,6 +11,7 @@ import {
   ContinueWatchingOutput,
   CreateImportJobInput,
   CreateIntegrationInput,
+  DeleteWatchInput,
   DiscoverInput,
   DiscoverOutput,
   DiscoverRecommendationsOutput,
@@ -26,6 +27,7 @@ import {
   LibraryListInput,
   LibraryListOutput,
   LibraryStatsOutput,
+  LogWatchInput,
   MediaTypeParam,
   PageParam,
   PaginatedInput,
@@ -197,6 +199,42 @@ export const contract = {
       })
       .input(WatchHistoryListInput)
       .output(WatchHistoryListOutput),
+    deleteWatch: oc
+      .route({
+        method: "POST",
+        path: "/tracking/history/delete",
+        tags: ["Tracking"],
+        summary: "Remove one watch",
+        description:
+          "Remove a single watch record (one play of a movie or episode) belonging to the current user.",
+      })
+      .input(DeleteWatchInput)
+      .output(z.void())
+      .errors({
+        NOT_FOUND: {
+          message: "Watch not found",
+          data: appErrorData(AppErrorCode.WATCH_NOT_FOUND),
+        },
+      }),
+    logWatch: oc
+      .route({
+        method: "POST",
+        path: "/tracking/log",
+        tags: ["Tracking"],
+        summary: "Log a watch at a date",
+        description:
+          "Log a watch of a movie (title ID) or an episode (episode ID) at a specific date and time. Dates in the future or before 1900 are rejected.",
+      })
+      .input(LogWatchInput)
+      .output(z.void())
+      .errors({
+        NOT_FOUND: {
+          message: "Title or episode not found",
+          data: z.object({
+            code: z.enum([AppErrorCode.TITLE_NOT_FOUND, AppErrorCode.EPISODE_NOT_FOUND]),
+          }),
+        },
+      }),
   },
 
   // ─── Library ────────────────────────────────────────────────

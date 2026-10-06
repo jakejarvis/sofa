@@ -147,6 +147,31 @@ export const WatchHistoryListInput = z
   })
   .meta({ description: "Filters and pagination for watch history" });
 
+const MIN_WATCHED_AT_MS = Date.UTC(1900, 0, 1);
+const MAX_FUTURE_SKEW_MS = 5 * 60 * 1000;
+
+export const DeleteWatchInput = z
+  .object({
+    kind: z.enum(["movie", "episode"]).describe("Whether the watch is a movie or an episode"),
+    watchId: z.string().min(1).describe("Watch record ID (from the history list)"),
+  })
+  .meta({ description: "Identifies a single watch record to remove" });
+
+export const LogWatchInput = z
+  .object({
+    kind: z.enum(["movie", "episode"]).describe("Whether id is a movie title ID or an episode ID"),
+    id: z.string().min(1).describe("Movie title ID or episode ID"),
+    watchedAt: z
+      .string()
+      .datetime({ offset: true })
+      .refine((value) => {
+        const ms = Date.parse(value);
+        return ms >= MIN_WATCHED_AT_MS && ms <= Date.now() + MAX_FUTURE_SKEW_MS;
+      }, "watchedAt must be between 1900-01-01 and now")
+      .describe("ISO 8601 timestamp of when it was watched"),
+  })
+  .meta({ description: "A watch to log at a specific date and time" });
+
 export const WatchHistoryItemSchema = z
   .object({
     watchId: z.string().describe("Watch record ID"),

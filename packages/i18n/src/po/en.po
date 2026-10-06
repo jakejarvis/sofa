@@ -962,6 +962,10 @@ msgstr ""
 msgid "Database restored. Reloading..."
 msgstr ""
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Date"
+msgstr "Date"
+
 #: apps/native/src/components/library/sort-menu.tsx
 #: apps/web/src/components/library/library-toolbar.tsx
 msgid "Date Added"
@@ -1170,6 +1174,10 @@ msgstr "Episode {episodeNumber}"
 msgid "Episode {episodeNumber}, {episodeLabel}"
 msgstr "Episode {episodeNumber}, {episodeLabel}"
 
+#: packages/i18n/src/errors.ts
+msgid "Episode not found"
+msgstr "Episode not found"
+
 #: apps/native/src/components/titles/season-accordion.tsx
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -1309,6 +1317,10 @@ msgstr "Failed to load backup schedule settings"
 msgid "Failed to load title"
 msgstr ""
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Failed to log watch"
+msgstr "Failed to log watch"
+
 #: apps/native/src/lib/title-actions.ts
 #: apps/web/src/components/titles/use-title-actions.ts
 msgid "Failed to mark all episodes as watched"
@@ -1364,6 +1376,11 @@ msgstr ""
 #: apps/web/src/components/settings/integration-card.tsx
 msgid "Failed to regenerate {label} URL"
 msgstr ""
+
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/use-delete-watch.ts
+msgid "Failed to remove from history"
+msgstr "Failed to remove from history"
 
 #: apps/native/src/lib/title-actions.ts
 msgid "Failed to remove from library"
@@ -1863,6 +1880,18 @@ msgstr "Loading"
 msgid "Loading…"
 msgstr ""
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch"
+msgstr "Log a watch"
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch…"
+msgstr "Log a watch…"
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log watch"
+msgstr "Log watch"
+
 #: apps/web/src/components/auth-form.tsx
 msgid "Login failed"
 msgstr "Login failed"
@@ -2037,6 +2066,10 @@ msgstr ""
 #: apps/web/src/components/ui/breadcrumb.tsx
 msgid "More"
 msgstr "More"
+
+#: apps/web/src/components/history/history-row.tsx
+msgid "More actions"
+msgstr "More actions"
 
 #: apps/native/src/app/title/[id].tsx
 msgid "More Like This"
@@ -2676,6 +2709,10 @@ msgstr ""
 msgid "Recommended for You"
 msgstr ""
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Record when you watched this."
+msgstr "Record when you watched this."
+
 #: apps/web/src/components/auth-form.tsx
 msgid "Redirecting…"
 msgstr ""
@@ -2739,6 +2776,11 @@ msgstr "Release Date"
 msgid "Remove"
 msgstr ""
 
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/history-row.tsx
+msgid "Remove from history"
+msgstr "Remove from history"
+
 #: apps/native/src/components/dashboard/continue-watching-card.tsx
 #: apps/native/src/components/dashboard/upcoming-row.tsx
 #: apps/native/src/components/titles/status-action-button.tsx
@@ -2773,6 +2815,11 @@ msgstr ""
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Remove profile picture"
 msgstr ""
+
+#: apps/native/src/components/history/history-row.tsx
+#: apps/web/src/components/history/use-delete-watch.ts
+msgid "Removed from history"
+msgstr "Removed from history"
 
 #: apps/native/src/hooks/use-title-actions.ts
 #: apps/native/src/lib/title-actions.ts
@@ -3407,6 +3454,10 @@ msgstr ""
 msgid "Thursday"
 msgstr ""
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Time (optional)"
+msgstr "Time (optional)"
+
 #: apps/web/src/components/settings/backup-schedule-section.tsx
 msgid "Time:"
 msgstr ""
@@ -3747,6 +3798,14 @@ msgstr ""
 #: apps/web/src/components/settings/imports-section.tsx
 msgid "Watch history"
 msgstr ""
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Watch logged"
+msgstr "Watch logged"
+
+#: packages/i18n/src/errors.ts
+msgid "Watch not found"
+msgstr "Watch not found"
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Watch on {name}"
