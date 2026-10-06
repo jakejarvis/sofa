@@ -3,6 +3,7 @@ import { useForm } from "@tanstack/react-form";
 import { Stack, useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
 import { Alert, ScrollView, type TextInput, View } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useResolveClassNames } from "uniwind";
 import { z } from "zod";
@@ -12,6 +13,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { FieldError, Input, Label, TextField } from "@/components/ui/text-field";
+import { getAuthErrorMessage } from "@/lib/error-messages";
 import { authClient } from "@/lib/server";
 import { toast } from "@/lib/toast";
 import * as Haptics from "@/utils/haptics";
@@ -68,7 +70,7 @@ export default function ChangePasswordScreen() {
         });
         if (result.error) {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-          Alert.alert(t`Error`, t`Failed to change password`);
+          Alert.alert(t`Error`, getAuthErrorMessage(result.error, t`Failed to change password`));
           return;
         }
 
@@ -83,144 +85,151 @@ export default function ChangePasswordScreen() {
     },
   });
 
+  const submit = () => {
+    if (!form.state.isSubmitting) void form.handleSubmit();
+  };
+
   return (
-    <ScrollView
-      className="bg-background flex-1"
-      contentContainerStyle={{
-        paddingHorizontal: 16,
-        paddingTop: 16,
-        paddingBottom: 24,
-      }}
-      contentInsetAdjustmentBehavior="automatic"
-      keyboardShouldPersistTaps="handled"
+    // iOS's form sheet already moves above the keyboard; only Android needs padding.
+    <KeyboardAvoidingView
+      behavior="padding"
+      enabled={process.env.EXPO_OS === "android"}
+      style={{ flex: 1 }}
     >
-      <Stack.Screen.Title style={headerTitleStyle as Record<string, unknown>}>
-        <Trans>Change password</Trans>
-      </Stack.Screen.Title>
-
-      <form.Subscribe
-        selector={(state) => ({
-          isSubmitting: state.isSubmitting,
-          validationError: formatFormErrors(state.errorMap.onSubmit),
-        })}
+      <ScrollView
+        className="bg-background flex-1"
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingTop: 16,
+          paddingBottom: 24,
+        }}
+        contentInsetAdjustmentBehavior="automatic"
+        keyboardShouldPersistTaps="handled"
       >
-        {({ isSubmitting, validationError }) => (
-          <View className="gap-4">
-            {validationError && (
-              <FieldError isInvalid className="mb-1">
-                {validationError}
-              </FieldError>
-            )}
+        <Stack.Screen.Title style={headerTitleStyle as Record<string, unknown>}>
+          <Trans>Change password</Trans>
+        </Stack.Screen.Title>
 
-            <Animated.View entering={FadeInDown.duration(300).delay(100)}>
-              <form.Field name="currentPassword">
-                {(field) => (
-                  <TextField>
-                    <Label>
-                      <Trans>Current password</Trans>
-                    </Label>
-                    <Input
-                      value={field.state.value}
-                      accessibilityLabel={t`Current password`}
-                      onBlur={field.handleBlur}
-                      onChangeText={field.handleChange}
-                      placeholder="••••••••"
-                      secureTextEntry
-                      autoComplete="current-password"
-                      textContentType="password"
-                      returnKeyType="next"
-                      blurOnSubmit={false}
-                      onSubmitEditing={() => newPasswordRef.current?.focus()}
-                    />
-                  </TextField>
-                )}
-              </form.Field>
-            </Animated.View>
+        <form.Subscribe
+          selector={(state) => ({
+            isSubmitting: state.isSubmitting,
+            validationError: formatFormErrors(state.errorMap.onSubmit),
+          })}
+        >
+          {({ isSubmitting, validationError }) => (
+            <View className="gap-4">
+              {validationError && (
+                <FieldError isInvalid className="mb-1">
+                  {validationError}
+                </FieldError>
+              )}
 
-            <Animated.View entering={FadeInDown.duration(300).delay(200)}>
-              <form.Field name="newPassword">
-                {(field) => (
-                  <TextField>
-                    <Label>
-                      <Trans>New password</Trans>
-                    </Label>
-                    <Input
-                      ref={newPasswordRef}
-                      value={field.state.value}
-                      accessibilityLabel={t`New password`}
-                      onBlur={field.handleBlur}
-                      onChangeText={field.handleChange}
-                      placeholder="••••••••"
-                      secureTextEntry
-                      autoComplete="new-password"
-                      textContentType="newPassword"
-                      returnKeyType="next"
-                      blurOnSubmit={false}
-                      onSubmitEditing={() => confirmPasswordRef.current?.focus()}
-                    />
-                  </TextField>
-                )}
-              </form.Field>
-            </Animated.View>
+              <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+                <form.Field name="currentPassword">
+                  {(field) => (
+                    <TextField>
+                      <Label>
+                        <Trans>Current password</Trans>
+                      </Label>
+                      <Input
+                        value={field.state.value}
+                        accessibilityLabel={t`Current password`}
+                        onBlur={field.handleBlur}
+                        onChangeText={field.handleChange}
+                        placeholder="••••••••"
+                        secureTextEntry
+                        autoComplete="current-password"
+                        textContentType="password"
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        onSubmitEditing={() => newPasswordRef.current?.focus()}
+                      />
+                    </TextField>
+                  )}
+                </form.Field>
+              </Animated.View>
 
-            <Animated.View entering={FadeInDown.duration(300).delay(300)}>
-              <form.Field name="confirmPassword">
-                {(field) => (
-                  <TextField>
-                    <Label>
-                      <Trans>Confirm new password</Trans>
-                    </Label>
-                    <Input
-                      ref={confirmPasswordRef}
-                      value={field.state.value}
-                      accessibilityLabel={t`Confirm new password`}
-                      onBlur={field.handleBlur}
-                      onChangeText={field.handleChange}
-                      placeholder="••••••••"
-                      secureTextEntry
-                      autoComplete="new-password"
-                      textContentType="newPassword"
-                      returnKeyType="go"
-                      onSubmitEditing={form.handleSubmit}
-                    />
-                  </TextField>
-                )}
-              </form.Field>
-            </Animated.View>
+              <Animated.View entering={FadeInDown.duration(300).delay(200)}>
+                <form.Field name="newPassword">
+                  {(field) => (
+                    <TextField>
+                      <Label>
+                        <Trans>New password</Trans>
+                      </Label>
+                      <Input
+                        ref={newPasswordRef}
+                        value={field.state.value}
+                        accessibilityLabel={t`New password`}
+                        onBlur={field.handleBlur}
+                        onChangeText={field.handleChange}
+                        placeholder="••••••••"
+                        secureTextEntry
+                        autoComplete="new-password"
+                        textContentType="newPassword"
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+                      />
+                    </TextField>
+                  )}
+                </form.Field>
+              </Animated.View>
 
-            <Animated.View
-              entering={FadeInDown.duration(300).delay(400)}
-              className="border-border bg-input flex-row items-center justify-between rounded-xl border px-3.5 py-3"
-              style={{ borderCurve: "continuous" }}
-            >
-              <Text className="text-foreground text-base">
-                <Trans>Sign out of other sessions</Trans>
-              </Text>
-              <Switch
-                value={revokeOtherSessions}
-                onValueChange={setRevokeOtherSessions}
-                accessibilityLabel={t`Sign out of other sessions`}
-              />
-            </Animated.View>
+              <Animated.View entering={FadeInDown.duration(300).delay(300)}>
+                <form.Field name="confirmPassword">
+                  {(field) => (
+                    <TextField>
+                      <Label>
+                        <Trans>Confirm new password</Trans>
+                      </Label>
+                      <Input
+                        ref={confirmPasswordRef}
+                        value={field.state.value}
+                        accessibilityLabel={t`Confirm new password`}
+                        onBlur={field.handleBlur}
+                        onChangeText={field.handleChange}
+                        placeholder="••••••••"
+                        secureTextEntry
+                        autoComplete="new-password"
+                        textContentType="newPassword"
+                        returnKeyType="go"
+                        onSubmitEditing={submit}
+                      />
+                    </TextField>
+                  )}
+                </form.Field>
+              </Animated.View>
 
-            <Animated.View entering={FadeInDown.duration(300).delay(500)}>
-              <Button
-                onPress={form.handleSubmit}
-                disabled={isSubmitting}
-                className="bg-primary mt-2"
+              <Animated.View
+                entering={FadeInDown.duration(300).delay(400)}
+                className="border-border bg-input flex-row items-center justify-between rounded-xl border px-3.5 py-3"
+                style={{ borderCurve: "continuous" }}
               >
-                {isSubmitting ? (
-                  <Spinner size="sm" />
-                ) : (
-                  <ButtonLabel>
-                    <Trans>Update password</Trans>
-                  </ButtonLabel>
-                )}
-              </Button>
-            </Animated.View>
-          </View>
-        )}
-      </form.Subscribe>
-    </ScrollView>
+                <Text className="text-foreground text-base">
+                  <Trans>Sign out of other sessions</Trans>
+                </Text>
+                <Switch
+                  value={revokeOtherSessions}
+                  onValueChange={setRevokeOtherSessions}
+                  accessibilityLabel={t`Sign out of other sessions`}
+                />
+              </Animated.View>
+
+              <Animated.View entering={FadeInDown.duration(300).delay(500)}>
+                <Button onPress={submit} disabled={isSubmitting} className="bg-primary mt-2">
+                  {isSubmitting ? (
+                    <Spinner size="sm" />
+                  ) : (
+                    <ButtonLabel>
+                      <Trans>Update password</Trans>
+                    </ButtonLabel>
+                  )}
+                </Button>
+              </Animated.View>
+            </View>
+          )}
+        </form.Subscribe>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

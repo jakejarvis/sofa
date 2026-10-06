@@ -925,6 +925,10 @@ msgstr "Création…"
 msgid "Current password"
 msgstr "Mot de passe actuel"
 
+#: packages/i18n/src/errors.ts
+msgid "Current password is incorrect"
+msgstr ""
+
 #: apps/native/src/app/change-password.tsx
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Current password is required"

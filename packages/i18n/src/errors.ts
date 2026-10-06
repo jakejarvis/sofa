@@ -45,6 +45,7 @@ const AUTH_ERROR_MESSAGES: Record<string, MessageDescriptor> = {
   PASSWORD_TOO_SHORT: msg`Password is too short`,
   PASSWORD_TOO_LONG: msg`Password is too long`,
   INVALID_EMAIL: msg`Enter a valid email address`,
+  INVALID_PASSWORD: msg`Current password is incorrect`,
   REGISTRATION_CLOSED: msg`Registration is currently closed`,
 };
 

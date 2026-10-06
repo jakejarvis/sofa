@@ -48,4 +48,10 @@ describe("getAuthErrorMessage", () => {
     expect(getAuthErrorMessage({ code: "INVALID_EMAIL" }, "F")).toBe("Enter a valid email address");
     expect(getAuthErrorMessage({ code: "UNKNOWN" }, "F")).toBe("F");
   });
+
+  test("maps a wrong current password", () => {
+    expect(getAuthErrorMessage({ code: "INVALID_PASSWORD" }, "x")).toBe(
+      "Current password is incorrect",
+    );
+  });
 });
