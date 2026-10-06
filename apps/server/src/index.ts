@@ -2,6 +2,7 @@ import { type Context, Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
+import { secureHeaders } from "hono/secure-headers";
 
 import { CACHE_DIR } from "@sofa/config";
 import { ensureBackupDir } from "@sofa/core/backup";
@@ -18,6 +19,7 @@ import { apiBodyLimit, UPLOAD_BODY_LIMIT } from "./body-limits";
 import { getJobSchedules, startJobs, stopJobs } from "./cron";
 import { handler as rpcHandler } from "./orpc/handler";
 import { openApiHandler } from "./orpc/openapi-handler";
+import { rejectCrossSiteRequests, SECURITY_HEADERS_OPTIONS } from "./request-guards";
 import authRoutes from "./routes/auth";
 import avatarsRoutes from "./routes/avatars";
 import backupsRoutes from "./routes/backups";
@@ -81,12 +83,18 @@ app.use(
   }),
 );
 
+app.use("*", secureHeaders(SECURITY_HEADERS_OPTIONS));
+
 app.use("*", async (c, next) => {
   if (isDatabaseAccessBlocked() && c.req.path !== "/api/health") {
     return c.json({ error: "Service unavailable during database restore" }, 503);
   }
   await next();
 });
+
+// Browsers may only call the API from Sofa's own origin(s).
+app.use("/rpc/*", rejectCrossSiteRequests);
+app.use("/api/v1/*", rejectCrossSiteRequests);
 
 // Request body limits (see body-limits.ts); Better Auth and webhook bodies are small.
 app.use("/rpc/*", apiBodyLimit);
