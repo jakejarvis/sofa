@@ -147,7 +147,8 @@ export function BackupSection() {
                         >
                           {backup.source === "scheduled" ? (
                             <IconClock aria-hidden={true} className="size-3.5" />
-                          ) : backup.source === "pre-restore" || backup.source === "pre-migration" ? (
+                          ) : backup.source === "pre-restore" ||
+                            backup.source === "pre-migration" ? (
                             <IconShieldCheck aria-hidden={true} className="size-3.5" />
                           ) : (
                             <IconPointer aria-hidden={true} className="size-3.5" />

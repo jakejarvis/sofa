@@ -127,14 +127,14 @@ describe("migrations on an older database", () => {
     expect(client.pragma("foreign_key_check")).toEqual([]);
     expect(client.pragma("integrity_check", { simple: true })).toBe("ok");
 
-    for (const table of SEEDED_TABLES) {
-      expect(count(client, table), table).toBe(before[table]);
-    }
+    const after = Object.fromEntries(SEEDED_TABLES.map((t) => [t, count(client, t)]));
+    expect(after).toEqual(before);
     expect(count(client, "titleCast")).toBe(1);
 
-    const statuses = client
-      .prepare("SELECT titleId, status FROM userTitleStatus")
-      .all() as { titleId: string; status: string }[];
+    const statuses = client.prepare("SELECT titleId, status FROM userTitleStatus").all() as {
+      titleId: string;
+      status: string;
+    }[];
     const byTitle = Object.fromEntries(statuses.map((s) => [s.titleId, s.status]));
     expect(byTitle).toEqual({
       "t-show": "in_progress",

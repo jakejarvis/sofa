@@ -59,7 +59,8 @@
     "generate:openapi": "bun scripts/generate-openapi-spec.ts && cd docs && bun run generate:api-docs",
     "i18n:extract": "lingui extract",
     "i18n:claude": "bun packages/i18n/scripts/claude.ts",
-    "sync:providers": "bun scripts/sync-tmdb-providers.ts"
+    "sync:providers": "bun scripts/sync-tmdb-providers.ts",
+    "smoke:backup": "bun scripts/backup-restore-smoke.ts"
   },
   "devDependencies": {
     "@lingui/cli": "catalog:",

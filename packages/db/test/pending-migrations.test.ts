@@ -28,7 +28,9 @@ describe("hasPendingMigrations", () => {
 
   test("is true when a migration has not been applied", () => {
     removed = testClient
-      .prepare("SELECT id, hash, created_at, name FROM __drizzle_migrations ORDER BY id DESC LIMIT 1")
+      .prepare(
+        "SELECT id, hash, created_at, name FROM __drizzle_migrations ORDER BY id DESC LIMIT 1",
+      )
       .get() as MigrationRow;
     testClient.exec(
       "DELETE FROM __drizzle_migrations WHERE id = (SELECT max(id) FROM __drizzle_migrations)",
