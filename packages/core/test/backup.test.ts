@@ -26,6 +26,10 @@ describe("getBackupSource", () => {
     expect(getBackupSource("pre-restore-2024-06-01-030000.db")).toBe("pre-restore");
   });
 
+  test("detects pre-migration backup", () => {
+    expect(getBackupSource("pre-migration-2026-10-04-120000.db")).toBe("pre-migration");
+  });
+
   test("defaults to manual for unknown patterns", () => {
     expect(getBackupSource("random-file.db")).toBe("manual");
   });
@@ -42,6 +46,10 @@ describe("isKnownBackup", () => {
 
   test("recognizes pre-restore backup", () => {
     expect(isKnownBackup("pre-restore-2024-06-01-030000.db")).toBe(true);
+  });
+
+  test("recognizes pre-migration backup", () => {
+    expect(isKnownBackup("pre-migration-2026-10-04-120000.db")).toBe(true);
   });
 
   test("recognizes backup with milliseconds", () => {

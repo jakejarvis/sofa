@@ -5,12 +5,12 @@ import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 
 import { CACHE_DIR } from "@sofa/config";
-import { ensureBackupDir } from "@sofa/core/backup";
+import { createBackup, ensureBackupDir } from "@sofa/core/backup";
 import { recoverInterruptedCronRuns } from "@sofa/core/cron";
 import { ensureImageDirs, imageCacheEnabled } from "@sofa/core/image-cache";
 import { registerJobScheduleProvider } from "@sofa/core/system-health";
 import { closeDatabase, isDatabaseAccessBlocked } from "@sofa/db/client";
-import { runMigrations } from "@sofa/db/migrate";
+import { hasPendingMigrations, runMigrations } from "@sofa/db/migrate";
 import { clearFinishedImportPayloads, recoverStaleImportJobs } from "@sofa/db/queries/imports";
 import { seedPlatforms } from "@sofa/db/seed-platforms";
 import { createLogger } from "@sofa/logger";
@@ -40,7 +40,12 @@ if (imageCacheEnabled()) {
 }
 await ensureBackupDir();
 
-// Run database migrations
+// Run database migrations. Migrations can rewrite data; keep a copy of an existing database
+// before applying them.
+if (hasPendingMigrations()) {
+  log.info("Pending database migrations found; creating a pre-upgrade backup...");
+  await createBackup("pre-migration");
+}
 runMigrations();
 
 // Seed streaming platforms (idempotent upsert)

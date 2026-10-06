@@ -147,7 +147,7 @@ export function BackupSection() {
                         >
                           {backup.source === "scheduled" ? (
                             <IconClock aria-hidden={true} className="size-3.5" />
-                          ) : backup.source === "pre-restore" ? (
+                          ) : backup.source === "pre-restore" || backup.source === "pre-migration" ? (
                             <IconShieldCheck aria-hidden={true} className="size-3.5" />
                           ) : (
                             <IconPointer aria-hidden={true} className="size-3.5" />
@@ -158,7 +158,9 @@ export function BackupSection() {
                             ? t`Scheduled backup`
                             : backup.source === "pre-restore"
                               ? t`Pre-restore backup`
-                              : t`Manual backup`}
+                              : backup.source === "pre-migration"
+                                ? t`Pre-upgrade backup`
+                                : t`Manual backup`}
                         </TooltipContent>
                       </Tooltip>
                       <div className="min-w-0 flex-1">

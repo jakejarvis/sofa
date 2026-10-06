@@ -2555,6 +2555,10 @@ msgstr "Vóór 1980"
 msgid "Pre-restore backup"
 msgstr "Back-up vóór herstel"
 
+#: apps/web/src/components/settings/backup-section.tsx
+msgid "Pre-upgrade backup"
+msgstr ""
+
 #: apps/web/src/components/ui/pagination.tsx
 msgid "Previous"
 msgstr "Vorige"

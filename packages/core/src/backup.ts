@@ -25,9 +25,10 @@ const log = createLogger("backup");
 const MANUAL_PATTERN = /^sofa-manual-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
 const SCHEDULED_PATTERN = /^sofa-scheduled-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
 const PRE_RESTORE_PATTERN = /^pre-restore-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
+const PRE_MIGRATION_PATTERN = /^pre-migration-\d{4}-\d{2}-\d{2}-\d{6}(?:\d{3})?\.db$/;
 
-export type BackupSource = "manual" | "scheduled" | "pre-restore";
-type BackupPrefix = "sofa-manual" | "sofa-scheduled" | "pre-restore";
+export type BackupSource = "manual" | "scheduled" | "pre-restore" | "pre-migration";
+type BackupPrefix = "sofa-manual" | "sofa-scheduled" | "pre-restore" | "pre-migration";
 
 export interface BackupInfo {
   filename: string;
@@ -42,6 +43,7 @@ let backupOpQueue: Promise<void> = Promise.resolve();
 export function getBackupSource(filename: string): BackupSource {
   if (SCHEDULED_PATTERN.test(filename)) return "scheduled";
   if (PRE_RESTORE_PATTERN.test(filename)) return "pre-restore";
+  if (PRE_MIGRATION_PATTERN.test(filename)) return "pre-migration";
   return "manual";
 }
 
@@ -50,7 +52,8 @@ export function isKnownBackup(filename: string): boolean {
   return (
     MANUAL_PATTERN.test(filename) ||
     SCHEDULED_PATTERN.test(filename) ||
-    PRE_RESTORE_PATTERN.test(filename)
+    PRE_RESTORE_PATTERN.test(filename) ||
+    PRE_MIGRATION_PATTERN.test(filename)
   );
 }
 

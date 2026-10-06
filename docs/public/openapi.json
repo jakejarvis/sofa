@@ -1181,9 +1181,10 @@
             "enum": [
               "manual",
               "scheduled",
-              "pre-restore"
+              "pre-restore",
+              "pre-migration"
             ],
-            "description": "How the backup was created: manual, scheduled, or automatic pre-restore"
+            "description": "How the backup was created: manual, scheduled, automatic pre-restore, or automatic pre-migration"
           }
         },
         "required": [

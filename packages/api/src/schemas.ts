@@ -1044,8 +1044,8 @@ export const BackupSchema = z
     sizeBytes: z.number().describe("Backup file size in bytes"),
     createdAt: z.string().describe("When the backup was created (ISO 8601)"),
     source: z
-      .enum(["manual", "scheduled", "pre-restore"])
-      .describe("How the backup was created: manual, scheduled, or automatic pre-restore"),
+      .enum(["manual", "scheduled", "pre-restore", "pre-migration"])
+      .describe("How the backup was created: manual, scheduled, automatic pre-restore, or automatic pre-migration"),
   })
   .meta({ id: "Backup", description: "A database backup file" });
 
