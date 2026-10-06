@@ -887,6 +887,10 @@ msgstr ""
 msgid "Couldn't search right now"
 msgstr ""
 
+#: apps/native/src/app/(auth)/login.tsx
+msgid "Couldn't start sign-in"
+msgstr ""
+
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 msgid "Crash reporting"
 msgstr "クラッシュレポート"
@@ -3190,6 +3194,10 @@ msgstr "サインアウト"
 #: apps/web/src/components/settings/account-section.tsx
 msgid "Sign out of other sessions"
 msgstr "他のセッションからサインアウト"
+
+#: apps/native/src/app/(auth)/login.tsx
+msgid "Sign-in didn't complete"
+msgstr ""
 
 #: apps/web/src/routes/_app/onboarding.tsx
 msgid "Skip for now"

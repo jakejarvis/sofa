@@ -73,6 +73,34 @@ export default function LoginScreen() {
 
   const isSubmitting = useStore(form.store, (s) => s.isSubmitting);
   const busy = isSubmitting || isSignedIn;
+  const [isSsoPending, setSsoPending] = useState(false);
+
+  const signInWithSso = async () => {
+    if (isSsoPending) return;
+    setSsoPending(true);
+    try {
+      const result = await authClient.signIn.social({
+        provider: "oidc",
+        callbackURL: "/(tabs)/(home)",
+        // Same prefix as callbackURL so the auth session also closes on failure (Android matches by prefix).
+        errorCallbackURL: "/(tabs)/(home)",
+      });
+      if (result.error) {
+        toast.error(getAuthErrorMessage(result.error, t`Couldn't start sign-in`));
+        return;
+      }
+      // The Expo plugin stores the session cookie when the browser returns successfully; if no
+      // session appeared, the flow was cancelled or failed at the provider.
+      const session = await authClient.getSession();
+      if (!session.data) {
+        toast.error(t`Sign-in didn't complete`);
+      }
+    } catch {
+      toast.error(t`Couldn't start sign-in`);
+    } finally {
+      setSsoPending(false);
+    }
+  };
 
   const statusCompletedColor = useCSSVariable("--color-status-completed") as string;
   const serverHost = splitUrl(getServerUrl()).host;
@@ -99,18 +127,18 @@ export default function LoginScreen() {
           return (
             <Animated.View entering={FadeInDown.duration(300).delay(100)} className="mb-4">
               <Button
-                onPress={() => {
-                  authClient.signIn.social({
-                    provider: "oidc",
-                    callbackURL: "/(tabs)/(home)",
-                  });
-                }}
+                onPress={() => void signInWithSso()}
+                disabled={busy || isSsoPending}
                 variant="secondary"
                 className="w-full"
               >
-                <ButtonLabel>
-                  <Trans>Sign in with {providerName}</Trans>
-                </ButtonLabel>
+                {isSsoPending ? (
+                  <Spinner size="sm" />
+                ) : (
+                  <ButtonLabel>
+                    <Trans>Sign in with {providerName}</Trans>
+                  </ButtonLabel>
+                )}
               </Button>
 
               {showPasswordLogin && (
