@@ -1,7 +1,9 @@
 import { rmSync } from "node:fs";
 import path from "node:path";
 
+import { sql } from "drizzle-orm";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { readMigrationFiles } from "drizzle-orm/migrator";
 
 import { createLogger } from "@sofa/logger";
 
@@ -16,6 +18,23 @@ export function runMigrations(migrationsFolder = getMigrationsFolder()) {
   log.debug("Running database migrations...");
   migrate(db, { migrationsFolder });
   log.debug("Database migrations complete");
+}
+
+/**
+ * True when an existing database has migrations to apply. A brand-new database (no
+ * migrations table yet) returns false — there's nothing to back up.
+ */
+export function hasPendingMigrations(migrationsFolder = getMigrationsFolder()): boolean {
+  const table = db.all<{ name: string }>(
+    sql`SELECT name FROM sqlite_master WHERE type = 'table' AND name = '__drizzle_migrations'`,
+  );
+  if (table.length === 0) return false;
+  const columns = db.all<{ name: string }>(sql`PRAGMA table_info(__drizzle_migrations)`);
+  if (!columns.some((c) => c.name === "name")) return true; // legacy table; drizzle will upgrade it
+  const applied = new Set(
+    db.all<{ name: string | null }>(sql`SELECT name FROM __drizzle_migrations`).map((r) => r.name),
+  );
+  return readMigrationFiles({ migrationsFolder }).some((m) => !applied.has(m.name));
 }
 
 /**
