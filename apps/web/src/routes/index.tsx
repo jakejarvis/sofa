@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({
   beforeLoad: async () => {
     const [{ data: session }, info] = await Promise.all([
       authClient.getSession(),
-      client.system.publicInfo({}),
+      client.system.publicInfo(),
     ]);
     if (session?.user) throw redirect({ to: "/dashboard" });
     if (!info.tmdbConfigured) throw redirect({ to: "/setup" });

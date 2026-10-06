@@ -7,7 +7,7 @@ import { client } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_auth/register")({
   beforeLoad: async () => {
-    const publicInfo = await client.system.publicInfo({});
+    const publicInfo = await client.system.publicInfo();
     return { publicInfo };
   },
   head: () => ({ meta: [{ title: "Create account — Sofa" }] }),

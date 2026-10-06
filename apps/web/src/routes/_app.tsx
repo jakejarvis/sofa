@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_app")({
     let updateCheck = null;
     if (session.user.role === "admin") {
       try {
-        const settings = await client.admin.settings.get({});
+        const settings = await client.admin.settings.get();
         updateCheck = settings.updateCheck;
       } catch {
         // Silently ignore — update check is non-critical

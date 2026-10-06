@@ -1,4 +1,4 @@
-import { ORPCError } from "@orpc/client";
+import { MalformedResponseError, ORPCError } from "@orpc/client";
 import { describe, expect, test, vi } from "vitest";
 
 vi.mock("@sofa/i18n", () => ({
@@ -30,6 +30,22 @@ describe("error classification", () => {
     expect(isClientError(new ORPCError("BAD_REQUEST"))).toBe(true);
     expect(isClientError(new ORPCError("INTERNAL_SERVER_ERROR"))).toBe(false);
     expect(isClientError(new Error("Network request failed"))).toBe(false);
+  });
+
+  const malformed = (status: number) =>
+    new ORPCError("MALFORMED_ORPC_RESPONSE", {
+      cause: new MalformedResponseError({ response: { status, headers: {}, body: undefined } }),
+    });
+
+  test("classifies non-oRPC responses by their HTTP status", () => {
+    expect(isUnauthorizedError(malformed(401))).toBe(true);
+    expect(isClientError(malformed(404))).toBe(true);
+    expect(isClientError(malformed(502))).toBe(false);
+  });
+
+  test("unknown error codes are not client errors", () => {
+    expect(isClientError(new ORPCError("NOT_FOUND"))).toBe(true);
+    expect(isClientError(new ORPCError("SOMETHING_CUSTOM"))).toBe(false);
   });
 });
 

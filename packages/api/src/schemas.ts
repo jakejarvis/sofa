@@ -369,7 +369,7 @@ export const EpisodeSchema = z
     airDate: z.string().nullable().describe("Original air date (ISO 8601)"),
     runtimeMinutes: z.number().nullable().describe("Episode runtime in minutes"),
   })
-  .meta({ description: "A single TV episode" });
+  .meta({ id: "Episode", description: "A single TV episode" });
 
 export const SeasonSchema = z
   .object({
@@ -378,7 +378,7 @@ export const SeasonSchema = z
     name: z.string().nullable().describe("Season name"),
     episodes: z.array(EpisodeSchema).describe("Episodes in this season"),
   })
-  .meta({ description: "A TV season with its episodes" });
+  .meta({ id: "Season", description: "A TV season with its episodes" });
 
 export const AvailabilityOfferSchema = z
   .object({
@@ -434,7 +434,7 @@ export const CastMemberSchema = z
       .describe("ThumbHash blur placeholder for the profile photo"),
     tmdbId: z.number().describe("TMDB person ID"),
   })
-  .meta({ description: "A cast or crew member credit" });
+  .meta({ id: "CastMember", description: "A cast or crew member credit" });
 
 export const ResolvedTitleSchema = z
   .object({
@@ -466,7 +466,7 @@ export const ResolvedTitleSchema = z
     trailerVideoKey: z.string().nullable().describe("YouTube video key for the trailer"),
     genres: z.array(z.string()).describe("Genre names"),
   })
-  .meta({ description: "A fully resolved movie or TV show from TMDB" });
+  .meta({ id: "Title", description: "A fully resolved movie or TV show from TMDB" });
 
 export const PersonSchema = z
   .object({
@@ -488,7 +488,7 @@ export const PersonSchema = z
       .describe("Primary department (e.g. Acting, Directing)"),
     imdbId: z.string().nullable().describe("IMDb person ID (e.g. nm0000123)"),
   })
-  .meta({ description: "A person (actor, director, crew member) from TMDB" });
+  .meta({ id: "Person", description: "A person (actor, director, crew member) from TMDB" });
 
 export const PersonCreditSchema = z
   .object({
@@ -505,7 +505,7 @@ export const PersonCreditSchema = z
     department: z.string().describe("Department (e.g. Acting, Directing)"),
     job: z.string().nullable().describe("Job title (for crew credits)"),
   })
-  .meta({ description: "A person's credit in a movie or TV show" });
+  .meta({ id: "PersonCredit", description: "A person's credit in a movie or TV show" });
 
 /** Reusable TMDB browse result (trending / popular / discover items) */
 export const TmdbBrowseItem = z
@@ -521,6 +521,7 @@ export const TmdbBrowseItem = z
     voteAverage: z.number().nullable().describe("Average rating (0-10)"),
   })
   .meta({
+    id: "BrowseItem",
     description: "A TMDB title card used in browse/trending/popular lists",
   });
 
@@ -537,7 +538,7 @@ export const RecommendationItemSchema = z
     firstAirDate: z.string().nullable().describe("First air date (ISO 8601)"),
     voteAverage: z.number().nullable().describe("Average rating (0-10)"),
   })
-  .meta({ description: "A recommended title" });
+  .meta({ id: "Recommendation", description: "A recommended title" });
 
 const displayStatusEnum = z.enum(["in_watchlist", "watching", "caught_up", "completed"]);
 
@@ -913,7 +914,7 @@ export const JobSchema = z
     isCurrentlyRunning: z.boolean().describe("Whether the job is currently executing"),
     disabled: z.boolean().describe("Whether the job is disabled"),
   })
-  .meta({ description: "Status of a background cron job" });
+  .meta({ id: "Job", description: "Status of a background cron job" });
 
 export const SystemHealthSchema = z
   .object({
@@ -977,6 +978,7 @@ export const SystemHealthSchema = z
     checkedAt: z.string().describe("When this health check was performed (ISO 8601)"),
   })
   .meta({
+    id: "SystemHealth",
     description:
       "Comprehensive system health report covering database, TMDB, jobs, cache, backups, and environment",
   });
@@ -1005,7 +1007,7 @@ export const IntegrationSchema = z
     lastEventAt: z.string().nullable().describe("Last received event timestamp (ISO 8601)"),
     createdAt: z.string().describe("When the integration was created (ISO 8601)"),
   })
-  .meta({ description: "A media server integration configuration" });
+  .meta({ id: "Integration", description: "A media server integration configuration" });
 
 export const IntegrationEventSchema = z
   .object({
@@ -1016,7 +1018,7 @@ export const IntegrationEventSchema = z
     status: z.enum(["success", "ignored", "error"]).describe("Event processing outcome"),
     receivedAt: z.string().describe("When the event was received (ISO 8601)"),
   })
-  .meta({ description: "A webhook or sync event from a media server" });
+  .meta({ id: "IntegrationEvent", description: "A webhook or sync event from a media server" });
 
 export const IntegrationsListOutput = z
   .object({
@@ -1045,7 +1047,7 @@ export const BackupSchema = z
       .enum(["manual", "scheduled", "pre-restore"])
       .describe("How the backup was created: manual, scheduled, or automatic pre-restore"),
   })
-  .meta({ description: "A database backup file" });
+  .meta({ id: "Backup", description: "A database backup file" });
 
 export const BackupsListOutput = z
   .object({

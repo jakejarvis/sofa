@@ -1,21 +1,9 @@
-import { OpenAPIGenerator, type OpenAPIGeneratorGenerateOptions } from "@orpc/openapi";
-import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-
 import {
-  BackupSchema,
-  CastMemberSchema,
-  EpisodeSchema,
-  IntegrationEventSchema,
-  IntegrationSchema,
-  JobSchema,
-  PersonCreditSchema,
-  PersonSchema,
-  RecommendationItemSchema,
-  ResolvedTitleSchema,
-  SeasonSchema,
-  SystemHealthSchema,
-  TmdbBrowseItem,
-} from "@sofa/api/schemas";
+  OpenAPIGenerator,
+  type OpenAPIDocument,
+  type OpenAPIGeneratorGenerateOptions,
+} from "@orpc/openapi";
+import { ZodToJsonSchemaConverter } from "@orpc/zod";
 
 import { implementedRouter } from "./router";
 
@@ -33,12 +21,16 @@ export const openApiTags = [
 ] as const;
 
 const generator = new OpenAPIGenerator({
-  schemaConverters,
+  converters: schemaConverters,
 });
 
 const httpMethods = ["get", "put", "post", "delete", "options", "head", "patch", "trace"] as const;
 
-type OpenApiSpec = Awaited<ReturnType<OpenAPIGenerator["generate"]>>;
+// oRPC v2 defaults to OpenAPI 3.2; keep emitting 3.1 like v1 did so the committed docs spec and
+// its renderers (fumadocs-openapi, Scalar) see the same dialect.
+const OPENAPI_VERSION = "3.1.1";
+
+type OpenApiSpec = OpenAPIDocument<typeof OPENAPI_VERSION>;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -173,13 +165,16 @@ export function normalizeOpenApiSpec<T extends OpenApiSpec>(spec: T): T {
         }
       }
 
+      // ResponsesObject allows `x-*` extension keys, so its values are typed loosely.
       for (const response of Object.values(operation.responses ?? {})) {
-        if (!response || !("content" in response)) continue;
+        if (!isRecord(response) || !isRecord(response.content)) continue;
 
-        const nextContent = normalizeContent(response.content);
+        const nextContent = normalizeContent(
+          response.content as Record<string, { schema?: unknown }>,
+        );
 
         if (nextContent) {
-          response.content = nextContent as typeof response.content;
+          response.content = nextContent;
         } else {
           delete response.content;
         }
@@ -193,39 +188,25 @@ export function normalizeOpenApiSpec<T extends OpenApiSpec>(spec: T): T {
 export async function generateOpenApiSpec(options: {
   title: string;
   version: string;
-  servers: OpenAPIGeneratorGenerateOptions["servers"];
+  servers: NonNullable<OpenAPIGeneratorGenerateOptions<typeof OPENAPI_VERSION>["base"]>["servers"];
   sessionCookieName: string;
   tags?: Array<{ name: string; description?: string }>;
 }): Promise<OpenApiSpec> {
   const spec = await generator.generate(implementedRouter, {
-    info: {
-      title: options.title,
-      version: options.version,
-    },
-    servers: options.servers,
-    tags: options.tags,
-    commonSchemas: {
-      Title: { schema: ResolvedTitleSchema },
-      Person: { schema: PersonSchema },
-      PersonCredit: { schema: PersonCreditSchema },
-      Episode: { schema: EpisodeSchema },
-      Season: { schema: SeasonSchema },
-      CastMember: { schema: CastMemberSchema },
-      BrowseItem: { schema: TmdbBrowseItem },
-      Recommendation: { schema: RecommendationItemSchema },
-      Integration: { schema: IntegrationSchema },
-      IntegrationEvent: { schema: IntegrationEventSchema },
-      Backup: { schema: BackupSchema },
-      Job: { schema: JobSchema },
-      SystemHealth: { schema: SystemHealthSchema },
-    },
-    components: {
-      securitySchemes: {
-        session: {
-          type: "apiKey",
-          name: options.sessionCookieName,
-          in: "cookie",
-          description: "Better Auth session cookie",
+    version: OPENAPI_VERSION,
+    base: {
+      info: { title: options.title, version: options.version },
+      servers: options.servers,
+      tags: options.tags,
+      security: [{ session: [] }],
+      components: {
+        securitySchemes: {
+          session: {
+            type: "apiKey",
+            name: options.sessionCookieName,
+            in: "cookie",
+            description: "Better Auth session cookie",
+          },
         },
       },
     },

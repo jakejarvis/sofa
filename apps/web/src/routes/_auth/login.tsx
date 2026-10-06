@@ -5,7 +5,7 @@ import { client } from "@/lib/orpc/client";
 
 export const Route = createFileRoute("/_auth/login")({
   beforeLoad: async () => {
-    const publicInfo = await client.system.publicInfo({});
+    const publicInfo = await client.system.publicInfo();
     if (publicInfo.userCount === 0) throw redirect({ to: "/register" });
 
     return { publicInfo };

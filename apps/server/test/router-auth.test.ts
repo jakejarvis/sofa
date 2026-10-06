@@ -1,4 +1,4 @@
-import { isProcedure } from "@orpc/server";
+import { Procedure } from "@orpc/server";
 import { describe, expect, test } from "vitest";
 
 import { admin, authed } from "../src/orpc/middleware";
@@ -11,8 +11,13 @@ function collectProcedures(
   node: unknown,
   path: string[] = [],
 ): { path: string; middlewares: readonly unknown[] }[] {
-  if (isProcedure(node)) {
-    return [{ path: path.join("."), middlewares: node["~orpc"].middlewares }];
+  if (node instanceof Procedure) {
+    return [
+      {
+        path: path.join("."),
+        middlewares: node["~orpc"].orderedMiddlewares.map((m) => m.middleware),
+      },
+    ];
   }
   return Object.entries(node as Record<string, unknown>).flatMap(([key, child]) =>
     collectProcedures(child, [...path, key]),

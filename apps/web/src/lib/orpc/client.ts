@@ -1,7 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
-import type { ContractRouterClient } from "@orpc/contract";
+import type { RouterContractClient } from "@orpc/contract";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -30,10 +30,11 @@ export const queryClient = new QueryClient({
 });
 
 export const link = new RPCLink({
-  url: `${window.location.origin}/rpc`,
-  fetch: (input, init) => fetch(input, { ...init, credentials: "include" }),
+  // No `origin`: in the browser the link uses the current origin.
+  url: "/rpc",
+  fetch: (url, init) => fetch(url, { ...init, credentials: "include" }),
 });
 
-export const client: ContractRouterClient<typeof contract> = createORPCClient(link);
+export const client: RouterContractClient<typeof contract> = createORPCClient(link);
 
 export const orpc = createTanstackQueryUtils(client);
