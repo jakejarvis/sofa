@@ -26,6 +26,22 @@ function todayLocal() {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
+/**
+ * Resolve the picked date/time to a timestamp. Date-only watches land at local noon (matching
+ * imported date-only watches), clamped to `now` when noon hasn't happened yet today. Returns
+ * null for an invalid or future result.
+ */
+export function resolveWatchedAt(date: string, time: string, now: Date): Date | null {
+  if (time) {
+    const picked = new Date(`${date}T${time}:00`);
+    if (Number.isNaN(picked.getTime()) || picked > now) return null;
+    return picked;
+  }
+  const noon = new Date(`${date}T12:00:00`);
+  if (Number.isNaN(noon.getTime())) return null;
+  return noon > now ? now : noon;
+}
+
 /** Log a watch of a movie on a chosen date (and optional time). */
 export function LogWatchDialog({ titleId }: { titleId: string }) {
   const { t } = useLingui();
@@ -58,9 +74,11 @@ export function LogWatchDialog({ titleId }: { titleId: string }) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!date || isPending) return;
-    // Date-only watches land at local noon, matching imported date-only watches.
-    const watchedAt = new Date(`${date}T${time || "12:00"}:00`);
-    if (Number.isNaN(watchedAt.getTime())) return;
+    const watchedAt = resolveWatchedAt(date, time, new Date());
+    if (!watchedAt) {
+      toast.error(t`That time is in the future`);
+      return;
+    }
     mutate({ kind: "movie", id: titleId, watchedAt: watchedAt.toISOString() });
   }
 

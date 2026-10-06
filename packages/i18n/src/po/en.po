@@ -3338,6 +3338,10 @@ msgstr "Switch to {name}"
 msgid "Takes effect after restarting the app"
 msgstr "Takes effect after restarting the app"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "That time is in the future"
+msgstr "That time is in the future"
+
 #: apps/native/src/app/(auth)/server-url.tsx
 msgid "That URL doesn't look right. Include the full server address."
 msgstr "That URL doesn't look right. Include the full server address."

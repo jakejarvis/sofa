@@ -3338,6 +3338,10 @@ msgstr "{name}(으)로 전환"
 msgid "Takes effect after restarting the app"
 msgstr "앱을 다시 시작하면 적용됩니다"
 
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "That time is in the future"
+msgstr ""
+
 #: apps/native/src/app/(auth)/server-url.tsx
 msgid "That URL doesn't look right. Include the full server address."
 msgstr ""
