@@ -8,7 +8,7 @@ import {
   IconUser,
 } from "@tabler/icons-react-native";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useIsPreview, useLocalSearchParams, useRouter } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { Pressable, useWindowDimensions, View } from "react-native";
@@ -68,6 +68,7 @@ export default function PersonDetailScreen() {
       }),
     );
 
+  const isPreview = useIsPreview();
   const person = data?.pages[0]?.person;
   const filmography = useMemo(() => data?.pages.flatMap((p) => p.filmography) ?? [], [data?.pages]);
   const userStatuses = useMemo(
@@ -84,6 +85,7 @@ export default function PersonDetailScreen() {
   const personDepartment = person?.knownForDepartment ?? null;
 
   useEffect(() => {
+    if (isPreview) return;
     if (personName) {
       addRecentlyViewed({
         id,
@@ -93,7 +95,7 @@ export default function PersonDetailScreen() {
         subtitle: personDepartment,
       });
     }
-  }, [id, personName, personProfilePath, personDepartment]);
+  }, [isPreview, id, personName, personProfilePath, personDepartment]);
 
   const renderFilmographyItem = useCallback(
     ({ item: credit }: { item: (typeof filmography)[number] }) => (

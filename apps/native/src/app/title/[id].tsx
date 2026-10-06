@@ -16,7 +16,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
-import { Link, useLocalSearchParams, useRouter } from "expo-router";
+import { Link, useIsPreview, useLocalSearchParams, useRouter } from "expo-router";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import * as WebBrowser from "expo-web-browser";
 import { useCallback, useEffect, useMemo } from "react";
@@ -94,6 +94,7 @@ const titleDetailStyles = StyleSheet.create({
 export default function TitleDetailScreen() {
   const { t } = useLingui();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const isPreview = useIsPreview();
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { back } = useRouter();
@@ -126,7 +127,7 @@ export default function TitleDetailScreen() {
   const title = detail.data?.title;
   const detailErrorCode = getAppErrorCode(detail.error);
   const palette = title?.colorPalette ?? null;
-  useTitleTheme(palette);
+  useTitleTheme(isPreview ? null : palette);
   const providerIcon = process.env.EXPO_OS === "ios" ? IconBrandAppstore : IconBrandGooglePlay;
 
   const titleName = title?.title;
@@ -135,6 +136,7 @@ export default function TitleDetailScreen() {
   const titleYear = (title?.releaseDate ?? title?.firstAirDate)?.slice(0, 4) ?? null;
 
   useEffect(() => {
+    if (isPreview) return;
     if (titleName && titleType) {
       addRecentlyViewed({
         id,
@@ -144,7 +146,7 @@ export default function TitleDetailScreen() {
         subtitle: titleYear,
       });
     }
-  }, [id, titleName, titleType, titlePosterPath, titleYear]);
+  }, [isPreview, id, titleName, titleType, titlePosterPath, titleYear]);
 
   const seasons = detail.data?.seasons ?? [];
   const cast = detail.data?.cast ?? [];
