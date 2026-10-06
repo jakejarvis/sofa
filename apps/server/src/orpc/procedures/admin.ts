@@ -20,7 +20,13 @@ import { getSystemHealth } from "@sofa/core/system-health";
 import { isTelemetryEnabled } from "@sofa/core/telemetry";
 import { getCachedUpdateCheck, isUpdateCheckEnabled } from "@sofa/core/update-check";
 
-import { pauseJobs, rescheduleBackup, resumeJobs, triggerJob as triggerCronJob } from "../../cron";
+import {
+  getJobSchedules,
+  pauseJobs,
+  rescheduleBackup,
+  resumeJobs,
+  triggerJob as triggerCronJob,
+} from "../../cron";
 import { os } from "../context";
 import { admin } from "../middleware";
 
@@ -100,12 +106,17 @@ export const backupsRestore = os.admin.backups.restore
   });
 
 export const backupsSchedule = os.admin.backups.schedule.use(admin).handler(() => {
+  const enabled = getSetting("scheduledBackups") === "true";
   return {
-    enabled: getSetting("scheduledBackups") === "true",
+    enabled,
     maxRetention: Number.parseInt(getSetting("maxBackupRetention") ?? "7", 10),
     frequency: (getSetting("backupScheduleFrequency") ?? "1d") as "6h" | "12h" | "1d" | "7d",
     time: getSetting("backupScheduleTime") ?? "02:00",
     dayOfWeek: Number.parseInt(getSetting("backupScheduleDow") ?? "0", 10),
+    nextRunAt: enabled
+      ? (getJobSchedules().find((j) => j.jobName === "scheduledBackup")?.nextRunAt ?? null)
+      : null,
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   };
 });
 

@@ -1062,6 +1062,11 @@ export const BackupScheduleOutput = z
     frequency: backupFrequency,
     time: z.string().describe("Scheduled time (HH:MM, 24-hour format)"),
     dayOfWeek: z.number().describe("Day of week for weekly backups (0 = Sunday)"),
+    nextRunAt: z
+      .string()
+      .nullable()
+      .describe("When the next scheduled backup will run (ISO 8601), or null when disabled"),
+    timeZone: z.string().describe("IANA time zone the schedule's times are in (the server's)"),
   })
   .meta({ description: "Automated backup schedule configuration" });
 

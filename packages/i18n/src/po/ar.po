@@ -3497,6 +3497,10 @@ msgstr ""
 msgid "Time:"
 msgstr "الوقت:"
 
+#: apps/web/src/components/settings/backup-schedule-section.tsx
+msgid "Times use the server's time zone ({timeZone})"
+msgstr ""
+
 #: apps/web/src/components/command-palette.tsx
 msgid "Title"
 msgstr "العنوان"

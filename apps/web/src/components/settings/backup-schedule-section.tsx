@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconCalendarWeek } from "@tabler/icons-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -38,56 +38,9 @@ interface BackupScheduleState {
   dow: number;
 }
 
-function getNextBackupDate(frequency: BackupFrequency, time: string, dayOfWeek: number): Date {
-  const now = new Date();
-  const [h, m] = time.split(":").map(Number);
-
-  if (frequency === "6h") {
-    const next = new Date(now);
-    const currentHour = next.getHours();
-    const nextHour = Math.ceil((currentHour + 1) / 6) * 6;
-    next.setHours(nextHour, m, 0, 0);
-    if (next <= now) next.setHours(next.getHours() + 6);
-    return next;
-  }
-
-  if (frequency === "12h") {
-    const next = new Date(now);
-    const h2 = (h + 12) % 24;
-    const candidates = [h, h2].sort((a, b) => a - b);
-    for (const candidate of candidates) {
-      next.setHours(candidate, m, 0, 0);
-      if (next > now) return next;
-    }
-    next.setDate(next.getDate() + 1);
-    next.setHours(candidates[0], m, 0, 0);
-    return next;
-  }
-
-  if (frequency === "7d") {
-    const next = new Date(now);
-    const daysUntil = (dayOfWeek - next.getDay() + 7) % 7;
-    if (daysUntil === 0) {
-      next.setHours(h, m, 0, 0);
-      if (next > now) return next;
-      next.setDate(next.getDate() + 7);
-      next.setHours(h, m, 0, 0);
-      return next;
-    }
-    next.setDate(next.getDate() + daysUntil);
-    next.setHours(h, m, 0, 0);
-    return next;
-  }
-
-  // 1d
-  const next = new Date(now);
-  next.setHours(h, m, 0, 0);
-  if (next <= now) next.setDate(next.getDate() + 1);
-  return next;
-}
-
 export function BackupScheduleSection() {
   const { t } = useLingui();
+  const queryClient = useQueryClient();
 
   const DAYS_OF_WEEK = [
     t`Sunday`,
@@ -118,9 +71,12 @@ export function BackupScheduleSection() {
 
   const { enabled, maxRetention, frequency, time, dow } = current;
 
-  function formatNextBackup(freq: BackupFrequency, timeOfDay: string, dayOfWeek: number): string {
-    const next = getNextBackupDate(freq, timeOfDay, dayOfWeek);
-    const distance = formatRelativeTime(next);
+  const nextRunAt = scheduleData?.nextRunAt;
+  const timeZone = scheduleData?.timeZone;
+
+  function formatNextBackup(): string | null {
+    if (!nextRunAt) return null;
+    const distance = formatRelativeTime(new Date(nextRunAt));
     return t`Next backup ${distance}`;
   }
 
@@ -151,6 +107,8 @@ export function BackupScheduleSection() {
           toast.error(t`Failed to update schedule`);
         }
       },
+      onSettled: () =>
+        queryClient.invalidateQueries({ queryKey: orpc.admin.backups.schedule.key() }),
     }),
   );
 
@@ -220,7 +178,8 @@ export function BackupScheduleSection() {
               <CardDescription>
                 {enabled ? (
                   <span className="inline-flex flex-wrap items-baseline" suppressHydrationWarning>
-                    {formatNextBackup(frequency, time, dow)}. <Trans>Keeping</Trans>{" "}
+                    {formatNextBackup() && <>{formatNextBackup()}. </>}
+                    <Trans>Keeping</Trans>{" "}
                     <Select
                       value={String(maxRetention)}
                       onValueChange={(v) => v && changeMaxRetention(Number(v))}
@@ -330,6 +289,12 @@ export function BackupScheduleSection() {
                     </motion.div>
                   )}
                 </AnimatePresence>
+
+                {timeZone && (
+                  <p className="text-muted-foreground/70 text-xs">
+                    <Trans>Times use the server's time zone ({timeZone})</Trans>
+                  </p>
+                )}
 
                 {/* Time selector — shown for 12h, 1d, 7d */}
                 <AnimatePresence initial={false}>

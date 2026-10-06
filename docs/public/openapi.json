@@ -6422,6 +6422,21 @@
                     "dayOfWeek": {
                       "type": "number",
                       "description": "Day of week for weekly backups (0 = Sunday)"
+                    },
+                    "nextRunAt": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "When the next scheduled backup will run (ISO 8601), or null when disabled"
+                    },
+                    "timeZone": {
+                      "type": "string",
+                      "description": "IANA time zone the schedule's times are in (the server's)"
                     }
                   },
                   "required": [
@@ -6429,7 +6444,9 @@
                     "maxRetention",
                     "frequency",
                     "time",
-                    "dayOfWeek"
+                    "dayOfWeek",
+                    "nextRunAt",
+                    "timeZone"
                   ],
                   "description": "Automated backup schedule configuration"
                 }
