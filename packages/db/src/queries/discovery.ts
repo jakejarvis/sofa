@@ -222,13 +222,36 @@ export function getHighlyRatedTitleIds(userId: string) {
     .map((r) => r.titleId);
 }
 
-export function getAllTrackedTitleIds(userId: string) {
-  return db
+/** Title IDs the user has tracked, rated or watched (anything they already know). */
+export function getKnownTitleIds(userId: string): Set<string> {
+  const ids = new Set<string>();
+  for (const r of db
     .select({ titleId: userTitleStatus.titleId })
     .from(userTitleStatus)
     .where(eq(userTitleStatus.userId, userId))
-    .all()
-    .map((r) => r.titleId);
+    .all())
+    ids.add(r.titleId);
+  for (const r of db
+    .select({ titleId: userRatings.titleId })
+    .from(userRatings)
+    .where(eq(userRatings.userId, userId))
+    .all())
+    ids.add(r.titleId);
+  for (const r of db
+    .selectDistinct({ titleId: userMovieWatches.titleId })
+    .from(userMovieWatches)
+    .where(eq(userMovieWatches.userId, userId))
+    .all())
+    ids.add(r.titleId);
+  for (const r of db
+    .selectDistinct({ titleId: seasons.titleId })
+    .from(userEpisodeWatches)
+    .innerJoin(episodes, eq(episodes.id, userEpisodeWatches.episodeId))
+    .innerJoin(seasons, eq(seasons.id, episodes.seasonId))
+    .where(eq(userEpisodeWatches.userId, userId))
+    .all())
+    ids.add(r.titleId);
+  return ids;
 }
 
 export function getRecommendationRows(sourceIds: string[]) {

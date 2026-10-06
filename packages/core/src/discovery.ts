@@ -1,6 +1,6 @@
 import { localDateString } from "@sofa/config";
 import {
-  getAllTrackedTitleIds,
+  getKnownTitleIds,
   getAvailabilityByTitleIds,
   getEngagedTitleIds,
   getEpisodesBySeasonIds,
@@ -310,8 +310,8 @@ export function getRecommendationsFeed(userId: string) {
   const sourceIds = [...new Set([...userCompletedOrRated, ...ratedIds])];
   if (sourceIds.length === 0) return [];
 
-  // Get all tracked title IDs to exclude
-  const trackedIds = new Set(getAllTrackedTitleIds(userId));
+  // Exclude anything the user has tracked, rated or watched
+  const knownIds = getKnownTitleIds(userId);
 
   // Batch fetch all recommendations for all source IDs (1 query)
   const allRecRows = getRecommendationRows(sourceIds);
@@ -319,7 +319,7 @@ export function getRecommendationsFeed(userId: string) {
   const recs: Map<string, { titleId: string; score: number }> = new Map();
 
   for (const rec of allRecRows) {
-    if (trackedIds.has(rec.recommendedTitleId)) continue;
+    if (knownIds.has(rec.recommendedTitleId)) continue;
     const existing = recs.get(rec.recommendedTitleId);
     const score = 100 - rec.rank;
     if (existing) {

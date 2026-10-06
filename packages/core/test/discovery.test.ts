@@ -454,6 +454,51 @@ describe("getRecommendationsFeed", () => {
     expect(feed).toHaveLength(0);
   });
 
+  test("excludes rated titles that are not in the library", () => {
+    insertUser();
+    insertTitle({ id: "m1", tmdbId: 1 });
+    insertTitle({ id: "m2", tmdbId: 2 });
+    insertTitle({ id: "m3", tmdbId: 3 });
+    insertRating("user-1", "m1", 5);
+    insertRating("user-1", "m2", 5);
+    insertRecommendation("m1", "m2", { rank: 1 });
+    insertRecommendation("m1", "m3", { rank: 2 });
+
+    const ids = getRecommendationsFeed("user-1").map((t) => t?.id);
+    expect(ids).toContain("m3");
+    expect(ids).not.toContain("m2");
+  });
+
+  test("excludes watched movies that are not in the library", () => {
+    insertUser();
+    insertTitle({ id: "m1", tmdbId: 1 });
+    insertTitle({ id: "m2", tmdbId: 2 });
+    insertTitle({ id: "m3", tmdbId: 3 });
+    insertStatus("user-1", "m1", "completed");
+    insertMovieWatch("user-1", "m2");
+    insertRecommendation("m1", "m2", { rank: 1 });
+    insertRecommendation("m1", "m3", { rank: 2 });
+
+    const ids = getRecommendationsFeed("user-1").map((t) => t?.id);
+    expect(ids).toContain("m3");
+    expect(ids).not.toContain("m2");
+  });
+
+  test("excludes shows with watched episodes that are not in the library", () => {
+    insertUser();
+    insertTitle({ id: "m1", tmdbId: 1 });
+    insertTitle({ id: "m3", tmdbId: 3 });
+    const { episodeIds } = insertTvShow("tv-1", 99999, 1, 3);
+    insertStatus("user-1", "m1", "completed");
+    insertEpisodeWatch("user-1", episodeIds[0]!);
+    insertRecommendation("m1", "tv-1", { rank: 1 });
+    insertRecommendation("m1", "m3", { rank: 2 });
+
+    const ids = getRecommendationsFeed("user-1").map((t) => t?.id);
+    expect(ids).toContain("m3");
+    expect(ids).not.toContain("tv-1");
+  });
+
   test("returns empty when no source titles", () => {
     insertUser();
     const feed = getRecommendationsFeed("user-1");
