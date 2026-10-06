@@ -29,24 +29,20 @@ import { getDisplayStatusesByTitleIds } from "./tracking";
 
 export type TimePeriod = "today" | "this_week" | "this_month" | "this_year";
 
-export function periodStartTimestamp(period: TimePeriod): number {
-  const now = new Date();
-  const start = new Date(now);
+export function periodStartTimestamp(period: TimePeriod, now: Date = new Date()): number {
+  let start: Date;
   switch (period) {
-    case "today":
-      start.setHours(now.getHours() - 24, now.getMinutes(), 0, 0);
+    case "today": // 24 hourly buckets, oldest = the hour 23 hours ago
+      start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() - 23);
       break;
-    case "this_week":
-      start.setDate(now.getDate() - 7);
-      start.setHours(0, 0, 0, 0);
+    case "this_week": // 7 daily buckets incl. today
+      start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
       break;
-    case "this_month":
-      start.setDate(now.getDate() - 30);
-      start.setHours(0, 0, 0, 0);
+    case "this_month": // 30 daily buckets incl. today
+      start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29);
       break;
-    case "this_year":
-      start.setFullYear(now.getFullYear() - 1);
-      start.setHours(0, 0, 0, 0);
+    case "this_year": // 12 monthly buckets incl. this month
+      start = new Date(now.getFullYear(), now.getMonth() - 11, 1);
       break;
   }
   return Math.floor(start.getTime() / 1000);
@@ -117,8 +113,7 @@ export function getWatchHistory(
     case "this_year":
       fmt = "%Y-%m";
       buckets = Array.from({ length: 12 }, (_, i) => {
-        const d = new Date(now);
-        d.setMonth(now.getMonth() - 11 + i);
+        const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
         return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, "0")}`;
       });
       break;

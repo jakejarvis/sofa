@@ -23,6 +23,7 @@ import {
   getUserStats,
   getWatchCount,
   getWatchHistory,
+  periodStartTimestamp,
 } from "../src/discovery";
 
 const TEST_NOW = new Date("2026-03-01T12:00:00Z");
@@ -37,6 +38,7 @@ afterAll(() => {
 });
 
 beforeEach(() => {
+  vi.setSystemTime(TEST_NOW);
   clearAllTables();
 });
 
@@ -117,6 +119,66 @@ describe("getWatchHistory", () => {
     const history = getWatchHistory("user-1", "movies", "this_year");
     expect(history).toHaveLength(12);
   });
+});
+
+describe("getWatchHistory year buckets", () => {
+  test("yields 12 distinct consecutive months on Oct 31", () => {
+    vi.setSystemTime(new Date(2026, 9, 31, 12));
+    insertUser();
+    expect(getWatchHistory("user-1", "movies", "this_year").map((b) => b.bucket)).toEqual([
+      "2025-11",
+      "2025-12",
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07",
+      "2026-08",
+      "2026-09",
+      "2026-10",
+    ]);
+  });
+
+  test("yields 12 distinct consecutive months on Mar 30", () => {
+    vi.setSystemTime(new Date(2027, 2, 30, 12));
+    insertUser();
+    expect(getWatchHistory("user-1", "movies", "this_year").map((b) => b.bucket)).toEqual([
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07",
+      "2026-08",
+      "2026-09",
+      "2026-10",
+      "2026-11",
+      "2026-12",
+      "2027-01",
+      "2027-02",
+      "2027-03",
+    ]);
+  });
+});
+
+describe("window boundaries match chart buckets", () => {
+  test.each(["today", "this_week", "this_month", "this_year"] as const)(
+    "%s count equals chart sum at the window edge",
+    (period) => {
+      const now = new Date(2026, 6, 15, 12, 30);
+      vi.setSystemTime(now);
+      insertUser();
+      insertTitle({ id: "inside", tmdbId: 1 });
+      insertTitle({ id: "outside", tmdbId: 2 });
+      const startMs = periodStartTimestamp(period, now) * 1000;
+      insertMovieWatch("user-1", "inside", new Date(startMs + 60_000));
+      insertMovieWatch("user-1", "outside", new Date(startMs - 60_000));
+
+      expect(getWatchCount("user-1", "movies", period)).toBe(1);
+      const sum = getWatchHistory("user-1", "movies", period).reduce((n, b) => n + b.count, 0);
+      expect(sum).toBe(1);
+    },
+  );
 });
 
 // ── getUserStats ────────────────────────────────────────────────────
