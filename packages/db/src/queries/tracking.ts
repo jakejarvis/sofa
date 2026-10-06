@@ -384,13 +384,6 @@ export function deleteAllEpisodeWatchesForTitle(userId: string, titleId: string)
 
 type WatchSource = "manual" | "import" | "plex" | "jellyfin" | "emby";
 
-export interface WatchHistoryCursor {
-  /** watchedAt in epoch ms */
-  t: number;
-  /** watch row id */
-  i: string;
-}
-
 export interface WatchHistoryQueryOptions {
   limit: number;
   source?: WatchSource;

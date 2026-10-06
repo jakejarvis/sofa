@@ -1,15 +1,7 @@
-import { and, eq, gte, inArray, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
 
 import { db } from "../client";
-import {
-  cronRuns,
-  seasons,
-  titleAvailability,
-  titleCast,
-  titleRecommendations,
-  titles,
-  userTitleStatus,
-} from "../schema";
+import { cronRuns, seasons, titles, userTitleStatus } from "../schema";
 
 export function insertCronRunReturning(jobName: string) {
   return db
@@ -65,37 +57,6 @@ export function getStaleNonLibraryTitles(staleDate: Date, limit: number) {
     .all();
 }
 
-export function getTitlesWithStaleOffers(titleIds: string[]) {
-  if (titleIds.length === 0) return new Set<string>();
-  return new Set(
-    db
-      .select({ titleId: titleAvailability.titleId })
-      .from(titleAvailability)
-      .where(inArray(titleAvailability.titleId, titleIds))
-      .groupBy(titleAvailability.titleId)
-      .all()
-      .map((r) => r.titleId),
-  );
-}
-
-export function getTitlesWithStaleOffersFetchedBefore(titleIds: string[], staleDate: Date) {
-  if (titleIds.length === 0) return new Set<string>();
-  return new Set(
-    db
-      .select({ titleId: titleAvailability.titleId })
-      .from(titleAvailability)
-      .where(
-        and(
-          inArray(titleAvailability.titleId, titleIds),
-          lt(titleAvailability.lastFetchedAt, staleDate),
-        ),
-      )
-      .groupBy(titleAvailability.titleId)
-      .all()
-      .map((r) => r.titleId),
-  );
-}
-
 export function getReturningTvShows() {
   const returningStatuses = ["Returning Series", "In Production"];
   return db
@@ -133,39 +94,12 @@ export function getTitleByIdForCron(titleId: string) {
   return db.select().from(titles).where(eq(titles.id, titleId)).get();
 }
 
-export function getCastEntryForTitle(titleId: string) {
-  return db.select().from(titleCast).where(eq(titleCast.titleId, titleId)).limit(1).get();
-}
-
 export function deleteOldCronRuns(beforeDate: Date): number {
   return db
     .delete(cronRuns)
     .where(lt(cronRuns.startedAt, beforeDate))
     .returning({ id: cronRuns.id })
     .all().length;
-}
-
-export function getTitlesWithFreshRecommendations(
-  titleIds: string[],
-  sinceDate: Date,
-): Set<string> {
-  if (titleIds.length === 0) return new Set();
-
-  return new Set(
-    db
-      .select({ titleId: titleRecommendations.titleId })
-      .from(titleRecommendations)
-      .where(
-        and(
-          inArray(titleRecommendations.titleId, titleIds),
-          // All recs for a title share the same lastFetchedAt, so any row suffices
-          gte(titleRecommendations.lastFetchedAt, sinceDate),
-        ),
-      )
-      .groupBy(titleRecommendations.titleId)
-      .all()
-      .map((r) => r.titleId),
-  );
 }
 
 type CheckedAtColumn = "availabilityCheckedAt" | "recommendationsCheckedAt" | "creditsCheckedAt";

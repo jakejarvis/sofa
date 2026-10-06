@@ -1,5 +1,4 @@
 import {
-  getCastEntryForTitle,
   getLibraryTitleIds as queryGetLibraryTitleIds,
   getRefreshCandidates,
   getReturningTvShows,
@@ -8,9 +7,6 @@ import {
   getTitleByIdForCron,
   getTitleIdsCheckedBefore,
   getTitleIdsWithStaleSeasons,
-  getTitlesWithFreshRecommendations,
-  getTitlesWithStaleOffers,
-  getTitlesWithStaleOffersFetchedBefore,
   insertCronRunReturning,
   updateCronRunError,
   updateCronRunSuccess,
@@ -109,17 +105,9 @@ export function getStaleNonLibraryTitlesForRefresh(staleDate: Date, limit: numbe
   return getStaleNonLibraryTitles(staleDate, limit);
 }
 
-export function getStaleAvailabilityTitles(libraryIds: string[], staleDate: Date) {
-  const withOffers = getTitlesWithStaleOffers(libraryIds);
-  const withStaleOffers = getTitlesWithStaleOffersFetchedBefore(libraryIds, staleDate);
-  return { withOffers, withStaleOffers };
-}
-
 export {
-  getCastEntryForTitle,
   getReturningTvShows,
   getTitleByIdForCron,
   getTitleIdsCheckedBefore,
   getTitleIdsWithStaleSeasons,
-  getTitlesWithFreshRecommendations,
 };
