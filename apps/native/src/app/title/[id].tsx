@@ -149,7 +149,10 @@ export default function TitleDetailScreen() {
   }, [isPreview, id, titleName, titleType, titlePosterPath, titleYear]);
 
   const seasons = detail.data?.seasons ?? [];
-  const cast = detail.data?.cast ?? [];
+  const cast = useMemo(
+    () => (detail.data?.cast ?? []).filter((member) => member.department === "Acting"),
+    [detail.data?.cast],
+  );
   const availability = detail.data?.availability ?? [];
   const watchedEpisodeIds = useMemo(
     () => new Set(userInfo.data?.episodeWatches ?? []),
