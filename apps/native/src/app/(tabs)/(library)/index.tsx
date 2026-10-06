@@ -382,39 +382,51 @@ export default function LibraryScreen() {
 
   // ─── Render ───────────────────────────────────────────────────────
 
+  const nonListState = libraryQuery.isPending ? (
+    <View className="items-center justify-center py-16">
+      <Spinner colorClassName="accent-primary" />
+    </View>
+  ) : libraryQuery.isError ? (
+    <EmptyState
+      icon={IconAlertTriangle}
+      title={t`Something went wrong`}
+      description={t`Could not load your library`}
+      actionLabel={t`Retry`}
+      onAction={() => libraryQuery.refetch()}
+    />
+  ) : activeFilterCount > 0 ? (
+    <EmptyState
+      icon={IconAdjustmentsHorizontal}
+      title={t`No matching titles`}
+      description={t`Try adjusting your filters`}
+      actionLabel={t`Clear filters`}
+      onAction={clearAll}
+    />
+  ) : (
+    <EmptyState
+      icon={IconBooks}
+      title={t`Your library is empty`}
+      description={t`Start tracking movies and shows`}
+    />
+  );
+
   return (
     <View collapsable={false} className="bg-background flex-1">
-      {libraryQuery.isPending ? (
-        <View className="flex-1 items-center justify-center">
-          <Spinner colorClassName="accent-primary" />
-        </View>
-      ) : libraryQuery.isError && allItems.length === 0 ? (
-        <EmptyState
-          icon={IconAlertTriangle}
-          title={t`Something went wrong`}
-          description={t`Could not load your library`}
-          actionLabel={t`Retry`}
-          onAction={() => libraryQuery.refetch()}
-        />
-      ) : allItems.length === 0 ? (
-        <Animated.View entering={FadeIn.duration(300)} className="flex-1">
-          {filterStrip}
-          {activeFilterCount > 0 ? (
-            <EmptyState
-              icon={IconAdjustmentsHorizontal}
-              title={t`No matching titles`}
-              description={t`Try adjusting your filters`}
-              actionLabel={t`Clear filters`}
-              onAction={clearAll}
-            />
-          ) : (
-            <EmptyState
-              icon={IconBooks}
-              title={t`Your library is empty`}
-              description={t`Start tracking movies and shows`}
-            />
-          )}
-        </Animated.View>
+      {allItems.length === 0 ? (
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={{
+            paddingHorizontal: EDGE_PADDING - GAP / 2,
+            paddingBottom: 16,
+          }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Animated.View entering={FadeIn.duration(300)}>
+            {filterStrip}
+            {nonListState}
+          </Animated.View>
+        </ScrollView>
       ) : (
         <FlashList
           data={allItems}
