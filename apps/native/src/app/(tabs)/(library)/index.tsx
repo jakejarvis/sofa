@@ -17,6 +17,7 @@ import { Pressable, RefreshControl, ScrollView, View, useWindowDimensions } from
 import Animated, { FadeIn } from "react-native-reanimated";
 
 import { EmptyState } from "@/components/ui/empty-state";
+import { LoadMoreFooter } from "@/components/ui/load-more-footer";
 import { PosterCard } from "@/components/ui/poster-card";
 import { SelectModal } from "@/components/ui/select-modal";
 import { Spinner } from "@/components/ui/spinner";
@@ -438,18 +439,11 @@ export default function LibraryScreen() {
           }}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
-            libraryQuery.isFetchingNextPage ? (
-              <View className="items-center py-4">
-                <Spinner />
-              </View>
-            ) : libraryQuery.isFetchNextPageError ? (
-              <View className="flex-row items-center justify-center gap-3 py-4">
-                <Text className="text-muted-foreground text-sm">{t`Couldn't load more`}</Text>
-                <Pressable onPress={() => libraryQuery.fetchNextPage()}>
-                  <Text className="text-primary font-sans text-sm font-medium">{t`Retry`}</Text>
-                </Pressable>
-              </View>
-            ) : null
+            <LoadMoreFooter
+              isFetchingNextPage={libraryQuery.isFetchingNextPage}
+              isFetchNextPageError={libraryQuery.isFetchNextPageError}
+              onRetry={() => libraryQuery.fetchNextPage()}
+            />
           }
         />
       )}

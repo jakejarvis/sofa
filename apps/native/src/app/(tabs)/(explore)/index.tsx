@@ -80,6 +80,8 @@ export default function ExploreScreen() {
             defaultUserStatuses={trendingStatuses}
             defaultEpisodeProgress={trendingProgress}
             isLoading={trending.isPending}
+            isError={trending.isError}
+            onRetry={() => void trending.refetch()}
           />
         </Animated.View>
 
@@ -93,6 +95,8 @@ export default function ExploreScreen() {
             defaultEpisodeProgress={popularMovies.data?.episodeProgress ?? {}}
             genres={movieGenres.data?.genres}
             isLoading={popularMovies.isPending}
+            isError={popularMovies.isError}
+            onRetry={() => void popularMovies.refetch()}
           />
         </Animated.View>
 
@@ -106,6 +110,8 @@ export default function ExploreScreen() {
             defaultEpisodeProgress={popularTv.data?.episodeProgress ?? {}}
             genres={tvGenres.data?.genres}
             isLoading={popularTv.isPending}
+            isError={popularTv.isError}
+            onRetry={() => void popularTv.refetch()}
           />
         </Animated.View>
       </View>

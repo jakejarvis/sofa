@@ -97,6 +97,16 @@ export default function RegisterScreen() {
     }
   };
 
+  if (publicInfo.isPending) {
+    return (
+      <AuthScreen title={t`Create account`}>
+        <View className="items-center py-12">
+          <Spinner />
+        </View>
+      </AuthScreen>
+    );
+  }
+
   if (publicInfo.isError && !publicInfo.data) {
     return (
       <AuthScreen title={t`Can't reach the server`}>

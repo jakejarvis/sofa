@@ -863,7 +863,7 @@ msgstr "无法加载您的媒体库"
 msgid "Could not reach the server. Check your connection and the URL."
 msgstr ""
 
-#: apps/native/src/app/(tabs)/(library)/index.tsx
+#: apps/native/src/components/ui/load-more-footer.tsx
 msgid "Couldn't load more"
 msgstr ""
 
@@ -2905,6 +2905,7 @@ msgstr "正在获取您的观看记录、观看列表和评分..."
 #: apps/native/src/app/(tabs)/(search)/index.tsx
 #: apps/native/src/components/explore/filterable-title-row.tsx
 #: apps/native/src/components/settings/integrations-section.tsx
+#: apps/native/src/components/ui/load-more-footer.tsx
 #: apps/native/src/components/ui/offline-banner.ios.tsx
 #: apps/native/src/components/ui/offline-banner.tsx
 #: apps/native/src/components/ui/server-unreachable-banner.ios.tsx

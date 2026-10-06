@@ -9,6 +9,7 @@ import { useCSSVariable, useResolveClassNames } from "uniwind";
 
 import { HistoryRow } from "@/components/history/history-row";
 import { EmptyState } from "@/components/ui/empty-state";
+import { LoadMoreFooter } from "@/components/ui/load-more-footer";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
@@ -57,18 +58,26 @@ export default function HistoryScreen() {
 
   const [mediaType, setMediaType] = useState<"all" | "movie" | "tv">("all");
 
-  const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(
-      orpc.tracking.history.infiniteOptions({
-        input: (pageParam: string | undefined) => ({
-          limit: 30,
-          cursor: pageParam,
-          type: mediaType !== "all" ? mediaType : undefined,
-        }),
-        initialPageParam: undefined as string | undefined,
-        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetchNextPageError,
+  } = useInfiniteQuery(
+    orpc.tracking.history.infiniteOptions({
+      input: (pageParam: string | undefined) => ({
+        limit: 30,
+        cursor: pageParam,
+        type: mediaType !== "all" ? mediaType : undefined,
       }),
-    );
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    }),
+  );
 
   const allItems = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
 
@@ -96,10 +105,10 @@ export default function HistoryScreen() {
   const { refreshing, onRefresh } = usePullToRefresh(refreshHistory);
 
   const onEndReached = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) {
+    if (hasNextPage && !isFetchingNextPage && !isFetchNextPageError) {
       fetchNextPage();
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage]);
 
   const filterChips = (
     <ScrollView
@@ -163,6 +172,13 @@ export default function HistoryScreen() {
         contentInsetAdjustmentBehavior="automatic"
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          <LoadMoreFooter
+            isFetchingNextPage={isFetchingNextPage}
+            isFetchNextPageError={isFetchNextPageError}
+            onRetry={() => fetchNextPage()}
+          />
+        }
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListEmptyComponent={
           isPending ? null : isError && allItems.length === 0 ? (

@@ -16,6 +16,18 @@ import { orpc } from "@/lib/orpc";
 type TitleStatus = "in_watchlist" | "watching" | "caught_up" | "completed";
 const genreChipsContentStyle = { paddingHorizontal: 16 };
 
+function LoadError({ onRetry }: { onRetry: () => void }) {
+  const { t } = useLingui();
+  return (
+    <View className="items-center gap-2 py-6">
+      <Text className="text-muted-foreground text-sm">{t`Couldn't load titles`}</Text>
+      <Pressable onPress={onRetry}>
+        <Text className="text-primary font-sans text-sm font-medium">{t`Retry`}</Text>
+      </Pressable>
+    </View>
+  );
+}
+
 export function FilterableTitleRow({
   title,
   icon,
@@ -25,6 +37,8 @@ export function FilterableTitleRow({
   defaultEpisodeProgress,
   genres,
   isLoading,
+  isError,
+  onRetry,
 }: {
   title: string;
   icon: Icon;
@@ -43,6 +57,10 @@ export function FilterableTitleRow({
   defaultEpisodeProgress: Record<string, { watched: number; total: number }>;
   genres?: Array<{ id: number; name: string }>;
   isLoading?: boolean;
+  /** Error state of the default (no genre) list. */
+  isError?: boolean;
+  /** Retries the default (no genre) list. */
+  onRetry?: () => void;
 }) {
   const { t } = useLingui();
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
@@ -130,12 +148,9 @@ export function FilterableTitleRow({
       )}
 
       {!showLoading && items.length === 0 && selectedGenre !== null && discover.isError ? (
-        <View className="items-center gap-2 py-6">
-          <Text className="text-muted-foreground text-sm">{t`Couldn't load titles`}</Text>
-          <Pressable onPress={() => discover.refetch()}>
-            <Text className="text-primary font-sans text-sm font-medium">{t`Retry`}</Text>
-          </Pressable>
-        </View>
+        <LoadError onRetry={() => discover.refetch()} />
+      ) : !showLoading && items.length === 0 && selectedGenre === null && isError ? (
+        <LoadError onRetry={() => onRetry?.()} />
       ) : !showLoading && items.length === 0 && selectedGenre !== null ? (
         <View className="items-center py-6">
           <Text className="text-muted-foreground text-sm">

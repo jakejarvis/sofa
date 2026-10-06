@@ -9,6 +9,7 @@ import { useCSSVariable, useResolveClassNames } from "uniwind";
 
 import { UpcomingRow } from "@/components/dashboard/upcoming-row";
 import { EmptyState } from "@/components/ui/empty-state";
+import { LoadMoreFooter } from "@/components/ui/load-more-footer";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
@@ -59,21 +60,29 @@ export default function UpcomingScreen() {
   const [mediaType, setMediaType] = useState<"all" | "movie" | "tv">("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "watching" | "watchlist">("all");
 
-  const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(
-      orpc.library.upcoming.infiniteOptions({
-        input: (pageParam: string | undefined) => ({
-          days: 90,
-          limit: 20,
-          cursor: pageParam,
-          direction: isRecent ? "recent" : undefined,
-          mediaType: !isRecent && mediaType !== "all" ? mediaType : undefined,
-          statusFilter: !isRecent && statusFilter !== "all" ? [statusFilter] : undefined,
-        }),
-        initialPageParam: undefined as string | undefined,
-        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetchNextPageError,
+  } = useInfiniteQuery(
+    orpc.library.upcoming.infiniteOptions({
+      input: (pageParam: string | undefined) => ({
+        days: 90,
+        limit: 20,
+        cursor: pageParam,
+        direction: isRecent ? "recent" : undefined,
+        mediaType: !isRecent && mediaType !== "all" ? mediaType : undefined,
+        statusFilter: !isRecent && statusFilter !== "all" ? [statusFilter] : undefined,
       }),
-    );
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    }),
+  );
 
   const allItems = useMemo(() => data?.pages.flatMap((p) => p.items) ?? [], [data]);
   const sections = useMemo(
@@ -93,10 +102,10 @@ export default function UpcomingScreen() {
   const { refreshing, onRefresh } = usePullToRefresh(refreshUpcoming);
 
   const onEndReached = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) {
+    if (hasNextPage && !isFetchingNextPage && !isFetchNextPageError) {
       fetchNextPage();
     }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage]);
 
   const filterChips = (
     <ScrollView
@@ -186,6 +195,13 @@ export default function UpcomingScreen() {
         contentInsetAdjustmentBehavior="automatic"
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          <LoadMoreFooter
+            isFetchingNextPage={isFetchingNextPage}
+            isFetchNextPageError={isFetchNextPageError}
+            onRetry={() => fetchNextPage()}
+          />
+        }
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListEmptyComponent={
           isPending ? null : isError && allItems.length === 0 ? (

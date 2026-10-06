@@ -10,6 +10,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { RecentlyViewedList } from "@/components/search/recently-viewed-list";
 import { type SearchResultItem, SearchResultRow } from "@/components/search/search-result-row";
 import { EmptyState } from "@/components/ui/empty-state";
+import { LoadMoreFooter } from "@/components/ui/load-more-footer";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -117,17 +118,21 @@ export default function SearchScreen() {
           keyboardShouldPersistTaps="handled"
           contentInsetAdjustmentBehavior="automatic"
           onEndReached={() => {
-            if (searchResults.hasNextPage && !searchResults.isFetchingNextPage) {
+            if (
+              searchResults.hasNextPage &&
+              !searchResults.isFetchingNextPage &&
+              !searchResults.isFetchNextPageError
+            ) {
               searchResults.fetchNextPage();
             }
           }}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
-            searchResults.isFetchingNextPage ? (
-              <View className="items-center py-4">
-                <Spinner />
-              </View>
-            ) : null
+            <LoadMoreFooter
+              isFetchingNextPage={searchResults.isFetchingNextPage}
+              isFetchNextPageError={searchResults.isFetchNextPageError}
+              onRetry={() => searchResults.fetchNextPage()}
+            />
           }
         />
       )}
