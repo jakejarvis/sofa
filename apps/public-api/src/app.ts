@@ -19,6 +19,11 @@ app.use("*", cors());
 // ─── Version Check ──────────────────────────────────────────
 
 app.get("/v1/version", async (c) => {
+  // Query strings would bypass the edge cache (and spend the GitHub token's rate limit).
+  if (new URL(c.req.url).search) {
+    return c.redirect("/v1/version", 301);
+  }
+
   try {
     const res = await fetch(GITHUB_RELEASES_URL, {
       headers: {
@@ -55,12 +60,18 @@ app.post(
   zValidator(
     "json",
     z.object({
-      instanceId: z.string().min(1),
-      version: z.string().min(1),
-      arch: z.string().optional(),
-      users: z.union([z.number(), z.string()]).optional(),
-      titles: z.union([z.number(), z.string()]).optional(),
-      features: z.record(z.string(), z.unknown()).optional(),
+      instanceId: z.string().min(1).max(64),
+      version: z.string().min(1).max(64),
+      arch: z.string().max(64).optional(),
+      users: z.union([z.number(), z.string().max(16)]).optional(),
+      titles: z.union([z.number(), z.string().max(16)]).optional(),
+      features: z
+        .object({
+          imageCache: z.boolean().optional(),
+          oidc: z.boolean().optional(),
+          scheduledBackups: z.boolean().optional(),
+        })
+        .optional(),
     }),
   ),
   async (c) => {
@@ -80,11 +91,11 @@ app.post(
           event: "instance_report",
           distinct_id: body.instanceId,
           properties: {
+            ...body.features,
             version: body.version,
             arch: body.arch,
             users: body.users,
             titles: body.titles,
-            ...body.features,
           },
         }),
         signal: AbortSignal.timeout(10_000),
