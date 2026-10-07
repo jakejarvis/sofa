@@ -122,7 +122,7 @@
     },
     "apps/server": {
       "name": "@sofa/server",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "dependencies": {
         "@orpc/contract": "catalog:",
         "@orpc/json-schema": "catalog:",
@@ -148,7 +148,7 @@
     },
     "apps/web": {
       "name": "@sofa/web",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "dependencies": {
         "@base-ui/react": "1.8.0",
         "@fontsource-variable/dm-sans": "5.3.0",
@@ -210,7 +210,7 @@
     },
     "packages/api": {
       "name": "@sofa/api",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "dependencies": {
         "@orpc/contract": "catalog:",
         "@orpc/openapi": "catalog:",
@@ -223,7 +223,7 @@
     },
     "packages/auth": {
       "name": "@sofa/auth",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "dependencies": {
         "@better-auth/drizzle-adapter": "1.7.7",
         "@better-auth/expo": "catalog:",
@@ -240,7 +240,7 @@
     },
     "packages/config": {
       "name": "@sofa/config",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "devDependencies": {
         "@sofa/tsconfig": "workspace:*",
         "@types/bun": "catalog:",
@@ -249,7 +249,7 @@
     },
     "packages/core": {
       "name": "@sofa/core",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "dependencies": {
         "@orpc/server": "catalog:",
         "@sofa/api": "workspace:*",
@@ -272,7 +272,7 @@
     },
     "packages/db": {
       "name": "@sofa/db",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "dependencies": {
         "@sofa/config": "workspace:*",
         "@sofa/logger": "workspace:*",
@@ -287,7 +287,7 @@
     },
     "packages/i18n": {
       "name": "@sofa/i18n",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "dependencies": {
         "@lingui/core": "catalog:",
         "@lingui/react": "catalog:",
@@ -306,7 +306,7 @@
     },
     "packages/logger": {
       "name": "@sofa/logger",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "dependencies": {
         "pino": "10.4.0",
         "pino-pretty": "13.2.0",
@@ -319,7 +319,7 @@
     },
     "packages/test": {
       "name": "@sofa/test",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "dependencies": {
         "@sofa/db": "workspace:*",
         "better-sqlite3": "13.0.3",
@@ -334,7 +334,7 @@
     },
     "packages/tmdb": {
       "name": "@sofa/tmdb",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "dependencies": {
         "@sofa/logger": "workspace:*",
         "openapi-fetch": "0.17.0",
@@ -347,7 +347,7 @@
     },
     "packages/tsconfig": {
       "name": "@sofa/tsconfig",
-      "version": "0.2.0",
+      "version": "0.3.0",
     },
   },
   "trustedDependencies": [
