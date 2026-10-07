@@ -20,7 +20,7 @@ export function baseOptions(): BaseLayoutProps {
     },
     links: [
       { text: "Docs", url: "/docs" },
-      { text: "API Reference", url: "/docs/api" },
+      { text: "API", url: "/docs/api" },
     ],
     githubUrl: "https://github.com/jakejarvis/sofa",
     themeSwitch: { enabled: false },

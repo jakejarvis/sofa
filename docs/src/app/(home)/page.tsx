@@ -114,8 +114,8 @@ const composeNotes = [
   },
   {
     line: 10,
-    span: 3,
-    title: "The three settings",
+    span: 1,
+    title: "Always up-to-date",
     description: (
       <>
         A free{" "}
@@ -126,8 +126,8 @@ const composeNotes = [
           className="text-fd-foreground hover:text-fd-primary underline underline-offset-4"
         >
           TMDB read access token
-        </a>
-        , a long random secret, and the address you’ll open Sofa at.
+        </a>{" "}
+        provides the latest movie and TV show data.
       </>
     ),
   },
@@ -159,8 +159,8 @@ export default function HomePage() {
     <div className="overflow-x-clip">
       <section className="mx-auto w-full max-w-6xl px-6 pt-14 md:pt-24">
         <h1 className="font-display text-[2.75rem] leading-[1.04] tracking-[-0.01em] text-balance md:text-7xl md:leading-[1.02]">
-          Everything you’ve watched,
-          <br className="hidden sm:inline" /> on a server you own.
+          Your watchlist belongs
+          <br className="hidden sm:inline" /> to you.
         </h1>
         <p className="text-fd-muted-foreground mt-6 max-w-[36rem] text-lg leading-relaxed md:mt-8 md:text-xl md:leading-relaxed">
           Sofa is a movie and TV tracker you run yourself, in one Docker container. Follow shows
@@ -175,16 +175,8 @@ export default function HomePage() {
               "bg-fd-primary text-fd-primary-foreground hover:bg-fd-primary/85",
             )}
           >
-            Install Sofa
+            Get started
           </Link>
-          <a
-            href="https://github.com/jakejarvis/sofa"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(buttonBase, "ring-fd-border hover:bg-fd-accent ring-1 ring-inset")}
-          >
-            View on GitHub
-          </a>
         </div>
       </section>
 
@@ -230,7 +222,7 @@ export default function HomePage() {
           id="stack-heading"
           className="font-display text-center text-4xl leading-tight text-balance md:text-5xl"
         >
-          Works with the rest of your stack
+          Right at home in your stack
         </h2>
 
         <dl className="mt-16 space-y-14 md:mt-20 md:space-y-16">
@@ -276,7 +268,7 @@ export default function HomePage() {
           id="deploy-heading"
           className="font-display text-4xl leading-tight text-balance md:text-5xl"
         >
-          One container, three settings
+          Ready in minutes
         </h2>
         <p className="text-fd-muted-foreground mt-4 max-w-[36rem] text-lg leading-relaxed">
           This is the whole deployment. Sofa keeps everything in a single SQLite file, so there’s no
@@ -286,7 +278,7 @@ export default function HomePage() {
         <div className="compose mt-10 grid gap-10 md:mt-14 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-14">
           <figure className="bg-fd-card ring-fd-border min-w-0 overflow-hidden rounded-lg ring-1">
             <figcaption className="border-fd-border text-fd-muted-foreground flex h-10 items-center border-b px-4 font-mono text-xs">
-              docker-compose.yml
+              compose.yml
             </figcaption>
             <pre className="overflow-x-auto py-4 font-mono text-[13px]">
               <code className="block min-w-max">
