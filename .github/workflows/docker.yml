@@ -16,6 +16,8 @@ on:
       - "tsconfig.json"
       - ".github/workflows/docker.yml"
     tags: ["v*"]
+  # Dispatched by the Release workflow for each new tag
+  workflow_dispatch:
 
 permissions:
   contents: read

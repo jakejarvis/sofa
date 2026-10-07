@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write # push the release branch, create tags and releases
+  pull-requests: write # open the "Version Packages" PR
+  actions: write # dispatch the Docker workflow for a new tag
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Tags and releases the current version unless it already has a tag, so it only does
+      # something right after a "Version Packages" PR merges
+      - name: Publish release
+        run: bun run release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Opens or updates the "Version Packages" PR while changesets are pending
+      - name: Create release PR
+        uses: changesets/action@v2
+        with:
+          version-script: bun run version-packages
+          commit-message: "chore(release): version packages"
+          pr-title: "chore(release): version packages"
+        env:
+          # Read by @changesets/changelog-github to link PRs and authors
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -14,6 +14,7 @@ bun run test             # Run tests
 bun run generate:openapi # Regenerate OpenAPI spec + docs API pages (run after contract/schema changes)
 bun run i18n:extract     # Run LingUI's string extraction
 bun run i18n:claude      # Prompt Claude Code to fill in untranslated strings
+bun run changeset        # Add a changeset describing a user-facing change (see Releases)
 
 # Database commands (run from packages/db/)
 cd packages/db && bun run db:push       # Push schema changes to SQLite database
@@ -34,6 +35,8 @@ bun run format:check
 bun run check-types
 bun run test
 ```
+
+If the change is user-facing, it also needs a changeset — see [Releases](#releases).
 
 ## Architecture
 
@@ -56,6 +59,7 @@ couch-potato/
 │   ├── logger/        # @sofa/logger — Pino-based structured logging (JIT)
 │   ├── test/          # @sofa/test — Vitest setup + in-memory DB test helpers
 │   └── tmdb/          # @sofa/tmdb — TMDB API client + image URL helper (JIT)
+├── .changeset/        # Changesets config + pending changesets (see Releases)
 ├── .oxlintrc.json
 ├── .oxfmtrc.json
 ├── Dockerfile
@@ -154,6 +158,26 @@ Optional:
 ### Docker
 
 Single container, single process. Hono serves API + SPA on port 3000. API routes (`/rpc/*`, `/api/*`) mounted first; unmatched routes fall back to `index.html`.
+
+### Releases
+
+Versions and changelogs are managed with [Changesets](https://changesets.dev). **Every PR with a user-facing change needs a changeset**: a Markdown file in `.changeset/` naming the affected packages and their semver bump. Run `bun run changeset`, or write one by hand with any unique filename:
+
+```md
+---
+"@sofa/web": minor
+---
+
+Add a "Rewatch" button to title pages
+```
+
+- **The summary is user-facing** — it lands verbatim in `CHANGELOG.md` and the GitHub release notes, so write it for people running Sofa. Skip the changeset for changes users won't notice (refactors, tests, CI, internal docs).
+- **Server release** — `@sofa/server`, `@sofa/web`, and every `packages/*` library are a fixed group sharing one version: the Docker image tag and the `vX.Y.Z` GitHub release. Name the packages you changed; any bump moves the whole group.
+- **`@sofa/native`** is left out of Changesets (`ignore` in the config): its version is the App Store / Play Store version, bumped by hand for store submissions. Never name it in a changeset — Changesets rejects a changeset that mixes it with other packages and silently skips one that names only it.
+- **`@sofa/public-api`** is versioned on its own and deploys continuously; a changeset is optional.
+- **Bump types** — `patch` for fixes, `minor` for features and for breaking changes while on 0.x. Never use `major` unless asked: it would release 1.0.0.
+
+`.github/workflows/release.yml` automates the rest. While changesets are pending, it keeps a "chore(release): version packages" PR up to date (`bun run version-packages` bumps versions, writes changelogs, and syncs `bun.lock` and the OpenAPI spec version). Merging that PR makes `bun run release` tag `vX.Y.Z`, publish the GitHub release, and dispatch the Docker workflow for the tag. Mobile builds still go through the EAS workflows.
 
 ## Browser Automation
 

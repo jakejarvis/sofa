@@ -1,0 +1,28 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@4.0.1/schema.json",
+  "baseBranch": "main",
+  "access": "restricted",
+  "format": "oxfmt",
+  "changelog": ["@changesets/changelog-github", { "repo": "jakejarvis/sofa" }],
+  "commit": false,
+  "ignore": ["@sofa/native"],
+  "fixed": [
+    [
+      "@sofa/server",
+      "@sofa/web",
+      "@sofa/api",
+      "@sofa/auth",
+      "@sofa/config",
+      "@sofa/core",
+      "@sofa/db",
+      "@sofa/i18n",
+      "@sofa/logger",
+      "@sofa/test",
+      "@sofa/tmdb",
+      "@sofa/tsconfig"
+    ]
+  ],
+  "linked": [],
+  "updateInternalDependencies": "patch",
+  "privatePackages": { "version": true, "tag": false }
+}
