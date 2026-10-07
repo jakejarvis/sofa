@@ -71,41 +71,71 @@
   }
 }
 
-@layer utilities {
-  .animate-stagger-item {
-    animation: stagger-fade-in 0.35s ease-out both;
-    animation-delay: calc(var(--stagger-index, 0) * 0.04s);
-  }
-
-  .animate-scroll-bounce {
-    animation: scroll-bounce 2s ease-in-out 1.4s infinite;
-  }
+/* Landing page: the screenshot comes on like a TV in a dark room and lights its surroundings */
+.screen-image {
+  /* The screenshot is cut mid-list, so let it run off into the page */
+  mask-image: linear-gradient(to bottom, #000 84%, transparent);
+  animation: screen-on 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s both;
 }
 
-@keyframes stagger-fade-in {
+.screen-glow {
+  opacity: 0.5;
+  filter: blur(72px) saturate(1.6);
+  transform: scale(1.04, 1.08) translateY(5%);
+  animation: screen-glow-on 1.8s ease-out 0.5s both;
+}
+
+@keyframes screen-on {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    filter: brightness(0.25);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    filter: brightness(1);
   }
 }
 
-@keyframes scroll-bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(4px);
+@keyframes screen-glow-on {
+  from {
+    opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-stagger-item,
-  .animate-scroll-bounce {
+  .screen-image,
+  .screen-glow {
     animation: none;
+  }
+}
+
+/* Landing page: compose file notes sit beside the line they describe */
+.compose {
+  --compose-line: 1.75rem;
+}
+
+.compose-line {
+  line-height: var(--compose-line);
+}
+
+@media (width >= 64rem) {
+  .compose-note {
+    /* figcaption (2.5rem) + border + pre padding (1rem), then down to the line */
+    top: calc(3.5rem + 1px + var(--line) * var(--compose-line));
+  }
+
+  /* Leader from the code block to the note, centered on the first line */
+  .compose-note::before {
+    content: "";
+    position: absolute;
+    top: calc(var(--compose-line) / 2);
+    right: calc(100% + 0.75rem);
+    width: 2.25rem;
+    height: 1px;
+    background: var(--color-fd-border);
+  }
+
+  .compose-note > p:first-child {
+    line-height: var(--compose-line);
   }
 }
