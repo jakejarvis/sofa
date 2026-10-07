@@ -153,6 +153,7 @@ Useful commands:
 - `bun run lint`
 - `bun run format`
 - `bun run check-types`
+- `bun run changeset` (describe a user-facing change for the next release's changelog)
 - `cd packages/db && bun run db:generate`
 - `cd packages/db && bun run db:migrate`
 

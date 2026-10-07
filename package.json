@@ -60,9 +60,14 @@
     "i18n:extract": "lingui extract",
     "i18n:claude": "bun packages/i18n/scripts/claude.ts",
     "sync:providers": "bun scripts/sync-tmdb-providers.ts",
-    "smoke:backup": "bun scripts/backup-restore-smoke.ts"
+    "smoke:backup": "bun scripts/backup-restore-smoke.ts",
+    "changeset": "changeset",
+    "version-packages": "bun scripts/version-packages.ts",
+    "release": "bun scripts/release.ts"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "1.0.1",
+    "@changesets/cli": "3.0.3",
     "@lingui/cli": "catalog:",
     "@lingui/conf": "catalog:",
     "@lingui/format-po": "catalog:",
