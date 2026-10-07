@@ -5,7 +5,7 @@
   "format": "oxfmt",
   "changelog": ["@changesets/changelog-github", { "repo": "jakejarvis/sofa" }],
   "commit": false,
-  "ignore": [],
+  "ignore": ["@sofa/native"],
   "fixed": [
     [
       "@sofa/server",

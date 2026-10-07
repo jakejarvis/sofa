@@ -173,7 +173,7 @@ Add a "Rewatch" button to title pages
 
 - **The summary is user-facing** — it lands verbatim in `CHANGELOG.md` and the GitHub release notes, so write it for people running Sofa. Skip the changeset for changes users won't notice (refactors, tests, CI, internal docs).
 - **Server release** — `@sofa/server`, `@sofa/web`, and every `packages/*` library are a fixed group sharing one version: the Docker image tag and the `vX.Y.Z` GitHub release. Name the packages you changed; any bump moves the whole group.
-- **`@sofa/native`** is versioned on its own (it's the App Store / Play Store version). List it as well when a change reaches the mobile app, including through `@sofa/api` or `@sofa/i18n`.
+- **`@sofa/native`** is left out of Changesets (`ignore` in the config): its version is the App Store / Play Store version, bumped by hand for store submissions. Never name it in a changeset — Changesets rejects a changeset that mixes it with other packages and silently skips one that names only it.
 - **`@sofa/public-api`** is versioned on its own and deploys continuously; a changeset is optional.
 - **Bump types** — `patch` for fixes, `minor` for features and for breaking changes while on 0.x. Never use `major` unless asked: it would release 1.0.0.
 
