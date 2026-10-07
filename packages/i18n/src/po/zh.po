@@ -2542,6 +2542,10 @@ msgstr "人气"
 msgid "Portuguese"
 msgstr "葡萄牙语"
 
+#: apps/web/src/components/landing-page.tsx
+msgid "Powered by <0><1/><2>Sofa</2></0>"
+msgstr ""
+
 #: apps/web/src/components/explore/discover-section.tsx
 msgid "Pre-1970"
 msgstr "1970 年前"

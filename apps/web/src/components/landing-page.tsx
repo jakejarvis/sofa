@@ -91,7 +91,7 @@ export function LandingPage({
         }}
       />
 
-      <main className="relative z-10 flex flex-col items-center gap-10 px-6 text-center">
+      <main className="relative z-10 flex flex-1 flex-col items-center justify-center gap-10 px-6 text-center">
         <div className="space-y-4">
           <motion.p
             className="text-primary text-sm font-medium tracking-[0.3em] uppercase"
@@ -184,6 +184,28 @@ export function LandingPage({
 
       {/* Bottom fade */}
       <div className="from-background pointer-events-none absolute right-0 bottom-0 left-0 h-32 bg-gradient-to-t to-transparent" />
+
+      <motion.footer
+        className="relative z-10 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+      >
+        <a
+          href="https://sofa.watch"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group text-muted-foreground/70 inline-flex items-center gap-1.5 text-xs"
+        >
+          <Trans>
+            Powered by{" "}
+            <span className="text-foreground/80 group-hover:text-primary inline-flex items-center gap-1 transition-colors">
+              <SofaLogo className="size-3.5" />
+              <span className="font-display text-sm leading-none">Sofa</span>
+            </span>
+          </Trans>
+        </a>
+      </motion.footer>
     </div>
   );
 }
