@@ -4010,3 +4010,40 @@ msgstr "이름"
 #: apps/web/src/components/auth-form.tsx
 msgid "Your name…"
 msgstr "이름…"
+
+#: apps/native/src/components/settings/integration-card.tsx
+#: apps/web/src/components/settings/integration-card.tsx
+msgid "{label} user"
+msgstr ""
+
+#: apps/native/src/components/settings/integration-card.tsx
+#: apps/web/src/components/settings/integration-card.tsx
+msgid "{label} user saved"
+msgstr ""
+
+#: apps/native/src/components/settings/integration-card.tsx
+#: apps/web/src/components/settings/integration-card.tsx
+msgid "Failed to save {label} user"
+msgstr ""
+
+#: apps/native/src/components/settings/integration-card.tsx
+#: apps/web/src/components/settings/integration-card.tsx
+msgid "Everyone on the server"
+msgstr ""
+
+#: apps/native/src/components/settings/integration-card.tsx
+#: apps/web/src/components/settings/integration-card.tsx
+msgid "Only log what this {label} user watches. Leave it empty to log watches from everyone on the server."
+msgstr ""
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch of {episodeLabel} on a date…"
+msgstr ""
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch on a date…"
+msgstr ""
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Record when you watched {episodeLabel}."
+msgstr ""
