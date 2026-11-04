@@ -7,7 +7,7 @@
       "packages/*"
     ],
     "catalog": {
-      "@better-auth/expo": "1.7.7",
+      "@better-auth/expo": "1.7.16",
       "@lingui/babel-plugin-lingui-macro": "6.9.0",
       "@lingui/cli": "6.9.0",
       "@lingui/conf": "6.9.0",
@@ -31,7 +31,7 @@
       "@vitest/browser": "5.0.3",
       "@vitest/browser-playwright": "5.0.3",
       "@vitest/coverage-v8": "5.0.3",
-      "better-auth": "1.7.7",
+      "better-auth": "1.7.16",
       "drizzle-kit": "1.0.0-rc.4",
       "drizzle-orm": "1.0.0-rc.4",
       "react": "19.2.3",
