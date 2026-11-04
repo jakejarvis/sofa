@@ -92,7 +92,12 @@ export const integrationsList = os.account.integrations.list.use(authed).handler
 export const integrationsCreate = os.account.integrations.create
   .use(authed)
   .handler(({ input, context }) => {
-    return createOrUpdateIntegration(context.user.id, input.provider, input.enabled);
+    return createOrUpdateIntegration(
+      context.user.id,
+      input.provider,
+      input.enabled,
+      input.serverUsername,
+    );
   });
 
 export const integrationsDelete = os.account.integrations.delete

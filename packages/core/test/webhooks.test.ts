@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { episodes } from "@sofa/db/schema";
+import { episodes, integrationEvents } from "@sofa/db/schema";
 import {
   clearAllTables,
   insertIntegration,
@@ -11,6 +11,7 @@ import {
 } from "@sofa/test/db";
 
 import {
+  matchesServerUsername,
   parseEmbyPayload,
   parseJellyfinPayload,
   parsePlexPayload,
@@ -696,5 +697,128 @@ describe("processWebhook", () => {
 
     const result = await processWebhook(connectionId, userId, "plex", event);
     expect(result.status).toBe("error");
+  });
+});
+
+// ─── Media server user filter ───────────────────────────────────────
+
+describe("media server usernames", () => {
+  test("reads the Plex account that played the item", () => {
+    const result = parsePlexPayload(
+      makePlexForm({
+        event: "media.scrobble",
+        Account: { id: 1, title: "christian" },
+        Metadata: { type: "movie", title: "Inception", Guid: [{ id: "tmdb://27205" }] },
+      }),
+    );
+    expect(result?.username).toBe("christian");
+  });
+
+  test("reads the Jellyfin notification user", () => {
+    const result = parseJellyfinPayload({
+      NotificationType: "PlaybackStop",
+      PlayedToCompletion: true,
+      ItemType: "Movie",
+      Name: "The Matrix",
+      NotificationUsername: "ana",
+    });
+    expect(result?.username).toBe("ana");
+  });
+
+  test("reads the Emby user", () => {
+    const result = parseEmbyPayload({
+      Event: "playback.stop",
+      PlayedToCompletion: true,
+      User: { Name: "luis" },
+      Item: { Type: "Movie", Name: "Interstellar", ProviderIds: { Tmdb: "157336" } },
+    });
+    expect(result?.username).toBe("luis");
+  });
+
+  test("leaves the username undefined when the payload has none", () => {
+    const result = parseJellyfinPayload({
+      NotificationType: "PlaybackStop",
+      PlayedToCompletion: true,
+      ItemType: "Movie",
+      Name: "The Matrix",
+    });
+    expect(result?.username).toBeUndefined();
+  });
+
+  test("matchesServerUsername accepts everyone without a filter", () => {
+    expect(matchesServerUsername(null, "anyone")).toBe(true);
+    expect(matchesServerUsername("  ", undefined)).toBe(true);
+  });
+
+  test("matchesServerUsername compares names case-insensitively", () => {
+    expect(matchesServerUsername("Christian", "christian")).toBe(true);
+    expect(matchesServerUsername(" christian ", "CHRISTIAN")).toBe(true);
+    expect(matchesServerUsername("christian", "ana")).toBe(false);
+    expect(matchesServerUsername("christian", undefined)).toBe(false);
+  });
+});
+
+describe("processWebhook with a username filter", () => {
+  const userId = "user-1";
+  let connectionId: string;
+
+  beforeEach(() => {
+    insertUser(userId);
+    connectionId = insertIntegration(userId, "plex", "plex-token").id;
+  });
+
+  test("ignores watches from another media server user without recording the title", async () => {
+    const event: WebhookEvent = {
+      provider: "plex",
+      mediaType: "movie",
+      title: "Someone Else's Movie",
+      tmdbId: 27205,
+      username: "ana",
+    };
+
+    const result = await processWebhook(connectionId, userId, "plex", event, {
+      serverUsername: "christian",
+    });
+    expect(result.status).toBe("ignored");
+    expect(mockResolveMovieTmdbId).not.toHaveBeenCalled();
+
+    const events = testDb.select().from(integrationEvents).all();
+    expect(events).toHaveLength(1);
+    expect(events[0]?.status).toBe("ignored");
+    expect(events[0]?.mediaTitle).toBeNull();
+  });
+
+  test("ignores events without a user when a filter is set", async () => {
+    const event: WebhookEvent = {
+      provider: "jellyfin",
+      mediaType: "movie",
+      title: "The Matrix",
+      tmdbId: 603,
+    };
+
+    const result = await processWebhook(connectionId, userId, "jellyfin", event, {
+      serverUsername: "christian",
+    });
+    expect(result.status).toBe("ignored");
+  });
+
+  test("logs watches from the matching user", async () => {
+    const { insertTitle } = await import("@sofa/test/db");
+    insertTitle({ id: "title-1", tmdbId: 27205, type: "movie", title: "Inception" });
+    mockResolveMovieTmdbId.mockResolvedValue(27205);
+    mockGetOrFetchTitleByTmdbId.mockResolvedValue({ id: "title-1" });
+
+    const event: WebhookEvent = {
+      provider: "plex",
+      mediaType: "movie",
+      title: "Inception",
+      tmdbId: 27205,
+      username: "Christian",
+    };
+
+    const result = await processWebhook(connectionId, userId, "plex", event, {
+      serverUsername: "christian",
+    });
+    expect(result.status).toBe("success");
   });
 });

@@ -1103,6 +1103,13 @@
             "type": "boolean",
             "description": "Whether the integration is active"
           },
+          "serverUsername": {
+            "description": "Media server user whose watches are logged (null = every user)",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "lastEventAt": {
             "description": "Last received event timestamp (ISO 8601)",
             "type": [
@@ -1121,6 +1128,7 @@
           "type",
           "token",
           "enabled",
+          "serverUsername",
           "lastEventAt",
           "createdAt"
         ],
@@ -4986,6 +4994,18 @@
                   "enabled": {
                     "description": "Whether the integration starts enabled (default: true)",
                     "type": "boolean"
+                  },
+                  "serverUsername": {
+                    "description": "Only log watches played by this media server user (Plex/Jellyfin/Emby). Empty or null logs watches from every user.",
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 },
                 "required": [

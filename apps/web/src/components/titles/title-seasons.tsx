@@ -26,8 +26,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { Season } from "@sofa/api/schemas";
 import { formatShortDate } from "@sofa/i18n/format";
 
+import { LogWatchDialog } from "./log-watch-dialog";
 import { useTitleContext, useTitleUserInfo } from "./title-context";
 import { useTitleActions } from "./use-title-actions";
+
+/** "S01E03 · Pilot" (or just "S01E03" when the episode has no name). */
+function episodeLabel(seasonNumber: number, episodeNumber: number, name: string | null) {
+  const code = `S${String(seasonNumber).padStart(2, "0")}E${String(episodeNumber).padStart(2, "0")}`;
+  return name ? `${code} · ${name}` : code;
+}
 
 export function SeasonsSkeleton() {
   return (
@@ -328,6 +335,15 @@ export function TitleSeasons({
                                 </p>
                               )}
                             </div>
+                            <LogWatchDialog
+                              kind="episode"
+                              id={ep.id}
+                              episodeLabel={episodeLabel(
+                                season.seasonNumber,
+                                ep.episodeNumber,
+                                ep.name,
+                              )}
+                            />
                           </div>
                         </div>
                       );

@@ -40,7 +40,7 @@ export function TitleActions() {
           )}
         </Button>
       )}
-      {titleType === "movie" && <LogWatchDialog titleId={titleId} />}
+      {titleType === "movie" && <LogWatchDialog kind="movie" id={titleId} />}
       <Separator orientation="vertical" className="bg-border/50 mx-0.5 my-auto h-6" />
       <StarRating value={userRating ?? 0} onChange={handleRating} />
     </div>

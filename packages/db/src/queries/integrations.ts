@@ -37,10 +37,13 @@ export function getIntegrationByUserAndProvider(userId: string, provider: string
     .get();
 }
 
-export function updateIntegrationEnabled(integrationId: string, enabled: boolean) {
+export function updateIntegrationSettings(
+  integrationId: string,
+  values: Pick<Partial<typeof integrations.$inferInsert>, "enabled" | "serverUsername">,
+) {
   return db
     .update(integrations)
-    .set({ enabled })
+    .set(values)
     .where(eq(integrations.id, integrationId))
     .returning()
     .get();

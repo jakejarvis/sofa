@@ -440,6 +440,8 @@ export const integrations = sqliteTable(
     enabled: int("enabled", { mode: "boolean" }).notNull().default(true),
     createdAt: int("createdAt", { mode: "timestamp" }).notNull(),
     lastEventAt: int("lastEventAt", { mode: "timestamp" }),
+    /** Only log webhook events played by this media server user (null = accept everyone). */
+    serverUsername: text("serverUsername"),
   },
   (table) => [
     uniqueIndex("integrations_userId_provider").on(table.userId, table.provider),

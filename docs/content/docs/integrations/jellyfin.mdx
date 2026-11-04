@@ -26,6 +26,10 @@ The webhook URL looks like:
 https://sofa.example.com/api/webhooks/{token}
 ```
 
+## Only your watches
+
+If other people use your Jellyfin server, type your Jellyfin username in **Settings → Integrations → Jellyfin → Jellyfin user** and click **Save**. Sofa then ignores anything played by other users (it reads the user from the payload's `NotificationUsername` field). Leave the field empty to log watches from every user.
+
 ## How It Works
 
 When you finish watching something on Jellyfin, the Webhook plugin sends a `PlaybackStop` event to Sofa. Sofa only processes events where `PlayedToCompletion` is `true` — partially watched content is ignored.

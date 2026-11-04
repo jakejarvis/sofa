@@ -29,6 +29,29 @@ export interface WebhookEvent {
   seasonNumber?: number;
   episodeNumber?: number;
   showTitle?: string;
+  /** Media server user who played the item, when the payload includes one. */
+  username?: string;
+}
+
+/** @internal */
+export function toOptionalString(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+/**
+ * Whether an event passes an integration's username filter. No filter accepts everyone; with a
+ * filter, the event must name the same user (compared case-insensitively).
+ */
+export function matchesServerUsername(
+  expected: string | null | undefined,
+  actual: string | undefined,
+): boolean {
+  const wanted = toOptionalString(expected);
+  if (!wanted) return true;
+  if (!actual) return false;
+  return wanted.localeCompare(actual, undefined, { sensitivity: "accent" }) === 0;
 }
 
 /** @internal */
@@ -96,6 +119,8 @@ export function parsePlexPayload(formData: FormData): WebhookEvent | null {
     seasonNumber: toOptionalInt(metadata.parentIndex),
     episodeNumber: toOptionalInt(metadata.index),
     showTitle: (metadata.grandparentTitle ?? metadata.parentTitle) as string | undefined,
+    // Plex sends one webhook per account for every user on the server; `Account` says who played it.
+    username: toOptionalString((payload.Account as Record<string, unknown> | undefined)?.title),
   };
 }
 
@@ -123,6 +148,7 @@ export function parseJellyfinPayload(body: Record<string, unknown>): WebhookEven
     seasonNumber: toOptionalInt(body.SeasonNumber),
     episodeNumber: toOptionalInt(body.EpisodeNumber),
     showTitle: (body.SeriesName ?? body.ShowName) as string | undefined,
+    username: toOptionalString(body.NotificationUsername ?? body.Username),
   };
 }
 
@@ -161,6 +187,7 @@ export function parseEmbyPayload(body: Record<string, unknown>): WebhookEvent | 
     seasonNumber: toOptionalInt(item.ParentIndexNumber),
     episodeNumber: toOptionalInt(item.IndexNumber),
     showTitle: (item.SeriesName ?? item.ShowName) as string | undefined,
+    username: toOptionalString((body.User as Record<string, unknown> | undefined)?.Name),
   };
 }
 
@@ -217,7 +244,7 @@ function logEvent(
             ? "playback.stop"
             : "PlaybackStop",
       mediaType: event?.mediaType ?? null,
-      mediaTitle: event?.title ?? null,
+      mediaTitle: event?.title || null,
       status,
       errorMessage: errorMessage ?? null,
       receivedAt: new Date(),
@@ -233,8 +260,20 @@ export async function processWebhook(
   userId: string,
   provider: "plex" | "jellyfin" | "emby",
   event: WebhookEvent,
+  options: { serverUsername?: string | null } = {},
 ): Promise<{ status: "success" | "ignored" | "error"; message: string }> {
   log.info(`Received ${provider} webhook: ${event.mediaType} "${event.title}"`);
+
+  if (!matchesServerUsername(options.serverUsername, event.username)) {
+    const message = event.username
+      ? `Played by another ${provider} user`
+      : `No ${provider} user in the event to match`;
+    log.debug(`Webhook ignored: ${message}`);
+    // Don't record what someone else watched in this user's event log.
+    logEvent(connectionId, { ...event, title: "" }, "ignored", message);
+    return { status: "ignored", message };
+  }
+
   try {
     if (event.mediaType === "movie") {
       const hasExternalId = event.tmdbId || event.imdbId || event.tvdbId;

@@ -24,6 +24,7 @@ import { useCSSVariable } from "uniwind";
 import type { IntegrationConfig } from "@/components/settings/integration-configs";
 import { ScaledIcon } from "@/components/ui/scaled-icon";
 import { Text } from "@/components/ui/text";
+import { Input, Label, TextField } from "@/components/ui/text-field";
 import { orpc } from "@/lib/orpc";
 import { queryClient } from "@/lib/query-client";
 import { toast } from "@/lib/toast";
@@ -35,6 +36,7 @@ interface IntegrationCardProps {
     type: string;
     token: string;
     enabled: boolean;
+    serverUsername: string | null;
     lastEventAt: string | null;
   } | null;
 }
@@ -99,6 +101,30 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
       onError: () => toast.error(t`Failed to disconnect ${label}`),
     }),
   );
+
+  const savedUsername = connection?.serverUsername ?? "";
+  const [usernameDraft, setUsernameDraft] = useState(savedUsername);
+  const usernameChanged = usernameDraft.trim() !== savedUsername;
+
+  // Follow the saved value when it changes (after a save, reconnect, or refetch).
+  useEffect(() => {
+    setUsernameDraft(savedUsername);
+  }, [savedUsername]);
+
+  const { mutate: saveUsername, isPending: isSavingUsername } = useMutation(
+    orpc.account.integrations.create.mutationOptions({
+      onSuccess: () => {
+        toast.success(t`${label} user saved`);
+        queryClient.invalidateQueries({ queryKey: orpc.account.integrations.key() });
+      },
+      onError: () => toast.error(t`Failed to save ${label} user`),
+    }),
+  );
+
+  const handleSaveUsername = useCallback(() => {
+    if (!usernameChanged || isSavingUsername) return;
+    saveUsername({ provider: providerInput, serverUsername: usernameDraft.trim() });
+  }, [isSavingUsername, providerInput, saveUsername, usernameChanged, usernameDraft]);
 
   const { mutate: regenerateToken, isPending: isRegenerating } = useMutation(
     orpc.account.integrations.regenerateToken.mutationOptions({
@@ -244,6 +270,44 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                   </Pressable>
                 </View>
               </View>
+
+              {/* Media server user filter */}
+              {connection.type === "webhook" && (
+                <TextField>
+                  <Label className="text-muted-foreground text-xs font-normal">
+                    <Trans>{label} user</Trans>
+                  </Label>
+                  <View className="flex-row items-center gap-2">
+                    <Input
+                      value={usernameDraft}
+                      onChangeText={setUsernameDraft}
+                      onSubmitEditing={handleSaveUsername}
+                      placeholder={t`Everyone on the server`}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      maxLength={100}
+                      returnKeyType="done"
+                      className="flex-1"
+                    />
+                    <Pressable
+                      onPress={handleSaveUsername}
+                      disabled={!usernameChanged || isSavingUsername}
+                      accessibilityRole="button"
+                      className={`bg-secondary min-h-12 justify-center rounded-lg px-4 active:opacity-80 ${!usernameChanged || isSavingUsername ? "opacity-50" : ""}`}
+                    >
+                      <Text className="text-foreground font-sans text-sm font-medium">
+                        <Trans>Save</Trans>
+                      </Text>
+                    </Pressable>
+                  </View>
+                  <Text className="text-muted-foreground text-xs">
+                    <Trans>
+                      Only log what this {label} user watches. Leave it empty to log watches from
+                      everyone on the server.
+                    </Trans>
+                  </Text>
+                </TextField>
+              )}
 
               {/* Action buttons */}
               <View className="flex-row gap-2">
