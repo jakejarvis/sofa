@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { episodes, integrationEvents } from "@sofa/db/schema";
+import { episodes, integrationEvents, userEpisodeWatches } from "@sofa/db/schema";
 import {
   clearAllTables,
   insertIntegration,
   insertMovieWatch,
+  insertStatus,
   insertTvShow,
   insertUser,
   testDb,
@@ -12,6 +13,7 @@ import {
 
 import {
   matchesServerUsername,
+  normalizeShowTitle,
   parseEmbyPayload,
   parseJellyfinPayload,
   parsePlexPayload,
@@ -20,18 +22,25 @@ import {
   type WebhookEvent,
 } from "../src/webhooks";
 
-const { mockResolveMovieTmdbId, mockResolveShowTmdbId } = vi.hoisted(() => ({
-  mockResolveMovieTmdbId: vi.fn<() => Promise<number | null>>(async () => null),
-  mockResolveShowTmdbId: vi.fn<() => Promise<number | null>>(async () => null),
-}));
+const { mockResolveMovieTmdbId, mockResolveShowTmdbId, mockResolveEpisodeByExternalIds } =
+  vi.hoisted(() => ({
+    mockResolveMovieTmdbId: vi.fn<() => Promise<number | null>>(async () => null),
+    mockResolveShowTmdbId: vi.fn<() => Promise<number | null>>(async () => null),
+    mockResolveEpisodeByExternalIds: vi.fn<
+      () => Promise<{ showTmdbId: number; seasonNumber: number; episodeNumber: number } | null>
+    >(async () => null),
+  }));
 
 vi.mock("../src/imports/resolve", () => ({
   resolveMovieTmdbId: mockResolveMovieTmdbId,
   resolveShowTmdbId: mockResolveShowTmdbId,
+  resolveEpisodeByExternalIds: mockResolveEpisodeByExternalIds,
 }));
 
 const { mockGetOrFetchTitleByTmdbId, mockRefreshTvChildren } = vi.hoisted(() => ({
-  mockGetOrFetchTitleByTmdbId: vi.fn<() => Promise<{ id: string } | null>>(async () => null),
+  mockGetOrFetchTitleByTmdbId: vi.fn<
+    (tmdbId?: number, type?: string) => Promise<{ id: string } | null>
+  >(async () => null),
   mockRefreshTvChildren: vi.fn<() => Promise<void>>(async () => {}),
 }));
 
@@ -54,6 +63,7 @@ beforeEach(() => {
   clearAllTables();
   mockResolveMovieTmdbId.mockReset().mockResolvedValue(null);
   mockResolveShowTmdbId.mockReset().mockResolvedValue(null);
+  mockResolveEpisodeByExternalIds.mockReset().mockResolvedValue(null);
   mockGetOrFetchTitleByTmdbId.mockReset().mockResolvedValue(null);
   mockRefreshTvChildren.mockReset();
   mockGetTvDetails.mockReset().mockResolvedValue({ number_of_seasons: 1 });
@@ -578,12 +588,12 @@ describe("processWebhook", () => {
     const result = await processWebhook(connectionId, userId, "plex", event);
 
     expect(result.status).toBe("success");
-    expect(mockResolveShowTmdbId).toHaveBeenCalledWith({
-      tmdbId: undefined,
+    // The episode's own IDs are looked up as an episode; the episode TMDB ID is never used.
+    expect(mockResolveEpisodeByExternalIds).toHaveBeenCalledWith({
       imdbId: "tt35740476",
       tvdbId: "11560129",
-      title: "The Pitt",
     });
+    expect(mockResolveShowTmdbId).toHaveBeenCalledWith({ title: "The Pitt" });
   });
 
   test("returns error when episode cannot be resolved", async () => {
@@ -820,5 +830,73 @@ describe("processWebhook with a username filter", () => {
       serverUsername: "christian",
     });
     expect(result.status).toBe("success");
+  });
+});
+
+describe("episode matching across numbering schemes", () => {
+  const userId = "user-1";
+  let connectionId: string;
+
+  beforeEach(() => {
+    insertUser(userId);
+    connectionId = insertIntegration(userId, "plex", "plex-token").id;
+  });
+
+  test("normalizeShowTitle treats ½ and 1/2 alike", () => {
+    expect(normalizeShowTitle("Ranma ½")).toBe("ranma12");
+    expect(normalizeShowTitle("Ranma1/2")).toBe("ranma12");
+    expect(normalizeShowTitle("Pokémon: Horizons")).toBe("pokemonhorizons");
+  });
+
+  test("uses TMDB's season and episode from the episode's own ID", async () => {
+    // TVDB/Plex call it S3E2; TMDB has the same episode as S1E14.
+    const { titleId, episodeIds } = insertTvShow("tv-ranma", 259140, 1, 14, { title: "Ranma1/2" });
+    mockResolveEpisodeByExternalIds.mockResolvedValue({
+      showTmdbId: 259140,
+      seasonNumber: 1,
+      episodeNumber: 14,
+    });
+    mockGetOrFetchTitleByTmdbId.mockResolvedValue({ id: titleId });
+
+    const event: WebhookEvent = {
+      provider: "plex",
+      mediaType: "episode",
+      title: "Galletas de la Rosa Negra",
+      showTitle: "Ranma1/2",
+      tvdbId: "10000001",
+      seasonNumber: 3,
+      episodeNumber: 2,
+    };
+
+    const result = await processWebhook(connectionId, userId, "plex", event);
+    expect(result.status).toBe("success");
+    expect(mockResolveShowTmdbId).not.toHaveBeenCalled();
+
+    const watches = testDb.select().from(userEpisodeWatches).all();
+    expect(watches.map((w) => w.episodeId)).toEqual([episodeIds[13]]);
+  });
+
+  test("prefers a show in the user's library over a title search", async () => {
+    insertTvShow("tv-1989", 57706, 1, 3, { title: "Ranma ½" });
+    const { titleId } = insertTvShow("tv-2024", 259140, 1, 3, { title: "Ranma1/2" });
+    insertStatus(userId, titleId, "in_progress");
+    mockResolveShowTmdbId.mockResolvedValue(57706);
+    mockGetOrFetchTitleByTmdbId.mockImplementation(async (tmdbId?: number) =>
+      tmdbId === 259140 ? { id: "tv-2024" } : { id: "tv-1989" },
+    );
+
+    const event: WebhookEvent = {
+      provider: "plex",
+      mediaType: "episode",
+      title: "Episode",
+      showTitle: "Ranma ½",
+      seasonNumber: 1,
+      episodeNumber: 2,
+    };
+
+    const result = await processWebhook(connectionId, userId, "plex", event);
+    expect(result.status).toBe("success");
+    expect(mockResolveShowTmdbId).not.toHaveBeenCalled();
+    expect(mockGetOrFetchTitleByTmdbId).toHaveBeenCalledWith(259140, "tv");
   });
 });

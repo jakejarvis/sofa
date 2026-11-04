@@ -1,5 +1,6 @@
 import { findEpisodeBySeasonAndNumber, findSeasonByTitleAndNumber } from "@sofa/db/queries/title";
 import {
+  getLibraryShows,
   getRecentEpisodeWatch,
   getRecentMovieWatch,
   insertIntegrationEventTransaction,
@@ -7,7 +8,11 @@ import {
 import { createLogger } from "@sofa/logger";
 import { getTvDetails } from "@sofa/tmdb/client";
 
-import { resolveMovieTmdbId, resolveShowTmdbId } from "./imports/resolve";
+import {
+  resolveEpisodeByExternalIds,
+  resolveMovieTmdbId,
+  resolveShowTmdbId,
+} from "./imports/resolve";
 import { getOrFetchTitleByTmdbId, refreshTvChildren } from "./metadata";
 import { logEpisodeWatch, logMovieWatch } from "./tracking";
 
@@ -193,23 +198,58 @@ export function parseEmbyPayload(body: Record<string, unknown>): WebhookEvent | 
 
 // ─── Title Resolution ───────────────────────────────────────────────
 
-async function resolveEpisode(event: WebhookEvent): Promise<{
+/** @internal Loose title key: "Ranma ½" and "Ranma1/2" both become "ranma12". */
+export function normalizeShowTitle(title: string): string {
+  return title
+    .replaceAll("½", "1/2")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "");
+}
+
+/** The show in the user's library whose title matches, preferring ones they're watching. */
+function findLibraryShowByTitle(userId: string, showTitle: string): number | null {
+  const wanted = normalizeShowTitle(showTitle);
+  if (!wanted) return null;
+  const matches = getLibraryShows(userId).filter(
+    (show) =>
+      normalizeShowTitle(show.title) === wanted ||
+      (show.originalTitle != null && normalizeShowTitle(show.originalTitle) === wanted),
+  );
+  const best = matches.find((show) => show.status === "in_progress") ?? matches[0];
+  return best?.tmdbId ?? null;
+}
+
+async function resolveEpisode(
+  event: WebhookEvent,
+  userId: string,
+): Promise<{
   showTmdbId: number;
   seasonNumber: number;
   episodeNumber: number;
+  via: string;
 } | null> {
   const { seasonNumber, episodeNumber } = event;
   if (seasonNumber == null || episodeNumber == null) return null;
 
-  const showTmdbId = await resolveShowTmdbId({
-    tmdbId: event.tmdbId,
-    imdbId: event.imdbId,
-    tvdbId: event.tvdbId,
-    title: event.showTitle,
-  });
+  // 1. The episode's own IDs give TMDB's show and numbering, so a media server that numbers
+  //    seasons differently (TVDB ordering, common for anime) still lands on the right episode.
+  const exact = await resolveEpisodeByExternalIds({ imdbId: event.imdbId, tvdbId: event.tvdbId });
+  if (exact) return { ...exact, via: "episode ID" };
 
+  // 2. A show the user already tracks beats an arbitrary search hit with the same name.
+  if (event.showTitle) {
+    const libraryShow = findLibraryShowByTitle(userId, event.showTitle);
+    if (libraryShow) {
+      return { showTmdbId: libraryShow, seasonNumber, episodeNumber, via: "library title" };
+    }
+  }
+
+  // 3. Last resort: search TMDB by title. Episode IDs were already tried above.
+  const showTmdbId = await resolveShowTmdbId({ title: event.showTitle });
   if (!showTmdbId) return null;
-  return { showTmdbId, seasonNumber, episodeNumber };
+  return { showTmdbId, seasonNumber, episodeNumber, via: "title search" };
 }
 
 // ─── Deduplication ──────────────────────────────────────────────────
@@ -310,7 +350,7 @@ export async function processWebhook(
     }
 
     if (event.mediaType === "episode") {
-      const resolved = await resolveEpisode(event);
+      const resolved = await resolveEpisode(event, userId);
       if (!resolved) {
         log.warn(`Could not resolve episode "${event.title}" from ${provider}`);
         logEvent(connectionId, event, "error", "Could not resolve episode");
@@ -322,6 +362,11 @@ export async function processWebhook(
         logEvent(connectionId, event, "error", "Failed to import TV show");
         return { status: "error", message: "Failed to import TV show" };
       }
+
+      log.info(
+        `Matched ${provider} "${event.showTitle ?? event.title}" S${event.seasonNumber}E${event.episodeNumber} ` +
+          `to "${title.title}" (TMDB ${resolved.showTmdbId}) S${resolved.seasonNumber}E${resolved.episodeNumber} via ${resolved.via}`,
+      );
 
       // Find the episode in our DB
       let season = findSeasonByTitleAndNumber(title.id, resolved.seasonNumber);

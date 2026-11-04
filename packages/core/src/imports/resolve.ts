@@ -179,3 +179,41 @@ export async function resolveShowTmdbId(
   cache?.set(key, null);
   return null;
 }
+
+export interface ResolvedEpisode {
+  showTmdbId: number;
+  seasonNumber: number;
+  episodeNumber: number;
+}
+
+/**
+ * Look up a single episode by its own TVDB or IMDb ID. TMDB answers with the show and the
+ * episode's position in TMDB's numbering, which often differs from the media server's
+ * (e.g. anime split into different seasons on TVDB). Returns null when TMDB doesn't know it.
+ */
+export async function resolveEpisodeByExternalIds(ids: {
+  imdbId?: string;
+  tvdbId?: number | string;
+}): Promise<ResolvedEpisode | null> {
+  const lookups: [string, "tvdb_id" | "imdb_id"][] = [];
+  if (ids.tvdbId) lookups.push([String(ids.tvdbId), "tvdb_id"]);
+  if (ids.imdbId) lookups.push([ids.imdbId, "imdb_id"]);
+
+  for (const [externalId, source] of lookups) {
+    try {
+      await tmdbLimiter.acquire();
+      const result = await findByExternalId(externalId, source);
+      const ep = result.tv_episode_results?.[0];
+      if (ep) {
+        return {
+          showTmdbId: ep.show_id,
+          seasonNumber: ep.season_number,
+          episodeNumber: ep.episode_number,
+        };
+      }
+    } catch {
+      // Try the next ID; callers fall back to title matching.
+    }
+  }
+  return null;
+}
