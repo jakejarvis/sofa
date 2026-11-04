@@ -183,7 +183,7 @@ export function TitleSeasons({
                         e.stopPropagation();
                         handleMarkSeason(season);
                       }}
-                      className="text-primary hover:bg-primary/10 hover:text-primary tracking-wider uppercase sm:hidden sm:w-24 sm:group-hover/season:block"
+                      className="text-primary hover:bg-primary/10 hover:text-primary tracking-wider uppercase sm:hidden sm:min-w-24 sm:group-hover/season:block"
                     >
                       <IconChecks aria-hidden={true} className="size-3.5 sm:hidden" />
                       <span className="hidden sm:inline">
@@ -199,7 +199,7 @@ export function TitleSeasons({
                         e.stopPropagation();
                         handleUnmarkSeason(season);
                       }}
-                      className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive tracking-wider uppercase sm:hidden sm:w-24 sm:group-hover/season:block"
+                      className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive tracking-wider uppercase sm:hidden sm:min-w-24 sm:group-hover/season:block"
                     >
                       <IconChecks aria-hidden={true} className="size-3.5 sm:hidden" />
                       <span className="hidden sm:inline">
