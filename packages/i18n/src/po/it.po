@@ -8,7 +8,7 @@ msgstr ""
 "Language: it\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-07-12 21:31\n"
+"PO-Revision-Date: 2026-10-07 12:28\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1301,7 +1301,7 @@ msgstr "Impossibile cambiare la password"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Failed to connect"
-#~ msgstr "Impossibile connettersi"
+#~ msgstr ""
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -1509,7 +1509,7 @@ msgstr "Importazione da {source} completata."
 
 #: apps/web/src/components/settings/account-section.tsx
 #~ msgid "Finished importing your Sofa export."
-#~ msgstr "Importazione del tuo export Sofa completata."
+#~ msgstr "Finished importing your Sofa export."
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Free"
@@ -1724,7 +1724,7 @@ msgstr "Importati {importedCount} elementi dall'export Sofa"
 
 #: apps/web/src/components/settings/account-section.tsx
 #~ msgid "Importing data"
-#~ msgstr "Importazione dati"
+#~ msgstr "Importing data"
 
 #: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Importing from {source}"
@@ -1848,7 +1848,7 @@ msgstr "Ultimo evento {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #~ msgid "Last event {timeAgo}"
-#~ msgstr "Ultimo evento {timeAgo}"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/integration-card.tsx
 #~ msgid "Last polled {0}"
@@ -1860,7 +1860,7 @@ msgstr "Ultima verifica {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #~ msgid "Last polled {timeAgo}"
-#~ msgstr "Ultimo polling {timeAgo}"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Last run"
@@ -1974,7 +1974,7 @@ msgstr "Segna episodio come visto"
 #. placeholder {1}: nextEpisode.episodeNumber
 #: apps/web/src/components/dashboard/continue-watching-card.tsx
 #~ msgid "Mark S{0} E{1} watched"
-#~ msgstr ""
+#~ msgstr "Mark S{0} E{1} watched"
 
 #: apps/web/src/components/dashboard/continue-watching-card.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
@@ -2702,7 +2702,7 @@ msgstr "Valutazione rimossa"
 
 #: apps/native/src/components/ui/star-rating.tsx
 #~ msgid "Rating: {rating} out of 5 stars"
-#~ msgstr "Valutazione: {rating} su 5 stelle"
+#~ msgstr "Rating: {rating} out of 5 stars"
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
@@ -2892,7 +2892,7 @@ msgstr "Richiede Emby Server 4.7.9+ e una licenza Emby Premiere attiva."
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Restart"
-#~ msgstr "Riavvia"
+#~ msgstr "Restart"
 
 #: apps/native/src/components/root-error-fallback.tsx
 msgid "Restart app"
@@ -2900,7 +2900,7 @@ msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Restart Required"
-#~ msgstr "Riavvio necessario"
+#~ msgstr "Restart Required"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Restore"
@@ -3247,7 +3247,7 @@ msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Sofa needs to restart to apply the new layout direction."
-#~ msgstr "Sofa deve essere riavviato per applicare la nuova direzione del layout."
+#~ msgstr "Sofa needs to restart to apply the new layout direction."
 
 #: apps/web/src/routes/setup.tsx
 msgid "Sofa uses <0>The Movie Database{linkIcon}</0> for movie & TV metadata, posters, and streaming availability. You'll need a free API key to get started."
@@ -4010,3 +4010,4 @@ msgstr "Il tuo nome"
 #: apps/web/src/components/auth-form.tsx
 msgid "Your name…"
 msgstr "Il tuo nome…"
+
