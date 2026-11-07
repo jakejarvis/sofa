@@ -30,12 +30,6 @@ import { LogWatchDialog } from "./log-watch-dialog";
 import { useTitleContext, useTitleUserInfo } from "./title-context";
 import { useTitleActions } from "./use-title-actions";
 
-/** "S01E03 · Pilot" (or just "S01E03" when the episode has no name). */
-function episodeLabel(seasonNumber: number, episodeNumber: number, name: string | null) {
-  const code = `S${String(seasonNumber).padStart(2, "0")}E${String(episodeNumber).padStart(2, "0")}`;
-  return name ? `${code} · ${name}` : code;
-}
-
 export function SeasonsSkeleton() {
   return (
     <div className="space-y-3">
@@ -68,6 +62,11 @@ export function TitleSeasons({
 } = {}) {
   const { t } = useLingui();
   const { seasons, setSeasons, watchingEp } = useTitleContext();
+
+  /** "S1 E3 · Pilot" (or "S1 E3" when unnamed); same messages as the history list. */
+  function episodeLabel(season: number, episode: number, name: string | null) {
+    return name ? t`S${season} E${episode} · ${name}` : t`S${season} E${episode}`;
+  }
   const { episodeWatches, userStatus } = useTitleUserInfo();
 
   // When seasons are streamed via Suspense, sync them into context

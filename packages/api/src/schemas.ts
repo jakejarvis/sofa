@@ -223,7 +223,7 @@ export const CreateIntegrationInput = z
       .nullable()
       .optional()
       .describe(
-        "Only log watches played by this media server user (Plex/Jellyfin/Emby). Empty or null logs watches from every user.",
+        "Only log watches played by this media server user (Plex/Jellyfin/Emby). Empty or null logs watches from every user. Ignored for list integrations (Sonarr/Radarr).",
       ),
   })
   .meta({ description: "Create a new media server integration" });

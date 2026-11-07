@@ -1,4 +1,7 @@
+import { createLogger } from "@sofa/logger";
 import { findByExternalId, searchMovies, searchTv } from "@sofa/tmdb/client";
+
+const log = createLogger("imports");
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -211,8 +214,11 @@ export async function resolveEpisodeByExternalIds(ids: {
           episodeNumber: ep.episode_number,
         };
       }
-    } catch {
+    } catch (err) {
       // Try the next ID; callers fall back to title matching.
+      log.warn(
+        `TMDB episode lookup failed for ${source} ${externalId}: ${err instanceof Error ? err.message : String(err)}`,
+      );
     }
   }
   return null;

@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { episodes, integrationEvents, userEpisodeWatches } from "@sofa/db/schema";
+import {
+  episodes,
+  integrationEvents,
+  userEpisodeWatches,
+  userMovieWatches,
+} from "@sofa/db/schema";
 import {
   clearAllTables,
   insertIntegration,
@@ -593,7 +598,11 @@ describe("processWebhook", () => {
       imdbId: "tt35740476",
       tvdbId: "11560129",
     });
-    expect(mockResolveShowTmdbId).toHaveBeenCalledWith({ title: "The Pitt" });
+    expect(mockResolveShowTmdbId).toHaveBeenCalledWith({
+      imdbId: "tt35740476",
+      tvdbId: "11560129",
+      title: "The Pitt",
+    });
   });
 
   test("returns error when episode cannot be resolved", async () => {
@@ -830,6 +839,11 @@ describe("processWebhook with a username filter", () => {
       serverUsername: "christian",
     });
     expect(result.status).toBe("success");
+
+    const watches = testDb.select().from(userMovieWatches).all();
+    expect(watches).toHaveLength(1);
+    expect(watches[0]?.titleId).toBe("title-1");
+    expect(watches[0]?.userId).toBe(userId);
   });
 });
 

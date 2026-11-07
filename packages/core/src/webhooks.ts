@@ -153,7 +153,7 @@ export function parseJellyfinPayload(body: Record<string, unknown>): WebhookEven
     seasonNumber: toOptionalInt(body.SeasonNumber),
     episodeNumber: toOptionalInt(body.EpisodeNumber),
     showTitle: (body.SeriesName ?? body.ShowName) as string | undefined,
-    username: toOptionalString(body.NotificationUsername ?? body.Username),
+    username: toOptionalString(body.NotificationUsername) ?? toOptionalString(body.Username),
   };
 }
 
@@ -246,8 +246,12 @@ async function resolveEpisode(
     }
   }
 
-  // 3. Last resort: search TMDB by title. Episode IDs were already tried above.
-  const showTmdbId = await resolveShowTmdbId({ title: event.showTitle });
+  // 3. Last resort: resolve the show itself (its IDs may still point at a show), then by title.
+  const showTmdbId = await resolveShowTmdbId({
+    imdbId: event.imdbId,
+    tvdbId: event.tvdbId,
+    title: event.showTitle,
+  });
   if (!showTmdbId) return null;
   return { showTmdbId, seasonNumber, episodeNumber, via: "title search" };
 }
@@ -302,17 +306,17 @@ export async function processWebhook(
   event: WebhookEvent,
   options: { serverUsername?: string | null } = {},
 ): Promise<{ status: "success" | "ignored" | "error"; message: string }> {
-  log.info(`Received ${provider} webhook: ${event.mediaType} "${event.title}"`);
-
   if (!matchesServerUsername(options.serverUsername, event.username)) {
     const message = event.username
       ? `Played by another ${provider} user`
       : `No ${provider} user in the event to match`;
-    log.debug(`Webhook ignored: ${message}`);
-    // Don't record what someone else watched in this user's event log.
+    // Don't record what someone else watched, in the server log or this user's event log.
+    log.info(`Ignored ${provider} webhook: ${message}`);
     logEvent(connectionId, { ...event, title: "" }, "ignored", message);
     return { status: "ignored", message };
   }
+
+  log.info(`Received ${provider} webhook: ${event.mediaType} "${event.title}"`);
 
   try {
     if (event.mediaType === "movie") {

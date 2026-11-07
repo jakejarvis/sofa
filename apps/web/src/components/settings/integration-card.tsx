@@ -80,14 +80,16 @@ export function IntegrationCard({
   const { t } = useLingui();
   const { provider, label } = config;
   const providerInput = provider as "plex" | "jellyfin" | "emby" | "sonarr" | "radarr";
-  const [usernameDraft, setUsernameDraft] = useState(connection?.serverUsername ?? "");
-  const usernameChanged = usernameDraft.trim() !== (connection?.serverUsername ?? "");
+  const savedUsername = connection?.serverUsername ?? "";
+  // null = not editing: the field follows the saved value (after a save, reconnect, or refetch).
+  const [usernameDraft, setUsernameDraft] = useState<string | null>(null);
+  const usernameValue = usernameDraft ?? savedUsername;
+  const usernameChanged = usernameValue.trim() !== savedUsername;
 
   const connectMutation = useMutation(
     orpc.account.integrations.create.mutationOptions({
       onSuccess: (result) => {
         setConnections((prev) => [...prev, { ...result, recentEvents: [] }]);
-        setUsernameDraft(result.serverUsername ?? "");
         toast.success(t`${label} connected`);
       },
       onError: () => toast.error(t`Failed to connect ${label}`),
@@ -132,7 +134,10 @@ export function IntegrationCard({
             c.provider === provider ? { ...c, serverUsername: result.serverUsername } : c,
           ),
         );
-        setUsernameDraft(result.serverUsername ?? "");
+        // Stop editing only if nothing new was typed while the save was in flight.
+        setUsernameDraft(
+          (draft) => (draft !== null && draft.trim() === (result.serverUsername ?? "") ? null : draft),
+        );
         toast.success(t`${label} user saved`);
       },
       onError: () => toast.error(t`Failed to save ${label} user`),
@@ -142,7 +147,7 @@ export function IntegrationCard({
   function handleUsernameSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!usernameChanged || usernameMutation.isPending) return;
-    usernameMutation.mutate({ provider: providerInput, serverUsername: usernameDraft.trim() });
+    usernameMutation.mutate({ provider: providerInput, serverUsername: usernameValue.trim() });
   }
 
   const [copied, setCopied] = useState(false);
@@ -247,7 +252,7 @@ export function IntegrationCard({
                         <div className="flex items-center gap-2">
                           <Input
                             id={`${config.provider}-username`}
-                            value={usernameDraft}
+                            value={usernameValue}
                             maxLength={100}
                             autoComplete="off"
                             spellCheck={false}

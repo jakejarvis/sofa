@@ -103,17 +103,18 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
   );
 
   const savedUsername = connection?.serverUsername ?? "";
-  const [usernameDraft, setUsernameDraft] = useState(savedUsername);
-  const usernameChanged = usernameDraft.trim() !== savedUsername;
-
-  // Follow the saved value when it changes (after a save, reconnect, or refetch).
-  useEffect(() => {
-    setUsernameDraft(savedUsername);
-  }, [savedUsername]);
+  // null = not editing: the field follows the saved value (after a save, reconnect, or refetch).
+  const [usernameDraft, setUsernameDraft] = useState<string | null>(null);
+  const usernameValue = usernameDraft ?? savedUsername;
+  const usernameChanged = usernameValue.trim() !== savedUsername;
 
   const { mutate: saveUsername, isPending: isSavingUsername } = useMutation(
     orpc.account.integrations.create.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (result) => {
+        // Stop editing only if nothing new was typed while the save was in flight.
+        setUsernameDraft(
+          (draft) => (draft !== null && draft.trim() === (result.serverUsername ?? "") ? null : draft),
+        );
         toast.success(t`${label} user saved`);
         queryClient.invalidateQueries({ queryKey: orpc.account.integrations.key() });
       },
@@ -123,8 +124,8 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
 
   const handleSaveUsername = useCallback(() => {
     if (!usernameChanged || isSavingUsername) return;
-    saveUsername({ provider: providerInput, serverUsername: usernameDraft.trim() });
-  }, [isSavingUsername, providerInput, saveUsername, usernameChanged, usernameDraft]);
+    saveUsername({ provider: providerInput, serverUsername: usernameValue.trim() });
+  }, [isSavingUsername, providerInput, saveUsername, usernameChanged, usernameValue]);
 
   const { mutate: regenerateToken, isPending: isRegenerating } = useMutation(
     orpc.account.integrations.regenerateToken.mutationOptions({
@@ -279,7 +280,7 @@ export function IntegrationCard({ config, connection }: IntegrationCardProps) {
                   </Label>
                   <View className="flex-row items-center gap-2">
                     <Input
-                      value={usernameDraft}
+                      value={usernameValue}
                       onChangeText={setUsernameDraft}
                       onSubmitEditing={handleSaveUsername}
                       placeholder={t`Everyone on the server`}
