@@ -1,7 +1,31 @@
-import { and, eq, gte, lt } from "drizzle-orm";
+import { and, desc, eq, gte, lt } from "drizzle-orm";
 
 import { db } from "../client";
-import { integrationEvents, integrations, userEpisodeWatches, userMovieWatches } from "../schema";
+import {
+  integrationEvents,
+  integrations,
+  titles,
+  userEpisodeWatches,
+  userMovieWatches,
+  userTitleStatus,
+} from "../schema";
+
+/** TV shows in a user's library (any status), most recently updated first. */
+export function getLibraryShows(userId: string) {
+  return db
+    .select({
+      tmdbId: titles.tmdbId,
+      title: titles.title,
+      originalTitle: titles.originalTitle,
+      status: userTitleStatus.status,
+      updatedAt: userTitleStatus.updatedAt,
+    })
+    .from(userTitleStatus)
+    .innerJoin(titles, eq(titles.id, userTitleStatus.titleId))
+    .where(and(eq(userTitleStatus.userId, userId), eq(titles.type, "tv")))
+    .orderBy(desc(userTitleStatus.updatedAt))
+    .all();
+}
 
 export function getRecentMovieWatch(userId: string, titleId: string, since: Date) {
   return db

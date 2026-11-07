@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
@@ -35,6 +36,7 @@ export interface IntegrationConnection {
   type: "webhook" | "list";
   token: string;
   enabled: boolean;
+  serverUsername: string | null;
   lastEventAt: string | null;
   recentEvents: {
     id: string;
@@ -78,6 +80,11 @@ export function IntegrationCard({
   const { t } = useLingui();
   const { provider, label } = config;
   const providerInput = provider as "plex" | "jellyfin" | "emby" | "sonarr" | "radarr";
+  const savedUsername = connection?.serverUsername ?? "";
+  // null = not editing: the field follows the saved value (after a save, reconnect, or refetch).
+  const [usernameDraft, setUsernameDraft] = useState<string | null>(null);
+  const usernameValue = usernameDraft ?? savedUsername;
+  const usernameChanged = usernameValue.trim() !== savedUsername;
 
   const connectMutation = useMutation(
     orpc.account.integrations.create.mutationOptions({
@@ -118,6 +125,31 @@ export function IntegrationCard({
       onError: () => toast.error(t`Failed to regenerate ${label} URL`),
     }),
   );
+
+  const usernameMutation = useMutation(
+    orpc.account.integrations.create.mutationOptions({
+      onSuccess: (result) => {
+        setConnections((prev) =>
+          prev.map((c) =>
+            c.provider === provider ? { ...c, serverUsername: result.serverUsername } : c,
+          ),
+        );
+        // Stop editing only if nothing new was typed while the save was in flight.
+        setUsernameDraft(
+          (draft) => (draft !== null && draft.trim() === (result.serverUsername ?? "") ? null : draft),
+        );
+        toast.success(t`${label} user saved`);
+      },
+      onError: () => toast.error(t`Failed to save ${label} user`),
+    }),
+  );
+
+  function handleUsernameSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!usernameChanged || usernameMutation.isPending) return;
+    usernameMutation.mutate({ provider: providerInput, serverUsername: usernameValue.trim() });
+  }
+
   const [copied, setCopied] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
@@ -208,6 +240,42 @@ export function IntegrationCard({
                         </InputGroupAddon>
                       </InputGroup>
                     </div>
+
+                    {connection.type === "webhook" && (
+                      <form onSubmit={handleUsernameSubmit}>
+                        <Label
+                          htmlFor={`${config.provider}-username`}
+                          className="text-muted-foreground mb-1"
+                        >
+                          <Trans>{label} user</Trans>
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            id={`${config.provider}-username`}
+                            value={usernameValue}
+                            maxLength={100}
+                            autoComplete="off"
+                            spellCheck={false}
+                            placeholder={t`Everyone on the server`}
+                            onChange={(e) => setUsernameDraft(e.target.value)}
+                          />
+                          <Button
+                            type="submit"
+                            variant="outline"
+                            size="sm"
+                            disabled={!usernameChanged || usernameMutation.isPending}
+                          >
+                            <Trans>Save</Trans>
+                          </Button>
+                        </div>
+                        <p className="text-muted-foreground mt-1 text-xs">
+                          <Trans>
+                            Only log what this {label} user watches. Leave it empty to log watches
+                            from everyone on the server.
+                          </Trans>
+                        </p>
+                      </form>
+                    )}
 
                     <div className="flex items-center gap-2">
                       <Button

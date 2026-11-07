@@ -26,6 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { Season } from "@sofa/api/schemas";
 import { formatShortDate } from "@sofa/i18n/format";
 
+import { LogWatchDialog } from "./log-watch-dialog";
 import { useTitleContext, useTitleUserInfo } from "./title-context";
 import { useTitleActions } from "./use-title-actions";
 
@@ -61,6 +62,11 @@ export function TitleSeasons({
 } = {}) {
   const { t } = useLingui();
   const { seasons, setSeasons, watchingEp } = useTitleContext();
+
+  /** "S1 E3 · Pilot" (or "S1 E3" when unnamed); same messages as the history list. */
+  function episodeLabel(season: number, episode: number, name: string | null) {
+    return name ? t`S${season} E${episode} · ${name}` : t`S${season} E${episode}`;
+  }
   const { episodeWatches, userStatus } = useTitleUserInfo();
 
   // When seasons are streamed via Suspense, sync them into context
@@ -176,7 +182,7 @@ export function TitleSeasons({
                         e.stopPropagation();
                         handleMarkSeason(season);
                       }}
-                      className="text-primary hover:bg-primary/10 hover:text-primary tracking-wider uppercase sm:hidden sm:w-24 sm:group-hover/season:block"
+                      className="text-primary hover:bg-primary/10 hover:text-primary tracking-wider uppercase sm:hidden sm:min-w-24 sm:group-hover/season:block"
                     >
                       <IconChecks aria-hidden={true} className="size-3.5 sm:hidden" />
                       <span className="hidden sm:inline">
@@ -192,7 +198,7 @@ export function TitleSeasons({
                         e.stopPropagation();
                         handleUnmarkSeason(season);
                       }}
-                      className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive tracking-wider uppercase sm:hidden sm:w-24 sm:group-hover/season:block"
+                      className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive tracking-wider uppercase sm:hidden sm:min-w-24 sm:group-hover/season:block"
                     >
                       <IconChecks aria-hidden={true} className="size-3.5 sm:hidden" />
                       <span className="hidden sm:inline">
@@ -328,6 +334,15 @@ export function TitleSeasons({
                                 </p>
                               )}
                             </div>
+                            <LogWatchDialog
+                              kind="episode"
+                              id={ep.id}
+                              episodeLabel={episodeLabel(
+                                season.seasonNumber,
+                                ep.episodeNumber,
+                                ep.name,
+                              )}
+                            />
                           </div>
                         </div>
                       );

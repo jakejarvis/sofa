@@ -22,6 +22,12 @@ The webhook URL looks like:
 https://sofa.example.com/api/webhooks/{token}
 ```
 
+## Only your watches
+
+Plex sends webhooks for **everyone** who plays something on servers tied to your Plex account, including friends and Home users. If other people use your server, type your Plex username in **Settings → Integrations → Plex → Plex user** and click **Save**. Sofa then ignores anything played by other accounts, and doesn't record what they watched.
+
+Everyone with their own Sofa account can connect Plex with their own URL and username. Leave the field empty to log watches from every user.
+
 ## How It Works
 
 When you finish watching something on Plex, it sends a `media.scrobble` event to Sofa. Sofa then:
@@ -42,4 +48,5 @@ If watches aren't being logged, check the event log in **Settings → Integratio
 
 - **"Could not resolve TMDB ID"** — the media's external IDs don't map to a TMDB entry. This is rare but can happen with obscure titles.
 - **"Season/episode not found"** — the show's season data hasn't been loaded yet. Try searching for the show in Sofa first.
+- **"Played by another plex user"** — the watch came from a different Plex account than the one in the **Plex user** field. Check the spelling of your username (case doesn't matter).
 - **No events appearing** — verify the webhook URL is correct in Plex settings and that your Sofa server is reachable from the Plex server.

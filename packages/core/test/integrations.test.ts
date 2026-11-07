@@ -53,6 +53,37 @@ describe("createOrUpdateIntegration", () => {
     const result = createOrUpdateIntegration("user-1", "jellyfin", false);
     expect(result.enabled).toBe(false);
   });
+
+  test("has no username filter by default", () => {
+    const result = createOrUpdateIntegration("user-1", "plex");
+    expect(result.serverUsername).toBeNull();
+  });
+
+  test("saves a trimmed media server username", () => {
+    const result = createOrUpdateIntegration("user-1", "plex", undefined, "  christian  ");
+    expect(result.serverUsername).toBe("christian");
+  });
+
+  test("updates and clears the username without touching enabled", () => {
+    createOrUpdateIntegration("user-1", "jellyfin", false);
+    const updated = createOrUpdateIntegration("user-1", "jellyfin", undefined, "ana");
+    expect(updated.serverUsername).toBe("ana");
+    expect(updated.enabled).toBe(false);
+
+    const cleared = createOrUpdateIntegration("user-1", "jellyfin", undefined, "   ");
+    expect(cleared.serverUsername).toBeNull();
+  });
+
+  test("keeps the username when only enabled changes", () => {
+    createOrUpdateIntegration("user-1", "emby", true, "ana");
+    const updated = createOrUpdateIntegration("user-1", "emby", false);
+    expect(updated.serverUsername).toBe("ana");
+  });
+
+  test("ignores a username for list integrations", () => {
+    const result = createOrUpdateIntegration("user-1", "sonarr", undefined, "ana");
+    expect(result.serverUsername).toBeNull();
+  });
 });
 
 describe("listUserIntegrations", () => {

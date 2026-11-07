@@ -25,6 +25,10 @@ The webhook URL looks like:
 https://sofa.example.com/api/webhooks/{token}
 ```
 
+## Only your watches
+
+If other people use your Emby server, type your Emby username in **Settings → Integrations → Emby → Emby user** and click **Save**. Sofa then ignores anything played by other users (it reads the user from the payload's `User.Name` field). Leave the field empty to log watches from every user.
+
 ## How It Works
 
 When you finish watching something on Emby, it sends a `playback.stop` event to Sofa. Sofa only processes events where `PlayedToCompletion` is `true`.

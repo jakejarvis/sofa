@@ -6,7 +6,7 @@ import {
   getUserIntegrations,
   insertIntegration,
   regenerateIntegrationToken,
-  updateIntegrationEnabled,
+  updateIntegrationSettings,
 } from "@sofa/db/queries/integrations";
 
 const LIST_PROVIDERS = new Set(["sonarr", "radarr"]);
@@ -27,9 +27,11 @@ function serializeIntegration(row: {
   enabled: boolean;
   lastEventAt: Date | null;
   createdAt: Date;
+  serverUsername: string | null;
 }) {
   return {
     ...row,
+    serverUsername: row.serverUsername ?? null,
     lastEventAt: row.lastEventAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
   };
@@ -58,12 +60,30 @@ export function listUserIntegrations(userId: string) {
   return { integrations: result };
 }
 
-export function createOrUpdateIntegration(userId: string, provider: string, enabled?: boolean) {
+/** Trim a media server username; blank means "no filter". */
+export function normalizeServerUsername(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+}
+
+export function createOrUpdateIntegration(
+  userId: string,
+  provider: string,
+  enabled?: boolean,
+  serverUsername?: string | null,
+) {
   const existing = getIntegrationByUserAndProvider(userId, provider);
+  // The username filter only applies to webhook (media server) integrations.
+  const acceptsUsername = integrationTypeFor(provider) === "webhook";
 
   if (existing) {
-    if (enabled !== undefined) {
-      const row = updateIntegrationEnabled(existing.id, enabled);
+    const changes: { enabled?: boolean; serverUsername?: string | null } = {};
+    if (enabled !== undefined) changes.enabled = enabled;
+    if (serverUsername !== undefined && acceptsUsername) {
+      changes.serverUsername = normalizeServerUsername(serverUsername);
+    }
+    if (Object.keys(changes).length > 0) {
+      const row = updateIntegrationSettings(existing.id, changes);
       return serializeIntegration(row);
     }
     return serializeIntegration(existing);
@@ -75,6 +95,7 @@ export function createOrUpdateIntegration(userId: string, provider: string, enab
     type: integrationTypeFor(provider),
     token: generateToken(),
     enabled: enabled ?? true,
+    serverUsername: acceptsUsername ? normalizeServerUsername(serverUsername) : null,
     createdAt: new Date(),
   });
 

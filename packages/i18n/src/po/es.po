@@ -4010,3 +4010,40 @@ msgstr "Tu nombre"
 #: apps/web/src/components/auth-form.tsx
 msgid "Your name…"
 msgstr "Tu nombre…"
+
+#: apps/native/src/components/settings/integration-card.tsx
+#: apps/web/src/components/settings/integration-card.tsx
+msgid "{label} user"
+msgstr "Usuario de {label}"
+
+#: apps/native/src/components/settings/integration-card.tsx
+#: apps/web/src/components/settings/integration-card.tsx
+msgid "{label} user saved"
+msgstr "Usuario de {label} guardado"
+
+#: apps/native/src/components/settings/integration-card.tsx
+#: apps/web/src/components/settings/integration-card.tsx
+msgid "Failed to save {label} user"
+msgstr "No se pudo guardar el usuario de {label}"
+
+#: apps/native/src/components/settings/integration-card.tsx
+#: apps/web/src/components/settings/integration-card.tsx
+msgid "Everyone on the server"
+msgstr "Todos en el servidor"
+
+#: apps/native/src/components/settings/integration-card.tsx
+#: apps/web/src/components/settings/integration-card.tsx
+msgid "Only log what this {label} user watches. Leave it empty to log watches from everyone on the server."
+msgstr "Solo registra lo que ve este usuario de {label}. Déjalo vacío para registrar lo que vea cualquier persona del servidor."
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch of {episodeLabel} on a date…"
+msgstr "Registrar {episodeLabel} en una fecha…"
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Log a watch on a date…"
+msgstr "Registrar en una fecha…"
+
+#: apps/web/src/components/titles/log-watch-dialog.tsx
+msgid "Record when you watched {episodeLabel}."
+msgstr "Indica cuándo viste {episodeLabel}."

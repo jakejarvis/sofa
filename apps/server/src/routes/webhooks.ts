@@ -50,7 +50,9 @@ app.post("/:token", async (c) => {
       return c.json({ ok: true });
     }
 
-    await processWebhook(connection.id, connection.userId, provider, event);
+    await processWebhook(connection.id, connection.userId, provider, event, {
+      serverUsername: connection.serverUsername,
+    });
   } catch (err) {
     // Swallow errors — never return non-200 to media servers
     log.warn("Webhook processing failed:", err);

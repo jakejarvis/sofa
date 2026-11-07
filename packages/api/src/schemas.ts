@@ -217,6 +217,14 @@ export const CreateIntegrationInput = z
       .boolean()
       .optional()
       .describe("Whether the integration starts enabled (default: true)"),
+    serverUsername: z
+      .string()
+      .max(100)
+      .nullable()
+      .optional()
+      .describe(
+        "Only log watches played by this media server user (Plex/Jellyfin/Emby). Empty or null logs watches from every user. Ignored for list integrations (Sonarr/Radarr).",
+      ),
   })
   .meta({ description: "Create a new media server integration" });
 
@@ -1004,6 +1012,10 @@ export const IntegrationSchema = z
       .describe("Integration type: webhook (Plex/Jellyfin/Emby) or list (Sonarr/Radarr)"),
     token: z.string().describe("Webhook authentication token"),
     enabled: z.boolean().describe("Whether the integration is active"),
+    serverUsername: z
+      .string()
+      .nullable()
+      .describe("Media server user whose watches are logged (null = every user)"),
     lastEventAt: z.string().nullable().describe("Last received event timestamp (ISO 8601)"),
     createdAt: z.string().describe("When the integration was created (ISO 8601)"),
   })

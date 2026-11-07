@@ -1,16 +1,24 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { episodes } from "@sofa/db/schema";
+import {
+  episodes,
+  integrationEvents,
+  userEpisodeWatches,
+  userMovieWatches,
+} from "@sofa/db/schema";
 import {
   clearAllTables,
   insertIntegration,
   insertMovieWatch,
+  insertStatus,
   insertTvShow,
   insertUser,
   testDb,
 } from "@sofa/test/db";
 
 import {
+  matchesServerUsername,
+  normalizeShowTitle,
   parseEmbyPayload,
   parseJellyfinPayload,
   parsePlexPayload,
@@ -19,18 +27,25 @@ import {
   type WebhookEvent,
 } from "../src/webhooks";
 
-const { mockResolveMovieTmdbId, mockResolveShowTmdbId } = vi.hoisted(() => ({
-  mockResolveMovieTmdbId: vi.fn<() => Promise<number | null>>(async () => null),
-  mockResolveShowTmdbId: vi.fn<() => Promise<number | null>>(async () => null),
-}));
+const { mockResolveMovieTmdbId, mockResolveShowTmdbId, mockResolveEpisodeByExternalIds } =
+  vi.hoisted(() => ({
+    mockResolveMovieTmdbId: vi.fn<() => Promise<number | null>>(async () => null),
+    mockResolveShowTmdbId: vi.fn<() => Promise<number | null>>(async () => null),
+    mockResolveEpisodeByExternalIds: vi.fn<
+      () => Promise<{ showTmdbId: number; seasonNumber: number; episodeNumber: number } | null>
+    >(async () => null),
+  }));
 
 vi.mock("../src/imports/resolve", () => ({
   resolveMovieTmdbId: mockResolveMovieTmdbId,
   resolveShowTmdbId: mockResolveShowTmdbId,
+  resolveEpisodeByExternalIds: mockResolveEpisodeByExternalIds,
 }));
 
 const { mockGetOrFetchTitleByTmdbId, mockRefreshTvChildren } = vi.hoisted(() => ({
-  mockGetOrFetchTitleByTmdbId: vi.fn<() => Promise<{ id: string } | null>>(async () => null),
+  mockGetOrFetchTitleByTmdbId: vi.fn<
+    (tmdbId?: number, type?: string) => Promise<{ id: string } | null>
+  >(async () => null),
   mockRefreshTvChildren: vi.fn<() => Promise<void>>(async () => {}),
 }));
 
@@ -53,6 +68,7 @@ beforeEach(() => {
   clearAllTables();
   mockResolveMovieTmdbId.mockReset().mockResolvedValue(null);
   mockResolveShowTmdbId.mockReset().mockResolvedValue(null);
+  mockResolveEpisodeByExternalIds.mockReset().mockResolvedValue(null);
   mockGetOrFetchTitleByTmdbId.mockReset().mockResolvedValue(null);
   mockRefreshTvChildren.mockReset();
   mockGetTvDetails.mockReset().mockResolvedValue({ number_of_seasons: 1 });
@@ -577,8 +593,12 @@ describe("processWebhook", () => {
     const result = await processWebhook(connectionId, userId, "plex", event);
 
     expect(result.status).toBe("success");
+    // The episode's own IDs are looked up as an episode; the episode TMDB ID is never used.
+    expect(mockResolveEpisodeByExternalIds).toHaveBeenCalledWith({
+      imdbId: "tt35740476",
+      tvdbId: "11560129",
+    });
     expect(mockResolveShowTmdbId).toHaveBeenCalledWith({
-      tmdbId: undefined,
       imdbId: "tt35740476",
       tvdbId: "11560129",
       title: "The Pitt",
@@ -696,5 +716,201 @@ describe("processWebhook", () => {
 
     const result = await processWebhook(connectionId, userId, "plex", event);
     expect(result.status).toBe("error");
+  });
+});
+
+// ─── Media server user filter ───────────────────────────────────────
+
+describe("media server usernames", () => {
+  test("reads the Plex account that played the item", () => {
+    const result = parsePlexPayload(
+      makePlexForm({
+        event: "media.scrobble",
+        Account: { id: 1, title: "christian" },
+        Metadata: { type: "movie", title: "Inception", Guid: [{ id: "tmdb://27205" }] },
+      }),
+    );
+    expect(result?.username).toBe("christian");
+  });
+
+  test("reads the Jellyfin notification user", () => {
+    const result = parseJellyfinPayload({
+      NotificationType: "PlaybackStop",
+      PlayedToCompletion: true,
+      ItemType: "Movie",
+      Name: "The Matrix",
+      NotificationUsername: "ana",
+    });
+    expect(result?.username).toBe("ana");
+  });
+
+  test("reads the Emby user", () => {
+    const result = parseEmbyPayload({
+      Event: "playback.stop",
+      PlayedToCompletion: true,
+      User: { Name: "luis" },
+      Item: { Type: "Movie", Name: "Interstellar", ProviderIds: { Tmdb: "157336" } },
+    });
+    expect(result?.username).toBe("luis");
+  });
+
+  test("leaves the username undefined when the payload has none", () => {
+    const result = parseJellyfinPayload({
+      NotificationType: "PlaybackStop",
+      PlayedToCompletion: true,
+      ItemType: "Movie",
+      Name: "The Matrix",
+    });
+    expect(result?.username).toBeUndefined();
+  });
+
+  test("matchesServerUsername accepts everyone without a filter", () => {
+    expect(matchesServerUsername(null, "anyone")).toBe(true);
+    expect(matchesServerUsername("  ", undefined)).toBe(true);
+  });
+
+  test("matchesServerUsername compares names case-insensitively", () => {
+    expect(matchesServerUsername("Christian", "christian")).toBe(true);
+    expect(matchesServerUsername(" christian ", "CHRISTIAN")).toBe(true);
+    expect(matchesServerUsername("christian", "ana")).toBe(false);
+    expect(matchesServerUsername("christian", undefined)).toBe(false);
+  });
+});
+
+describe("processWebhook with a username filter", () => {
+  const userId = "user-1";
+  let connectionId: string;
+
+  beforeEach(() => {
+    insertUser(userId);
+    connectionId = insertIntegration(userId, "plex", "plex-token").id;
+  });
+
+  test("ignores watches from another media server user without recording the title", async () => {
+    const event: WebhookEvent = {
+      provider: "plex",
+      mediaType: "movie",
+      title: "Someone Else's Movie",
+      tmdbId: 27205,
+      username: "ana",
+    };
+
+    const result = await processWebhook(connectionId, userId, "plex", event, {
+      serverUsername: "christian",
+    });
+    expect(result.status).toBe("ignored");
+    expect(mockResolveMovieTmdbId).not.toHaveBeenCalled();
+
+    const events = testDb.select().from(integrationEvents).all();
+    expect(events).toHaveLength(1);
+    expect(events[0]?.status).toBe("ignored");
+    expect(events[0]?.mediaTitle).toBeNull();
+  });
+
+  test("ignores events without a user when a filter is set", async () => {
+    const event: WebhookEvent = {
+      provider: "jellyfin",
+      mediaType: "movie",
+      title: "The Matrix",
+      tmdbId: 603,
+    };
+
+    const result = await processWebhook(connectionId, userId, "jellyfin", event, {
+      serverUsername: "christian",
+    });
+    expect(result.status).toBe("ignored");
+  });
+
+  test("logs watches from the matching user", async () => {
+    const { insertTitle } = await import("@sofa/test/db");
+    insertTitle({ id: "title-1", tmdbId: 27205, type: "movie", title: "Inception" });
+    mockResolveMovieTmdbId.mockResolvedValue(27205);
+    mockGetOrFetchTitleByTmdbId.mockResolvedValue({ id: "title-1" });
+
+    const event: WebhookEvent = {
+      provider: "plex",
+      mediaType: "movie",
+      title: "Inception",
+      tmdbId: 27205,
+      username: "Christian",
+    };
+
+    const result = await processWebhook(connectionId, userId, "plex", event, {
+      serverUsername: "christian",
+    });
+    expect(result.status).toBe("success");
+
+    const watches = testDb.select().from(userMovieWatches).all();
+    expect(watches).toHaveLength(1);
+    expect(watches[0]?.titleId).toBe("title-1");
+    expect(watches[0]?.userId).toBe(userId);
+  });
+});
+
+describe("episode matching across numbering schemes", () => {
+  const userId = "user-1";
+  let connectionId: string;
+
+  beforeEach(() => {
+    insertUser(userId);
+    connectionId = insertIntegration(userId, "plex", "plex-token").id;
+  });
+
+  test("normalizeShowTitle treats ½ and 1/2 alike", () => {
+    expect(normalizeShowTitle("Ranma ½")).toBe("ranma12");
+    expect(normalizeShowTitle("Ranma1/2")).toBe("ranma12");
+    expect(normalizeShowTitle("Pokémon: Horizons")).toBe("pokemonhorizons");
+  });
+
+  test("uses TMDB's season and episode from the episode's own ID", async () => {
+    // TVDB/Plex call it S3E2; TMDB has the same episode as S1E14.
+    const { titleId, episodeIds } = insertTvShow("tv-ranma", 259140, 1, 14, { title: "Ranma1/2" });
+    mockResolveEpisodeByExternalIds.mockResolvedValue({
+      showTmdbId: 259140,
+      seasonNumber: 1,
+      episodeNumber: 14,
+    });
+    mockGetOrFetchTitleByTmdbId.mockResolvedValue({ id: titleId });
+
+    const event: WebhookEvent = {
+      provider: "plex",
+      mediaType: "episode",
+      title: "Galletas de la Rosa Negra",
+      showTitle: "Ranma1/2",
+      tvdbId: "10000001",
+      seasonNumber: 3,
+      episodeNumber: 2,
+    };
+
+    const result = await processWebhook(connectionId, userId, "plex", event);
+    expect(result.status).toBe("success");
+    expect(mockResolveShowTmdbId).not.toHaveBeenCalled();
+
+    const watches = testDb.select().from(userEpisodeWatches).all();
+    expect(watches.map((w) => w.episodeId)).toEqual([episodeIds[13]]);
+  });
+
+  test("prefers a show in the user's library over a title search", async () => {
+    insertTvShow("tv-1989", 57706, 1, 3, { title: "Ranma ½" });
+    const { titleId } = insertTvShow("tv-2024", 259140, 1, 3, { title: "Ranma1/2" });
+    insertStatus(userId, titleId, "in_progress");
+    mockResolveShowTmdbId.mockResolvedValue(57706);
+    mockGetOrFetchTitleByTmdbId.mockImplementation(async (tmdbId?: number) =>
+      tmdbId === 259140 ? { id: "tv-2024" } : { id: "tv-1989" },
+    );
+
+    const event: WebhookEvent = {
+      provider: "plex",
+      mediaType: "episode",
+      title: "Episode",
+      showTitle: "Ranma ½",
+      seasonNumber: 1,
+      episodeNumber: 2,
+    };
+
+    const result = await processWebhook(connectionId, userId, "plex", event);
+    expect(result.status).toBe("success");
+    expect(mockResolveShowTmdbId).not.toHaveBeenCalled();
+    expect(mockGetOrFetchTitleByTmdbId).toHaveBeenCalledWith(259140, "tv");
   });
 });

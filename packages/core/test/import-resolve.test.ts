@@ -2,7 +2,11 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 
 import * as tmdbClient from "@sofa/tmdb/client";
 
-import { resolveMovieTmdbId, resolveShowTmdbId } from "../src/imports/resolve";
+import {
+  resolveEpisodeByExternalIds,
+  resolveMovieTmdbId,
+  resolveShowTmdbId,
+} from "../src/imports/resolve";
 
 // The TMDB client functions (findByExternalId, searchMovies, searchTv) are
 // called by the resolve functions. We spy on them directly rather than on
@@ -329,5 +333,57 @@ describe("resolveShowTmdbId", () => {
     const second = await resolveShowTmdbId({ imdbId: "tt8888888" }, cache);
     expect(second).toBe(950);
     expect(findSpy).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ── resolveEpisodeByExternalIds ─────────────────────────────────────
+
+describe("resolveEpisodeByExternalIds", () => {
+  test("returns TMDB's show and numbering for an episode hit", async () => {
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId").mockResolvedValue({
+      movie_results: [],
+      tv_results: [],
+      tv_episode_results: [{ show_id: 259140, season_number: 1, episode_number: 29 }],
+    } as never);
+
+    const result = await resolveEpisodeByExternalIds({ tvdbId: "10000001" });
+    expect(result).toEqual({ showTmdbId: 259140, seasonNumber: 1, episodeNumber: 29 });
+    expect(findSpy).toHaveBeenCalledWith("10000001", "tvdb_id");
+  });
+
+  test("falls through to IMDb when TVDB has no episode", async () => {
+    findSpy = vi
+      .spyOn(tmdbClient, "findByExternalId")
+      .mockResolvedValueOnce({
+        movie_results: [],
+        tv_results: [],
+        tv_episode_results: [],
+      } as never)
+      .mockResolvedValueOnce({
+        movie_results: [],
+        tv_results: [],
+        tv_episode_results: [{ show_id: 1396, season_number: 2, episode_number: 5 }],
+      } as never);
+
+    const result = await resolveEpisodeByExternalIds({ tvdbId: 42, imdbId: "tt0000042" });
+    expect(result).toEqual({ showTmdbId: 1396, seasonNumber: 2, episodeNumber: 5 });
+    expect(findSpy).toHaveBeenNthCalledWith(1, "42", "tvdb_id");
+    expect(findSpy).toHaveBeenNthCalledWith(2, "tt0000042", "imdb_id");
+  });
+
+  test("returns null when a lookup throws and no other ID matches", async () => {
+    findSpy = vi
+      .spyOn(tmdbClient, "findByExternalId")
+      .mockRejectedValue(new Error("TMDB unavailable"));
+
+    const result = await resolveEpisodeByExternalIds({ tvdbId: 42 });
+    expect(result).toBeNull();
+  });
+
+  test("returns null without any IDs", async () => {
+    findSpy = vi.spyOn(tmdbClient, "findByExternalId");
+
+    expect(await resolveEpisodeByExternalIds({})).toBeNull();
+    expect(findSpy).not.toHaveBeenCalled();
   });
 });
