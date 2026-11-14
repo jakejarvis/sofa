@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-07-12 21:31\n"
+"PO-Revision-Date: 2026-10-07 12:28\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -1301,7 +1301,7 @@ msgstr "비밀번호 변경 실패"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Failed to connect"
-#~ msgstr "연결 실패"
+#~ msgstr ""
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -1509,7 +1509,7 @@ msgstr "{source}에서 가져오기가 완료되었습니다."
 
 #: apps/web/src/components/settings/account-section.tsx
 #~ msgid "Finished importing your Sofa export."
-#~ msgstr "Sofa 내보내기 가져오기가 완료되었습니다."
+#~ msgstr "Finished importing your Sofa export."
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Free"
@@ -1724,7 +1724,7 @@ msgstr "Sofa 내보내기에서 {importedCount}개의 항목을 가져왔습니�
 
 #: apps/web/src/components/settings/account-section.tsx
 #~ msgid "Importing data"
-#~ msgstr "데이터 가져오는 중"
+#~ msgstr "Importing data"
 
 #: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Importing from {source}"
@@ -1848,7 +1848,7 @@ msgstr "마지막 이벤트 {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #~ msgid "Last event {timeAgo}"
-#~ msgstr "마지막 이벤트 {timeAgo}"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/integration-card.tsx
 #~ msgid "Last polled {0}"
@@ -1860,7 +1860,7 @@ msgstr "마지막 폴링 {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #~ msgid "Last polled {timeAgo}"
-#~ msgstr "마지막 폴링 {timeAgo}"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Last run"
@@ -1974,7 +1974,7 @@ msgstr "에피소드 시청함으로 표시"
 #. placeholder {1}: nextEpisode.episodeNumber
 #: apps/web/src/components/dashboard/continue-watching-card.tsx
 #~ msgid "Mark S{0} E{1} watched"
-#~ msgstr ""
+#~ msgstr "Mark S{0} E{1} watched"
 
 #: apps/web/src/components/dashboard/continue-watching-card.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
@@ -2702,7 +2702,7 @@ msgstr "평점이 삭제되었습니다"
 
 #: apps/native/src/components/ui/star-rating.tsx
 #~ msgid "Rating: {rating} out of 5 stars"
-#~ msgstr "평점: 5점 만점에 {rating}점"
+#~ msgstr "Rating: {rating} out of 5 stars"
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
@@ -2892,7 +2892,7 @@ msgstr "Emby Server 4.7.9+ 및 활성 Emby Premiere 라이선스가 필요합니
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Restart"
-#~ msgstr "재시작"
+#~ msgstr "Restart"
 
 #: apps/native/src/components/root-error-fallback.tsx
 msgid "Restart app"
@@ -2900,7 +2900,7 @@ msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Restart Required"
-#~ msgstr "재시작 필요"
+#~ msgstr "Restart Required"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Restore"
@@ -3247,7 +3247,7 @@ msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Sofa needs to restart to apply the new layout direction."
-#~ msgstr "Sofa를 재시작해야 새 레이아웃 방향이 적용됩니다."
+#~ msgstr "Sofa needs to restart to apply the new layout direction."
 
 #: apps/web/src/routes/setup.tsx
 msgid "Sofa uses <0>The Movie Database{linkIcon}</0> for movie & TV metadata, posters, and streaming availability. You'll need a free API key to get started."
@@ -4010,3 +4010,4 @@ msgstr "이름"
 #: apps/web/src/components/auth-form.tsx
 msgid "Your name…"
 msgstr "이름…"
+
