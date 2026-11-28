@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: sofa\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-07-12 21:31\n"
+"PO-Revision-Date: 2026-10-07 12:28\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -1301,7 +1301,7 @@ msgstr "修改密码失败"
 
 #: apps/web/src/components/settings/imports-section.tsx
 #~ msgid "Failed to connect"
-#~ msgstr "连接失败"
+#~ msgstr ""
 
 #: apps/native/src/components/settings/integration-card.tsx
 #: apps/web/src/components/settings/integration-card.tsx
@@ -1509,7 +1509,7 @@ msgstr "已完成从 {source} 导入。"
 
 #: apps/web/src/components/settings/account-section.tsx
 #~ msgid "Finished importing your Sofa export."
-#~ msgstr "已完成导入您的 Sofa 导出文件。"
+#~ msgstr "Finished importing your Sofa export."
 
 #: apps/web/src/components/titles/title-availability.tsx
 #~ msgid "Free"
@@ -1724,7 +1724,7 @@ msgstr "已从 Sofa 导出文件导入 {importedCount} 个条目"
 
 #: apps/web/src/components/settings/account-section.tsx
 #~ msgid "Importing data"
-#~ msgstr "正在导入数据"
+#~ msgstr "Importing data"
 
 #: apps/web/src/components/settings/import-dialog-parts.tsx
 msgid "Importing from {source}"
@@ -1848,7 +1848,7 @@ msgstr "最近事件 {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #~ msgid "Last event {timeAgo}"
-#~ msgstr "最近事件 {timeAgo}"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/integration-card.tsx
 #~ msgid "Last polled {0}"
@@ -1860,7 +1860,7 @@ msgstr "最近轮询 {relativeTime}"
 
 #: apps/native/src/components/settings/integration-configs.ts
 #~ msgid "Last polled {timeAgo}"
-#~ msgstr "最近轮询 {timeAgo}"
+#~ msgstr ""
 
 #: apps/web/src/components/settings/system-health-section.tsx
 msgid "Last run"
@@ -1974,7 +1974,7 @@ msgstr "标记剧集为已观看"
 #. placeholder {1}: nextEpisode.episodeNumber
 #: apps/web/src/components/dashboard/continue-watching-card.tsx
 #~ msgid "Mark S{0} E{1} watched"
-#~ msgstr ""
+#~ msgstr "Mark S{0} E{1} watched"
 
 #: apps/web/src/components/dashboard/continue-watching-card.tsx
 #: apps/web/src/components/dashboard/upcoming-item.tsx
@@ -2702,7 +2702,7 @@ msgstr "评分已删除"
 
 #: apps/native/src/components/ui/star-rating.tsx
 #~ msgid "Rating: {rating} out of 5 stars"
-#~ msgstr "评分：{rating} / 5 星"
+#~ msgstr "Rating: {rating} out of 5 stars"
 
 #: apps/web/src/components/settings/account-section.tsx
 #: apps/web/src/components/settings/imports-section.tsx
@@ -2892,7 +2892,7 @@ msgstr "需要 Emby Server 4.7.9+ 以及有效的 Emby Premiere 授权。"
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Restart"
-#~ msgstr "重启"
+#~ msgstr "Restart"
 
 #: apps/native/src/components/root-error-fallback.tsx
 msgid "Restart app"
@@ -2900,7 +2900,7 @@ msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Restart Required"
-#~ msgstr "需要重启"
+#~ msgstr "Restart Required"
 
 #: apps/web/src/components/settings/backup-restore-section.tsx
 msgid "Restore"
@@ -3247,7 +3247,7 @@ msgstr ""
 
 #: apps/native/src/app/(tabs)/(settings)/index.tsx
 #~ msgid "Sofa needs to restart to apply the new layout direction."
-#~ msgstr "Sofa 需要重启以应用新的布局方向。"
+#~ msgstr "Sofa needs to restart to apply the new layout direction."
 
 #: apps/web/src/routes/setup.tsx
 msgid "Sofa uses <0>The Movie Database{linkIcon}</0> for movie & TV metadata, posters, and streaming availability. You'll need a free API key to get started."
@@ -4010,3 +4010,4 @@ msgstr "您的姓名"
 #: apps/web/src/components/auth-form.tsx
 msgid "Your name…"
 msgstr "您的名字…"
+
